@@ -16,6 +16,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Tenant\AssetRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Models\Central\AssetCategory;
+use App\Models\Central\CategoryType;
 
 class TenantAssetController extends Controller
 {
@@ -33,7 +34,7 @@ class TenantAssetController extends Controller
      */
     public function create()
     {
-        $categories = AssetCategory::all();
+        $categories = CategoryType::where('category', 'asset')->get();
         return Inertia::render('tenants/assets/create', ['categories' => $categories]);
     }
 
@@ -101,7 +102,7 @@ class TenantAssetController extends Controller
      */
     public function edit(Asset $asset)
     {
-        $categories = AssetCategory::all();
+        $categories = CategoryType::where('category', 'asset')->get();
         return Inertia::render('tenants/assets/create', ['asset' => $asset->load('assetCategory'), 'categories' => $categories]);
     }
 

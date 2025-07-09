@@ -8,6 +8,8 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Central\AdminLocationTypeController;
 use App\Http\Controllers\Central\AdminSiteTypeController;
 use App\Http\Controllers\Central\CentralAssetCategoryController;
+use App\Http\Controllers\Central\CentralCategoryTypeController;
+use App\Http\Controllers\Central\CentralDocumentTypeController;
 use App\Http\Controllers\Central\RegisterCentralTenantController;
 
 foreach (config('tenancy.central_domains') as $domain) {
@@ -40,7 +42,10 @@ foreach (config('tenancy.central_domains') as $domain) {
 
 
             Route::resource('location-types', AdminLocationTypeController::class)->parameters(['location-types' => 'locationType'])->names('central.locations');
+
             Route::resource('asset-categories', CentralAssetCategoryController::class)->parameters(['asset-categories' => 'assetCategory'])->names('central.assets');
+
+            Route::resource('category-types', CentralCategoryTypeController::class)->parameters(['category-types' => 'categoryType'])->names('central.types');
         });
     });
 }

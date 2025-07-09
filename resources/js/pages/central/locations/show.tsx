@@ -1,8 +1,8 @@
 import AppLayout from '@/layouts/central/app-layout';
-import { CentralType, type BreadcrumbItem } from '@/types';
+import { LocationType, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 
-export default function ShowCategoryType({ type }: { type: CentralType }) {
+export default function ShowType({ type }: { type: LocationType }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `${type.label}`,
@@ -12,11 +12,11 @@ export default function ShowCategoryType({ type }: { type: CentralType }) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Category type ${type.label}`} />
+            <Head title="Tenants" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <ul>
                     <li key={type.id}>
-                        {type.slug}
+                        {type.prefix} - {type.slug} - {type.level}
                         <ul>
                             {type.translations.map((translation) => (
                                 <li key={translation.id}>

@@ -24,8 +24,8 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
-        title: 'Asset categories',
-        href: route('central.assets.index'),
+        title: 'Category types',
+        href: route('central.types.index'),
         icon: LayoutGrid,
     },
     // {

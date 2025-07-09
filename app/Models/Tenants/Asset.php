@@ -5,6 +5,7 @@ namespace App\Models\Tenants;
 use App\Models\Central\AssetType;
 use App\Models\Tenants\Maintainable;
 use App\Models\Central\AssetCategory;
+use App\Models\Central\CategoryType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -66,7 +67,7 @@ class Asset extends Model
 
     public function assetCategory(): BelongsTo
     {
-        return $this->belongsTo(AssetCategory::class, 'asset_category_id');
+        return $this->belongsTo(CategoryType::class, 'category_type_id');
     }
 
     public function category($locale = null): Attribute

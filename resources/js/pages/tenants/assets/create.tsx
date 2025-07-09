@@ -210,11 +210,11 @@ export default function CreateAsset({ asset, categories }: { asset?: Asset; cate
                     >
                         {categories && categories.length > 0 && (
                             <>
-                                <option value="0" disabled>
+                                <option value="0" disabled className="bg-background text-foreground">
                                     Select an option
                                 </option>
                                 {categories?.map((category) => (
-                                    <option value={category.id} key={category.id}>
+                                    <option value={category.id} key={category.id} className="bg-background text-foreground">
                                         {category.label}
                                     </option>
                                 ))}

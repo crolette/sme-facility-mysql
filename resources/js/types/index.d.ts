@@ -31,6 +31,7 @@ export interface Flash {
 }
 
 export type LocationLevel = 'site' | 'building' | 'floor' | 'room';
+export type CategoryTypeEnum = 'document' | 'intervention' | 'asset';
 
 export interface Maintainable {
     id: number;
@@ -82,6 +83,14 @@ export interface Asset {
     asset_category: AssetCategory;
     maintainable: Maintainable;
     location: TenantSite | TenantBuilding | TenantFloor | TenantRoom;
+}
+
+export interface CentralType {
+    id: number;
+    slug: string;
+    category: string;
+    label: string;
+    translations: Translation[];
 }
 
 export interface Translation {
