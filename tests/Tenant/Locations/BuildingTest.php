@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Models\Tenants\User;
 use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\Floor;

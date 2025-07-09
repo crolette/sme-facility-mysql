@@ -1,12 +1,12 @@
 <?php
 
-use App\Models\User;
+use App\Models\Central\CentralUser;
 use Illuminate\Support\Facades\Hash;
 
 uses(DatabaseTransactions::class);
 
 test('password can be updated', function () {
-    $user = User::factory()->create();
+    $user = CentralUser::factory()->create();
 
     $response = $this
         ->actingAs($user)
@@ -25,7 +25,7 @@ test('password can be updated', function () {
 });
 
 test('correct password must be provided to update password', function () {
-    $user = User::factory()->create();
+    $user = CentralUser::factory()->create();
 
     $response = $this
         ->actingAs($user)

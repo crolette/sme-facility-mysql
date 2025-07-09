@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Models\Tenants\User;
 use Tests\Concerns\ManagesTenantDatabases;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -23,7 +23,7 @@ test('users can authenticate using the login screen', function () {
         'password' => 'password',
     ]);
 
-    $this->assertAuthenticated();
+    $this->assertAuthenticated('tenant');
 
     $response->assertRedirect($this->tenantRoute('tenant.dashboard'));
 });
@@ -42,7 +42,7 @@ test('users can not authenticate with invalid password', function () {
 test('users can logout', function () {
     $user = User::factory()->create();
 
-    $response = $this->actingAs($user)->postToTenant('tenant.logout');
+    $response = $this->actingAs($user, 'tenant')->postToTenant('tenant.logout');
 
     $this->assertGuest();
     $response->assertRedirect('/');

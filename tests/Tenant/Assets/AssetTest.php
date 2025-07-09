@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Models\Tenants\User;
 use App\Models\LocationType;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
@@ -33,10 +33,11 @@ beforeEach(function () {
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
+    $this->user = User::factory()->create();
+    $this->actingAs($this->user, 'tenant');
 });
 
 it('can render the index assets page', function () {
-    $this->actingAs($user = User::factory()->create());
 
     $asset = Asset::factory()->forLocation($this->site)->create();
     Asset::factory()->forLocation($this->building)->create();
@@ -60,8 +61,6 @@ it('can render the index assets page', function () {
 
 it('can render the create asset page', function () {
 
-    $this->actingAs($user = User::factory()->create());
-
     $response = $this->getFromTenant('tenant.assets.create');
     $response->assertOk();
 
@@ -73,9 +72,6 @@ it('can render the create asset page', function () {
 });
 
 it('can create a new asset to site', function () {
-
-    $this->actingAs($user = User::factory()->create());
-
 
     $formData = [
         'name' => 'New asset',
@@ -113,10 +109,6 @@ it('can create a new asset to site', function () {
 
 it('can create a new asset to building', function () {
 
-    $this->actingAs($user = User::factory()->create());
-
-
-
     $formData = [
         'name' => 'New asset',
         'description' => 'Description new asset',
@@ -152,8 +144,6 @@ it('can create a new asset to building', function () {
 
 it('cannot create a new asset with non existing building', function () {
 
-    $this->actingAs($user = User::factory()->create());
-
     $formData = [
         'name' => 'New asset',
         'description' => 'Description new asset',
@@ -170,8 +160,6 @@ it('cannot create a new asset with non existing building', function () {
 });
 
 it('cannot create a new asset with non existing location reference code', function () {
-
-    $this->actingAs($user = User::factory()->create());
 
     $formData = [
         'name' => 'New asset',
@@ -190,8 +178,6 @@ it('cannot create a new asset with non existing location reference code', functi
 
 it('cannot create a new asset with unrelated asset category type', function () {
 
-    $this->actingAs($user = User::factory()->create());
-
     $formData = [
         'name' => 'New asset',
         'description' => 'Description new asset',
@@ -209,7 +195,7 @@ it('cannot create a new asset with unrelated asset category type', function () {
 
 it('cannot create a new asset with non existing location type', function () {
 
-    $this->actingAs($user = User::factory()->create());
+
 
     $formData = [
         'name' => 'New asset',
@@ -228,7 +214,7 @@ it('cannot create a new asset with non existing location type', function () {
 
 it('can create a new asset to floor', function () {
 
-    $this->actingAs($user = User::factory()->create());
+
 
     $formData = [
         'name' => 'New asset',
@@ -265,7 +251,7 @@ it('can create a new asset to floor', function () {
 
 it('can create a new asset to room', function () {
 
-    $this->actingAs($user = User::factory()->create());
+
 
     $formData = [
         'name' => 'New asset',
@@ -503,7 +489,7 @@ it('can force delete a soft deleted asset', function () {
 });
 
 it('fails when model has more than 100 chars', function () {
-    $this->actingAs($user = User::factory()->create());
+
 
     $formData = [
         'name' => fake()->text(50),
@@ -522,7 +508,7 @@ it('fails when model has more than 100 chars', function () {
 });
 
 it('fails when brand has more than 100 chars', function () {
-    $this->actingAs($user = User::factory()->create());
+
 
     $formData = [
         'name' => fake()->text(50),
@@ -541,7 +527,7 @@ it('fails when brand has more than 100 chars', function () {
 });
 
 it('fails when serial_number has more than 50 chars', function () {
-    $this->actingAs($user = User::factory()->create());
+
 
     $formData = [
         'name' => fake()->text(50),

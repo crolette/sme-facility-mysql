@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Models\Central\CentralUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -26,7 +26,7 @@ test('guests are redirected to the login page', function () {
 });
 
 test('authenticated users can visit the dashboard', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
 
     $this->get('/dashboard')->assertOk();
 });

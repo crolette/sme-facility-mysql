@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Models\Central\CentralUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -36,6 +36,6 @@ test('new users can register', function () {
     $this->assertAuthenticated();
     $response->assertRedirect(route('dashboard', absolute: false));
 
-    $user = User::where('name', 'Test User')->first();
+    $user = CentralUser::where('name', 'Test User')->first();
     $user->delete();
 });

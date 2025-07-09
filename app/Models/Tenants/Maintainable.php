@@ -37,9 +37,6 @@ class Maintainable extends Model
     }
 
 
-
-
-
     public function maintainable()
     {
         return $this->morphTo();

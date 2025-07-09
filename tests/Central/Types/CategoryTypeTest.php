@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Models\Central\CentralUser;
 use App\Enums\CategoryTypes;
 use App\Models\Central\CategoryType;
 use function Pest\Laravel\assertDatabaseHas;
@@ -22,7 +22,7 @@ beforeEach(function () {
 });
 
 it('renders the index document types page', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
 
     CategoryType::factory()->count(3)->create();
     $response = $this->get(route('central.types.index'));
@@ -40,7 +40,7 @@ it('renders the index document types page', function () {
 });
 
 it('renders the create document type page', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
 
     $categories = array_map(fn($case) => "{$case->value}", CategoryTypes::cases());
 
@@ -58,7 +58,7 @@ it('renders the create document type page', function () {
 });
 
 it('creates a new category type in the database', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
 
     $formData = [
         'category' => 'document',
@@ -94,7 +94,7 @@ it('creates a new category type in the database', function () {
 });
 
 it('fails to create a new category type with a non existing type', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
 
     $formData = [
         'category' => 'schtroumpf',
@@ -117,7 +117,7 @@ it('fails to create a new category type with a non existing type', function () {
 });
 
 it('shows the category type page', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
 
     $category = CategoryType::factory()->create();;
 
@@ -138,7 +138,7 @@ it('shows the category type page', function () {
 });
 
 it('renders the update asset category page', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
 
     $category = CategoryType::factory()->create();
     $categories = array_map(fn($case) => "{$case->value}", CategoryTypes::cases());
@@ -163,7 +163,7 @@ it('renders the update asset category page', function () {
 
 
 it('can update an existing category type', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
 
     $category = CategoryType::factory()->create(['category' => 'document']);
 
@@ -220,14 +220,14 @@ it('can update an existing category type', function () {
 
 
 it('deletes a location type and translations', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
 
     $category = CategoryType::factory()->create();
 
     try {
         $response = $this->delete(route('central.types.destroy', $category->slug));
         $response->assertStatus(302);
-        assertDatabaseMissing('asset_categories', [
+        assertDatabaseMissing('category_types', [
             'slug' => $category->slug
         ]);
 

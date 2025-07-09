@@ -1,12 +1,12 @@
 <?php
 
-use App\Models\User;
+use App\Models\Central\CentralUser;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 uses(DatabaseTransactions::class);
 
 test('profile page is displayed', function () {
-    $user = User::factory()->create();
+    $user = CentralUser::factory()->create();
 
     $response = $this
         ->actingAs($user)
@@ -37,7 +37,7 @@ test('profile information can be updated', function () {
 });
 
 test('email verification status is unchanged when the email address is unchanged', function () {
-    $user = User::factory()->create();
+    $user = CentralUser::factory()->create();
 
     $response = $this
         ->actingAs($user)
@@ -54,7 +54,7 @@ test('email verification status is unchanged when the email address is unchanged
 });
 
 test('user can delete their account', function () {
-    $user = User::factory()->create();
+    $user = CentralUser::factory()->create();
 
     $response = $this
         ->actingAs($user)
@@ -71,7 +71,7 @@ test('user can delete their account', function () {
 });
 
 test('correct password must be provided to delete account', function () {
-    $user = User::factory()->create();
+    $user = CentralUser::factory()->create();
 
     $response = $this
         ->actingAs($user)

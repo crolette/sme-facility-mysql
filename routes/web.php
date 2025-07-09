@@ -11,6 +11,7 @@ use App\Http\Controllers\Central\CentralAssetCategoryController;
 use App\Http\Controllers\Central\CentralCategoryTypeController;
 use App\Http\Controllers\Central\CentralDocumentTypeController;
 use App\Http\Controllers\Central\RegisterCentralTenantController;
+use App\Http\Middleware\AuthenticateCentral;
 
 foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->group(function () {
@@ -19,7 +20,7 @@ foreach (config('tenancy.central_domains') as $domain) {
         })->name('home');
 
 
-        Route::middleware(['auth', 'verified'])->group(function () {
+        Route::middleware(['web', AuthenticateCentral::class])->group(function () {
             Route::get('dashboard', function () {
 
 

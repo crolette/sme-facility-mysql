@@ -15,6 +15,7 @@ Route::prefix('api/v1')->group(
             InitializeTenancyBySubDomain::class,
             \Stancl\Tenancy\Middleware\ScopeSessions::class,
             \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+            'auth:tenant'
         ])->group(function () {
 
             Route::middleware(['auth'])->group(function () {

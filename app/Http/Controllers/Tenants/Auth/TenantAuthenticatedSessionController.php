@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Tenants\Auth;
 
-use App\Models\User;
+use App\Models\Tenants\User;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\Request;
@@ -10,7 +10,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Route;
-use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Requests\Auth\TenantLoginRequest;
 
 class TenantAuthenticatedSessionController extends Controller
 {
@@ -30,7 +30,7 @@ class TenantAuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(TenantLoginRequest $request): RedirectResponse
     {
         $request->authenticate();
 
@@ -45,7 +45,7 @@ class TenantAuthenticatedSessionController extends Controller
     public function destroy(Request $request): RedirectResponse
     {
         // dd($request);
-        Auth::guard('web')->logout();
+        Auth::guard('tenant')->logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
