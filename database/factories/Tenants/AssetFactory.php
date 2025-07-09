@@ -1,0 +1,65 @@
+<?php
+
+namespace Database\Factories\Tenants;
+
+use App\Models\Central\AssetCategory;
+use App\Models\Tenants\Asset;
+use App\Models\Tenants\Maintainable;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
+ */
+class AssetFactory extends Factory
+{
+
+    protected $model = Asset::class;
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+
+        $category = AssetCategory::first();
+        // Remplissage temporaire avant de définir les 
+        return [
+            'asset_category_id' => $category->id,
+            'location_type' => null,
+            'location_id' => null,
+            'reference_code' => null,
+            'code' => null,
+        ];
+    }
+
+    public function forLocation($location): static
+    {
+        return $this->for($location, 'location')->state(function () use ($location) {
+            $count = Asset::count();
+
+            $codeNumber = generateCodeNumber($count, 'A', 4);
+
+            $referenceCode = $location->reference_code . '-' . $codeNumber;
+
+            return [
+                'reference_code' => $referenceCode,
+                'code' => $codeNumber
+            ];
+        });
+    }
+
+
+    public function configure()
+    {
+        return $this->afterCreating(
+
+            function (Asset $asset) {
+
+                $asset->maintainable()->save(
+                    Maintainable::factory()->make()
+                );
+            }
+        );
+    }
+}
