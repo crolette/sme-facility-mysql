@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { Asset, type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
+import { BiSolidFilePdf } from 'react-icons/bi';
 
 export default function ShowAsset({ asset }: { asset: Asset }) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -44,6 +45,38 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                 <p>Brand : {asset.brand}</p>
                 <p>Model : {asset.model}</p>
                 <p>Serial number : {asset.serial_number}</p>
+                <h3>Documents</h3>
+                {asset.documents.length > 0 && (
+                    <ul className="flex flex-col gap-4">
+                        {asset.documents.map((document, index) => {
+                            const isImage = document.mime_type.startsWith('image/');
+                            const isPdf = document.mime_type === 'application/pdf';
+                            return (
+                                <li key={index} className="bg-foreground/10 grid grid-cols-2 gap-2 p-6">
+                                    <div>
+                                        {isImage && (
+                                            <img
+                                                src={route('documents.show', document)}
+                                                alt="preview"
+                                                className="mx-auto h-40 w-40 rounded object-cover"
+                                            />
+                                        )}
+                                        {isPdf && <BiSolidFilePdf size={'160px'} />}
+                                    </div>
+                                    <div>
+                                        <p>{document.category}</p>
+                                        <p>{document.name}</p>
+                                        <p>{document.filename}</p>
+
+                                        <p>{document.created_at}</p>
+                                        <p>{document.description}</p>
+                                        <p>{document.sizeMo} Mo</p>
+                                    </div>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                )}
             </div>
         </AppLayout>
     );

@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Asset extends Model
 {
@@ -35,6 +36,7 @@ class Asset extends Model
     protected $with = [
         'location',
         'maintainable',
+
     ];
 
     protected $appends = [
@@ -61,9 +63,9 @@ class Asset extends Model
         return $this->morphOne(Maintainable::class, 'maintainable');
     }
 
-    public function documents(): MorphMany
+    public function documents(): MorphToMany
     {
-        return $this->morphMany(Document::class, 'documentable');
+        return $this->morphToMany(Document::class, 'documentable');
     }
 
     public function location(): MorphTo

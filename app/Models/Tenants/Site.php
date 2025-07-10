@@ -5,6 +5,7 @@ namespace App\Models\Tenants;
 use App\Models\LocationType;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Building;
+use App\Models\Tenants\Document;
 use App\Models\Tenants\Maintainable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Site extends Model
 {
@@ -64,5 +66,10 @@ class Site extends Model
     public function assets(): MorphMany
     {
         return $this->morphMany(Asset::class, 'location');
+    }
+
+    public function documents(): MorphToMany
+    {
+        return $this->morphToMany(Document::class, 'documentable');
     }
 }
