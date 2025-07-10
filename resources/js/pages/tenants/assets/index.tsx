@@ -66,7 +66,7 @@ export default function IndexAssets({ assets }: { assets: Asset[] }) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Sites" />
+            <Head title="Assets" />
 
             <div>
                 <ul className="flex border-b-2 pl-4">

@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use App\Models\LocationType;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
@@ -7,8 +8,8 @@ use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Building;
-use App\Models\Tenants\Document;
 
+use App\Models\Tenants\Document;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
 use function Pest\Laravel\assertDatabaseHas;
@@ -43,6 +44,7 @@ it('can upload several files', function () {
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
     $categoryType = CategoryType::where('category', 'document')->first();
 
+
     $formData = [
         'name' => 'New asset',
         'description' => 'Description new asset',
@@ -70,6 +72,18 @@ it('can upload several files', function () {
 
     $response = $this->postToTenant('tenant.assets.store', $formData);
     $response->assertSessionHasNoErrors();
+
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => 'App\Models\Tenants\Asset',
+        'documentable_id' => 1
+    ]);
+
+    $fileName = Carbon::parse(Carbon::now())->isoFormat('YYYYMMDD') . '_' . Str::slug('Long description of more than 10 chars', '-') . '_' . $categoryType->slug . '_' . Str::substr(Str::uuid7(), 0, 8) .  '.png';
+
+
+    Storage::disk('tenants')->assertExists(tenancy()->tenant->id . '/assets/1/documents/' . $fileName);
 });
 
 it('fails when upload wrong image mime (ie. webp)', function () {
@@ -137,39 +151,4 @@ it('fails when upload exceeding document size : ' . Document::maxUploadSizeKB() 
     $response->assertSessionHasErrors([
         'files.0.file' => "The files.0.file field must not be greater than " . Document::maxUploadSizeKB() . " kilobytes.",
     ]);
-});
-
-it('can upload a file and is saved in the DB', function () {
-
-    $file1 = UploadedFile::fake()->image('avatar.png');
-    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
-    $categoryType = CategoryType::where('category', 'document')->first();
-
-    $formData = [
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'locationId' => $this->room->id,
-        'locationReference' => $this->room->reference_code,
-        'locationType' => 'room',
-        'categoryId' => $this->categoryType->id,
-        'files' => [
-            [
-                'file' => $file1,
-                'name' => 'Long description of more than 10 chars',
-                'description' => 'descriptionIMG',
-                'typeId' => $categoryType->id,
-                'typeName' => $categoryType->slug
-            ],
-            [
-                'file' => $file2,
-                'name' => 'Long description of more than 10 chars',
-                'description' => 'descriptionPDF',
-                'typeId' => $categoryType->id,
-                'typeName' => $categoryType->slug
-            ]
-        ]
-    ];
-
-    $response = $this->postToTenant('tenant.assets.store', $formData);
-    $response->assertSessionHasNoErrors();
 });

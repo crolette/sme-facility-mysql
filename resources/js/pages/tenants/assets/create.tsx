@@ -60,15 +60,14 @@ export default function CreateAsset({
         },
     ];
 
-    console.log(documentTypes);
     const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
     const { data, setData, post, errors } = useForm<TypeFormData>({
         q: '',
         name: asset?.maintainable.name ?? '',
         description: asset?.maintainable.description ?? '',
         locationId: asset?.location_id ?? '',
-        locationReference: asset?.location.code ?? '',
-        locationType: asset?.location.location_type.label ?? '',
+        locationReference: asset?.location.reference_code ?? '',
+        locationType: asset?.location.location_type.slug ?? '',
         locationName: asset?.location.maintainable.name ?? '',
         categoryId: asset?.asset_category.id ?? '',
         purchase_date: asset?.maintainable.purchase_date ?? '',
@@ -80,6 +79,8 @@ export default function CreateAsset({
         serial_number: asset?.maintainable.serial_number ?? '',
         files: selectedDocuments,
     });
+
+    console.log(asset);
 
     const [listIsOpen, setListIsOpen] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
@@ -159,8 +160,6 @@ export default function CreateAsset({
 
     const addFile: FormEventHandler = (e) => {
         e.preventDefault();
-        console.log(newFileName, newFileDescription);
-        console.log(newFile);
 
         if (!newFile) return;
 
@@ -474,39 +473,41 @@ export default function CreateAsset({
                             <InputError className="mt-2" message={errors.end_warranty_date} />
                         </div>
                     )}
-                    <div id="files">
-                        <Button onClick={() => setShowFileModal(!showFileModal)} type="button">
-                            Add file
-                        </Button>
-                        {selectedDocuments.length > 0 && (
-                            <ul className="flex gap-4">
-                                {selectedDocuments.map((document, index) => {
-                                    const isImage = document.file.type.startsWith('image/');
-                                    const isPdf = document.file.type === 'application/pdf';
-                                    const fileURL = URL.createObjectURL(document.file);
-                                    return (
-                                        <li key={index} className="bg-foreground/10 flex w-50 flex-col gap-2 p-6">
-                                            <p>
-                                                {
-                                                    documentTypes.find((type) => {
-                                                        return type.id === document.type;
-                                                    })?.label
-                                                }
-                                            </p>
-                                            {isImage && <img src={fileURL} alt="preview" className="mx-auto h-40 w-40 rounded object-cover" />}
-                                            {isPdf && <BiSolidFilePdf size={'160px'} />}
-                                            <p>{document.name}</p>
+                    {!asset && (
+                        <div id="files">
+                            <Button onClick={() => setShowFileModal(!showFileModal)} type="button">
+                                Add file
+                            </Button>
+                            {selectedDocuments.length > 0 && (
+                                <ul className="flex gap-4">
+                                    {selectedDocuments.map((document, index) => {
+                                        const isImage = document.file.type.startsWith('image/');
+                                        const isPdf = document.file.type === 'application/pdf';
+                                        const fileURL = URL.createObjectURL(document.file);
+                                        return (
+                                            <li key={index} className="bg-foreground/10 flex w-50 flex-col gap-2 p-6">
+                                                <p>
+                                                    {
+                                                        documentTypes.find((type) => {
+                                                            return type.id === document.type;
+                                                        })?.label
+                                                    }
+                                                </p>
+                                                {isImage && <img src={fileURL} alt="preview" className="mx-auto h-40 w-40 rounded object-cover" />}
+                                                {isPdf && <BiSolidFilePdf size={'160px'} />}
+                                                <p>{document.name}</p>
 
-                                            <p>{document.description}</p>
-                                            <Button type="button" variant="destructive" className="" onClick={() => removeDocument(index)}>
-                                                Remove
-                                            </Button>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        )}
-                    </div>
+                                                <p>{document.description}</p>
+                                                <Button type="button" variant="destructive" className="" onClick={() => removeDocument(index)}>
+                                                    Remove
+                                                </Button>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            )}
+                        </div>
+                    )}
 
                     <br />
                     <Button type="submit">{asset ? 'Update' : 'Submit'}</Button>

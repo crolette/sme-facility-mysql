@@ -136,7 +136,8 @@ class TenantAssetController extends Controller
     public function edit(Asset $asset)
     {
         $categories = CategoryType::where('category', 'asset')->get();
-        return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents']), 'categories' => $categories]);
+        $documentTypes = CategoryType::where('category', 'document')->get();
+        return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents']), 'categories' => $categories, 'documentTypes' => $documentTypes]);
     }
 
     /**
@@ -164,8 +165,6 @@ class TenantAssetController extends Controller
                 $asset->location()->dissociate();
                 $asset->location()->associate($location);
 
-
-
                 $asset->update([
                     'reference_code' => $referenceCode
                 ]);
@@ -187,7 +186,7 @@ class TenantAssetController extends Controller
 
             DB::commit();
 
-            return redirect()->route('tenant.assets.index')->with(['message' => 'Asset created', 'type' => 'success']);
+            return redirect()->route('tenant.assets.index')->with(['message' => 'Asset updated', 'type' => 'success']);
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());

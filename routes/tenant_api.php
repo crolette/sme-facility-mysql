@@ -2,7 +2,10 @@
 
 use App\Http\Controllers\API\V1\ApiSearchLocationController;
 use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
+use App\Http\Controllers\API\V1\UpdateDocumentController;
+use App\Models\Tenants\Asset;
 use App\Models\Tenants\Document;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubDomain;
 
@@ -22,6 +25,17 @@ Route::prefix('api/v1')->group(
             Route::middleware(['auth'])->group(function () {
                 Route::get('/locations', [ApiSearchLocationController::class, 'index'])->name('api.locations');
                 Route::get('/assets/trashed', [ApiSearchTrashedAssetController::class, 'index'])->name('api.assets.trashed');
+
+
+                Route::get('/assets/{asset}/documents/', function (Asset $asset) {
+
+                    Debugbar::info('assetsdocuments', $asset);
+                    return response()->json($asset->load('documents')->documents);
+                })->name('api.assets.documents');
+
+                // Route to get the documents from a tenant - to display on show page
+                Route::delete('/documents/{document}', [UpdateDocumentController::class, 'destroy'])->name('api.documents.delete');
+
                 Route::get('/documents/{document}', function (Document $document) {
 
                     $path = $document->path;

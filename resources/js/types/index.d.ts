@@ -25,7 +25,7 @@ export interface NavItem {
 type FlashType = 'success' | 'error' | 'warning' | 'info';
 
 export interface Flash {
-    status: string;
+    status?: string;
     message: string;
     type: FlashType;
 }
@@ -80,9 +80,21 @@ export interface Asset {
     serial_number: string;
     category: string;
     asset_category_id: number;
+    documents: Document[];
     asset_category: AssetCategory;
     maintainable: Maintainable;
     location: TenantSite | TenantBuilding | TenantFloor | TenantRoom;
+}
+
+export interface Document {
+    id: number;
+    name: string;
+    mime_type: string;
+    category: string;
+    filename: string;
+    description: string;
+    sizeMo: number;
+    created_at: string;
 }
 
 export interface CentralType {
