@@ -3,19 +3,28 @@
 namespace App\Http\Controllers\Tenants;
 
 use Exception;
+use Carbon\Carbon;
 use Inertia\Inertia;
+use Illuminate\Support\Str;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Building;
+use App\Models\Tenants\Document;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Tenant\AssetRequest;
-use App\Http\Requests\Tenant\MaintainableRequest;
+use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Central\AssetCategory;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\Tenant\AssetRequest;
+use App\Http\Requests\Tenant\FileUploadRequest;
+use App\Http\Requests\Tenant\MaintainableRequest;
+use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Services\DocumentService;
 
 class TenantAssetController extends Controller
 {
@@ -33,14 +42,15 @@ class TenantAssetController extends Controller
      */
     public function create()
     {
-        $categories = AssetCategory::all();
-        return Inertia::render('tenants/assets/create', ['categories' => $categories]);
+        $categories = CategoryType::where('category', 'asset')->get();
+        $documentTypes = CategoryType::where('category', 'document')->get();
+        return Inertia::render('tenants/assets/create', ['categories' => $categories, 'documentTypes' => $documentTypes]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest)
+    public function store(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
     {
 
         try {
@@ -58,7 +68,6 @@ class TenantAssetController extends Controller
             }
 
             $count = Asset::withTrashed()->count();
-
             $codeNumber = generateCodeNumber($count, 'A', 4);
 
             $referenceCode = $location->reference_code . '-' . $codeNumber;
@@ -69,12 +78,21 @@ class TenantAssetController extends Controller
                 'reference_code' => $referenceCode
             ]);
 
+
+
             $asset->assetCategory()->associate($assetRequest->validated('categoryId'));
             $asset->location()->associate($location);
 
             $asset->save();
 
             $asset->maintainable()->create($maintainableRequest->validated());
+
+            $files = $documentUploadRequest->validated('files');
+
+            if ($files) {
+                $documentService->uploadAndAttachDocuments($asset, $files);
+            }
+
 
             DB::commit();
 
@@ -92,8 +110,7 @@ class TenantAssetController extends Controller
      */
     public function show(Asset $asset)
     {
-        //
-        return Inertia::render('tenants/assets/show', ['asset' => $asset]);
+        return Inertia::render('tenants/assets/show', ['asset' => $asset->load('documents')]);
     }
 
     /**
@@ -101,14 +118,15 @@ class TenantAssetController extends Controller
      */
     public function edit(Asset $asset)
     {
-        $categories = AssetCategory::all();
-        return Inertia::render('tenants/assets/create', ['asset' => $asset->load('assetCategory'), 'categories' => $categories]);
+        $categories = CategoryType::where('category', 'asset')->get();
+        $documentTypes = CategoryType::where('category', 'document')->get();
+        return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents']), 'categories' => $categories, 'documentTypes' => $documentTypes]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, Asset $asset)
+    public function update(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentRequest, Asset $asset)
     {
         try {
             DB::beginTransaction();
@@ -129,8 +147,6 @@ class TenantAssetController extends Controller
                 $referenceCode = $location->reference_code . '-' . $asset->code;
                 $asset->location()->dissociate();
                 $asset->location()->associate($location);
-
-
 
                 $asset->update([
                     'reference_code' => $referenceCode
@@ -153,7 +169,7 @@ class TenantAssetController extends Controller
 
             DB::commit();
 
-            return redirect()->route('tenant.assets.index')->with(['message' => 'Asset created', 'type' => 'success']);
+            return redirect()->route('tenant.assets.index')->with(['message' => 'Asset updated', 'type' => 'success']);
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());

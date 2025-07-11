@@ -7,12 +7,15 @@ use App\Models\LocationType;
 use App\Models\Tenants\Room;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Floor;
+use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\Central\CategoryType;
 use App\Http\Requests\Tenant\TenantRoomRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
+use App\Http\Requests\Tenant\DocumentUploadRequest;
 
 class TenantRoomController extends Controller
 {
@@ -32,14 +35,14 @@ class TenantRoomController extends Controller
     {
         $levelTypes = Floor::all();
         $locationTypes = LocationType::where('level', 'room')->get();
-
-        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms']);
+        $documentTypes = CategoryType::where('category', 'document')->get();
+        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms', 'documentTypes' => $documentTypes]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(TenantRoomRequest $roomRequest, MaintainableRequest $maintainableRequest)
+    public function store(TenantRoomRequest $roomRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
     {
 
         try {
@@ -65,6 +68,11 @@ class TenantRoomController extends Controller
 
             $room->maintainable()->create($maintainableRequest->validated());
 
+            $files = $documentUploadRequest->validated('files');
+            if ($files) {
+                $documentService->uploadAndAttachDocuments($room, $files);
+            }
+
             DB::commit();
 
             return redirect()->route('tenant.rooms.index')->with(['message' => 'Room created', 'type' => 'success']);
@@ -81,7 +89,7 @@ class TenantRoomController extends Controller
      */
     public function show(Room $room)
     {
-        return Inertia::render('tenants/locations/show', ['location' => $room->load('floor')]);
+        return Inertia::render('tenants/locations/show', ['location' => $room->load(['floor', 'documents'])]);
     }
 
     /**

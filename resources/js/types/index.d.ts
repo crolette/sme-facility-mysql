@@ -25,12 +25,13 @@ export interface NavItem {
 type FlashType = 'success' | 'error' | 'warning' | 'info';
 
 export interface Flash {
-    status: string;
+    status?: string;
     message: string;
     type: FlashType;
 }
 
 export type LocationLevel = 'site' | 'building' | 'floor' | 'room';
+export type CategoryTypeEnum = 'document' | 'intervention' | 'asset';
 
 export interface Maintainable {
     id: number;
@@ -49,23 +50,22 @@ export interface TenantSite {
     id: number;
     code: string;
     reference_code: string;
+    category: string;
+    level_id: number;
     location_type: LocationType;
     maintainable: Maintainable;
 }
 
 export interface TenantBuilding extends TenantSite {
     site: TenantSite;
-    level_id: number;
 }
 
 export interface TenantFloor extends TenantSite {
     building: TenantBuilding;
-    level_id: number;
 }
 
 export interface TenantRoom extends TenantSite {
     floor: TenantFloor;
-    level_id: number;
 }
 
 export interface Asset {
@@ -79,9 +79,30 @@ export interface Asset {
     serial_number: string;
     category: string;
     asset_category_id: number;
+    documents: Document[];
     asset_category: AssetCategory;
     maintainable: Maintainable;
     location: TenantSite | TenantBuilding | TenantFloor | TenantRoom;
+}
+
+export interface Document {
+    id: number;
+    name: string;
+    mime_type: string;
+    category: string;
+    filename: string;
+    description: string;
+    sizeMo: number;
+    category_type_id: number;
+    created_at: string;
+}
+
+export interface CentralType {
+    id: number;
+    slug: string;
+    category: string;
+    label: string;
+    translations: Translation[];
 }
 
 export interface Translation {

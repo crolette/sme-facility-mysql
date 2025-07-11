@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Models\Tenants\User;
 use App\Models\Tenant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;

@@ -6,7 +6,7 @@ use App\Models\Tenants\Maintainable;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Tenants\Maintainable>
  */
 class MaintainableFactory extends Factory
 {

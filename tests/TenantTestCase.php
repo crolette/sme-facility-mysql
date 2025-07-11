@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use App\Models\User;
+use App\Models\Tenants\User;
 use App\Models\Tenant;
 use App\Models\Address;
 use App\Enums\AddressTypes;

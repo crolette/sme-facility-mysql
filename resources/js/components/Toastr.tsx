@@ -34,9 +34,6 @@ export default function Toastr() {
         info: <BiInfoCircle />,
     };
 
-    console.log(flash);
-    console.log('TOASTR');
-
     return (
         <>
             <div

@@ -1,6 +1,6 @@
 <?php
 
-use App\Models\User;
+use App\Models\Central\CentralUser;
 use App\Models\SiteType;
 use App\Enums\LevelTypes;
 use App\Models\LocationType;
@@ -27,7 +27,7 @@ beforeEach(function () {
 
 
 it('renders the index location pages', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
     LocationType::factory()->count(1)->create(['level' => 'site']);
     LocationType::factory()->count(2)->create(['level' => 'building']);
     LocationType::factory()->count(3)->create(['level' => 'floor']);
@@ -50,7 +50,7 @@ it('renders the index location pages', function () {
 });
 
 it('renders the create location type page', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
     $types = array_map(fn($case) => "{$case->value}", LevelTypes::cases());
 
     try {
@@ -113,7 +113,7 @@ it('creates a new location type in the database', function () {
 
 it('show the location type page', function () {
 
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
     $type = LocationType::factory()->create();
 
     try {
@@ -136,7 +136,7 @@ it('show the location type page', function () {
 
 it('renders the location type edit page', function () {
 
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
     $type = LocationType::factory()->create();
 
     try {
@@ -159,7 +159,7 @@ it('renders the location type edit page', function () {
 
 it('updates the location translations', function () {
 
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
     $locationType = LocationType::factory()->create();
 
     $formData = [
@@ -199,7 +199,7 @@ it('updates the location translations', function () {
 
 it('cannot update an existing location prefix', function () {
 
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
     $type = LocationType::factory()->create();
 
     $prefix = $type->prefix;
@@ -230,7 +230,7 @@ it('cannot update an existing location prefix', function () {
 });
 
 it('deletes a location type and translations', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
 
     $type = LocationType::factory()->create();
 

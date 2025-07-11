@@ -9,6 +9,7 @@ use Illuminate\Validation\Rule;
 use App\Models\Tenants\Building;
 use Illuminate\Validation\Validator;
 use App\Models\Central\AssetCategory;
+use App\Models\Central\CategoryType;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
@@ -38,7 +39,7 @@ class AssetRequest extends FormRequest
             'locationType' => ['nullable', 'in:site,building,floor,room'],
             'locationId' => ['nullable'],
             'locationReference' => ['nullable'],
-            'categoryId' => ['required', Rule::in(AssetCategory::pluck('id')->toArray())],
+            'categoryId' => ['required', Rule::in(CategoryType::where('category', 'asset')->pluck('id')->toArray())],
             'model' => ['nullable', 'string', 'max:100'],
             'brand' => ['nullable', 'string', 'max:100'],
             'serial_number' => ['nullable', 'string', 'max:50'],

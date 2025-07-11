@@ -1,30 +1,28 @@
 <?php
 
-use App\Models\User;
+use App\Models\Tenants\User;
 use App\Models\LocationType;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Building;
-use App\Models\Central\AssetCategory;
+use App\Models\Central\CategoryType;
+
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
 
-
-
 beforeEach(function () {
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
     LocationType::factory()->create(['level' => 'room']);
-    AssetCategory::factory()->count(2)->create();
-
-    $this->category = AssetCategory::first();
-
+    CategoryType::factory()->count(2)->create(['category' => 'document']);
+    $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
+    CategoryType::factory()->count(2)->create(['category' => 'asset']);
     $this->site = Site::factory()->create();
     $this->building = Building::factory()->create();
     $this->floor = Floor::factory()->create();
@@ -33,10 +31,11 @@ beforeEach(function () {
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
+    $this->user = User::factory()->create();
+    $this->actingAs($this->user, 'tenant');
 });
 
 it('can render the index assets page', function () {
-    $this->actingAs($user = User::factory()->create());
 
     $asset = Asset::factory()->forLocation($this->site)->create();
     Asset::factory()->forLocation($this->building)->create();
@@ -60,44 +59,17 @@ it('can render the index assets page', function () {
 
 it('can render the create asset page', function () {
 
-    $this->actingAs($user = User::factory()->create());
-
     $response = $this->getFromTenant('tenant.assets.create');
     $response->assertOk();
 
     $response->assertInertia(
         fn($page) => $page->component('tenants/assets/create')
-            ->has('categories', 2)
+            ->has('categories', 3)
     );
     $response->assertOk();
 });
 
-// it('can search on the API on the create asset page', function () {
-
-//     $this->actingAs($user = User::factory()->create());
-
-//     $site = Site::factory()->create([
-//         'code' => 'A1',
-//         'reference_code' => 'Ref-A1',
-//     ]);
-
-//     $response = $this->getJson($this->tenantRoute('api.locations', ['q' => 'A1']));
-
-//     dump($response);
-//     $response->assertOk();
-//     $response->assertJsonFragment([
-//         'id' => $site->id,
-//         'type' => 'site',
-//         'code' => 'A1',
-//         'reference_code' => 'RefA1',
-//         'name' => 'Main Building',
-//     ]);
-// });
-
 it('can create a new asset to site', function () {
-
-    $this->actingAs($user = User::factory()->create());
-
 
     $formData = [
         'name' => 'New asset',
@@ -105,7 +77,7 @@ it('can create a new asset to site', function () {
         'locationId' => $this->site->id,
         'locationReference' => $this->site->reference_code,
         'locationType' => 'site',
-        'categoryId' => $this->category->id,
+        'categoryId' => $this->categoryType->id,
     ];
 
     $response = $this->postToTenant('tenant.assets.store', $formData);
@@ -122,7 +94,7 @@ it('can create a new asset to site', function () {
         'reference_code' => $this->site->reference_code . '-' . 'A0001',
         'location_type' => get_class($this->site),
         'location_id' => $this->site->id,
-        'asset_category_id' => $this->category->id
+        'category_type_id' => $this->categoryType->id
     ]);
 
     assertDatabaseHas('maintainables', [
@@ -135,17 +107,13 @@ it('can create a new asset to site', function () {
 
 it('can create a new asset to building', function () {
 
-    $this->actingAs($user = User::factory()->create());
-
-
-
     $formData = [
         'name' => 'New asset',
         'description' => 'Description new asset',
         'locationId' => $this->building->id,
         'locationReference' => $this->building->reference_code,
         'locationType' => 'building',
-        'categoryId' => $this->category->id,
+        'categoryId' => $this->categoryType->id,
     ];
 
     $response = $this->postToTenant('tenant.assets.store', $formData);
@@ -161,7 +129,7 @@ it('can create a new asset to building', function () {
         'reference_code' => $this->building->reference_code . '-' . 'A0001',
         'location_type' => get_class($this->building),
         'location_id' => $this->building->id,
-        'asset_category_id' => $this->category->id
+        'category_type_id' => $this->categoryType->id
     ]);
 
     assertDatabaseHas('maintainables', [
@@ -174,15 +142,13 @@ it('can create a new asset to building', function () {
 
 it('cannot create a new asset with non existing building', function () {
 
-    $this->actingAs($user = User::factory()->create());
-
     $formData = [
         'name' => 'New asset',
         'description' => 'Description new asset',
         'locationId' => 2,
         'locationReference' => $this->building->reference_code,
         'locationType' => 'building',
-        'categoryId' => $this->category->id,
+        'categoryId' => $this->categoryType->id,
     ];
 
     $response = $this->postToTenant('tenant.assets.store', $formData);
@@ -193,15 +159,13 @@ it('cannot create a new asset with non existing building', function () {
 
 it('cannot create a new asset with non existing location reference code', function () {
 
-    $this->actingAs($user = User::factory()->create());
-
     $formData = [
         'name' => 'New asset',
         'description' => 'Description new asset',
         'locationId' => $this->building->id,
         'locationReference' => 'ABC123',
         'locationType' => 'building',
-        'categoryId' => $this->category->id,
+        'categoryId' => $this->categoryType->id,
     ];
 
     $response = $this->postToTenant('tenant.assets.store', $formData);
@@ -210,9 +174,7 @@ it('cannot create a new asset with non existing location reference code', functi
     ]);
 });
 
-it('cannot create a new asset with non existing category type', function () {
-
-    $this->actingAs($user = User::factory()->create());
+it('cannot create a new asset with unrelated asset category type', function () {
 
     $formData = [
         'name' => 'New asset',
@@ -220,7 +182,7 @@ it('cannot create a new asset with non existing category type', function () {
         'locationId' => $this->building->id,
         'locationReference' => $this->building->reference_code,
         'locationType' => 'building',
-        'categoryId' => 3,
+        'categoryId' => 2,
     ];
 
     $response = $this->postToTenant('tenant.assets.store', $formData);
@@ -231,7 +193,7 @@ it('cannot create a new asset with non existing category type', function () {
 
 it('cannot create a new asset with non existing location type', function () {
 
-    $this->actingAs($user = User::factory()->create());
+
 
     $formData = [
         'name' => 'New asset',
@@ -239,7 +201,7 @@ it('cannot create a new asset with non existing location type', function () {
         'locationId' => $this->building->id,
         'locationReference' => $this->building->id,
         'locationType' => 'test',
-        'categoryId' => $this->category->id,
+        'categoryId' => $this->categoryType->id,
     ];
 
     $response = $this->postToTenant('tenant.assets.store', $formData);
@@ -250,7 +212,7 @@ it('cannot create a new asset with non existing location type', function () {
 
 it('can create a new asset to floor', function () {
 
-    $this->actingAs($user = User::factory()->create());
+
 
     $formData = [
         'name' => 'New asset',
@@ -258,7 +220,7 @@ it('can create a new asset to floor', function () {
         'locationId' => $this->floor->id,
         'locationReference' => $this->floor->reference_code,
         'locationType' => 'floor',
-        'categoryId' => $this->category->id,
+        'categoryId' => $this->categoryType->id,
     ];
 
     $response = $this->postToTenant('tenant.assets.store', $formData);
@@ -274,7 +236,7 @@ it('can create a new asset to floor', function () {
         'reference_code' => $this->floor->reference_code . '-' . 'A0001',
         'location_type' => get_class($this->floor),
         'location_id' => $this->floor->id,
-        'asset_category_id' => $this->category->id,
+        'category_type_id' => $this->categoryType->id,
     ]);
 
     assertDatabaseHas('maintainables', [
@@ -287,7 +249,7 @@ it('can create a new asset to floor', function () {
 
 it('can create a new asset to room', function () {
 
-    $this->actingAs($user = User::factory()->create());
+
 
     $formData = [
         'name' => 'New asset',
@@ -298,7 +260,7 @@ it('can create a new asset to room', function () {
         'model' => 'Blue daba di daba da',
         'brand' => 'Alpine',
         'serial_number' => '123-AZ-65-XF',
-        'categoryId' => $this->category->id,
+        'categoryId' => $this->categoryType->id,
     ];
 
     $response = $this->postToTenant('tenant.assets.store', $formData);
@@ -317,7 +279,7 @@ it('can create a new asset to room', function () {
         'model' => 'Blue daba di daba da',
         'brand' => 'Alpine',
         'serial_number' => '123-AZ-65-XF',
-        'asset_category_id' => $this->category->id,
+        'category_type_id' => $this->categoryType->id,
     ]);
 
     assertDatabaseHas('maintainables', [
@@ -341,12 +303,11 @@ it('can show the asset page', function () {
             ->where('asset.location.code', $this->room->code)
             ->where('asset.maintainable.description', $asset->maintainable->description)
             ->where('asset.code', $asset->code)
-            ->where('asset.category', $this->category->label,)
+            ->where('asset.category', $this->categoryType->label)
             ->where('asset.reference_code', $asset->reference_code)
             ->where('asset.location_type', get_class($this->room))
     );
 });
-
 
 it('can render the update asset page', function () {
     $this->actingAs(User::factory()->create());
@@ -526,7 +487,7 @@ it('can force delete a soft deleted asset', function () {
 });
 
 it('fails when model has more than 100 chars', function () {
-    $this->actingAs($user = User::factory()->create());
+
 
     $formData = [
         'name' => fake()->text(50),
@@ -534,7 +495,7 @@ it('fails when model has more than 100 chars', function () {
         'locationId' => $this->site->id,
         'locationReference' => $this->site->reference_code,
         'locationType' => 'site',
-        'categoryId' => $this->category->id,
+        'categoryId' => $this->categoryType->id,
         'model' => str_repeat('A', 101)
     ];
 
@@ -545,7 +506,7 @@ it('fails when model has more than 100 chars', function () {
 });
 
 it('fails when brand has more than 100 chars', function () {
-    $this->actingAs($user = User::factory()->create());
+
 
     $formData = [
         'name' => fake()->text(50),
@@ -553,7 +514,7 @@ it('fails when brand has more than 100 chars', function () {
         'locationId' => $this->site->id,
         'locationReference' => $this->site->reference_code,
         'locationType' => 'site',
-        'categoryId' => $this->category->id,
+        'categoryId' => $this->categoryType->id,
         'brand' => str_repeat('A', 101)
     ];
 
@@ -564,7 +525,7 @@ it('fails when brand has more than 100 chars', function () {
 });
 
 it('fails when serial_number has more than 50 chars', function () {
-    $this->actingAs($user = User::factory()->create());
+
 
     $formData = [
         'name' => fake()->text(50),
@@ -572,7 +533,7 @@ it('fails when serial_number has more than 50 chars', function () {
         'locationId' => $this->site->id,
         'locationReference' => $this->site->reference_code,
         'locationType' => 'site',
-        'categoryId' => $this->category->id,
+        'categoryId' => $this->categoryType->id,
         'serial_number' => str_repeat('A', 51)
     ];
 

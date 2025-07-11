@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\AuthenticateTenant;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -18,6 +19,14 @@ Route::middleware([
     \Stancl\Tenancy\Middleware\ScopeSessions::class,
     \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
 ])->group(function () {
+    Route::get('/', function () {
+        if (Auth::guard('tenant')->check()) {
+
+            return redirect()->route('tenant.dashboard');
+        }
+
+        return redirect()->route('tenant.login');
+    })->name('login');
 
     Route::get('login', [TenantAuthenticatedSessionController::class, 'create'])
         ->name('tenant.login');

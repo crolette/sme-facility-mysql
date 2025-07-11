@@ -5,6 +5,7 @@ namespace App\Models\Tenants;
 use App\Models\Central\AssetType;
 use App\Models\Tenants\Maintainable;
 use App\Models\Central\AssetCategory;
+use App\Models\Central\CategoryType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -12,6 +13,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Asset extends Model
 {
@@ -33,6 +36,7 @@ class Asset extends Model
     protected $with = [
         'location',
         'maintainable',
+
     ];
 
     protected $appends = [
@@ -59,6 +63,11 @@ class Asset extends Model
         return $this->morphOne(Maintainable::class, 'maintainable');
     }
 
+    public function documents(): MorphToMany
+    {
+        return $this->morphToMany(Document::class, 'documentable');
+    }
+
     public function location(): MorphTo
     {
         return $this->morphTo();
@@ -66,7 +75,7 @@ class Asset extends Model
 
     public function assetCategory(): BelongsTo
     {
-        return $this->belongsTo(AssetCategory::class, 'asset_category_id');
+        return $this->belongsTo(CategoryType::class, 'category_type_id');
     }
 
     public function category($locale = null): Attribute

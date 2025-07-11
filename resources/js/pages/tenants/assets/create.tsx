@@ -6,9 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { Asset, AssetCategory, type BreadcrumbItem } from '@/types';
+import { Asset, AssetCategory, CentralType, type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useEffect, useState } from 'react';
+import { BiSolidFilePdf } from 'react-icons/bi';
 
 type TypeFormData = {
     q: string;
@@ -26,6 +27,13 @@ type TypeFormData = {
     brand: string;
     model: string;
     serial_number: string;
+    files: {
+        file: File;
+        name: string;
+        description: string;
+        typeId: null | number;
+        typeSlug: string;
+    }[];
 };
 
 type SearchedLocation = {
@@ -36,7 +44,15 @@ type SearchedLocation = {
     code: string;
 };
 
-export default function CreateAsset({ asset, categories }: { asset?: Asset; categories?: AssetCategory[] }) {
+export default function CreateAsset({
+    asset,
+    categories,
+    documentTypes,
+}: {
+    asset?: Asset;
+    categories?: AssetCategory[];
+    documentTypes: CentralType[];
+}) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Create asset`,
@@ -44,15 +60,14 @@ export default function CreateAsset({ asset, categories }: { asset?: Asset; cate
         },
     ];
 
-    console.log(asset);
-
+    const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
     const { data, setData, post, errors } = useForm<TypeFormData>({
         q: '',
         name: asset?.maintainable.name ?? '',
         description: asset?.maintainable.description ?? '',
         locationId: asset?.location_id ?? '',
-        locationReference: asset?.location.code ?? '',
-        locationType: asset?.location.location_type.label ?? '',
+        locationReference: asset?.location.reference_code ?? '',
+        locationType: asset?.location.location_type.slug ?? '',
         locationName: asset?.location.maintainable.name ?? '',
         categoryId: asset?.asset_category.id ?? '',
         purchase_date: asset?.maintainable.purchase_date ?? '',
@@ -62,9 +77,8 @@ export default function CreateAsset({ asset, categories }: { asset?: Asset; cate
         brand: asset?.maintainable.brand ?? '',
         model: asset?.maintainable.model ?? '',
         serial_number: asset?.maintainable.serial_number ?? '',
+        files: selectedDocuments,
     });
-
-    console.log(data.q);
 
     const [listIsOpen, setListIsOpen] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
@@ -81,7 +95,6 @@ export default function CreateAsset({ asset, categories }: { asset?: Asset; cate
     }, [data.q]);
 
     useEffect(() => {
-        console.log('debounce', debouncedSearch);
         if (debouncedSearch.length < 2) {
             setLocations([]);
         }
@@ -107,7 +120,6 @@ export default function CreateAsset({ asset, categories }: { asset?: Asset; cate
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        console.log(data);
         if (asset) {
             post(route(`tenant.assets.update`, asset.code), {
                 headers: {
@@ -121,6 +133,7 @@ export default function CreateAsset({ asset, categories }: { asset?: Asset; cate
         }
     };
 
+    console.log(data);
     const setSelectedLocation = (location: SearchedLocation) => {
         if (!location) {
             return;
@@ -136,6 +149,130 @@ export default function CreateAsset({ asset, categories }: { asset?: Asset; cate
     };
 
     const minEndDateWarranty = new Date().toISOString().split('T')[0];
+
+    const [showFileModal, setShowFileModal] = useState(false);
+    const [newFileName, setNewFileName] = useState('');
+    const [newFileDescription, setNewFileDescription] = useState('');
+    const [newFile, setNewFile] = useState<File | null>(null);
+    const [newDocumentType, setNewDocumentType] = useState<number | null>(null);
+
+    const addFile: FormEventHandler = (e) => {
+        e.preventDefault();
+
+        if (!newFile) return;
+
+        const typeSlug = documentTypes.find((type) => {
+            return type.id === newDocumentType;
+        })?.slug;
+
+        const fileToAdd: TypeFormData['files'][number] = {
+            file: newFile,
+            name: newFileName,
+            description: newFileDescription,
+            typeId: newDocumentType,
+            typeSlug: typeSlug ?? '',
+        };
+
+        setSelectedDocuments((prev) => {
+            const updated = [...prev, fileToAdd];
+            setData('files', updated);
+            return updated;
+        });
+
+        setShowFileModal(!showFileModal);
+    };
+
+    const closeFileModal = () => {
+        setNewFileName('');
+        setNewFileDescription('');
+        setShowFileModal(!showFileModal);
+        setNewDocumentType(null);
+        setNewFile(null);
+    };
+
+    const removeDocument = (index: number) => {
+        const files = data.files.filter((file, indexFile) => {
+            return index !== indexFile ? file : null;
+        });
+        setSelectedDocuments(() => {
+            setData('files', files);
+            return files;
+        });
+    };
+
+    const addFileModalForm = () => {
+        return (
+            <div className="bg-background/50 absolute inset-0 z-50">
+                <div className="bg-background/20 flex h-dvh items-center justify-center">
+                    <div className="bg-background flex items-center justify-center p-4">
+                        <div className="flex flex-col gap-2">
+                            <form onSubmit={addFile} className="space-y-2">
+                                <p className="text-center">Add new document</p>
+                                <select
+                                    name="documentType"
+                                    required
+                                    value={newDocumentType ?? ''}
+                                    onChange={(e) => setNewDocumentType(parseInt(e.target.value))}
+                                    id=""
+                                    className={cn(
+                                        'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                    )}
+                                >
+                                    {documentTypes && documentTypes.length > 0 && (
+                                        <>
+                                            <option value="" disabled className="bg-background text-foreground">
+                                                Select an option
+                                            </option>
+                                            {documentTypes?.map((documentType) => (
+                                                <option value={documentType.id} key={documentType.id} className="bg-background text-foreground">
+                                                    {documentType.label}
+                                                </option>
+                                            ))}
+                                        </>
+                                    )}
+                                </select>
+                                <Input
+                                    type="file"
+                                    name=""
+                                    id=""
+                                    onChange={(e) => setNewFile(e.target.files ? e.target.files[0] : null)}
+                                    required
+                                    accept="image/png, image/jpeg, image/jpg, .pdf"
+                                />
+
+                                <Input
+                                    type="text"
+                                    name="name"
+                                    required
+                                    placeholder="Document name"
+                                    onChange={(e) => setNewFileName(e.target.value)}
+                                />
+                                <p className="text-border text-xs">Servira à la sauvegarde du nom du fichier</p>
+                                <Input
+                                    type="text"
+                                    name="description"
+                                    id="description"
+                                    required
+                                    minLength={10}
+                                    maxLength={250}
+                                    placeholder="Document description"
+                                    onChange={(e) => setNewFileDescription(e.target.value)}
+                                />
+                                <div className="flex justify-between">
+                                    <Button>Submit</Button>
+                                    <Button type="button" onClick={closeFileModal} variant={'outline'}>
+                                        Cancel
+                                    </Button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -154,7 +291,7 @@ export default function CreateAsset({ asset, categories }: { asset?: Asset; cate
                     <Label htmlFor="search">Search</Label>
                     <div className="relative">
                         <Input type="search" value={data.q} onChange={(e) => setData('q', e.target.value)} placeholder="Search by code or name" />
-                        <ul className="bg-background absolute z-50 flex w-full flex-col border" aria-autocomplete="list" role="listbox">
+                        <ul className="bg-background absolute z-10 flex w-full flex-col border" aria-autocomplete="list" role="listbox">
                             {isSearching && (
                                 <li value="0" key="" className="">
                                     Searching...
@@ -210,11 +347,11 @@ export default function CreateAsset({ asset, categories }: { asset?: Asset; cate
                     >
                         {categories && categories.length > 0 && (
                             <>
-                                <option value="0" disabled>
+                                <option value="0" disabled className="bg-background text-foreground">
                                     Select an option
                                 </option>
                                 {categories?.map((category) => (
-                                    <option value={category.id} key={category.id}>
+                                    <option value={category.id} key={category.id} className="bg-background text-foreground">
                                         {category.label}
                                     </option>
                                 ))}
@@ -327,10 +464,51 @@ export default function CreateAsset({ asset, categories }: { asset?: Asset; cate
                             <InputError className="mt-2" message={errors.end_warranty_date} />
                         </div>
                     )}
+                    {!asset && (
+                        <div id="files">
+                            <Button onClick={() => setShowFileModal(!showFileModal)} type="button">
+                                Add file
+                            </Button>
+                            {selectedDocuments.length > 0 && (
+                                <ul className="flex gap-4">
+                                    {selectedDocuments.map((document, index) => {
+                                        const isImage = document.file.type.startsWith('image/');
+                                        const isPdf = document.file.type === 'application/pdf';
+                                        const fileURL = URL.createObjectURL(document.file);
+                                        return (
+                                            <li key={index} className="bg-foreground/10 flex w-50 flex-col gap-2 p-6">
+                                                <p>
+                                                    {
+                                                        documentTypes.find((type) => {
+                                                            return type.id === document.type;
+                                                        })?.label
+                                                    }
+                                                </p>
+                                                {isImage && <img src={fileURL} alt="preview" className="mx-auto h-40 w-40 rounded object-cover" />}
+                                                {isPdf && <BiSolidFilePdf size={'160px'} />}
+                                                <p>{document.name}</p>
+
+                                                <p>{document.description}</p>
+                                                <Button type="button" variant="destructive" className="" onClick={() => removeDocument(index)}>
+                                                    Remove
+                                                </Button>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            )}
+                        </div>
+                    )}
 
                     <br />
                     <Button type="submit">{asset ? 'Update' : 'Submit'}</Button>
+                    <a href={route('tenant.assets.index')}>
+                        <Button type="button" tabIndex={6} variant={'secondary'}>
+                            Cancel
+                        </Button>
+                    </a>
                 </form>
+                {showFileModal && addFileModalForm()}
             </div>
         </AppLayout>
     );

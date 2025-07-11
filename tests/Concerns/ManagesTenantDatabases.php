@@ -3,8 +3,8 @@
 namespace Tests\Concerns;
 
 use Exception;
-use App\Models\User;
 use App\Models\Tenant;
+use App\Models\Tenants\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 

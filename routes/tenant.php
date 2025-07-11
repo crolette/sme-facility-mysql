@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Models\User;
 use Inertia\Inertia;
 use App\Models\Tenant;
 use App\Jobs\DeleteDatabase;
@@ -21,6 +20,7 @@ use App\Http\Controllers\Tenants\TenantAssetController;
 use App\Http\Controllers\Tenants\TenantFloorController;
 use App\Http\Controllers\Tenants\TenantRoomController;
 use App\Http\Controllers\Tenants\TenantSiteController;
+use App\Http\Middleware\AuthenticateTenant;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,30 +39,22 @@ Route::middleware([
     InitializeTenancyBySubdomain::class,
     ScopeSessions::class,
     PreventAccessFromCentralDomains::class,
+    'auth:tenant'
 ])->group(function () {
-    Route::get('/', function () {
-        if (Auth::check())
-            return redirect()->route('tenant.dashboard');
+    Route::get('dashboard', function () {
+        // dd(Auth::user()->hasVerifiedEmail());
+        return Inertia::render('tenants/dashboard');
+    })->name('tenant.dashboard');
 
-        return redirect()->route('tenant.login');
-    })->name('login');
-
-    Route::middleware(['auth', 'verified'])->group(function () {
-        Route::get('dashboard', function () {
-            // dd(Auth::user()->hasVerifiedEmail());
-            return Inertia::render('tenants/dashboard');
-        })->name('tenant.dashboard');
-
-        Route::resource('sites', TenantSiteController::class)->parameters(['sites' => 'site'])->names('tenant.sites');
-        Route::resource('buildings', TenantBuildingController::class)->parameters(['buildings' => 'building'])->names('tenant.buildings');
-        Route::resource('floors', TenantFloorController::class)->parameters(['floors' => 'floor'])->names('tenant.floors');
-        Route::resource('rooms', TenantRoomController::class)->parameters(['rooms' => 'room'])->names('tenant.rooms');
+    Route::resource('sites', TenantSiteController::class)->parameters(['sites' => 'site'])->names('tenant.sites');
+    Route::resource('buildings', TenantBuildingController::class)->parameters(['buildings' => 'building'])->names('tenant.buildings');
+    Route::resource('floors', TenantFloorController::class)->parameters(['floors' => 'floor'])->names('tenant.floors');
+    Route::resource('rooms', TenantRoomController::class)->parameters(['rooms' => 'room'])->names('tenant.rooms');
 
 
-        Route::resource('assets', TenantAssetController::class)->parameters(['assets' => 'asset'])->names('tenant.assets');
-        Route::post('assets/{assetId}/restore', [RestoreSoftDeletedAssetController::class, 'restore'])->name('tenant.assets.restore');
-        Route::delete('assets/{assetId}/force', [ForceDeleteAssetController::class, 'forceDelete'])->name('tenant.assets.force');
-    });
+    Route::resource('assets', TenantAssetController::class)->parameters(['assets' => 'asset'])->names('tenant.assets');
+    Route::post('assets/{assetId}/restore', [RestoreSoftDeletedAssetController::class, 'restore'])->name('tenant.assets.restore');
+    Route::delete('assets/{assetId}/force', [ForceDeleteAssetController::class, 'forceDelete'])->name('tenant.assets.force');
 });
 
 require __DIR__ . '/tenant_auth.php';

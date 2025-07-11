@@ -8,7 +8,10 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Central\AdminLocationTypeController;
 use App\Http\Controllers\Central\AdminSiteTypeController;
 use App\Http\Controllers\Central\CentralAssetCategoryController;
+use App\Http\Controllers\Central\CentralCategoryTypeController;
+use App\Http\Controllers\Central\CentralDocumentTypeController;
 use App\Http\Controllers\Central\RegisterCentralTenantController;
+use App\Http\Middleware\AuthenticateCentral;
 
 foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->group(function () {
@@ -17,7 +20,7 @@ foreach (config('tenancy.central_domains') as $domain) {
         })->name('home');
 
 
-        Route::middleware(['auth', 'verified'])->group(function () {
+        Route::middleware(['web', AuthenticateCentral::class])->group(function () {
             Route::get('dashboard', function () {
 
 
@@ -40,7 +43,10 @@ foreach (config('tenancy.central_domains') as $domain) {
 
 
             Route::resource('location-types', AdminLocationTypeController::class)->parameters(['location-types' => 'locationType'])->names('central.locations');
+
             Route::resource('asset-categories', CentralAssetCategoryController::class)->parameters(['asset-categories' => 'assetCategory'])->names('central.assets');
+
+            Route::resource('category-types', CentralCategoryTypeController::class)->parameters(['category-types' => 'categoryType'])->names('central.types');
         });
     });
 }

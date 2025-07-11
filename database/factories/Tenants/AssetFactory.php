@@ -3,6 +3,7 @@
 namespace Database\Factories\Tenants;
 
 use App\Models\Central\AssetCategory;
+use App\Models\Central\CategoryType;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Maintainable;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -22,10 +23,10 @@ class AssetFactory extends Factory
     public function definition(): array
     {
 
-        $category = AssetCategory::first();
+        $category = CategoryType::where('category', 'asset')->first();
         // Remplissage temporaire avant de définir les 
         return [
-            'asset_category_id' => $category->id,
+            'category_type_id' => $category->id,
             'location_type' => null,
             'location_id' => null,
             'reference_code' => null,

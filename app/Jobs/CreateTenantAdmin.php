@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Models\User;
+use App\Models\Tenants\User;
 use App\Models\Tenant;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;

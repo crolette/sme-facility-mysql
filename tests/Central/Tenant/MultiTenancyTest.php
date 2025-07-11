@@ -1,21 +1,22 @@
 <?php
 
-use App\Models\User;
 use App\Models\Tenant;
 use App\Models\Address;
 use App\Enums\AddressTypes;
+use App\Models\Tenants\User;
 use Illuminate\Support\Facades\DB;
+use App\Models\Central\CentralUser;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Session;
 use function PHPUnit\Framework\assertTrue;
+
 use Tests\Concerns\ManagesTenantDatabases;
 use function PHPUnit\Framework\assertFalse;
-
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\Facades\Session;
 
 uses(ManagesTenantDatabases::class);
 
@@ -43,7 +44,7 @@ beforeEach(function () {
 
 
 it('renders the tenant show page', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
 
     $userTenant = User::factory()->raw();
     Session::put([...$userTenant]);
@@ -76,7 +77,7 @@ it('renders the tenant show page', function () {
 
 
 it('returns 404 if tenant does not exist', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
     $response = $this->get(route('central.tenants.show', ['tenant' => 9999]));
 
     $response->assertNotFound();
@@ -87,7 +88,7 @@ it('returns 404 if tenant does not exist', function () {
 
 it('can render tenancy create page', function () {
 
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
 
     $this->get(route('central.tenants.create'))->assertOk();
 
@@ -97,7 +98,7 @@ it('can render tenancy create page', function () {
 it('can create tenant & attach the domain & verifies that database exists', function () {
 
     Log::info('TEST CREATE TENANT');
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
     Log::info($user);
     $companyAddress = Address::factory()->make();
     $invoiceAddress = Address::factory()->make(['address_type' => AddressTypes::INVOICE->value]);
@@ -192,7 +193,7 @@ it('can create tenant & attach the domain & verifies that database exists', func
 
 
 it('renders the tenant update page', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
     $userTenant = User::factory()->raw();
     Session::put([...$userTenant]);
 
@@ -219,7 +220,7 @@ it('renders the tenant update page', function () {
 
 it('verifies that initialized tenant is on his database', function () {
 
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
     $companyAddress = Address::factory()->make();
     $invoiceAddress = Address::factory()->make(['address_type' => AddressTypes::INVOICE->value]);
 
@@ -282,7 +283,7 @@ it('verifies that initialized tenant is on his database', function () {
 
 
 it('deletes the tenant and the domain and the database', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = CentralUser::factory()->create());
 
     $userTenant = User::factory()->raw();
     Session::put([...$userTenant]);

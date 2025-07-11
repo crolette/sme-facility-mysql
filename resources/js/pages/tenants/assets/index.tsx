@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { Asset, BreadcrumbItem } from '@/types';
@@ -66,7 +67,7 @@ export default function IndexAssets({ assets }: { assets: Asset[] }) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Sites" />
+            <Head title="Assets" />
 
             <div>
                 <ul className="flex border-b-2 pl-4">
@@ -95,53 +96,89 @@ export default function IndexAssets({ assets }: { assets: Asset[] }) {
                     <a href={route(`tenant.assets.create`)}>
                         <Button>Create</Button>
                     </a>
-                    <ul className="">
-                        {assets.length > 0 &&
-                            assets.map((asset) => (
-                                <li key={asset.id} className="">
-                                    <div>
-                                        <p>
-                                            {asset.reference_code} - {asset.code} - {asset.category}
-                                        </p>{' '}
-                                        <p>{asset.maintainable.name}</p>
-                                        <p>{asset.maintainable.description}</p>
-                                    </div>
-                                    <div>
-                                        <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
-                                            Delete
-                                        </Button>
-                                        <a href={route(`tenant.assets.edit`, asset.code)}>
-                                            <Button>Edit</Button>
-                                        </a>
-                                        <a href={route(`tenant.assets.show`, asset.code)}>
-                                            <Button variant={'outline'}>See</Button>
-                                        </a>
-                                    </div>
-                                </li>
-                            ))}
-                    </ul>
+                    <Table>
+                        <TableHead>
+                            <TableHeadRow>
+                                <TableHeadData>Reference code</TableHeadData>
+                                <TableHeadData>Code</TableHeadData>
+                                <TableHeadData>Category</TableHeadData>
+                                <TableHeadData>Name</TableHeadData>
+                                <TableHeadData>Description</TableHeadData>
+                                <TableHeadData></TableHeadData>
+                            </TableHeadRow>
+                        </TableHead>
+                        <TableBody>
+                            {assets &&
+                                assets.map((asset, index) => {
+                                    return (
+                                        <TableBodyRow key={index}>
+                                            <TableBodyData>
+                                                <a href={route(`tenant.assets.show`, asset.code)}> {asset.reference_code} </a>
+                                            </TableBodyData>
+                                            <TableBodyData>{asset.code}</TableBodyData>
+                                            <TableBodyData>{asset.category}</TableBodyData>
+                                            <TableBodyData>{asset.maintainable.name}</TableBodyData>
+                                            <TableBodyData>{asset.maintainable.description}</TableBodyData>
+
+                                            <TableBodyData>
+                                                <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
+                                                    Delete
+                                                </Button>
+                                                <a href={route(`tenant.assets.edit`, asset.code)}>
+                                                    <Button>Edit</Button>
+                                                </a>
+                                                <a href={route(`tenant.assets.show`, asset.code)}>
+                                                    <Button variant={'outline'}>See</Button>
+                                                </a>
+                                            </TableBodyData>
+                                        </TableBodyRow>
+                                    );
+                                })}
+                        </TableBody>
+                    </Table>
                 </div>
             )}
             {trashedAssetsTab && (
                 <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                     TRASH
-                    <ul>
-                        {trashedAssets &&
-                            trashedAssets?.length > 0 &&
-                            trashedAssets?.map((asset) => (
-                                <li key={asset.id}>
-                                    <p>
-                                        {asset.reference_code} - {asset.code}
-                                    </p>{' '}
-                                    <p>{asset.maintainable.name}</p>
-                                    <p>{asset.maintainable.description}</p>
-                                    <Button onClick={() => deleteDefinitelyAsset(asset)} variant={'destructive'}>
-                                        Delete definitely
-                                    </Button>
-                                    <Button onClick={() => restoreAsset(asset)}>Restore</Button>
-                                </li>
-                            ))}
-                    </ul>
+                    <Table>
+                        <TableHead>
+                            <TableHeadRow>
+                                <TableHeadData>Reference code</TableHeadData>
+                                <TableHeadData>Code</TableHeadData>
+                                <TableHeadData>Category</TableHeadData>
+                                <TableHeadData>Name</TableHeadData>
+                                <TableHeadData>Description</TableHeadData>
+                                <TableHeadData></TableHeadData>
+                            </TableHeadRow>
+                        </TableHead>
+                        <TableBody>
+                            {trashedAssets &&
+                                trashedAssets.map((asset, index) => {
+                                    return (
+                                        <TableBodyRow key={index}>
+                                            <TableBodyData>{asset.reference_code}</TableBodyData>
+                                            <TableBodyData>{asset.code}</TableBodyData>
+                                            <TableBodyData>{asset.category}</TableBodyData>
+                                            <TableBodyData>{asset.maintainable.name}</TableBodyData>
+                                            <TableBodyData>{asset.maintainable.description}</TableBodyData>
+
+                                            <TableBodyData>
+                                                <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
+                                                    Delete
+                                                </Button>
+                                                <a href={route(`tenant.assets.edit`, asset.code)}>
+                                                    <Button>Edit</Button>
+                                                </a>
+                                                <a href={route(`tenant.assets.show`, asset.code)}>
+                                                    <Button variant={'outline'}>See</Button>
+                                                </a>
+                                            </TableBodyData>
+                                        </TableBodyRow>
+                                    );
+                                })}
+                        </TableBody>
+                    </Table>
                 </div>
             )}
         </AppLayout>

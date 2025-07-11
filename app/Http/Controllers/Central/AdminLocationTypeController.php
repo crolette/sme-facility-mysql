@@ -28,7 +28,7 @@ class AdminLocationTypeController extends Controller
         $types = LocationType::all()->groupBy('level');
         // $types = LocationType::all();
 
-        return Inertia::render('central/types/index', ['types' => $types ?? null, 'routeName' => 'locations']);
+        return Inertia::render('central/locations/index', ['types' => $types ?? null, 'routeName' => 'locations']);
     }
 
     /**
@@ -37,7 +37,7 @@ class AdminLocationTypeController extends Controller
     public function create()
     {
         $types = array_map(fn($case) => "{$case->value}", LevelTypes::cases());
-        return Inertia::render('central/types/create', ['types' => $types, 'routeName' => 'locations']);
+        return Inertia::render('central/locations/create', ['types' => $types, 'routeName' => 'locations']);
     }
 
     /**
@@ -78,7 +78,7 @@ class AdminLocationTypeController extends Controller
      */
     public function show(LocationType $locationType)
     {
-        return Inertia::render('central/types/show', ['type' => $locationType->load('translations')]);
+        return Inertia::render('central/locations/show', ['type' => $locationType->load('translations')]);
     }
 
     /**
@@ -87,7 +87,7 @@ class AdminLocationTypeController extends Controller
     public function edit(LocationType $locationType)
     {
         $types = array_map(fn($case) => "{$case->value}", LevelTypes::cases());
-        return Inertia::render('central/types/create', ['type' => $locationType, 'types' => $types, 'routeName' => 'locations']);
+        return Inertia::render('central/locations/create', ['type' => $locationType, 'types' => $types, 'routeName' => 'locations']);
     }
 
     /**
