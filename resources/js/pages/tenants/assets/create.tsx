@@ -120,7 +120,6 @@ export default function CreateAsset({
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        console.log(data);
         if (asset) {
             post(route(`tenant.assets.update`, asset.code), {
                 headers: {
@@ -134,6 +133,7 @@ export default function CreateAsset({
         }
     };
 
+    console.log(data);
     const setSelectedLocation = (location: SearchedLocation) => {
         if (!location) {
             return;
@@ -182,8 +182,6 @@ export default function CreateAsset({
         setShowFileModal(!showFileModal);
     };
 
-    console.log(asset);
-
     const closeFileModal = () => {
         setNewFileName('');
         setNewFileDescription('');
@@ -193,12 +191,9 @@ export default function CreateAsset({
     };
 
     const removeDocument = (index: number) => {
-        console.log(index);
-        console.log(data.files[index]);
         const files = data.files.filter((file, indexFile) => {
             return index !== indexFile ? file : null;
         });
-        console.log(files);
         setSelectedDocuments(() => {
             setData('files', files);
             return files;
@@ -507,6 +502,11 @@ export default function CreateAsset({
 
                     <br />
                     <Button type="submit">{asset ? 'Update' : 'Submit'}</Button>
+                    <a href={route('tenant.assets.index')}>
+                        <Button type="button" tabIndex={6} variant={'secondary'}>
+                            Cancel
+                        </Button>
+                    </a>
                 </form>
                 {showFileModal && addFileModalForm()}
             </div>

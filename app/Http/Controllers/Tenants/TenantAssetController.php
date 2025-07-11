@@ -89,7 +89,9 @@ class TenantAssetController extends Controller
 
             $files = $documentUploadRequest->validated('files');
 
-            $documentService->uploadAndAttachDocuments($asset, $files);
+            if ($files) {
+                $documentService->uploadAndAttachDocuments($asset, $files);
+            }
 
 
             DB::commit();

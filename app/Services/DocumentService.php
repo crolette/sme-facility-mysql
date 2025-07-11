@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Models\Tenants\Document;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,6 +19,7 @@ class DocumentService
         $modelId = $model->id;
 
         foreach ($files as $file) {
+            Debugbar::info('documentservice', $file);
             $directory = "$tenantId/$modelType/$modelId/documents";
             $fileName = Carbon::now()->isoFormat('YYYYMMDD') . '_' . Str::slug($file['name'], '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $file['file']->extension();
 

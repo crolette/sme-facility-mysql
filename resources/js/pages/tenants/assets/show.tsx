@@ -69,6 +69,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
         setShowFileModal(!showFileModal);
         setDocumentTypes([]);
         fetchDocuments();
+        setSubmitType('edit');
     };
 
     const fetchDocumentTypes = async () => {
@@ -105,6 +106,14 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
         setShowFileModal(!showFileModal);
     };
 
+    const [submitType, setSubmitType] = useState<'edit' | 'new'>('edit');
+    const addNewFile = () => {
+        console.log('addNewFile');
+        fetchDocumentTypes();
+        setSubmitType('new');
+        setShowFileModal(!showFileModal);
+    };
+
     useEffect(() => {
         if (documentTypes.length === 0) return;
 
@@ -131,14 +140,35 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
         }
     };
 
+    const submitNewFile: FormEventHandler = async (e) => {
+        e.preventDefault();
+        console.log('submitNewFile');
+        const newFile = {
+            files: [newFileData],
+        };
+        console.log(newFile);
+        try {
+            await axios.post(route('api.assets.documents.post', asset.code), newFile, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            closeFileModal();
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    console.log(newFileData);
+
     const addFileModalForm = () => {
         return (
             <div className="bg-background/50 absolute inset-0 z-50">
                 <div className="bg-background/20 flex h-dvh items-center justify-center">
                     <div className="bg-background flex items-center justify-center p-4">
                         <div className="flex flex-col gap-2">
-                            <form onSubmit={submitEditFile} className="space-y-2">
-                                <p className="text-center">Add new document</p>
+                            <form onSubmit={submitType === 'edit' ? submitEditFile : submitNewFile} className="space-y-2">
+                                <p className="text-center">Edit document</p>
                                 <select
                                     name="documentType"
                                     required
@@ -158,7 +188,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                                 >
                                     {documentTypes && documentTypes.length > 0 && (
                                         <>
-                                            <option value="" disabled className="bg-background text-foreground">
+                                            <option value={0} disabled className="bg-background text-foreground">
                                                 Select an option
                                             </option>
                                             {documentTypes?.map((documentType) => (
@@ -169,6 +199,21 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                                         </>
                                     )}
                                 </select>
+                                {submitType === 'new' && (
+                                    <Input
+                                        type="file"
+                                        name=""
+                                        id=""
+                                        onChange={(e) =>
+                                            setNewFileData((prev) => ({
+                                                ...prev,
+                                                file: e.target.files ? e.target.files[0] : null,
+                                            }))
+                                        }
+                                        required
+                                        accept="image/png, image/jpeg, image/jpg, .pdf"
+                                    />
+                                )}
 
                                 <Input
                                     type="text"
@@ -226,6 +271,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                     <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
                         Delete
                     </Button>
+                    <Button onClick={() => addNewFile()}>Add new file</Button>
                 </div>
                 <p>Code : {asset.code}</p>
                 <p>Reference code : {asset.reference_code}</p>
@@ -240,12 +286,11 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                 <p>Model : {asset.model}</p>
                 <p>Serial number : {asset.serial_number}</p>
 
-                {documents.length > 0 && (
-                    <details open>
-                        <summary>
-                            <h3 className="inline">Documents ({documents.length})</h3>
-                        </summary>
-
+                <details>
+                    <summary>
+                        <h3 className="inline">Documents ({documents.length})</h3>
+                    </summary>
+                    {documents.length > 0 && (
                         <Table>
                             <TableHead>
                                 <TableHeadRow>
@@ -295,9 +340,10 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                                 })}
                             </TableBody>
                         </Table>
-                    </details>
-                )}
+                    )}
+                </details>
             </div>
+
             {showFileModal && addFileModalForm()}
         </AppLayout>
     );

@@ -8,12 +8,15 @@ use App\Models\LocationType;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Building;
+use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\Central\CategoryType;
 use App\Http\Requests\Tenant\TenantFloorRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
+use App\Http\Requests\Tenant\DocumentUploadRequest;
 
 class TenantFloorController extends Controller
 {
@@ -33,14 +36,14 @@ class TenantFloorController extends Controller
     {
         $levelTypes = Building::all();
         $locationTypes = LocationType::where('level', 'floor')->get();
-
-        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'floors']);
+        $documentTypes = CategoryType::where('category', 'document')->get();
+        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'floors', 'documentTypes' => $documentTypes]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(TenantFloorRequest $floorRequest, MaintainableRequest $maintainableRequest)
+    public function store(TenantFloorRequest $floorRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
     {
         try {
             DB::beginTransaction();
@@ -66,6 +69,12 @@ class TenantFloorController extends Controller
                 ...$maintainableRequest->validated()
             ]);
 
+            $files = $documentUploadRequest->validated('files');
+            if ($files) {
+                $documentService->uploadAndAttachDocuments($floor, $files);
+            }
+
+
             DB::commit();
 
             return redirect()->route('tenant.floors.index')->with(['message' => 'Floor created', 'type' => 'success']);
@@ -82,7 +91,7 @@ class TenantFloorController extends Controller
      */
     public function show(Floor $floor)
     {
-        return Inertia::render('tenants/locations/show', ['location' => $floor->load('locationType')]);
+        return Inertia::render('tenants/locations/show', ['location' => $floor->load(['locationType', 'documents'])]);
     }
 
     /**

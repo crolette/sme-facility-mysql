@@ -1,18 +1,28 @@
 <?php
 
-use App\Models\Tenants\User;
 use App\Models\LocationType;
 use App\Models\Tenants\Site;
+use App\Models\Tenants\User;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Building;
+use App\Models\Tenants\Document;
+use Illuminate\Http\UploadedFile;
+use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Storage;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
 
+
+beforeEach(function () {
+    $this->user = User::factory()->create();
+    $this->actingAs($this->user, 'tenant');
+});
+
 it('can render the index buildings page', function () {
-    $this->actingAs($user = User::factory()->create());
+
 
     LocationType::factory()->count(1)->create(['level' => 'site']);
     LocationType::factory()->count(2)->create(['level' => 'building']);
@@ -30,14 +40,10 @@ it('can render the index buildings page', function () {
     );
 });
 
-
 it('can render the create building page', function () {
-
-    $this->actingAs($user = User::factory()->create());
 
     LocationType::factory()->count(1)->create(['level' => 'site']);
     LocationType::factory()->count(2)->create(['level' => 'building']);
-
 
     $response = $this->getFromTenant('tenant.buildings.create');
     $response->assertOk();
@@ -50,10 +56,7 @@ it('can render the create building page', function () {
     );
 });
 
-
 it('can create a new building', function () {
-
-    $this->actingAs($user = User::factory()->create());
 
     $siteType = LocationType::factory()->create(['level' => 'site']);
     $buildingType = LocationType::factory()->create(['level' => 'building']);
@@ -86,9 +89,55 @@ it('can create a new building', function () {
     ]);
 });
 
+it('can upload several files to building', function () {
+
+    LocationType::factory()->create(['level' => 'site']);
+    $location = LocationType::factory()->create(['level' => 'building']);
+    $site = Site::factory()->create();
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
+    CategoryType::factory()->count(2)->create(['category' => 'document']);
+    $categoryType = CategoryType::where('category', 'document')->first();
+
+    $formData = [
+        'name' => 'New room',
+        'description' => 'Description new room',
+        'levelType' => $site->id,
+        'locationType' => $location->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ]
+        ]
+    ];
+
+    $response = $this->postToTenant('tenant.buildings.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => 'App\Models\Tenants\Building',
+        'documentable_id' => 1
+    ]);
+
+    Storage::disk('tenants')->assertExists(Document::first()->path);
+});
+
 it('can render the show building page', function () {
 
-    $this->actingAs($user = User::factory()->create());
+
 
     LocationType::factory()->count(3)->create(['level' => 'site']);
     LocationType::factory()->count(3)->create(['level' => 'building']);
@@ -109,10 +158,9 @@ it('can render the show building page', function () {
     );
 });
 
-
 it('can render the update building page', function () {
 
-    $this->actingAs($user = User::factory()->create());
+
 
     LocationType::factory()->count(3)->create(['level' => 'site']);
     LocationType::factory()->count(3)->create(['level' => 'building']);
@@ -133,10 +181,9 @@ it('can render the update building page', function () {
     );
 });
 
-
 it('can update a building', function () {
 
-    $this->actingAs($user = User::factory()->create());
+
 
     $level = LocationType::factory()->create(['level' => 'site']);
     $buildingType = LocationType::factory()->create(['level' => 'building']);
@@ -182,7 +229,7 @@ it('can update a building', function () {
 
 it('cannot update a building type of an existing building', function () {
 
-    $this->actingAs($user = User::factory()->create());
+
 
     LocationType::factory()->count(2)->create(['level' => 'site']);
     LocationType::factory()->count(2)->create(['level' => 'building']);
@@ -203,10 +250,9 @@ it('cannot update a building type of an existing building', function () {
     ]);
 });
 
-
 it('can delete a building', function () {
 
-    $this->actingAs($user = User::factory()->create());
+
 
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
@@ -234,10 +280,9 @@ it('can delete a building', function () {
     assertDatabaseCount('maintainables', 1);
 });
 
-
 it('can delete a building and the related floors', function () {
 
-    $this->actingAs($user = User::factory()->create());
+
 
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
@@ -263,4 +308,38 @@ it('can delete a building and the related floors', function () {
     assertDatabaseEmpty('buildings');
     assertDatabaseEmpty('floors');
     assertDatabaseCount('maintainables', 1);
+});
+
+it('can update name and description of a document from a building ', function () {
+    CategoryType::factory()->count(2)->create(['category' => 'document']);
+    LocationType::factory()->create(['level' => 'site']);
+    LocationType::factory()->create(['level' => 'building']);
+    LocationType::factory()->create(['level' => 'floor']);
+    Site::factory()->create();
+    $building = Building::factory()->create();
+
+    $document = Document::factory()->withCustomAttributes([
+        'user' => $this->user,
+        'directoryName' => 'buildings',
+        'model' => $building,
+    ])->create();
+    $building->documents()->attach($document);
+
+    $categoryType = CategoryType::where('category', 'document')->get()->last();
+
+    $formData =  [
+        'name' => 'New document name',
+        'description' =>  'New description of the new document',
+        'typeId' => $categoryType->id,
+        'typeSlug' => $categoryType->slug
+    ];
+
+    $response = $this->patchToTenant('api.documents.update', $formData, $document->id);
+    $response->assertOk();
+    $this->assertDatabaseHas('documents', [
+        'id' => $document->id,
+        'name' => 'New document name',
+        'description' => 'New description of the new document',
+        'category_type_id' => $categoryType->id,
+    ]);
 });

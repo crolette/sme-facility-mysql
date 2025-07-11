@@ -19,7 +19,6 @@ use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
 
 beforeEach(function () {
-
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
@@ -44,7 +43,7 @@ beforeEach(function () {
     // $this->asset = Asset::factory()->forLocation($this->room)->create();
 });
 
-it('can upload several files', function () {
+it('can upload several files to asset', function () {
 
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
@@ -85,10 +84,9 @@ it('can upload several files', function () {
         'documentable_id' => 1
     ]);
 
-    $fileName = Carbon::parse(Carbon::now())->isoFormat('YYYYMMDD') . '_' . Str::slug('FILE 1 - Long name of more than 10 chars', '-')  . '_' . Str::substr(Str::uuid7(), 0, 8) .  '.png';
-
     Storage::disk('tenants')->assertExists(Document::first()->path);
 });
+
 
 it('fails when upload wrong image mime (ie. webp)', function () {
 
@@ -160,7 +158,11 @@ it('fails when upload exceeding document size : ' . Document::maxUploadSizeKB() 
 it('can delete a document from an asset', function () {
 
     $asset = Asset::factory()->forLocation($this->room)->create();
-    $document = Document::factory()->create();
+    $document = Document::factory()->withCustomAttributes([
+        'user' => $this->user,
+        'directoryName' => 'assets',
+        'model' => $asset,
+    ])->create();
     $asset->documents()->attach($document);
 
     $response = $this->deleteFromTenant('api.documents.delete', $document->id);
@@ -180,7 +182,11 @@ it('can delete a document from an asset', function () {
 it('can update name and description a document from an asset ', function () {
 
     $asset = Asset::factory()->forLocation($this->room)->create();
-    $document = Document::factory()->create();
+    $document = Document::factory()->withCustomAttributes([
+        'user' => $this->user,
+        'directoryName' => 'assets',
+        'model' => $asset,
+    ])->create();
     $asset->documents()->attach($document);
 
     $categoryType = CategoryType::where('category', 'document')->get()->last();
@@ -192,7 +198,7 @@ it('can update name and description a document from an asset ', function () {
         'typeSlug' => $categoryType->slug
     ];
 
-    $response = $this->patchToTenant('api.documents.delete', $formData, $document->id);
+    $response = $this->patchToTenant('api.documents.update', $formData, $document->id);
     $response->assertOk();
     $this->assertDatabaseHas('documents', [
         'id' => $document->id,
@@ -200,9 +206,4 @@ it('can update name and description a document from an asset ', function () {
         'description' => 'New description of the new document',
         'category_type_id' => $categoryType->id
     ]);
-
-    // $this->assertDatabaseMissing('documentables', [
-    //     'documentable_id' => $asset->id,
-    //     'documentable_type' => Asset::class
-    // ]);
 });

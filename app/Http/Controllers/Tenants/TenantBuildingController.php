@@ -8,12 +8,15 @@ use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Building;
+use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\Central\CategoryType;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\MaintainableRequest;
+use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Requests\Tenant\TenantBuildingRequest;
 
 class TenantBuildingController extends Controller
@@ -36,14 +39,14 @@ class TenantBuildingController extends Controller
         //
         $levelTypes = Site::all();
         $locationTypes = LocationType::where('level', 'building')->get();
-
-        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings']);
+        $documentTypes = CategoryType::where('category', 'document')->get();
+        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings', 'documentTypes' => $documentTypes]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(TenantBuildingRequest $buildingRequest, MaintainableRequest $maintainableRequest)
+    public function store(TenantBuildingRequest $buildingRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
     {
 
         try {
@@ -68,6 +71,11 @@ class TenantBuildingController extends Controller
             $building->maintainable()->create([
                 ...$maintainableRequest->validated()
             ]);
+
+            $files = $documentUploadRequest->validated('files');
+            if ($files) {
+                $documentService->uploadAndAttachDocuments($building, $files);
+            }
 
             DB::commit();
 

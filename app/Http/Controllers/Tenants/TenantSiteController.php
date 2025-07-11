@@ -7,13 +7,16 @@ use Inertia\Inertia;
 use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
+use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\Central\CategoryType;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\TenantSiteRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
+use App\Http\Requests\Tenant\DocumentUploadRequest;
 
 class TenantSiteController extends Controller
 {
@@ -24,8 +27,6 @@ class TenantSiteController extends Controller
     {
         $sites = Site::all();
 
-        // dd(Site::with(['buildings', 'buildings.floors'])->get());
-
         return Inertia::render('tenants/locations/index', ['locations' => $sites, 'routeName' => 'sites']);
     }
 
@@ -35,13 +36,14 @@ class TenantSiteController extends Controller
     public function create()
     {
         $locationTypes = LocationType::where('level', 'site')->get();
-        return Inertia::render('tenants/locations/create', ['locationTypes' => $locationTypes, 'routeName' => 'sites']);
+        $documentTypes = CategoryType::where('category', 'document')->get();
+        return Inertia::render('tenants/locations/create', ['locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(TenantSiteRequest $siteRequest, MaintainableRequest $maintainableRequest)
+    public function store(TenantSiteRequest $siteRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
     {
         try {
             DB::beginTransaction();
@@ -57,10 +59,14 @@ class TenantSiteController extends Controller
                 'location_type_id' => $locationType->id
             ]);
 
-
             $site->maintainable()->create([
                 ...$maintainableRequest->validated()
             ]);
+
+            $files = $documentUploadRequest->validated('files');
+            if ($files) {
+                $documentService->uploadAndAttachDocuments($site, $files);
+            }
 
             DB::commit();
             return redirect()->route('tenant.sites.index')->with(['message' => 'Site created', 'type' => 'success']);
@@ -78,7 +84,7 @@ class TenantSiteController extends Controller
      */
     public function show(Site $site)
     {
-        return Inertia::render('tenants/locations/show', ['location' => $site->load('locationType')]);
+        return Inertia::render('tenants/locations/show', ['routeName' => 'sites', 'location' => $site->load(['locationType', 'documents'])]);
     }
 
     /**
@@ -95,7 +101,7 @@ class TenantSiteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(TenantSiteRequest $siteRequest, MaintainableRequest $maintainableRequest, Site $site)
+    public function update(TenantSiteRequest $siteRequest, MaintainableRequest $maintainableRequest,  Site $site)
     {
         // TODO Check how to perform a check or be sure that a user can't change the level/location type as it would change every child (building, floor, room)
 

@@ -1,8 +1,10 @@
 <?php
 
 use App\Helpers\ApiResponse;
+use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
+use App\Models\Tenants\Floor;
 use App\Models\Tenants\Document;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Route;
@@ -12,7 +14,9 @@ use App\Http\Controllers\API\V1\DestroyDocumentController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubDomain;
 use App\Http\Controllers\API\V1\ApiSearchLocationController;
 use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
-
+use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Models\Tenants\Building;
+use App\Services\DocumentService;
 
 Route::prefix('api/v1')->group(
     function () {
@@ -34,6 +38,34 @@ Route::prefix('api/v1')->group(
                 Route::get('/assets/{asset}/documents/', function (Asset $asset) {
                     return response()->json($asset->load('documents')->documents);
                 })->name('api.assets.documents');
+
+                Route::post('/assets/{asset}/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Asset $asset) {
+
+                    Debugbar::info($documentUploadRequest, $documentUploadRequest->validated());
+                    $files = $documentUploadRequest->validated('files');
+                    if ($files) {
+                        $documentService->uploadAndAttachDocuments($asset, $files);
+                    }
+
+                    return response()->json($asset->load('documents')->documents);
+                })->name('api.assets.documents.post');
+
+
+                Route::get('/sites/{site}/documents/', function (Site $site) {
+                    return response()->json($site->load('documents')->documents);
+                })->name('api.sites.documents');
+
+                Route::get('/buildings/{building}/documents/', function (Building $building) {
+                    return response()->json($building->load('documents')->documents);
+                })->name('api.buildings.documents');
+
+                Route::get('/floors/{floor}/documents/', function (Floor $floor) {
+                    return response()->json($floor->load('documents')->documents);
+                })->name('api.floors.documents');
+
+                Route::get('/rooms/{room}/documents/', function (Room $room) {
+                    return response()->json($room->load('documents')->documents);
+                })->name('api.rooms.documents');
 
 
                 // Return the category type searched
