@@ -173,7 +173,7 @@ export interface Address {
 
 export interface SharedData {
     name: string;
-    tenant: string;
+    tenantName: string;
     auth: Auth;
     flash: Flash;
     ziggy: Config & { location: string };

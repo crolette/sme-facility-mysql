@@ -5,25 +5,25 @@ use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
+use App\Services\DocumentService;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Controllers\API\V1\UpdateDocumentController;
 use App\Http\Controllers\API\V1\DestroyDocumentController;
-use Stancl\Tenancy\Middleware\InitializeTenancyBySubDomain;
+use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\API\V1\ApiSearchLocationController;
 use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
-use App\Http\Requests\Tenant\DocumentUploadRequest;
-use App\Models\Tenants\Building;
-use App\Services\DocumentService;
 
 Route::prefix('api/v1')->group(
     function () {
         Route::middleware([
             'web',
 
-            InitializeTenancyBySubDomain::class,
+            InitializeTenancyBySubdomain::class,
             \Stancl\Tenancy\Middleware\ScopeSessions::class,
             \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
             'auth:tenant'

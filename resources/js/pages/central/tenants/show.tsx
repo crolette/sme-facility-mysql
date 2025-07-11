@@ -22,9 +22,6 @@ export default function ShowTenant({ tenant }: { tenant: Tenant }) {
                             <li key="99">Company address : {tenant.full_company_address}</li>
                             <li key="88">Invoice address : {tenant.full_invoice_address ?? 'Same as company address'}</li>
                         </ul>
-                        {/* <Button onClick={() => setData('tenant', tenant.id)} variant={'destructive'}>
-                                    Delete
-                                </Button> */}
                     </li>
                 </ul>
             </div>

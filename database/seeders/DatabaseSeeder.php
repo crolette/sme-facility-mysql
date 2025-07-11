@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
             'last_name' => 'Admin',
             'username' => 'super.admin',
             'email' => 'super@sme-facility.com',
-            'password' => Hash::make('pass123')
+            'password' => Hash::make('SME_2025!fwebxp')
         ]);
     }
 }

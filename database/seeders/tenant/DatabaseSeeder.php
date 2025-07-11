@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
         User::factory()->create([
             'name' => 'Super Admin',
             'email' => 'super@sme-facility.com',
-            'password' => Hash::make('pass123')
+            'password' => Hash::make('SME_2025!fwebxp')
         ]);
     }
 }

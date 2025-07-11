@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('assets', function (Blueprint $table) {
-            $table->timestamp('deleted_at');
+            // for soft deletes
+            $table->timestamp('deleted_at')->nullable();
         });
     }
 
