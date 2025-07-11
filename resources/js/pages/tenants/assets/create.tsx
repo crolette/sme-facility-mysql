@@ -32,7 +32,7 @@ type TypeFormData = {
         name: string;
         description: string;
         typeId: null | number;
-        typeName: string;
+        typeSlug: string;
     }[];
 };
 
@@ -79,8 +79,6 @@ export default function CreateAsset({
         serial_number: asset?.maintainable.serial_number ?? '',
         files: selectedDocuments,
     });
-
-    console.log(asset);
 
     const [listIsOpen, setListIsOpen] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
@@ -163,7 +161,7 @@ export default function CreateAsset({
 
         if (!newFile) return;
 
-        const typeName = documentTypes.find((type) => {
+        const typeSlug = documentTypes.find((type) => {
             return type.id === newDocumentType;
         })?.slug;
 
@@ -172,7 +170,7 @@ export default function CreateAsset({
             name: newFileName,
             description: newFileDescription,
             typeId: newDocumentType,
-            typeName: typeName ?? '',
+            typeSlug: typeSlug ?? '',
         };
 
         setSelectedDocuments((prev) => {
@@ -206,8 +204,6 @@ export default function CreateAsset({
             return files;
         });
     };
-
-    console.log(data);
 
     const addFileModalForm = () => {
         return (

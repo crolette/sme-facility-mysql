@@ -50,23 +50,22 @@ export interface TenantSite {
     id: number;
     code: string;
     reference_code: string;
+    category: string;
+    level_id: number;
     location_type: LocationType;
     maintainable: Maintainable;
 }
 
 export interface TenantBuilding extends TenantSite {
     site: TenantSite;
-    level_id: number;
 }
 
 export interface TenantFloor extends TenantSite {
     building: TenantBuilding;
-    level_id: number;
 }
 
 export interface TenantRoom extends TenantSite {
     floor: TenantFloor;
-    level_id: number;
 }
 
 export interface Asset {
@@ -94,6 +93,7 @@ export interface Document {
     filename: string;
     description: string;
     sizeMo: number;
+    category_type_id: number;
     created_at: string;
 }
 

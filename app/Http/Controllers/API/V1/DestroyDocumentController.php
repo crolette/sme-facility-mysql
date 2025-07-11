@@ -16,37 +16,23 @@ use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\DocumentUpdateRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 
-class UpdateDocumentController extends Controller
+class DestroyDocumentController extends Controller
 {
 
-
-    public function update(DocumentUpdateRequest $request, Document $document)
+    public function destroy(Document $document)
     {
         if (!$document)
             return ApiResponse::error('Document not found', [], 404);
 
         try {
 
-            $document->update([...$request->validated()]);
+            $document->delete();
 
-            if ($document->category_type_id !== $request->validated('typeId')) {
-                $document->documentCategory()->dissociate();
-                $document->documentCategory()->associate($request->validated('typeId'));
-                $document->save();
-            }
-
-            return ApiResponse::success(null, 'Document updated');
+            return ApiResponse::success(null, 'Document deleted');
         } catch (Exception $e) {
             return ApiResponse::error('Impossible de mettre à jour le document.', [
                 'exception' => $e->getMessage()
             ], 500);
         }
-    }
-
-    public function destroy(Document $document)
-    {
-        $document->delete();
-
-        return response()->noContent();
     }
 }

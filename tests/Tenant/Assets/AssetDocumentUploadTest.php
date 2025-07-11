@@ -19,6 +19,7 @@ use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
 
 beforeEach(function () {
+
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
@@ -26,16 +27,21 @@ beforeEach(function () {
     CategoryType::factory()->count(2)->create(['category' => 'document']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
     CategoryType::factory()->count(2)->create(['category' => 'asset']);
+
+    $this->user = User::factory()->create();
+    $this->actingAs($this->user, 'tenant');
+
+    // on créée les différentes "locations" possibles pour attacher un asset
     $this->site = Site::factory()->create();
     $this->building = Building::factory()->create();
     $this->floor = Floor::factory()->create();
-
     $this->room = Room::factory()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
-    $this->user = User::factory()->create();
-    $this->actingAs($this->user, 'tenant');
+
+    // on créé un asset qu'on attache à une room
+    // $this->asset = Asset::factory()->forLocation($this->room)->create();
 });
 
 it('can upload several files', function () {
@@ -43,7 +49,6 @@ it('can upload several files', function () {
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
     $categoryType = CategoryType::where('category', 'document')->first();
-
 
     $formData = [
         'name' => 'New asset',
@@ -55,17 +60,17 @@ it('can upload several files', function () {
         'files' => [
             [
                 'file' => $file1,
-                'name' => 'Long description of more than 10 chars',
+                'name' => 'FILE 1 - Long name of more than 10 chars',
                 'description' => 'descriptionIMG',
                 'typeId' => $categoryType->id,
-                'typeName' => $categoryType->slug
+                'typeSlug' => $categoryType->slug
             ],
             [
                 'file' => $file2,
-                'name' => 'Long description of more than 10 chars',
+                'name' => 'FILE 2 - Long name of more than 10 chars',
                 'description' => 'descriptionPDF',
                 'typeId' => $categoryType->id,
-                'typeName' => $categoryType->slug
+                'typeSlug' => $categoryType->slug
             ]
         ]
     ];
@@ -80,10 +85,9 @@ it('can upload several files', function () {
         'documentable_id' => 1
     ]);
 
-    $fileName = Carbon::parse(Carbon::now())->isoFormat('YYYYMMDD') . '_' . Str::slug('Long description of more than 10 chars', '-') . '_' . $categoryType->slug . '_' . Str::substr(Str::uuid7(), 0, 8) .  '.png';
+    $fileName = Carbon::parse(Carbon::now())->isoFormat('YYYYMMDD') . '_' . Str::slug('FILE 1 - Long name of more than 10 chars', '-')  . '_' . Str::substr(Str::uuid7(), 0, 8) .  '.png';
 
-
-    Storage::disk('tenants')->assertExists(tenancy()->tenant->id . '/assets/1/documents/' . $fileName);
+    Storage::disk('tenants')->assertExists(Document::first()->path);
 });
 
 it('fails when upload wrong image mime (ie. webp)', function () {
@@ -151,4 +155,54 @@ it('fails when upload exceeding document size : ' . Document::maxUploadSizeKB() 
     $response->assertSessionHasErrors([
         'files.0.file' => "The files.0.file field must not be greater than " . Document::maxUploadSizeKB() . " kilobytes.",
     ]);
+});
+
+it('can delete a document from an asset', function () {
+
+    $asset = Asset::factory()->forLocation($this->room)->create();
+    $document = Document::factory()->create();
+    $asset->documents()->attach($document);
+
+    $response = $this->deleteFromTenant('api.documents.delete', $document->id);
+    $response->assertOk();
+
+    $this->assertDatabaseMissing('documents', [
+        'id' => $document->id,
+        'filename' => $document->filename
+    ]);
+
+    $this->assertDatabaseMissing('documentables', [
+        'documentable_id' => $asset->id,
+        'documentable_type' => Asset::class
+    ]);
+});
+
+it('can update name and description a document from an asset ', function () {
+
+    $asset = Asset::factory()->forLocation($this->room)->create();
+    $document = Document::factory()->create();
+    $asset->documents()->attach($document);
+
+    $categoryType = CategoryType::where('category', 'document')->get()->last();
+
+    $formData =  [
+        'name' => 'New document name',
+        'description' =>  'New description of the new document',
+        'typeId' => $categoryType->id,
+        'typeSlug' => $categoryType->slug
+    ];
+
+    $response = $this->patchToTenant('api.documents.delete', $formData, $document->id);
+    $response->assertOk();
+    $this->assertDatabaseHas('documents', [
+        'id' => $document->id,
+        'name' => 'New document name',
+        'description' => 'New description of the new document',
+        'category_type_id' => $categoryType->id
+    ]);
+
+    // $this->assertDatabaseMissing('documentables', [
+    //     'documentable_id' => $asset->id,
+    //     'documentable_type' => Asset::class
+    // ]);
 });

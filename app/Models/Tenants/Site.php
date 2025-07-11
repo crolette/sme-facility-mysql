@@ -8,6 +8,7 @@ use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use App\Models\Tenants\Maintainable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -33,6 +34,10 @@ class Site extends Model
     protected $with = [
         'locationType',
         'maintainable'
+    ];
+
+    protected $appends = [
+        'category',
     ];
 
     public static function boot()
@@ -71,5 +76,14 @@ class Site extends Model
     public function documents(): MorphToMany
     {
         return $this->morphToMany(Document::class, 'documentable');
+    }
+
+    public function category($locale = null): Attribute
+    {
+        $locale = $locale ?? app()->getLocale();
+
+        return Attribute::make(
+            get: fn() => $this->locationType->translations->where('locale', $locale)->first()?->label ?? $this->locationType->translations->where('locale', config('app.fallback_locale'))?->label
+        );
     }
 }

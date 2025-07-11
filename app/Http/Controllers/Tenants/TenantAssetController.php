@@ -24,6 +24,7 @@ use App\Http\Requests\Tenant\AssetRequest;
 use App\Http\Requests\Tenant\FileUploadRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Services\DocumentService;
 
 class TenantAssetController extends Controller
 {
@@ -49,7 +50,7 @@ class TenantAssetController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest)
+    public function store(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
     {
 
         try {
@@ -87,28 +88,9 @@ class TenantAssetController extends Controller
             $asset->maintainable()->create($maintainableRequest->validated());
 
             $files = $documentUploadRequest->validated('files');
-            foreach ($files as $fileIndex => $file) {
-                // dd(Carbon::now()->toDateString(), Carbon::now()->toFormattedDateString(), );
-                $directory = tenancy()->tenant->id . '/assets/' . $asset->id . '/documents';
-                $fileName = Carbon::parse(Carbon::now())->isoFormat('YYYYMMDD') . '_' . Str::slug($file['name'], '-') . '_' . $file['typeName'] . '_' . Str::substr(Str::uuid7(), 0, 8) .  '.' . $file['file']->extension();
 
-                $path = Storage::disk('tenants')->putFileAs($directory, $file['file'], $fileName);
-                $document = new Document([
-                    'path' => $path,
-                    'filename' => $fileName,
-                    'directory' => $directory,
-                    'name' => $file['name'],
-                    'description' => $file['description'] ?? null,
-                    'size' => $file['file']->getSize(),
-                    'mime_type' =>  $file['file']->getMimeType(),
-                ]);
+            $documentService->uploadAndAttachDocuments($asset, $files);
 
-                $document->documentCategory()->associate($file['typeId']);
-                $document->uploader()->associate(Auth::guard('tenant')->user());
-
-                $document->save();
-                $asset->documents()->attach($document);
-            };
 
             DB::commit();
 
@@ -126,7 +108,6 @@ class TenantAssetController extends Controller
      */
     public function show(Asset $asset)
     {
-        //
         return Inertia::render('tenants/assets/show', ['asset' => $asset->load('documents')]);
     }
 
