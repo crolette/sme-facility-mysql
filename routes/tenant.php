@@ -7,20 +7,21 @@ use App\Models\Tenant;
 use App\Jobs\DeleteDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\AuthenticateTenant;
 use Stancl\Tenancy\Middleware\ScopeSessions;
-use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
-use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
-use App\Http\Controllers\Tenants\TenantBuildingController;
-use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
-use App\Http\Controllers\Tenants\Auth\TenantAuthenticatedSessionController;
-use App\Http\Controllers\Tenants\ForceDeleteAssetController;
-use App\Http\Controllers\Tenants\TenantAssetController;
-use App\Http\Controllers\Tenants\TenantFloorController;
+use App\Http\Controllers\Tenants\TicketController;
 use App\Http\Controllers\Tenants\TenantRoomController;
 use App\Http\Controllers\Tenants\TenantSiteController;
-use App\Http\Middleware\AuthenticateTenant;
+use App\Http\Controllers\Tenants\TenantAssetController;
+use App\Http\Controllers\Tenants\TenantFloorController;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use App\Http\Controllers\Tenants\TenantBuildingController;
+use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
+use App\Http\Controllers\Tenants\ForceDeleteAssetController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
+use App\Http\Controllers\Tenants\Auth\TenantAuthenticatedSessionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -55,6 +56,11 @@ Route::middleware([
     Route::resource('assets', TenantAssetController::class)->parameters(['assets' => 'asset'])->names('tenant.assets');
     Route::post('assets/{assetId}/restore', [RestoreSoftDeletedAssetController::class, 'restore'])->name('tenant.assets.restore');
     Route::delete('assets/{assetId}/force', [ForceDeleteAssetController::class, 'forceDelete'])->name('tenant.assets.force');
+
+
+    Route::get('/tickets', [TicketController::class, 'index'])->name('tenant.tickets.index');
+
+    Route::get('tickets/create', [TicketController::class, 'create'])->name('tenant.tickets.create');
 });
 
 require __DIR__ . '/tenant_auth.php';

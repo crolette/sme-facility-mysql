@@ -38,6 +38,11 @@ const mainNavItems: NavItem[] = [
         href: '/assets',
         icon: LayoutGrid,
     },
+    {
+        title: 'Tickets',
+        href: '/tickets',
+        icon: LayoutGrid,
+    },
 ];
 
 const footerNavItems: NavItem[] = [

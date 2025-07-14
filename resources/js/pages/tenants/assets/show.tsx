@@ -159,8 +159,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
         }
     };
 
-    console.log(newFileData);
-
     const addFileModalForm = () => {
         return (
             <div className="bg-background/50 absolute inset-0 z-50">
@@ -272,6 +270,9 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                         Delete
                     </Button>
                     <Button onClick={() => addNewFile()}>Add new file</Button>
+                    <a href={route(`tenant.tickets.create`)}>
+                        <Button>Add new ticket</Button>
+                    </a>
                 </div>
                 <p>Code : {asset.code}</p>
                 <p>Reference code : {asset.reference_code}</p>

@@ -17,6 +17,7 @@ use App\Http\Controllers\API\V1\DestroyDocumentController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\API\V1\ApiSearchLocationController;
 use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
+use App\Http\Controllers\API\V1\APITicketController;
 
 Route::prefix('api/v1')->group(
     function () {
@@ -91,6 +92,11 @@ Route::prefix('api/v1')->group(
 
                     return response()->file(Storage::disk('tenants')->path($path));
                 })->name('documents.show');
+
+
+                Route::post('tickets', [APITicketController::class, 'store'])->name('api.tickets.store');
+                Route::patch('tickets/{ticket}', [APITicketController::class, 'update'])->name('api.tickets.update');
+                Route::patch('tickets/{ticket}/close', [APITicketController::class, 'close'])->name('api.tickets.close');
             });
         });
     }
