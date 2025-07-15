@@ -146,7 +146,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
 
     const [submitType, setSubmitType] = useState<'edit' | 'new'>('edit');
     const addNewFile = () => {
-        console.log('addNewFile');
         fetchDocumentTypes();
         setSubmitType('new');
         setShowFileModal(!showFileModal);
@@ -180,11 +179,10 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
 
     const submitNewFile: FormEventHandler = async (e) => {
         e.preventDefault();
-        console.log('submitNewFile');
+
         const newFile = {
             files: [newFileData],
         };
-        console.log(newFile);
         try {
             await axios.post(route('api.assets.documents.post', asset.code), newFile, {
                 headers: {
@@ -208,9 +206,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            console.log(response.data.message, response.data.status);
             if (response.data.status === 'success') {
-                console.log('SUCCESS');
                 fetchPictures();
                 setNewPictures(null);
                 setAddPictures(!addPictures);
@@ -380,11 +376,8 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
 
     const submitEditTicket: FormEventHandler = async (e) => {
         e.preventDefault();
-        console.log('submitEditTicket');
-        console.log(newTicketData);
         try {
             const response = await axios.patch(route('api.tickets.update', newTicketData.ticket_id), newTicketData);
-            console.log(response.data.status, response.data.message);
             fetchTickets();
             closeModalTicket();
             // }
@@ -395,15 +388,12 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
 
     const submitNewTicket: FormEventHandler = async (e) => {
         e.preventDefault();
-        console.log('submitNewTicket');
         try {
-            console.log('post');
             const response = await axios.post(route('api.tickets.store'), newTicketData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            console.log(response.data.status, response.data.message);
             if (response.data.status === 'success') {
                 fetchTickets();
                 closeModalTicket();
@@ -421,15 +411,12 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
         setSubmitTypeTicket('edit');
     };
 
-    console.log(submitTypeTicket);
     const [tickets, setTickets] = useState<Ticket[]>(asset.tickets);
 
     const editTicket = async (id: number) => {
         setSubmitTypeTicket('edit');
         try {
-            console.log('post');
             const response = await axios.get(route('api.tickets.get', id), {});
-            console.log(response.data.data);
             setNewTicketData((prev) => ({
                 ...prev,
                 ticket_id: response.data.data.id,
@@ -438,7 +425,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
             }));
 
             setAddTicketModal(true);
-            console.log(newTicketData);
 
             // }
         } catch (error) {

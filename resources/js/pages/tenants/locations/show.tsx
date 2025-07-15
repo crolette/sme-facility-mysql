@@ -122,8 +122,6 @@ export default function ShowLocation({ location, routeName }: { location: Tenant
 
         setShowFileModal(!showFileModal);
     };
-    console.log(location);
-    console.log();
 
     useEffect(() => {
         if (documentTypes.length === 0) return;
@@ -174,10 +172,6 @@ export default function ShowLocation({ location, routeName }: { location: Tenant
             console.log(error.response.data.errors);
         }
     };
-
-    console.log(newFileData);
-    console.log(submitType);
-    console.log(routeName);
 
     const addFileModalForm = () => {
         return (
@@ -353,17 +347,13 @@ export default function ShowLocation({ location, routeName }: { location: Tenant
 
     const [newTicketData, setNewTicketData] = useState<FormDataTicket>(updateTicketData);
 
-    console.log(newTicketData);
-
     const closeModalTicket = () => {
         setAddTicketModal(false);
         setNewTicketData(updateTicketData);
         setSubmitTypeTicket('edit');
     };
 
-    console.log(submitTypeTicket);
     const [tickets, setTickets] = useState<Ticket[]>(location.tickets);
-    console.log(tickets);
 
     const editTicket = async (id: number) => {
         setSubmitTypeTicket('edit');
@@ -485,30 +475,28 @@ export default function ShowLocation({ location, routeName }: { location: Tenant
                             <TableBody>
                                 {tickets.map((ticket, index) => {
                                     return (
-                                        <>
-                                            <TableBodyRow key={index}>
-                                                <TableBodyData>
-                                                    <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
-                                                </TableBodyData>
-                                                <TableBodyData>{ticket.status}</TableBodyData>
-                                                <TableBodyData>{ticket.code}</TableBodyData>
-                                                <TableBodyData>{ticket.description}</TableBodyData>
-                                                <TableBodyData>{ticket.created_at}</TableBodyData>
-                                                <TableBodyData>{ticket.updated_at}</TableBodyData>
+                                        <TableBodyRow key={index}>
+                                            <TableBodyData>
+                                                <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
+                                            </TableBodyData>
+                                            <TableBodyData>{ticket.status}</TableBodyData>
+                                            <TableBodyData>{ticket.code}</TableBodyData>
+                                            <TableBodyData>{ticket.description}</TableBodyData>
+                                            <TableBodyData>{ticket.created_at}</TableBodyData>
+                                            <TableBodyData>{ticket.updated_at}</TableBodyData>
 
-                                                <TableBodyData>
-                                                    {ticket.status !== 'closed' && (
-                                                        <>
-                                                            <Button variant={'destructive'} onClick={() => closeTicket(ticket.id)}>
-                                                                Close
-                                                            </Button>
+                                            <TableBodyData>
+                                                {ticket.status !== 'closed' && (
+                                                    <>
+                                                        <Button variant={'destructive'} onClick={() => closeTicket(ticket.id)}>
+                                                            Close
+                                                        </Button>
 
-                                                            <Button onClick={() => editTicket(ticket.id)}>Edit</Button>
-                                                        </>
-                                                    )}
-                                                </TableBodyData>
-                                            </TableBodyRow>
-                                        </>
+                                                        <Button onClick={() => editTicket(ticket.id)}>Edit</Button>
+                                                    </>
+                                                )}
+                                            </TableBodyData>
+                                        </TableBodyRow>
                                     );
                                 })}
                             </TableBody>

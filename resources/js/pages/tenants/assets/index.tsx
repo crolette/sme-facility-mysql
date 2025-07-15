@@ -50,7 +50,6 @@ export default function IndexAssets({ assets }: { assets: Asset[] }) {
     }, [search]);
 
     useEffect(() => {
-        console.log('search trash');
         const fetchData = async () => {
             try {
                 const response = await fetch(`/api/v1/assets/trashed?q=${debouncedSearch}`);
