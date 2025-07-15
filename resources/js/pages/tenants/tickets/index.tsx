@@ -16,7 +16,6 @@ export default function IndexTickets() {
     const fetchTickets = async () => {
         try {
             const response = await axios.get(route('api.tickets.all'));
-            console.log(response.data);
             setTickets(response.data.data);
         } catch (error) {
             console.error('Erreur lors de la recherche :', error);
@@ -43,9 +42,6 @@ export default function IndexTickets() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Tickets" />
-            <a href={route('tenant.tickets.create')}>
-                <Button>Create ticket</Button>
-            </a>
             <details open>
                 <summary className="">
                     <h3 className="inline">Tickets ({tickets?.length ?? 0})</h3>
@@ -64,14 +60,14 @@ export default function IndexTickets() {
                             </TableHeadRow>
                         </TableHead>
                         <TableBody>
-                            {tickets.map((ticket, index) => {
+                            {tickets?.map((ticket, index) => {
                                 return (
                                     <TableBodyRow key={index}>
                                         <TableBodyData>
                                             <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
                                         </TableBodyData>
                                         <TableBodyData>{ticket.status}</TableBodyData>
-                                        <TableBodyData>{ticket.code}</TableBodyData>
+                                        <TableBodyData>{ticket.reporter?.full_name ?? ticket.reporter_email}</TableBodyData>
                                         <TableBodyData>{ticket.description}</TableBodyData>
                                         <TableBodyData>{ticket.created_at}</TableBodyData>
                                         <TableBodyData>{ticket.updated_at}</TableBodyData>

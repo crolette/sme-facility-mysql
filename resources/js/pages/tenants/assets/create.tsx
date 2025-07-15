@@ -467,8 +467,20 @@ export default function CreateAsset({
                         </div>
                     )}
                     {!asset && (
+                        <div>
+                            <Label>Pictures</Label>
+                            <Input
+                                type="file"
+                                multiple
+                                onChange={(e) => setData('pictures', e.target.files)}
+                                accept="image/png, image/jpeg, image/jpg"
+                            />
+                        </div>
+                    )}
+                    {!asset && (
                         <div id="files">
-                            <Button onClick={() => setShowFileModal(!showFileModal)} type="button">
+                            <Label>Documents</Label>
+                            <Button onClick={() => setShowFileModal(!showFileModal)} type="button" className="block">
                                 Add file
                             </Button>
                             {selectedDocuments.length > 0 && (
@@ -499,16 +511,6 @@ export default function CreateAsset({
                                     })}
                                 </ul>
                             )}
-                        </div>
-                    )}
-                    {!asset && (
-                        <div>
-                            <Input
-                                type="file"
-                                multiple
-                                onChange={(e) => setData('pictures', e.target.files)}
-                                accept="image/png, image/jpeg, image/jpg"
-                            />
                         </div>
                     )}
 
