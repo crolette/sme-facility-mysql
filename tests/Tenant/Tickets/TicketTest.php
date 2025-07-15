@@ -10,6 +10,7 @@ use App\Models\Tenants\Floor;
 use App\Models\Tenants\Ticket;
 
 use App\Models\Tenants\Building;
+use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -41,7 +42,9 @@ beforeEach(function () {
 
 it('can render the index tickets page', function () {
 
-    Ticket::factory()->count(4)->forLocation($this->asset)->create();
+    Ticket::factory()->forLocation($this->asset)->create();
+    Ticket::factory()->forLocation($this->asset)->ongoing()->create();
+    Ticket::factory()->forLocation($this->asset)->closed()->create();
 
     $response = $this->getFromTenant('tenant.tickets.index');
     $response->assertOk();
@@ -49,7 +52,7 @@ it('can render the index tickets page', function () {
     $response->assertInertia(
         fn($page) =>
         $page->component('tenants/tickets/index')
-            ->has('tickets', 4)
+            ->has('tickets', 3)
     );
 });
 
@@ -192,6 +195,32 @@ it('can create a new ticket to an ASSET with "anonymous" user', function () {
         'description' => 'A nice description for this new ticket',
         'ticketable_type' => get_class($this->asset),
         'ticketable_id' => 1,
+    ]);
+});
+
+it('can create a ticket with uploaded pictures', function () {
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->image('test.jpg');
+
+    $formData = [
+        'location_type' => 'assets',
+        'location_id' => $this->asset->id,
+        'status' => TicketStatus::OPEN->value,
+        'description' => 'A nice description for this new ticket',
+        'being_notified' => false,
+        'reported_by' => $this->user->id,
+        'pictures' => [
+            $file1,
+            $file2
+        ]
+    ];
+
+    $response = $this->postToTenant('api.tickets.store', $formData);
+    $response->assertSessionHasNoErrors();
+    assertDatabaseCount('pictures', 2);
+    assertDatabaseHas('pictures', [
+        'imageable_type' => 'App\Models\Tenants\Ticket',
+        'imageable_id' => 1
     ]);
 });
 

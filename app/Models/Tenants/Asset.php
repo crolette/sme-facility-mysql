@@ -83,6 +83,11 @@ class Asset extends Model
         return $this->belongsTo(CategoryType::class, 'category_type_id');
     }
 
+    public function pictures(): MorphMany
+    {
+        return $this->morphMany(Picture::class, 'imageable');
+    }
+
     public function category($locale = null): Attribute
     {
         $locale = $locale ?? app()->getLocale();

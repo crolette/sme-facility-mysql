@@ -26,6 +26,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
     ];
 
     const [documents, setDocuments] = useState(asset.documents);
+    const [pictures, setPictures] = useState(asset.pictures);
 
     const { delete: destroy } = useForm();
 
@@ -36,9 +37,26 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
     const deleteDocument = async (id: number) => {
         try {
             await axios.delete(route('api.documents.delete', id));
-            fetchDocuments();
         } catch (error) {
             console.error('Erreur lors de la suppression', error);
+        }
+    };
+
+    const deletePicture = async (id: number) => {
+        try {
+            await axios.delete(route('api.picture.delete', id));
+            fetchPictures();
+        } catch (error) {
+            console.error('Erreur lors de la suppression', error);
+        }
+    };
+
+    const fetchPictures = async () => {
+        try {
+            const response = await axios.get(`/api/v1/assets/${asset.code}/pictures`);
+            setPictures(await response.data);
+        } catch (error) {
+            console.error('Erreur lors de la recherche :', error);
         }
     };
 
@@ -343,6 +361,20 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                         </Table>
                     )}
                 </details>
+                <h3 className="inline">Pictures ({pictures.length})</h3>
+                <div className="flex">
+                    {pictures.length > 0 &&
+                        pictures.map((picture, index) => {
+                            return (
+                                <div key={index}>
+                                    <img src={route('pictures.show', picture.id)} className="w-64" />
+                                    <Button variant={'destructive'} onClick={() => deletePicture(picture.id)}>
+                                        Delete
+                                    </Button>
+                                </div>
+                            );
+                        })}
+                </div>
             </div>
 
             {showFileModal && addFileModalForm()}

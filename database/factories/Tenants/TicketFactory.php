@@ -23,7 +23,8 @@ class TicketFactory extends Factory
      */
     public function definition(): array
     {
-        $count = Ticket::all()->count();
+
+        $count = Ticket::count();
         $codeNumber = generateCodeNumber($count, 'TK', 4);
 
         return [
@@ -45,10 +46,13 @@ class TicketFactory extends Factory
 
     public function forLocation($location)
     {
-        return $this->state(fn() => [
-            'ticketable_type' => get_class($location),
-            'ticketable_id' => $location->id,
-        ]);
+        return $this->for($location, 'ticketable')->state(function () use ($location) {
+
+            return [
+                'ticketable_type' => get_class($location),
+                'ticketable_id' => $location->id,
+            ];
+        });
     }
 
     public function ongoing(): static
@@ -62,7 +66,7 @@ class TicketFactory extends Factory
     {
 
         return $this->state(fn() => [
-            'status' => TicketStatus::CLOSE->value,
+            'status' => TicketStatus::CLOSED->value,
             'closed_at' => now(),
             'closed_by' => User::factory(),
         ]);

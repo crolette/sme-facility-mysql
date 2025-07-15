@@ -9,13 +9,15 @@ use App\Models\Tenants\Asset;
 use App\Models\Tenants\Ticket;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Tenant\PictureUploadRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Tenant\TicketRequest;
+use App\Services\PictureService;
 
 class APITicketController extends Controller
 {
 
-    public function store(TicketRequest $request)
+    public function store(TicketRequest $request, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService)
     {
         try {
             DB::beginTransaction();
@@ -50,6 +52,12 @@ class APITicketController extends Controller
             $ticket->ticketable()->associate($location);
 
             $ticket->save();
+
+            $files = $pictureUploadRequest->validated('pictures');
+
+            if ($files) {
+                $pictureService->uploadAndAttachPictures($ticket, $files, $request->validated('reporter_email') ?? null);
+            }
 
             DB::commit();
 
@@ -86,6 +94,8 @@ class APITicketController extends Controller
 
                 $ticket->save();
             }
+
+
 
             DB::commit();
         } catch (Exception $e) {

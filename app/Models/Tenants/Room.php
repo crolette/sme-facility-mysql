@@ -75,6 +75,11 @@ class Room extends Model
         return $this->morphToMany(Document::class, 'documentable');
     }
 
+    public function pictures(): MorphMany
+    {
+        return $this->morphMany(Picture::class, 'imageable');
+    }
+
     public function category($locale = null): Attribute
     {
         $locale = $locale ?? app()->getLocale();

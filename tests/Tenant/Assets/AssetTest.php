@@ -1,14 +1,15 @@
 <?php
 
-use App\Models\Tenants\User;
 use App\Models\LocationType;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
+use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Building;
-use App\Models\Central\CategoryType;
+use Illuminate\Http\UploadedFile;
 
+use App\Models\Central\CategoryType;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
@@ -140,6 +141,32 @@ it('can create a new asset to building', function () {
     ]);
 });
 
+it('can create an asset with uploaded pictures', function () {
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->image('test.jpg');
+
+    $formData = [
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+        'locationId' => $this->building->id,
+        'locationReference' => $this->building->reference_code,
+        'locationType' => 'building',
+        'categoryId' => $this->categoryType->id,
+        'pictures' => [
+            $file1,
+            $file2
+        ]
+    ];
+
+    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response->assertSessionHasNoErrors();
+    assertDatabaseCount('pictures', 2);
+    assertDatabaseHas('pictures', [
+        'imageable_type' => 'App\Models\Tenants\Asset',
+        'imageable_id' => 1
+    ]);
+});
+
 it('cannot create a new asset with non existing building', function () {
 
     $formData = [
@@ -192,9 +219,6 @@ it('cannot create a new asset with unrelated asset category type', function () {
 });
 
 it('cannot create a new asset with non existing location type', function () {
-
-
-
     $formData = [
         'name' => 'New asset',
         'description' => 'Description new asset',
@@ -211,8 +235,6 @@ it('cannot create a new asset with non existing location type', function () {
 });
 
 it('can create a new asset to floor', function () {
-
-
 
     $formData = [
         'name' => 'New asset',

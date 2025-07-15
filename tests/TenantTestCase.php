@@ -9,6 +9,8 @@ use App\Enums\AddressTypes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\Storage;
+
 // use Stancl\Tenancy\Database\Models\Tenant;
 
 abstract class TenantTestCase extends BaseTestCase
@@ -162,6 +164,8 @@ abstract class TenantTestCase extends BaseTestCase
         if (tenancy()->initialized && tenancy()->tenant->id === $this->tenant->id) {
             tenancy()->end();
         }
+
+        Storage::disk('tenants')->deleteDirectory('test');
 
         parent::tearDown();
     }

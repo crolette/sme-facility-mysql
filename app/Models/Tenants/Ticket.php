@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Ticket extends Model
 {
@@ -47,6 +48,11 @@ class Ticket extends Model
     public function ticketable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function pictures(): MorphMany
+    {
+        return $this->morphMany(Picture::class, 'imageable');
     }
 
     public function closeTicket()

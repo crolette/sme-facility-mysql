@@ -80,10 +80,23 @@ export interface Asset {
     serial_number: string;
     category: string;
     asset_category_id: number;
+    pictures: Picture[];
     documents: Document[];
     asset_category: AssetCategory;
     maintainable: Maintainable;
     location: TenantSite | TenantBuilding | TenantFloor | TenantRoom;
+}
+
+export interface Picture {
+    id: number;
+    mime_type: string;
+    filename: string;
+    size: number;
+    sizeMo: number;
+    fullPath: string;
+    created_at: string;
+    uploaded_by?: User;
+    uploaded_email?: string;
 }
 
 export interface Document {

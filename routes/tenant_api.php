@@ -18,6 +18,8 @@ use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\API\V1\ApiSearchLocationController;
 use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
 use App\Http\Controllers\API\V1\APITicketController;
+use App\Http\Controllers\API\V1\DestroyPictureController;
+use App\Models\Tenants\Picture;
 
 Route::prefix('api/v1')->group(
     function () {
@@ -39,6 +41,10 @@ Route::prefix('api/v1')->group(
                 Route::get('/assets/{asset}/documents/', function (Asset $asset) {
                     return response()->json($asset->load('documents')->documents);
                 })->name('api.assets.documents');
+
+                Route::get('/assets/{asset}/pictures/', function (Asset $asset) {
+                    return response()->json($asset->load('pictures')->pictures);
+                })->name('api.assets.pictures');
 
                 Route::post('/assets/{asset}/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Asset $asset) {
 
@@ -93,6 +99,18 @@ Route::prefix('api/v1')->group(
                     return response()->file(Storage::disk('tenants')->path($path));
                 })->name('documents.show');
 
+                Route::get('/pictures/{picture}', function (Picture $picture) {
+
+                    $path = $picture->path;
+
+                    if (! Storage::disk('tenants')->exists($path)) {
+                        abort(404);
+                    }
+
+                    return response()->file(Storage::disk('tenants')->path($path));
+                })->name('pictures.show');
+
+                Route::delete('/pictures/{picture}', [DestroyPictureController::class, 'destroy'])->name('api.picture.delete');
 
                 Route::post('tickets', [APITicketController::class, 'store'])->name('api.tickets.store');
                 Route::patch('tickets/{ticket}', [APITicketController::class, 'update'])->name('api.tickets.update');
