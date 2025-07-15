@@ -91,7 +91,7 @@ class TenantFloorController extends Controller
      */
     public function show(Floor $floor)
     {
-        return Inertia::render('tenants/locations/show', ['location' => $floor->load(['locationType', 'documents'])]);
+        return Inertia::render('tenants/locations/show', ['routeName' => 'floors', 'location' => $floor->load(['locationType', 'documents'])]);
     }
 
     /**
@@ -101,8 +101,8 @@ class TenantFloorController extends Controller
     {
         $levelTypes = Building::all();
         $locationTypes = LocationType::where('level', 'floor')->get();
-
-        return Inertia::render('tenants/locations/create', ['location' => $floor->load('building'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'floors']);
+        $documentTypes = CategoryType::where('category', 'document')->get();
+        return Inertia::render('tenants/locations/create', ['location' => $floor->load('building'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'floors', 'documentTypes' => $documentTypes]);
     }
 
     /**
@@ -112,14 +112,14 @@ class TenantFloorController extends Controller
     {
         // TODO Check how to perform a check or be sure that a user can't change the level/location type as it would change every child (building, floor, room)
 
-        if ($floorRequest->validated('locationType') !== $floor->locationType->id) {
+        if (intval($floorRequest->validated('locationType')) !== $floor->locationType->id) {
             $errors = new MessageBag([
                 'locationType' => ['You cannot change the floor type of a location'],
             ]);
             return back()->withErrors($errors)->withInput()->with(['message' => 'Error !', 'type' => 'error']);
         }
 
-        if ($floorRequest->validated('levelType') !== $floor->building->id) {
+        if (intval($floorRequest->validated('levelType')) !== $floor->building->id) {
             $errors = new MessageBag([
                 'levelType' => ['You cannot change the level type of a location'],
             ]);

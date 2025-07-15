@@ -95,7 +95,7 @@ class TenantBuildingController extends Controller
     {
         // dd($building->load('locationType'));
 
-        return Inertia::render('tenants/locations/show', ['location' => $building->load('site')]);
+        return Inertia::render('tenants/locations/show', ['routeName' => 'buildings', 'location' => $building->load('site', 'documents')]);
     }
 
     /**
@@ -105,8 +105,8 @@ class TenantBuildingController extends Controller
     {
         $levelTypes = Site::all();
         $locationTypes = LocationType::where('level', 'building')->get();
-
-        return Inertia::render('tenants/locations/create', ['location' => $building->load('site'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings']);
+        $documentTypes = CategoryType::where('category', 'document')->get();
+        return Inertia::render('tenants/locations/create', ['location' => $building->load('site'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings', 'documentTypes' => $documentTypes]);
     }
 
     /**

@@ -73,9 +73,19 @@ class Asset extends Model
         return $this->morphTo();
     }
 
+    public function tickets(): MorphMany
+    {
+        return $this->morphMany(Ticket::class, 'ticketable');
+    }
+
     public function assetCategory(): BelongsTo
     {
         return $this->belongsTo(CategoryType::class, 'category_type_id');
+    }
+
+    public function pictures(): MorphMany
+    {
+        return $this->morphMany(Picture::class, 'imageable');
     }
 
     public function category($locale = null): Attribute

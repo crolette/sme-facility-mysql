@@ -11,6 +11,7 @@ use App\Http\Controllers\Central\CentralAssetCategoryController;
 use App\Http\Controllers\Central\CentralCategoryTypeController;
 use App\Http\Controllers\Central\CentralDocumentTypeController;
 use App\Http\Controllers\Central\RegisterCentralTenantController;
+use App\Http\Controllers\Tenants\TicketController;
 use App\Http\Middleware\AuthenticateCentral;
 
 foreach (config('tenancy.central_domains') as $domain) {

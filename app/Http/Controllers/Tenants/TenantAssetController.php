@@ -24,7 +24,9 @@ use App\Http\Requests\Tenant\AssetRequest;
 use App\Http\Requests\Tenant\FileUploadRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Services\DocumentService;
+use App\Services\PictureService;
 
 class TenantAssetController extends Controller
 {
@@ -50,7 +52,7 @@ class TenantAssetController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
+    public function store(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, DocumentService $documentService)
     {
 
         try {
@@ -78,8 +80,6 @@ class TenantAssetController extends Controller
                 'reference_code' => $referenceCode
             ]);
 
-
-
             $asset->assetCategory()->associate($assetRequest->validated('categoryId'));
             $asset->location()->associate($location);
 
@@ -91,6 +91,12 @@ class TenantAssetController extends Controller
 
             if ($files) {
                 $documentService->uploadAndAttachDocuments($asset, $files);
+            }
+
+            $pictures = $pictureUploadRequest->validated('pictures');
+
+            if ($pictures) {
+                $pictureService->uploadAndAttachPictures($asset, $pictures);
             }
 
 
@@ -110,7 +116,7 @@ class TenantAssetController extends Controller
      */
     public function show(Asset $asset)
     {
-        return Inertia::render('tenants/assets/show', ['asset' => $asset->load('documents')]);
+        return Inertia::render('tenants/assets/show', ['asset' => $asset->load('documents', 'pictures', 'tickets.pictures')]);
     }
 
     /**
@@ -126,7 +132,7 @@ class TenantAssetController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentRequest, Asset $asset)
+    public function update(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, Asset $asset,)
     {
         try {
             DB::beginTransaction();
@@ -162,6 +168,7 @@ class TenantAssetController extends Controller
             $asset->update([
                 ...$assetRequest->validated(),
             ]);
+
 
             $asset->save();
 

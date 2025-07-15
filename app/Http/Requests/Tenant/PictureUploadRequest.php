@@ -2,12 +2,13 @@
 
 namespace App\Http\Requests\Tenant;
 
-use App\Models\LocationType;
 use Illuminate\Validation\Rule;
-use App\Models\Tenants\Building;
+use App\Models\Tenants\Document;
+use App\Models\Central\CategoryType;
+use App\Models\Tenants\Picture;
 use Illuminate\Foundation\Http\FormRequest;
 
-class TenantFloorRequest extends FormRequest
+class PictureUploadRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,12 +25,9 @@ class TenantFloorRequest extends FormRequest
      */
     public function rules(): array
     {
-        $buildings = Building::all()->pluck('id');
-        $locationTypes = LocationType::where('level', 'floor')->pluck('id');
-
         return [
-            'levelType' => ['required', 'integer', Rule::in([...$buildings])],
-            'locationType' => ['required', 'integer', Rule::in([...$locationTypes])]
+            'pictures' => 'nullable|array',
+            'pictures.*' => 'image|mimes:jpg,jpeg,png|max:' . Picture::maxUploadSizeKB(),
         ];
     }
 }

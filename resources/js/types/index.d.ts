@@ -31,6 +31,7 @@ export interface Flash {
 }
 
 export type LocationLevel = 'site' | 'building' | 'floor' | 'room';
+export type TicketStatus = 'open' | 'ongoing' | 'closed';
 export type CategoryTypeEnum = 'document' | 'intervention' | 'asset';
 
 export interface Maintainable {
@@ -54,6 +55,8 @@ export interface TenantSite {
     level_id: number;
     location_type: LocationType;
     maintainable: Maintainable;
+    tickets: Ticket[];
+    documents: Document[];
 }
 
 export interface TenantBuilding extends TenantSite {
@@ -79,10 +82,24 @@ export interface Asset {
     serial_number: string;
     category: string;
     asset_category_id: number;
-    documents: Document[];
+    tickets?: Ticket[];
+    pictures?: Picture[];
+    documents?: Document[];
     asset_category: AssetCategory;
     maintainable: Maintainable;
     location: TenantSite | TenantBuilding | TenantFloor | TenantRoom;
+}
+
+export interface Picture {
+    id: number;
+    mime_type: string;
+    filename: string;
+    size: number;
+    sizeMo: number;
+    fullPath: string;
+    created_at: string;
+    uploaded_by?: User;
+    uploaded_email?: string;
 }
 
 export interface Document {
@@ -118,6 +135,24 @@ export interface LocationType {
     label: string;
     level: LocationLevel;
     translations: Translation[];
+}
+
+export interface Ticket {
+    id: number;
+    status: TicketStatus;
+    description: string;
+    reported_by?: number;
+    closer?: User;
+    reporter?: User;
+    reporter_email?: string;
+    being_notified: boolean;
+
+    code: string;
+    closed_at?: string;
+    created_at: string;
+    updated_at: string;
+    pictures?: Picture[];
+    ticketable: TenantSite | TenantBuilding | TenantFloor | TenantRoom | Asset;
 }
 
 export interface AssetCategory {
