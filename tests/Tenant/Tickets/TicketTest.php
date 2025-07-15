@@ -191,7 +191,7 @@ it('can create a new ticket to an ASSET with "anonymous" user', function () {
     assertDatabaseHas('tickets', [
         'status' => 'open',
         'reporter_email' => 'test@test.com',
-        'being_notified' => true,
+        'being_notified' => 1,
         'description' => 'A nice description for this new ticket',
         'ticketable_type' => get_class($this->asset),
         'ticketable_id' => 1,
@@ -414,4 +414,60 @@ it('can close an existing ticket', function () {
         'closed_by' => $this->user->id,
     ]);
     $this->assertNotNull($ticket->fresh()->closed_at);
+});
+
+it('can retrieve all tickets from a site', function () {
+    Ticket::factory()->forLocation($this->site)->create(['reported_by' => $this->user->id]);
+    Ticket::factory()->forLocation($this->site)->create(['reported_by' => $this->user->id]);
+    Ticket::factory()->forLocation($this->site)->create(['reported_by' => $this->user->id]);
+
+    $response = $this->getFromTenant('api.sites.tickets', $this->site->id);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ])
+        ->assertJsonCount(3, 'data');
+});
+
+it('can retrieve all tickets from a building', function () {
+    Ticket::factory()->forLocation($this->building)->create(['reported_by' => $this->user->id]);
+    Ticket::factory()->forLocation($this->building)->create(['reported_by' => $this->user->id]);
+    Ticket::factory()->forLocation($this->building)->create(['reported_by' => $this->user->id]);
+
+    $response = $this->getFromTenant('api.buildings.tickets', $this->building->id);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ])
+        ->assertJsonCount(3, 'data');
+});
+
+it('can retrieve all tickets from a floor', function () {
+    Ticket::factory()->forLocation($this->floor)->create(['reported_by' => $this->user->id]);
+    Ticket::factory()->forLocation($this->floor)->create(['reported_by' => $this->user->id]);
+    Ticket::factory()->forLocation($this->floor)->create(['reported_by' => $this->user->id]);
+
+    $response = $this->getFromTenant('api.floors.tickets', $this->floor->id);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ])
+        ->assertJsonCount(3, 'data');
+});
+
+it('can retrieve all tickets from a room', function () {
+    Ticket::factory()->forLocation($this->room)->create(['reported_by' => $this->user->id]);
+    Ticket::factory()->forLocation($this->room)->create(['reported_by' => $this->user->id]);
+    Ticket::factory()->forLocation($this->room)->create(['reported_by' => $this->user->id]);
+
+    $response = $this->getFromTenant('api.rooms.tickets', $this->room->id);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ])
+        ->assertJsonCount(3, 'data');
 });

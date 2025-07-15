@@ -55,6 +55,8 @@ export interface TenantSite {
     level_id: number;
     location_type: LocationType;
     maintainable: Maintainable;
+    tickets: Ticket[];
+    documents: Document[];
 }
 
 export interface TenantBuilding extends TenantSite {
@@ -139,7 +141,9 @@ export interface Ticket {
     id: number;
     status: TicketStatus;
     description: string;
-    reported_by?: User;
+    reported_by?: number;
+    closer?: User;
+    reporter?: User;
     reporter_email?: string;
     being_notified: boolean;
 
@@ -147,6 +151,7 @@ export interface Ticket {
     closed_at?: string;
     created_at: string;
     updated_at: string;
+    pictures?: Picture[];
     ticketable: TenantSite | TenantBuilding | TenantFloor | TenantRoom | Asset;
 }
 

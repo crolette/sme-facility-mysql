@@ -91,7 +91,7 @@ class TenantFloorController extends Controller
      */
     public function show(Floor $floor)
     {
-        return Inertia::render('tenants/locations/show', ['location' => $floor->load(['locationType', 'documents'])]);
+        return Inertia::render('tenants/locations/show', ['routeName' => 'floors', 'location' => $floor->load(['locationType', 'documents'])]);
     }
 
     /**

@@ -25,12 +25,17 @@ class Ticket extends Model
         'closed_at',
     ];
 
+    protected $with = [
+        'reporter',
+        'closer'
+    ];
+
     protected function casts(): array
     {
         return [
-            'closed_at' => 'date:d-m-Y',
-            'created_at' => 'date:d-m-Y',
-            'updated_at' => 'date:d-m-Y',
+            'closed_at' => 'date:d-m-Y h:m',
+            'created_at' => 'date:d-m-Y H:m',
+            'updated_at' => 'date:d-m-Y H:m',
             'being_notified' => 'boolean'
         ];
     }

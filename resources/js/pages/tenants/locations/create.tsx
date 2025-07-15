@@ -326,7 +326,12 @@ export default function CreateLocation({
                         </div>
                     )}
 
-                    <Button type="submit">Submit</Button>
+                    <Button type="submit">{location ? 'Update' : 'Submit'}</Button>
+                    <a href={location ? route(`tenant.${routeName}.show`, location.id) : route(`tenant.${routeName}.index`)}>
+                        <Button type="button" tabIndex={6} variant={'secondary'}>
+                            Cancel
+                        </Button>
+                    </a>
                 </form>
                 {showFileModal && addFileModalForm()}
             </div>

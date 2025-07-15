@@ -89,7 +89,7 @@ class TenantRoomController extends Controller
      */
     public function show(Room $room)
     {
-        return Inertia::render('tenants/locations/show', ['location' => $room->load(['floor', 'documents'])]);
+        return Inertia::render('tenants/locations/show', ['routeName' => 'rooms', 'location' => $room->load(['floor', 'documents', 'tickets.pictures'])]);
     }
 
     /**

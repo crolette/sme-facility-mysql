@@ -257,9 +257,6 @@ it('can delete a site and the related buildings', function () {
 });
 
 it('can delete a site and the related buildings and related floors', function () {
-
-
-
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
@@ -308,5 +305,44 @@ it('can update name and description of a document from a site ', function () {
         'name' => 'New document name',
         'description' => 'New description of the new document',
         'category_type_id' => $categoryType->id
+    ]);
+});
+
+it('can upload a document to an existing site', function () {
+
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
+    $locationType = LocationType::factory()->create(['level' => 'site']);
+    CategoryType::factory()->count(2)->create(['category' => 'document']);
+    $site = Site::factory()->create();
+    $categoryType = CategoryType::where('category', 'document')->first();
+
+    $formData = [
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ]
+        ]
+    ];
+
+    $response = $this->postToTenant('api.sites.documents.post', $formData, $site);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => 'App\Models\Tenants\Site',
+        'documentable_id' => 1
     ]);
 });

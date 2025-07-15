@@ -33,7 +33,6 @@ type FormDataTicket = {
 
 export default function ShowAsset({ asset }: { asset: Asset }) {
     const auth = usePage().props.auth.user;
-    console.log();
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `${asset.reference_code} - ${asset.maintainable.name}`,
@@ -55,17 +54,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
             const response = await axios.delete(route('api.documents.delete', id));
             if (response.data.status === 'success') {
                 fetchDocuments();
-            }
-        } catch (error) {
-            console.error('Erreur lors de la suppression', error);
-        }
-    };
-
-    const closeTicket = async (id: number) => {
-        try {
-            const response = await axios.patch(route('api.tickets.close', id));
-            if (response.data.status === 'success') {
-                fetchTickets();
             }
         } catch (error) {
             console.error('Erreur lors de la suppression', error);
@@ -96,15 +84,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
         try {
             const response = await axios.get(`/api/v1/assets/${asset.code}/documents`);
             setDocuments(await response.data);
-        } catch (error) {
-            console.error('Erreur lors de la recherche :', error);
-        }
-    };
-
-    const fetchTickets = async () => {
-        try {
-            const response = await axios.get(`/api/v1/assets/${asset.code}/tickets`);
-            setTickets(await response.data);
         } catch (error) {
             console.error('Erreur lors de la recherche :', error);
         }
@@ -280,19 +259,22 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                                     )}
                                 </select>
                                 {submitType === 'new' && (
-                                    <Input
-                                        type="file"
-                                        name=""
-                                        id=""
-                                        onChange={(e) =>
-                                            setNewFileData((prev) => ({
-                                                ...prev,
-                                                file: e.target.files ? e.target.files[0] : null,
-                                            }))
-                                        }
-                                        required
-                                        accept="image/png, image/jpeg, image/jpg, .pdf"
-                                    />
+                                    <>
+                                        <Input
+                                            type="file"
+                                            name=""
+                                            id=""
+                                            onChange={(e) =>
+                                                setNewFileData((prev) => ({
+                                                    ...prev,
+                                                    file: e.target.files ? e.target.files[0] : null,
+                                                }))
+                                            }
+                                            required
+                                            accept="image/png, image/jpeg, image/jpg, .pdf"
+                                        />
+                                        <p className="text-xs">Accepted files: png, jpg, pdf. - Maximum file size: 4MB</p>
+                                    </>
                                 )}
 
                                 <Input
@@ -363,6 +345,26 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
         );
     };
 
+    const closeTicket = async (id: number) => {
+        try {
+            const response = await axios.patch(route('api.tickets.close', id));
+            if (response.data.status === 'success') {
+                fetchTickets();
+            }
+        } catch (error) {
+            console.error('Erreur lors de la suppression', error);
+        }
+    };
+
+    const fetchTickets = async () => {
+        try {
+            const response = await axios.get(`/api/v1/assets/${asset.code}/tickets`);
+            setTickets(await response.data);
+        } catch (error) {
+            console.error('Erreur lors de la recherche :', error);
+        }
+    };
+
     const [addTicketModal, setAddTicketModal] = useState<boolean>(false);
     const [submitTypeTicket, setSubmitTypeTicket] = useState<'edit' | 'new'>('edit');
     const updateTicketData = {
@@ -411,8 +413,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
         }
     };
 
-    console.log(addTicketModal);
-
     const [newTicketData, setNewTicketData] = useState<FormDataTicket>(updateTicketData);
 
     const closeModalTicket = () => {
@@ -445,8 +445,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
             console.log(error);
         }
     };
-
-    console.log(newTicketData);
 
     const addTicket = () => {
         return (
@@ -545,7 +543,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
 
                 <details>
                     <summary className="">
-                        <h3 className="inline">Tickets ({tickets.length})</h3>
+                        <h3 className="inline">Tickets ({tickets?.length ?? 0})</h3>
                     </summary>
                     {tickets.length > 0 && (
                         <Table>
@@ -564,7 +562,9 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                                 {tickets.map((ticket, index) => {
                                     return (
                                         <TableBodyRow key={index}>
-                                            <TableBodyData>{ticket.code}</TableBodyData>
+                                            <TableBodyData>
+                                                <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
+                                            </TableBodyData>
                                             <TableBodyData>{ticket.status}</TableBodyData>
                                             <TableBodyData>{ticket.code}</TableBodyData>
                                             <TableBodyData>{ticket.description}</TableBodyData>
@@ -593,7 +593,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
 
                 <details>
                     <summary className="">
-                        <h3 className="inline">Documents ({documents?.length})</h3>
+                        <h3 className="inline">Documents ({documents?.length ?? 0})</h3>
                         <Button onClick={() => addNewFile()}>Add new file</Button>
                     </summary>
                     {documents && documents.length > 0 && (

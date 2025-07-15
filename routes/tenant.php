@@ -54,8 +54,7 @@ Route::middleware([
 
 
     Route::resource('assets', TenantAssetController::class)->parameters(['assets' => 'asset'])->names('tenant.assets');
-    Route::post('assets/{assetId}/restore', [RestoreSoftDeletedAssetController::class, 'restore'])->name('tenant.assets.restore');
-    Route::delete('assets/{assetId}/force', [ForceDeleteAssetController::class, 'forceDelete'])->name('tenant.assets.force');
+
 
 
     Route::get('/tickets', [TicketController::class, 'index'])->name('tenant.tickets.index');

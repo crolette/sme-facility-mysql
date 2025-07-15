@@ -28,7 +28,7 @@ class TicketRequest extends FormRequest
             $data['reporter_email'] = Str::lower($data['reporter_email']);
         }
 
-        if (isset($data['being_notified']) && $data['being_notified'] === 'true') {
+        if (isset($data['being_notified']) && ($data['being_notified'] === 'true' || $data['being_notified'] === true)) {
             $data['being_notified'] = true;
         } else {
             $data['being_notified'] = false;
@@ -52,9 +52,6 @@ class TicketRequest extends FormRequest
         $statuses = array_column(TicketStatus::cases(), 'value');
 
         $data = $this->all();
-
-        dump($data);
-        Debugbar::info($data);
 
         return [
             'ticket_id' => ['nullable', 'integer', Rule::exists('tickets', 'id')],
