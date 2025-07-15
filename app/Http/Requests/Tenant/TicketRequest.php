@@ -57,8 +57,9 @@ class TicketRequest extends FormRequest
         Debugbar::info($data);
 
         return [
-            'location_type' => ['required', 'string', Rule::in(['sites', 'buildings', 'floors', 'rooms', 'assets'])],
-            'location_id' => ['required', 'integer'],
+            'ticket_id' => ['nullable', 'integer', Rule::exists('tickets', 'id')],
+            'location_type' => ['nullable', 'string', Rule::in(['sites', 'buildings', 'floors', 'rooms', 'assets'])],
+            'location_id' => ['nullable', 'integer'],
             'status' => ['required', 'string', Rule::in(...$statuses)],
             'description' => ['required', 'string', 'min:10'],
             'being_notified' => ['required', 'boolean'],

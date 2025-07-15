@@ -5,6 +5,7 @@ use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Picture;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
@@ -129,6 +130,11 @@ Route::prefix('api/v1')->group(
                 Route::delete('/pictures/{picture}', [DestroyPictureController::class, 'destroy'])->name('api.picture.delete');
 
                 Route::post('tickets', [APITicketController::class, 'store'])->name('api.tickets.store');
+
+                Route::get('/tickets/{ticket}', function (Ticket $ticket) {
+                    Debugbar::info($ticket);
+                    return ApiResponse::success($ticket->load('pictures'), 'Ticket');
+                })->name('api.tickets.get');
 
                 Route::patch('tickets/{ticket}', [APITicketController::class, 'update'])->name('api.tickets.update');
 

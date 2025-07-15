@@ -21,7 +21,7 @@ type TypeFormData = {
 };
 
 type FormDataTicket = {
-    ticketId: number;
+    ticket_id: number;
     location_type: string;
     location_id: number;
     description: string;
@@ -366,7 +366,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
     const [addTicketModal, setAddTicketModal] = useState<boolean>(false);
     const [submitTypeTicket, setSubmitTypeTicket] = useState<'edit' | 'new'>('edit');
     const updateTicketData = {
-        ticketId: 0,
+        ticket_id: 0,
         location_type: 'assets',
         location_id: asset.id,
         being_notified: false,
@@ -376,9 +376,19 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
         pictures: [],
     };
 
-    const submitEditTicket: FormEventHandler = (e) => {
+    const submitEditTicket: FormEventHandler = async (e) => {
         e.preventDefault();
         console.log('submitEditTicket');
+        console.log(newTicketData);
+        try {
+            const response = await axios.patch(route('api.tickets.update', newTicketData.ticket_id), newTicketData);
+            console.log(response.data.status, response.data.message);
+            fetchTickets();
+            closeModalTicket();
+            // }
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     const submitNewTicket: FormEventHandler = async (e) => {
@@ -401,14 +411,42 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
         }
     };
 
+    console.log(addTicketModal);
+
     const [newTicketData, setNewTicketData] = useState<FormDataTicket>(updateTicketData);
 
     const closeModalTicket = () => {
         setAddTicketModal(false);
         setNewTicketData(updateTicketData);
+        setSubmitTypeTicket('edit');
     };
 
+    console.log(submitTypeTicket);
     const [tickets, setTickets] = useState<Ticket[]>(asset.tickets);
+
+    const editTicket = async (id: number) => {
+        setSubmitTypeTicket('edit');
+        try {
+            console.log('post');
+            const response = await axios.get(route('api.tickets.get', id), {});
+            console.log(response.data.data);
+            setNewTicketData((prev) => ({
+                ...prev,
+                ticket_id: response.data.data.id,
+                description: response.data.data.description,
+                being_notified: response.data?.data.being_notified,
+            }));
+
+            setAddTicketModal(true);
+            console.log(newTicketData);
+
+            // }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    console.log(newTicketData);
 
     const addTicket = () => {
         return (
@@ -467,7 +505,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
             </div>
         );
     };
-    console.log(tickets);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -536,10 +573,15 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                                             <TableBodyData>PICTURES</TableBodyData>
 
                                             <TableBodyData>
-                                                <Button variant={'destructive'} onClick={() => closeTicket(ticket.id)}>
-                                                    Close
-                                                </Button>
-                                                {/* <Button onClick={() => editFile(document.id)}>Edit</Button> */}
+                                                {ticket.status !== 'closed' && (
+                                                    <>
+                                                        <Button variant={'destructive'} onClick={() => closeTicket(ticket.id)}>
+                                                            Close
+                                                        </Button>
+
+                                                        <Button onClick={() => editTicket(ticket.id)}>Edit</Button>
+                                                    </>
+                                                )}
                                             </TableBodyData>
                                         </TableBodyRow>
                                     );

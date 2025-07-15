@@ -28,8 +28,8 @@ class TenantFloorRequest extends FormRequest
         $locationTypes = LocationType::where('level', 'floor')->pluck('id');
 
         return [
-            'levelType' => ['required', Rule::in([...$buildings])],
-            'locationType' => ['required', Rule::in([...$locationTypes])]
+            'levelType' => ['required', 'integer', Rule::in([...$buildings])],
+            'locationType' => ['required', 'integer', Rule::in([...$locationTypes])]
         ];
     }
 }
