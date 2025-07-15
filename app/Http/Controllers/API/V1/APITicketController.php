@@ -16,9 +16,9 @@ use App\Services\PictureService;
 
 class APITicketController extends Controller
 {
-
     public function store(TicketRequest $request, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService)
     {
+
         try {
             DB::beginTransaction();
 
@@ -98,6 +98,7 @@ class APITicketController extends Controller
 
 
             DB::commit();
+            return ApiResponse::success(null, 'Ticket updated');
         } catch (Exception $e) {
             DB::rollback();
             return ApiResponse::error('Error during Ticket update', [$e->getMessage()]);
@@ -111,6 +112,7 @@ class APITicketController extends Controller
     {
         try {
             $response = $ticket->closeTicket();
+            return ApiResponse::success(null, 'Ticket closed');
         } catch (Exception $e) {
             return ApiResponse::error('Error during Ticket closing', [$e->getMessage()]);
         }

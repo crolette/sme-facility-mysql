@@ -73,9 +73,9 @@ class Asset extends Model
         return $this->morphTo();
     }
 
-    public function tickets(): MorphToMany
+    public function tickets(): MorphMany
     {
-        return $this->morphToMany(Ticket::class, 'ticketable');
+        return $this->morphMany(Ticket::class, 'ticketable');
     }
 
     public function assetCategory(): BelongsTo

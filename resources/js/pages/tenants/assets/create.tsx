@@ -202,8 +202,6 @@ export default function CreateAsset({
         });
     };
 
-    console.log(data.pictures);
-
     const addFileModalForm = () => {
         return (
             <div className="bg-background/50 absolute inset-0 z-50">
@@ -503,9 +501,16 @@ export default function CreateAsset({
                             )}
                         </div>
                     )}
-                    <div>
-                        <input type="file" multiple onChange={(e) => setData('pictures', e.target.files)} accept="image/png, image/jpeg, image/jpg" />
-                    </div>
+                    {!asset && (
+                        <div>
+                            <Input
+                                type="file"
+                                multiple
+                                onChange={(e) => setData('pictures', e.target.files)}
+                                accept="image/png, image/jpeg, image/jpg"
+                            />
+                        </div>
+                    )}
 
                     <br />
                     <Button type="submit">{asset ? 'Update' : 'Submit'}</Button>

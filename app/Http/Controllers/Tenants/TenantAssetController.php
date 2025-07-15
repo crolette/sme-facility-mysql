@@ -116,8 +116,7 @@ class TenantAssetController extends Controller
      */
     public function show(Asset $asset)
     {
-        // dd($asset->load('documents', 'pictures'));
-        return Inertia::render('tenants/assets/show', ['asset' => $asset->load('documents', 'pictures')]);
+        return Inertia::render('tenants/assets/show', ['asset' => $asset->load('documents', 'pictures', 'tickets.pictures')]);
     }
 
     /**
@@ -133,7 +132,7 @@ class TenantAssetController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, Asset $asset, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService)
+    public function update(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, Asset $asset,)
     {
         try {
             DB::beginTransaction();
@@ -170,11 +169,6 @@ class TenantAssetController extends Controller
                 ...$assetRequest->validated(),
             ]);
 
-            $pictures = $pictureUploadRequest->validated('pictures');
-
-            if ($pictures) {
-                $pictureService->uploadAndAttachPictures($asset, $pictures);
-            }
 
             $asset->save();
 

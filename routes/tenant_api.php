@@ -5,21 +5,23 @@ use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Models\Tenants\Picture;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
+use App\Services\PictureService;
 use App\Services\DocumentService;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Http\Controllers\API\V1\APITicketController;
+use App\Http\Controllers\API\V1\DestroyPictureController;
 use App\Http\Controllers\API\V1\UpdateDocumentController;
 use App\Http\Controllers\API\V1\DestroyDocumentController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\API\V1\ApiSearchLocationController;
 use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
-use App\Http\Controllers\API\V1\APITicketController;
-use App\Http\Controllers\API\V1\DestroyPictureController;
-use App\Models\Tenants\Picture;
 
 Route::prefix('api/v1')->group(
     function () {
@@ -42,10 +44,6 @@ Route::prefix('api/v1')->group(
                     return response()->json($asset->load('documents')->documents);
                 })->name('api.assets.documents');
 
-                Route::get('/assets/{asset}/pictures/', function (Asset $asset) {
-                    return response()->json($asset->load('pictures')->pictures);
-                })->name('api.assets.pictures');
-
                 Route::post('/assets/{asset}/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Asset $asset) {
 
                     Debugbar::info($documentUploadRequest, $documentUploadRequest->validated());
@@ -56,6 +54,24 @@ Route::prefix('api/v1')->group(
 
                     return response()->json($asset->load('documents')->documents);
                 })->name('api.assets.documents.post');
+
+                Route::get('/assets/{asset}/pictures/', function (Asset $asset) {
+                    return response()->json($asset->load('pictures')->pictures);
+                })->name('api.assets.pictures');
+
+                Route::get('/assets/{asset}/tickets/', function (Asset $asset) {
+                    return response()->json($asset->load('tickets.pictures')->tickets);
+                })->name('api.assets.tickets');
+
+                Route::post('/assets/{asset}/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Asset $asset) {
+
+                    $files = $pictureUploadRequest->validated('pictures');
+                    if ($files) {
+                        $pictureService->uploadAndAttachPictures($asset, $files);
+                    }
+
+                    return ApiResponse::success(null, 'Pictures added');
+                })->name('api.assets.pictures.post');
 
 
                 Route::get('/sites/{site}/documents/', function (Site $site) {
@@ -113,7 +129,9 @@ Route::prefix('api/v1')->group(
                 Route::delete('/pictures/{picture}', [DestroyPictureController::class, 'destroy'])->name('api.picture.delete');
 
                 Route::post('tickets', [APITicketController::class, 'store'])->name('api.tickets.store');
+
                 Route::patch('tickets/{ticket}', [APITicketController::class, 'update'])->name('api.tickets.update');
+
                 Route::patch('tickets/{ticket}/close', [APITicketController::class, 'close'])->name('api.tickets.close');
             });
         });

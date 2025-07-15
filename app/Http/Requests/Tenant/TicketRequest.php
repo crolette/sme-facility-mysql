@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use App\Models\Tenants\User;
 use Illuminate\Validation\Rule;
 use App\Rules\NotDisposableEmail;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Foundation\Http\FormRequest;
 
 class TicketRequest extends FormRequest
@@ -27,6 +28,16 @@ class TicketRequest extends FormRequest
             $data['reporter_email'] = Str::lower($data['reporter_email']);
         }
 
+        if (isset($data['being_notified']) && $data['being_notified'] === 'true') {
+            $data['being_notified'] = true;
+        } else {
+            $data['being_notified'] = false;
+        }
+
+        if (!isset($data['status'])) {
+            $data['status'] = TicketStatus::OPEN->value;
+        }
+
         $this->replace($data);
     }
 
@@ -42,10 +53,8 @@ class TicketRequest extends FormRequest
 
         $data = $this->all();
 
-        // location type is the table name
-        // dump($this->validate([
-        //     'location_type' => ['required', 'string', Rule::in(['sites', 'buildings', 'floors', 'rooms', 'assets'])],
-        // ]));
+        dump($data);
+        Debugbar::info($data);
 
         return [
             'location_type' => ['required', 'string', Rule::in(['sites', 'buildings', 'floors', 'rooms', 'assets'])],

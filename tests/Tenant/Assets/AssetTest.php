@@ -142,6 +142,7 @@ it('can create a new asset to building', function () {
 });
 
 it('can create an asset with uploaded pictures', function () {
+
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->image('test.jpg');
 
@@ -159,6 +160,27 @@ it('can create an asset with uploaded pictures', function () {
     ];
 
     $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response->assertSessionHasNoErrors();
+    assertDatabaseCount('pictures', 2);
+    assertDatabaseHas('pictures', [
+        'imageable_type' => 'App\Models\Tenants\Asset',
+        'imageable_id' => 1
+    ]);
+});
+
+it('can add pictures to an asset', function () {
+    $this->asset = Asset::factory()->forLocation($this->room)->create();
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->image('test.jpg');
+
+    $formData = [
+        'pictures' => [
+            $file1,
+            $file2
+        ]
+    ];
+
+    $response = $this->postToTenant('api.assets.pictures.post', $formData, $this->asset);
     $response->assertSessionHasNoErrors();
     assertDatabaseCount('pictures', 2);
     assertDatabaseHas('pictures', [

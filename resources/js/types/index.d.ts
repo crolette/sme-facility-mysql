@@ -80,8 +80,9 @@ export interface Asset {
     serial_number: string;
     category: string;
     asset_category_id: number;
-    pictures: Picture[];
-    documents: Document[];
+    tickets?: Ticket[];
+    pictures?: Picture[];
+    documents?: Document[];
     asset_category: AssetCategory;
     maintainable: Maintainable;
     location: TenantSite | TenantBuilding | TenantFloor | TenantRoom;
