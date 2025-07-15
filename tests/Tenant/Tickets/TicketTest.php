@@ -65,6 +65,20 @@ it('can render the create ticket page', function () {
     $response->assertOk();
 });
 
+it('can render the show ticket page', function () {
+
+    $ticket = Ticket::factory()->forLocation($this->asset)->create();
+
+    $response = $this->getFromTenant('tenant.tickets.show', $ticket);
+    $response->assertOk();
+
+    $response->assertInertia(
+        fn($page) => $page->component('tenants/tickets/show')
+            ->has('ticket')
+    );
+    $response->assertOk();
+});
+
 it('fails when creating a new ticket with a wrong asset id', function () {
 
     $formData = [
@@ -143,6 +157,7 @@ it('can create a new ticket to an ASSET with the logged user', function () {
     assertDatabaseCount('tickets', 1);
 
     assertDatabaseHas('tickets', [
+        'code' => 'TK0001',
         'status' => 'open',
         'reported_by' => $this->user->id,
         'being_notified' => false,
@@ -177,6 +192,47 @@ it('can create a new ticket to an ASSET with "anonymous" user', function () {
         'description' => 'A nice description for this new ticket',
         'ticketable_type' => get_class($this->asset),
         'ticketable_id' => 1,
+    ]);
+});
+
+it('can create several tickets with correct incremental code', function () {
+
+    $formData = [
+        'location_type' => 'assets',
+        'location_id' => $this->asset->id,
+        'status' => TicketStatus::OPEN->value,
+        'description' => 'A nice description for this new ticket',
+        'being_notified' => false,
+        'reported_by' => $this->user->id
+    ];
+    $response = $this->postToTenant('api.tickets.store', $formData);
+
+    $formData = [
+        'location_type' => 'sites',
+        'location_id' => $this->site->id,
+        'status' => TicketStatus::OPEN->value,
+        'description' => 'A nice description for this new ticket',
+        'being_notified' => false,
+        'reported_by' => $this->user->id
+    ];
+
+    $response = $this->postToTenant('api.tickets.store', $formData);
+
+    $response->assertOk(302);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseCount('tickets', 2);
+
+    assertDatabaseHas('tickets', [
+        'code' => 'TK0001',
+        'ticketable_type' => get_class($this->asset),
+        'ticketable_id' => $this->asset->id,
+    ]);
+
+    assertDatabaseHas('tickets', [
+        'code' => 'TK0002',
+        'ticketable_type' => get_class($this->site),
+        'ticketable_id' => $this->site->id,
     ]);
 });
 
@@ -291,7 +347,6 @@ it('can create a new ticket to a SITE', function () {
         'ticketable_id' => $this->site->id,
     ]);
 });
-
 
 it('can update an existing ticket', function () {
 

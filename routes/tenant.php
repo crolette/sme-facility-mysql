@@ -61,6 +61,8 @@ Route::middleware([
     Route::get('/tickets', [TicketController::class, 'index'])->name('tenant.tickets.index');
 
     Route::get('tickets/create', [TicketController::class, 'create'])->name('tenant.tickets.create');
+
+    Route::get('tickets/{ticket}', [TicketController::class, 'show'])->name('tenant.tickets.show');
 });
 
 require __DIR__ . '/tenant_auth.php';

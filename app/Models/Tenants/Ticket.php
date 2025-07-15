@@ -16,14 +16,13 @@ class Ticket extends Model
     use HasFactory;
 
     protected $fillable = [
+        'code',
         'status',
         'description',
         'reporter_email',
         'being_notified',
         'closed_at',
     ];
-
-
 
     protected function casts(): array
     {
@@ -57,7 +56,6 @@ class Ticket extends Model
         $this->status = TicketStatus::CLOSED->value;
         $this->closed_at = now();
 
-        dump('close ticket model');
         return $this->save();
     }
 }

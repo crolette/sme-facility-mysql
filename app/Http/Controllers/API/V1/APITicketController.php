@@ -20,7 +20,16 @@ class APITicketController extends Controller
         try {
             DB::beginTransaction();
 
-            $ticket = new Ticket([...$request->validated()]);
+            $count = Ticket::all()->count();
+            $codeNumber = generateCodeNumber($count, 'TK', 4);
+
+            $ticket = new Ticket(
+                [
+                    ...$request->validated(),
+                    'code' => $codeNumber
+                ]
+            );
+
 
             if (!$request->validated('reporter_email')) {
                 $ticket->reporter()->associate($request->validated('reported_by'));

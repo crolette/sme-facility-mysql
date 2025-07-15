@@ -23,7 +23,11 @@ class TicketFactory extends Factory
      */
     public function definition(): array
     {
+        $count = Ticket::all()->count();
+        $codeNumber = generateCodeNumber($count, 'TK', 4);
+
         return [
+            'code' => $codeNumber,
             'status' => TicketStatus::OPEN->value,
             'description' => fake()->paragraph(),
             'reported_by' => User::factory()->create()->id,
