@@ -4,8 +4,9 @@ use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Floor;
-use App\Models\Tenants\Building;
+use App\Models\Tenants\Picture;
 
+use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
@@ -20,16 +21,14 @@ use function Pest\Laravel\assertDatabaseMissing;
 beforeEach(function () {
     $this->user = User::factory()->create();
     $this->actingAs($this->user, 'tenant');
+    $this->siteType = LocationType::factory()->create(['level' => 'site']);
+    $this->buildingType = LocationType::factory()->create(['level' => 'building']);
+    $this->floorType = LocationType::factory()->create(['level' => 'floor']);
+    Site::factory()->create();
+    $this->building = Building::factory()->create();
 });
 
 it('can render the index floors page', function () {
-
-
-    LocationType::factory()->count(1)->create(['level' => 'site']);
-    LocationType::factory()->count(1)->create(['level' => 'building']);
-    LocationType::factory()->count(1)->create(['level' => 'floor']);
-    Site::factory()->create();
-    Building::factory()->create();
     Floor::factory()->count(3)->create();
     $response = $this->getFromTenant('tenant.floors.index');
     $response->assertOk();
@@ -44,11 +43,7 @@ it('can render the index floors page', function () {
 });
 
 it('can render the create floor page', function () {
-    LocationType::factory()->count(1)->create(['level' => 'site']);
-    LocationType::factory()->count(1)->create(['level' => 'building']);
-    LocationType::factory()->count(3)->create(['level' => 'floor']);
-
-    Site::factory()->create();
+    LocationType::factory()->count(2)->create(['level' => 'floor']);
     Building::factory()->count(2)->create();
 
 
@@ -58,23 +53,17 @@ it('can render the create floor page', function () {
 
     $response->assertInertia(
         fn($page) => $page->component('tenants/locations/create')
-            ->has('levelTypes', 2)
+            ->has('levelTypes', 3)
             ->has('locationTypes', 3)
     );
 });
 
 it('can create a new floor', function () {
-    LocationType::factory()->create(['level' => 'site']);
-    $siteType = LocationType::factory()->create(['level' => 'building']);
-    $location = LocationType::factory()->create(['level' => 'floor']);
-    Site::factory()->create();
-    $building = Building::factory()->create();
-
     $formData = [
         'name' => 'New floor',
         'description' => 'Description new floor',
-        'levelType' => $building->id,
-        'locationType' => $location->id
+        'levelType' => $this->building->id,
+        'locationType' => $this->floorType->id
     ];
 
     $response = $this->postToTenant('tenant.floors.store', $formData);
@@ -90,10 +79,10 @@ it('can create a new floor', function () {
 
 
     assertDatabaseHas('floors', [
-        'location_type_id' => $location->id,
-        'code' => $location->prefix . '01',
-        'reference_code' => $building->reference_code . '-' . $location->prefix . '01',
-        'level_id' => $building->id
+        'location_type_id' => $this->floorType->id,
+        'code' => $this->floorType->prefix . '01',
+        'reference_code' => $this->building->reference_code . '-' . $this->floorType->prefix . '01',
+        'level_id' => $this->building->id
     ]);
 
     assertDatabaseHas('maintainables', [
@@ -106,11 +95,6 @@ it('can create a new floor', function () {
 
 it('can upload several files to building', function () {
 
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    $location = LocationType::factory()->create(['level' => 'floor']);
-    Site::factory()->create();
-    $building = Building::factory()->create();
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
     CategoryType::factory()->count(2)->create(['category' => 'document']);
@@ -119,8 +103,8 @@ it('can upload several files to building', function () {
     $formData = [
         'name' => 'New room',
         'description' => 'Description new room',
-        'levelType' => $building->id,
-        'locationType' => $location->id,
+        'levelType' => $this->building->id,
+        'locationType' => $this->floorType->id,
         'files' => [
             [
                 'file' => $file1,
@@ -153,11 +137,6 @@ it('can upload several files to building', function () {
 });
 
 it('can render the show floor page', function () {
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    Site::factory()->create();
-    Building::factory()->create();
     $floor = Floor::factory()->create();
 
     $response = $this->getFromTenant('tenant.floors.show', $floor);
@@ -175,11 +154,9 @@ it('can render the show floor page', function () {
 });
 
 it('can render the update floor page', function () {
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->count(3)->create(['level' => 'building']);
-    LocationType::factory()->count(3)->create(['level' => 'floor']);
-    Site::factory()->create();
-    Building::factory()->count(3)->create();
+    LocationType::factory()->count(2)->create(['level' => 'building']);
+    LocationType::factory()->count(2)->create(['level' => 'floor']);
+    Building::factory()->count(2)->create();
     $floor = Floor::factory()->create();
 
     $response = $this->getFromTenant('tenant.floors.edit', $floor);
@@ -197,11 +174,6 @@ it('can render the update floor page', function () {
 });
 
 it('can update a floor maintainable', function () {
-    LocationType::factory()->create(['level' => 'site']);
-    $buildingType = LocationType::factory()->create(['level' => 'building']);
-    $locationType = LocationType::factory()->create(['level' => 'floor']);
-    $site = Site::factory()->create();
-    $building = Building::factory()->create();
 
     $floor = Floor::factory()->create();
 
@@ -211,8 +183,8 @@ it('can update a floor maintainable', function () {
     $formData = [
         'name' => 'New floor',
         'description' => 'Description new floor',
-        'levelType' => $building->id,
-        'locationType' => $locationType->id
+        'levelType' => $this->building->id,
+        'locationType' => $this->floorType->id
     ];
 
     $response = $this->patchToTenant('tenant.floors.update', $formData, $floor);
@@ -225,10 +197,10 @@ it('can update a floor maintainable', function () {
     assertDatabaseCount('maintainables', 3);
 
     assertDatabaseHas('floors', [
-        'location_type_id' => $locationType->id,
-        'level_id' => $building->id,
-        'code' => $locationType->prefix . '01',
-        'reference_code' => $building->reference_code . '-' . $locationType->prefix . '01',
+        'location_type_id' => $this->floorType->id,
+        'level_id' => $this->building->id,
+        'code' => $this->floorType->prefix . '01',
+        'reference_code' => $this->building->reference_code . '-' . $this->floorType->prefix . '01',
     ]);
 
     assertDatabaseHas('maintainables', [
@@ -242,19 +214,33 @@ it('can update a floor maintainable', function () {
     ]);
 });
 
-it('cannot update a floor type of an existing floor', function () {
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->count(2)->create(['level' => 'building']);
-    LocationType::factory()->count(3)->create(['level' => 'floor']);
-    Site::factory()->create();
-    $building = Building::factory()->create();
+it('fails when update of an existing floor with a non existing floor type', function () {
     $floor = Floor::factory()->create();
 
     $formData = [
         'name' => 'New site',
         'description' => 'Description new site',
-        'levelType' => $building->level_id,
+        'levelType' => $this->building->level_id,
         'locationType' => 5
+    ];
+
+    $response = $this->patchToTenant('tenant.floors.update', $formData, $floor);
+    $response->assertRedirect();
+    $response->assertSessionHasErrors([
+        'locationType' => 'The selected location type is invalid.',
+    ]);
+});
+
+it('cannot update a floor type of an existing floor', function () {
+    LocationType::factory()->create(['level' => 'floor']);
+
+    $floor = Floor::factory()->create();
+
+    $formData = [
+        'name' => 'New site',
+        'description' => 'Description new site',
+        'levelType' => $this->building->level_id,
+        'locationType' => 4
     ];
 
     $response = $this->patchToTenant('tenant.floors.update', $formData, $floor);
@@ -265,15 +251,10 @@ it('cannot update a floor type of an existing floor', function () {
 });
 
 it('can delete a floor and his maintainable', function () {
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    $site = Site::factory()->create();
-    $building = Building::factory()->create();
     $floor = Floor::factory()->create();
 
     assertDatabaseHas('floors', [
-        'level_id' => $building->id,
+        'level_id' => $this->building->id,
         'code' => $floor->code
     ]);
 
@@ -292,4 +273,39 @@ it('can delete a floor and his maintainable', function () {
     assertDatabaseCount('buildings', 1);
     assertDatabaseEmpty('floors');
     assertDatabaseCount('maintainables', 2);
+});
+
+it('can add pictures to a floor', function () {
+    $floor = Floor::factory()->create();
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->image('test.jpg');
+
+    $formData = [
+        'pictures' => [
+            $file1,
+            $file2
+        ]
+    ];
+
+    $response = $this->postToTenant('api.floors.pictures.post', $formData, $floor);
+    $response->assertSessionHasNoErrors();
+    assertDatabaseCount('pictures', 2);
+    assertDatabaseHas('pictures', [
+        'imageable_type' => 'App\Models\Tenants\Floor',
+        'imageable_id' => 1
+    ]);
+});
+
+it('can retrieve all pictures from a floor', function () {
+    $floor = Floor::factory()->create();
+
+    Picture::factory()->forModelAndUser($floor, $this->user, 'floors')->create();
+    Picture::factory()->forModelAndUser($floor, $this->user, 'floors')->create();
+
+    assertDatabaseCount('pictures', 2);
+
+    $response = $this->getFromTenant('api.floors.pictures', $floor);
+    $response->assertStatus(200);
+    $data = $response->json('data');
+    $this->assertCount(2, $data);
 });

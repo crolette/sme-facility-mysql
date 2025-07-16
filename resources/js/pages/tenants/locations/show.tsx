@@ -1,4 +1,5 @@
 import { DocumentManager } from '@/components/tenant/documentManager';
+
 import { PictureManager } from '@/components/tenant/pictureManager';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -486,6 +487,7 @@ export default function ShowLocation({ location, routeName }: { location: Tenant
                         </Table>
                     )}
                 </details>
+
                 <DocumentManager
                     itemCodeId={location.id}
                     getDocumentsUrl={`api.${routeName}.documents`}
@@ -494,6 +496,7 @@ export default function ShowLocation({ location, routeName }: { location: Tenant
                     deleteRoute={`api.documents.delete`}
                     showRoute={'api.documents.show'}
                 />
+
                 <PictureManager
                     itemCodeId={location.id}
                     getPicturesUrl={`api.${routeName}.pictures`}
@@ -502,7 +505,7 @@ export default function ShowLocation({ location, routeName }: { location: Tenant
                     showRoute={'api.pictures.show'}
                 />
             </div>
-            {showFileModal && addFileModalForm()}
+
             {addTicketModal && addTicket()}
         </AppLayout>
     );

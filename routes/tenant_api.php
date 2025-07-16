@@ -62,7 +62,7 @@ Route::prefix('api/v1')->group(
 
                 // Get all pictures from an asset
                 Route::get('/assets/{asset}/pictures/', function (Asset $asset) {
-                    return response()->json($asset->load('pictures')->pictures);
+                    return ApiResponse::success($asset->load('pictures')->pictures, 'Pictures added');
                 })->name('api.assets.pictures');
 
                 // Get all tickets from an asset
@@ -106,6 +106,22 @@ Route::prefix('api/v1')->group(
                     return ApiResponse::success($site->load('tickets.pictures')->tickets, 'Document added');
                 })->name('api.sites.tickets');
 
+                // Get all pictures from a site
+                Route::get('/sites/{site}/pictures/', function (Site $site) {
+                    return ApiResponse::success($site->load('pictures')->pictures, 'Pictures added');
+                })->name('api.sites.pictures');
+
+                // Post a new picture to a site
+                Route::post('/sites/{site}/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Site $site) {
+
+                    $files = $pictureUploadRequest->validated('pictures');
+                    if ($files) {
+                        $pictureService->uploadAndAttachPictures($site, $files);
+                    }
+
+                    return ApiResponse::success(null, 'Pictures added');
+                })->name('api.sites.pictures.post');
+
 
                 // Get all documents from a building
                 Route::get('/buildings/{building}/documents/', function (Building $building) {
@@ -128,6 +144,23 @@ Route::prefix('api/v1')->group(
                 Route::get('/buildings/{building}/tickets/', function (Building $building) {
                     return ApiResponse::success($building->load('tickets.pictures')->tickets, 'Document added');
                 })->name('api.buildings.tickets');
+
+                // Get all pictures from a building
+                Route::get('/buildings/{building}/pictures/', function (Building $building) {
+                    return ApiResponse::success($building->load('pictures')->pictures, 'Pictures added');
+                })->name('api.buildings.pictures');
+
+                // Post a new picture to a building
+                Route::post('/buildings/{building}/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Building $building) {
+
+                    $files = $pictureUploadRequest->validated('pictures');
+                    if ($files) {
+                        $pictureService->uploadAndAttachPictures($building, $files);
+                    }
+
+                    return ApiResponse::success(null, 'Pictures added');
+                })->name('api.buildings.pictures.post');
+
 
 
                 // Get all documents from a floor
@@ -153,26 +186,63 @@ Route::prefix('api/v1')->group(
                 })->name('api.floors.tickets');
 
 
-                // Get all documents from a room
-                Route::get('/rooms/{room}/documents/', function (Room $room) {
-                    return response()->json($room->load('documents')->documents);
-                })->name('api.rooms.documents');
+                // Get all pictures from a floor
+                Route::get('/floors/{floor}/pictures/', function (Floor $floor) {
+                    return ApiResponse::success($floor->load('pictures')->pictures, 'Pictures added');
+                })->name('api.floors.pictures');
 
-                // Post a new document to a floor
-                Route::post('/rooms/{room}/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Room $room) {
+                // Post a new picture to a floor
+                Route::post('/floors/{floor}/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Floor $floor) {
 
-                    $files = $documentUploadRequest->validated('files');
+                    $files = $pictureUploadRequest->validated('pictures');
                     if ($files) {
-                        $documentService->uploadAndAttachDocuments($room, $files);
+                        $pictureService->uploadAndAttachPictures($floor, $files);
                     }
 
-                    return ApiResponse::success(null, 'Document added');
-                })->name('api.rooms.documents.post');
+                    return ApiResponse::success(null, 'Pictures added');
+                })->name('api.floors.pictures.post');
 
-                // Get all tickets from a room
-                Route::get('/rooms/{room}/tickets/', function (Room $room) {
-                    return ApiResponse::success($room->load('tickets.pictures')->tickets, 'Document added');
-                })->name('api.rooms.tickets');
+
+                Route::prefix('rooms')->group(function () {
+
+                    // Get all documents from a room
+                    Route::get('{room}/documents/', function (Room $room) {
+                        return response()->json($room->load('documents')->documents);
+                    })->name('api.rooms.documents');
+
+                    // Post a new document to a floor
+                    Route::post('{room}/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Room $room) {
+
+                        $files = $documentUploadRequest->validated('files');
+                        if ($files) {
+                            $documentService->uploadAndAttachDocuments($room, $files);
+                        }
+
+                        return ApiResponse::success(null, 'Document added');
+                    })->name('api.rooms.documents.post');
+
+                    // Get all tickets from a room
+                    Route::get('{room}/tickets/', function (Room $room) {
+                        return ApiResponse::success($room->load('tickets.pictures')->tickets, 'Document added');
+                    })->name('api.rooms.tickets');
+
+                    // Get all pictures from a room
+                    Route::get('{room}/pictures/', function (Room $room) {
+                        return ApiResponse::success($room->load('pictures')->pictures, 'Pictures added');
+                    })->name('api.rooms.pictures');
+
+                    // Post a new picture to a room
+                    Route::post('{room}/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Room $room) {
+                        Debugbar::info('post picture to room', $pictureUploadRequest->validated('pictures'), $room);
+                        $files = $pictureUploadRequest->validated('pictures');
+                        if ($files) {
+                            $pictureService->uploadAndAttachPictures($room, $files);
+                        }
+
+                        return ApiResponse::success(null, 'Pictures added');
+                    })->name('api.rooms.pictures.post');
+                });
+
 
                 // Return the category type searched
                 Route::get('category-types/', function (Request $request) {

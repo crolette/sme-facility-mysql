@@ -5,8 +5,9 @@ use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Floor;
-use App\Models\Tenants\Building;
+use App\Models\Tenants\Picture;
 
+use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
@@ -27,7 +28,6 @@ beforeEach(function () {
     LocationType::factory()->count(1)->create(['level' => 'room']);
     CategoryType::factory()->count(2)->create(['category' => 'document']);
     $this->site = Site::factory()->create();
-
     $this->building = Building::factory()->create();
     $this->floor = Floor::factory()->create();
 });
@@ -379,4 +379,45 @@ it('can upload a document to an existing room', function () {
         'documentable_type' => 'App\Models\Tenants\Room',
         'documentable_id' => 1
     ]);
+});
+
+it('can add pictures to a room', function () {
+    $room = Room::factory()
+        ->for(LocationType::where('level', 'room')->first())
+        ->for(Floor::first())
+        ->create();
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->image('test.jpg');
+
+    $formData = [
+        'pictures' => [
+            $file1,
+            $file2
+        ]
+    ];
+
+    $response = $this->postToTenant('api.rooms.pictures.post', $formData, $room);
+    $response->assertSessionHasNoErrors();
+    assertDatabaseCount('pictures', 2);
+    assertDatabaseHas('pictures', [
+        'imageable_type' => 'App\Models\Tenants\Room',
+        'imageable_id' => 1
+    ]);
+});
+
+it('can retrieve all pictures from a room', function () {
+    $room = Room::factory()
+        ->for(LocationType::where('level', 'room')->first())
+        ->for(Floor::first())
+        ->create();
+
+    Picture::factory()->forModelAndUser($room, $this->user, 'rooms')->create();
+    Picture::factory()->forModelAndUser($room, $this->user, 'rooms')->create();
+
+    assertDatabaseCount('pictures', 2);
+
+    $response = $this->getFromTenant('api.rooms.pictures', $room);
+    $response->assertStatus(200);
+    $data = $response->json('data');
+    $this->assertCount(2, $data);
 });

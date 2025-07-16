@@ -55,6 +55,8 @@ Route::middleware([
 
     Route::resource('assets', TenantAssetController::class)->parameters(['assets' => 'asset'])->names('tenant.assets');
 
+    Route::get('/assets/{id}/deleted', [TenantAssetController::class, 'showDeleted'])->name('tenant.assets.deleted');
+
 
 
     Route::get('/tickets', [TicketController::class, 'index'])->name('tenant.tickets.index');

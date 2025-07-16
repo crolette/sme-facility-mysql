@@ -6,6 +6,7 @@ use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Floor;
+use App\Models\Tenants\Picture;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use Illuminate\Http\UploadedFile;
@@ -345,4 +346,41 @@ it('can upload a document to an existing site', function () {
         'documentable_type' => 'App\Models\Tenants\Site',
         'documentable_id' => 1
     ]);
+});
+
+it('can add pictures to a site', function () {
+    LocationType::factory()->create(['level' => 'site']);
+    $site = Site::factory()->create();
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->image('test.jpg');
+
+    $formData = [
+        'pictures' => [
+            $file1,
+            $file2
+        ]
+    ];
+
+    $response = $this->postToTenant('api.sites.pictures.post', $formData, $site);
+    $response->assertSessionHasNoErrors();
+    assertDatabaseCount('pictures', 2);
+    assertDatabaseHas('pictures', [
+        'imageable_type' => 'App\Models\Tenants\Site',
+        'imageable_id' => 1
+    ]);
+});
+
+it('can retrieve all pictures from a site', function () {
+    LocationType::factory()->create(['level' => 'site']);
+    $site = Site::factory()->create();
+
+    Picture::factory()->forModelAndUser($site, $this->user, 'sites')->create();
+    Picture::factory()->forModelAndUser($site, $this->user, 'sites')->create();
+
+    assertDatabaseCount('pictures', 2);
+
+    $response = $this->getFromTenant('api.sites.pictures', $site);
+    $response->assertStatus(200);
+    $data = $response->json('data');
+    $this->assertCount(2, $data);
 });

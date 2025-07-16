@@ -1,4 +1,6 @@
+
 import { DocumentManager } from '@/components/tenant/documentManager';
+
 import { PictureManager } from '@/components/tenant/pictureManager';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -26,6 +28,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
     const deleteAsset = (asset: Asset) => {
         destroy(route(`tenant.assets.destroy`, asset.code));
     };
+
 
     const closeTicket = async (id: number) => {
         try {
@@ -191,22 +194,36 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div>
-                    <a href={route(`tenant.assets.edit`, asset.code)}>
-                        <Button>Edit</Button>
-                    </a>
-                    <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
-                        Delete
-                    </Button>
+                    {asset.deleted_at ? (
+                        <>
+                            <Button onClick={() => restoreAsset(asset)} variant={'green'}>
+                                Restore
+                            </Button>
+                            <Button onClick={() => deleteDefinitelyAsset(asset)} variant={'destructive'}>
+                                Delete definitely
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <a href={route(`tenant.assets.edit`, asset.code)}>
+                                <Button>Edit</Button>
+                            </a>
+                            <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
+                                Delete
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    setSubmitTypeTicket('new');
+                                    setAddTicketModal(!addTicketModal);
+                                }}
+                            >
+                                Add new ticket
+                            </Button>
+                        </>
+                    )}
 
                     {/* <a href={route(`tenant.tickets.create`)}> */}
-                    <Button
-                        onClick={() => {
-                            setSubmitTypeTicket('new');
-                            setAddTicketModal(!addTicketModal);
-                        }}
-                    >
-                        Add new ticket
-                    </Button>
+
                     {/* </a> */}
                 </div>
                 <p>Code : {asset.code}</p>
@@ -322,6 +339,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                         </Table>
                     )}
                 </details>
+
                 <DocumentManager
                     itemCodeId={asset.code}
                     getDocumentsUrl={`api.assets.documents`}
@@ -340,7 +358,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
             </div>
 
             {/* {addPictures && addNewPicturesModal()} */}
-
             {addTicketModal && addTicket()}
         </AppLayout>
     );

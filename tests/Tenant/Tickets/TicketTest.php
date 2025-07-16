@@ -416,6 +416,21 @@ it('can close an existing ticket', function () {
     $this->assertNotNull($ticket->fresh()->closed_at);
 });
 
+it('can retrieve all tickets ', function () {
+    Ticket::factory()->forLocation($this->room)->create(['reported_by' => $this->user->id]);
+    Ticket::factory()->forLocation($this->site)->create(['reported_by' => $this->user->id]);
+    Ticket::factory()->forLocation($this->floor)->create(['reported_by' => $this->user->id]);
+    Ticket::factory()->forLocation($this->asset)->create(['reported_by' => $this->user->id]);
+
+    $response = $this->getFromTenant('api.tickets.index');
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ])
+        ->assertJsonCount(4, 'data');
+});
+
 it('can retrieve all tickets from a site', function () {
     Ticket::factory()->forLocation($this->site)->create(['reported_by' => $this->user->id]);
     Ticket::factory()->forLocation($this->site)->create(['reported_by' => $this->user->id]);

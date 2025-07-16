@@ -16,6 +16,18 @@ use App\Services\PictureService;
 
 class APITicketController extends Controller
 {
+    public function index()
+    {
+
+        $tickets = Ticket::all()->load('pictures');
+        return ApiResponse::success($tickets, 'Ticket created');
+    }
+
+    public function show(Ticket $ticket)
+    {
+        return ApiResponse::success($ticket->load('pictures'), 'Ticket');
+    }
+
     public function store(TicketRequest $request, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService)
     {
 
