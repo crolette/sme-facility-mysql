@@ -222,7 +222,7 @@ export const DocumentManager = ({ itemCodeId, getDocumentsUrl, editRoute, upload
                         <div className="bg-background flex items-center justify-center p-4">
                             <div className="flex flex-col gap-2">
                                 <form onSubmit={submitType === 'edit' ? submitEditFile : submitNewFile} className="space-y-2">
-                                    <p className="text-center">Edit document</p>
+                                    <p className="text-center">{submitType === 'edit' ? 'Edit document' : 'Add document'}</p>
                                     <select
                                         name="documentType"
                                         required
