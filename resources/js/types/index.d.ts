@@ -85,6 +85,9 @@ export interface Asset {
     tickets?: Ticket[];
     pictures?: Picture[];
     documents?: Document[];
+    deleted_at?: string;
+    created_at: string;
+    updated_at?: string;
     asset_category: AssetCategory;
     maintainable: Maintainable;
     location: TenantSite | TenantBuilding | TenantFloor | TenantRoom;

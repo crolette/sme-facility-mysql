@@ -156,7 +156,10 @@ export default function IndexAssets({ assets }: { assets: Asset[] }) {
                                 trashedAssets.map((asset, index) => {
                                     return (
                                         <TableBodyRow key={index}>
-                                            <TableBodyData>{asset.reference_code}</TableBodyData>
+                                            <TableBodyData>
+                                                <a href={route(`tenant.assets.deleted`, asset.id)}> {asset.reference_code} </a>
+                                            </TableBodyData>
+
                                             <TableBodyData>{asset.code}</TableBodyData>
                                             <TableBodyData>{asset.category}</TableBodyData>
                                             <TableBodyData>{asset.maintainable.name}</TableBodyData>
@@ -169,6 +172,9 @@ export default function IndexAssets({ assets }: { assets: Asset[] }) {
                                                 <Button onClick={() => restoreAsset(asset)} variant={'green'}>
                                                     Restore
                                                 </Button>
+                                                <a href={route('tenant.assets.deleted', asset.id)}>
+                                                    <Button>Show</Button>
+                                                </a>
                                             </TableBodyData>
                                         </TableBodyRow>
                                     );

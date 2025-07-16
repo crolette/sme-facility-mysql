@@ -157,3 +157,7 @@
         @apply bg-background text-foreground;
     }
 }
+
+a:hover {
+    @apply underline;
+}

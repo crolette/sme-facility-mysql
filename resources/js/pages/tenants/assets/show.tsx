@@ -43,7 +43,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
     const [documents, setDocuments] = useState(asset.documents);
     const [pictures, setPictures] = useState(asset.pictures);
 
-    const { delete: destroy } = useForm();
+    const { post, delete: destroy } = useForm();
 
     const deleteAsset = (asset: Asset) => {
         destroy(route(`tenant.assets.destroy`, asset.code));
@@ -490,28 +490,51 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
         );
     };
 
+    const restoreAsset = (asset: Asset) => {
+        post(route('api.tenant.assets.restore', asset.id));
+    };
+
+    const deleteDefinitelyAsset = (asset: Asset) => {
+        destroy(route(`api.tenant.assets.force`, asset.id));
+    };
+
+    console.log(asset);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Asset ${asset.maintainable.name}`} />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div>
-                    <a href={route(`tenant.assets.edit`, asset.code)}>
-                        <Button>Edit</Button>
-                    </a>
-                    <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
-                        Delete
-                    </Button>
+                    {asset.deleted_at ? (
+                        <>
+                            <Button onClick={() => restoreAsset(asset)} variant={'green'}>
+                                Restore
+                            </Button>
+                            <Button onClick={() => deleteDefinitelyAsset(asset)} variant={'destructive'}>
+                                Delete definitely
+                            </Button>
+                        </>
+                    ) : (
+                        <>
+                            <a href={route(`tenant.assets.edit`, asset.code)}>
+                                <Button>Edit</Button>
+                            </a>
+                            <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
+                                Delete
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    setSubmitTypeTicket('new');
+                                    setAddTicketModal(!addTicketModal);
+                                }}
+                            >
+                                Add new ticket
+                            </Button>
+                        </>
+                    )}
 
                     {/* <a href={route(`tenant.tickets.create`)}> */}
-                    <Button
-                        onClick={() => {
-                            setSubmitTypeTicket('new');
-                            setAddTicketModal(!addTicketModal);
-                        }}
-                    >
-                        Add new ticket
-                    </Button>
+
                     {/* </a> */}
                 </div>
                 <p>Code : {asset.code}</p>
