@@ -45,7 +45,7 @@ Route::prefix('api/v1')->group(
 
                 // Get all the documents from an asset
                 Route::get('/assets/{asset}/documents/', function (Asset $asset) {
-                    return response()->json($asset->load('documents')->documents);
+                    return ApiResponse::success($asset->load('documents')->documents);
                 })->name('api.assets.documents');
 
                 // Post a new document to the assets
@@ -57,7 +57,7 @@ Route::prefix('api/v1')->group(
                         $documentService->uploadAndAttachDocuments($asset, $files);
                     }
 
-                    return response()->json($asset->load('documents')->documents);
+                    return ApiResponse::success([], 'Document added');
                 })->name('api.assets.documents.post');
 
                 // Get all pictures from an asset
@@ -249,7 +249,7 @@ Route::prefix('api/v1')->group(
                     $documentTypes = CategoryType::where('category', $request->query('type'))->get();
                     Debugbar::info($request->query('type'), $documentTypes);
 
-                    return response()->json($documentTypes);
+                    return ApiResponse::success($documentTypes, 'Success');
                 });
 
                 // Route to get the documents from a tenant - to display on show page
@@ -268,7 +268,7 @@ Route::prefix('api/v1')->group(
                     }
 
                     return response()->file(Storage::disk('tenants')->path($path));
-                })->name('documents.show');
+                })->name('api.documents.show');
 
                 // Get the path to a specific picture through the guard tenant
                 Route::get('/pictures/{picture}', function (Picture $picture) {
