@@ -36,7 +36,7 @@ Route::prefix('api/v1')->group(
 
                 // Get all the documents from an asset
                 Route::get('/assets/{asset}/documents/', function (Asset $asset) {
-                    return response()->json($asset->load('documents')->documents);
+                    return ApiResponse::success($asset->load('documents')->documents);
                 })->name('api.assets.documents');
 
                 Route::post('/assets/{asset}/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Asset $asset) {
@@ -47,7 +47,7 @@ Route::prefix('api/v1')->group(
                         $documentService->uploadAndAttachDocuments($asset, $files);
                     }
 
-                    return response()->json($asset->load('documents')->documents);
+                    return ApiResponse::success([], 'Document added');
                 })->name('api.assets.documents.post');
 
 
@@ -73,7 +73,7 @@ Route::prefix('api/v1')->group(
                     $documentTypes = CategoryType::where('category', $request->query('type'))->get();
                     Debugbar::info($request->query('type'), $documentTypes);
 
-                    return response()->json($documentTypes);
+                    return ApiResponse::success($documentTypes, 'Success');
                 });
 
                 // Route to get the documents from a tenant - to display on show page
@@ -90,7 +90,39 @@ Route::prefix('api/v1')->group(
                     }
 
                     return response()->file(Storage::disk('tenants')->path($path));
-                })->name('documents.show');
+                })->name('api.documents.show');
+
+                // Get the path to a specific picture through the guard tenant
+                Route::get('/pictures/{picture}', function (Picture $picture) {
+
+                    $path = $picture->path;
+
+                    if (! Storage::disk('tenants')->exists($path)) {
+                        abort(404);
+                    }
+
+                    return response()->file(Storage::disk('tenants')->path($path));
+                })->name('api.pictures.show');
+
+                // Delete a specific picture
+                Route::delete('/pictures/{picture}', [DestroyPictureController::class, 'destroy'])->name('api.pictures.delete');
+
+                Route::prefix('tickets')->group(function () {
+                    // Get all tickets
+                    Route::get('/', [APITicketController::class, 'index'])->name('api.tickets.index');
+
+                    // Post a new ticket
+                    Route::post('/', [APITicketController::class, 'store'])->name('api.tickets.store');
+
+                    // Get a specific ticket
+                    Route::get('{ticket}', [APITicketController::class, 'show'])->name('api.tickets.get');
+
+                    // Update a specific ticket
+                    Route::patch('{ticket}', [APITicketController::class, 'update'])->name('api.tickets.update');
+
+                    // Close a specific ticket
+                    Route::patch('{ticket}/close', [APITicketController::class, 'close'])->name('api.tickets.close');
+                });
             });
         });
     }
