@@ -87,7 +87,7 @@ Route::prefix('api/v1')->group(
 
                 // Get all documents from a site
                 Route::get('/sites/{site}/documents/', function (Site $site) {
-                    return response()->json($site->load('documents')->documents);
+                    return ApiResponse::success($site->load('documents')->documents);
                 })->name('api.sites.documents');
 
                 // Post a new document to a site
@@ -125,7 +125,7 @@ Route::prefix('api/v1')->group(
 
                 // Get all documents from a building
                 Route::get('/buildings/{building}/documents/', function (Building $building) {
-                    return response()->json($building->load('documents')->documents);
+                    return ApiResponse::success($building->load('documents')->documents);
                 })->name('api.buildings.documents');
 
                 // Post a new document to a building
@@ -165,7 +165,7 @@ Route::prefix('api/v1')->group(
 
                 // Get all documents from a floor
                 Route::get('/floors/{floor}/documents/', function (Floor $floor) {
-                    return response()->json($floor->load('documents')->documents);
+                    return ApiResponse::success($floor->load('documents')->documents);
                 })->name('api.floors.documents');
 
                 // Post a new document to a floor
@@ -207,7 +207,7 @@ Route::prefix('api/v1')->group(
 
                     // Get all documents from a room
                     Route::get('{room}/documents/', function (Room $room) {
-                        return response()->json($room->load('documents')->documents);
+                        return ApiResponse::success($room->load('documents')->documents);
                     })->name('api.rooms.documents');
 
                     // Post a new document to a floor

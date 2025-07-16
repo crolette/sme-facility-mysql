@@ -53,7 +53,9 @@ export default function ShowTicket({ ticket }: { ticket: Ticket }) {
             <div className="flex gap-4">
                 {ticketItem.pictures &&
                     ticketItem.pictures.map((picture) => {
-                        return <img key={picture.id} src={route('pictures.show', picture.id)} alt="" className="h-64 w-64" />;
+                        return (
+                            <img key={picture.id} src={route('api.pictures.show', picture.id)} alt="" className="aspect-square h-64 object-cover" />
+                        );
                     })}
             </div>
         </AppLayout>

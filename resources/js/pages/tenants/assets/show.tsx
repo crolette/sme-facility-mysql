@@ -1,4 +1,3 @@
-
 import { DocumentManager } from '@/components/tenant/documentManager';
 
 import { PictureManager } from '@/components/tenant/pictureManager';
@@ -10,7 +9,7 @@ import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { Asset, Ticket, type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { FormEventHandler, useState } from 'react';
 
@@ -28,7 +27,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
     const deleteAsset = (asset: Asset) => {
         destroy(route(`tenant.assets.destroy`, asset.code));
     };
-
 
     const closeTicket = async (id: number) => {
         try {
@@ -242,57 +240,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                 <details>
                     <summary className="">
                         <h3 className="inline">Tickets ({tickets?.length ?? 0})</h3>
-                    </summary>
-                    {tickets.length > 0 && (
-                        <Table>
-                            <TableHead>
-                                <TableHeadRow>
-                                    <TableHeadData>Code</TableHeadData>
-                                    <TableHeadData>Status</TableHeadData>
-                                    <TableHeadData>Reporter</TableHeadData>
-                                    <TableHeadData>Description</TableHeadData>
-                                    <TableHeadData>Created at</TableHeadData>
-                                    <TableHeadData>Updated at</TableHeadData>
-                                    <TableHeadData></TableHeadData>
-                                </TableHeadRow>
-                            </TableHead>
-                            <TableBody>
-                                {tickets.map((ticket, index) => {
-                                    return (
-                                        <TableBodyRow key={index}>
-                                            <TableBodyData>
-                                                <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
-                                            </TableBodyData>
-                                            <TableBodyData>{ticket.status}</TableBodyData>
-                                            <TableBodyData>{ticket.code}</TableBodyData>
-                                            <TableBodyData>{ticket.description}</TableBodyData>
-                                            <TableBodyData>{ticket.created_at}</TableBodyData>
-                                            <TableBodyData>{ticket.updated_at !== ticket.created_at ? ticket.updated_at : '-'}</TableBodyData>
-                                            <TableBodyData>PICTURES</TableBodyData>
-
-                                            <TableBodyData>
-                                                {ticket.status !== 'closed' && (
-                                                    <>
-                                                        <Button variant={'destructive'} onClick={() => closeTicket(ticket.id)}>
-                                                            Close
-                                                        </Button>
-
-                                                        <Button onClick={() => editTicket(ticket.id)}>Edit</Button>
-                                                    </>
-                                                )}
-                                            </TableBodyData>
-                                        </TableBodyRow>
-                                    );
-                                })}
-                            </TableBody>
-                        </Table>
-                    )}
-                </details>
-
-                <details>
-                    <summary className="">
-                        <h3 className="inline">Documents ({documents?.length ?? 0})</h3>
-                        <Button onClick={() => addNewFile()}>Add new file</Button>
                     </summary>
                     {tickets.length > 0 && (
                         <Table>
