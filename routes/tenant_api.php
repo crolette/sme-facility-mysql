@@ -45,7 +45,7 @@ Route::prefix('api/v1')->group(
 
                 // Get all the documents from an asset
                 Route::get('/assets/{asset}/documents/', function (Asset $asset) {
-                    return response()->json($asset->load('documents')->documents);
+                    return ApiResponse::success($asset->load('documents')->documents);
                 })->name('api.assets.documents');
 
                 // Post a new document to the assets
@@ -57,7 +57,7 @@ Route::prefix('api/v1')->group(
                         $documentService->uploadAndAttachDocuments($asset, $files);
                     }
 
-                    return response()->json($asset->load('documents')->documents);
+                    return ApiResponse::success([], 'Document added');
                 })->name('api.assets.documents.post');
 
                 // Get all pictures from an asset
@@ -179,7 +179,7 @@ Route::prefix('api/v1')->group(
                     $documentTypes = CategoryType::where('category', $request->query('type'))->get();
                     Debugbar::info($request->query('type'), $documentTypes);
 
-                    return response()->json($documentTypes);
+                    return ApiResponse::success($documentTypes, 'Success');
                 });
 
                 // Route to get the documents from a tenant - to display on show page
@@ -198,7 +198,7 @@ Route::prefix('api/v1')->group(
                     }
 
                     return response()->file(Storage::disk('tenants')->path($path));
-                })->name('documents.show');
+                })->name('api.documents.show');
 
                 // Get the path to a specific picture through the guard tenant
                 Route::get('/pictures/{picture}', function (Picture $picture) {
@@ -210,30 +210,27 @@ Route::prefix('api/v1')->group(
                     }
 
                     return response()->file(Storage::disk('tenants')->path($path));
-                })->name('pictures.show');
+                })->name('api.pictures.show');
 
                 // Delete a specific picture
-                Route::delete('/pictures/{picture}', [DestroyPictureController::class, 'destroy'])->name('api.picture.delete');
+                Route::delete('/pictures/{picture}', [DestroyPictureController::class, 'destroy'])->name('api.pictures.delete');
 
-                // Post a new ticket
-                Route::post('tickets', [APITicketController::class, 'store'])->name('api.tickets.store');
+                Route::prefix('tickets')->group(function () {
+                    // Get all tickets
+                    Route::get('/', [APITicketController::class, 'index'])->name('api.tickets.index');
 
-                // Get all tickets
-                Route::get('/tickets/', function () {
-                    return ApiResponse::success(Ticket::all()->load('pictures'));
-                })->name('api.tickets.all');
+                    // Post a new ticket
+                    Route::post('/', [APITicketController::class, 'store'])->name('api.tickets.store');
 
-                // Get a specific ticket
-                Route::get('/tickets/{ticket}', function (Ticket $ticket) {
-                    Debugbar::info($ticket);
-                    return ApiResponse::success($ticket->load('pictures'), 'Ticket');
-                })->name('api.tickets.get');
+                    // Get a specific ticket
+                    Route::get('{ticket}', [APITicketController::class, 'show'])->name('api.tickets.get');
 
-                // Update a specific ticket
-                Route::patch('tickets/{ticket}', [APITicketController::class, 'update'])->name('api.tickets.update');
+                    // Update a specific ticket
+                    Route::patch('{ticket}', [APITicketController::class, 'update'])->name('api.tickets.update');
 
-                // Close a specific ticket
-                Route::patch('tickets/{ticket}/close', [APITicketController::class, 'close'])->name('api.tickets.close');
+                    // Close a specific ticket
+                    Route::patch('{ticket}/close', [APITicketController::class, 'close'])->name('api.tickets.close');
+                });
             });
         });
     }

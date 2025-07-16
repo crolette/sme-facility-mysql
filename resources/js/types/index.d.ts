@@ -56,7 +56,7 @@ export interface TenantSite {
     location_type: LocationType;
     maintainable: Maintainable;
     tickets: Ticket[];
-    documents: Document[];
+    documents: Documents[];
 }
 
 export interface TenantBuilding extends TenantSite {
@@ -84,7 +84,10 @@ export interface Asset {
     asset_category_id: number;
     tickets?: Ticket[];
     pictures?: Picture[];
-    documents?: Document[];
+    documents?: Documents[];
+    deleted_at?: string;
+    created_at: string;
+    updated_at?: string;
     asset_category: AssetCategory;
     maintainable: Maintainable;
     location: TenantSite | TenantBuilding | TenantFloor | TenantRoom;
@@ -102,7 +105,7 @@ export interface Picture {
     uploaded_email?: string;
 }
 
-export interface Document {
+export interface Documents {
     id: number;
     name: string;
     mime_type: string;
