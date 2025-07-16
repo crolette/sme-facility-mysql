@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('assets', function (Blueprint $table) {
-            // for soft deletes
-            $table->timestamp('deleted_at')->nullable();
+        Schema::table('tickets', function (Blueprint $table) {
+            $table->string('code')->after('id')->unique();
         });
     }
 
@@ -22,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('assets', function (Blueprint $table) {
-            $table->dropColumn('deleted_at');
+        Schema::table('tickets', function (Blueprint $table) {
+            $table->dropColumn('code');
         });
     }
 };

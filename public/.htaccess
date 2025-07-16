@@ -5,21 +5,62 @@
 
     RewriteEngine On
 
+    # Existing rewrite conditions
+    RewriteCond %{REQUEST_FILENAME} -s [OR]
+    RewriteCond %{REQUEST_FILENAME} -l [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^.*$ - [NC,L]
+    RewriteRule ^(.*) /index.php [NC,L]
+
+    # WWW redirect
+    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    RewriteRule ^(.*)$ https://%1/$1 [L,R=301]
+
+    # Force HTTPS
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Enhanced PATCH handling
+    # RewriteCond %{REQUEST_METHOD} ^PATCH
+    # RewriteRule .* - [E=HTTP_X_HTTP_METHOD_OVERRIDE:PATCH]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Handle X-XSRF-Token Header
-    RewriteCond %{HTTP:x-xsrf-token} .
-    RewriteRule .* - [E=HTTP_X_XSRF_TOKEN:%{HTTP:X-XSRF-Token}]
-
-    # Redirect Trailing Slashes If Not A Folder...
+    # Remove trailing slashes
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Send Requests To Front Controller...
+    # Route to index.php
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+    # Enhanced CORS Headers for all requests
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Origin, Content-Type, X-Auth-Token, Authorization, X-Requested-With, X-CSRF-TOKEN, X-HTTP-Method-Override"
+    Header always set Access-Control-Expose-Headers "*"
+    Header always set Access-Control-Max-Age "3600"
+    Header always set Access-Control-Allow-Credentials "true"
+    
+    # Special handling for JavaScript files
+    <FilesMatch "\.(js)$">
+        Header always set Content-Type "application/javascript"
+        Header always set X-Content-Type-Options "nosniff"
+    </FilesMatch>
+
+    # Handle preflight requests
+    <If "%{REQUEST_METHOD} == 'OPTIONS'">
+        Header always set Access-Control-Allow-Origin "*"
+        Header always set Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+        Header always set Access-Control-Allow-Headers "Origin, Content-Type, X-Auth-Token, Authorization, X-Requested-With, X-CSRF-TOKEN, X-HTTP-Method-Override"
+        Header always set Access-Control-Max-Age "3600"
+        Header always set Content-Length "0"
+        Header always set Content-Type "text/plain"
+    </If>
 </IfModule>

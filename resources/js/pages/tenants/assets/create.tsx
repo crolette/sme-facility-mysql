@@ -34,6 +34,7 @@ type TypeFormData = {
         typeId: null | number;
         typeSlug: string;
     }[];
+    pictures: File[];
 };
 
 type SearchedLocation = {
@@ -67,7 +68,7 @@ export default function CreateAsset({
         description: asset?.maintainable.description ?? '',
         locationId: asset?.location_id ?? '',
         locationReference: asset?.location.reference_code ?? '',
-        locationType: asset?.location.location_type.slug ?? '',
+        locationType: asset?.location.location_type.level ?? '',
         locationName: asset?.location.maintainable.name ?? '',
         categoryId: asset?.asset_category.id ?? '',
         purchase_date: asset?.maintainable.purchase_date ?? '',
@@ -78,6 +79,7 @@ export default function CreateAsset({
         model: asset?.maintainable.model ?? '',
         serial_number: asset?.maintainable.serial_number ?? '',
         files: selectedDocuments,
+        pictures: [],
     });
 
     const [listIsOpen, setListIsOpen] = useState(false);
@@ -499,10 +501,20 @@ export default function CreateAsset({
                             )}
                         </div>
                     )}
+                    {!asset && (
+                        <div>
+                            <Input
+                                type="file"
+                                multiple
+                                onChange={(e) => setData('pictures', e.target.files)}
+                                accept="image/png, image/jpeg, image/jpg"
+                            />
+                        </div>
+                    )}
 
                     <br />
                     <Button type="submit">{asset ? 'Update' : 'Submit'}</Button>
-                    <a href={route('tenant.assets.index')}>
+                    <a href={asset ? route('tenant.assets.show', asset.code) : route('tenant.assets.index')}>
                         <Button type="button" tabIndex={6} variant={'secondary'}>
                             Cancel
                         </Button>

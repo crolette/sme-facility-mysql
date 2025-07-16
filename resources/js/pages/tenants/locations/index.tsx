@@ -42,7 +42,7 @@ export default function IndexSites({ locations, routeName }: { locations: Tenant
                                 return (
                                     <TableBodyRow key={index}>
                                         <TableBodyData>
-                                            <a href={route(`tenant.assets.show`, item.code)}> {item.reference_code} </a>
+                                            <a href={route(`tenant.${routeName}.show`, item.id)}> {item.reference_code} </a>
                                         </TableBodyData>
                                         <TableBodyData>{item.code}</TableBodyData>
                                         <TableBodyData>{item.category}</TableBodyData>

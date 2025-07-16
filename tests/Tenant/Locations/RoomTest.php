@@ -21,20 +21,19 @@ use function Pest\Laravel\assertDatabaseMissing;
 beforeEach(function () {
     $this->user = User::factory()->create();
     $this->actingAs($this->user, 'tenant');
-});
-
-
-it('can render the index floors page', function () {
-
-
     LocationType::factory()->count(1)->create(['level' => 'site']);
     LocationType::factory()->count(1)->create(['level' => 'building']);
     LocationType::factory()->count(1)->create(['level' => 'floor']);
     LocationType::factory()->count(1)->create(['level' => 'room']);
-    Site::factory()->create();
-    Building::factory()->create();
-    $floor = Floor::factory()->create();
+    CategoryType::factory()->count(2)->create(['category' => 'document']);
+    $this->site = Site::factory()->create();
 
+    $this->building = Building::factory()->create();
+    $this->floor = Floor::factory()->create();
+});
+
+
+it('can render the index floors page', function () {
     $room = Room::factory()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
@@ -59,17 +58,8 @@ it('can render the index floors page', function () {
 
 
 it('can render the create floor page', function () {
-
-
-
-    LocationType::factory()->count(1)->create(['level' => 'site']);
-    LocationType::factory()->count(1)->create(['level' => 'building']);
-    LocationType::factory()->count(1)->create(['level' => 'floor']);
-    LocationType::factory()->count(2)->create(['level' => 'room']);
-
-    Site::factory()->create();
-    Building::factory()->create();
-    Floor::factory()->count(4)->create();
+    LocationType::factory()->create(['level' => 'room']);
+    Floor::factory()->count(3)->create();
 
 
     $response = $this->getFromTenant('tenant.rooms.create');
@@ -85,18 +75,12 @@ it('can render the create floor page', function () {
 });
 
 it('can create a new room', function () {
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    $location = LocationType::factory()->create(['level' => 'room']);
-    Site::factory()->create();
-    Building::factory()->create();
-    $floor = Floor::factory()->create();
+    $location = LocationType::where('level', 'room')->first();
 
     $formData = [
         'name' => 'New room',
         'description' => 'Description new room',
-        'levelType' => $floor->id,
+        'levelType' => $this->floor->id,
         'locationType' => $location->id
     ];
 
@@ -116,8 +100,8 @@ it('can create a new room', function () {
     assertDatabaseHas('rooms', [
         'location_type_id' => $location->id,
         'code' => $location->prefix . '001',
-        'reference_code' => $floor->reference_code . '-' . $location->prefix . '001',
-        'level_id' => $floor->id
+        'reference_code' => $this->floor->reference_code . '-' . $location->prefix . '001',
+        'level_id' => $this->floor->id
     ]);
 
     assertDatabaseHas('maintainables', [
@@ -130,13 +114,8 @@ it('can create a new room', function () {
 
 it('can upload several files to site', function () {
 
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    $location = LocationType::factory()->create(['level' => 'room']);
-    Site::factory()->create();
-    Building::factory()->create();
-    $floor = Floor::factory()->create();
+
+    $location = LocationType::where('level', 'room')->first();
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
     CategoryType::factory()->count(2)->create(['category' => 'document']);
@@ -145,7 +124,7 @@ it('can upload several files to site', function () {
     $formData = [
         'name' => 'New room',
         'description' => 'Description new room',
-        'levelType' => $floor->id,
+        'levelType' => $this->floor->id,
         'locationType' => $location->id,
         'files' => [
             [
@@ -180,15 +159,6 @@ it('can upload several files to site', function () {
 
 it('can render the show room page', function () {
 
-
-
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    LocationType::factory()->create(['level' => 'room']);
-    Site::factory()->create();
-    Building::factory()->create();
-    Floor::factory()->create();
     $room = Room::factory()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
@@ -210,16 +180,8 @@ it('can render the show room page', function () {
 
 
 it('can render the update floor page', function () {
-
-
-
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->count(1)->create(['level' => 'building']);
-    LocationType::factory()->count(1)->create(['level' => 'floor']);
-    LocationType::factory()->count(3)->create(['level' => 'room']);
-    Site::factory()->create();
-    Building::factory()->create();
-    Floor::factory()->count(3)->create();
+    LocationType::factory()->count(2)->create(['level' => 'room']);
+    Floor::factory()->count(2)->create();
     $room = Room::factory()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
@@ -242,15 +204,7 @@ it('can render the update floor page', function () {
 
 it('can update a room maintainable', function () {
 
-
-
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    $locationType = LocationType::factory()->create(['level' => 'room']);
-    Site::factory()->create();
-    Building::factory()->create();
-    $floor = Floor::factory()->create();
+    $locationType = LocationType::where('level', 'room')->first();
     $room = Room::factory()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
@@ -262,7 +216,7 @@ it('can update a room maintainable', function () {
     $formData = [
         'name' => 'New room',
         'description' => 'Description new room',
-        'levelType' => $floor->id,
+        'levelType' => $this->floor->id,
         'locationType' => $locationType->id
     ];
 
@@ -278,9 +232,9 @@ it('can update a room maintainable', function () {
 
     assertDatabaseHas('rooms', [
         'location_type_id' => $locationType->id,
-        'level_id' => $floor->id,
+        'level_id' => $this->floor->id,
         'code' => $locationType->prefix . '001',
-        'reference_code' => $floor->reference_code . '-' . $locationType->prefix . '001',
+        'reference_code' => $this->floor->reference_code . '-' . $locationType->prefix . '001',
     ]);
 
     assertDatabaseHas('maintainables', [
@@ -297,14 +251,7 @@ it('can update a room maintainable', function () {
 
 it('cannot update a room type of an existing room', function () {
 
-
-
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
     LocationType::factory()->count(2)->create(['level' => 'room']);
-    Site::factory()->create();
-    Building::factory()->create();
     $floor = Floor::factory()->create();
     $room = Room::factory()
         ->for(LocationType::where('level', 'room')->first())
@@ -327,20 +274,13 @@ it('cannot update a room type of an existing room', function () {
 
 
 it('can delete a room and his maintainable', function () {
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    LocationType::factory()->create(['level' => 'room']);
-    Site::factory()->create();
-    Building::factory()->create();
-    $floor = Floor::factory()->create();
     $room = Room::factory()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
 
     assertDatabaseHas('rooms', [
-        'level_id' => $floor->id,
+        'level_id' => $this->floor->id,
         'code' => $room->code
     ]);
 
@@ -363,14 +303,6 @@ it('can delete a room and his maintainable', function () {
 });
 
 it('can update name and description of a document from a site ', function () {
-    CategoryType::factory()->count(2)->create(['category' => 'document']);
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    LocationType::factory()->create(['level' => 'room']);
-    Site::factory()->create();
-    Building::factory()->create();
-    $floor = Floor::factory()->create();
     $room = Room::factory()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
@@ -399,5 +331,52 @@ it('can update name and description of a document from a site ', function () {
         'name' => 'New document name',
         'description' => 'New description of the new document',
         'category_type_id' => $categoryType->id,
+    ]);
+});
+
+it('can upload a document to an existing room', function () {
+
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
+    $locationType = LocationType::factory()->create(['level' => 'site']);
+    CategoryType::factory()->count(2)->create(['category' => 'document']);
+    $room = Room::factory()
+        ->for(LocationType::where('level', 'room')->first())
+        ->for(Floor::first())
+        ->create();
+    $categoryType = CategoryType::where('category', 'document')->first();
+
+    $formData = [
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ]
+        ]
+    ];
+
+    $response = $this->postToTenant('api.rooms.documents.post', $formData, $room);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => 'App\Models\Tenants\Room',
+        'documentable_id' => 1
+    ]);
+    assertDatabaseHas('documentables', [
+        'document_id' => 2,
+        'documentable_type' => 'App\Models\Tenants\Room',
+        'documentable_id' => 1
     ]);
 });

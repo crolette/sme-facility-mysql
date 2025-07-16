@@ -31,6 +31,7 @@ export interface Flash {
 }
 
 export type LocationLevel = 'site' | 'building' | 'floor' | 'room';
+export type TicketStatus = 'open' | 'ongoing' | 'closed';
 export type CategoryTypeEnum = 'document' | 'intervention' | 'asset';
 
 export interface Maintainable {
@@ -139,6 +140,24 @@ export interface LocationType {
     translations: Translation[];
 }
 
+export interface Ticket {
+    id: number;
+    status: TicketStatus;
+    description: string;
+    reported_by?: number;
+    closer?: User;
+    reporter?: User;
+    reporter_email?: string;
+    being_notified: boolean;
+
+    code: string;
+    closed_at?: string;
+    created_at: string;
+    updated_at: string;
+    pictures?: Picture[];
+    ticketable: TenantSite | TenantBuilding | TenantFloor | TenantRoom | Asset;
+}
+
 export interface AssetCategory {
     id: number;
     slug: string;
@@ -192,7 +211,7 @@ export interface Address {
 
 export interface SharedData {
     name: string;
-    tenant: string;
+    tenantName: string;
     auth: Auth;
     flash: Flash;
     ziggy: Config & { location: string };

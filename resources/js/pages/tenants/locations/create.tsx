@@ -32,7 +32,7 @@ export default function CreateLocation({
     documentTypes,
 }: {
     location?: TenantSite | TenantBuilding | TenantFloor | TenantRoom;
-    levelTypes?: LocationType[] | TenantSite[] | TenantFloor[];
+    levelTypes: LocationType[] | TenantSite[] | TenantFloor[];
     locationTypes: LocationType[];
     documentTypes: CentralType[];
     routeName: string;
@@ -47,10 +47,12 @@ export default function CreateLocation({
     const { data, setData, post, errors } = useForm<TypeFormData>({
         name: location?.maintainable?.name ?? '',
         description: location?.maintainable?.description ?? '',
-        levelType: location?.level_id ?? '',
-        locationType: location?.location_type?.id ?? '',
+        levelType: (location?.level_id ?? levelTypes?.length == 1) ? levelTypes[0].id : '',
+        locationType: (location?.location_type?.id ?? locationTypes.length == 1) ? locationTypes[0].id : '',
         files: selectedDocuments,
     });
+
+    console.log(location);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -288,42 +290,48 @@ export default function CreateLocation({
                         placeholder="Site description"
                     />
                     <InputError className="mt-2" message={errors.description} />
+                    {!location && (
+                        <div id="files">
+                            <Button onClick={() => setShowFileModal(!showFileModal)} type="button">
+                                Add file
+                            </Button>
+                            {selectedDocuments.length > 0 && (
+                                <ul className="flex gap-4">
+                                    {selectedDocuments.map((document, index) => {
+                                        const isImage = document.file.type.startsWith('image/');
+                                        const isPdf = document.file.type === 'application/pdf';
+                                        const fileURL = URL.createObjectURL(document.file);
+                                        return (
+                                            <li key={index} className="bg-foreground/10 flex w-50 flex-col gap-2 p-6">
+                                                <p>
+                                                    {
+                                                        documentTypes.find((type) => {
+                                                            return type.id === document.type;
+                                                        })?.label
+                                                    }
+                                                </p>
+                                                {isImage && <img src={fileURL} alt="preview" className="mx-auto h-40 w-40 rounded object-cover" />}
+                                                {isPdf && <BiSolidFilePdf size={'160px'} />}
+                                                <p>{document.name}</p>
 
-                    <div id="files">
-                        <Button onClick={() => setShowFileModal(!showFileModal)} type="button">
-                            Add file
+                                                <p>{document.description}</p>
+                                                <Button type="button" variant="destructive" className="" onClick={() => removeDocument(index)}>
+                                                    Remove
+                                                </Button>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            )}
+                        </div>
+                    )}
+
+                    <Button type="submit">{location ? 'Update' : 'Submit'}</Button>
+                    <a href={location ? route(`tenant.${routeName}.show`, location.id) : route(`tenant.${routeName}.index`)}>
+                        <Button type="button" tabIndex={6} variant={'secondary'}>
+                            Cancel
                         </Button>
-                        {selectedDocuments.length > 0 && (
-                            <ul className="flex gap-4">
-                                {selectedDocuments.map((document, index) => {
-                                    const isImage = document.file.type.startsWith('image/');
-                                    const isPdf = document.file.type === 'application/pdf';
-                                    const fileURL = URL.createObjectURL(document.file);
-                                    return (
-                                        <li key={index} className="bg-foreground/10 flex w-50 flex-col gap-2 p-6">
-                                            <p>
-                                                {
-                                                    documentTypes.find((type) => {
-                                                        return type.id === document.type;
-                                                    })?.label
-                                                }
-                                            </p>
-                                            {isImage && <img src={fileURL} alt="preview" className="mx-auto h-40 w-40 rounded object-cover" />}
-                                            {isPdf && <BiSolidFilePdf size={'160px'} />}
-                                            <p>{document.name}</p>
-
-                                            <p>{document.description}</p>
-                                            <Button type="button" variant="destructive" className="" onClick={() => removeDocument(index)}>
-                                                Remove
-                                            </Button>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        )}
-                    </div>
-
-                    <Button type="submit">Submit</Button>
+                    </a>
                 </form>
                 {showFileModal && addFileModalForm()}
             </div>

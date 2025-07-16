@@ -94,8 +94,8 @@ class TenantSiteController extends Controller
     {
         $locationTypes = LocationType::where('level', 'site')->get();
 
-        // dd($site);
-        return Inertia::render('tenants/locations/create', ['location' => $site, 'locationTypes' => $locationTypes, 'routeName' => 'sites']);
+        $documentTypes = CategoryType::where('category', 'document')->get();
+        return Inertia::render('tenants/locations/create', ['location' => $site, 'locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes]);
     }
 
     /**

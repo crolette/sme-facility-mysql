@@ -89,7 +89,7 @@ class TenantRoomController extends Controller
      */
     public function show(Room $room)
     {
-        return Inertia::render('tenants/locations/show', ['location' => $room->load(['floor', 'documents'])]);
+        return Inertia::render('tenants/locations/show', ['routeName' => 'rooms', 'location' => $room->load(['floor', 'documents', 'tickets.pictures'])]);
     }
 
     /**
@@ -99,8 +99,8 @@ class TenantRoomController extends Controller
     {
         $levelTypes = Floor::all();
         $locationTypes = LocationType::where('level', 'room')->get();
-
-        return Inertia::render('tenants/locations/create', ['location' => $room->makeVisible(['level_id', 'location_type_id'])->load('floor'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms']);
+        $documentTypes = CategoryType::where('category', 'document')->get();
+        return Inertia::render('tenants/locations/create', ['location' => $room->makeVisible(['level_id', 'location_type_id'])->load('floor'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms', 'documentTypes' => $documentTypes]);
     }
 
     /**

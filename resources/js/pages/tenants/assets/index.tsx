@@ -20,10 +20,10 @@ export default function IndexAssets({ assets }: { assets: Asset[] }) {
     const { post, delete: destroy } = useForm();
 
     const deleteDefinitelyAsset = (asset: Asset) => {
-        destroy(route(`tenant.assets.force`, asset.id));
+        destroy(route(`api.tenant.assets.force`, asset.id));
     };
     const restoreAsset = (asset: Asset) => {
-        post(route('tenant.assets.restore', asset.id), {
+        post(route('api.tenant.assets.restore', asset.id), {
             onSuccess: () => {
                 setTrashedAssetsTab(!trashedAssetsTab);
                 setActiveAssetsTab(!activeAssetsTab);
@@ -50,7 +50,6 @@ export default function IndexAssets({ assets }: { assets: Asset[] }) {
     }, [search]);
 
     useEffect(() => {
-        console.log('search trash');
         const fetchData = async () => {
             try {
                 const response = await fetch(`/api/v1/assets/trashed?q=${debouncedSearch}`);
@@ -164,15 +163,12 @@ export default function IndexAssets({ assets }: { assets: Asset[] }) {
                                             <TableBodyData>{asset.maintainable.description}</TableBodyData>
 
                                             <TableBodyData>
-                                                <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
-                                                    Delete
+                                                <Button onClick={() => deleteDefinitelyAsset(asset)} variant={'destructive'}>
+                                                    Delete definitely
                                                 </Button>
-                                                <a href={route(`tenant.assets.edit`, asset.code)}>
-                                                    <Button>Edit</Button>
-                                                </a>
-                                                <a href={route(`tenant.assets.show`, asset.code)}>
-                                                    <Button variant={'outline'}>See</Button>
-                                                </a>
+                                                <Button onClick={() => restoreAsset(asset)} variant={'green'}>
+                                                    Restore
+                                                </Button>
                                             </TableBodyData>
                                         </TableBodyRow>
                                     );

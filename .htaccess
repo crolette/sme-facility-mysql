@@ -1,5 +1,4 @@
 # To prevent access to .env and other files
-
 <Files .\*> # Apache 2.2
 <IfModule !mod_authz_core.c>
 Order deny,allow
@@ -9,11 +8,9 @@ Deny from all
 Require all denied
 </IfModule>
 </Files>
-
 <IfModule mod_suphp.c>
-    suPHP_ConfigPath /home/wahu4243/wowresto
+    suPHP_ConfigPath /home/wahu4243/sme-facility
 </IfModule>
-
 <IfModule mod_rewrite.c>
     RewriteEngine On
     
@@ -24,3 +21,14 @@ Require all denied
     # Your existing rule
     RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+PassengerAppRoot "/home/wahu4243/sme-facility"
+PassengerBaseURI "/"
+PassengerNodejs "/home/wahu4243/nodevenv/sme-facility/22/bin/node"
+PassengerAppType node
+PassengerStartupFile app.js
+# DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION BEGIN
+<IfModule Litespeed>
+</IfModule>
+# DO NOT REMOVE OR MODIFY. CLOUDLINUX ENV VARS CONFIGURATION END
