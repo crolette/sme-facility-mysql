@@ -86,7 +86,7 @@ export const DocumentManager = ({ itemCodeId, getDocumentsUrl, editRoute, upload
     const editFile = (id: number) => {
         fetchDocumentTypes();
 
-        const document = documents.find((document) => {
+        const document = documents?.find((document) => {
             return document.id === id;
         });
 
@@ -160,7 +160,7 @@ export const DocumentManager = ({ itemCodeId, getDocumentsUrl, editRoute, upload
     return (
         <>
             <details>
-                <summary className="">
+                <summary className="bg-red-5 border-2 p-2">
                     <h3 className="inline">Documents ({documents?.length ?? 0})</h3>
                     <Button onClick={() => addNewFile()}>Add new file</Button>
                 </summary>

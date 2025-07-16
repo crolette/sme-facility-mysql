@@ -29,9 +29,6 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
         }
     };
 
-    console.log(getPicturesUrl);
-    console.log(pictures);
-
     const deletePicture = async (id: number) => {
         try {
             const response = await axios.delete(route(deleteRoute, id));
@@ -63,30 +60,33 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
 
     return (
         <>
-            <div className="flex">
-                <h3 className="inline">Pictures ({pictures?.length})</h3>
-                {!addPictures && (
-                    <Button onClick={() => setAddPictures(!addPictures)} type="button">
-                        Add pictures
-                    </Button>
-                )}
-            </div>
-            <div className="flex flex-wrap gap-4">
-                {pictures &&
-                    pictures.length > 0 &&
-                    pictures.map((picture, index) => {
-                        return (
-                            <div key={index} className="w-32">
-                                <a href={route(showRoute, picture.id)} download className="w cursor-pointer">
-                                    <img src={route(showRoute, picture.id)} className="aspect-square object-cover" alt={picture.filename} />
-                                </a>
-                                <Button variant={'destructive'} onClick={() => deletePicture(picture.id)}>
-                                    Delete
-                                </Button>
-                            </div>
-                        );
-                    })}
-            </div>
+            <details>
+                <summary className="bg-red-5 border-2 p-2">
+                    <h3 className="inline">Pictures ({pictures?.length})</h3>
+                    {!addPictures && (
+                        <Button onClick={() => setAddPictures(!addPictures)} type="button">
+                            Add pictures
+                        </Button>
+                    )}
+                </summary>
+                <div className="flex flex-wrap gap-4">
+                    {pictures &&
+                        pictures.length > 0 &&
+                        pictures.map((picture, index) => {
+                            return (
+                                <div key={index} className="w-32">
+                                    <a href={route(showRoute, picture.id)} download className="w cursor-pointer">
+                                        <img src={route(showRoute, picture.id)} className="aspect-square object-cover" alt={picture.filename} />
+                                    </a>
+                                    <Button variant={'destructive'} onClick={() => deletePicture(picture.id)}>
+                                        Delete
+                                    </Button>
+                                </div>
+                            );
+                        })}
+                </div>
+            </details>
+
             {addPictures && (
                 <div className="bg-background/50 absolute inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">

@@ -7,19 +7,24 @@ use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Ticket;
+use App\Services\PictureService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Tenant\PictureUploadRequest;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\TicketRequest;
-use App\Services\PictureService;
+use App\Http\Requests\Tenant\PictureUploadRequest;
 
 class APITicketController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-
-        $tickets = Ticket::all()->load('pictures');
+        $status = $request->query('status');
+        if ($status != null) {
+            $tickets = Ticket::where('status', $status)->get()->load('pictures');
+        } else {
+            $tickets = Ticket::all()->load('pictures');
+        }
         return ApiResponse::success($tickets, 'Ticket created');
     }
 

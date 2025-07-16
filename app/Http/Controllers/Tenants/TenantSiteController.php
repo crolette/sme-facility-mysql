@@ -135,6 +135,11 @@ class TenantSiteController extends Controller
      */
     public function destroy(Site $site)
     {
+
+        if ($site->assets || $site->buildings) {
+            return redirect()->route('tenant.sites.index')->with(['message' => 'Site cannot be deleted ! Assets and/or buildings are linked to this site', 'type' => 'warning']);
+        }
+
         $site->delete();
         return redirect()->back()->with(['message' => 'Site deleted', 'type' => 'success']);
     }
