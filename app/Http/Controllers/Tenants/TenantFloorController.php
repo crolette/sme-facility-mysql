@@ -149,6 +149,10 @@ class TenantFloorController extends Controller
      */
     public function destroy(Floor $floor)
     {
+        if ($floor->assets || $floor->rooms) {
+            return redirect()->route('tenant.rooms.index')->with(['message' => 'Floor cannot be deleted ! Assets and/or rooms are linked to this floor', 'type' => 'warning']);
+        }
+
         $floor->delete();
         return redirect()->route('tenant.floors.index')->with(['message' => 'Floor deleted', 'type' => 'success']);
     }

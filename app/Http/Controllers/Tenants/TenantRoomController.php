@@ -144,6 +144,12 @@ class TenantRoomController extends Controller
      */
     public function destroy(Room $room)
     {
+
+        if ($room->assets) {
+            return redirect()->route('tenant.rooms.index')->with(['message' => 'Room cannot be deleted ! Assets are linked to this room', 'type' => 'warning']);
+        }
+
+
         $room->delete();
 
         return redirect()->route('tenant.rooms.index')->with(['message' => 'Room deleted', 'type' => 'success']);

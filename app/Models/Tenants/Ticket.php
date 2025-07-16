@@ -5,12 +5,14 @@ namespace App\Models\Tenants;
 use Carbon\Carbon;
 use App\Enums\TicketStatus;
 use App\Models\Tenants\User;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Ticket extends Model
 {
@@ -25,9 +27,13 @@ class Ticket extends Model
         'closed_at',
     ];
 
+    protected $appends = [
+        'asset_code',
+    ];
+
     protected $with = [
         'reporter',
-        'closer'
+        'closer',
     ];
 
     protected function casts(): array
@@ -68,5 +74,12 @@ class Ticket extends Model
         $this->closed_at = now();
 
         return $this->save();
+    }
+
+    public function assetCode(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->ticketable->code
+        );
     }
 }

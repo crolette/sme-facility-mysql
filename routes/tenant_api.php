@@ -62,12 +62,12 @@ Route::prefix('api/v1')->group(
 
                 // Get all pictures from an asset
                 Route::get('/assets/{asset}/pictures/', function (Asset $asset) {
-                    return ApiResponse::success($asset->load('pictures')->pictures, 'Pictures added');
+                    return ApiResponse::success($asset->load('pictures')->pictures);
                 })->name('api.assets.pictures');
 
                 // Get all tickets from an asset
                 Route::get('/assets/{asset}/tickets/', function (Asset $asset) {
-                    return response()->json($asset->load('tickets.pictures')->tickets);
+                    return ApiResponse::success($asset->load('tickets.pictures')->tickets);
                 })->name('api.assets.tickets');
 
                 // Post a new picture to an asset
@@ -182,7 +182,7 @@ Route::prefix('api/v1')->group(
 
                 // Get all tickets from a floor
                 Route::get('/floors/{floor}/tickets/', function (Floor $floor) {
-                    return ApiResponse::success($floor->load('tickets.pictures')->tickets, 'Document added');
+                    return ApiResponse::success($floor->load('tickets.pictures')->tickets);
                 })->name('api.floors.tickets');
 
 

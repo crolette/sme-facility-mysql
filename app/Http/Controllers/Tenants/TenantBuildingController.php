@@ -146,6 +146,10 @@ class TenantBuildingController extends Controller
      */
     public function destroy(Building $building)
     {
+        if ($building->assets || $building->floors) {
+            return redirect()->route('tenant.buildings.index')->with(['message' => 'Building cannot be deleted ! Assets and/or floors are linked to this building', 'type' => 'warning']);
+        }
+
         $building->delete();
         return redirect()->back()->with(['message' => 'Building deleted', 'type' => 'success']);
     }
