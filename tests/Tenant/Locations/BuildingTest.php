@@ -4,6 +4,7 @@ use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Floor;
+use App\Models\Tenants\Picture;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use Illuminate\Http\UploadedFile;
@@ -342,4 +343,48 @@ it('can update name and description of a document from a building ', function ()
         'description' => 'New description of the new document',
         'category_type_id' => $categoryType->id,
     ]);
+});
+
+it('can add pictures to a building', function () {
+    LocationType::factory()->create(['level' => 'site']);
+    LocationType::factory()->create(['level' => 'building']);
+    LocationType::factory()->create(['level' => 'floor']);
+    Site::factory()->create();
+    $building = Building::factory()->create();
+
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->image('test.jpg');
+
+    $formData = [
+        'pictures' => [
+            $file1,
+            $file2
+        ]
+    ];
+
+    $response = $this->postToTenant('api.buildings.pictures.post', $formData, $building);
+    $response->assertSessionHasNoErrors();
+    assertDatabaseCount('pictures', 2);
+    assertDatabaseHas('pictures', [
+        'imageable_type' => 'App\Models\Tenants\Building',
+        'imageable_id' => 1
+    ]);
+});
+
+it('can retrieve all pictures from a building', function () {
+    LocationType::factory()->create(['level' => 'site']);
+    LocationType::factory()->create(['level' => 'building']);
+    LocationType::factory()->create(['level' => 'floor']);
+    Site::factory()->create();
+    $building = Building::factory()->create();
+
+    Picture::factory()->forModelAndUser($building, $this->user, 'buildings')->create();
+    Picture::factory()->forModelAndUser($building, $this->user, 'buildings')->create();
+
+    assertDatabaseCount('pictures', 2);
+
+    $response = $this->getFromTenant('api.buildings.pictures', $building);
+    $response->assertStatus(200);
+    $data = $response->json('data');
+    $this->assertCount(2, $data);
 });

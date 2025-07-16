@@ -1,3 +1,4 @@
+import { PictureManager } from '@/components/tenant/pictureManager';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -41,7 +42,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
     ];
 
     const [documents, setDocuments] = useState(asset.documents);
-    const [pictures, setPictures] = useState(asset.pictures);
 
     const { post, delete: destroy } = useForm();
 
@@ -57,26 +57,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
             }
         } catch (error) {
             console.error('Erreur lors de la suppression', error);
-        }
-    };
-
-    const deletePicture = async (id: number) => {
-        try {
-            const response = await axios.delete(route('api.picture.delete', id));
-            if (response.data.status === 'success') {
-                fetchPictures();
-            }
-        } catch (error) {
-            console.error('Erreur lors de la suppression', error);
-        }
-    };
-
-    const fetchPictures = async () => {
-        try {
-            const response = await axios.get(`/api/v1/assets/${asset.code}/pictures`);
-            setPictures(await response.data);
-        } catch (error) {
-            console.error('Erreur lors de la recherche :', error);
         }
     };
 
@@ -195,27 +175,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
         }
     };
 
-    const [addPictures, setAddPictures] = useState(false);
-    const [newPictures, setNewPictures] = useState<File[] | null>(null);
-
-    const postNewPictures: FormEventHandler = async (e) => {
-        e.preventDefault();
-        try {
-            const response = await axios.post(route('api.assets.pictures.post', asset.code), newPictures, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            if (response.data.status === 'success') {
-                fetchPictures();
-                setNewPictures(null);
-                setAddPictures(!addPictures);
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
     const addFileModalForm = () => {
         return (
             <div className="bg-background/50 absolute inset-0 z-50">
@@ -311,30 +270,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                                 </div>
                             </form>
                         </div>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
-    const addNewPicturesModal = () => {
-        return (
-            <div className="bg-background/50 absolute inset-0 z-50">
-                <div className="bg-background/20 flex h-dvh items-center justify-center">
-                    <div className="bg-background flex items-center justify-center p-4">
-                        <form onSubmit={postNewPictures}>
-                            <input
-                                type="file"
-                                multiple
-                                onChange={(e) => setNewPictures({ pictures: e.target.files })}
-                                accept="image/png, image/jpeg, image/jpg"
-                            />
-
-                            <Button disabled={newPictures == null}>Add new pictures</Button>
-                            <Button onClick={() => setAddPictures(!addPictures)} type="button" variant={'secondary'}>
-                                Cancel
-                            </Button>
-                        </form>
                     </div>
                 </div>
             </div>
@@ -657,32 +592,16 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                         </Table>
                     )}
                 </details>
-                <div className="flex">
-                    <h3 className="inline">Pictures ({pictures?.length})</h3>
-                    {!addPictures && (
-                        <Button onClick={() => setAddPictures(!addPictures)} type="button">
-                            Add pictures
-                        </Button>
-                    )}
-                </div>
-                <div className="flex flex-wrap gap-4">
-                    {pictures &&
-                        pictures.length > 0 &&
-                        pictures.map((picture, index) => {
-                            return (
-                                <div key={index} className="w-32">
-                                    <a href={route('pictures.show', picture.id)} download className="w cursor-pointer">
-                                        <img src={route('pictures.show', picture.id)} className="aspect-square object-cover" />
-                                    </a>
-                                    <Button variant={'destructive'} onClick={() => deletePicture(picture.id)}>
-                                        Delete
-                                    </Button>
-                                </div>
-                            );
-                        })}
-                </div>
+                <PictureManager
+                    itemCodeId={asset.code}
+                    getPicturesUrl={`api.assets.pictures`}
+                    uploadRoute={`api.assets.pictures.post`}
+                    deleteRoute={`api.pictures.delete`}
+                    showRoute={'api.pictures.show'}
+                />
             </div>
-            {addPictures && addNewPicturesModal()}
+
+            {/* {addPictures && addNewPicturesModal()} */}
             {showFileModal && addFileModalForm()}
             {addTicketModal && addTicket()}
         </AppLayout>

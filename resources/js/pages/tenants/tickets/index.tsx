@@ -15,7 +15,7 @@ export default function IndexTickets() {
     ];
     const fetchTickets = async () => {
         try {
-            const response = await axios.get(route('api.tickets.all'));
+            const response = await axios.get(route('api.tickets.index'));
             setTickets(response.data.data);
         } catch (error) {
             console.error('Erreur lors de la recherche :', error);
@@ -46,7 +46,7 @@ export default function IndexTickets() {
                 <summary className="">
                     <h3 className="inline">Tickets ({tickets?.length ?? 0})</h3>
                 </summary>
-                {tickets?.length > 0 && (
+                {tickets && tickets?.length > 0 && (
                     <Table>
                         <TableHead>
                             <TableHeadRow>

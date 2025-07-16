@@ -1,3 +1,4 @@
+import { PictureManager } from '@/components/tenant/pictureManager';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -560,7 +561,15 @@ export default function ShowLocation({ location, routeName }: { location: Tenant
                         </Table>
                     )}
                 </details>
+                <PictureManager
+                    itemCodeId={location.id}
+                    getPicturesUrl={`api.${routeName}.pictures`}
+                    uploadRoute={`api.${routeName}.pictures.post`}
+                    deleteRoute={`api.pictures.delete`}
+                    showRoute={'api.pictures.show'}
+                />
             </div>
+
             {showFileModal && addFileModalForm()}
             {addTicketModal && addTicket()}
         </AppLayout>
