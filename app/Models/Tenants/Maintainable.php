@@ -2,8 +2,11 @@
 
 namespace App\Models\Tenants;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Tenants\Intervention;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Maintainable extends Model
 {
@@ -40,5 +43,10 @@ class Maintainable extends Model
     public function maintainable()
     {
         return $this->morphTo();
+    }
+
+    public function interventions(): HasMany
+    {
+        return $this->hasMany(Intervention::class);
     }
 }

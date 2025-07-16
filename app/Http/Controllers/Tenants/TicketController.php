@@ -27,6 +27,6 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket)
     {
-        return Inertia::render('tenants/tickets/show', ['ticket' => $ticket->load('pictures')]);
+        return Inertia::render('tenants/tickets/show', ['ticket' => $ticket->load('pictures', 'interventions')]);
     }
 };

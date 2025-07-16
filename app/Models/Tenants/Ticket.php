@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Ticket extends Model
 {
@@ -34,6 +35,7 @@ class Ticket extends Model
     protected $with = [
         'reporter',
         'closer',
+        'interventions'
     ];
 
     protected function casts(): array
@@ -54,6 +56,11 @@ class Ticket extends Model
     public function closer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'closed_by');
+    }
+
+    public function interventions(): HasMany
+    {
+        return $this->hasMany(Intervention::class);
     }
 
     public function ticketable(): MorphTo
