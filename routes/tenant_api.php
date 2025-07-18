@@ -26,8 +26,8 @@ use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\API\V1\ApiSearchLocationController;
 use App\Http\Controllers\Tenants\ForceDeleteAssetController;
 use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
-use App\Http\Controllers\API\V1\InterventionForTicketController;
 use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
+use App\Http\Controllers\API\V1\Tickets\InterventionForTicketController;
 
 Route::prefix('api/v1')->group(
     function () {
@@ -303,7 +303,7 @@ Route::prefix('api/v1')->group(
                     // Close a specific ticket
                     Route::patch('{ticket}/close', [APITicketController::class, 'close'])->name('api.tickets.close');
 
-                    Route::post('/intervention', [InterventionForTicketController::class, 'store'])->name('api.tickets.intervention.store');
+                    Route::post('/intervention', [InterventionForTicketController::class, 'store'])->name('api.tickets.interventions.store');
                 });
 
 

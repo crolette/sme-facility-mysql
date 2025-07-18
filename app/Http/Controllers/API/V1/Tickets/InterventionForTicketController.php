@@ -1,20 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\API\V1;
+namespace App\Http\Controllers\API\V1\Tickets;
 
 use Exception;
 use App\Helpers\ApiResponse;
-use Illuminate\Http\Request;
-use App\Models\Tenants\Asset;
 use App\Models\Tenants\Ticket;
-use App\Services\PictureService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Barryvdh\Debugbar\Facades\Debugbar;
-use App\Http\Requests\Tenant\TicketRequest;
-use App\Http\Requests\Tenant\PictureUploadRequest;
-use App\Http\Request\Tenant\InterventionRequest;
+use App\Models\Tenants\Intervention;
+use App\Http\Requests\Tenant\InterventionRequest;
 
 class InterventionForTicketController extends Controller
 {
@@ -39,7 +33,17 @@ class InterventionForTicketController extends Controller
         try {
             DB::beginTransaction();
 
+            $intervention = new Intervention(
+                $request->validated()
+            );
 
+            $ticket = Ticket::find($request->validated('ticket_id'));
+            $intervention->ticket()->associate($ticket);
+            $intervention->interventionType()->associate($request->validated('intervention_type_id'));
+            $intervention->interventionable()->associate($ticket->ticketable);
+            $intervention->maintainable()->associate($ticket->ticketable->maintainable->id);
+
+            $intervention->save();
 
             DB::commit();
 
