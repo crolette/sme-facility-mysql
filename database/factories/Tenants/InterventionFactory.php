@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\Tenants\Ticket;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
+use App\Models\Tenants\InterventionAction;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -47,5 +48,18 @@ class InterventionFactory extends Factory
                 'interventionable_id' => $location->id,
             ];
         });
+    }
+
+    public function configure()
+    {
+        return $this->afterCreating(
+
+            function (Intervention $intervention) {
+
+                $intervention->actions()->save(
+                    InterventionAction::factory()->make()
+                );
+            }
+        );
     }
 }

@@ -35,10 +35,10 @@ class InterventionRequest extends FormRequest
             'repair_delay' => ['nullable', 'date', Rule::date()->afterOrEqual(today())],
             'total_costs' => ['nullable', 'numeric', 'decimal:2,4'],
 
-            'maintainable_id' => ['required', Rule::exists('maintainable', 'id')],
+            'maintainable_id' => ['nullable', 'required_without:ticket_id', Rule::exists('maintainable', 'id')],
 
-            'interventionable_type' => ['required', 'in:site,building,floor,room'],
-            'interventionable_id' => ['required'],
+            'interventionable_type' => ['nullable', 'in:site,building,floor,room'],
+            'interventionable_id' => ['nullable'],
 
             'ticket_id' => ['nullable', Rule::exists('tickets', 'id')],
 

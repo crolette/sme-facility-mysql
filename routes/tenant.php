@@ -22,6 +22,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
 use App\Http\Controllers\Tenants\Auth\TenantAuthenticatedSessionController;
+use App\Http\Controllers\Tenants\InterventionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -58,12 +59,16 @@ Route::middleware([
     Route::get('/assets/{id}/deleted', [TenantAssetController::class, 'showDeleted'])->name('tenant.assets.deleted');
 
 
+    // TICKETS
+    Route::prefix('tickets')->group(function () {
+        Route::get('/', [TicketController::class, 'index'])->name('tenant.tickets.index');
+        Route::get('/create', [TicketController::class, 'create'])->name('tenant.tickets.create');
+        Route::get('/{ticket}', [TicketController::class, 'show'])->name('tenant.tickets.show');
+    });
 
-    Route::get('/tickets', [TicketController::class, 'index'])->name('tenant.tickets.index');
-
-    Route::get('tickets/create', [TicketController::class, 'create'])->name('tenant.tickets.create');
-
-    Route::get('tickets/{ticket}', [TicketController::class, 'show'])->name('tenant.tickets.show');
+    Route::get('interventions/', [InterventionController::class, 'index'])->name('tenant.interventions.index');
+    Route::get('interventions/create/{ticket}', [InterventionController::class, 'create'])->name('tenant.interventions.create');
+    Route::get('interventions/{intervention}', [InterventionController::class, 'show'])->name('tenant.interventions.show');
 });
 
 require __DIR__ . '/tenant_auth.php';

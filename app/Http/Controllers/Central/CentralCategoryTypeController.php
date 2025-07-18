@@ -46,7 +46,7 @@ class CentralCategoryTypeController extends Controller
         try {
             DB::beginTransaction();
 
-            $slug = Str::slug($request->validated('translations.en'));
+            $slug = Str::slug($request->validated('category')  . '-' . $request->validated('translations.en'));
 
             // the category is a string (values from enum)
             $categoryType = CategoryType::create([

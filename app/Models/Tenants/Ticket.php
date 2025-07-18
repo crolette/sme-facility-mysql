@@ -63,6 +63,7 @@ class Ticket extends Model
         return $this->hasMany(Intervention::class);
     }
 
+    // Asset, Site, Building, Floor, Room
     public function ticketable(): MorphTo
     {
         return $this->morphTo();

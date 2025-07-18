@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Tenants;
 
-use App\Models\Intervention;
+use App\Models\Tenants\Intervention;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Tenants\Ticket;
+use Inertia\Inertia;
 
 class InterventionController extends Controller
 {
@@ -13,15 +15,16 @@ class InterventionController extends Controller
      */
     public function index()
     {
-        //
+        $interventions = Intervention::all();
+        return Inertia::render('tenants/tickets/interventions/index', ['interventions' => $interventions]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Ticket $ticket)
     {
-        //
+        return Inertia::render('tenants/tickets/interventions/create', ['ticket' => $ticket]);
     }
 
 
@@ -30,6 +33,6 @@ class InterventionController extends Controller
      */
     public function show(Intervention $intervention)
     {
-        //
+        return Inertia::render('tenants/tickets/interventions/show', ['intervention' => $intervention->load('ticket')]);
     }
 }

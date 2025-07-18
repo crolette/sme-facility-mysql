@@ -20,11 +20,13 @@ use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Controllers\API\V1\APITicketController;
 use App\Http\Controllers\API\V1\DestroyPictureController;
 use App\Http\Controllers\API\V1\UpdateDocumentController;
+use App\Http\Controllers\API\V1\APIInterventionController;
 use App\Http\Controllers\API\V1\DestroyDocumentController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\API\V1\ApiSearchLocationController;
 use App\Http\Controllers\Tenants\ForceDeleteAssetController;
 use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
+use App\Http\Controllers\API\V1\InterventionForTicketController;
 use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
 
 Route::prefix('api/v1')->group(
@@ -300,7 +302,12 @@ Route::prefix('api/v1')->group(
 
                     // Close a specific ticket
                     Route::patch('{ticket}/close', [APITicketController::class, 'close'])->name('api.tickets.close');
+
+                    Route::post('/intervention', [InterventionForTicketController::class, 'store'])->name('api.tickets.intervention.store');
                 });
+
+
+                Route::post('/interventions/create', [APIInterventionController::class, 'store'])->name('api.interventions.store');
             });
         });
     }
