@@ -95,6 +95,11 @@ class Floor extends Model
         return $this->morphMany(Ticket::class, 'ticketable');
     }
 
+    public function interventions(): MorphMany
+    {
+        return $this->morphMany(Intervention::class, 'interventionable');
+    }
+
     public function category($locale = null): Attribute
     {
         $locale = $locale ?? app()->getLocale();

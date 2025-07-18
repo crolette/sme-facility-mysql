@@ -83,6 +83,11 @@ class Site extends Model
         return $this->morphMany(Picture::class, 'imageable');
     }
 
+    public function interventions(): MorphMany
+    {
+        return $this->morphMany(Intervention::class, 'interventionable');
+    }
+
     public function tickets(): MorphMany
     {
         return $this->morphMany(Ticket::class, 'ticketable');

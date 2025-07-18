@@ -28,11 +28,12 @@ class InterventionFactory extends Factory
         return [
             'intervention_type_id' => $category->id,
             'priority' => 'medium',
-            'status' => 'planned',
+            'status' => 'draft',
             'planned_at' => Carbon::now()->add('day', 7),
             'description' => fake()->paragraph(),
             'repair_delay' => Carbon::now()->add('month', 1),
             'ticket_id' => $ticket->id,
+            'maintainable_id' => $ticket->ticketable->maintainable->id,
         ];
     }
 

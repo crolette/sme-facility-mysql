@@ -1,3 +1,4 @@
+import { InterventionManager } from '@/components/tenant/interventionManager';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Ticket } from '@/types';
@@ -41,8 +42,10 @@ export default function ShowTicket({ ticket }: { ticket: Ticket }) {
                     Close
                 </Button>
             )}
+
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div>
+                    <p>Code: {ticketItem.code}</p>
                     <p>Status: {ticketItem.status}</p>
                     <p>Description : {ticketItem.description}</p>
                     <p>Reporter : {ticketItem.reporter ? ticketItem.reporter.full_name : ticketItem.reporter_email}</p>
@@ -61,6 +64,7 @@ export default function ShowTicket({ ticket }: { ticket: Ticket }) {
                             );
                         })}
                 </div>
+                <InterventionManager itemCodeId={ticket.id} getInterventionsUrl="api.tickets.interventions" type="ticket" />
             </div>
         </AppLayout>
     );

@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Requests○\Tenant;
+namespace App\Http\Requests\Tenant;
 
 use App\Enums\PriorityLevel;
 use Illuminate\Validation\Rule;
 use App\Enums\InterventionStatus;
 use App\Rules\NotDisposableEmail;
+use App\Models\Central\CategoryType;
 use Illuminate\Foundation\Http\FormRequest;
 
 class InterventionActionRequest extends FormRequest
@@ -26,12 +27,12 @@ class InterventionActionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'action_type_id' => ['required', Rule::in(CategoryType::where('category', 'intervention')->pluck('id')->toArray())],
+            'action_type_id' => ['required', Rule::in(CategoryType::where('category', 'action')->pluck('id')->toArray())],
 
             'description' => ['nullable', 'string'],
             'intervention_date' => ['nullable', 'date'],
-            'started_at' => ['nullable', 'date_format:H:i:s'],
-            'finished_at' => ['nullable', 'date_format:H:i:s', 'after:start_time'],
+            'started_at' => ['nullable', 'date_format:H:i'],
+            'finished_at' => ['nullable', 'date_format:H:i', 'after:start_time'],
             'intervention_costs' => ['nullable', 'numeric', 'decimal:2,4'],
 
             'created_by' => ['nullable', 'required_without:creator_email', 'exists:App\Models\Tenants\User,id'],

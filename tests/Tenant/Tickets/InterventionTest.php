@@ -43,8 +43,9 @@ beforeEach(function () {
 
 it('can factory intervention', function () {
     Intervention::factory()->forLocation($this->asset)->create();
-    assertDatabaseCount('interventions', 1);
-    assertDatabaseCount('intervention_actions', 1);
+    Intervention::factory()->create();
+    assertDatabaseCount('interventions', 2);
+    assertDatabaseCount('intervention_actions', 2);
 });
 
 it('can render interventions in the ticket page', function () {
@@ -114,7 +115,7 @@ it('can create a new intervention for a TICKET', function () {
         'ticket_id' => $this->ticket->id,
     ];
 
-    $response = $this->postToTenant('api.tickets.interventions.store', $formData);
+    $response = $this->postToTenant('api.interventions.store', $formData);
     $response->assertStatus(200)
         ->assertJson([
             'status' => 'success',
@@ -133,33 +134,235 @@ it('can create a new intervention for a TICKET', function () {
 
 it('can create a new intervention for an ASSET', function () {
 
-    // dump($this->ticket, $this->ticket->ticketable);
+    $formData = [
+        'intervention_type_id' => $this->interventionType->id,
+        'priority' => 'medium',
+        'status' => 'planned',
+        'planned_at' => Carbon::now()->add('day', 7),
+        'description' => fake()->paragraph(),
+        'repair_delay' => Carbon::now()->add('month', 1),
+        'locationId' => $this->asset->id,
+        'locationType' => 'asset'
+    ];
 
-    // $formData = [
-    //     'intervention_type_id' => $this->interventionType->id,
-    //     'priority' => 'medium',
-    //     'status' => 'planned',
-    //     'planned_at' => Carbon::now()->add('day', 7),
-    //     'description' => fake()->paragraph(),
-    //     'repair_delay' => Carbon::now()->add('month', 1),
-    //     'ticket_id' => $this->ticket->id,
-    // ];
+    $response = $this->postToTenant('api.interventions.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
 
-    // $response = $this->postToTenant('api.interventions.store', $formData);
-    // $response->assertStatus(200)
-    //     ->assertJson([
-    //         'status' => 'success',
-    //     ]);
-
-    // assertDatabaseCount('interventions', 1);
-    // assertDatabaseHas('interventions', [
-    //     'ticket_id' => $this->ticket->id,
-    //     'status' => 'planned',
-    //     'priority' => 'medium',
-    //     'maintainable_id' => $this->ticket->ticketable->maintainable->id,
-    //     'interventionabnle_type' => $this->ticket->
-    // ]);
+    assertDatabaseCount('interventions', 1);
+    assertDatabaseHas('interventions', [
+        'priority' => 'medium',
+        'status' => 'planned',
+        'maintainable_id' => $this->asset->maintainable->id,
+        'interventionable_type' => get_class($this->asset),
+        'interventionable_id' => $this->asset->id
+    ]);
 });
 
+
+it('can get all interventions for an ASSET', function () {
+    Intervention::factory()->forLocation($this->asset)->count(2)->create();
+    $response = $this->getFromTenant('api.assets.interventions', $this->asset);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ])
+        ->assertJsonCount(2, 'data');
+});
+
+it('can create a new intervention for a SITE', function () {
+
+    $formData = [
+        'intervention_type_id' => $this->interventionType->id,
+        'priority' => 'high',
+        'status' => 'planned',
+        'planned_at' => Carbon::now()->add('day', 7),
+        'description' => fake()->paragraph(),
+        'repair_delay' => Carbon::now()->add('month', 1),
+        'locationId' => $this->site->id,
+        'locationType' => 'site'
+    ];
+
+    $response = $this->postToTenant('api.interventions.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseCount('interventions', 1);
+    assertDatabaseHas('interventions', [
+        'priority' => 'high',
+        'status' => 'planned',
+        'maintainable_id' => $this->site->maintainable->id,
+        'interventionable_type' => get_class($this->site),
+        'interventionable_id' => $this->site->id
+    ]);
+});
+
+it('can get all interventions for a SITE', function () {
+    Intervention::factory()->forLocation($this->site)->count(2)->create();
+    $response = $this->getFromTenant('api.sites.interventions', $this->site);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ])
+        ->assertJsonCount(2, 'data');
+});
+
+it('can create a new intervention for a BUILDING', function () {
+
+    $formData = [
+        'intervention_type_id' => $this->interventionType->id,
+        'priority' => 'high',
+        'status' => 'planned',
+        'planned_at' => Carbon::now()->add('day', 7),
+        'description' => fake()->paragraph(),
+        'repair_delay' => Carbon::now()->add('month', 1),
+        'locationId' => $this->building->id,
+        'locationType' => 'building'
+    ];
+
+    $response = $this->postToTenant('api.interventions.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseCount('interventions', 1);
+    assertDatabaseHas('interventions', [
+        'priority' => 'high',
+        'status' => 'planned',
+        'maintainable_id' => $this->building->maintainable->id,
+        'interventionable_type' => get_class($this->building),
+        'interventionable_id' => $this->building->id
+    ]);
+});
+
+it('can get all interventions for a BUILDING', function () {
+    Intervention::factory()->forLocation($this->building)->count(2)->create();
+    $response = $this->getFromTenant('api.buildings.interventions', $this->building);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ])
+        ->assertJsonCount(2, 'data');
+});
+
+
+it('can create a new intervention for a FLOOR', function () {
+
+    $formData = [
+        'intervention_type_id' => $this->interventionType->id,
+        'priority' => 'high',
+        'status' => 'planned',
+        'planned_at' => Carbon::now()->add('day', 7),
+        'description' => fake()->paragraph(),
+        'repair_delay' => Carbon::now()->add('month', 1),
+        'locationId' => $this->floor->id,
+        'locationType' => 'floor'
+    ];
+
+    $response = $this->postToTenant('api.interventions.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseCount('interventions', 1);
+    assertDatabaseHas('interventions', [
+        'priority' => 'high',
+        'status' => 'planned',
+        'maintainable_id' => $this->floor->maintainable->id,
+        'interventionable_type' => get_class($this->floor),
+        'interventionable_id' => $this->floor->id
+    ]);
+});
+
+it('can get all interventions for a FLOOR', function () {
+    Intervention::factory()->forLocation($this->floor)->count(2)->create();
+    $response = $this->getFromTenant('api.floors.interventions', $this->floor);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ])
+        ->assertJsonCount(2, 'data');
+});
+
+it('can create a new intervention for a ROOM', function () {
+
+    $formData = [
+        'intervention_type_id' => $this->interventionType->id,
+        'priority' => 'high',
+        'status' => 'planned',
+        'planned_at' => Carbon::now()->add('day', 7),
+        'description' => fake()->paragraph(),
+        'repair_delay' => Carbon::now()->add('month', 1),
+        'locationId' => $this->room->id,
+        'locationType' => 'room'
+    ];
+
+    $response = $this->postToTenant('api.interventions.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseCount('interventions', 1);
+    assertDatabaseHas('interventions', [
+        'priority' => 'high',
+        'status' => 'planned',
+        'maintainable_id' => $this->room->maintainable->id,
+        'interventionable_type' => get_class($this->room),
+        'interventionable_id' => $this->room->id
+    ]);
+});
+
+it('can get all interventions for a ROOM', function () {
+    Intervention::factory()->forLocation($this->room)->count(2)->create();
+    $response = $this->getFromTenant('api.rooms.interventions', $this->room);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ])
+        ->assertJsonCount(2, 'data');
+});
+
+it('can update an existing intervention', function () {
+
+    $intervention = Intervention::factory()->create(['status' => 'draft']);
+
+    $formData = [
+        'intervention_type_id' => $this->interventionType->id,
+        'priority' => 'high',
+        'status' => 'planned',
+        'planned_at' => Carbon::now()->add('day', 20),
+        'description' => 'New intervention description',
+        'repair_delay' => Carbon::now()->add('month', 5),
+        'locationId' => $this->room->id,
+        'locationType' => 'room'
+    ];
+
+    $response = $this->patchToTenant('api.interventions.update', $formData, $intervention);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseHas('interventions', [
+        'priority' => 'high',
+        'status' => 'planned',
+        'planned_at' => Carbon::now()->add('day', 20)->toDateString(),
+        'description' => 'New intervention description',
+        'repair_delay' => Carbon::now()->add('month', 5)->toDateString(),
+    ]);
+});
 
 // it('sum intervention costs automatically based on actions', function () {});

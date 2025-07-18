@@ -22,6 +22,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
 use App\Http\Controllers\Tenants\Auth\TenantAuthenticatedSessionController;
+use App\Http\Controllers\Tenants\InterventionActionController;
 use App\Http\Controllers\Tenants\InterventionController;
 
 /*
@@ -66,9 +67,12 @@ Route::middleware([
         Route::get('/{ticket}', [TicketController::class, 'show'])->name('tenant.tickets.show');
     });
 
+    // INTERVENTIONS
     Route::get('interventions/', [InterventionController::class, 'index'])->name('tenant.interventions.index');
     Route::get('interventions/create/{ticket}', [InterventionController::class, 'create'])->name('tenant.interventions.create');
     Route::get('interventions/{intervention}', [InterventionController::class, 'show'])->name('tenant.interventions.show');
+    Route::get('interventions/{intervention}/actions/create', [InterventionActionController::class, 'create'])->name('tenant.interventions.actions.create');
+    Route::get('actions/{action}/edit', [InterventionActionController::class, 'edit'])->name('tenant.interventions.actions.edit');
 });
 
 require __DIR__ . '/tenant_auth.php';

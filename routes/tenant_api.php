@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\ApiResponse;
+use App\Http\Controllers\API\V1\APIInterventionActionController;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
@@ -26,8 +27,8 @@ use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\API\V1\ApiSearchLocationController;
 use App\Http\Controllers\Tenants\ForceDeleteAssetController;
 use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
+use App\Http\Controllers\API\V1\Tickets\InterventionForLocationController;
 use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
-use App\Http\Controllers\API\V1\Tickets\InterventionForTicketController;
 
 Route::prefix('api/v1')->group(
     function () {
@@ -67,11 +68,6 @@ Route::prefix('api/v1')->group(
                     return ApiResponse::success($asset->load('pictures')->pictures);
                 })->name('api.assets.pictures');
 
-                // Get all tickets from an asset
-                Route::get('/assets/{asset}/tickets/', function (Asset $asset) {
-                    return ApiResponse::success($asset->load('tickets.pictures')->tickets);
-                })->name('api.assets.tickets');
-
                 // Post a new picture to an asset
                 Route::post('/assets/{asset}/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Asset $asset) {
 
@@ -83,9 +79,21 @@ Route::prefix('api/v1')->group(
                     return ApiResponse::success(null, 'Pictures added');
                 })->name('api.assets.pictures.post');
 
-                Route::post('assets/{assetId}/restore', [RestoreSoftDeletedAssetController::class, 'restore'])->name('api.tenant.assets.restore');
-                Route::delete('assets/{assetId}/force', [ForceDeleteAssetController::class, 'forceDelete'])->name('api.tenant.assets.force');
+                // Get all tickets from an asset
+                Route::get('/assets/{asset}/tickets/', function (Asset $asset) {
+                    return ApiResponse::success($asset->load('tickets.pictures')->tickets);
+                })->name('api.assets.tickets');
 
+                // Get all interventions from an asset
+                Route::get('/assets/{asset}/interventions/', function (Asset $asset) {
+                    return ApiResponse::success($asset->load('interventions')->interventions);
+                })->name('api.assets.interventions');
+
+                // Restore a soft deleted asset
+                Route::post('assets/{assetId}/restore', [RestoreSoftDeletedAssetController::class, 'restore'])->name('api.tenant.assets.restore');
+
+                // Force delete a soft deleted asset
+                Route::delete('assets/{assetId}/force', [ForceDeleteAssetController::class, 'forceDelete'])->name('api.tenant.assets.force');
 
                 // Get all documents from a site
                 Route::get('/sites/{site}/documents/', function (Site $site) {
@@ -107,6 +115,11 @@ Route::prefix('api/v1')->group(
                 Route::get('/sites/{site}/tickets/', function (Site $site) {
                     return ApiResponse::success($site->load('tickets.pictures')->tickets, 'Document added');
                 })->name('api.sites.tickets');
+
+                // Get all interventions from a site
+                Route::get('/sites/{site}/interventions/', function (Site $site) {
+                    return ApiResponse::success($site->load('interventions')->interventions);
+                })->name('api.sites.interventions');
 
                 // Get all pictures from a site
                 Route::get('/sites/{site}/pictures/', function (Site $site) {
@@ -146,6 +159,11 @@ Route::prefix('api/v1')->group(
                 Route::get('/buildings/{building}/tickets/', function (Building $building) {
                     return ApiResponse::success($building->load('tickets.pictures')->tickets, 'Document added');
                 })->name('api.buildings.tickets');
+
+                // Get all interventions from a building
+                Route::get('/buildings/{building}/interventions/', function (Building $building) {
+                    return ApiResponse::success($building->load('interventions')->interventions);
+                })->name('api.buildings.interventions');
 
                 // Get all pictures from a building
                 Route::get('/buildings/{building}/pictures/', function (Building $building) {
@@ -187,6 +205,10 @@ Route::prefix('api/v1')->group(
                     return ApiResponse::success($floor->load('tickets.pictures')->tickets);
                 })->name('api.floors.tickets');
 
+                // Get all interventions from a floor
+                Route::get('/floors/{floor}/interventions/', function (Floor $floor) {
+                    return ApiResponse::success($floor->load('interventions')->interventions);
+                })->name('api.floors.interventions');
 
                 // Get all pictures from a floor
                 Route::get('/floors/{floor}/pictures/', function (Floor $floor) {
@@ -214,23 +236,28 @@ Route::prefix('api/v1')->group(
 
                     // Post a new document to a floor
                     Route::post('{room}/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Room $room) {
-
                         $files = $documentUploadRequest->validated('files');
                         if ($files) {
                             $documentService->uploadAndAttachDocuments($room, $files);
+                            return ApiResponse::success(null, 'Document added');
+                        } else {
+                            return ApiResponse::error('Error posting new documents');
                         }
-
-                        return ApiResponse::success(null, 'Document added');
                     })->name('api.rooms.documents.post');
 
                     // Get all tickets from a room
                     Route::get('{room}/tickets/', function (Room $room) {
-                        return ApiResponse::success($room->load('tickets.pictures')->tickets, 'Document added');
+                        return ApiResponse::success($room->load('tickets.pictures')->tickets);
                     })->name('api.rooms.tickets');
+
+                    // Get all interventions from a room
+                    Route::get('{room}/interventions/', function (Room $room) {
+                        return ApiResponse::success($room->load('interventions')->interventions);
+                    })->name('api.rooms.interventions');
 
                     // Get all pictures from a room
                     Route::get('{room}/pictures/', function (Room $room) {
-                        return ApiResponse::success($room->load('pictures')->pictures, 'Pictures added');
+                        return ApiResponse::success($room->load('pictures')->pictures);
                     })->name('api.rooms.pictures');
 
                     // Post a new picture to a room
@@ -303,11 +330,18 @@ Route::prefix('api/v1')->group(
                     // Close a specific ticket
                     Route::patch('{ticket}/close', [APITicketController::class, 'close'])->name('api.tickets.close');
 
-                    Route::post('/intervention', [InterventionForTicketController::class, 'store'])->name('api.tickets.interventions.store');
+                    // Get all ticket related interventions
+                    Route::get('{ticket}/interventions', function (Ticket $ticket) {
+                        return ApiResponse::success($ticket->load('interventions')->interventions);
+                    })->name('api.tickets.interventions');
                 });
 
-
-                Route::post('/interventions/create', [APIInterventionController::class, 'store'])->name('api.interventions.store');
+                Route::prefix('interventions')->group(function () {
+                    Route::post('/create', [APIInterventionController::class, 'store'])->name('api.interventions.store');
+                    Route::patch('/{intervention}', [APIInterventionController::class, 'update'])->name('api.interventions.update');
+                    Route::post('/{intervention}/actions', [APIInterventionActionController::class, 'store'])->name('api.interventions.actions.store');
+                    Route::patch('/actions/{action}', [APIInterventionActionController::class, 'update'])->name('api.interventions.actions.update');
+                });
             });
         });
     }

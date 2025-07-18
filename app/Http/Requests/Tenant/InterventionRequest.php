@@ -28,18 +28,16 @@ class InterventionRequest extends FormRequest
         return [
             'intervention_type_id' => ['required', Rule::in(CategoryType::where('category', 'intervention')->pluck('id')->toArray())],
 
-            'status' => ['nullable', Rule::in(array_column(InterventionStatus::cases(), 'value'))],
-            'priority' => ['nullable',  Rule::in(array_column(PriorityLevel::cases(), 'value'))],
+            'status' => ['required', 'string', Rule::in(array_column(InterventionStatus::cases(), 'value'))],
+            'priority' => ['required', 'string', Rule::in(array_column(PriorityLevel::cases(), 'value'))],
 
             'planned_at' => ['nullable', 'date', Rule::date()->afterOrEqual(today())],
             'description' => ['nullable', 'string'],
             'repair_delay' => ['nullable', 'date', Rule::date()->afterOrEqual(today())],
             'total_costs' => ['nullable', 'numeric', 'decimal:2,4'],
 
-            'maintainable_id' => ['nullable', 'required_without:ticket_id', Rule::exists('maintainable', 'id')],
-
-            'interventionable_type' => ['nullable', 'required_without:ticket_id', 'in:site,building,floor,room'],
-            'interventionable_id' => ['nullable', 'required_without:ticket_id'],
+            'locationType' => ['nullable', 'required_without:ticket_id', 'in:site,building,floor,room,asset'],
+            'locationId' => ['nullable', 'required_without:ticket_id'],
 
             'ticket_id' => ['nullable', Rule::exists('tickets', 'id')],
 
