@@ -1,4 +1,5 @@
 import { DocumentManager } from '@/components/tenant/documentManager';
+import { InterventionManager } from '@/components/tenant/interventionManager';
 import { PictureManager } from '@/components/tenant/pictureManager';
 import { TicketManager } from '@/components/tenant/ticketManager';
 import { Button } from '@/components/ui/button';
@@ -87,6 +88,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                     deleteRoute={`api.pictures.delete`}
                     showRoute={'api.pictures.show'}
                 />
+                <InterventionManager itemCodeId={asset.code} getInterventionsUrl="api.assets.interventions" type="asset" />
             </div>
 
             {/* {addPictures && addNewPicturesModal()} */}

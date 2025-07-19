@@ -34,6 +34,7 @@ export default function ShowTicket({ ticket }: { ticket: Ticket }) {
         }
     };
 
+    console.log(ticket);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Ticket" />

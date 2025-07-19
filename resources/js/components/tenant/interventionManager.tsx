@@ -25,7 +25,7 @@ type InterventionFormData = {
     repair_delay: null | string;
     total_costs: null | number;
     locationType: null | string;
-    locationId: null | number;
+    locationId: null | number | string;
     ticket_id: null | number;
 };
 
@@ -60,9 +60,6 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
         fetchInterventions();
     }, []);
 
-    console.log(interventions);
-    console.log(interventionTypes);
-
     const interventionData = {
         intervention_type_id: null,
         status: null,
@@ -84,7 +81,14 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
                 ...prev,
                 ticket_id: parseInt(itemCodeId),
             }));
+        } else {
+            setInterventionDataForm((prev) => ({
+                ...prev,
+                locationType: type,
+                locationId: itemCodeId,
+            }));
         }
+
         fetchInterventionTypes();
         setAddIntervention(true);
     };
@@ -101,9 +105,13 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
 
     const submitIntervention: FormEventHandler = async (e) => {
         e.preventDefault();
+        console.log('submit');
         try {
             const response = await axios.post(route('api.interventions.store'), interventionDataForm);
-            closeModale();
+            console.log(response.data.message);
+            if (response.data.status === 'success') {
+                closeModale();
+            }
         } catch (error) {
             console.error(error);
         }
@@ -114,7 +122,27 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
     return (
         <div>
             Intervention Manager ({interventions.length})
-            <ul>{interventions && interventions.map((intervention) => <li key={intervention.id}>{intervention.description}</li>)}</ul>
+            <ul>
+                {interventions &&
+                    interventions.map((intervention) => (
+                        <li key={intervention.id}>
+                            <p>Description: {intervention.description}</p>
+                            <p>Priority: {intervention.priority}</p>
+                            <p>Status: {intervention.status}</p>
+                            <p>Planned at: {intervention.planned_at ?? 'Not planned'}</p>
+                            <p>Repair delay: {intervention.repair_delay ?? 'Not repair delay'}</p>
+                            Actions
+                            <ul>
+                                {intervention.actions?.map((action) => (
+                                    <li>
+                                        <p>{action.description}</p>
+                                        <p>{action.intervention_date}</p>
+                                    </li>
+                                ))}
+                            </ul>
+                        </li>
+                    ))}
+            </ul>
             <Button onClick={openModale}>add intervention</Button>
             {addIntervention && (
                 <div className="bg-background/50 absolute inset-0 z-50">

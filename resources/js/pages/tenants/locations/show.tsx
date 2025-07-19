@@ -1,4 +1,5 @@
 import { DocumentManager } from '@/components/tenant/documentManager';
+import { InterventionManager } from '@/components/tenant/interventionManager';
 
 import { PictureManager } from '@/components/tenant/pictureManager';
 import { TicketManager } from '@/components/tenant/ticketManager';
@@ -43,6 +44,7 @@ export default function ShowLocation({ location, routeName }: { location: Tenant
                     deleteRoute={`api.pictures.delete`}
                     showRoute={'api.pictures.show'}
                 />
+                <InterventionManager itemCodeId={location.id} getInterventionsUrl={`api.${routeName}.interventions`} type={routeName} />
             </div>
         </AppLayout>
     );

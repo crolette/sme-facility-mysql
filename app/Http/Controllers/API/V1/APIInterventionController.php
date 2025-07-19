@@ -41,6 +41,7 @@ class APIInterventionController extends Controller
 
     public function store(InterventionRequest $request)
     {
+        Debugbar::info('store intervention', $request->validated());
         try {
             DB::beginTransaction();
 
@@ -56,16 +57,19 @@ class APIInterventionController extends Controller
             } else {
 
                 $modelMap = [
-                    'site' => \App\Models\Tenants\Site::class,
-                    'building' => \App\Models\Tenants\Building::class,
-                    'floor' => \App\Models\Tenants\Floor::class,
-                    'room' => \App\Models\Tenants\Room::class,
+                    'sites' => \App\Models\Tenants\Site::class,
+                    'buildings' => \App\Models\Tenants\Building::class,
+                    'floors' => \App\Models\Tenants\Floor::class,
+                    'rooms' => \App\Models\Tenants\Room::class,
                     'asset' => \App\Models\Tenants\Asset::class,
                 ];
 
                 $model = $modelMap[$request->validated('locationType')];
-
-                $location = $model::where('id', $request->validated('locationId'))->first();
+                if ($request->validated('locationType') === 'asset') {
+                    $location = $model::where('code', $request->validated('locationId'))->first();
+                } else {
+                    $location = $model::where('id', $request->validated('locationId'))->first();
+                }
                 $intervention->interventionable()->associate($location);
                 $intervention->maintainable()->associate($location->maintainable->id);
             }

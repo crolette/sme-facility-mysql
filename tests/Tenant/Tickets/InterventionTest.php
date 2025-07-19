@@ -141,7 +141,7 @@ it('can create a new intervention for an ASSET', function () {
         'planned_at' => Carbon::now()->add('day', 7),
         'description' => fake()->paragraph(),
         'repair_delay' => Carbon::now()->add('month', 1),
-        'locationId' => $this->asset->id,
+        'locationId' => $this->asset->code,
         'locationType' => 'asset'
     ];
 
@@ -183,7 +183,7 @@ it('can create a new intervention for a SITE', function () {
         'description' => fake()->paragraph(),
         'repair_delay' => Carbon::now()->add('month', 1),
         'locationId' => $this->site->id,
-        'locationType' => 'site'
+        'locationType' => 'sites'
     ];
 
     $response = $this->postToTenant('api.interventions.store', $formData);
@@ -223,7 +223,7 @@ it('can create a new intervention for a BUILDING', function () {
         'description' => fake()->paragraph(),
         'repair_delay' => Carbon::now()->add('month', 1),
         'locationId' => $this->building->id,
-        'locationType' => 'building'
+        'locationType' => 'buildings'
     ];
 
     $response = $this->postToTenant('api.interventions.store', $formData);
@@ -264,7 +264,7 @@ it('can create a new intervention for a FLOOR', function () {
         'description' => fake()->paragraph(),
         'repair_delay' => Carbon::now()->add('month', 1),
         'locationId' => $this->floor->id,
-        'locationType' => 'floor'
+        'locationType' => 'floors'
     ];
 
     $response = $this->postToTenant('api.interventions.store', $formData);
@@ -304,7 +304,7 @@ it('can create a new intervention for a ROOM', function () {
         'description' => fake()->paragraph(),
         'repair_delay' => Carbon::now()->add('month', 1),
         'locationId' => $this->room->id,
-        'locationType' => 'room'
+        'locationType' => 'rooms'
     ];
 
     $response = $this->postToTenant('api.interventions.store', $formData);
@@ -346,7 +346,7 @@ it('can update an existing intervention', function () {
         'description' => 'New intervention description',
         'repair_delay' => Carbon::now()->add('month', 5),
         'locationId' => $this->room->id,
-        'locationType' => 'room'
+        'locationType' => 'rooms'
     ];
 
     $response = $this->patchToTenant('api.interventions.update', $formData, $intervention);

@@ -45,6 +45,8 @@ export default function IndexTickets() {
         }
     };
 
+    console.log(tickets);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Tickets" />
