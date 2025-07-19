@@ -365,4 +365,17 @@ it('can update an existing intervention', function () {
     ]);
 });
 
+it('can delete an intervention', function () {
+
+    $intervention = Intervention::factory()->create();
+
+    $response = $this->deleteFromTenant('api.interventions.destroy', $intervention);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseEmpty('interventions');
+});
+
 // it('sum intervention costs automatically based on actions', function () {});

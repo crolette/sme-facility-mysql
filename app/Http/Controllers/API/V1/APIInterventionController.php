@@ -106,4 +106,10 @@ class APIInterventionController extends Controller
 
         return ApiResponse::error('Error during Intervention update');
     }
+
+    public function destroy(Intervention $intervention)
+    {
+        $intervention->delete();
+        return ApiResponse::success(null, 'Intervention deleted');
+    }
 }

@@ -161,12 +161,16 @@ export interface Ticket {
 
 export interface Intervention {
     id: number;
+    intervention_type_id: number;
     priority: PriorityLevel;
     status: InterventionStatus;
     planned_at?: string;
     description: string;
     repair_delay?: string;
+    total_costs?: number;
     ticket: Ticket;
+    ticket_id?: number;
+    interventionable_id?: number;
     actions?: InterventionAction[];
 }
 

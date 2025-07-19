@@ -26,6 +26,7 @@ class InterventionRequest extends FormRequest
     public function rules(): array
     {
         return [
+
             'intervention_type_id' => ['required', Rule::in(CategoryType::where('category', 'intervention')->pluck('id')->toArray())],
 
             'status' => ['required', 'string', Rule::in(array_column(InterventionStatus::cases(), 'value'))],

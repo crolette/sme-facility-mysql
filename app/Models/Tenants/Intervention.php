@@ -34,6 +34,7 @@ class Intervention extends Model
     {
         return [
             'planned_at' => 'date:d-m-Y',
+            'repair_delay' => 'date:d-m-Y',
             'created_at' => 'date:d-m-Y H:m',
             'updated_at' => 'date:d-m-Y H:m',
             'status' => InterventionStatus::class,

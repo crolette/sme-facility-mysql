@@ -338,7 +338,11 @@ Route::prefix('api/v1')->group(
 
                 Route::prefix('interventions')->group(function () {
                     Route::post('/create', [APIInterventionController::class, 'store'])->name('api.interventions.store');
-                    Route::patch('/{intervention}', [APIInterventionController::class, 'update'])->name('api.interventions.update');
+                    Route::patch('/{intervention}', [APIInterventionController::class, 'update'])
+                        ->name('api.interventions.update');
+                    Route::delete('/{intervention}', [APIInterventionController::class, 'destroy'])
+                        ->name('api.interventions.destroy');
+
                     Route::post('/{intervention}/actions', [APIInterventionActionController::class, 'store'])->name('api.interventions.actions.store');
                     Route::patch('/actions/{action}', [APIInterventionActionController::class, 'update'])->name('api.interventions.actions.update');
                 });

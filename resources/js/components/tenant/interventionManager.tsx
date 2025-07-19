@@ -17,6 +17,7 @@ interface InterventionManagerProps {
 }
 
 type InterventionFormData = {
+    intervention_id: null | number;
     intervention_type_id: null | number;
     status: null | string;
     priority: null | string;
@@ -33,6 +34,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
     const [interventions, setInterventions] = useState<Intervention[]>([]);
 
     const [addIntervention, setAddIntervention] = useState<boolean>(false);
+    const [submitType, setSubmitType] = useState<'edit' | 'new'>('edit');
 
     const fetchInterventions = async () => {
         try {
@@ -48,7 +50,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
     const fetchInterventionTypes = async () => {
         try {
             const response = await axios.get(`/api/v1/category-types/?type=intervention`);
-            setInterventionTypes(await response.data.data);
+            setInterventionTypes(response.data.data);
         } catch (error) {
             console.error('Erreur lors de la recherche :', error);
             const errors = error.response.data.errors;
@@ -61,6 +63,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
     }, []);
 
     const interventionData = {
+        intervention_id: null,
         intervention_type_id: null,
         status: null,
         priority: null,
@@ -76,6 +79,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
     const [interventionDataForm, setInterventionDataForm] = useState<InterventionFormData>(interventionData);
 
     const openModale = () => {
+        setSubmitType('new');
         if (type === 'ticket') {
             setInterventionDataForm((prev) => ({
                 ...prev,
@@ -89,23 +93,25 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
             }));
         }
 
-        fetchInterventionTypes();
+        if (interventionTypes.length === 0) fetchInterventionTypes();
         setAddIntervention(true);
     };
 
     const cancelModale = () => {
         setInterventionDataForm(interventionData);
         setAddIntervention(false);
+        setSubmitType('edit');
     };
     const closeModale = () => {
         setInterventionDataForm(interventionData);
         setAddIntervention(false);
         fetchInterventions();
+        setSubmitType('edit');
     };
 
     const submitIntervention: FormEventHandler = async (e) => {
         e.preventDefault();
-        console.log('submit');
+
         try {
             const response = await axios.post(route('api.interventions.store'), interventionDataForm);
             console.log(response.data.message);
@@ -117,7 +123,61 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
         }
     };
 
-    console.log(interventionDataForm);
+    const editIntervention = (id: number) => {
+        setSubmitType('edit');
+        const intervention = interventions.find((intervention) => {
+            return intervention.id === id;
+        });
+        if (interventionTypes.length === 0) fetchInterventionTypes();
+
+        setInterventionDataForm((prev) => ({
+            ...prev,
+            intervention_id: id,
+            intervention_type_id: intervention?.intervention_type_id ?? null,
+            status: intervention?.status ?? null,
+            priority: intervention?.priority ?? null,
+            planned_at: intervention?.planned_at ? formatDateForInput(intervention?.planned_at) : null,
+            description: intervention?.description ?? null,
+            repair_delay: intervention?.repair_delay ? formatDateForInput(intervention?.repair_delay) : null,
+            total_costs: intervention?.total_costs ?? null,
+            ticket_id: intervention?.ticket_id ?? null,
+            locationType: intervention?.ticket_id ? null : type,
+            locationId: intervention?.ticket_id ? null : (intervention?.interventionable_id ?? null),
+        }));
+        setAddIntervention(true);
+    };
+
+    const submitEditIntervention: FormEventHandler = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.patch(route('api.interventions.update', interventionDataForm.intervention_id), interventionDataForm);
+            if (response.data.status === 'success') {
+                fetchInterventions();
+                setAddIntervention(false);
+                setSubmitType('new');
+                setInterventionDataForm(interventionData);
+            }
+        } catch (error) {
+            console.error('Erreur lors de la recherche : ', error);
+        }
+    };
+
+    function formatDateForInput(dateStr: string) {
+        const [day, month, year] = dateStr.split('-');
+        return `${year}-${month}-${day}`;
+    }
+
+    const deleteIntervention = async (id: number) => {
+        try {
+            const response = await axios.delete(route('api.interventions.destroy', id));
+            console.log(response.data.message);
+            if (response.data.status === 'success') {
+                fetchInterventions();
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     return (
         <div>
@@ -130,7 +190,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
                             <p>Priority: {intervention.priority}</p>
                             <p>Status: {intervention.status}</p>
                             <p>Planned at: {intervention.planned_at ?? 'Not planned'}</p>
-                            <p>Repair delay: {intervention.repair_delay ?? 'Not repair delay'}</p>
+                            <p>Repair delay: {intervention.repair_delay ?? 'No repair delay'}</p>
                             Actions
                             <ul>
                                 {intervention.actions?.map((action) => (
@@ -140,6 +200,10 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
                                     </li>
                                 ))}
                             </ul>
+                            <Button onClick={() => editIntervention(intervention.id)}>Edit</Button>
+                            <Button type="button" variant="destructive" onClick={() => deleteIntervention(intervention.id)}>
+                                Delete
+                            </Button>
                         </li>
                     ))}
             </ul>
@@ -148,7 +212,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
                 <div className="bg-background/50 absolute inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">
                         <div className="bg-background flex items-center justify-center p-4">
-                            <form onSubmit={submitIntervention} className="flex flex-col space-y-2">
+                            <form onSubmit={submitType === 'new' ? submitIntervention : submitEditIntervention} className="flex flex-col space-y-2">
                                 <Label>Intervention Type</Label>
                                 <select
                                     name="intervention_type"
@@ -212,6 +276,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
                                 <Label>Description</Label>
                                 <Textarea
                                     placeholder="description"
+                                    value={interventionDataForm.description ?? ''}
                                     onChange={(e) =>
                                         setInterventionDataForm((prev) => ({
                                             ...prev,
@@ -222,6 +287,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
                                 <Label>Planned at</Label>
                                 <Input
                                     type="date"
+                                    value={interventionDataForm.planned_at ?? ''}
                                     onChange={(e) =>
                                         setInterventionDataForm((prev) => ({
                                             ...prev,
@@ -229,9 +295,22 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
                                         }))
                                     }
                                 />
+                                <Button
+                                    variant={'outline'}
+                                    type="button"
+                                    onClick={() =>
+                                        setInterventionDataForm((prev) => ({
+                                            ...prev,
+                                            planned_at: null,
+                                        }))
+                                    }
+                                >
+                                    Clear planned at
+                                </Button>
                                 <Label>Repair delay</Label>
                                 <Input
                                     type="date"
+                                    value={interventionDataForm.repair_delay ?? ''}
                                     onChange={(e) =>
                                         setInterventionDataForm((prev) => ({
                                             ...prev,
@@ -239,6 +318,18 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
                                         }))
                                     }
                                 />
+                                <Button
+                                    variant={'outline'}
+                                    type="button"
+                                    onClick={() =>
+                                        setInterventionDataForm((prev) => ({
+                                            ...prev,
+                                            repair_delay: null,
+                                        }))
+                                    }
+                                >
+                                    Clear Repair delay
+                                </Button>
                                 <Button type="submit">Submit</Button>
                                 <Button onClick={cancelModale} type="button">
                                     Cancel
