@@ -7,7 +7,9 @@ use App\Models\Tenants\Ticket;
 use App\Enums\InterventionStatus;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -27,7 +29,7 @@ class Intervention extends Model
     ];
 
     protected $with = [
-        'interventionType',
+        'interventionType:id',
         'actions'
     ];
 
@@ -42,6 +44,17 @@ class Intervention extends Model
             'status' => InterventionStatus::class,
             'priority' => PriorityLevel::class
         ];
+    }
+
+    public static function booted(): void
+    {
+        static::addGlobalScope('ancient', function (Builder $builder) {
+            $builder->orderBy('created_at', 'desc');
+        });
+
+        static::created(function ($intervention) {
+            $intervention->ticket?->changeStatusToOngoing();
+        });
     }
 
     public function actions(): HasMany

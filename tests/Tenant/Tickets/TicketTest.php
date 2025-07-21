@@ -405,7 +405,7 @@ it('can close an existing ticket', function () {
 
     $ticket = Ticket::factory()->forLocation($this->asset)->create(['reported_by' => $this->user->id]);
 
-    $response = $this->patchToTenant('api.tickets.close', [], $ticket);
+    $response = $this->patchToTenant('api.tickets.status', ['status' => 'closed'], $ticket);
     $response->assertSessionHasNoErrors();
 
     assertDatabaseHas('tickets', [

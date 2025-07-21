@@ -1,4 +1,5 @@
 import { InterventionManager } from '@/components/tenant/interventionManager';
+import { PictureManager } from '@/components/tenant/pictureManager';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Ticket } from '@/types';
@@ -25,47 +26,81 @@ export default function ShowTicket({ ticket }: { ticket: Ticket }) {
         }
     };
 
-    const closeTicket = async (id: number) => {
+    const changeStatusTicket = async (id: number, status: string) => {
+        console.log(status);
         try {
-            await axios.patch(route('api.tickets.close', id));
-            fetchTicket();
+            const response = await axios.patch(route('api.tickets.status', id), { status: status });
+            if (response.data.status === 'success') {
+                fetchTicket();
+            }
         } catch (error) {
             console.error('Erreur lors de la suppression', error);
         }
     };
 
+    function formatUrlAsset(assetType: string) {
+        const type = ticket.ticketable_type.split(`\\`)[3].toLowerCase();
+
+        return `tenant.${type}s.show`;
+    }
+
     console.log(ticket);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Ticket" />
-            {ticket.status !== 'closed' && (
-                <Button variant={'destructive'} onClick={() => closeTicket(ticket.id)}>
-                    Close
-                </Button>
-            )}
+            <div>
+                <a href={route(formatUrlAsset(ticket.ticketable_type), ticketItem.ticketable.code)}>
+                    <Button type="button">Show asset</Button>
+                </a>
+                {ticketItem.status !== 'closed' && (
+                    <Button variant={'destructive'} onClick={() => changeStatusTicket(ticketItem.id, 'closed')}>
+                        Close
+                    </Button>
+                )}
+                {ticketItem.status === 'closed' && (
+                    <Button variant={'green'} onClick={() => changeStatusTicket(ticketItem.id, 'open')}>
+                        Re-open
+                    </Button>
+                )}
+            </div>
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div>
                     <p>Code: {ticketItem.code}</p>
+                    <p>Creation date: {ticketItem.created_at}</p>
                     <p>Status: {ticketItem.status}</p>
                     <p>Description : {ticketItem.description}</p>
                     <p>Reporter : {ticketItem.reporter ? ticketItem.reporter.full_name : ticketItem.reporter_email}</p>
                     <p>Closer: {ticketItem.closer?.full_name}</p>
+                    <p>Asset/Location</p>
+                    <p>Code: {ticketItem.ticketable.code}</p>
+                    <p>Name: {ticketItem.ticketable.maintainable.name}</p>
+                    <p>Location: {ticketItem.ticketable.reference_code}</p>
                 </div>
-                <div className="flex gap-4">
-                    {ticketItem.pictures &&
-                        ticketItem.pictures.map((picture) => {
-                            return (
-                                <img
-                                    key={picture.id}
-                                    src={route('api.pictures.show', picture.id)}
-                                    alt=""
-                                    className="aspect-square h-64 object-cover"
-                                />
-                            );
-                        })}
-                </div>
-                <InterventionManager itemCodeId={ticket.id} getInterventionsUrl="api.tickets.interventions" type="ticket" />
+                {/* <DocumentManager
+                    itemCodeId={ticket.id}
+                    getDocumentsUrl={`api.tickets.documents`}
+                    editRoute={`api.documents.update`}
+                    uploadRoute={`api.tickets.documents.post`}
+                    deleteRoute={`api.documents.delete`}
+                    showRoute={'api.documents.show'}
+                /> */}
+
+                <PictureManager
+                    itemCodeId={ticket.id}
+                    getPicturesUrl={`api.tickets.pictures`}
+                    uploadRoute={`api.tickets.pictures.post`}
+                    deleteRoute={`api.pictures.delete`}
+                    showRoute={'api.pictures.show'}
+                />
+
+                <InterventionManager
+                    itemCodeId={ticket.id}
+                    getInterventionsUrl="api.tickets.interventions"
+                    type="ticket"
+                    closed={ticketItem.status === 'closed' ? true : false}
+                />
             </div>
         </AppLayout>
     );

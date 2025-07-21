@@ -81,6 +81,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                     deleteRoute={`api.documents.delete`}
                     showRoute={'api.documents.show'}
                 />
+
                 <PictureManager
                     itemCodeId={asset.code}
                     getPicturesUrl={`api.assets.pictures`}

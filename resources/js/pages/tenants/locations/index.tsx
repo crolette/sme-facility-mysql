@@ -14,8 +14,8 @@ export default function IndexSites({ locations, routeName }: { locations: Tenant
 
     const { delete: destroy } = useForm();
 
-    const deleteLocation = (locationId: number) => {
-        destroy(route(`tenant.${routeName}.destroy`, locationId));
+    const deleteLocation = (locationCode: string) => {
+        destroy(route(`tenant.${routeName}.destroy`, locationCode));
     };
 
     return (
@@ -42,7 +42,7 @@ export default function IndexSites({ locations, routeName }: { locations: Tenant
                                 return (
                                     <TableBodyRow key={index}>
                                         <TableBodyData>
-                                            <a href={route(`tenant.${routeName}.show`, item.id)}> {item.reference_code} </a>
+                                            <a href={route(`tenant.${routeName}.show`, item.code)}> {item.reference_code} </a>
                                         </TableBodyData>
                                         <TableBodyData>{item.code}</TableBodyData>
                                         <TableBodyData>{item.category}</TableBodyData>
@@ -50,13 +50,13 @@ export default function IndexSites({ locations, routeName }: { locations: Tenant
                                         <TableBodyData>{item.maintainable.description}</TableBodyData>
 
                                         <TableBodyData>
-                                            <Button onClick={() => deleteLocation(item.id)} variant={'destructive'}>
+                                            <Button onClick={() => deleteLocation(item.code)} variant={'destructive'}>
                                                 Delete
                                             </Button>
-                                            <a href={route(`tenant.${routeName}.edit`, item.id)}>
+                                            <a href={route(`tenant.${routeName}.edit`, item.code)}>
                                                 <Button>Edit</Button>
                                             </a>
-                                            <a href={route(`tenant.${routeName}.show`, item.id)}>
+                                            <a href={route(`tenant.${routeName}.show`, item.code)}>
                                                 <Button variant={'outline'}>See</Button>
                                             </a>
                                         </TableBodyData>

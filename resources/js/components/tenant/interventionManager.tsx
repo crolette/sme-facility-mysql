@@ -16,6 +16,7 @@ interface InterventionManagerProps {
     deleteRoute?: string;
     showRoute?: string;
     type: string;
+    closed?: boolean;
 }
 
 type InterventionFormData = {
@@ -32,7 +33,7 @@ type InterventionFormData = {
     ticket_id: null | number;
 };
 
-export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: InterventionManagerProps) => {
+export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, closed = false }: InterventionManagerProps) => {
     const [interventions, setInterventions] = useState<Intervention[]>([]);
 
     const [addIntervention, setAddIntervention] = useState<boolean>(false);
@@ -181,51 +182,75 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
         }
     };
 
-    console.log(interventions);
+    const [actionsChanged, setActionsChanged] = useState<boolean>(false);
+    useEffect(() => {
+        fetchInterventions();
+        setActionsChanged(false);
+    }, [actionsChanged === true]);
+
+    console.log('closed', closed);
 
     return (
         <div>
-            Interventions ({interventions.length})<Button onClick={openModale}>add intervention</Button>
-            <ul>
-                {interventions && interventions.length > 0 && (
-                    <Table>
-                        <TableHead>
-                            <TableHeadRow>
-                                <TableHeadData>Description</TableHeadData>
-                                <TableHeadData>Priority</TableHeadData>
-                                <TableHeadData>Status</TableHeadData>
-                                <TableHeadData>Planned at</TableHeadData>
-                                <TableHeadData>Repair delay</TableHeadData>
-                                <TableHeadData>Total costs</TableHeadData>
-                                <TableHeadData></TableHeadData>
-                            </TableHeadRow>
-                        </TableHead>
+            <p>Interventions ({interventions.length})</p>
+            {!closed && <Button onClick={openModale}>add intervention</Button>}
 
-                        <TableBody>
-                            {interventions.map((intervention, index) => (
-                                <>
-                                    <TableBodyRow key={index}>
-                                        <TableBodyData>{intervention.description}</TableBodyData>
-                                        <TableBodyData>{intervention.priority}</TableBodyData>
-                                        <TableBodyData>{intervention.status}</TableBodyData>
-                                        <TableBodyData>{intervention.planned_at ?? 'Not planned'}</TableBodyData>
-                                        <TableBodyData>{intervention.repair_delay ?? 'No repair delay'}</TableBodyData>
-                                        <TableBodyData>{intervention.total_costs ?? 'No costs'}</TableBodyData>
-                                        <Button onClick={() => editIntervention(intervention.id)}>Edit</Button>
-                                        <Button type="button" variant="destructive" onClick={() => deleteIntervention(intervention.id)}>
-                                            Delete
-                                        </Button>
-                                    </TableBodyRow>
-                                    <TableBodyRow key={`action-${index}`}>
-                                        <TableBodyData colSpan={7}>
-                                            <InterventionActionManager interventionId={intervention.id} />
-                                        </TableBodyData>
-                                    </TableBodyRow>
-                                </>
-                            ))}
-                        </TableBody>
-                    </Table>
-                )}
+            <ul>
+                {interventions &&
+                    interventions.length > 0 &&
+                    interventions.map((intervention, index) => (
+                        <Table key={index}>
+                            <TableHead>
+                                <TableHeadRow>
+                                    <TableHeadData>Type</TableHeadData>
+                                    <TableHeadData>Description</TableHeadData>
+                                    <TableHeadData>Priority</TableHeadData>
+                                    <TableHeadData>Status</TableHeadData>
+                                    <TableHeadData>Planned at</TableHeadData>
+                                    <TableHeadData>Repair delay</TableHeadData>
+                                    <TableHeadData>Total costs</TableHeadData>
+                                    <TableHeadData></TableHeadData>
+                                </TableHeadRow>
+                            </TableHead>
+
+                            <TableBody>
+                                <TableBodyRow>
+                                    <TableBodyData>{intervention.intervention_type.label}</TableBodyData>
+                                    <TableBodyData>{intervention.description}</TableBodyData>
+                                    <TableBodyData>{intervention.priority}</TableBodyData>
+                                    <TableBodyData>{intervention.status}</TableBodyData>
+                                    <TableBodyData>{intervention.planned_at ?? 'Not planned'}</TableBodyData>
+                                    <TableBodyData>{intervention.repair_delay ?? 'No repair delay'}</TableBodyData>
+                                    <TableBodyData>{intervention.total_costs ? `${intervention.total_costs} €` : '-'}</TableBodyData>
+                                    <TableBodyData>
+                                        {!closed && (
+                                            <>
+                                                <Button onClick={() => editIntervention(intervention.id)}>Edit</Button>
+                                                <Button type="button" variant="destructive" onClick={() => deleteIntervention(intervention.id)}>
+                                                    Delete
+                                                </Button>
+                                            </>
+                                        )}
+                                    </TableBodyData>
+                                </TableBodyRow>
+                                <TableBodyRow key={`action-${index}`}>
+                                    <TableBodyData colSpan={8}>
+                                        <InterventionActionManager
+                                            interventionId={intervention.id}
+                                            actionsChanged={setActionsChanged}
+                                            closed={
+                                                closed
+                                                    ? true
+                                                    : intervention.status === 'completed' || intervention.status === 'cancelled'
+                                                      ? true
+                                                      : false
+                                            }
+                                        />
+                                    </TableBodyData>
+                                </TableBodyRow>
+                            </TableBody>
+                        </Table>
+                    ))}
             </ul>
             {addIntervention && (
                 <div className="bg-background/50 absolute inset-0 z-50">

@@ -6,6 +6,7 @@ use App\Models\Tenants\User;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -37,6 +38,10 @@ class InterventionAction extends Model
 
     public static function booted()
     {
+        static::addGlobalScope('ancient', function (Builder $builder) {
+            $builder->orderBy('created_at', 'desc');
+        });
+
         static::created(function ($action) {
             $action->intervention->updateTotalCosts();
         });

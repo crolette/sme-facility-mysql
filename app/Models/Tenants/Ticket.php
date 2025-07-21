@@ -90,4 +90,11 @@ class Ticket extends Model
             get: fn() => $this->ticketable->code
         );
     }
+
+    public function changeStatusToOngoing(): void
+    {
+        Debugbar::info('changeStatusToOngoing');
+        $this->status = TicketStatus::ONGOING->value;
+        $this->save();
+    }
 }

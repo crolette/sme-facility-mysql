@@ -25,7 +25,10 @@ class InterventionRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $isUpdate = $this->isMethod('patch');
+
+
+        $rules = [
 
             'intervention_type_id' => ['required', Rule::in(CategoryType::where('category', 'intervention')->pluck('id')->toArray())],
 
@@ -41,8 +44,13 @@ class InterventionRequest extends FormRequest
             'locationId' => ['nullable', 'required_without:ticket_id'],
 
             'ticket_id' => ['nullable', Rule::exists('tickets', 'id')],
-
-
         ];
+
+        if ($isUpdate) {
+            $rules['planned_at'] = ['nullable', 'date'];
+            $rules['repair_delay'] = ['nullable', 'date'];
+        }
+
+        return $rules;
     }
 }

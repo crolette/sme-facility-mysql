@@ -145,6 +145,7 @@ export interface LocationType {
 export interface Ticket {
     id: number;
     status: TicketStatus;
+    asset_code: string;
     description: string;
     reported_by?: number;
     closer?: User;
@@ -162,6 +163,7 @@ export interface Ticket {
 export interface Intervention {
     id: number;
     intervention_type_id: number;
+    intervention_type: CentralType;
     priority: PriorityLevel;
     status: InterventionStatus;
     planned_at?: string;

@@ -40,6 +40,12 @@ class Floor extends Model
         'category',
     ];
 
+    // Ensure route model binding use the slug instead of ID
+    public function getRouteKeyName()
+    {
+        return 'code';
+    }
+
     public static function boot()
     {
         parent::boot();

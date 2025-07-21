@@ -34,9 +34,10 @@ export default function IndexTickets() {
         fetchTickets();
     }, [fetchTicketStatus]);
 
-    const closeTicket = async (id: number) => {
+    const changeStatusTicket = async (id: number, status: string) => {
+        console.log(status);
         try {
-            const response = await axios.patch(route('api.tickets.close', id));
+            const response = await axios.patch(route('api.tickets.status', id), { status: status });
             if (response.data.status === 'success') {
                 fetchTickets();
             }
@@ -44,8 +45,6 @@ export default function IndexTickets() {
             console.error('Erreur lors de la suppression', error);
         }
     };
-
-    console.log(tickets);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -63,17 +62,7 @@ export default function IndexTickets() {
                     >
                         all
                     </li>
-                    <li
-                        className={cn(
-                            'cursor-pointer border-x-2 border-t-2 px-4 py-1',
-                            fetchTicketStatus === 'ongoing' ? 'bg-secondary' : 'bg-transparent',
-                        )}
-                        onClick={() => {
-                            setFetchTicketStatus('ongoing');
-                        }}
-                    >
-                        ongoing
-                    </li>
+
                     <li
                         className={cn(
                             'cursor-pointer border-x-2 border-t-2 px-4 py-1',
@@ -84,6 +73,17 @@ export default function IndexTickets() {
                         }}
                     >
                         open
+                    </li>
+                    <li
+                        className={cn(
+                            'cursor-pointer border-x-2 border-t-2 px-4 py-1',
+                            fetchTicketStatus === 'ongoing' ? 'bg-secondary' : 'bg-transparent',
+                        )}
+                        onClick={() => {
+                            setFetchTicketStatus('ongoing');
+                        }}
+                    >
+                        ongoing
                     </li>
                     <li
                         className={cn(
@@ -132,15 +132,25 @@ export default function IndexTickets() {
                                         <TableBodyData>{ticket.updated_at}</TableBodyData>
 
                                         <TableBodyData>
+                                            {ticket.status == 'open' && (
+                                                <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'ongoing')}>
+                                                    Ongoing
+                                                </Button>
+                                            )}
                                             {ticket.status !== 'closed' && (
                                                 <>
-                                                    <Button variant={'destructive'} onClick={() => closeTicket(ticket.id)}>
+                                                    <Button variant={'destructive'} onClick={() => changeStatusTicket(ticket.id, 'closed')}>
                                                         Close
                                                     </Button>
                                                     <a href={route('tenant.tickets.show', ticket.id)}>
                                                         <Button type="button">Show</Button>
                                                     </a>
                                                 </>
+                                            )}
+                                            {ticket.status === 'closed' && (
+                                                <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'open')}>
+                                                    Re-open
+                                                </Button>
                                             )}
                                         </TableBodyData>
                                     </TableBodyRow>

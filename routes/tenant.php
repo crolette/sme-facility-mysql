@@ -22,6 +22,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
 use App\Http\Controllers\Tenants\Auth\TenantAuthenticatedSessionController;
+use App\Http\Controllers\Tenants\DashboardController;
 use App\Http\Controllers\Tenants\InterventionActionController;
 use App\Http\Controllers\Tenants\InterventionController;
 
@@ -44,10 +45,7 @@ Route::middleware([
     PreventAccessFromCentralDomains::class,
     'auth:tenant'
 ])->group(function () {
-    Route::get('dashboard', function () {
-        // dd(Auth::user()->hasVerifiedEmail());
-        return Inertia::render('tenants/dashboard');
-    })->name('tenant.dashboard');
+    Route::get('dashboard', [DashboardController::class, 'show'])->name('tenant.dashboard');
 
     Route::resource('sites', TenantSiteController::class)->parameters(['sites' => 'site'])->names('tenant.sites');
     Route::resource('buildings', TenantBuildingController::class)->parameters(['buildings' => 'building'])->names('tenant.buildings');
@@ -64,6 +62,7 @@ Route::middleware([
     Route::prefix('tickets')->group(function () {
         Route::get('/', [TicketController::class, 'index'])->name('tenant.tickets.index');
         Route::get('/create', [TicketController::class, 'create'])->name('tenant.tickets.create');
+        Route::get('/{ticket}/edit', [TicketController::class, 'create'])->name('tenant.tickets.edit');
         Route::get('/{ticket}', [TicketController::class, 'show'])->name('tenant.tickets.show');
     });
 

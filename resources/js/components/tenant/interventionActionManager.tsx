@@ -15,6 +15,8 @@ interface InterventionActionManagerProps {
     editRoute?: string;
     deleteRoute?: string;
     showRoute?: string;
+    closed: boolean;
+    actionsChanged: (val: boolean) => void;
 }
 
 type InterventionFormData = {
@@ -31,9 +33,8 @@ type InterventionFormData = {
     updated_by: null | number;
 };
 
-export const InterventionActionManager = ({ interventionId }: InterventionActionManagerProps) => {
+export const InterventionActionManager = ({ interventionId, closed, actionsChanged }: InterventionActionManagerProps) => {
     const auth = usePage().props.auth;
-    console.log(auth);
     const [interventionActions, setInterventionActions] = useState<InterventionAction[]>([]);
 
     const [addInterventionAction, setAddInterventionAction] = useState<boolean>(false);
@@ -88,7 +89,6 @@ export const InterventionActionManager = ({ interventionId }: InterventionAction
         setAddInterventionAction(true);
     };
 
-    console.log(interventionActionDataForm);
     const cancelModale = () => {
         setInterventionActionDataForm(interventionActionData);
         setAddInterventionAction(false);
@@ -98,6 +98,7 @@ export const InterventionActionManager = ({ interventionId }: InterventionAction
         setInterventionActionDataForm(interventionActionData);
         setAddInterventionAction(false);
         fetchInterventionActions();
+        actionsChanged(true);
         setSubmitType('edit');
     };
 
@@ -144,10 +145,7 @@ export const InterventionActionManager = ({ interventionId }: InterventionAction
                 interventionActionDataForm,
             );
             if (response.data.status === 'success') {
-                fetchInterventionActions();
-                setAddInterventionAction(false);
-                setSubmitType('new');
-                setInterventionActionDataForm(interventionActionData);
+                closeModale();
             }
         } catch (error) {
             console.error('Erreur lors de la recherche : ', error);
@@ -176,12 +174,10 @@ export const InterventionActionManager = ({ interventionId }: InterventionAction
         }
     };
 
-    console.log(interventionActions);
-
     return (
         <>
             <ul>
-                Actions ({interventionActions.length})<Button onClick={openModale}>add action</Button>
+                Actions ({interventionActions.length}){!closed && <Button onClick={openModale}>add action</Button>}
                 {interventionActions && interventionActions.length > 0 && (
                     <Table>
                         <TableHead>
@@ -189,6 +185,8 @@ export const InterventionActionManager = ({ interventionId }: InterventionAction
                                 <TableHeadData>Description</TableHeadData>
                                 <TableHeadData>Action</TableHeadData>
                                 <TableHeadData>Date</TableHeadData>
+                                <TableHeadData>Started at</TableHeadData>
+                                <TableHeadData>Finished at</TableHeadData>
                                 <TableHeadData>Costs</TableHeadData>
                                 {/* <TableHeadData>Description</TableHeadData> */}
                                 {/* <TableHeadData>Planned at</TableHeadData> */}
@@ -203,14 +201,20 @@ export const InterventionActionManager = ({ interventionId }: InterventionAction
                                     <TableBodyData>{action.description}</TableBodyData>
                                     <TableBodyData>{action.action_type.label}</TableBodyData>
                                     <TableBodyData>{action.intervention_date}</TableBodyData>
-                                    <TableBodyData>{action.intervention_costs}</TableBodyData>
-                                    {/* <TableBodyData>{intervention.status}</TableBodyData> */}
-                                    {/* <TableBodyData>{intervention.planned_at ?? 'Not planned'}</TableBodyData> */}
-                                    {/* <TableBodyData>{intervention.repair_delay ?? 'No repair delay'}</TableBodyData> */}
-                                    <Button onClick={() => editInterventionAction(action.id)}>Edit</Button>
-                                    <Button type="button" variant="destructive" onClick={() => deleteInterventionAction(action.id)}>
-                                        Delete
-                                    </Button>
+                                    <TableBodyData>{action.started_at}</TableBodyData>
+                                    <TableBodyData>{action.finished_at}</TableBodyData>
+                                    <TableBodyData>{action.intervention_costs ? `${action.intervention_costs} €` : '-'} </TableBodyData>
+
+                                    <TableBodyData>
+                                        {!closed && (
+                                            <>
+                                                <Button onClick={() => editInterventionAction(action.id)}>Edit</Button>
+                                                <Button type="button" variant="destructive" onClick={() => deleteInterventionAction(action.id)}>
+                                                    Delete
+                                                </Button>
+                                            </>
+                                        )}
+                                    </TableBodyData>
                                 </TableBodyRow>
                             ))}
                         </TableBody>

@@ -42,6 +42,8 @@ export const DocumentManager = ({ itemCodeId, getDocumentsUrl, editRoute, upload
         }
     };
 
+    console.log(documents);
+
     const fetchDocuments = async () => {
         try {
             const response = await axios.get(route(getDocumentsUrl, itemCodeId));
