@@ -10,8 +10,6 @@ export default function CreateIntervention({ ticket }: { ticket: Ticket }) {
         },
     ];
 
-    console.log(ticket);
-
     return (
         <>
             <AppLayout breadcrumbs={breadcrumbs}>

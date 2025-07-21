@@ -10,8 +10,6 @@ export default function CreateInterventionAction({ intervention }: { interventio
         },
     ];
 
-    console.log(intervention);
-
     return (
         <>
             <AppLayout breadcrumbs={breadcrumbs}>

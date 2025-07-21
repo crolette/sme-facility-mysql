@@ -52,8 +52,6 @@ export default function CreateLocation({
         files: selectedDocuments,
     });
 
-    console.log(location);
-
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         if (location) {
@@ -110,12 +108,9 @@ export default function CreateLocation({
     };
 
     const removeDocument = (index: number) => {
-        console.log(index);
-        console.log(data.files[index]);
         const files = data.files.filter((file, indexFile) => {
             return index !== indexFile ? file : null;
         });
-        console.log(files);
         setSelectedDocuments(() => {
             setData('files', files);
             return files;

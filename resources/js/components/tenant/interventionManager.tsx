@@ -117,7 +117,6 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
 
         try {
             const response = await axios.post(route('api.interventions.store'), interventionDataForm);
-            console.log(response.data.message);
             if (response.data.status === 'success') {
                 closeModale();
             }
@@ -173,7 +172,6 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
     const deleteIntervention = async (id: number) => {
         try {
             const response = await axios.delete(route('api.interventions.destroy', id));
-            console.log(response.data.message);
             if (response.data.status === 'success') {
                 fetchInterventions();
             }
@@ -187,8 +185,6 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         fetchInterventions();
         setActionsChanged(false);
     }, [actionsChanged === true]);
-
-    console.log('closed', closed);
 
     return (
         <div>

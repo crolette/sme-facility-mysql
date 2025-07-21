@@ -62,8 +62,6 @@ export default function CreateDocumentType({ type, categories }: { type?: Centra
         });
     };
 
-    console.log(data);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Create asset category`} />

@@ -27,7 +27,6 @@ export default function ShowTicket({ ticket }: { ticket: Ticket }) {
     };
 
     const changeStatusTicket = async (id: number, status: string) => {
-        console.log(status);
         try {
             const response = await axios.patch(route('api.tickets.status', id), { status: status });
             if (response.data.status === 'success') {
@@ -43,8 +42,6 @@ export default function ShowTicket({ ticket }: { ticket: Ticket }) {
 
         return `tenant.${type}s.show`;
     }
-
-    console.log(ticket);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

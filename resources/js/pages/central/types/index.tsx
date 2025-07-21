@@ -19,7 +19,6 @@ export default function DocumentTypesIndex({ types }: { types: CentralType[] }) 
 
     // TODO FETCH Types to render different types in different tabs
 
-    console.log(types);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Category types" />

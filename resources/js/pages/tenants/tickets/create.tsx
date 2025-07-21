@@ -10,8 +10,6 @@ export default function CreateTicket({ ticket, statuses }: { ticket?: Ticket; st
         },
     ];
 
-    console.log(ticket);
-
     return (
         <>
             <AppLayout breadcrumbs={breadcrumbs}>

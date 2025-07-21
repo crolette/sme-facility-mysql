@@ -107,7 +107,6 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
 
         try {
             const response = await axios.post(route('api.interventions.actions.store', interventionId), interventionActionDataForm);
-            console.log(response.data.message);
             if (response.data.status === 'success') {
                 closeModale();
             }
@@ -165,7 +164,6 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
     const deleteInterventionAction = async (id: number) => {
         try {
             const response = await axios.delete(route('api.interventions.actions.destroy', id));
-            console.log(response.data.message);
             if (response.data.status === 'success') {
                 fetchInterventionActions();
             }
