@@ -25,6 +25,11 @@ use App\Models\Tenants\InterventionAction;
 
 class APIInterventionActionController extends Controller
 {
+    public function index(Intervention $intervention)
+    {
+        return ApiResponse::success($intervention->load('actions')->actions);
+    }
+
     public function store(InterventionActionRequest $request, Intervention $intervention)
     {
         try {
@@ -51,14 +56,16 @@ class APIInterventionActionController extends Controller
         return ApiResponse::error('Error during Intervention action creation');
     }
 
-    public function update(InterventionActionRequest $request, Intervention $intervention)
+    public function update(InterventionActionRequest $request, InterventionAction $action)
     {
         try {
             DB::beginTransaction();
 
-            // $intervention->update([
-            //     ...$request->safe()->except('locationType', 'locationId', 'ticket_id')
-            // ]);
+
+            $action->update($request->safe()->except('created_by', 'creator_email', 'updated_by'));
+            $action->updater()->associate($request->validated('updated_by'));
+            $action->save();
+
 
             DB::commit();
             return ApiResponse::success(null, 'Intervention action updated');
@@ -68,5 +75,12 @@ class APIInterventionActionController extends Controller
         }
 
         return ApiResponse::error('Error during Intervention action update');
+    }
+
+    public  function destroy(InterventionAction $action)
+    {
+        $action->delete();
+
+        return ApiResponse::success(null, 'Action deleted');
     }
 }

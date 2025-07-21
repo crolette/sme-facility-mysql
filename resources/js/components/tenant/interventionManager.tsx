@@ -1,3 +1,4 @@
+import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import { CentralType, Intervention } from '@/types';
 import axios from 'axios';
 import { FormEventHandler, useEffect, useState } from 'react';
@@ -5,6 +6,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
+import { InterventionActionManager } from './interventionActionManager';
 
 interface InterventionManagerProps {
     itemCodeId: number | string;
@@ -179,35 +181,52 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type }: I
         }
     };
 
+    console.log(interventions);
+
     return (
         <div>
-            Intervention Manager ({interventions.length})
+            Interventions ({interventions.length})<Button onClick={openModale}>add intervention</Button>
             <ul>
-                {interventions &&
-                    interventions.map((intervention) => (
-                        <li key={intervention.id}>
-                            <p>Description: {intervention.description}</p>
-                            <p>Priority: {intervention.priority}</p>
-                            <p>Status: {intervention.status}</p>
-                            <p>Planned at: {intervention.planned_at ?? 'Not planned'}</p>
-                            <p>Repair delay: {intervention.repair_delay ?? 'No repair delay'}</p>
-                            Actions
-                            <ul>
-                                {intervention.actions?.map((action) => (
-                                    <li>
-                                        <p>{action.description}</p>
-                                        <p>{action.intervention_date}</p>
-                                    </li>
-                                ))}
-                            </ul>
-                            <Button onClick={() => editIntervention(intervention.id)}>Edit</Button>
-                            <Button type="button" variant="destructive" onClick={() => deleteIntervention(intervention.id)}>
-                                Delete
-                            </Button>
-                        </li>
-                    ))}
+                {interventions && interventions.length > 0 && (
+                    <Table>
+                        <TableHead>
+                            <TableHeadRow>
+                                <TableHeadData>Description</TableHeadData>
+                                <TableHeadData>Priority</TableHeadData>
+                                <TableHeadData>Status</TableHeadData>
+                                <TableHeadData>Planned at</TableHeadData>
+                                <TableHeadData>Repair delay</TableHeadData>
+                                <TableHeadData>Total costs</TableHeadData>
+                                <TableHeadData></TableHeadData>
+                            </TableHeadRow>
+                        </TableHead>
+
+                        <TableBody>
+                            {interventions.map((intervention, index) => (
+                                <>
+                                    <TableBodyRow key={index}>
+                                        <TableBodyData>{intervention.description}</TableBodyData>
+                                        <TableBodyData>{intervention.priority}</TableBodyData>
+                                        <TableBodyData>{intervention.status}</TableBodyData>
+                                        <TableBodyData>{intervention.planned_at ?? 'Not planned'}</TableBodyData>
+                                        <TableBodyData>{intervention.repair_delay ?? 'No repair delay'}</TableBodyData>
+                                        <TableBodyData>{intervention.total_costs ?? 'No costs'}</TableBodyData>
+                                        <Button onClick={() => editIntervention(intervention.id)}>Edit</Button>
+                                        <Button type="button" variant="destructive" onClick={() => deleteIntervention(intervention.id)}>
+                                            Delete
+                                        </Button>
+                                    </TableBodyRow>
+                                    <TableBodyRow key={`action-${index}`}>
+                                        <TableBodyData colSpan={7}>
+                                            <InterventionActionManager interventionId={intervention.id} />
+                                        </TableBodyData>
+                                    </TableBodyRow>
+                                </>
+                            ))}
+                        </TableBody>
+                    </Table>
+                )}
             </ul>
-            <Button onClick={openModale}>add intervention</Button>
             {addIntervention && (
                 <div className="bg-background/50 absolute inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">

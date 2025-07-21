@@ -22,6 +22,10 @@ class InterventionAction extends Model
         'creator_email'
     ];
 
+    protected $with = [
+        'actionType:id',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -30,6 +34,23 @@ class InterventionAction extends Model
             'updated_at' => 'date:d-m-Y H:m',
         ];
     }
+
+    public static function booted()
+    {
+        static::created(function ($action) {
+            $action->intervention->updateTotalCosts();
+        });
+
+        static::updated(function ($action) {
+            $action->intervention->updateTotalCosts();
+        });
+
+        static::deleted(function ($action) {
+            $action->intervention->updateTotalCosts();
+        });
+    }
+
+
 
     public function intervention(): BelongsTo
     {

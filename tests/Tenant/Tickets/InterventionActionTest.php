@@ -12,6 +12,8 @@ use App\Models\Tenants\Building;
 
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
+use App\Models\Tenants\InterventionAction;
+
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
@@ -104,5 +106,61 @@ it('can, has an authenticated user, create a new action to an intervention', fun
         'finished_at' => '17:30:00',
         'intervention_costs' => '9999999.25',
         'created_by' => $this->user->id
+    ]);
+});
+
+it('can update an intervention action', function () {
+    $interventionAction = InterventionAction::factory()->forIntervention($this->intervention)->create();
+
+    assertDatabaseCount('intervention_actions', 2);
+
+    $formData = [
+        'action_type_id' => $this->interventionActionType->id,
+        'description' => 'Updated action for intervention',
+        'intervention_date' => Carbon::now()->add('day', 2),
+        'started_at' => '14:25',
+        'finished_at' => '18:30',
+        'intervention_costs' => '0',
+        'updated_by' => $this->user->id,
+    ];
+
+    $response = $this->patchToTenant('api.interventions.actions.update', $formData, $interventionAction);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+
+    $this->assertNotNull($interventionAction->creator_email);
+    $this->assertNull($interventionAction->created_by);
+
+    assertDatabaseHas('intervention_actions', [
+        'id' => 2,
+        'action_type_id' => $this->interventionActionType->id,
+        'description' => 'Updated action for intervention',
+        'intervention_date' => Carbon::now()->add('day', 2)->toDateString(),
+        'started_at' => '14:25:00',
+        'finished_at' => '18:30:00',
+        'intervention_costs' => '0',
+        'updated_by' => $this->user->id,
+    ]);
+});
+
+it('can delete an intervention action', function () {
+    $interventionAction = InterventionAction::factory()->forIntervention($this->intervention)->create();
+
+    assertDatabaseCount('intervention_actions', 2);
+
+    $response = $this->deleteFromTenant('api.interventions.actions.destroy', $interventionAction);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseCount('intervention_actions', 1);
+    assertDatabaseMissing('intervention_actions', [
+        'id' => $interventionAction->id
     ]);
 });

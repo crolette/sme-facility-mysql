@@ -8,6 +8,7 @@ use App\Enums\InterventionStatus;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,6 +30,7 @@ class Intervention extends Model
         'interventionType',
         'actions'
     ];
+
 
     protected function casts(): array
     {
@@ -66,5 +68,11 @@ class Intervention extends Model
     public function ticket(): BelongsTo
     {
         return $this->belongsTo(Ticket::class);
+    }
+
+    public function updateTotalCosts(): void
+    {
+        $this->total_costs = $this->actions()->sum('intervention_costs');
+        $this->save();
     }
 }

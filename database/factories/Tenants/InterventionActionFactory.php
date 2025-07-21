@@ -34,4 +34,14 @@ class InterventionActionFactory extends Factory
             'creator_email' => fake()->safeEmail()
         ];
     }
+
+    public function forIntervention($intervention)
+    {
+        return $this->state(function () use ($intervention) {
+
+            return [
+                'intervention_id' => $intervention->id,
+            ];
+        });
+    }
 }

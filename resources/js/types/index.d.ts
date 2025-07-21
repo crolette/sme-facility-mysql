@@ -178,6 +178,7 @@ export interface InterventionAction {
     id: number;
     description: string;
     intervention_date?: string;
+    action_type: CentralType;
     started_at?: string;
     finished_at?: string;
     intervention_costs?: number;

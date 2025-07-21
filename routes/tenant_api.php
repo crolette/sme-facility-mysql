@@ -343,8 +343,10 @@ Route::prefix('api/v1')->group(
                     Route::delete('/{intervention}', [APIInterventionController::class, 'destroy'])
                         ->name('api.interventions.destroy');
 
+                    Route::get('/{intervention}/actions', [APIInterventionActionController::class, 'index'])->name('api.interventions.actions.index');
                     Route::post('/{intervention}/actions', [APIInterventionActionController::class, 'store'])->name('api.interventions.actions.store');
                     Route::patch('/actions/{action}', [APIInterventionActionController::class, 'update'])->name('api.interventions.actions.update');
+                    Route::delete('/actions/{action}', [APIInterventionActionController::class, 'destroy'])->name('api.interventions.actions.destroy');
                 });
             });
         });
