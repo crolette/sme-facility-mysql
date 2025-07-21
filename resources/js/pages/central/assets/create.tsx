@@ -34,8 +34,6 @@ export default function CreateAssetCategory({ category }: { category?: AssetCate
         },
     });
 
-    console.log(errors['translations.en']);
-
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         if (category) {

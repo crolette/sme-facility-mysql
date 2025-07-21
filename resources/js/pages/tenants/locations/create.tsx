@@ -52,12 +52,10 @@ export default function CreateLocation({
         files: selectedDocuments,
     });
 
-    console.log(location);
-
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         if (location) {
-            post(route(`tenant.${routeName}.update`, location.id), {
+            post(route(`tenant.${routeName}.update`, location.code), {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-HTTP-Method-Override': 'PATCH',
@@ -110,12 +108,9 @@ export default function CreateLocation({
     };
 
     const removeDocument = (index: number) => {
-        console.log(index);
-        console.log(data.files[index]);
         const files = data.files.filter((file, indexFile) => {
             return index !== indexFile ? file : null;
         });
-        console.log(files);
         setSelectedDocuments(() => {
             setData('files', files);
             return files;
@@ -327,7 +322,7 @@ export default function CreateLocation({
                     )}
 
                     <Button type="submit">{location ? 'Update' : 'Submit'}</Button>
-                    <a href={location ? route(`tenant.${routeName}.show`, location.id) : route(`tenant.${routeName}.index`)}>
+                    <a href={location ? route(`tenant.${routeName}.show`, location.code) : route(`tenant.${routeName}.index`)}>
                         <Button type="button" tabIndex={6} variant={'secondary'}>
                             Cancel
                         </Button>

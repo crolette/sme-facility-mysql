@@ -40,6 +40,12 @@ class Floor extends Model
         'category',
     ];
 
+    // Ensure route model binding use the slug instead of ID
+    public function getRouteKeyName()
+    {
+        return 'code';
+    }
+
     public static function boot()
     {
         parent::boot();
@@ -93,6 +99,11 @@ class Floor extends Model
     public function tickets(): MorphMany
     {
         return $this->morphMany(Ticket::class, 'ticketable');
+    }
+
+    public function interventions(): MorphMany
+    {
+        return $this->morphMany(Intervention::class, 'interventionable');
     }
 
     public function category($locale = null): Attribute

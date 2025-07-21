@@ -4,29 +4,29 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, LayoutGrid } from 'lucide-react';
+import { BookOpen, BrickWall, Building, Building2, Cuboid, LayoutDashboard, LayoutGrid, Ticket } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: '/dashboard',
-        icon: LayoutGrid,
+        icon: LayoutDashboard,
     },
     {
         title: 'Sites',
         href: '/sites',
-        icon: LayoutGrid,
+        icon: Building2,
     },
     {
         title: 'Buildings',
         href: '/buildings',
-        icon: LayoutGrid,
+        icon: Building,
     },
     {
         title: 'Floors',
         href: '/floors',
-        icon: LayoutGrid,
+        icon: BrickWall,
     },
     {
         title: 'Rooms',
@@ -36,13 +36,18 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Assets',
         href: '/assets',
-        icon: LayoutGrid,
+        icon: Cuboid,
     },
     {
         title: 'Tickets',
         href: '/tickets',
-        icon: LayoutGrid,
+        icon: Ticket,
     },
+    // {
+    //     title: 'Interventions',
+    //     href: '/interventions',
+    //     icon: Wrench,
+    // },
 ];
 
 const footerNavItems: NavItem[] = [

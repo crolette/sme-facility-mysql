@@ -45,7 +45,6 @@ class AssetRequest extends FormRequest
             'serial_number' => ['nullable', 'string', 'max:50'],
         ];
 
-        Debugbar::info($this->input('locationType'));
         $isCreate = $this->isMethod('post');
         $type = $this->input('locationType');
 

@@ -62,7 +62,7 @@ export const TicketManager = ({ itemCodeId, getTicketsUrl, itemId = itemCodeId, 
 
     const closeTicket = async (id: number) => {
         try {
-            const response = await axios.patch(route('api.tickets.close', id));
+            const response = await axios.patch(route('api.tickets.status', id), { status: close });
             if (response.data.status === 'success') {
                 fetchTickets();
             }
@@ -161,7 +161,7 @@ export const TicketManager = ({ itemCodeId, getTicketsUrl, itemId = itemCodeId, 
                                             <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
                                         </TableBodyData>
                                         <TableBodyData>{ticket.status}</TableBodyData>
-                                        <TableBodyData>{ticket.code}</TableBodyData>
+                                        <TableBodyData>{ticket.reporter_email ?? ticket.reporter?.email}</TableBodyData>
                                         <TableBodyData>{ticket.description}</TableBodyData>
                                         <TableBodyData>{ticket.created_at}</TableBodyData>
                                         <TableBodyData>{ticket.updated_at !== ticket.created_at ? ticket.updated_at : '-'}</TableBodyData>
@@ -210,32 +210,35 @@ export const TicketManager = ({ itemCodeId, getTicketsUrl, itemId = itemCodeId, 
                                     value={newTicketData.description}
                                 />
                                 {submitTypeTicket === 'new' && (
-                                    <Input
-                                        type="file"
-                                        multiple
-                                        accept="image/png, image/jpeg, image/jpg"
-                                        onChange={(e) => {
-                                            // const pictures = { pictures: };
-                                            setNewTicketData((prev) => ({
-                                                ...prev,
-                                                pictures: e.target.files,
-                                            }));
-                                        }}
-                                    />
+                                    <>
+                                        <Input
+                                            type="file"
+                                            multiple
+                                            accept="image/png, image/jpeg, image/jpg"
+                                            onChange={(e) => {
+                                                // const pictures = { pictures: };
+                                                setNewTicketData((prev) => ({
+                                                    ...prev,
+                                                    pictures: e.target.files,
+                                                }));
+                                            }}
+                                        />
+
+                                        <div className="flex items-center gap-4">
+                                            <Label htmlFor="notified">Do you want to be notified of changes ? </Label>
+                                            <Checkbox
+                                                id="notified"
+                                                checked={newTicketData.being_notified}
+                                                onClick={() => {
+                                                    setNewTicketData((prev) => ({
+                                                        ...prev,
+                                                        being_notified: !newTicketData.being_notified,
+                                                    }));
+                                                }}
+                                            />
+                                        </div>
+                                    </>
                                 )}
-                                <div className="flex items-center gap-4">
-                                    <Label htmlFor="notified">Do you want to be notified of changes ? </Label>
-                                    <Checkbox
-                                        id="notified"
-                                        checked={newTicketData.being_notified}
-                                        onClick={() => {
-                                            setNewTicketData((prev) => ({
-                                                ...prev,
-                                                being_notified: !newTicketData.being_notified,
-                                            }));
-                                        }}
-                                    />
-                                </div>
                                 {submitTypeTicket === 'new' ? <Button>Add new ticket</Button> : <Button>Edit ticket</Button>}
 
                                 <Button onClick={closeModalTicket} type="button" variant={'secondary'}>

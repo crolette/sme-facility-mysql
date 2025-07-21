@@ -40,6 +40,12 @@ class Site extends Model
         'category',
     ];
 
+    // Ensure route model binding use the slug instead of ID
+    public function getRouteKeyName()
+    {
+        return 'code';
+    }
+
     public static function boot()
     {
         parent::boot();
@@ -81,6 +87,11 @@ class Site extends Model
     public function pictures(): MorphMany
     {
         return $this->morphMany(Picture::class, 'imageable');
+    }
+
+    public function interventions(): MorphMany
+    {
+        return $this->morphMany(Intervention::class, 'interventionable');
     }
 
     public function tickets(): MorphMany

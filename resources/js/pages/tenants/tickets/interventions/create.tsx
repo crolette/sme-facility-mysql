@@ -2,18 +2,18 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Ticket } from '@/types';
 import { Head } from '@inertiajs/react';
 
-export default function CreateTicket({ ticket, statuses }: { ticket?: Ticket; statuses: string[] }) {
+export default function CreateIntervention({ ticket }: { ticket: Ticket }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Edit ticket`,
-            href: `/tickets/edit`,
+            title: `Create ticket`,
+            href: `/tickets/create`,
         },
     ];
 
     return (
         <>
             <AppLayout breadcrumbs={breadcrumbs}>
-                <Head title="Tickets" />
+                <Head title="Intervention Ticket" />
                 <form action=""></form>
             </AppLayout>
         </>

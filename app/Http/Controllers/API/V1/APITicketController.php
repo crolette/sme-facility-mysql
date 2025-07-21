@@ -112,13 +112,22 @@ class APITicketController extends Controller
                 $ticket->save();
             }
 
-
-
             DB::commit();
             return ApiResponse::success(null, 'Ticket updated');
         } catch (Exception $e) {
             DB::rollback();
             return ApiResponse::error('Error during Ticket update', [$e->getMessage()]);
+        }
+
+        return ApiResponse::error('Error during Ticket update');
+    }
+
+    public function changeStatus(Request $request, Ticket $ticket)
+    {
+        Debugbar::info($request, $request->status);
+        if (in_array($request->status, ['open', 'closed', 'ongoing'])) {
+            $ticket->update(['status' => $request->status]);
+            return ApiResponse::success(null, 'Ticket updated');
         }
 
         return ApiResponse::error('Error during Ticket update');

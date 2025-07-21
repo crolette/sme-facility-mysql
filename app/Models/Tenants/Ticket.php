@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Ticket extends Model
 {
@@ -34,6 +35,7 @@ class Ticket extends Model
     protected $with = [
         'reporter',
         'closer',
+        'interventions'
     ];
 
     protected function casts(): array
@@ -56,6 +58,12 @@ class Ticket extends Model
         return $this->belongsTo(User::class, 'closed_by');
     }
 
+    public function interventions(): HasMany
+    {
+        return $this->hasMany(Intervention::class);
+    }
+
+    // Asset, Site, Building, Floor, Room
     public function ticketable(): MorphTo
     {
         return $this->morphTo();
@@ -81,5 +89,12 @@ class Ticket extends Model
         return Attribute::make(
             get: fn() => $this->ticketable->code
         );
+    }
+
+    public function changeStatusToOngoing(): void
+    {
+        Debugbar::info('changeStatusToOngoing');
+        $this->status = TicketStatus::ONGOING->value;
+        $this->save();
     }
 }

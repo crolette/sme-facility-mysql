@@ -1,54 +1,49 @@
-import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { cn } from '@/lib/utils';
-import { BreadcrumbItem, Ticket } from '@/types';
+import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import axios from 'axios';
-import { useEffect, useState } from 'react';
 
-export default function IndexTickets() {
+export default function IndexInterventions() {
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Index tickets`,
-            href: `/tickets`,
+            title: `Index interventions`,
+            href: `/interventions`,
         },
     ];
-    const [fetchTicketStatus, setFetchTicketStatus] = useState<null | 'open' | 'ongoing' | 'closed'>('open');
-    const [fetchingData, setFetchingData] = useState<boolean>(true);
+    // const [fetchTicketStatus, setFetchTicketStatus] = useState<null | 'open' | 'ongoing' | 'closed'>('open');
+    // const [fetchingData, setFetchingData] = useState<boolean>(true);
 
-    const fetchTickets = async () => {
-        try {
-            const response = await axios.get(route('api.tickets.index', { status: fetchTicketStatus }));
-            setTickets(response.data.data);
-            setFetchingData(false);
-        } catch (error) {
-            console.error('Erreur lors de la recherche :', error);
-        }
-    };
+    // const fetchTickets = async () => {
+    //     try {
+    //         const response = await axios.get(route('api.tickets.index', { status: fetchTicketStatus }));
+    //         setTickets(response.data.data);
+    //         setFetchingData(false);
+    //     } catch (error) {
+    //         console.error('Erreur lors de la recherche :', error);
+    //     }
+    // };
 
-    const [tickets, setTickets] = useState<Ticket[]>();
+    // const [tickets, setTickets] = useState<Ticket[]>();
 
-    useEffect(() => {
-        setFetchingData(true);
-        fetchTickets();
-    }, [fetchTicketStatus]);
+    // useEffect(() => {
+    //     setFetchingData(true);
+    //     fetchTickets();
+    // }, [fetchTicketStatus]);
 
-    const changeStatusTicket = async (id: number, status: string) => {
-        try {
-            const response = await axios.patch(route('api.tickets.status', id), { status: status });
-            if (response.data.status === 'success') {
-                fetchTickets();
-            }
-        } catch (error) {
-            console.error('Erreur lors de la suppression', error);
-        }
-    };
+    // const closeTicket = async (id: number) => {
+    //     try {
+    //         const response = await axios.patch(route('api.tickets.close', id));
+    //         if (response.data.status === 'success') {
+    //             fetchTickets();
+    //         }
+    //     } catch (error) {
+    //         console.error('Erreur lors de la suppression', error);
+    //     }
+    // };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Tickets" />
-            <div>
+            <Head title="interventions" />
+            {/* <div>
                 <ul className="flex border-b-2 pl-4">
                     <li
                         className={cn(
@@ -61,18 +56,6 @@ export default function IndexTickets() {
                     >
                         all
                     </li>
-
-                    <li
-                        className={cn(
-                            'cursor-pointer border-x-2 border-t-2 px-4 py-1',
-                            fetchTicketStatus === 'open' ? 'bg-secondary' : 'bg-transparent',
-                        )}
-                        onClick={() => {
-                            setFetchTicketStatus('open');
-                        }}
-                    >
-                        open
-                    </li>
                     <li
                         className={cn(
                             'cursor-pointer border-x-2 border-t-2 px-4 py-1',
@@ -83,6 +66,17 @@ export default function IndexTickets() {
                         }}
                     >
                         ongoing
+                    </li>
+                    <li
+                        className={cn(
+                            'cursor-pointer border-x-2 border-t-2 px-4 py-1',
+                            fetchTicketStatus === 'open' ? 'bg-secondary' : 'bg-transparent',
+                        )}
+                        onClick={() => {
+                            setFetchTicketStatus('open');
+                        }}
+                    >
+                        open
                     </li>
                     <li
                         className={cn(
@@ -131,25 +125,15 @@ export default function IndexTickets() {
                                         <TableBodyData>{ticket.updated_at}</TableBodyData>
 
                                         <TableBodyData>
-                                            {ticket.status == 'open' && (
-                                                <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'ongoing')}>
-                                                    Ongoing
-                                                </Button>
-                                            )}
                                             {ticket.status !== 'closed' && (
                                                 <>
-                                                    <Button variant={'destructive'} onClick={() => changeStatusTicket(ticket.id, 'closed')}>
+                                                    <Button variant={'destructive'} onClick={() => closeTicket(ticket.id)}>
                                                         Close
                                                     </Button>
                                                     <a href={route('tenant.tickets.show', ticket.id)}>
                                                         <Button type="button">Show</Button>
                                                     </a>
                                                 </>
-                                            )}
-                                            {ticket.status === 'closed' && (
-                                                <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'open')}>
-                                                    Re-open
-                                                </Button>
                                             )}
                                         </TableBodyData>
                                     </TableBodyRow>
@@ -158,7 +142,7 @@ export default function IndexTickets() {
                         </TableBody>
                     </Table>
                 )}
-            </details>
+            </details> */}
         </AppLayout>
     );
 }

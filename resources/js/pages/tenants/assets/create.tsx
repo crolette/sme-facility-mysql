@@ -135,7 +135,6 @@ export default function CreateAsset({
         }
     };
 
-    console.log(data);
     const setSelectedLocation = (location: SearchedLocation) => {
         if (!location) {
             return;

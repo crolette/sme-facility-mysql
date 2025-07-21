@@ -14,7 +14,7 @@ class TicketController extends Controller
 
     public function index()
     {
-        $tickets = Ticket::all();
+        $tickets = Ticket::all()->load('interventions');
 
         return Inertia::render('tenants/tickets/index', ['tickets' => $tickets]);
     }
@@ -27,6 +27,8 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket)
     {
-        return Inertia::render('tenants/tickets/show', ['ticket' => $ticket->load('pictures')]);
+        // dd($ticket, $ticket->interventions()->first()->actions()->sum('intervention_costs'));
+
+        return Inertia::render('tenants/tickets/show', ['ticket' => $ticket->load('pictures', 'interventions')]);
     }
 };

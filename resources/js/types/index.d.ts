@@ -33,6 +33,8 @@ export interface Flash {
 export type LocationLevel = 'site' | 'building' | 'floor' | 'room';
 export type TicketStatus = 'open' | 'ongoing' | 'closed';
 export type CategoryTypeEnum = 'document' | 'intervention' | 'asset';
+export type PriorityLevel = 'low' | 'middle' | 'high' | 'urgent';
+export type InterventionStatus = 'draft' | 'planned' | 'in progress' | 'waiting for parts' | 'completed' | 'cancelled';
 
 export interface Maintainable {
     id: number;
@@ -143,19 +145,50 @@ export interface LocationType {
 export interface Ticket {
     id: number;
     status: TicketStatus;
+    asset_code: string;
     description: string;
     reported_by?: number;
     closer?: User;
     reporter?: User;
     reporter_email?: string;
     being_notified: boolean;
-
     code: string;
     closed_at?: string;
     created_at: string;
     updated_at: string;
     pictures?: Picture[];
     ticketable: TenantSite | TenantBuilding | TenantFloor | TenantRoom | Asset;
+}
+
+export interface Intervention {
+    id: number;
+    intervention_type_id: number;
+    intervention_type: CentralType;
+    priority: PriorityLevel;
+    status: InterventionStatus;
+    planned_at?: string;
+    description: string;
+    repair_delay?: string;
+    total_costs?: number;
+    ticket: Ticket;
+    ticket_id?: number;
+    interventionable_id?: number;
+    actions?: InterventionAction[];
+}
+
+export interface InterventionAction {
+    id: number;
+    description: string;
+    intervention_date?: string;
+    action_type: CentralType;
+    started_at?: string;
+    finished_at?: string;
+    intervention_costs?: number;
+    created_by?: User;
+    updated_by?: User;
+    creator?: User;
+    updater?: User;
+    creator_email?: string;
 }
 
 export interface AssetCategory {
