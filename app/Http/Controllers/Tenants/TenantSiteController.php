@@ -55,6 +55,8 @@ class TenantSiteController extends Controller
 
             $site = Site::create([
                 'code' => $codeNumber,
+                'surface_floor' => $siteRequest->validated('surface_floor'),
+                'surface_walls' => $siteRequest->validated('surface_walls'),
                 'reference_code' => $codeNumber,
                 'location_type_id' => $locationType->id
             ]);
@@ -115,6 +117,11 @@ class TenantSiteController extends Controller
         try {
             DB::beginTransaction();
 
+            $site->update([
+                'surface_floor' => $siteRequest->validated('surface_floor'),
+                'surface_walls' => $siteRequest->validated('surface_walls'),
+            ]);
+
             $site->maintainable()->update([
                 ...$maintainableRequest->validated()
             ]);
@@ -135,9 +142,8 @@ class TenantSiteController extends Controller
      */
     public function destroy(Site $site)
     {
-
-        if ($site->assets || $site->buildings) {
-            return redirect()->route('tenant.sites.index')->with(['message' => 'Site cannot be deleted ! Assets and/or buildings are linked to this site', 'type' => 'warning']);
+        if (count($site->assets) > 0 || count($site->buildings) > 0) {
+            abort(409)->with(['message' => 'Site cannot be deleted ! Assets and/or buildings are linked to this site', 'type' => 'warning']);
         }
 
         $site->delete();

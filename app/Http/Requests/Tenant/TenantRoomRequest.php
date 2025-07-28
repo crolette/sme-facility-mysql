@@ -29,7 +29,9 @@ class TenantRoomRequest extends FormRequest
 
         return [
             'levelType' => ['required', Rule::in([...$floors])],
-            'locationType' => ['required', Rule::in([...$locationTypes])]
+            'locationType' => ['required', Rule::in([...$locationTypes])],
+            'surface_floor' => 'nullable|numeric|gt:0|decimal:0,2',
+            'surface_walls' => 'nullable|numeric|gt:0|decimal:0,2',
         ];
     }
 }

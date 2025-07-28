@@ -29,7 +29,9 @@ class TenantBuildingRequest extends FormRequest
 
         return [
             'levelType' => ['required', Rule::in([...$siteTypes])],
-            'locationType' => ['required', Rule::in([...$locationTypes])]
+            'locationType' => ['required', Rule::in([...$locationTypes])],
+            'surface_floor' => 'nullable|numeric|gt:0|decimal:0,2',
+            'surface_walls' => 'nullable|numeric|gt:0|decimal:0,2',
         ];
     }
 }

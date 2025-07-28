@@ -13,6 +13,8 @@ import { BiSolidFilePdf } from 'react-icons/bi';
 type TypeFormData = {
     name: string;
     description: string;
+    surface_floor: null | number;
+    surface_walls: null | number;
     levelType: string | number;
     locationType: string | number;
     files: {
@@ -47,6 +49,8 @@ export default function CreateLocation({
     const { data, setData, post, errors } = useForm<TypeFormData>({
         name: location?.maintainable?.name ?? '',
         description: location?.maintainable?.description ?? '',
+        surface_floor: location?.surface_floor ?? null,
+        surface_walls: location?.surface_walls ?? null,
         levelType: (location?.level_id ?? levelTypes?.length == 1) ? levelTypes[0].id : '',
         locationType: (location?.location_type?.id ?? locationTypes.length == 1) ? locationTypes[0].id : '',
         files: selectedDocuments,
@@ -264,14 +268,37 @@ export default function CreateLocation({
                         id="name"
                         type="text"
                         required
-                        // disabled={type?.prefix ? true : false}
                         autoFocus
                         maxLength={100}
                         value={data.name}
                         onChange={(e) => setData('name', e.target.value)}
-                        placeholder="Site name"
+                        placeholder="Name"
                     />
                     <InputError className="mt-2" message={errors.name} />
+
+                    <Label htmlFor="surface_floor">Surface floor</Label>
+                    <Input
+                        id="surface_floor"
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        value={data.surface_floor ?? ''}
+                        placeholder="Surface floor (max. 2 decimals) : 4236.3"
+                        onChange={(e) => setData('surface_floor', parseFloat(e.target.value))}
+                    />
+                    <InputError className="mt-2" message={errors.surface_floor} />
+
+                    <Label htmlFor="surface_walls">Surface walls</Label>
+                    <Input
+                        id="surface_walls"
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        value={data.surface_walls ?? ''}
+                        onChange={(e) => setData('surface_walls', parseFloat(e.target.value))}
+                        placeholder="Surface walls (max. 2 decimals) : 4236.3"
+                    />
+                    <InputError className="mt-2" message={errors.surface_walls} />
 
                     <Label htmlFor="name">Description</Label>
                     <Input
@@ -282,7 +309,7 @@ export default function CreateLocation({
                         maxLength={255}
                         value={data.description}
                         onChange={(e) => setData('description', e.target.value)}
-                        placeholder="Site description"
+                        placeholder="Description"
                     />
                     <InputError className="mt-2" message={errors.description} />
                     {!location && (

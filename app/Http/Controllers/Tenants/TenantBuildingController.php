@@ -61,6 +61,8 @@ class TenantBuildingController extends Controller
 
             $building = Building::create([
                 'code' => $code,
+                'surface_floor' => $buildingRequest->validated('surface_floor'),
+                'surface_walls' => $buildingRequest->validated('surface_walls'),
                 'reference_code' => $referenceCode,
                 'location_type_id' => $buildingType->id
             ]);
@@ -126,6 +128,11 @@ class TenantBuildingController extends Controller
         try {
             DB::beginTransaction();
 
+            $building->update([
+                'surface_floor' => $buildingRequest->validated('surface_floor'),
+                'surface_walls' => $buildingRequest->validated('surface_walls'),
+            ]);
+
             $building->maintainable()->update([
                 ...$maintainableRequest->validated()
             ]);
@@ -146,8 +153,8 @@ class TenantBuildingController extends Controller
      */
     public function destroy(Building $building)
     {
-        if ($building->assets || $building->floors) {
-            return redirect()->route('tenant.buildings.index')->with(['message' => 'Building cannot be deleted ! Assets and/or floors are linked to this building', 'type' => 'warning']);
+        if (count($building->assets) > 0 || count($building->floors) > 0) {
+            abort(409)->with(['message' => 'Building cannot be deleted ! Assets and/or floors are linked to this building', 'type' => 'warning']);
         }
 
         $building->delete();

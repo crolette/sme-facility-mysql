@@ -64,6 +64,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                 <p>Location : {asset.location.maintainable.description}</p>
                 <p>Category : {asset.category}</p>
                 <p>Name : {asset.maintainable?.name}</p>
+                <p>Surface : {asset.surface}</p>
                 <p>Description : {asset.maintainable?.description}</p>
                 <p>Purchase date : {asset.maintainable?.purchase_date}</p>
                 <p>Purchase cost : {asset.maintainable?.purchase_cost}</p>

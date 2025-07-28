@@ -14,6 +14,7 @@ import { BiSolidFilePdf } from 'react-icons/bi';
 type TypeFormData = {
     q: string;
     name: string;
+    surface: null | number;
     description: string;
     locationId: number;
     locationReference: string;
@@ -66,6 +67,7 @@ export default function CreateAsset({
         q: '',
         name: asset?.maintainable.name ?? '',
         description: asset?.maintainable.description ?? '',
+        surface: asset?.surface ?? null,
         locationId: asset?.location_id ?? '',
         locationReference: asset?.location.reference_code ?? '',
         locationType: asset?.location.location_type.level ?? '',
@@ -384,6 +386,18 @@ export default function CreateAsset({
                         placeholder="Asset description"
                     />
                     <InputError className="mt-2" message={errors.description} />
+
+                    <Label htmlFor="surface">Surface</Label>
+                    <Input
+                        id="surface"
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        value={data.surface ?? ''}
+                        placeholder="Asset surface"
+                        onChange={(e) => setData('surface', parseFloat(e.target.value))}
+                    />
+                    <InputError className="mt-2" message={errors.surface} />
 
                     <Label htmlFor="brand">Brand</Label>
                     <Input

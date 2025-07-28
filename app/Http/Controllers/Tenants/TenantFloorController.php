@@ -58,6 +58,8 @@ class TenantFloorController extends Controller
 
             $floor = Floor::create([
                 'code' => $codeNumber,
+                'surface_floor' => $floorRequest->validated('surface_floor'),
+                'surface_walls' => $floorRequest->validated('surface_walls'),
                 'reference_code' => $referenceCode,
                 'location_type_id' => $floorType->id
             ]);
@@ -129,6 +131,11 @@ class TenantFloorController extends Controller
         try {
             DB::beginTransaction();
 
+            $floor->update([
+                'surface_floor' => $floorRequest->validated('surface_floor'),
+                'surface_walls' => $floorRequest->validated('surface_walls'),
+            ]);
+
             $floor->maintainable()->update([
                 ...$maintainableRequest->validated()
             ]);
@@ -149,8 +156,8 @@ class TenantFloorController extends Controller
      */
     public function destroy(Floor $floor)
     {
-        if ($floor->assets || $floor->rooms) {
-            return redirect()->route('tenant.rooms.index')->with(['message' => 'Floor cannot be deleted ! Assets and/or rooms are linked to this floor', 'type' => 'warning']);
+        if (count($floor->assets) > 0 || count($floor->rooms) > 0) {
+            abort(409)->with(['message' => 'Floor cannot be deleted ! Assets and/or rooms are linked to this floor', 'type' => 'warning']);
         }
 
         $floor->delete();

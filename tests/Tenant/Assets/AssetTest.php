@@ -76,6 +76,7 @@ it('can create a new asset to site', function () {
         'name' => 'New asset',
         'description' => 'Description new asset',
         'locationId' => $this->site->id,
+        'surface' => 12,
         'locationReference' => $this->site->reference_code,
         'locationType' => 'site',
         'categoryId' => $this->categoryType->id,
@@ -95,7 +96,8 @@ it('can create a new asset to site', function () {
         'reference_code' => $this->site->reference_code . '-' . 'A0001',
         'location_type' => get_class($this->site),
         'location_id' => $this->site->id,
-        'category_type_id' => $this->categoryType->id
+        'category_type_id' => $this->categoryType->id,
+        'surface' => 12,
     ]);
 
     assertDatabaseHas('maintainables', [
@@ -260,6 +262,7 @@ it('can create a new asset to floor', function () {
 
     $formData = [
         'name' => 'New asset',
+        'surface' => 12,
         'description' => 'Description new asset',
         'locationId' => $this->floor->id,
         'locationReference' => $this->floor->reference_code,
@@ -280,6 +283,7 @@ it('can create a new asset to floor', function () {
         'reference_code' => $this->floor->reference_code . '-' . 'A0001',
         'location_type' => get_class($this->floor),
         'location_id' => $this->floor->id,
+        'surface' => 12,
         'category_type_id' => $this->categoryType->id,
     ]);
 
@@ -293,11 +297,10 @@ it('can create a new asset to floor', function () {
 
 it('can create a new asset to room', function () {
 
-
-
     $formData = [
         'name' => 'New asset',
         'description' => 'Description new asset',
+        'surface' => 12.40,
         'locationId' => $this->room->id,
         'locationReference' => $this->room->reference_code,
         'locationType' => 'room',
@@ -318,6 +321,7 @@ it('can create a new asset to room', function () {
     assertDatabaseHas('assets', [
         'code' => 'A0001',
         'reference_code' => $this->room->reference_code . '-' . 'A0001',
+        'surface' => 12.40,
         'location_type' => get_class($this->room),
         'location_id' => $this->room->id,
         'model' => 'Blue daba di daba da',
@@ -410,6 +414,7 @@ it('can update asset\'s location', function () {
 
     $formData = [
         'name' => $name,
+        'surface' => 12.2,
         'locationId' => $this->floor->id,
         'locationReference' => $this->floor->reference_code,
         'locationType' => 'floor',
@@ -422,6 +427,7 @@ it('can update asset\'s location', function () {
 
     assertDatabaseHas('assets', [
         'code' => 'A0001',
+        'surface' => 12.2,
         'reference_code' => $this->floor->reference_code . '-A0001',
         'location_type' => get_class($this->floor),
         'location_id' => $this->floor->id
@@ -482,7 +488,7 @@ it('can restore a soft deleted asset', function () {
         'code' => 'A0001',
     ]);
 
-    $response = $this->postToTenant('tenant.assets.restore', [], $asset->id);
+    $response = $this->postToTenant('api.tenant.assets.restore', [], $asset->id);
     $response->assertStatus(302);
     $this->assertNull($asset->deleted_at);
 
@@ -519,7 +525,7 @@ it('can force delete a soft deleted asset', function () {
     ]);
     $this->assertNull($asset->deleted_at);
 
-    $response = $this->deleteFromTenant('tenant.assets.force', $asset->id);
+    $response = $this->deleteFromTenant('api.tenant.assets.force', $asset->id);
     $response->assertStatus(302);
     assertDatabaseEmpty('assets');
 

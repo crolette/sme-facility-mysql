@@ -26,6 +26,7 @@ class AssetFactory extends Factory
         $category = CategoryType::where('category', 'asset')->first();
         // Remplissage temporaire avant de définir les 
         return [
+            'surface' => fake()->numberBetween(1, 10),
             'category_type_id' => $category->id,
             'location_type' => null,
             'location_id' => null,

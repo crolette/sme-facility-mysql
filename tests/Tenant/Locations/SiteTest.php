@@ -60,6 +60,8 @@ it('can create a new site', function () {
 
     $formData = [
         'name' => 'New site',
+        'surface_floor' => 2569.12,
+        'surface_walls' => 256.9,
         'description' => 'Description new site',
         'locationType' => $locationType->id,
     ];
@@ -74,6 +76,8 @@ it('can create a new site', function () {
     assertDatabaseHas('sites', [
         'location_type_id' => $locationType->id,
         'code' => $locationType->prefix . '01',
+        'surface_floor' => 2569.12,
+        'surface_walls' => 256.9,
         'reference_code' => $locationType->prefix . '01',
     ]);
 
@@ -127,9 +131,6 @@ it('can upload several files to site', function () {
 });
 
 it('can render the show site page', function () {
-
-
-
     LocationType::factory()->count(3)->create(['level' => 'site']);
     $site = Site::factory()->create();
 
@@ -147,9 +148,6 @@ it('can render the show site page', function () {
 });
 
 it('can render the update site page', function () {
-
-
-
     LocationType::factory()->count(3)->create(['level' => 'site']);
     $site = Site::factory()->create();
 
@@ -166,9 +164,6 @@ it('can render the update site page', function () {
 });
 
 it('can update a site maintainable and his name and description', function () {
-
-
-
     $locationType = LocationType::factory()->create(['level' => 'site']);
     $site = Site::factory()->create();
 
@@ -177,6 +172,8 @@ it('can update a site maintainable and his name and description', function () {
 
     $formData = [
         'name' => 'New site',
+        'surface_floor' => 2569.12,
+        'surface_walls' => 256.9,
         'description' => 'Description new site',
         'locationType' => $locationType->id
     ];
@@ -191,6 +188,8 @@ it('can update a site maintainable and his name and description', function () {
     assertDatabaseHas('sites', [
         'location_type_id' => $locationType->id,
         'code' => $locationType->prefix . '01',
+        'surface_floor' => 2569.12,
+        'surface_walls' => 256.9,
         'reference_code' => $locationType->prefix . '01',
     ]);
 
@@ -230,7 +229,9 @@ it('can delete a site', function () {
     LocationType::factory()->count(3)->create(['level' => 'site']);
     $site = Site::factory()->create();
 
-    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->id);
+    dump($site);
+
+    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->code);
     $response->assertStatus(302);
     assertDatabaseMissing('sites', [
         'reference_code' => $site->reference_code
@@ -241,23 +242,20 @@ it('can delete a site', function () {
     ]);
 });
 
-it('can delete a site and the related buildings', function () {
-
-
-
+it('cannot delete a site which has buildings', function () {
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
     $site = Site::factory()->create();
     Building::factory()->create();
 
-    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->id);
-    $response->assertStatus(302);
-    assertDatabaseEmpty('sites');
-    assertDatabaseEmpty('buildings');
-    assertDatabaseEmpty('maintainables');
+    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->code);
+    $response->assertStatus(409);
+    // assertDatabaseEmpty('sites');
+    // assertDatabaseEmpty('buildings');
+    // assertDatabaseEmpty('maintainables');
 });
 
-it('can delete a site and the related buildings and related floors', function () {
+it('cannot delete a site which has related buildings and related floors', function () {
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
@@ -270,13 +268,13 @@ it('can delete a site and the related buildings and related floors', function ()
     assertDatabaseCount('floors', 3);
     assertDatabaseCount('maintainables', 5);
 
-    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->id);
-    $response->assertStatus(302);
+    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->code);
+    $response->assertStatus(409);
 
-    assertDatabaseEmpty('sites');
-    assertDatabaseEmpty('buildings');
-    assertDatabaseEmpty('floors');
-    assertDatabaseEmpty('maintainables');
+    // assertDatabaseEmpty('sites');
+    // assertDatabaseEmpty('buildings');
+    // assertDatabaseEmpty('floors');
+    // assertDatabaseEmpty('maintainables');
 });
 
 it('can update name and description of a document from a site ', function () {

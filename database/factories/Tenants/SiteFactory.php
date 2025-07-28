@@ -27,7 +27,9 @@ class SiteFactory extends Factory
         $location = LocationType::where('level', 'site')->first();
 
         return [
-            'location_type_id' => $location->id
+            'location_type_id' => $location->id,
+            'surface_floor' => fake()->numberBetween(100, 3000),
+            'surface_walls' => fake()->numberBetween(100, 3000)
         ];
     }
 

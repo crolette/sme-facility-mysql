@@ -22,6 +22,8 @@ class Floor extends Model
     protected $fillable = [
         'reference_code',
         'code',
+        'surface_floor',
+        'surface_walls',
         'location_type_id',
         'level_id'
     ];

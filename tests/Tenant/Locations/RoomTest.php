@@ -79,6 +79,8 @@ it('can create a new room', function () {
 
     $formData = [
         'name' => 'New room',
+        'surface_floor' => 2569.12,
+        'surface_walls' => 256.9,
         'description' => 'Description new room',
         'levelType' => $this->floor->id,
         'locationType' => $location->id
@@ -100,6 +102,8 @@ it('can create a new room', function () {
     assertDatabaseHas('rooms', [
         'location_type_id' => $location->id,
         'code' => $location->prefix . '001',
+        'surface_floor' => 2569.12,
+        'surface_walls' => 256.9,
         'reference_code' => $this->floor->reference_code . '-' . $location->prefix . '001',
         'level_id' => $this->floor->id
     ]);
@@ -215,6 +219,8 @@ it('can update a room maintainable', function () {
 
     $formData = [
         'name' => 'New room',
+        'surface_floor' => 2569.12,
+        'surface_walls' => 256.9,
         'description' => 'Description new room',
         'levelType' => $this->floor->id,
         'locationType' => $locationType->id
@@ -233,6 +239,8 @@ it('can update a room maintainable', function () {
     assertDatabaseHas('rooms', [
         'location_type_id' => $locationType->id,
         'level_id' => $this->floor->id,
+        'surface_floor' => 2569.12,
+        'surface_walls' => 256.9,
         'code' => $locationType->prefix . '001',
         'reference_code' => $this->floor->reference_code . '-' . $locationType->prefix . '001',
     ]);
@@ -284,7 +292,7 @@ it('can delete a room and his maintainable', function () {
         'code' => $room->code
     ]);
 
-    $response = $this->deleteFromTenant('tenant.rooms.destroy', $room->id);
+    $response = $this->deleteFromTenant('tenant.rooms.destroy', $room->code);
     $response->assertStatus(302);
     assertDatabaseMissing('rooms', [
         'reference_code' => $room->reference_code

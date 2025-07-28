@@ -25,6 +25,8 @@ class BuildingFactory extends Factory
 
 
         return [
+            'surface_floor' => fake()->numberBetween(100, 3000),
+            'surface_walls' => fake()->numberBetween(100, 3000),
             'location_type_id' => $location->id,
             'level_id' => $siteLocation->id
 

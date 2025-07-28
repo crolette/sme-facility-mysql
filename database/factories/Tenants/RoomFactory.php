@@ -34,6 +34,8 @@ class RoomFactory extends Factory
         $code = $level->reference_code . '-' .  $codeNumber;
 
         return [
+            'surface_floor' => fake()->numberBetween(100, 3000),
+            'surface_walls' => fake()->numberBetween(100, 3000),
             'reference_code' => $code,
             'code' => $codeNumber,
         ];

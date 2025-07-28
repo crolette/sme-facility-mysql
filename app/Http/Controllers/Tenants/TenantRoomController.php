@@ -126,6 +126,11 @@ class TenantRoomController extends Controller
         try {
             DB::beginTransaction();
 
+            $room->update([
+                'surface_floor' => $roomRequest->validated('surface_floor'),
+                'surface_walls' => $roomRequest->validated('surface_walls'),
+            ]);
+
             $room->maintainable()->update($maintainableRequest->validated());
 
             DB::commit();
@@ -145,8 +150,8 @@ class TenantRoomController extends Controller
     public function destroy(Room $room)
     {
 
-        if ($room->assets) {
-            return redirect()->route('tenant.rooms.index')->with(['message' => 'Room cannot be deleted ! Assets are linked to this room', 'type' => 'warning']);
+        if (count($room->assets) > 0) {
+            abort(409)->with(['message' => 'Room cannot be deleted ! Assets are linked to this room', 'type' => 'warning']);
         }
 
 

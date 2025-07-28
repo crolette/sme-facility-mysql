@@ -61,6 +61,8 @@ it('can render the create floor page', function () {
 it('can create a new floor', function () {
     $formData = [
         'name' => 'New floor',
+        'surface_floor' => 2569.12,
+        'surface_walls' => 256.9,
         'description' => 'Description new floor',
         'levelType' => $this->building->id,
         'locationType' => $this->floorType->id
@@ -81,6 +83,8 @@ it('can create a new floor', function () {
     assertDatabaseHas('floors', [
         'location_type_id' => $this->floorType->id,
         'code' => $this->floorType->prefix . '01',
+        'surface_floor' => 2569.12,
+        'surface_walls' => 256.9,
         'reference_code' => $this->building->reference_code . '-' . $this->floorType->prefix . '01',
         'level_id' => $this->building->id
     ]);
@@ -182,6 +186,8 @@ it('can update a floor maintainable', function () {
 
     $formData = [
         'name' => 'New floor',
+        'surface_floor' => 2569.12,
+        'surface_walls' => 256.9,
         'description' => 'Description new floor',
         'levelType' => $this->building->id,
         'locationType' => $this->floorType->id
@@ -200,6 +206,8 @@ it('can update a floor maintainable', function () {
         'location_type_id' => $this->floorType->id,
         'level_id' => $this->building->id,
         'code' => $this->floorType->prefix . '01',
+        'surface_floor' => 2569.12,
+        'surface_walls' => 256.9,
         'reference_code' => $this->building->reference_code . '-' . $this->floorType->prefix . '01',
     ]);
 
@@ -258,7 +266,7 @@ it('can delete a floor and his maintainable', function () {
         'code' => $floor->code
     ]);
 
-    $response = $this->deleteFromTenant('tenant.floors.destroy', $floor->id);
+    $response = $this->deleteFromTenant('tenant.floors.destroy', $floor->code);
     $response->assertStatus(302);
     assertDatabaseMissing('floors', [
         'reference_code' => $floor->reference_code

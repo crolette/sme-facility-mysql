@@ -38,6 +38,7 @@ class AssetRequest extends FormRequest
         $rules = [
             'locationType' => ['nullable', 'in:site,building,floor,room'],
             'locationId' => ['nullable'],
+            'surface' => 'nullable|numeric|gt:0|decimal:0,2',
             'locationReference' => ['nullable'],
             'categoryId' => ['required', Rule::in(CategoryType::where('category', 'asset')->pluck('id')->toArray())],
             'model' => ['nullable', 'string', 'max:100'],

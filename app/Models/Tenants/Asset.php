@@ -24,6 +24,7 @@ class Asset extends Model
 
     protected $fillable = [
         'code',
+        'surface',
         'reference_code',
         'serial_number',
         'brand',
