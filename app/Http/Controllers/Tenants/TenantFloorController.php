@@ -57,7 +57,7 @@ class TenantFloorController extends Controller
             $floorType = LocationType::find($floorRequest->validated('locationType'));
             $count = Floor::where('location_type_id', $floorType->id)->where('level_id', $building->id)->count();
 
-            $codeNumber = generateCodeNumber($count, $floorType->prefix);
+            $codeNumber = generateCodeNumber($count + 1, $floorType->prefix);
 
             $referenceCode = $building->reference_code . '-' . $codeNumber;
 

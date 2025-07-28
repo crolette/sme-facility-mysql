@@ -30,6 +30,7 @@ use App\Http\Requests\Tenant\FileUploadRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Models\Tenants\Company;
 
 class TenantAssetController extends Controller
 {
@@ -72,7 +73,7 @@ class TenantAssetController extends Controller
                 $location = Room::where('id', $assetRequest->validated('locationId'))->where('reference_code', $assetRequest->validated('locationReference'))->first();
             }
 
-            $count = Asset::withTrashed()->count();
+            $count = Company::incrementAndGetAssetNumber();
             $codeNumber = generateCodeNumber($count, 'A', 4);
 
             $referenceCode = $location->reference_code . '-' . $codeNumber;

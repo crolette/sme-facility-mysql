@@ -53,6 +53,7 @@ export interface TenantSite {
     id: number;
     code: string;
     label: string;
+    qr_code: string;
     reference_code: string;
     surface_walls: number;
     surface_floor: number;

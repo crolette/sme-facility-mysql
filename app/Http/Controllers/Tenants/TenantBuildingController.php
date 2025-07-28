@@ -62,7 +62,7 @@ class TenantBuildingController extends Controller
             $buildingType = LocationType::find($buildingRequest->validated('locationType'));
             $count = Building::where('location_type_id', $buildingType->id)->where('level_id', $site->id)->count();
 
-            $code = generateCodeNumber($count, $buildingType->prefix);
+            $code = generateCodeNumber($count + 1, $buildingType->prefix);
             $referenceCode = $site->reference_code . '-' . $code;
 
             $building = Building::create([

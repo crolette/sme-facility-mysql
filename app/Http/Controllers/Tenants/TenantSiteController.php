@@ -58,7 +58,7 @@ class TenantSiteController extends Controller
             $locationType = LocationType::find($siteRequest->validated('locationType'));
             $count = Site::where('location_type_id', $locationType->id)->count();
 
-            $codeNumber = generateCodeNumber($count, $locationType->prefix);
+            $codeNumber = generateCodeNumber($count + 1, $locationType->prefix);
 
             $site = Site::create([
                 'code' => $codeNumber,

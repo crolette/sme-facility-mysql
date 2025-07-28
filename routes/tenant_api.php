@@ -99,16 +99,17 @@ Route::prefix('api/v1')->group(
                 Route::delete('assets/{assetId}/force', [ForceDeleteAssetController::class, 'forceDelete'])->name('api.tenant.assets.force');
 
                 // Get the qr code
-                Route::get('/assets/{asset}/qr/show', function (Asset $asset) {
+                Route::get('/qr/show', function (Request $request) {
 
-                    $path = $asset->qr_code;
+                    Debugbar::info($request);
+                    $path = $request->path;
 
                     if (! Storage::disk('tenants')->exists($path)) {
                         abort(404);
                     }
 
                     return response()->file(Storage::disk('tenants')->path($path));
-                })->name('api.assets.qr.show');
+                })->name('api.qr.show');
 
                 // Get all documents from a site
                 Route::get('/sites/{site}/documents/', function (Site $site) {

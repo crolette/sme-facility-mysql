@@ -2,10 +2,11 @@
 
 namespace Database\Factories\Tenants;
 
-use App\Models\Central\AssetCategory;
-use App\Models\Central\CategoryType;
 use App\Models\Tenants\Asset;
+use App\Models\Tenants\Company;
+use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
+use App\Models\Central\AssetCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -38,7 +39,7 @@ class AssetFactory extends Factory
     public function forLocation($location): static
     {
         return $this->for($location, 'location')->state(function () use ($location) {
-            $count = Asset::count();
+            $count = Company::incrementAndGetTicketNumber();
 
             $codeNumber = generateCodeNumber($count, 'A', 4);
 

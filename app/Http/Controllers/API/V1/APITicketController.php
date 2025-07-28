@@ -7,6 +7,7 @@ use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Ticket;
+use App\Models\Tenants\Company;
 use App\Services\PictureService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -39,7 +40,7 @@ class APITicketController extends Controller
         try {
             DB::beginTransaction();
 
-            $count = Ticket::all()->count();
+            $count = Company::incrementAndGetTicketNumber();
             $codeNumber = generateCodeNumber($count, 'TK', 4);
 
             $ticket = new Ticket(

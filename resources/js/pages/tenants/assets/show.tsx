@@ -70,9 +70,11 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                 <p>Brand : {asset.brand}</p>
                 <p>Model : {asset.model}</p>
                 <p>Serial number : {asset.serial_number}</p>
-                <a href={route('api.assets.qr.show', asset.code)} download className="w cursor-pointer">
-                    <img src={route('api.assets.qr.show', asset.code)} alt="" className="h-20 w-20" />
-                </a>
+                {asset.qr_code && (
+                    <a href={route('api.qr.show', { path: asset.qr_code })} download className="w cursor-pointer">
+                        <img src={route('api.qr.show', { path: asset.qr_code })} alt="" className="h-32 w-32" />
+                    </a>
+                )}
 
                 <TicketManager itemCode={asset.code} getTicketsUrl={`api.assets.tickets`} locationType="assets" />
                 <DocumentManager

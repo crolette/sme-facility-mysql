@@ -30,6 +30,11 @@ export default function ShowLocation({ location, routeName }: { location: Tenant
                 <p>{location.maintainable?.description}</p>
                 <p>Surface floor: {location.surface_floor}</p>
                 <p>Surface walls: {location.surface_walls}</p>
+                {location.qr_code && (
+                    <a href={route(`api.qr.show`, { path: location.qr_code })} download className="w cursor-pointer">
+                        <img src={route('api.qr.show', { path: location.qr_code })} alt="" className="h-32 w-32" />
+                    </a>
+                )}
                 <TicketManager itemCode={location.code} getTicketsUrl={`api.${routeName}.tickets`} locationType={routeName} />
                 <DocumentManager
                     itemCodeId={location.code}
