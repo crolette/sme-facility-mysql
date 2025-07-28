@@ -27,6 +27,7 @@ use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Services\DocumentService;
 use App\Services\PictureService;
+use App\Services\QRService;
 
 class TenantAssetController extends Controller
 {
@@ -52,7 +53,7 @@ class TenantAssetController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, DocumentService $documentService)
+    public function store(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, DocumentService $documentService, QRService $qrService)
     {
 
         try {
@@ -80,6 +81,8 @@ class TenantAssetController extends Controller
                 'reference_code' => $referenceCode
             ]);
 
+
+
             $asset->assetCategory()->associate($assetRequest->validated('categoryId'));
             $asset->location()->associate($location);
 
@@ -99,6 +102,7 @@ class TenantAssetController extends Controller
                 $pictureService->uploadAndAttachPictures($asset, $pictures);
             }
 
+            $qrService->createAndAttachQR($asset);
 
             DB::commit();
 
@@ -138,7 +142,7 @@ class TenantAssetController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, Asset $asset,)
+    public function update(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, Asset $asset)
     {
         try {
             DB::beginTransaction();

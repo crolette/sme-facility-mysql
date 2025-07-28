@@ -28,7 +28,8 @@ class Asset extends Model
         'reference_code',
         'serial_number',
         'brand',
-        'model'
+        'model',
+        'qr_code'
     ];
 
     protected $hidden = [
@@ -57,6 +58,7 @@ class Asset extends Model
 
         static::forceDeleting(function ($asset) {
             $asset->maintainable()->delete();
+            $asset->tickets()->delete();
         });
     }
 

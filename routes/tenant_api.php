@@ -44,6 +44,9 @@ Route::prefix('api/v1')->group(
             Route::middleware(['auth'])->group(function () {
                 Route::get('/locations', [ApiSearchLocationController::class, 'index'])->name('api.locations');
 
+                Route::get('/assets', function () {
+                    return ApiResponse::success(Asset::all());
+                });
                 Route::get('/assets/trashed', [ApiSearchTrashedAssetController::class, 'index'])->name('api.assets.trashed');
 
                 // Get all the documents from an asset
@@ -94,6 +97,18 @@ Route::prefix('api/v1')->group(
 
                 // Force delete a soft deleted asset
                 Route::delete('assets/{assetId}/force', [ForceDeleteAssetController::class, 'forceDelete'])->name('api.tenant.assets.force');
+
+                // Get the qr code
+                Route::get('/assets/{asset}/qr/show', function (Asset $asset) {
+
+                    $path = $asset->qr_code;
+
+                    if (! Storage::disk('tenants')->exists($path)) {
+                        abort(404);
+                    }
+
+                    return response()->file(Storage::disk('tenants')->path($path));
+                })->name('api.assets.qr.show');
 
                 // Get all documents from a site
                 Route::get('/sites/{site}/documents/', function (Site $site) {
@@ -310,6 +325,7 @@ Route::prefix('api/v1')->group(
 
                     return response()->file(Storage::disk('tenants')->path($path));
                 })->name('api.pictures.show');
+
 
                 // Delete a specific picture
                 Route::delete('/pictures/{picture}', [DestroyPictureController::class, 'destroy'])->name('api.pictures.delete');

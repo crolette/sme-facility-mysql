@@ -5,7 +5,7 @@ import { Head } from '@inertiajs/react';
 export default function CreateTicket({ ticket, statuses }: { ticket?: Ticket; statuses: string[] }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Edit ticket`,
+            title: `Create ticket`,
             href: `/tickets/edit`,
         },
     ];
