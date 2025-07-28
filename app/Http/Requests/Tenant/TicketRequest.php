@@ -56,7 +56,7 @@ class TicketRequest extends FormRequest
         return [
             'ticket_id' => ['nullable', 'integer', Rule::exists('tickets', 'id')],
             'location_type' => ['nullable', 'string', Rule::in(['sites', 'buildings', 'floors', 'rooms', 'assets'])],
-            'location_id' => ['nullable', 'integer'],
+            'location_code' => ['nullable', 'string'],
             'status' => ['required', 'string', Rule::in(...$statuses)],
             'description' => ['required', 'string', 'min:10'],
             'being_notified' => ['required', 'boolean'],
@@ -68,8 +68,8 @@ class TicketRequest extends FormRequest
 
     public function withValidator($validator)
     {
-        $validator->sometimes('location_id', [
-            'exists:' . $this->input('location_type') . ',id'
+        $validator->sometimes('location_code', [
+            'exists:' . $this->input('location_type') . ',code'
         ], function () {
             return in_array($this->input('location_type'), ['sites', 'buildings', 'floors', 'rooms', 'assets']);
         });

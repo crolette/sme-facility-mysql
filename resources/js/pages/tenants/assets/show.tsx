@@ -15,7 +15,9 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
         },
     ];
 
-    const { post, delete: destroy } = useForm();
+    console.log(asset);
+
+    const { get, post, delete: destroy } = useForm();
 
     const deleteAsset = (asset: Asset) => {
         destroy(route(`tenant.assets.destroy`, asset.code));
@@ -54,10 +56,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                             </Button>
                         </>
                     )}
-
-                    {/* <a href={route(`tenant.tickets.create`)}> */}
-
-                    {/* </a> */}
                 </div>
                 <p>Code : {asset.code}</p>
                 <p>Reference code : {asset.reference_code}</p>
@@ -72,8 +70,11 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                 <p>Brand : {asset.brand}</p>
                 <p>Model : {asset.model}</p>
                 <p>Serial number : {asset.serial_number}</p>
+                <a href={route('api.assets.qr.show', asset.code)} download className="w cursor-pointer">
+                    <img src={route('api.assets.qr.show', asset.code)} alt="" className="h-20 w-20" />
+                </a>
 
-                <TicketManager itemCodeId={asset.code} getTicketsUrl={`api.assets.tickets`} locationType="assets" itemId={asset.id} />
+                <TicketManager itemCode={asset.code} getTicketsUrl={`api.assets.tickets`} locationType="assets" />
                 <DocumentManager
                     itemCodeId={asset.code}
                     getDocumentsUrl={`api.assets.documents`}

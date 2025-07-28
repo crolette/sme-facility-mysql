@@ -35,7 +35,7 @@ class APITicketController extends Controller
 
     public function store(TicketRequest $request, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService)
     {
-
+        Debugbar::info($request->validated());
         try {
             DB::beginTransaction();
 
@@ -64,7 +64,7 @@ class APITicketController extends Controller
                 'sites'     => \App\Models\Tenants\Site::class,
             ];
 
-            $location = $models[$request->validated('location_type')]::find($request->validated('location_id'));
+            $location = $models[$request->validated('location_type')]::where('code', $request->validated('location_code'))->first();
 
             $ticket->ticketable()->associate($location);
 
@@ -105,7 +105,7 @@ class APITicketController extends Controller
             ];
 
             if ($models[$request->validated('location_type')] !== get_class($ticket->ticketable)) {
-                $location = $models[$request->validated('location_type')]::find($request->validated('location_id'));
+                $location = $models[$request->validated('location_type')]::where('code', $request->validated('location_code'))->first();
                 $ticket->ticketable()->dissociate();
                 $ticket->ticketable()->associate($location);
 
@@ -124,8 +124,12 @@ class APITicketController extends Controller
 
     public function changeStatus(Request $request, Ticket $ticket)
     {
-        Debugbar::info($request, $request->status);
+
         if (in_array($request->status, ['open', 'closed', 'ongoing'])) {
+            if ($request->status === 'closed') {
+                $ticket->closeTicket();
+                return ApiResponse::success(null, 'Ticket closed');
+            }
             $ticket->update(['status' => $request->status]);
             return ApiResponse::success(null, 'Ticket updated');
         }
@@ -134,15 +138,15 @@ class APITicketController extends Controller
     }
 
 
-    public function close(Ticket $ticket)
-    {
-        try {
-            $response = $ticket->closeTicket();
-            return ApiResponse::success(null, 'Ticket closed');
-        } catch (Exception $e) {
-            return ApiResponse::error('Error during Ticket closing', [$e->getMessage()]);
-        }
+    // public function close(Ticket $ticket)
+    // {
+    //     try {
+    //         $response = $ticket->closeTicket();
+    //         return ApiResponse::success(null, 'Ticket closed');
+    //     } catch (Exception $e) {
+    //         return ApiResponse::error('Error during Ticket closing', [$e->getMessage()]);
+    //     }
 
-        return ApiResponse::error('Error during Ticket closing');
-    }
+    //     return ApiResponse::error('Error during Ticket closing');
+    // }
 }

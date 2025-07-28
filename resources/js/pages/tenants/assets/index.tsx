@@ -6,7 +6,7 @@ import { Asset, BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
-export default function IndexAssets({ assets }: { assets: Asset[] }) {
+export default function IndexAssets() {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index assets`,
@@ -14,26 +14,64 @@ export default function IndexAssets({ assets }: { assets: Asset[] }) {
         },
     ];
 
+    const [assets, setAssets] = useState<Asset[]>();
+
+    useEffect(() => {
+        fetchAssets();
+    }, []);
+
     const [activeAssetsTab, setActiveAssetsTab] = useState(true);
     const [trashedAssetsTab, setTrashedAssetsTab] = useState(false);
 
     const { post, delete: destroy } = useForm();
 
     const deleteDefinitelyAsset = (asset: Asset) => {
-        destroy(route(`api.tenant.assets.force`, asset.id));
+        destroy(route(`api.tenant.assets.force`, asset.id), {
+            onSuccess: () => {
+                setTrashedAssetsTab(true);
+                setActiveAssetsTab(false);
+                fetchTrashedAssets();
+            },
+        });
     };
+
     const restoreAsset = (asset: Asset) => {
         post(route('api.tenant.assets.restore', asset.id), {
             onSuccess: () => {
                 setTrashedAssetsTab(!trashedAssetsTab);
                 setActiveAssetsTab(!activeAssetsTab);
                 setSearch('');
+                fetchAssets();
             },
         });
     };
 
+    const fetchAssets = async () => {
+        try {
+            const response = await fetch(`/api/v1/assets`);
+            const data = await response.json();
+            setAssets(data.data);
+        } catch (error) {
+            console.error('Erreur lors de la recherche :', error);
+        }
+    };
+
+    const fetchTrashedAssets = async () => {
+        try {
+            const response = await fetch(`/api/v1/assets/trashed`);
+            setTrashedAssets(await response.json());
+        } catch (error) {
+            console.error('Erreur lors de la recherche :', error);
+        }
+    };
+
     const deleteAsset = (asset: Asset) => {
-        destroy(route(`tenant.assets.destroy`, asset.code));
+        destroy(route(`tenant.assets.destroy`, asset.code), {
+            onSuccess: () => {
+                setSearch('');
+                fetchAssets();
+            },
+        });
     };
 
     const [search, setSearch] = useState('');

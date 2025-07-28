@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Tenants;
 
 use Exception;
 use Inertia\Inertia;
+use App\Services\QRService;
 use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
+use App\Services\QRCodeService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
@@ -20,6 +22,11 @@ use App\Http\Requests\Tenant\DocumentUploadRequest;
 
 class TenantSiteController extends Controller
 {
+
+    public function __construct(
+        protected QRCodeService $qrCodeService,
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -69,6 +76,8 @@ class TenantSiteController extends Controller
             if ($files) {
                 $documentService->uploadAndAttachDocuments($site, $files);
             }
+
+            $this->qrCodeService->createAndAttachQR($site);
 
             DB::commit();
             return redirect()->route('tenant.sites.index')->with(['message' => 'Site created', 'type' => 'success']);

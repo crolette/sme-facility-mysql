@@ -80,6 +80,7 @@ export interface Asset {
     id: number;
     code: string;
     surface: number;
+    qr_code: string;
     reference_code: string;
     location_id: number;
     location_type: string;

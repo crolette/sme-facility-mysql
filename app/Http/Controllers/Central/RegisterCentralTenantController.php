@@ -41,7 +41,6 @@ class RegisterCentralTenantController extends Controller
         $password = $tenantRequest->validated('password');
         session(['email' => $email, 'first_name' => $first_name, 'last_name' => $last_name, 'password' => $password]);
 
-
         $tenant = Tenant::create([...$tenantRequest->validated(), 'id' => $tenantRequest->validated('company_code')]);
 
         $tenant->domain()->create(['domain' => $tenantRequest->validated('domain_name')]);
