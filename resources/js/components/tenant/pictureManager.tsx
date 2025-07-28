@@ -72,7 +72,7 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
                 <div className="flex flex-wrap gap-4">
                     {pictures &&
                         pictures.length > 0 &&
-                        pictures.map((picture, index) => {
+                        pictures.map((picture, index) => { 
                             return (
                                 <div key={index} className="w-32">
                                     <a href={route(showRoute, picture.id)} download className="w cursor-pointer">

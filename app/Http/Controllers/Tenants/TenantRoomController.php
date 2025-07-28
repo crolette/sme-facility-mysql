@@ -7,6 +7,7 @@ use App\Models\LocationType;
 use App\Models\Tenants\Room;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Floor;
+use App\Services\QRCodeService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
@@ -19,6 +20,10 @@ use App\Http\Requests\Tenant\DocumentUploadRequest;
 
 class TenantRoomController extends Controller
 {
+    public function __construct(
+        protected QRCodeService $qrCodeService,
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -72,6 +77,8 @@ class TenantRoomController extends Controller
             if ($files) {
                 $documentService->uploadAndAttachDocuments($room, $files);
             }
+
+            $this->qrCodeService->createAndAttachQR($room);
 
             DB::commit();
 

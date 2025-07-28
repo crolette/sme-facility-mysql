@@ -57,14 +57,20 @@ Route::middleware([
 
     Route::get('/assets/{id}/deleted', [TenantAssetController::class, 'showDeleted'])->name('tenant.assets.deleted');
 
-    Route::get('/assets/{asset}/tickets/create', [AssetTicketController::class, 'create'])->name('tenant.assets.tickets.create');
+    Route::get('/assets/{asset}/tickets/create', [AssetTicketController::class, 'createFromAsset'])->name('tenant.assets.tickets.create');
+
+    Route::get('/sites/{site}/tickets/create', [AssetTicketController::class, 'createFromSite'])->name('tenant.sites.tickets.create');
+
+    Route::get('/buildings/{building}/tickets/create', [AssetTicketController::class, 'createFromBuilding'])->name('tenant.buildings.tickets.create');
+
+    Route::get('/floors/{floor}/tickets/create', [AssetTicketController::class, 'createFromFloor'])->name('tenant.floors.tickets.create');
+
+    Route::get('/rooms/{Room}/tickets/create', [AssetTicketController::class, 'createFromRoom'])->name('tenant.rooms.tickets.create');
 
 
     // TICKETS
     Route::prefix('tickets')->group(function () {
         Route::get('/', [TicketController::class, 'index'])->name('tenant.tickets.index');
-        // Route::get('/create', [TicketController::class, 'create'])->name('tenant.tickets.create');
-        // Route::get('/{ticket}/edit', [TicketController::class, 'create'])->name('tenant.tickets.edit');
         Route::get('/{ticket}', [TicketController::class, 'show'])->name('tenant.tickets.show');
     });
 
@@ -79,6 +85,27 @@ Route::middleware([
     // QR Code
     Route::get('/generate-qr', [QRCodeController::class, 'generate'])->name('qr-code');;
 });
+
+Route::middleware([
+    'web',
+    InitializeTenancyBySubdomain::class,
+    ScopeSessions::class,
+    PreventAccessFromCentralDomains::class,
+])->group(function () {
+
+    Route::get('/assets/{id}/deleted', [TenantAssetController::class, 'showDeleted'])->name('tenant.assets.deleted');
+
+    Route::get('/assets/{asset}/tickets/create', [AssetTicketController::class, 'createFromAsset'])->name('tenant.assets.tickets.create');
+
+    Route::get('/sites/{site}/tickets/create', [AssetTicketController::class, 'createFromSite'])->name('tenant.sites.tickets.create');
+
+    Route::get('/buildings/{building}/tickets/create', [AssetTicketController::class, 'createFromBuilding'])->name('tenant.buildings.tickets.create');
+
+    Route::get('/floors/{floor}/tickets/create', [AssetTicketController::class, 'createFromFloor'])->name('tenant.floors.tickets.create');
+
+    Route::get('/rooms/{Room}/tickets/create', [AssetTicketController::class, 'createFromRoom'])->name('tenant.rooms.tickets.create');
+});
+
 
 require __DIR__ . '/tenant_auth.php';
 require __DIR__ . '/tenant_api.php';

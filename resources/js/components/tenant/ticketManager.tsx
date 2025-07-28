@@ -10,8 +10,7 @@ import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 
 interface TicketManagerProps {
-    itemCodeId: number | string;
-    itemId?: number | string;
+    itemCode: string;
     getTicketsUrl: string;
     locationType: string;
 }
@@ -19,7 +18,7 @@ interface TicketManagerProps {
 type FormDataTicket = {
     ticket_id: number | null;
     location_type: string;
-    location_id: number;
+    location_code: string;
     description: string;
     reported_by: number;
     reporter_email: string;
@@ -27,7 +26,7 @@ type FormDataTicket = {
     pictures: File[];
 };
 
-export const TicketManager = ({ itemCodeId, getTicketsUrl, itemId = itemCodeId, locationType }: TicketManagerProps) => {
+export const TicketManager = ({ itemCode, getTicketsUrl, locationType }: TicketManagerProps) => {
     const auth = usePage().props.auth.user;
 
     const [tickets, setTickets] = useState<Ticket[]>();
@@ -35,9 +34,9 @@ export const TicketManager = ({ itemCodeId, getTicketsUrl, itemId = itemCodeId, 
     const [submitTypeTicket, setSubmitTypeTicket] = useState<'edit' | 'new'>('edit');
 
     const updateTicketData = {
-        ticket_id: '',
+        ticket_id: null,
         location_type: locationType,
-        location_id: itemId,
+        location_code: itemCode,
         being_notified: false,
         description: '',
         reported_by: auth.id,
@@ -53,7 +52,7 @@ export const TicketManager = ({ itemCodeId, getTicketsUrl, itemId = itemCodeId, 
 
     const fetchTickets = async () => {
         try {
-            const response = await axios.get(route(getTicketsUrl, itemCodeId));
+            const response = await axios.get(route(getTicketsUrl, itemCode));
             setTickets(await response.data.data);
         } catch (error) {
             console.error('Erreur lors de la recherche :', error);
@@ -107,6 +106,8 @@ export const TicketManager = ({ itemCodeId, getTicketsUrl, itemId = itemCodeId, 
             console.log(error);
         }
     };
+
+    console.log(newTicketData);
 
     const submitNewTicket: FormEventHandler = async (e) => {
         e.preventDefault();

@@ -25,6 +25,7 @@ class Building extends Model
     protected $fillable = [
         'reference_code',
         'code',
+        'qr_code',
         'surface_floor',
         'surface_walls',
         'location_type_id',

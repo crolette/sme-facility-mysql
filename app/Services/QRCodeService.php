@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
-class QRService
+class QRCodeService
 {
     public function createAndAttachQR(Model $model): void
     {
@@ -25,18 +25,10 @@ class QRService
         $qr = QrCode::format('png')
             ->size(300)
             ->margin(2)
-            ->generate(route('tenant.assets.tickets.create', $model->code));
+            ->generate(route('tenant.' . $modelType . '.tickets.create', $model->code));
 
         Storage::disk('tenants')->put($directory . $fileName, $qr);
 
         $model->update(['qr_code' => $directory . $fileName]);
-
-
-        // $document->documentCategory()->associate($file['typeId']);
-        // $document->uploader()->associate(Auth::guard('tenant')->user());
-        // $document->save();
-
-        // Attach to model (ensure polymorphic or many-to-many is set up accordingly)
-        // $model->documents()->attach($document);
     }
 };

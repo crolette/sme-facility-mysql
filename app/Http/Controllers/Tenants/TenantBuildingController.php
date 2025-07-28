@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
+use App\Services\QRCodeService;
 use App\Models\Tenants\Building;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
@@ -21,6 +22,11 @@ use App\Http\Requests\Tenant\TenantBuildingRequest;
 
 class TenantBuildingController extends Controller
 {
+
+    public function __construct(
+        protected QRCodeService $qrCodeService,
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -78,6 +84,8 @@ class TenantBuildingController extends Controller
             if ($files) {
                 $documentService->uploadAndAttachDocuments($building, $files);
             }
+
+            $this->qrCodeService->createAndAttachQR($building);
 
             DB::commit();
 

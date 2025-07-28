@@ -128,7 +128,7 @@ Route::prefix('api/v1')->group(
 
                 // Get all tickets from a site
                 Route::get('/sites/{site}/tickets/', function (Site $site) {
-                    return ApiResponse::success($site->load('tickets.pictures')->tickets, 'Document added');
+                    return ApiResponse::success($site->load('tickets.pictures')->tickets);
                 })->name('api.sites.tickets');
 
                 // Get all interventions from a site
@@ -138,7 +138,7 @@ Route::prefix('api/v1')->group(
 
                 // Get all pictures from a site
                 Route::get('/sites/{site}/pictures/', function (Site $site) {
-                    return ApiResponse::success($site->load('pictures')->pictures, 'Pictures added');
+                    return ApiResponse::success($site->load('pictures')->pictures);
                 })->name('api.sites.pictures');
 
                 // Post a new picture to a site

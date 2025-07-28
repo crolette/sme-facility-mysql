@@ -30,7 +30,7 @@ export default function ShowLocation({ location, routeName }: { location: Tenant
                 <p>{location.maintainable?.description}</p>
                 <p>Surface floor: {location.surface_floor}</p>
                 <p>Surface walls: {location.surface_walls}</p>
-                <TicketManager itemCodeId={location.code} getTicketsUrl={`api.${routeName}.tickets`} locationType={routeName} />
+                <TicketManager itemCode={location.code} getTicketsUrl={`api.${routeName}.tickets`} locationType={routeName} />
                 <DocumentManager
                     itemCodeId={location.code}
                     getDocumentsUrl={`api.${routeName}.documents`}

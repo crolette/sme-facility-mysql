@@ -74,7 +74,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                     <img src={route('api.assets.qr.show', asset.code)} alt="" className="h-20 w-20" />
                 </a>
 
-                <TicketManager itemCodeId={asset.code} getTicketsUrl={`api.assets.tickets`} locationType="assets" itemId={asset.id} />
+                <TicketManager itemCode={asset.code} getTicketsUrl={`api.assets.tickets`} locationType="assets" />
                 <DocumentManager
                     itemCodeId={asset.code}
                     getDocumentsUrl={`api.assets.documents`}

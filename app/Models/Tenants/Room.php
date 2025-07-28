@@ -21,6 +21,7 @@ class Room extends Model
 
     protected $fillable = [
         'code',
+        'qr_code',
         'surface_floor',
         'surface_walls',
         'reference_code'
