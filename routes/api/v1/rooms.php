@@ -8,6 +8,7 @@ use App\Services\DocumentService;
 use Illuminate\Support\Facades\Route;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Http\Controllers\API\V1\RelocateRoomController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 
 Route::middleware([
@@ -22,6 +23,8 @@ Route::middleware([
         // Route::middleware(['auth'])->group(function () {
 
         Route::prefix('{room}')->group(function () {
+
+            Route::patch('/relocate', [RelocateRoomController::class, 'relocateRoom'])->name('api.rooms.relocate');
 
             // Get all documents from a room
             Route::get('/assets/', function (Room $room) {

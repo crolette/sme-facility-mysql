@@ -22,6 +22,12 @@ class QRCodeService
         $directory = "$tenantId/$modelType/$modelId/qrcode/";
         $fileName = 'qr_'  . $model->code . '_' . Carbon::now()->isoFormat('YYYYMMDD')  . '.png';
 
+        $files = Storage::disk('tenants')->files($directory);
+
+        if (count($files) > 0) {
+            $this->deleteExistingQR($files);
+        }
+
         $qr = QrCode::format('png')
             ->size(300)
             ->margin(2)
@@ -30,5 +36,12 @@ class QRCodeService
         Storage::disk('tenants')->put($directory . $fileName, $qr);
 
         $model->update(['qr_code' => $directory . $fileName]);
+    }
+
+    public function deleteExistingQR($files)
+    {
+        foreach ($files as $file) {
+            Storage::disk('tenants')->delete($file);
+        }
     }
 };

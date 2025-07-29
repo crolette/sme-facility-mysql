@@ -56,6 +56,8 @@ export default function CreateLocation({
         files: selectedDocuments,
     });
 
+    console.log(data);
+
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         if (location) {

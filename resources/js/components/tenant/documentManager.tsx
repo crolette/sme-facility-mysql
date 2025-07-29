@@ -14,7 +14,7 @@ interface DocumentManagerProps {
     editRoute: string;
     deleteRoute: string;
     showRoute: string;
-    canAdd: boolean;
+    canAdd?: boolean;
 }
 
 type DocumentFormData = {

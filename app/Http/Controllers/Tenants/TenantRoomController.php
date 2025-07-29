@@ -60,7 +60,6 @@ class TenantRoomController extends Controller
             $count = Room::where('location_type_id', $roomType->id)->where('level_id', $floor->id)->count();
 
             $codeNumber = generateCodeNumber($count + 1, $roomType->prefix, 3);
-
             $referenceCode = $floor->reference_code . '-' . $codeNumber;
 
             $room->code = $codeNumber;

@@ -29,6 +29,7 @@ use App\Http\Controllers\Tenants\ForceDeleteAssetController;
 use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
 use App\Http\Controllers\API\V1\Tickets\InterventionForLocationController;
 use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
+use App\Models\LocationType;
 
 Route::prefix('/v1/')->group(
     function () {
@@ -65,6 +66,14 @@ Route::prefix('/v1/')->group(
 
                     return ApiResponse::success($documentTypes, 'Success');
                 })->name('api.category-types');
+
+                // Return the category location
+                Route::get('location-types/', function (Request $request) {
+                    $locationTypes = LocationType::where('level', $request->query('level'))->get();
+                    Debugbar::info($request->query('type'), $locationTypes);
+
+                    return ApiResponse::success($locationTypes, 'Success');
+                })->name('api.location-types');
 
                 // Route to get the documents from a tenant - to display on show page
                 Route::patch('/documents/{document}', [UpdateDocumentController::class, 'update'])->name('api.documents.update');

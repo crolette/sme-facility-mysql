@@ -3,19 +3,29 @@ import { DocumentManager } from '@/components/tenant/documentManager';
 import { InterventionManager } from '@/components/tenant/interventionManager';
 
 import { PictureManager } from '@/components/tenant/pictureManager';
+import RealocateRoomManager from '@/components/tenant/relocateRoomManager';
 import { TicketManager } from '@/components/tenant/ticketManager';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { TenantSite, type BreadcrumbItem } from '@/types';
+import { TenantBuilding, TenantFloor, TenantRoom, TenantSite, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
+import { useState } from 'react';
 
-export default function ShowLocation({ location, routeName }: { location: TenantSite; routeName: string }) {
+export default function ShowLocation({
+    location,
+    routeName,
+}: {
+    location: TenantSite | TenantBuilding | TenantFloor | TenantRoom;
+    routeName: string;
+}) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `${location.reference_code} - ${location.maintainable.name}`,
             href: ``,
         },
     ];
+
+    const [showModaleRelocateRoom, setShowModaleRelocateRoom] = useState<boolean>(false);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -24,7 +34,11 @@ export default function ShowLocation({ location, routeName }: { location: Tenant
                 <a href={route(`tenant.${routeName}.edit`, location.code)}>
                     <Button>Edit</Button>
                 </a>
+                <Button onClick={() => setShowModaleRelocateRoom(!showModaleRelocateRoom)}>Redefine room</Button>
             </div>
+            {routeName === 'rooms' && showModaleRelocateRoom && (
+                <RealocateRoomManager room={location} itemCode={location.code} onClose={() => setShowModaleRelocateRoom(false)} />
+            )}
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 {location.reference_code} - {location.code} - {location.location_type.label}
                 <p>{location.maintainable?.name}</p>

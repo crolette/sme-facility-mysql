@@ -9,7 +9,7 @@ interface PictureManagerProps {
     uploadRoute: string;
     deleteRoute: string;
     showRoute: string;
-    canAdd: boolean;
+    canAdd?: boolean;
 }
 
 export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, deleteRoute, showRoute, canAdd = true }: PictureManagerProps) => {

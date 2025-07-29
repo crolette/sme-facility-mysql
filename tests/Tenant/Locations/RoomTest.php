@@ -447,3 +447,75 @@ it('can retrieve all assets from a room', function () {
     $data = $response->json('data');
     $this->assertCount(2, $data);
 });
+
+it('can change location type of a room and related assets', function () {
+    $roomOne = Room::factory()
+        ->for(LocationType::where('level', 'room')->first())
+        ->for(Floor::first())
+        ->create();
+
+    $roomTwo = Room::factory()
+        ->for(LocationType::where('level', 'room')->first())
+        ->for(Floor::first())
+        ->create();
+
+    CategoryType::factory()->create(['category' => 'asset']);
+    $assetOne = Asset::factory()->forLocation($roomTwo)->create();
+    $assetTwo = Asset::factory()->forLocation($roomOne)->create();
+
+    $newLocationType = LocationType::factory()->create(['level' => 'room']);
+    $newLocationType = LocationType::factory()->create(['level' => 'room']);
+    // dump($newLocationType);
+
+    $formData = [
+        'locationType' => $newLocationType->id,
+        'assets' => [
+            [
+                'assetId' => $assetOne->id,
+                'locationType' => 'room',
+                'locationId' => $roomOne->id,
+            ],
+            [
+                'assetId' => $assetTwo->id,
+                'locationType' => 'room',
+                'locationId' => $roomTwo->id,
+            ]
+
+        ]
+    ];
+
+    $response = $this->patchToTenant('api.rooms.relocate', $formData, $roomOne);
+    $response->assertSessionHasNoErrors();
+
+    $roomOneChanged = Room::find($roomOne->id);
+
+    assertDatabaseHas(
+        'rooms',
+        [
+            'id' => $roomOne->id,
+            'location_type_id' => $newLocationType->id,
+            'code' => $newLocationType->prefix . '001',
+            'reference_code' => $roomOne->floor->reference_code . '-' . $newLocationType->prefix . '001'
+        ]
+    );
+
+    assertDatabaseHas(
+        'assets',
+        [
+            'id' => $assetOne->id,
+            'location_id' => $roomOneChanged->id,
+            'code' => $assetOne->code,
+            'reference_code' => $roomOneChanged->reference_code . '-' . $assetOne->code
+        ]
+    );
+
+    assertDatabaseHas(
+        'assets',
+        [
+            'id' => $assetTwo->id,
+            'location_id' => $roomTwo->id,
+            'code' => $assetTwo->code,
+            'reference_code' => $roomTwo->reference_code . '-' . $assetTwo->code
+        ]
+    );
+});

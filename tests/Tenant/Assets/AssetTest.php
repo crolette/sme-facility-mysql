@@ -76,9 +76,9 @@ it('can create a new asset to site', function () {
         'name' => 'New asset',
         'description' => 'Description new asset',
         'locationId' => $this->site->id,
-        'surface' => 12,
-        'locationReference' => $this->site->reference_code,
         'locationType' => 'site',
+        'locationReference' => $this->site->reference_code,
+        'surface' => 12,
         'categoryId' => $this->categoryType->id,
     ];
 
