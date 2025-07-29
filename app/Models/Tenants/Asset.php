@@ -8,6 +8,7 @@ use App\Models\Tenants\Intervention;
 use App\Models\Tenants\Maintainable;
 use App\Models\Central\AssetCategory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -52,9 +53,18 @@ class Asset extends Model
         return 'code';
     }
 
+
+
     public static function boot()
     {
         parent::boot();
+
+        static::deleting(function ($asset) {
+            $tickets = $asset->tickets;
+            foreach ($tickets as $ticket) {
+                $ticket->closeTicket();
+            }
+        });
 
         static::forceDeleting(function ($asset) {
             $asset->maintainable()->delete();

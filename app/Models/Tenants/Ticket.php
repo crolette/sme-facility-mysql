@@ -5,15 +5,16 @@ namespace App\Models\Tenants;
 use Carbon\Carbon;
 use App\Enums\TicketStatus;
 use App\Models\Tenants\User;
-use Barryvdh\Debugbar\Facades\Debugbar;
+use App\Models\Tenants\Asset;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Ticket extends Model
 {
@@ -33,10 +34,16 @@ class Ticket extends Model
     ];
 
     protected $with = [
-        'reporter',
-        'closer',
-        'interventions'
+        'reporter:id,first_name,last_name',
+        'reporter:id,first_name,last_name',
+        'interventions',
     ];
+
+    protected $hidden = [
+        'reported_by',
+        'ticketable_id',
+    ];
+
 
     protected function casts(): array
     {
@@ -47,6 +54,7 @@ class Ticket extends Model
             'being_notified' => 'boolean'
         ];
     }
+
 
     public function reporter(): BelongsTo
     {
@@ -66,7 +74,7 @@ class Ticket extends Model
     // Asset, Site, Building, Floor, Room
     public function ticketable(): MorphTo
     {
-        return $this->morphTo();
+        return $this->morphTo()->withTrashed();
     }
 
     public function pictures(): MorphMany
@@ -87,7 +95,7 @@ class Ticket extends Model
     public function assetCode(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->ticketable->code
+            get: fn() => $this->ticketable->code ?? "Deleted"
         );
     }
 

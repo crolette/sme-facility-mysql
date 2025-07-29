@@ -13,6 +13,7 @@ interface TicketManagerProps {
     itemCode: string;
     getTicketsUrl: string;
     locationType: string;
+    canAdd?: boolean;
 }
 
 type FormDataTicket = {
@@ -26,7 +27,7 @@ type FormDataTicket = {
     pictures: File[];
 };
 
-export const TicketManager = ({ itemCode, getTicketsUrl, locationType }: TicketManagerProps) => {
+export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = true }: TicketManagerProps) => {
     const auth = usePage().props.auth.user;
 
     const [tickets, setTickets] = useState<Ticket[]>();
@@ -131,15 +132,17 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType }: TicketM
             <details>
                 <summary className="bg-red-5 border-2 p-2">
                     <h3 className="inline">Tickets ({tickets?.length ?? 0})</h3>
-                    <Button
-                        className=""
-                        onClick={() => {
-                            setSubmitTypeTicket('new');
-                            setAddTicketModal(!addTicketModal);
-                        }}
-                    >
-                        Add new ticket
-                    </Button>
+                    {canAdd && (
+                        <Button
+                            className=""
+                            onClick={() => {
+                                setSubmitTypeTicket('new');
+                                setAddTicketModal(!addTicketModal);
+                            }}
+                        >
+                            Add new ticket
+                        </Button>
+                    )}
                 </summary>
                 {tickets && tickets?.length > 0 && (
                     <Table>

@@ -1,3 +1,4 @@
+import { AssetManager } from '@/components/tenant/assetManager';
 import { DocumentManager } from '@/components/tenant/documentManager';
 import { InterventionManager } from '@/components/tenant/interventionManager';
 
@@ -35,6 +36,7 @@ export default function ShowLocation({ location, routeName }: { location: Tenant
                         <img src={route('api.qr.show', { path: location.qr_code })} alt="" className="h-32 w-32" />
                     </a>
                 )}
+                <AssetManager itemCode={location.code} type={routeName} />
                 <TicketManager itemCode={location.code} getTicketsUrl={`api.${routeName}.tickets`} locationType={routeName} />
                 <DocumentManager
                     itemCodeId={location.code}

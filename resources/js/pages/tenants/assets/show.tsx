@@ -76,24 +76,38 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                     </a>
                 )}
 
-                <TicketManager itemCode={asset.code} getTicketsUrl={`api.assets.tickets`} locationType="assets" />
-                <DocumentManager
-                    itemCodeId={asset.code}
-                    getDocumentsUrl={`api.assets.documents`}
-                    editRoute={`api.documents.update`}
-                    uploadRoute={`api.assets.documents.post`}
-                    deleteRoute={`api.documents.delete`}
-                    showRoute={'api.documents.show'}
-                />
+                <>
+                    <TicketManager
+                        itemCode={asset.code}
+                        getTicketsUrl={`api.assets.tickets`}
+                        locationType="assets"
+                        canAdd={asset.deleted_at == null ? true : false}
+                    />
+                    <DocumentManager
+                        itemCodeId={asset.code}
+                        getDocumentsUrl={`api.assets.documents`}
+                        editRoute={`api.documents.update`}
+                        uploadRoute={`api.assets.documents.post`}
+                        deleteRoute={`api.documents.delete`}
+                        showRoute={'api.documents.show'}
+                        canAdd={asset.deleted_at == null ? true : false}
+                    />
 
-                <PictureManager
-                    itemCodeId={asset.code}
-                    getPicturesUrl={`api.assets.pictures`}
-                    uploadRoute={`api.assets.pictures.post`}
-                    deleteRoute={`api.pictures.delete`}
-                    showRoute={'api.pictures.show'}
-                />
-                <InterventionManager itemCodeId={asset.code} getInterventionsUrl="api.assets.interventions" type="asset" />
+                    <PictureManager
+                        itemCodeId={asset.code}
+                        getPicturesUrl={`api.assets.pictures`}
+                        uploadRoute={`api.assets.pictures.post`}
+                        deleteRoute={`api.pictures.delete`}
+                        showRoute={'api.pictures.show'}
+                        canAdd={asset.deleted_at == null ? true : false}
+                    />
+                    <InterventionManager
+                        itemCodeId={asset.code}
+                        getInterventionsUrl="api.assets.interventions"
+                        type="asset"
+                        closed={asset.deleted_at == null ? false : true}
+                    />
+                </>
             </div>
 
             {/* {addPictures && addNewPicturesModal()} */}

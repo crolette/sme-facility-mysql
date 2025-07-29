@@ -15,6 +15,8 @@ export default function ShowTicket({ ticket }: { ticket: Ticket }) {
         },
     ];
 
+    console.log(ticket);
+
     const [ticketItem, setTicketItem] = useState(ticket);
 
     const fetchTicket = async () => {
@@ -55,7 +57,7 @@ export default function ShowTicket({ ticket }: { ticket: Ticket }) {
                         Close
                     </Button>
                 )}
-                {ticketItem.status === 'closed' && (
+                {!ticketItem.ticketable.deleted_at && ticketItem.status === 'closed' && (
                     <Button variant={'green'} onClick={() => changeStatusTicket(ticketItem.id, 'open')}>
                         Re-open
                     </Button>

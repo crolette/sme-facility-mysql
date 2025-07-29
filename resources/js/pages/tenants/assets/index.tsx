@@ -4,6 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { Asset, BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 
 export default function IndexAssets() {
@@ -48,9 +49,8 @@ export default function IndexAssets() {
 
     const fetchAssets = async () => {
         try {
-            const response = await fetch(`/api/v1/assets`);
-            const data = await response.json();
-            setAssets(data.data);
+            const response = await axios.get(route('api.assets.index'));
+            setAssets(response.data.data);
         } catch (error) {
             console.error('Erreur lors de la recherche :', error);
         }
@@ -58,8 +58,8 @@ export default function IndexAssets() {
 
     const fetchTrashedAssets = async () => {
         try {
-            const response = await fetch(`/api/v1/assets/trashed`);
-            setTrashedAssets(await response.json());
+            const response = await axios.get(route('api.assets.trashed'));
+            setTrashedAssets(response.data.data);
         } catch (error) {
             console.error('Erreur lors de la recherche :', error);
         }
@@ -77,6 +77,7 @@ export default function IndexAssets() {
     const [search, setSearch] = useState('');
     const [trashedAssets, setTrashedAssets] = useState<Asset[]>();
     const [debouncedSearch, setDebouncedSearch] = useState(search);
+
     useEffect(() => {
         const handler = setTimeout(() => {
             setDebouncedSearch(search);
@@ -90,8 +91,8 @@ export default function IndexAssets() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`/api/v1/assets/trashed?q=${debouncedSearch}`);
-                setTrashedAssets(await response.json());
+                const response = await axios.get(route('api.assets.trashed', { q: debouncedSearch }));
+                setTrashedAssets(await response.data.data);
             } catch (error) {
                 console.error('Erreur lors de la recherche :', error);
             }
@@ -130,7 +131,7 @@ export default function IndexAssets() {
             </div>
             {activeAssetsTab && (
                 <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                    <a href={route(`tenant.assets.create`)}>
+                    <a href={route(`tenant.assets.create`)} className="w-fit">
                         <Button>Create</Button>
                     </a>
                     <Table>

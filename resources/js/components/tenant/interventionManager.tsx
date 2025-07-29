@@ -186,6 +186,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         setActionsChanged(false);
     }, [actionsChanged === true]);
 
+    console.log(closed);
     return (
         <div>
             <p>Interventions ({interventions.length})</p>

@@ -21,12 +21,14 @@ class APITicketController extends Controller
     public function index(Request $request)
     {
         $status = $request->query('status');
-        if ($status != null) {
-            $tickets = Ticket::where('status', $status)->get()->load('pictures');
+
+        if ($status !== null) {
+            $tickets = Ticket::where('status', $status)->get();
         } else {
-            $tickets = Ticket::all()->load('pictures');
+            $tickets = Ticket::all();
         }
-        return ApiResponse::success($tickets, 'Ticket created');
+
+        return ApiResponse::success($tickets, 'Ticket index');
     }
 
     public function show(Ticket $ticket)

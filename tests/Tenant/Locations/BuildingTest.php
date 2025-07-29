@@ -9,6 +9,7 @@ use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
+use App\Models\Tenants\Asset;
 use Illuminate\Support\Facades\Storage;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -23,8 +24,6 @@ beforeEach(function () {
 });
 
 it('can render the index buildings page', function () {
-
-
     LocationType::factory()->count(1)->create(['level' => 'site']);
     LocationType::factory()->count(2)->create(['level' => 'building']);
     Site::factory()->create();
@@ -383,6 +382,24 @@ it('can retrieve all pictures from a building', function () {
     assertDatabaseCount('pictures', 2);
 
     $response = $this->getFromTenant('api.buildings.pictures', $building);
+    $response->assertStatus(200);
+    $data = $response->json('data');
+    $this->assertCount(2, $data);
+});
+
+it('can retrieve all assets from a building', function () {
+    LocationType::factory()->create(['level' => 'site']);
+    LocationType::factory()->create(['level' => 'building']);
+    LocationType::factory()->create(['level' => 'floor']);
+    Site::factory()->create();
+    $building = Building::factory()->create();
+
+    CategoryType::factory()->create(['category' => 'asset']);
+    Asset::factory()->forLocation($building)->create();
+    Asset::factory()->forLocation($building)->create();
+
+
+    $response = $this->getFromTenant('api.buildings.assets', $building);
     $response->assertStatus(200);
     $data = $response->json('data');
     $this->assertCount(2, $data);

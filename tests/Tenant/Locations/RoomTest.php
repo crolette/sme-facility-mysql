@@ -4,9 +4,10 @@ use App\Models\LocationType;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
+use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
-use App\Models\Tenants\Picture;
 
+use App\Models\Tenants\Picture;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use Illuminate\Http\UploadedFile;
@@ -425,6 +426,23 @@ it('can retrieve all pictures from a room', function () {
     assertDatabaseCount('pictures', 2);
 
     $response = $this->getFromTenant('api.rooms.pictures', $room);
+    $response->assertStatus(200);
+    $data = $response->json('data');
+    $this->assertCount(2, $data);
+});
+
+it('can retrieve all assets from a room', function () {
+    $room = Room::factory()
+        ->for(LocationType::where('level', 'room')->first())
+        ->for(Floor::first())
+        ->create();
+
+    CategoryType::factory()->create(['category' => 'asset']);
+
+    Asset::factory()->forLocation($room)->create();
+    Asset::factory()->forLocation($room)->create();
+
+    $response = $this->getFromTenant('api.rooms.assets', $room);
     $response->assertStatus(200);
     $data = $response->json('data');
     $this->assertCount(2, $data);
