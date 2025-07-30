@@ -49,7 +49,6 @@ Route::prefix('/v1/')->group(
                 // Get the qr code
                 Route::get('/qr/show', function (Request $request) {
 
-                    Debugbar::info($request);
                     $path = $request->path;
 
                     if (! Storage::disk('tenants')->exists($path)) {
@@ -58,6 +57,17 @@ Route::prefix('/v1/')->group(
 
                     return response()->file(Storage::disk('tenants')->path($path));
                 })->name('api.qr.show');
+
+                Route::get('/qr/download', function (Request $request) {
+
+                    $path = $request->path;
+
+                    if (! Storage::disk('tenants')->exists($path)) {
+                        abort(404);
+                    }
+
+                    return Storage::disk('tenants')->download($path);
+                })->name('api.qr.download');
 
                 // Return the category type searched
                 Route::get('category-types/', function (Request $request) {

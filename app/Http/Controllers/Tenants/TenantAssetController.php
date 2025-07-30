@@ -111,7 +111,7 @@ class TenantAssetController extends Controller
      */
     public function show(Asset $asset)
     {
-        return Inertia::render('tenants/assets/show', ['asset' => $asset->load('documents', 'pictures', 'tickets.pictures')]);
+        return Inertia::render('tenants/assets/show', ['asset' => $asset]);
     }
 
     public function showDeleted($id)

@@ -17,7 +17,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
 
     console.log(asset);
 
-    const { get, post, delete: destroy } = useForm();
+    const { post, delete: destroy } = useForm();
 
     const deleteAsset = (asset: Asset) => {
         destroy(route(`tenant.assets.destroy`, asset.reference_code));
@@ -59,11 +59,16 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                 </div>
                 <p>Code : {asset.code}</p>
                 <p>Reference code : {asset.reference_code}</p>
-                <p>Location : {asset.location.maintainable.description}</p>
+                <p>
+                    Location : {asset.location.name} - {asset.location.description} -{' '}
+                    <a href={route(`tenant.${asset.location.location_type.level}s.show`, asset.location.reference_code)}>
+                        {asset.location.reference_code}
+                    </a>
+                </p>
                 <p>Category : {asset.category}</p>
-                <p>Name : {asset.maintainable?.name}</p>
+                <p>Name : {asset.name}</p>
                 <p>Surface : {asset.surface}</p>
-                <p>Description : {asset.maintainable?.description}</p>
+                <p>Description : {asset.description}</p>
                 <p>Purchase date : {asset.maintainable?.purchase_date}</p>
                 <p>Purchase cost : {asset.maintainable?.purchase_cost}</p>
                 <p>End warranty date : {asset.maintainable?.end_warranty_date}</p>
@@ -71,7 +76,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                 <p>Model : {asset.model}</p>
                 <p>Serial number : {asset.serial_number}</p>
                 {asset.qr_code && (
-                    <a href={route('api.qr.show', { path: asset.qr_code })} download className="w cursor-pointer">
+                    <a href={route('api.qr.download', { path: asset.qr_code })} download className="w-fit cursor-pointer">
                         <img src={route('api.qr.show', { path: asset.qr_code })} alt="" className="h-32 w-32" />
                     </a>
                 )}

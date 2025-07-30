@@ -8,6 +8,7 @@ use App\Models\Tenants\Floor;
 use App\Models\Tenants\Document;
 use App\Models\Tenants\Maintainable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -41,6 +42,8 @@ class Room extends Model
     ];
 
     protected $appends = [
+        'name',
+        'description',
         'category',
     ];
 
@@ -105,6 +108,27 @@ class Room extends Model
 
         return Attribute::make(
             get: fn() => $this->locationType->translations->where('locale', $locale)->first()?->label ?? $this->locationType->translations->where('locale', config('app.fallback_locale'))?->label
+        );
+    }
+
+    public function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->maintainable->name
+        );
+    }
+
+    public function description(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->maintainable->description
+        );
+    }
+
+    public function qrCodePath(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => Storage::disk('tenants')->url($this->qr_code) ?? null
         );
     }
 }

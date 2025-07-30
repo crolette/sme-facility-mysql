@@ -22,11 +22,20 @@ class ApiSearchLocationController extends Controller
         }
         Debugbar::info('search API', $search);
 
-        $data = collect()
-            ->merge($this->searchEntity(Site::class, 'site',  $search))
-            ->merge($this->searchEntity(Building::class, 'building',  $search))
-            ->merge($this->searchEntity(Floor::class, 'floor',  $search))
-            ->merge($this->searchEntity(Room::class, 'room',  $search));
+        if ($request->query('type')) {
+            $data = match ($request->query('type')) {
+                'site' => $this->searchEntity(Site::class, 'site',  $search),
+                'building' => $this->searchEntity(Building::class, 'building',  $search),
+                'floor' => $this->searchEntity(Floor::class, 'floor',  $search),
+                'room' => $this->searchEntity(Room::class, 'room',  $search),
+            };
+        } else {
+            $data = collect()
+                ->merge($this->searchEntity(Site::class, 'site',  $search))
+                ->merge($this->searchEntity(Building::class, 'building',  $search))
+                ->merge($this->searchEntity(Floor::class, 'floor',  $search))
+                ->merge($this->searchEntity(Room::class, 'room',  $search));
+        }
 
         return ApiResponse::success($data);
     }

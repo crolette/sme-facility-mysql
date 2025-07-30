@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Tenant;
 
+use Illuminate\Support\Str;
 use App\Models\LocationType;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -31,8 +32,9 @@ class RelocateRoomRequest extends FormRequest
         return [
             'locationType' => ['required', Rule::in([...$locationTypes])],
             'assets.*' => 'nullable|array',
+            'assets.*.change' => 'nullable|in:follow,change,delete',
             'assets.*.assetId' => 'nullable|exists:assets,id',
-            'assets.*.locationType' => 'nullable|in:site,building,floor,room',
+            'assets.*.locationType' => 'nullable|in:room',
             'assets.*.locationId' => 'nullable|exists:rooms,id'
         ];
     }

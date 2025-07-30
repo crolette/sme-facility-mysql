@@ -41,12 +41,13 @@ export default function ShowLocation({
             )}
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 {location.reference_code} - {location.code} - {location.location_type.label}
-                <p>{location.maintainable?.name}</p>
-                <p>{location.maintainable?.description}</p>
+                <p>{location.name}</p>
+                <p>{location.description}</p>
                 <p>Surface floor: {location.surface_floor}</p>
                 <p>Surface walls: {location.surface_walls}</p>
+                {/* <p>{location.qr_code_path}</p> */}
                 {location.qr_code && (
-                    <a href={route(`api.qr.show`, { path: location.qr_code })} download className="w cursor-pointer">
+                    <a href={route(`api.qr.download`, { path: location.qr_code })} className="w-fit cursor-pointer">
                         <img src={route('api.qr.show', { path: location.qr_code })} alt="" className="h-32 w-32" />
                     </a>
                 )}

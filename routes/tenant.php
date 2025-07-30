@@ -94,7 +94,7 @@ Route::middleware([
 ])->group(function () {
 
 
-    Route::get('/assets/{asset}/tickets/create', [AssetTicketController::class, 'createFromAsset'])->name('tenant.assets.tickets.create');
+    Route::get('/assets/{assetCode}/tickets/create', [AssetTicketController::class, 'createFromAsset'])->name('tenant.assets.tickets.create');
 
     Route::get('/sites/{site}/tickets/create', [AssetTicketController::class, 'createFromSite'])->name('tenant.sites.tickets.create');
 

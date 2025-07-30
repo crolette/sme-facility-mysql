@@ -40,6 +40,8 @@ class Floor extends Model
     ];
 
     protected $appends = [
+        'name',
+        'description',
         'category',
     ];
 
@@ -115,6 +117,20 @@ class Floor extends Model
 
         return Attribute::make(
             get: fn() => $this->locationType->translations->where('locale', $locale)->first()?->label ?? $this->locationType->translations->where('locale', config('app.fallback_locale'))?->label
+        );
+    }
+
+    public function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->maintainable->name
+        );
+    }
+
+    public function description(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->maintainable->description
         );
     }
 }

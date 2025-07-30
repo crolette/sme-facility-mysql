@@ -18,7 +18,7 @@ use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
-
+use function PHPUnit\Framework\assertJson;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -293,7 +293,7 @@ it('can delete a room and his maintainable', function () {
         'code' => $room->code
     ]);
 
-    $response = $this->deleteFromTenant('tenant.rooms.destroy', $room->code);
+    $response = $this->deleteFromTenant('tenant.rooms.destroy', $room->reference_code);
     $response->assertStatus(302);
     assertDatabaseMissing('rooms', [
         'reference_code' => $room->reference_code
@@ -334,6 +334,7 @@ it('can update name and description of a document from a site ', function () {
     ];
 
     $response = $this->patchToTenant('api.documents.update', $formData, $document->id);
+    $response->assertStatus(200)->assertJson(['status' => 'success']);
     $response->assertOk();
     $this->assertDatabaseHas('documents', [
         'id' => $document->id,
@@ -375,6 +376,7 @@ it('can upload a document to an existing room', function () {
     ];
 
     $response = $this->postToTenant('api.rooms.documents.post', $formData, $room);
+    $response->assertStatus(200)->assertJson(['status' => 'success']);
     $response->assertSessionHasNoErrors();
 
     assertDatabaseCount('documents', 2);
@@ -406,6 +408,8 @@ it('can add pictures to a room', function () {
     ];
 
     $response = $this->postToTenant('api.rooms.pictures.post', $formData, $room);
+    $response->assertStatus(200)->assertJson(['status' => 'success']);
+
     $response->assertSessionHasNoErrors();
     assertDatabaseCount('pictures', 2);
     assertDatabaseHas('pictures', [
@@ -426,9 +430,8 @@ it('can retrieve all pictures from a room', function () {
     assertDatabaseCount('pictures', 2);
 
     $response = $this->getFromTenant('api.rooms.pictures', $room);
-    $response->assertStatus(200);
-    $data = $response->json('data');
-    $this->assertCount(2, $data);
+    $response->assertStatus(200)->assertJson(['status' => 'success'])
+        ->assertJsonCount(2, 'data');
 });
 
 it('can retrieve all assets from a room', function () {
@@ -443,9 +446,10 @@ it('can retrieve all assets from a room', function () {
     Asset::factory()->forLocation($room)->create();
 
     $response = $this->getFromTenant('api.rooms.assets', $room);
-    $response->assertStatus(200);
-    $data = $response->json('data');
-    $this->assertCount(2, $data);
+    $response->assertStatus(200)->assertJson([
+        'status' => 'success',
+    ])
+        ->assertJsonCount(2, 'data');
 });
 
 it('can change location type of a room and related assets', function () {
@@ -462,6 +466,8 @@ it('can change location type of a room and related assets', function () {
     CategoryType::factory()->create(['category' => 'asset']);
     $assetOne = Asset::factory()->forLocation($roomTwo)->create();
     $assetTwo = Asset::factory()->forLocation($roomOne)->create();
+    $assetThree = Asset::factory()->forLocation($roomOne)->create();
+    $assetFour = Asset::factory()->forLocation($roomOne)->create();
 
     $newLocationType = LocationType::factory()->create(['level' => 'room']);
     $newLocationType = LocationType::factory()->create(['level' => 'room']);
@@ -472,20 +478,35 @@ it('can change location type of a room and related assets', function () {
         'assets' => [
             [
                 'assetId' => $assetOne->id,
+                'change' => 'change',
                 'locationType' => 'room',
                 'locationId' => $roomOne->id,
             ],
             [
                 'assetId' => $assetTwo->id,
+                'change' => 'change',
                 'locationType' => 'room',
                 'locationId' => $roomTwo->id,
+            ],
+            [
+                'assetId' => $assetThree->id,
+                'change' => 'follow',
+                'locationType' => 'room',
+                'locationId' => $roomOne->id,
+            ],
+            [
+                'assetId' => $assetFour->id,
+                'change' => 'delete',
             ]
 
         ]
     ];
 
     $response = $this->patchToTenant('api.rooms.relocate', $formData, $roomOne);
-    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
 
     $roomOneChanged = Room::find($roomOne->id);
 
@@ -506,7 +527,7 @@ it('can change location type of a room and related assets', function () {
             'location_id' => $roomOneChanged->id,
             'code' => $assetOne->code,
             'reference_code' => $roomOneChanged->reference_code . '-' . $assetOne->code
-        ]
+        ],
     );
 
     assertDatabaseHas(
@@ -516,6 +537,27 @@ it('can change location type of a room and related assets', function () {
             'location_id' => $roomTwo->id,
             'code' => $assetTwo->code,
             'reference_code' => $roomTwo->reference_code . '-' . $assetTwo->code
+        ]
+    );
+
+    assertDatabaseHas(
+        'assets',
+        [
+            'id' => $assetThree->id,
+            'location_id' => $roomOneChanged->id,
+            'code' => $assetThree->code,
+            'reference_code' => $roomOneChanged->reference_code . '-' . $assetThree->code
+        ]
+    );
+    $assetFour = Asset::withTrashed()->find(4);
+
+    $this->assertNotNull($assetFour->deleted_at);
+    assertDatabaseHas(
+        'assets',
+        [
+            'id' => $assetFour->id,
+            'location_id' => $roomOneChanged->id,
+            'reference_code' => $roomOne->reference_code . '-' . $assetFour->code
         ]
     );
 });
