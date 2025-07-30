@@ -20,7 +20,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
     const { get, post, delete: destroy } = useForm();
 
     const deleteAsset = (asset: Asset) => {
-        destroy(route(`tenant.assets.destroy`, asset.code));
+        destroy(route(`tenant.assets.destroy`, asset.reference_code));
     };
 
     const restoreAsset = (asset: Asset) => {
@@ -48,7 +48,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                         </>
                     ) : (
                         <>
-                            <a href={route(`tenant.assets.edit`, asset.code)}>
+                            <a href={route(`tenant.assets.edit`, asset.reference_code)}>
                                 <Button>Edit</Button>
                             </a>
                             <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
@@ -78,13 +78,13 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
 
                 <>
                     <TicketManager
-                        itemCode={asset.code}
+                        itemCode={asset.reference_code}
                         getTicketsUrl={`api.assets.tickets`}
                         locationType="assets"
                         canAdd={asset.deleted_at == null ? true : false}
                     />
                     <DocumentManager
-                        itemCodeId={asset.code}
+                        itemCodeId={asset.reference_code}
                         getDocumentsUrl={`api.assets.documents`}
                         editRoute={`api.documents.update`}
                         uploadRoute={`api.assets.documents.post`}
@@ -94,7 +94,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                     />
 
                     <PictureManager
-                        itemCodeId={asset.code}
+                        itemCodeId={asset.reference_code}
                         getPicturesUrl={`api.assets.pictures`}
                         uploadRoute={`api.assets.pictures.post`}
                         deleteRoute={`api.pictures.delete`}
@@ -102,7 +102,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                         canAdd={asset.deleted_at == null ? true : false}
                     />
                     <InterventionManager
-                        itemCodeId={asset.code}
+                        itemCodeId={asset.reference_code}
                         getInterventionsUrl="api.assets.interventions"
                         type="asset"
                         closed={asset.deleted_at == null ? false : true}

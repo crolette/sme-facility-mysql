@@ -128,7 +128,7 @@ export default function CreateAsset({
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         if (asset) {
-            post(route(`tenant.assets.update`, asset.code), {
+            post(route(`tenant.assets.update`, asset.reference_code), {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-HTTP-Method-Override': 'PATCH',
@@ -534,7 +534,7 @@ export default function CreateAsset({
 
                     <br />
                     <Button type="submit">{asset ? 'Update' : 'Submit'}</Button>
-                    <a href={asset ? route('tenant.assets.show', asset.code) : route('tenant.assets.index')}>
+                    <a href={asset ? route('tenant.assets.show', asset.reference_code) : route('tenant.assets.index')}>
                         <Button type="button" tabIndex={6} variant={'secondary'}>
                             Cancel
                         </Button>

@@ -57,7 +57,7 @@ Route::middleware([
 
             // Get all the documents from an asset
             Route::get('/documents/', function ($asset) {
-                $asset = Asset::withTrashed()->with('documents')->where('code', $asset)->first();
+                $asset = Asset::withTrashed()->with('documents')->where('reference_code', $asset)->first();
                 return ApiResponse::success($asset->documents);
             })->name('api.assets.documents');
 
@@ -75,7 +75,7 @@ Route::middleware([
 
             // Get all pictures from an asset
             Route::get('/pictures/', function ($asset) {
-                $asset = Asset::withTrashed()->with('pictures')->where('code', $asset)->first();
+                $asset = Asset::withTrashed()->with('pictures')->where('reference_code', $asset)->first();
                 return ApiResponse::success($asset->pictures);
             })->name('api.assets.pictures');
 
@@ -92,13 +92,13 @@ Route::middleware([
 
             // Get all tickets from an asset
             Route::get('/tickets/', function ($asset) {
-                $asset = Asset::withTrashed()->with('tickets')->where('code', $asset)->first();
+                $asset = Asset::withTrashed()->with('tickets')->where('reference_code', $asset)->first();
                 return ApiResponse::success($asset->tickets);
             })->name('api.assets.tickets');
 
             // Get all interventions from an asset
             Route::get('/interventions/', function ($asset) {
-                $asset = Asset::withTrashed()->with('interventions')->where('code', $asset)->first();
+                $asset = Asset::withTrashed()->with('interventions')->where('reference_code', $asset)->first();
                 return ApiResponse::success($asset->interventions);
             })->name('api.assets.interventions');
         });

@@ -28,8 +28,8 @@ export const AssetManager = ({ itemCode, type }: AssetManagerProps) => {
             <ul>
                 {assets &&
                     assets.map((asset) => (
-                        <li key={asset.code}>
-                            <a href={route('tenant.assets.show', asset.code)}>
+                        <li key={asset.reference_code}>
+                            <a href={route('tenant.assets.show', asset.reference_code)}>
                                 {asset.code} - {asset.maintainable.name}
                             </a>
                         </li>

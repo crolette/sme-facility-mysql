@@ -61,7 +61,7 @@ export default function CreateLocation({
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         if (location) {
-            post(route(`tenant.${routeName}.update`, location.code), {
+            post(route(`tenant.${routeName}.update`, location.reference_code), {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-HTTP-Method-Override': 'PATCH',
@@ -351,7 +351,7 @@ export default function CreateLocation({
                     )}
 
                     <Button type="submit">{location ? 'Update' : 'Submit'}</Button>
-                    <a href={location ? route(`tenant.${routeName}.show`, location.code) : route(`tenant.${routeName}.index`)}>
+                    <a href={location ? route(`tenant.${routeName}.show`, location.reference_code) : route(`tenant.${routeName}.index`)}>
                         <Button type="button" tabIndex={6} variant={'secondary'}>
                             Cancel
                         </Button>

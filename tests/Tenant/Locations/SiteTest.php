@@ -217,7 +217,7 @@ it('cannot update a site type of an existing site', function () {
 it('can delete a site', function () {
     $site = Site::factory()->create();
 
-    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->code);
+    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->reference_code);
     $response->assertStatus(302);
     assertDatabaseMissing('sites', [
         'reference_code' => $site->reference_code
@@ -233,7 +233,7 @@ it('cannot delete a site which has buildings', function () {
     $site = Site::factory()->create();
     Building::factory()->create();
 
-    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->code);
+    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->reference_code);
     $response->assertStatus(409);
     // assertDatabaseEmpty('sites');
     // assertDatabaseEmpty('buildings');
@@ -252,7 +252,7 @@ it('cannot delete a site which has related buildings and related floors', functi
     assertDatabaseCount('floors', 3);
     assertDatabaseCount('maintainables', 5);
 
-    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->code);
+    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->reference_code);
     $response->assertStatus(409);
 
     // assertDatabaseEmpty('sites');

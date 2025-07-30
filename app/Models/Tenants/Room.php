@@ -47,7 +47,7 @@ class Room extends Model
     // Ensure route model binding use the slug instead of ID
     public function getRouteKeyName()
     {
-        return 'code';
+        return 'reference_code';
     }
 
     public static function boot()

@@ -66,7 +66,7 @@ export default function IndexAssets() {
     };
 
     const deleteAsset = (asset: Asset) => {
-        destroy(route(`tenant.assets.destroy`, asset.code), {
+        destroy(route(`tenant.assets.destroy`, asset.reference_code), {
             onSuccess: () => {
                 setSearch('');
                 fetchAssets();
@@ -151,7 +151,7 @@ export default function IndexAssets() {
                                     return (
                                         <TableBodyRow key={index}>
                                             <TableBodyData>
-                                                <a href={route(`tenant.assets.show`, asset.code)}> {asset.reference_code} </a>
+                                                <a href={route(`tenant.assets.show`, asset.reference_code)}> {asset.reference_code} </a>
                                             </TableBodyData>
                                             <TableBodyData>{asset.code}</TableBodyData>
                                             <TableBodyData>{asset.category}</TableBodyData>
@@ -162,10 +162,10 @@ export default function IndexAssets() {
                                                 <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
                                                     Delete
                                                 </Button>
-                                                <a href={route(`tenant.assets.edit`, asset.code)}>
+                                                <a href={route(`tenant.assets.edit`, asset.reference_code)}>
                                                     <Button>Edit</Button>
                                                 </a>
-                                                <a href={route(`tenant.assets.show`, asset.code)}>
+                                                <a href={route(`tenant.assets.show`, asset.reference_code)}>
                                                     <Button variant={'outline'}>See</Button>
                                                 </a>
                                             </TableBodyData>

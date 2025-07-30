@@ -20,7 +20,7 @@ class QRCodeService
         $modelId = $model->id;
 
         $directory = "$tenantId/$modelType/$modelId/qrcode/";
-        $fileName = 'qr_'  . $model->code . '_' . Carbon::now()->isoFormat('YYYYMMDD')  . '.png';
+        $fileName = 'qr_'  . $model->reference_code . '_' . Carbon::now()->isoFormat('YYYYMMDD')  . '.png';
 
         $files = Storage::disk('tenants')->files($directory);
 

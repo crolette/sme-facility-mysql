@@ -42,7 +42,7 @@ export default function IndexSites({ locations, routeName }: { locations: Tenant
                                 return (
                                     <TableBodyRow key={index}>
                                         <TableBodyData>
-                                            <a href={route(`tenant.${routeName}.show`, item.code)}> {item.reference_code} </a>
+                                            <a href={route(`tenant.${routeName}.show`, item.reference_code)}> {item.reference_code} </a>
                                         </TableBodyData>
                                         <TableBodyData>{item.code}</TableBodyData>
                                         <TableBodyData>{item.category}</TableBodyData>
@@ -50,13 +50,13 @@ export default function IndexSites({ locations, routeName }: { locations: Tenant
                                         <TableBodyData>{item.maintainable.description}</TableBodyData>
 
                                         <TableBodyData>
-                                            <Button onClick={() => deleteLocation(item.code)} variant={'destructive'}>
+                                            <Button onClick={() => deleteLocation(item.reference_code)} variant={'destructive'}>
                                                 Delete
                                             </Button>
-                                            <a href={route(`tenant.${routeName}.edit`, item.code)}>
+                                            <a href={route(`tenant.${routeName}.edit`, item.reference_code)}>
                                                 <Button>Edit</Button>
                                             </a>
-                                            <a href={route(`tenant.${routeName}.show`, item.code)}>
+                                            <a href={route(`tenant.${routeName}.show`, item.reference_code)}>
                                                 <Button variant={'outline'}>See</Button>
                                             </a>
                                         </TableBodyData>
