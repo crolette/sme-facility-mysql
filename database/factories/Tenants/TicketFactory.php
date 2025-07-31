@@ -6,6 +6,7 @@ use App\Enums\TicketStatus;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Ticket;
+use App\Models\Tenants\Company;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,7 +25,7 @@ class TicketFactory extends Factory
     public function definition(): array
     {
 
-        $count = Ticket::count();
+        $count = Company::incrementAndGetTicketNumber();
         $codeNumber = generateCodeNumber($count, 'TK', 4);
 
         return [

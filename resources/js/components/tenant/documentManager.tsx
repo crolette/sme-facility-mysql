@@ -14,6 +14,7 @@ interface DocumentManagerProps {
     editRoute: string;
     deleteRoute: string;
     showRoute: string;
+    canAdd?: boolean;
 }
 
 type DocumentFormData = {
@@ -24,7 +25,15 @@ type DocumentFormData = {
     typeSlug: string;
 };
 
-export const DocumentManager = ({ itemCodeId, getDocumentsUrl, editRoute, uploadRoute, deleteRoute, showRoute }: DocumentManagerProps) => {
+export const DocumentManager = ({
+    itemCodeId,
+    getDocumentsUrl,
+    editRoute,
+    uploadRoute,
+    deleteRoute,
+    showRoute,
+    canAdd = true,
+}: DocumentManagerProps) => {
     const [documents, setDocuments] = useState<Documents[]>();
 
     useEffect(() => {
@@ -74,7 +83,7 @@ export const DocumentManager = ({ itemCodeId, getDocumentsUrl, editRoute, upload
 
     const fetchDocumentTypes = async () => {
         try {
-            const response = await axios.get(`/api/v1/category-types/?type=document`);
+            const response = await axios.get(route('api.category-types', { type: 'document' }));
             setDocumentTypes(await response.data.data);
         } catch (error) {
             console.error('Erreur lors de la recherche :', error);
@@ -162,7 +171,7 @@ export const DocumentManager = ({ itemCodeId, getDocumentsUrl, editRoute, upload
             <details>
                 <summary className="bg-red-5 border-2 p-2">
                     <h3 className="inline">Documents ({documents?.length ?? 0})</h3>
-                    <Button onClick={() => addNewFile()}>Add new file</Button>
+                    {canAdd && <Button onClick={() => addNewFile()}>Add new file</Button>}
                 </summary>
                 {documents && documents.length > 0 && (
                     <Table>

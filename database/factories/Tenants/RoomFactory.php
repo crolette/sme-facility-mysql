@@ -29,7 +29,7 @@ class RoomFactory extends Factory
 
         $count = Room::where('location_type_id', $locationType->id)->count();
 
-        $codeNumber = generateCodeNumber($count, $locationType->prefix, 3);
+        $codeNumber = generateCodeNumber($count + 1, $locationType->prefix, 3);
 
         $code = $level->reference_code . '-' .  $codeNumber;
 

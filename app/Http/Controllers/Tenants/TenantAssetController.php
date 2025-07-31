@@ -13,6 +13,8 @@ use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Services\AssetService;
+use App\Models\Tenants\Company;
 use App\Services\QRCodeService;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
@@ -33,6 +35,13 @@ use App\Http\Requests\Tenant\DocumentUploadRequest;
 
 class TenantAssetController extends Controller
 {
+
+    public function __construct(
+        protected QRCodeService $qrCodeService,
+        protected AssetService $assetService,
+
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -55,39 +64,19 @@ class TenantAssetController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, DocumentService $documentService, QRCodeService $qrService)
+    public function store(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, DocumentService $documentService,)
     {
 
         try {
             DB::beginTransaction();
 
-            $location = null;
-            if ($assetRequest->validated('locationType') === 'site') {
-                $location = Site::where('id', $assetRequest->validated('locationId'))->where('reference_code', $assetRequest->validated('locationReference'))->first();
-            } elseif ($assetRequest->validated('locationType') === 'building') {
-                $location = Building::where('id', $assetRequest->validated('locationId'))->where('reference_code', $assetRequest->validated('locationReference'))->first();
-            } elseif ($assetRequest->validated('locationType') === 'floor') {
-                $location = Floor::where('id', $assetRequest->validated('locationId'))->where('reference_code', $assetRequest->validated('locationReference'))->first();
-            } elseif ($assetRequest->validated('locationType') === 'room') {
-                $location = Room::where('id', $assetRequest->validated('locationId'))->where('reference_code', $assetRequest->validated('locationReference'))->first();
-            }
-
-            $count = Asset::withTrashed()->count();
-            $codeNumber = generateCodeNumber($count, 'A', 4);
-
-            $referenceCode = $location->reference_code . '-' . $codeNumber;
-
             $asset = new Asset([
                 ...$assetRequest->validated(),
-                'code' => $codeNumber,
-                'reference_code' => $referenceCode
             ]);
 
-
+            $asset = $this->assetService->attachLocation($asset, $assetRequest->validated('locationType'), $assetRequest->validated('locationId'));
 
             $asset->assetCategory()->associate($assetRequest->validated('categoryId'));
-            $asset->location()->associate($location);
-
             $asset->save();
 
             $asset->maintainable()->create($maintainableRequest->validated());
@@ -104,7 +93,7 @@ class TenantAssetController extends Controller
                 $pictureService->uploadAndAttachPictures($asset, $pictures);
             }
 
-            $qrService->createAndAttachQR($asset);
+            $this->qrCodeService->createAndAttachQR($asset);
 
             DB::commit();
 
@@ -122,7 +111,7 @@ class TenantAssetController extends Controller
      */
     public function show(Asset $asset)
     {
-        return Inertia::render('tenants/assets/show', ['asset' => $asset->load('documents', 'pictures', 'tickets.pictures')]);
+        return Inertia::render('tenants/assets/show', ['asset' => $asset]);
     }
 
     public function showDeleted($id)
@@ -144,41 +133,22 @@ class TenantAssetController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, Asset $asset)
+    public function update(AssetRequest $request, MaintainableRequest $maintainableRequest, Asset $asset)
     {
         try {
             DB::beginTransaction();
 
-            $location = null;
-            $locationType = $assetRequest->validated('locationType') ?? null;
-            if ($locationType) {
-                if ($assetRequest->validated('locationType') === 'site') {
-                    $location = Site::where('id', $assetRequest->validated('locationId'))->where('reference_code', $assetRequest->validated('locationReference'))->first();
-                } elseif ($assetRequest->validated('locationType') === 'building') {
-                    $location = Building::where('id', $assetRequest->validated('locationId'))->where('reference_code', $assetRequest->validated('locationReference'))->first();
-                } elseif ($assetRequest->validated('locationType') === 'floor') {
-                    $location = Floor::where('id', $assetRequest->validated('locationId'))->where('reference_code', $assetRequest->validated('locationReference'))->first();
-                } elseif ($assetRequest->validated('locationType') === 'room') {
-                    $location = Room::where('id', $assetRequest->validated('locationId'))->where('reference_code', $assetRequest->validated('locationReference'))->first();
-                }
+            if ($request->validated('locationType'))
+                $asset = $this->assetService->attachLocation($asset, $request->validated('locationType'), $request->validated('locationId'));
 
-                $referenceCode = $location->reference_code . '-' . $asset->code;
-                $asset->location()->dissociate();
-                $asset->location()->associate($location);
-
-                $asset->update([
-                    'reference_code' => $referenceCode
-                ]);
-            }
-
-            $categoryId = $assetRequest->validated('categoryId') ?? null;
+            $categoryId = $request->validated('categoryId') ?? null;
             if ($categoryId && $categoryId !== $asset->assetCategory->id) {
                 $asset->assetCategory()->dissociate();
-                $asset->assetCategory()->associate($assetRequest->validated('categoryId'));
+                $asset->assetCategory()->associate($request->validated('categoryId'));
             }
 
             $asset->update([
-                ...$assetRequest->validated(),
+                ...$request->validated(),
             ]);
 
 

@@ -51,8 +51,11 @@ export interface Maintainable {
 
 export interface TenantSite {
     id: number;
+    name: string;
+    description: string;
     code: string;
     label: string;
+    qr_code: string;
     reference_code: string;
     surface_walls: number;
     surface_floor: number;
@@ -78,6 +81,8 @@ export interface TenantRoom extends TenantSite {
 
 export interface Asset {
     id: number;
+    name: string;
+    description: string;
     code: string;
     surface: number;
     qr_code: string;

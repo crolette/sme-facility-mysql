@@ -7,6 +7,7 @@ use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Ticket;
+use App\Models\Tenants\Company;
 use App\Services\PictureService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -20,12 +21,14 @@ class APITicketController extends Controller
     public function index(Request $request)
     {
         $status = $request->query('status');
-        if ($status != null) {
-            $tickets = Ticket::where('status', $status)->get()->load('pictures');
+
+        if ($status !== null) {
+            $tickets = Ticket::where('status', $status)->get();
         } else {
-            $tickets = Ticket::all()->load('pictures');
+            $tickets = Ticket::all();
         }
-        return ApiResponse::success($tickets, 'Ticket created');
+
+        return ApiResponse::success($tickets, 'Ticket index');
     }
 
     public function show(Ticket $ticket)
@@ -39,7 +42,7 @@ class APITicketController extends Controller
         try {
             DB::beginTransaction();
 
-            $count = Ticket::all()->count();
+            $count = Company::incrementAndGetTicketNumber();
             $codeNumber = generateCodeNumber($count, 'TK', 4);
 
             $ticket = new Ticket(

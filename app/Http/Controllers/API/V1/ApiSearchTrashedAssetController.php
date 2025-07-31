@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Helpers\ApiResponse;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
@@ -27,6 +28,6 @@ class ApiSearchTrashedAssetController extends Controller
         }
 
 
-        return response()->json($assets);
+        return ApiResponse::success($assets);
     }
 }

@@ -34,6 +34,8 @@ export default function IndexTickets() {
         fetchTickets();
     }, [fetchTicketStatus]);
 
+    console.log(tickets);
+
     const changeStatusTicket = async (id: number, status: string) => {
         try {
             const response = await axios.patch(route('api.tickets.status', id), { status: status });

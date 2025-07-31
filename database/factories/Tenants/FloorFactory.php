@@ -42,7 +42,7 @@ class FloorFactory extends Factory
 
                 $count = Floor::where('location_type_id', $location->id)->where('id', '<', $floor->id)->count();
 
-                $code = generateCodeNumber($count, $location->prefix, 2);
+                $code = generateCodeNumber($count + 1, $location->prefix, 2);
                 $referenceCode = $building->reference_code . '-' .  $code;
 
                 $floor->update([

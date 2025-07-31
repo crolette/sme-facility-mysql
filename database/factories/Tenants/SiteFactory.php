@@ -43,7 +43,7 @@ class SiteFactory extends Factory
 
                 $count = Site::where('location_type_id', $location->id)->where('id', '<', $site->id)->count();
 
-                $codeNumber = generateCodeNumber($count, $location->prefix);
+                $codeNumber = generateCodeNumber($count + 1, $location->prefix);
 
                 $site->update([
                     'reference_code' => $codeNumber,

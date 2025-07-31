@@ -43,13 +43,15 @@ class Building extends Model
     ];
 
     protected $appends = [
+        'name',
+        'description',
         'category',
     ];
 
     // Ensure route model binding use the slug instead of ID
     public function getRouteKeyName()
     {
-        return 'code';
+        return 'reference_code';
     }
 
     public static function boot()
@@ -119,6 +121,20 @@ class Building extends Model
 
         return Attribute::make(
             get: fn() => $this->locationType->translations->where('locale', $locale)->first()?->label ?? $this->locationType->translations->where('locale', config('app.fallback_locale'))?->label
+        );
+    }
+
+    public function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->maintainable->name
+        );
+    }
+
+    public function description(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->maintainable->description
         );
     }
 }

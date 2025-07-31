@@ -13,8 +13,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class AssetTicketController extends Controller
 {
-    public function createFromAsset(Asset $asset)
+    public function createFromAsset(string $assetCode)
     {
+        $asset = Asset::where('code', $assetCode)->first();
         return $this->create($asset);
     }
 

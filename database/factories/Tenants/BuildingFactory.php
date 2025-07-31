@@ -44,7 +44,7 @@ class BuildingFactory extends Factory
 
                 $count = Building::where('location_type_id', $location->id)->where('level_id', $site->id)->where('id', '<', $building->id)->count();
 
-                $code = generateCodeNumber($count, $location->prefix);
+                $code = generateCodeNumber($count + 1, $location->prefix);
 
                 $referenceCode = $site->reference_code . '-' . $code;
 

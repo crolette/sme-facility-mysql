@@ -5,6 +5,7 @@ use Illuminate\Support\Str;
 use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
+use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Picture;
 use App\Models\Tenants\Building;
@@ -21,13 +22,12 @@ use function Pest\Laravel\assertDatabaseMissing;
 beforeEach(function () {
     $this->user = User::factory()->create();
     $this->actingAs($this->user, 'tenant');
+    $this->siteType = LocationType::factory()->create(['level' => 'site']);
 });
 
 it('can render the index sites page', function () {
     $this->assertAuthenticated();
 
-    LocationType::factory()->count(3)->create(['level' => 'site']);
-    LocationType::factory()->count(3)->create(['level' => 'building']);
     Site::factory()->count(3)->create();
     $response = $this->getFromTenant('tenant.sites.index');
     $response->assertOk();
@@ -42,7 +42,7 @@ it('can render the index sites page', function () {
 
 it('can render the create site page', function () {
 
-    LocationType::factory()->count(3)->create(['level' => 'site']);
+    LocationType::factory()->count(2)->create(['level' => 'site']);
 
     $response = $this->getFromTenant('tenant.sites.create');
     $response->assertOk();
@@ -55,15 +55,12 @@ it('can render the create site page', function () {
 });
 
 it('can create a new site', function () {
-
-    $locationType = LocationType::factory()->create(['level' => 'site']);
-
     $formData = [
         'name' => 'New site',
         'surface_floor' => 2569.12,
         'surface_walls' => 256.9,
         'description' => 'Description new site',
-        'locationType' => $locationType->id,
+        'locationType' => $this->siteType->id,
     ];
 
     $response = $this->postToTenant('tenant.sites.store', $formData);
@@ -74,11 +71,11 @@ it('can create a new site', function () {
     assertDatabaseCount('maintainables', 1);
 
     assertDatabaseHas('sites', [
-        'location_type_id' => $locationType->id,
-        'code' => $locationType->prefix . '01',
+        'location_type_id' => $this->siteType->id,
+        'code' => $this->siteType->prefix . '01',
         'surface_floor' => 2569.12,
         'surface_walls' => 256.9,
-        'reference_code' => $locationType->prefix . '01',
+        'reference_code' => $this->siteType->prefix . '01',
     ]);
 
     assertDatabaseHas('maintainables', [
@@ -91,14 +88,13 @@ it('can upload several files to site', function () {
 
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
-    $locationType = LocationType::factory()->create(['level' => 'site']);
     CategoryType::factory()->count(2)->create(['category' => 'document']);
     $categoryType = CategoryType::where('category', 'document')->first();
 
     $formData = [
         'name' => 'New site',
         'description' => 'Description new site',
-        'locationType' => $locationType->id,
+        'locationType' => $this->siteType->id,
         'files' => [
             [
                 'file' => $file1,
@@ -131,7 +127,6 @@ it('can upload several files to site', function () {
 });
 
 it('can render the show site page', function () {
-    LocationType::factory()->count(3)->create(['level' => 'site']);
     $site = Site::factory()->create();
 
     $response = $this->getFromTenant('tenant.sites.show', $site);
@@ -148,12 +143,11 @@ it('can render the show site page', function () {
 });
 
 it('can render the update site page', function () {
-    LocationType::factory()->count(3)->create(['level' => 'site']);
+    LocationType::factory()->count(2)->create(['level' => 'site']);
     $site = Site::factory()->create();
 
     $response = $this->getFromTenant('tenant.sites.edit', $site);
     $response->assertOk();
-
 
     $response->assertInertia(
         fn($page) => $page->component('tenants/locations/create')
@@ -164,7 +158,6 @@ it('can render the update site page', function () {
 });
 
 it('can update a site maintainable and his name and description', function () {
-    $locationType = LocationType::factory()->create(['level' => 'site']);
     $site = Site::factory()->create();
 
     $oldName = $site->maintainable->name;
@@ -175,7 +168,7 @@ it('can update a site maintainable and his name and description', function () {
         'surface_floor' => 2569.12,
         'surface_walls' => 256.9,
         'description' => 'Description new site',
-        'locationType' => $locationType->id
+        'locationType' => $this->siteType->id
     ];
 
     $response = $this->patchToTenant('tenant.sites.update', $formData, $site);
@@ -186,11 +179,11 @@ it('can update a site maintainable and his name and description', function () {
     assertDatabaseCount('maintainables', 1);
 
     assertDatabaseHas('sites', [
-        'location_type_id' => $locationType->id,
-        'code' => $locationType->prefix . '01',
+        'location_type_id' => $this->siteType->id,
+        'code' => $this->siteType->prefix . '01',
         'surface_floor' => 2569.12,
         'surface_walls' => 256.9,
-        'reference_code' => $locationType->prefix . '01',
+        'reference_code' => $this->siteType->prefix . '01',
     ]);
 
     assertDatabaseHas('maintainables', [
@@ -205,10 +198,7 @@ it('can update a site maintainable and his name and description', function () {
 });
 
 it('cannot update a site type of an existing site', function () {
-
-
-
-    LocationType::factory()->count(2)->create(['level' => 'site']);
+    LocationType::factory()->create(['level' => 'site']);
     $site = Site::factory()->create();
 
     $formData = [
@@ -225,13 +215,9 @@ it('cannot update a site type of an existing site', function () {
 });
 
 it('can delete a site', function () {
-
-    LocationType::factory()->count(3)->create(['level' => 'site']);
     $site = Site::factory()->create();
 
-    dump($site);
-
-    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->code);
+    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->reference_code);
     $response->assertStatus(302);
     assertDatabaseMissing('sites', [
         'reference_code' => $site->reference_code
@@ -243,12 +229,11 @@ it('can delete a site', function () {
 });
 
 it('cannot delete a site which has buildings', function () {
-    LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
     $site = Site::factory()->create();
     Building::factory()->create();
 
-    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->code);
+    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->reference_code);
     $response->assertStatus(409);
     // assertDatabaseEmpty('sites');
     // assertDatabaseEmpty('buildings');
@@ -256,7 +241,6 @@ it('cannot delete a site which has buildings', function () {
 });
 
 it('cannot delete a site which has related buildings and related floors', function () {
-    LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
     $site = Site::factory()->create();
@@ -268,7 +252,7 @@ it('cannot delete a site which has related buildings and related floors', functi
     assertDatabaseCount('floors', 3);
     assertDatabaseCount('maintainables', 5);
 
-    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->code);
+    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->reference_code);
     $response->assertStatus(409);
 
     // assertDatabaseEmpty('sites');
@@ -278,7 +262,6 @@ it('cannot delete a site which has related buildings and related floors', functi
 });
 
 it('can update name and description of a document from a site ', function () {
-    LocationType::factory()->count(3)->create(['level' => 'site']);
     CategoryType::factory()->count(2)->create(['category' => 'document']);
     $site = Site::factory()->create();
     $document = Document::factory()->withCustomAttributes([
@@ -308,10 +291,8 @@ it('can update name and description of a document from a site ', function () {
 });
 
 it('can upload a document to an existing site', function () {
-
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
-    $locationType = LocationType::factory()->create(['level' => 'site']);
     CategoryType::factory()->count(2)->create(['category' => 'document']);
     $site = Site::factory()->create();
     $categoryType = CategoryType::where('category', 'document')->first();
@@ -347,7 +328,6 @@ it('can upload a document to an existing site', function () {
 });
 
 it('can add pictures to a site', function () {
-    LocationType::factory()->create(['level' => 'site']);
     $site = Site::factory()->create();
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->image('test.jpg');
@@ -369,15 +349,25 @@ it('can add pictures to a site', function () {
 });
 
 it('can retrieve all pictures from a site', function () {
-    LocationType::factory()->create(['level' => 'site']);
     $site = Site::factory()->create();
 
     Picture::factory()->forModelAndUser($site, $this->user, 'sites')->create();
     Picture::factory()->forModelAndUser($site, $this->user, 'sites')->create();
 
-    assertDatabaseCount('pictures', 2);
-
     $response = $this->getFromTenant('api.sites.pictures', $site);
+    $response->assertStatus(200);
+    $data = $response->json('data');
+    $this->assertCount(2, $data);
+});
+
+it('can retrieve all assets from a site', function () {
+    $site = Site::factory()->create();
+    CategoryType::factory()->create(['category' => 'asset']);
+
+    Asset::factory()->forLocation($site)->create();
+    Asset::factory()->forLocation($site)->create();
+
+    $response = $this->getFromTenant('api.sites.assets', $site);
     $response->assertStatus(200);
     $data = $response->json('data');
     $this->assertCount(2, $data);

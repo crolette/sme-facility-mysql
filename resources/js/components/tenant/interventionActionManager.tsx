@@ -53,7 +53,7 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
 
     const fetchInterventionActionTypes = async () => {
         try {
-            const response = await axios.get(`/api/v1/category-types/?type=action`);
+            const response = await axios.get(route('api.category-types', { type: 'action' }));
             setInterventionActionTypes(response.data.data);
         } catch (error) {
             console.error('Erreur lors de la recherche :', error);

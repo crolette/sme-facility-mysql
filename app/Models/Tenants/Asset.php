@@ -8,6 +8,8 @@ use App\Models\Tenants\Intervention;
 use App\Models\Tenants\Maintainable;
 use App\Models\Central\AssetCategory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -43,18 +45,29 @@ class Asset extends Model
     ];
 
     protected $appends = [
+        'name',
+        'description',
         'category',
     ];
 
     // Ensure route model binding use the slug instead of ID
     public function getRouteKeyName()
     {
-        return 'code';
+        return 'reference_code';
     }
+
+
 
     public static function boot()
     {
         parent::boot();
+
+        static::deleting(function ($asset) {
+            $tickets = $asset->tickets;
+            foreach ($tickets as $ticket) {
+                $ticket->closeTicket();
+            }
+        });
 
         static::forceDeleting(function ($asset) {
             $asset->maintainable()->delete();
@@ -103,6 +116,29 @@ class Asset extends Model
 
         return Attribute::make(
             get: fn() => $this->assetCategory->translations->where('locale', $locale)->first()?->label ?? $this->assetCategory->translations->where('locale', config('app.fallback_locale'))?->label
+        );
+    }
+
+    public function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->maintainable->name
+        );
+    }
+
+    public function description(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->maintainable->description
+        );
+    }
+
+
+
+    public function qrCodePath(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => Storage::disk('tenants')->url($this->qr_code) ?? null
         );
     }
 }

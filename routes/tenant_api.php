@@ -29,8 +29,9 @@ use App\Http\Controllers\Tenants\ForceDeleteAssetController;
 use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
 use App\Http\Controllers\API\V1\Tickets\InterventionForLocationController;
 use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
+use App\Models\LocationType;
 
-Route::prefix('api/v1')->group(
+Route::prefix('/v1/')->group(
     function () {
         Route::middleware([
             'web',
@@ -44,249 +45,29 @@ Route::prefix('api/v1')->group(
             Route::middleware(['auth'])->group(function () {
                 Route::get('/locations', [ApiSearchLocationController::class, 'index'])->name('api.locations');
 
-                Route::get('/assets', function () {
-                    return ApiResponse::success(Asset::all());
-                });
-                Route::get('/assets/trashed', [ApiSearchTrashedAssetController::class, 'index'])->name('api.assets.trashed');
-
-                // Get all the documents from an asset
-                Route::get('/assets/{asset}/documents/', function (Asset $asset) {
-                    return ApiResponse::success($asset->load('documents')->documents);
-                })->name('api.assets.documents');
-
-                // Post a new document to the assets
-                Route::post('/assets/{asset}/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Asset $asset) {
-
-                    Debugbar::info($documentUploadRequest, $documentUploadRequest->validated());
-                    $files = $documentUploadRequest->validated('files');
-                    if ($files) {
-                        $documentService->uploadAndAttachDocuments($asset, $files);
-                    }
-
-                    return ApiResponse::success([], 'Document added');
-                })->name('api.assets.documents.post');
-
-                // Get all pictures from an asset
-                Route::get('/assets/{asset}/pictures/', function (Asset $asset) {
-                    return ApiResponse::success($asset->load('pictures')->pictures);
-                })->name('api.assets.pictures');
-
-                // Post a new picture to an asset
-                Route::post('/assets/{asset}/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Asset $asset) {
-
-                    $files = $pictureUploadRequest->validated('pictures');
-                    if ($files) {
-                        $pictureService->uploadAndAttachPictures($asset, $files);
-                    }
-
-                    return ApiResponse::success(null, 'Pictures added');
-                })->name('api.assets.pictures.post');
-
-                // Get all tickets from an asset
-                Route::get('/assets/{asset}/tickets/', function (Asset $asset) {
-                    return ApiResponse::success($asset->load('tickets.pictures')->tickets);
-                })->name('api.assets.tickets');
-
-                // Get all interventions from an asset
-                Route::get('/assets/{asset}/interventions/', function (Asset $asset) {
-                    return ApiResponse::success($asset->load('interventions')->interventions);
-                })->name('api.assets.interventions');
-
-                // Restore a soft deleted asset
-                Route::post('assets/{assetId}/restore', [RestoreSoftDeletedAssetController::class, 'restore'])->name('api.tenant.assets.restore');
-
-                // Force delete a soft deleted asset
-                Route::delete('assets/{assetId}/force', [ForceDeleteAssetController::class, 'forceDelete'])->name('api.tenant.assets.force');
 
                 // Get the qr code
-                Route::get('/assets/{asset}/qr/show', function (Asset $asset) {
+                Route::get('/qr/show', function (Request $request) {
 
-                    $path = $asset->qr_code;
+                    $path = $request->path;
 
                     if (! Storage::disk('tenants')->exists($path)) {
                         abort(404);
                     }
 
                     return response()->file(Storage::disk('tenants')->path($path));
-                })->name('api.assets.qr.show');
+                })->name('api.qr.show');
 
-                // Get all documents from a site
-                Route::get('/sites/{site}/documents/', function (Site $site) {
-                    return ApiResponse::success($site->load('documents')->documents);
-                })->name('api.sites.documents');
+                Route::get('/qr/download', function (Request $request) {
 
-                // Post a new document to a site
-                Route::post('/sites/{site}/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Site $site) {
+                    $path = $request->path;
 
-                    $files = $documentUploadRequest->validated('files');
-                    if ($files) {
-                        $documentService->uploadAndAttachDocuments($site, $files);
+                    if (! Storage::disk('tenants')->exists($path)) {
+                        abort(404);
                     }
 
-                    return ApiResponse::success(null, 'Document added');
-                })->name('api.sites.documents.post');
-
-                // Get all tickets from a site
-                Route::get('/sites/{site}/tickets/', function (Site $site) {
-                    return ApiResponse::success($site->load('tickets.pictures')->tickets);
-                })->name('api.sites.tickets');
-
-                // Get all interventions from a site
-                Route::get('/sites/{site}/interventions/', function (Site $site) {
-                    return ApiResponse::success($site->load('interventions')->interventions);
-                })->name('api.sites.interventions');
-
-                // Get all pictures from a site
-                Route::get('/sites/{site}/pictures/', function (Site $site) {
-                    return ApiResponse::success($site->load('pictures')->pictures);
-                })->name('api.sites.pictures');
-
-                // Post a new picture to a site
-                Route::post('/sites/{site}/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Site $site) {
-
-                    $files = $pictureUploadRequest->validated('pictures');
-                    if ($files) {
-                        $pictureService->uploadAndAttachPictures($site, $files);
-                    }
-
-                    return ApiResponse::success(null, 'Pictures added');
-                })->name('api.sites.pictures.post');
-
-
-                // Get all documents from a building
-                Route::get('/buildings/{building}/documents/', function (Building $building) {
-                    return ApiResponse::success($building->load('documents')->documents);
-                })->name('api.buildings.documents');
-
-                // Post a new document to a building
-                Route::post('/buildings/{building}/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Building $building) {
-
-                    $files = $documentUploadRequest->validated('files');
-                    if ($files) {
-                        $documentService->uploadAndAttachDocuments($building, $files);
-                    }
-
-                    return ApiResponse::success(null, 'Document added');
-                })->name('api.buildings.documents.post');
-
-
-                // Get all tickets from a building
-                Route::get('/buildings/{building}/tickets/', function (Building $building) {
-                    return ApiResponse::success($building->load('tickets.pictures')->tickets, 'Document added');
-                })->name('api.buildings.tickets');
-
-                // Get all interventions from a building
-                Route::get('/buildings/{building}/interventions/', function (Building $building) {
-                    return ApiResponse::success($building->load('interventions')->interventions);
-                })->name('api.buildings.interventions');
-
-                // Get all pictures from a building
-                Route::get('/buildings/{building}/pictures/', function (Building $building) {
-                    return ApiResponse::success($building->load('pictures')->pictures, 'Pictures added');
-                })->name('api.buildings.pictures');
-
-                // Post a new picture to a building
-                Route::post('/buildings/{building}/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Building $building) {
-
-                    $files = $pictureUploadRequest->validated('pictures');
-                    if ($files) {
-                        $pictureService->uploadAndAttachPictures($building, $files);
-                    }
-
-                    return ApiResponse::success(null, 'Pictures added');
-                })->name('api.buildings.pictures.post');
-
-
-
-                // Get all documents from a floor
-                Route::get('/floors/{floor}/documents/', function (Floor $floor) {
-                    return ApiResponse::success($floor->load('documents')->documents);
-                })->name('api.floors.documents');
-
-                // Post a new document to a floor
-                Route::post('/floors/{floor}/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Floor $floor) {
-
-                    $files = $documentUploadRequest->validated('files');
-                    if ($files) {
-                        $documentService->uploadAndAttachDocuments($floor, $files);
-                    }
-
-                    return ApiResponse::success(null, 'Document added');
-                })->name('api.floors.documents.post');
-
-
-                // Get all tickets from a floor
-                Route::get('/floors/{floor}/tickets/', function (Floor $floor) {
-                    return ApiResponse::success($floor->load('tickets.pictures')->tickets);
-                })->name('api.floors.tickets');
-
-                // Get all interventions from a floor
-                Route::get('/floors/{floor}/interventions/', function (Floor $floor) {
-                    return ApiResponse::success($floor->load('interventions')->interventions);
-                })->name('api.floors.interventions');
-
-                // Get all pictures from a floor
-                Route::get('/floors/{floor}/pictures/', function (Floor $floor) {
-                    return ApiResponse::success($floor->load('pictures')->pictures, 'Pictures added');
-                })->name('api.floors.pictures');
-
-                // Post a new picture to a floor
-                Route::post('/floors/{floor}/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Floor $floor) {
-
-                    $files = $pictureUploadRequest->validated('pictures');
-                    if ($files) {
-                        $pictureService->uploadAndAttachPictures($floor, $files);
-                    }
-
-                    return ApiResponse::success(null, 'Pictures added');
-                })->name('api.floors.pictures.post');
-
-
-                Route::prefix('rooms')->group(function () {
-
-                    // Get all documents from a room
-                    Route::get('{room}/documents/', function (Room $room) {
-                        return ApiResponse::success($room->load('documents')->documents);
-                    })->name('api.rooms.documents');
-
-                    // Post a new document to a floor
-                    Route::post('{room}/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Room $room) {
-                        $files = $documentUploadRequest->validated('files');
-                        if ($files) {
-                            $documentService->uploadAndAttachDocuments($room, $files);
-                            return ApiResponse::success(null, 'Document added');
-                        } else {
-                            return ApiResponse::error('Error posting new documents');
-                        }
-                    })->name('api.rooms.documents.post');
-
-                    // Get all tickets from a room
-                    Route::get('{room}/tickets/', function (Room $room) {
-                        return ApiResponse::success($room->load('tickets.pictures')->tickets);
-                    })->name('api.rooms.tickets');
-
-                    // Get all interventions from a room
-                    Route::get('{room}/interventions/', function (Room $room) {
-                        return ApiResponse::success($room->load('interventions')->interventions);
-                    })->name('api.rooms.interventions');
-
-                    // Get all pictures from a room
-                    Route::get('{room}/pictures/', function (Room $room) {
-                        return ApiResponse::success($room->load('pictures')->pictures);
-                    })->name('api.rooms.pictures');
-
-                    // Post a new picture to a room
-                    Route::post('{room}/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Room $room) {
-                        Debugbar::info('post picture to room', $pictureUploadRequest->validated('pictures'), $room);
-                        $files = $pictureUploadRequest->validated('pictures');
-                        if ($files) {
-                            $pictureService->uploadAndAttachPictures($room, $files);
-                        }
-
-                        return ApiResponse::success(null, 'Pictures added');
-                    })->name('api.rooms.pictures.post');
-                });
-
+                    return Storage::disk('tenants')->download($path);
+                })->name('api.qr.download');
 
                 // Return the category type searched
                 Route::get('category-types/', function (Request $request) {
@@ -294,7 +75,15 @@ Route::prefix('api/v1')->group(
                     Debugbar::info($request->query('type'), $documentTypes);
 
                     return ApiResponse::success($documentTypes, 'Success');
-                });
+                })->name('api.category-types');
+
+                // Return the category location
+                Route::get('location-types/', function (Request $request) {
+                    $locationTypes = LocationType::where('level', $request->query('level'))->get();
+                    Debugbar::info($request->query('type'), $locationTypes);
+
+                    return ApiResponse::success($locationTypes, 'Success');
+                })->name('api.location-types');
 
                 // Route to get the documents from a tenant - to display on show page
                 Route::patch('/documents/{document}', [UpdateDocumentController::class, 'update'])->name('api.documents.update');
@@ -403,3 +192,15 @@ Route::prefix('api/v1')->group(
         });
     }
 );
+
+$apiPath = __DIR__ . '/api';
+
+$iterator = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator($apiPath)
+);
+
+foreach ($iterator as $file) {
+    if ($file->isFile() && $file->getExtension() === 'php') {
+        require $file->getPathname();
+    }
+}

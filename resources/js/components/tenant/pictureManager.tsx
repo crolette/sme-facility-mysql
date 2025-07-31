@@ -9,9 +9,10 @@ interface PictureManagerProps {
     uploadRoute: string;
     deleteRoute: string;
     showRoute: string;
+    canAdd?: boolean;
 }
 
-export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, deleteRoute, showRoute }: PictureManagerProps) => {
+export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, deleteRoute, showRoute, canAdd = true }: PictureManagerProps) => {
     const [pictures, setPictures] = useState<Picture[]>([]);
     const [newPictures, setNewPictures] = useState<{ pictures: File[] } | null>(null);
     const [addPictures, setAddPictures] = useState(false);
@@ -63,7 +64,7 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
             <details>
                 <summary className="bg-red-5 border-2 p-2">
                     <h3 className="inline">Pictures ({pictures?.length})</h3>
-                    {!addPictures && (
+                    {canAdd && (
                         <Button onClick={() => setAddPictures(!addPictures)} type="button">
                             Add pictures
                         </Button>
@@ -72,7 +73,7 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
                 <div className="flex flex-wrap gap-4">
                     {pictures &&
                         pictures.length > 0 &&
-                        pictures.map((picture, index) => { 
+                        pictures.map((picture, index) => {
                             return (
                                 <div key={index} className="w-32">
                                     <a href={route(showRoute, picture.id)} download className="w cursor-pointer">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Helpers\ApiResponse;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
@@ -21,13 +22,22 @@ class ApiSearchLocationController extends Controller
         }
         Debugbar::info('search API', $search);
 
-        return response()->json(
-            collect()
+        if ($request->query('type')) {
+            $data = match ($request->query('type')) {
+                'site' => $this->searchEntity(Site::class, 'site',  $search),
+                'building' => $this->searchEntity(Building::class, 'building',  $search),
+                'floor' => $this->searchEntity(Floor::class, 'floor',  $search),
+                'room' => $this->searchEntity(Room::class, 'room',  $search),
+            };
+        } else {
+            $data = collect()
                 ->merge($this->searchEntity(Site::class, 'site',  $search))
                 ->merge($this->searchEntity(Building::class, 'building',  $search))
                 ->merge($this->searchEntity(Floor::class, 'floor',  $search))
-                ->merge($this->searchEntity(Room::class, 'room',  $search))
-        );
+                ->merge($this->searchEntity(Room::class, 'room',  $search));
+        }
+
+        return ApiResponse::success($data);
     }
 
     private function searchEntity($modelClass, $type, $search)

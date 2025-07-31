@@ -6,6 +6,7 @@ use App\Models\Tenants\User;
 use App\Models\Tenant;
 use App\Models\Address;
 use App\Enums\AddressTypes;
+use App\Models\Tenants\Company;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -20,13 +21,14 @@ abstract class TenantTestCase extends BaseTestCase
 
     protected $preservedTables = [
         'migrations',
+        'company'
     ];
 
     protected $preservedCentralTables = [
         'migrations',
         'addresses',
         'tenants',
-        'domains'
+        'domains',
     ];
 
     protected function setUp(): void
@@ -66,6 +68,10 @@ abstract class TenantTestCase extends BaseTestCase
 
         // Initialize tenant context
         tenancy()->initialize($this->tenant);
+        $company = Company::first();
+        if (!$company) {
+            Company::create(['last_ticket_number' => 0, 'last_asset_number' => 0]);
+        }
 
         app('router')->getRoutes()->refreshNameLookups();
 
@@ -174,6 +180,14 @@ abstract class TenantTestCase extends BaseTestCase
     {
         // S'assurer qu'on est dans le bon contexte tenant
         if (tenancy()->initialized) {
+
+            // Remettre à 0 les compteurs assets et tickets
+            $company = Company::first();
+            if ($company)
+                $company->update(['last_ticket_number' => 0, 'last_asset_number' => 0]);
+
+
+
             $this->truncateAllTablesExcept($this->preservedTables);
             $this->truncateAllCentralTablesExcept($this->preservedCentralTables);
         }
