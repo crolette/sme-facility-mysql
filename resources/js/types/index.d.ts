@@ -208,6 +208,15 @@ export interface AssetCategory {
     translations: Translation[];
 }
 
+export interface Provider {
+    id: number;
+    name: string;
+    email: string;
+    vat_number: string;
+    phone_number: string;
+    logo: string;
+}
+
 export interface User {
     id: number;
     first_name: string;

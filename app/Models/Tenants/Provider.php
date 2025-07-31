@@ -26,11 +26,10 @@ class Provider extends Model
         'name',
         'email',
         'vat_number',
+        'address',
         'logo',
         'phone_number',
-
     ];
-
 
 
     /**
@@ -43,7 +42,12 @@ class Provider extends Model
         'updated_at',
     ];
 
+    public const MAX_UPLOAD_SIZE_MB = 4;
 
+    public static function maxUploadSizeKB(): int
+    {
+        return self::MAX_UPLOAD_SIZE_MB * 1024;
+    }
 
     public function maintainables(): BelongsToMany
     {

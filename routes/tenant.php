@@ -27,6 +27,7 @@ use App\Http\Controllers\Tenants\InterventionActionController;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
 use App\Http\Controllers\Tenants\Auth\TenantAuthenticatedSessionController;
+use App\Http\Controllers\Tenants\ProviderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,6 +69,14 @@ Route::middleware([
     Route::get('/rooms/{Room}/tickets/create', [AssetTicketController::class, 'createFromRoom'])->name('tenant.rooms.tickets.create');
 
 
+    // PROVIDERS
+    Route::prefix('providers')->group(function () {
+        Route::get('/', [ProviderController::class, 'index'])->name('tenant.providers.index');
+        Route::get('/create', [ProviderController::class, 'create'])->name('tenant.providers.create');
+        Route::get('/{provider}', [ProviderController::class, 'show'])->name('tenant.providers.show');
+        Route::get('/{provider}/edit', [ProviderController::class, 'edit'])->name('tenant.providers.edit');
+    });
+
     // TICKETS
     Route::prefix('tickets')->group(function () {
         Route::get('/', [TicketController::class, 'index'])->name('tenant.tickets.index');
@@ -80,11 +89,8 @@ Route::middleware([
     Route::get('interventions/{intervention}', [InterventionController::class, 'show'])->name('tenant.interventions.show');
     Route::get('interventions/{intervention}/actions/create', [InterventionActionController::class, 'create'])->name('tenant.interventions.actions.create');
     Route::get('actions/{action}/edit', [InterventionActionController::class, 'edit'])->name('tenant.interventions.actions.edit');
-
-
-    // QR Code
-    Route::get('/generate-qr', [QRCodeController::class, 'generate'])->name('qr-code');;
 });
+
 
 Route::middleware([
     'web',
@@ -92,7 +98,6 @@ Route::middleware([
     ScopeSessions::class,
     PreventAccessFromCentralDomains::class,
 ])->group(function () {
-
 
     Route::get('/assets/{assetCode}/tickets/create', [AssetTicketController::class, 'createFromAsset'])->name('tenant.assets.tickets.create');
 

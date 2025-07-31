@@ -16,16 +16,16 @@ class ProviderController extends Controller
      */
     public function index()
     {
-        // $interventions = Provider::all();
-        // return Inertia::render('tenants/tickets/interventions/index', ['interventions' => $interventions]);
+        $providers = Provider::all();
+        return Inertia::render('tenants/providers/index', ['providers' => $providers]);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Provider $provider)
+    public function create()
     {
-        // return Inertia::render('tenants/tickets/interventions/create', ['ticket' => $ticket]);
+        return Inertia::render('tenants/providers/create');
     }
 
     /**
@@ -33,7 +33,7 @@ class ProviderController extends Controller
      */
     public function edit(Provider $provider)
     {
-        // return Inertia::render('tenants/tickets/interventions/create', ['ticket' => $ticket]);
+        return Inertia::render('tenants/providers/create', ['provider' => $provider]);
     }
 
 
@@ -42,6 +42,6 @@ class ProviderController extends Controller
      */
     public function show(Provider $provider)
     {
-        // return Inertia::render('tenants/tickets/interventions/show', ['intervention' => $intervention->load('ticket')]);
+        return Inertia::render('tenants/providers/show', ['provider' => $provider]);
     }
 }
