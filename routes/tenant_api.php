@@ -30,6 +30,7 @@ use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
 use App\Http\Controllers\API\V1\Tickets\InterventionForLocationController;
 use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
 use App\Models\LocationType;
+use App\Services\QRCodeService;
 
 Route::prefix('/v1/')->group(
     function () {
@@ -68,6 +69,11 @@ Route::prefix('/v1/')->group(
 
                     return Storage::disk('tenants')->download($path);
                 })->name('api.qr.download');
+
+                Route::post('/qr/regen/{asset}', function (Asset $asset, QRCodeService $qRCodeService) {
+                    $qRCodeService->createAndAttachQR($asset);
+                    return ApiResponse::success();
+                })->name('api.qr.regen');
 
                 // Return the category type searched
                 Route::get('category-types/', function (Request $request) {

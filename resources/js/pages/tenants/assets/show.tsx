@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { Asset, type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
+import axios from 'axios';
 
 export default function ShowAsset({ asset }: { asset: Asset }) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -29,6 +30,13 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
 
     const deleteDefinitelyAsset = (asset: Asset) => {
         destroy(route(`api.tenant.assets.force`, asset.id));
+    };
+
+    const generateQR = async () => {
+        const response = await axios.post(route('api.qr.regen', asset.reference_code));
+        if (response.data.status === 'success') {
+            location.reload();
+        }
     };
 
     return (
@@ -56,6 +64,9 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                             </Button>
                         </>
                     )}
+                    <Button onClick={generateQR} variant={'secondary'}>
+                        Generate QR
+                    </Button>
                 </div>
                 <p>Code : {asset.code}</p>
                 <p>Reference code : {asset.reference_code}</p>
