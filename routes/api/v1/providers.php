@@ -16,5 +16,6 @@ Route::middleware([
 
     Route::post('/', [APIProviderController::class, 'store'])->name('api.providers.store');
     Route::patch('/{provider}', [APIProviderController::class, 'update'])->name('api.providers.update');
+    Route::patch('/{provider}/password', [APIProviderController::class, 'updatePassword'])->name('api.providers.update-password');
     Route::delete('/{provider}', [APIProviderController::class, 'destroy'])->name('api.providers.destroy');
 });

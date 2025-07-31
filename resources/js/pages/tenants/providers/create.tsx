@@ -1,6 +1,6 @@
-import { Provider } from '@/types';
+import { User } from '@/types';
 
-export default function ProviderCreateUpdate({ provider }: { provider?: Provider }) {
-    console.log(provider ?? null);
+export default function UserCreateUpdate({ user }: { user?: User }) {
+    console.log(user ?? null);
     return;
 }

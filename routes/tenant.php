@@ -28,6 +28,7 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
 use App\Http\Controllers\Tenants\Auth\TenantAuthenticatedSessionController;
 use App\Http\Controllers\Tenants\ProviderController;
+use App\Http\Controllers\Tenants\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,6 +76,14 @@ Route::middleware([
         Route::get('/create', [ProviderController::class, 'create'])->name('tenant.providers.create');
         Route::get('/{provider}', [ProviderController::class, 'show'])->name('tenant.providers.show');
         Route::get('/{provider}/edit', [ProviderController::class, 'edit'])->name('tenant.providers.edit');
+    });
+
+    // USERS
+    Route::prefix('users')->group(function () {
+        Route::get('/', [UserController::class, 'index'])->name('tenant.users.index');
+        Route::get('/create', [UserController::class, 'create'])->name('tenant.users.create');
+        Route::get('/{user}', [UserController::class, 'show'])->name('tenant.users.show');
+        Route::get('/{user}/edit', [UserController::class, 'edit'])->name('tenant.users.edit');
     });
 
     // TICKETS
