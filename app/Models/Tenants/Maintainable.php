@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Maintainable extends Model
 {
@@ -43,6 +44,16 @@ class Maintainable extends Model
     public function maintainable()
     {
         return $this->morphTo();
+    }
+
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_maintainable');
+    }
+
+    public function providers(): BelongsToMany
+    {
+        return $this->belongsToMany(Provider::class, 'provider_maintainable');
     }
 
     public function interventions(): HasMany

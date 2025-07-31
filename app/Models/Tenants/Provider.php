@@ -8,13 +8,14 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable
+class Provider extends Model
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -22,17 +23,15 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'first_name',
-        'last_name',
+        'name',
         'email',
-        'password',
-        'username',
+        'vat_number',
+        'logo',
+        'phone_number',
 
     ];
 
-    protected $appends = [
-        'full_name'
-    ];
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -40,33 +39,14 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'created_at',
+        'updated_at',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+
 
     public function maintainables(): BelongsToMany
     {
         return $this->belongsToMany(Maintainable::class, 'user_maintainable');
-    }
-
-
-    public function fullName(): Attribute
-    {
-        return Attribute::make(
-            get: fn() => $this->first_name . ' ' . $this->last_name
-        );
     }
 }
