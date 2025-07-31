@@ -21,11 +21,11 @@ class Room extends Model
     use HasFactory;
 
     protected $fillable = [
+        'reference_code',
         'code',
         'qr_code',
         'surface_floor',
         'surface_walls',
-        'reference_code'
     ];
 
     protected $hidden = [
