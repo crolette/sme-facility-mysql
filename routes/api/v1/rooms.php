@@ -55,7 +55,7 @@ Route::middleware([
 
             // Get all interventions from a room
             Route::get('/interventions/', function (Room $room) {
-                return ApiResponse::success($room->load('interventions')->interventions);
+                return ApiResponse::success($room->interventions()->where('ticket_id', null)->get());
             })->name('api.rooms.interventions');
 
             // Get all pictures from a room

@@ -133,6 +133,11 @@ class Asset extends Model
         );
     }
 
+    public function ownInterventions(): HasMany
+    {
+        return $this->interventions()->where('ticket_id', null);
+    }
+
 
 
     public function qrCodePath(): Attribute

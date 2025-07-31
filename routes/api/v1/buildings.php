@@ -50,7 +50,7 @@ Route::middleware([
 
         // Get all interventions from a building
         Route::get('/interventions/', function (Building $building) {
-            return ApiResponse::success($building->load('interventions')->interventions);
+            return ApiResponse::success($building->interventions()->where('ticket_id', null)->get());
         })->name('api.buildings.interventions');
 
         // Get all pictures from a building

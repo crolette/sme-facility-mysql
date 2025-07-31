@@ -12,6 +12,12 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
+    protected string $guard_name = 'tenant';
+    protected function getDefaultGuardName(): string
+    {
+        return $this->guard_name;
+    }
+
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 

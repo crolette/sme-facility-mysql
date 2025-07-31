@@ -70,7 +70,7 @@ Route::middleware([
 
         // Get all interventions from a floor
         Route::get('/interventions/', function (Floor $floor) {
-            return ApiResponse::success($floor->load('interventions')->interventions);
+            return ApiResponse::success($floor->interventions()->where('ticket_id', null)->get());
         })->name('api.floors.interventions');
 
         // Get all pictures from a floor

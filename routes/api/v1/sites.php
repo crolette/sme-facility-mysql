@@ -48,7 +48,7 @@ Route::middleware([
 
         // Get all interventions from a site
         Route::get('/{site}/interventions/', function (Site $site) {
-            return ApiResponse::success($site->load('interventions')->interventions);
+            return ApiResponse::success($site->interventions()->where('ticket_id', null)->get());
         })->name('api.sites.interventions');
 
         // Get all pictures from a site

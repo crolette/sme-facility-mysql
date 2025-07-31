@@ -29,6 +29,7 @@ use App\Http\Controllers\Tenants\ForceDeleteAssetController;
 use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
 use App\Http\Controllers\API\V1\Tickets\InterventionForLocationController;
 use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
+use App\Models\Tenants\Intervention;
 
 Route::middleware([
     'web',
@@ -91,15 +92,18 @@ Route::middleware([
             })->name('api.assets.pictures.post');
 
             // Get all tickets from an asset
-            Route::get('/tickets/', function ($asset) {
-                $asset = Asset::withTrashed()->with('tickets')->where('reference_code', $asset)->first();
+            Route::get('/tickets/', function (Asset $asset) {
+                // $asset = Asset::withTrashed()->with('tickets')->where('reference_code', $asset)->first();
                 return ApiResponse::success($asset->tickets);
             })->name('api.assets.tickets');
 
             // Get all interventions from an asset
-            Route::get('/interventions/', function ($asset) {
-                $asset = Asset::withTrashed()->with('interventions')->where('reference_code', $asset)->first();
-                return ApiResponse::success($asset->interventions);
+            Route::get('/interventions/', function (Asset $asset) {
+                // $interventions = Intervention::whereMorphedTo('interventionable', $asset)->where('ticket_id', null)->get();
+                // $interventionsTwo = Intervention::where('ticket_id', null)->where('maintainable_id', $asset->maintainable->id)->get();
+                // Debugbar::info($interventions, $interventionsTwo, $asset->interventions()->where('ticket_id', null)->get());
+                // $asset = Asset::withTrashed()->with('interventions')->where('reference_code', $asset)->first();
+                return ApiResponse::success($asset->interventions()->where('ticket_id', null)->get());
             })->name('api.assets.interventions');
         });
 
