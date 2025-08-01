@@ -72,6 +72,10 @@ class TenantRoomController extends Controller
 
             $room->maintainable()->create($maintainableRequest->validated());
 
+            if ($maintainableRequest->validated('providers')) {
+                $room->maintainable->providers()->sync($maintainableRequest->validated('providers'));
+            }
+
             $files = $documentUploadRequest->validated('files');
             if ($files) {
                 $documentService->uploadAndAttachDocuments($room, $files);

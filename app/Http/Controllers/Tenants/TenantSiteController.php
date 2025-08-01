@@ -72,6 +72,10 @@ class TenantSiteController extends Controller
                 ...$maintainableRequest->validated()
             ]);
 
+            if ($maintainableRequest->validated('providers')) {
+                $site->maintainable->providers()->sync($maintainableRequest->validated('providers'));
+            }
+
             $files = $documentUploadRequest->validated('files');
             if ($files) {
                 $documentService->uploadAndAttachDocuments($site, $files);

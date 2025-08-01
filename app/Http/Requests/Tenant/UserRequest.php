@@ -42,6 +42,8 @@ class UserRequest extends FormRequest
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'avatar' => 'nullable|file|mimes:png,jpg,jpeg|max:' . User::maxUploadSizeKB(),
+            'can_login' => 'nullable|boolean',
+            'provider_id' => 'nullable|integer|exists:providers,id'
         ];
     }
 }

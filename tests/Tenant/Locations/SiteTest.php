@@ -10,6 +10,7 @@ use App\Models\Tenants\Floor;
 use App\Models\Tenants\Picture;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
+use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +19,8 @@ use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
+use function PHPUnit\Framework\assertCount;
+
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -371,4 +374,21 @@ it('can retrieve all assets from a site', function () {
     $response->assertStatus(200);
     $data = $response->json('data');
     $this->assertCount(2, $data);
+});
+
+it('can attach a provider to a site\'s maintainable', function () {
+    $provider = Provider::factory()->create();
+
+    $formData = [
+        'name' => 'New site',
+        'description' => 'Description new site',
+        'locationType' => $this->siteType->id,
+        'providers' => [$provider->id]
+    ];
+
+    $response = $this->postToTenant('tenant.sites.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    $site = Site::first();
+    assertCount(1, $site->maintainable->providers);
 });

@@ -28,17 +28,22 @@ class APIUserController extends Controller
 
             $user = new User($request->validated());
 
-            $password = Str::password(12);
+            if ($request->validated('can_login') === true) {
+                $password = Str::password(12);
+                $user->password = Hash::make($password);
+            }
 
-            $user->password = Hash::make($password);
+            if ($request->validated('avatar'))
+                $user = $this->userService->uploadAndAttachAvatar($user, $request->validated('avatar'), $request->validated('first_name') . ' ' . $request->validated('last_name'));
 
-            $user = $this->userService->uploadAndAttachAvatar($user, $request->validated('avatar'), $request->validated('first_name') . ' ' . $request->validated('last_name'));
+            if ($request->validated('provider_id'))
+                $user = $this->userService->attachProvider($user, $request->validated('provider_id'));
 
             $user->save();
 
             DB::commit();
 
-            return ApiResponse::success(['password' => $password], 'User created');
+            return ApiResponse::success(['password' => $password ?? null], 'User created');
         } catch (Exception $e) {
             DB::rollback();
             return ApiResponse::error($e->getMessage());
@@ -56,7 +61,11 @@ class APIUserController extends Controller
 
             $user->update($request->validated());
 
-            $user = $this->userService->uploadAndAttachAvatar($user, $request->validated('avatar'), $request->validated('first_name') . ' ' . $request->validated('first_name'));
+            if ($request->validated('avatar'))
+                $user = $this->userService->uploadAndAttachAvatar($user, $request->validated('avatar'), $request->validated('first_name') . ' ' . $request->validated('first_name'));
+
+            if ($request->validated('provider_id'))
+                $user = $this->userService->attachProvider($user, $request->validated('provider_id'));
 
             $user->save();
 

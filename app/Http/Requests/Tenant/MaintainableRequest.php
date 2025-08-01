@@ -40,7 +40,9 @@ class MaintainableRequest extends FormRequest
             'purchase_date' => ['nullable', 'date', Rule::date()->beforeOrEqual(today())],
             'purchase_cost' => 'nullable|numeric|gt:0|decimal:0,2',
             'under_warranty' => "boolean",
-            'end_warranty_date' => "nullable|date|required_if_accepted:under_warranty|after:purchase_date"
+            'end_warranty_date' => "nullable|date|required_if_accepted:under_warranty|after:purchase_date",
+            'providers' => 'nullable|array',
+            'providers.*' => 'integer|exists:providers,id'
         ];
     }
 }

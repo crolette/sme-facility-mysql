@@ -81,6 +81,10 @@ class TenantAssetController extends Controller
 
             $asset->maintainable()->create($maintainableRequest->validated());
 
+            if ($maintainableRequest->validated('providers')) {
+                $asset->maintainable->providers()->sync($maintainableRequest->validated('providers'));
+            }
+
             $files = $documentUploadRequest->validated('files');
 
             if ($files) {

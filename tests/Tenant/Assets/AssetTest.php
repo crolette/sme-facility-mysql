@@ -15,6 +15,8 @@ use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
+use function PHPUnit\Framework\assertCount;
+
 
 beforeEach(function () {
     LocationType::factory()->create(['level' => 'site']);
@@ -557,7 +559,6 @@ it('fails when model has more than 100 chars', function () {
 
 it('fails when brand has more than 100 chars', function () {
 
-
     $formData = [
         'name' => fake()->text(50),
         'description' => fake()->text(250),
@@ -591,4 +592,27 @@ it('fails when serial_number has more than 50 chars', function () {
     $response->assertSessionHasErrors([
         'serial_number' => 'The serial number field must not be greater than 50 characters.',
     ]);
+});
+
+
+it('can attach a provider to an asset\'s maintainable', function () {
+
+    $provider = Provider::factory()->create();
+
+    $formData = [
+        'name' => fake()->text(50),
+        'description' => fake()->text(250),
+        'locationId' => $this->site->id,
+        'locationReference' => $this->site->reference_code,
+        'locationType' => 'site',
+        'categoryId' => $this->category->id,
+        'purchase_cost' => 9999999.2,
+        'providers' => [$provider->id]
+    ];
+
+    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    $asset = Asset::first();
+    assertCount(1, $asset->maintainable->providers);
 });

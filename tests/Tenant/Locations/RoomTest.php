@@ -10,15 +10,17 @@ use App\Models\Tenants\Floor;
 use App\Models\Tenants\Picture;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
+use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Storage;
+use function PHPUnit\Framework\assertJson;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
-use function PHPUnit\Framework\assertJson;
+use function PHPUnit\Framework\assertCount;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -115,6 +117,26 @@ it('can create a new room', function () {
         'name' => 'New room',
         'description' => 'Description new room',
     ]);
+});
+
+it('can attach a provider to a building\'s maintainable', function () {
+    $provider = Provider::factory()->create();
+
+    $location = LocationType::where('level', 'room')->first();
+
+    $formData = [
+        'name' => 'New room',
+        'description' => 'Description new room',
+        'levelType' => $this->floor->id,
+        'locationType' => $location->id,
+        'providers' => [$provider->id]
+    ];
+
+    $response = $this->postToTenant('tenant.rooms.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    $room = Room::first();
+    assertCount(1, $room->maintainable->providers);
 });
 
 it('can upload several files to site', function () {

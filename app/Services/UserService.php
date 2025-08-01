@@ -9,6 +9,7 @@ use App\Models\Tenants\Provider;
 use App\Models\Tenants\User;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
@@ -40,5 +41,27 @@ class UserService
         foreach ($files as $file) {
             Storage::disk('tenants')->delete($file);
         }
+    }
+
+    public function attachProvider(User $user, int $providerId): User
+    {
+        if ($user->provider?->id === $providerId)
+            return $user;
+
+        if ($user->provider?->id !== $providerId) {
+            $user = $this->detachProvider($user);
+        }
+
+
+        $provider = Provider::find($providerId);
+        $user->provider()->associate($provider);
+
+        return $user;
+    }
+
+    public function detachProvider(User $user): User
+    {
+        $user->provider()->disassociate();
+        return $user;
     }
 };

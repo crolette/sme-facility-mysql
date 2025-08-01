@@ -80,6 +80,10 @@ class TenantBuildingController extends Controller
                 ...$maintainableRequest->validated()
             ]);
 
+            if ($maintainableRequest->validated('providers')) {
+                $building->maintainable->providers()->sync($maintainableRequest->validated('providers'));
+            }
+
             $files = $documentUploadRequest->validated('files');
             if ($files) {
                 $documentService->uploadAndAttachDocuments($building, $files);

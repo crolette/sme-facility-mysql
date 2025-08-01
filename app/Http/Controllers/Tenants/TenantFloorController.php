@@ -76,6 +76,10 @@ class TenantFloorController extends Controller
                 ...$maintainableRequest->validated()
             ]);
 
+            if ($maintainableRequest->validated('providers')) {
+                $floor->maintainable->providers()->sync($maintainableRequest->validated('providers'));
+            }
+
             $files = $documentUploadRequest->validated('files');
             if ($files) {
                 $documentService->uploadAndAttachDocuments($floor, $files);

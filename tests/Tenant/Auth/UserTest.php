@@ -10,6 +10,8 @@ use Illuminate\Testing\Fluent\AssertableJson;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
+use function PHPUnit\Framework\assertNotNull;
+use function PHPUnit\Framework\assertNull;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
@@ -66,7 +68,7 @@ it('can render the edit user page', function () {
 });
 
 
-it('can post a new user', function () {
+it('can post a new "loginable" user and return the password', function () {
 
     $file1 = UploadedFile::fake()->image('avatar.png');
 
@@ -74,6 +76,7 @@ it('can post a new user', function () {
         'first_name' => 'Jane',
         'last_name' => 'Doe',
         'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
         'avatar' => $file1
     ];
 
@@ -88,18 +91,49 @@ it('can post a new user', function () {
 
     $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
 
+    assertNotNull($createdUser->password);
+
     assertDatabaseHas('users', [
         'first_name' => 'Jane',
         'last_name' => 'Doe',
         'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => 1,
         'avatar' => $createdUser->avatar
     ]);
 
     Storage::disk('tenants')->assertExists($createdUser->avatar);
 });
 
+it('can post a new "non loginable" user and attach a provider', function () {
 
-it('can update an existing provider', function () {
+    $provider = Provider::factory()->create();
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'provider_id' => $provider->id
+    ];
+
+    $response = $this->postToTenant('api.users.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    assertNull($createdUser->password);
+
+    assertDatabaseHas('users', [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'provider_id' => $provider->id,
+        'can_login' => 0
+    ]);
+});
+
+
+it('can update an existing user', function () {
 
     $user = User::factory()->create();
 
