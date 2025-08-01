@@ -42,7 +42,8 @@ class MaintainableRequest extends FormRequest
             'under_warranty' => "boolean",
             'end_warranty_date' => "nullable|date|required_if_accepted:under_warranty|after:purchase_date",
             'providers' => 'nullable|array',
-            'providers.*' => 'integer|exists:providers,id'
+            'providers.*' => 'integer|exists:providers,id',
+            'maintenance_manager_id' => 'nullable|exists:users,id'
         ];
     }
 }

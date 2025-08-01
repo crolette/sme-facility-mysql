@@ -61,7 +61,7 @@ class UserService
 
     public function detachProvider(User $user): User
     {
-        $user->provider()->disassociate();
+        $user->provider()->disassociate()->save();
         return $user;
     }
 };

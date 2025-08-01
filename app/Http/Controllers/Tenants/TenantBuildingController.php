@@ -15,6 +15,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
+use App\Services\MaintainableService;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
@@ -25,6 +26,7 @@ class TenantBuildingController extends Controller
 
     public function __construct(
         protected QRCodeService $qrCodeService,
+        protected MaintainableService $maintainableService
     ) {}
 
     /**
@@ -76,13 +78,8 @@ class TenantBuildingController extends Controller
             $building->site()->associate($site);
             $building->save();
 
-            $building->maintainable()->create([
-                ...$maintainableRequest->validated()
-            ]);
+            $building = $this->maintainableService->createMaintainable($building, $maintainableRequest);
 
-            if ($maintainableRequest->validated('providers')) {
-                $building->maintainable->providers()->sync($maintainableRequest->validated('providers'));
-            }
 
             $files = $documentUploadRequest->validated('files');
             if ($files) {
@@ -145,9 +142,7 @@ class TenantBuildingController extends Controller
                 'surface_walls' => $buildingRequest->validated('surface_walls'),
             ]);
 
-            $building->maintainable()->update([
-                ...$maintainableRequest->validated()
-            ]);
+            $building = $this->maintainableService->createMaintainable($building, $maintainableRequest);
 
             DB::commit();
             return redirect()->route('tenant.buildings.index')->with(['message' => 'Building updated', 'type' => 'success']);

@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -68,10 +69,14 @@ class User extends Authenticatable
         return self::MAX_UPLOAD_SIZE_MB * 1024;
     }
 
-
     public function maintainables(): BelongsToMany
     {
         return $this->belongsToMany(Maintainable::class, 'user_maintainable');
+    }
+
+    public function manager(): HasMany
+    {
+        return $this->hasMany(Maintainable::class, 'maintenance_manager_id');
     }
 
     public function provider(): BelongsTo

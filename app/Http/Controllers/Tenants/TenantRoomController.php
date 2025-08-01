@@ -17,11 +17,13 @@ use App\Models\Central\CategoryType;
 use App\Http\Requests\Tenant\TenantRoomRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Services\MaintainableService;
 
 class TenantRoomController extends Controller
 {
     public function __construct(
         protected QRCodeService $qrCodeService,
+        protected MaintainableService $maintainableService,
     ) {}
 
     /**
@@ -70,11 +72,7 @@ class TenantRoomController extends Controller
 
             $room->save();
 
-            $room->maintainable()->create($maintainableRequest->validated());
-
-            if ($maintainableRequest->validated('providers')) {
-                $room->maintainable->providers()->sync($maintainableRequest->validated('providers'));
-            }
+            $room = $this->maintainableService->createMaintainable($room, $maintainableRequest);
 
             $files = $documentUploadRequest->validated('files');
             if ($files) {
@@ -141,7 +139,7 @@ class TenantRoomController extends Controller
                 'surface_walls' => $roomRequest->validated('surface_walls'),
             ]);
 
-            $room->maintainable()->update($maintainableRequest->validated());
+            $room = $this->maintainableService->createMaintainable($room, $maintainableRequest);
 
             DB::commit();
 

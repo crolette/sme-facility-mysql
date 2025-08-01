@@ -51,6 +51,11 @@ class Maintainable extends Model
         return $this->belongsToMany(User::class, 'user_maintainable');
     }
 
+    public function manager(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'maintenance_manager_id');
+    }
+
     public function providers(): BelongsToMany
     {
         return $this->belongsToMany(Provider::class, 'provider_maintainable');

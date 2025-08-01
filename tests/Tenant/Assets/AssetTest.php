@@ -7,15 +7,16 @@ use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Building;
-use Illuminate\Http\UploadedFile;
+use App\Models\Tenants\Provider;
 
+use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
+use function PHPUnit\Framework\assertCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
-use function PHPUnit\Framework\assertCount;
 
 
 beforeEach(function () {
@@ -605,7 +606,7 @@ it('can attach a provider to an asset\'s maintainable', function () {
         'locationId' => $this->site->id,
         'locationReference' => $this->site->reference_code,
         'locationType' => 'site',
-        'categoryId' => $this->category->id,
+        'categoryId' => $this->categoryType->id,
         'purchase_cost' => 9999999.2,
         'providers' => [$provider->id]
     ];
@@ -615,4 +616,24 @@ it('can attach a provider to an asset\'s maintainable', function () {
 
     $asset = Asset::first();
     assertCount(1, $asset->maintainable->providers);
+});
+
+
+it('can update providers to an asset\'s maintainable', function () {
+
+    Provider::factory()->count(3)->create();
+    $providers = Provider::all()->pluck('id');
+    $asset = Asset::factory()->forLocation($this->room)->create();
+
+    $formData = [
+        'name' => "New asset name",
+        'description' => "New asset description",
+        'categoryId' => $asset->assetCategory->id,
+        'providers' => [...$providers]
+    ];
+
+    $response = $this->patchToTenant('tenant.assets.update', $formData, $asset);
+
+    $asset = Asset::find($asset->id);
+    assertCount(3, $asset->maintainable->providers);
 });

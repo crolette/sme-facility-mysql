@@ -15,6 +15,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
+use App\Services\MaintainableService;
 use App\Http\Requests\Tenant\TenantFloorRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
@@ -23,6 +24,7 @@ class TenantFloorController extends Controller
 {
     public function __construct(
         protected QRCodeService $qrCodeService,
+        protected MaintainableService $maintainableService
     ) {}
 
     /**
@@ -72,9 +74,7 @@ class TenantFloorController extends Controller
             $floor->building()->associate($building);
             $floor->save();
 
-            $floor->maintainable()->create([
-                ...$maintainableRequest->validated()
-            ]);
+            $floor = $this->maintainableService->createMaintainable($floor, $maintainableRequest);
 
             if ($maintainableRequest->validated('providers')) {
                 $floor->maintainable->providers()->sync($maintainableRequest->validated('providers'));
@@ -145,9 +145,7 @@ class TenantFloorController extends Controller
                 'surface_walls' => $floorRequest->validated('surface_walls'),
             ]);
 
-            $floor->maintainable()->update([
-                ...$maintainableRequest->validated()
-            ]);
+            $floor = $this->maintainableService->createMaintainable($floor, $maintainableRequest);
 
             DB::commit();
             return redirect()->route('tenant.floors.index')->with(['message' => 'Floor updated', 'type' => 'success']);
