@@ -24,11 +24,11 @@ class UserService
         $files = Storage::disk('tenants')->files($directory);
 
         if (count($files) > 0) {
-            $this->deleteExistingQR($files);
+            $this->deleteExistingFiles($files);
         }
 
 
-        $fileName = Carbon::now()->isoFormat('YYYYMMDD') . '_avatar_' . Str::slug($name, '-') . '.' . $file->extension();
+        $fileName = Carbon::now()->isoFormat('YYYYMMDDHHMM') . '_avatar_' . Str::slug($name, '-') . '.' . $file->extension();
         $path = Storage::disk('tenants')->putFileAs($directory, $file, $fileName);
 
         $user->avatar = $path;

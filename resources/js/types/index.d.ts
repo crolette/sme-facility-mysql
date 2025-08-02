@@ -217,6 +217,7 @@ export interface Provider {
     phone_number: string;
     logo?: string;
     logo_path?: string;
+    users?: User[];
 }
 
 export interface User {

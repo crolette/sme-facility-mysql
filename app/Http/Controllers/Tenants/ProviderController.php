@@ -43,6 +43,6 @@ class ProviderController extends Controller
      */
     public function show(Provider $provider)
     {
-        return Inertia::render('tenants/providers/show', ['item' => $provider]);
+        return Inertia::render('tenants/providers/show', ['item' => $provider->load('users')]);
     }
 }

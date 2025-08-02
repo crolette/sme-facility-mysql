@@ -8,17 +8,19 @@ interface ImageUploadModalProps {
     isOpen: boolean;
     onClose: () => void;
     uploadUrl: string;
+    title?: string;
     onUploadSuccess?: (result: any) => void; // ou un type plus spécifique selon votre API
 }
 
 // Props pour Modal
-interface ModalProps {
+interface ModaleProps {
     isOpen: boolean;
     onClose: () => void;
+    title: string;
     children: React.ReactNode;
 }
 
-const Modale = ({ isOpen, onClose, children }: ModalProps) => {
+const Modale = ({ isOpen, onClose, children, title }: ModaleProps) => {
     if (!isOpen) return null;
 
     return (
@@ -30,7 +32,7 @@ const Modale = ({ isOpen, onClose, children }: ModalProps) => {
             <div className="bg-background relative z-10 mx-4 w-full max-w-md rounded-lg shadow-xl">
                 {/* Header */}
                 <div className="border-foreground flex items-center justify-between border-b p-4">
-                    <h3 className="text-lg font-semibold">Image upload</h3>
+                    <h3 className="text-lg font-semibold">{title}</h3>
                     <Button onClick={onClose} className="hover:bg-foreground/80 rounded-full transition-colors" type="button">
                         <X size={20} className="" />
                     </Button>
@@ -43,7 +45,7 @@ const Modale = ({ isOpen, onClose, children }: ModalProps) => {
     );
 };
 
-export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUploadSuccess }: ImageUploadModalProps) {
+export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUploadSuccess, title = 'Upload image' }: ImageUploadModalProps) {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [preview, setPreview] = useState(null);
     const [uploading, setUploading] = useState(false);
@@ -135,7 +137,7 @@ export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUpload
     };
 
     return (
-        <Modale isOpen={isOpen} onClose={handleClose}>
+        <Modale isOpen={isOpen} onClose={handleClose} title={title}>
             <div className="space-y-4">
                 {/* Zone de drop/sélection */}
                 <div

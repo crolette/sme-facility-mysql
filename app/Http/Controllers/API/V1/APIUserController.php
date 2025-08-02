@@ -6,12 +6,13 @@ use Illuminate\Support\Str;
 use App\Helpers\ApiResponse;
 use App\Models\Tenants\User;
 use App\Services\UserService;
+use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Password;
 use App\Http\Requests\Tenant\UserRequest;
-use Illuminate\Validation\Rules;
 
 class APIUserController extends Controller
 {
@@ -19,6 +20,10 @@ class APIUserController extends Controller
         protected UserService $userService
     ) {}
 
+    public function show(User $user)
+    {
+        return ApiResponse::success($user->load('provider:id,name'));
+    }
 
     public function store(UserRequest $request)
     {
@@ -55,14 +60,12 @@ class APIUserController extends Controller
     public function update(UserRequest $request, User $user)
     {
 
+        Debugbar::info($request->validated());
         try {
 
             DB::beginTransaction();
 
-            $user->update($request->validated());
-
-            if ($request->validated('avatar'))
-                $user = $this->userService->uploadAndAttachAvatar($user, $request->validated('avatar'), $request->validated('first_name') . ' ' . $request->validated('first_name'));
+            $user->update($request->safe()->except('avatar'));
 
             if ($request->validated('provider_id'))
                 $user = $this->userService->attachProvider($user, $request->validated('provider_id'));

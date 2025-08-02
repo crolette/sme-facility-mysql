@@ -14,6 +14,7 @@ export default function UserCreateUpdate({ user }: { user?: User }) {
             href: `/providers`,
         },
     ];
+    console.log(user);
 
     const { data, setData, reset } = useForm({
         first_name: user?.first_name ?? '',
@@ -21,8 +22,8 @@ export default function UserCreateUpdate({ user }: { user?: User }) {
         email: user?.email ?? '',
         can_login: user?.can_login ?? false,
         avatar: '',
-        provider_id: user?.provider_id ?? '',
-        provider_name: '',
+        provider_id: user?.provier_id ?? '',
+        provider_name: user?.provider?.name ?? '',
     });
 
     const [providers, setProviders] = useState<Provider[] | null>(null);

@@ -86,6 +86,14 @@ export default function ProviderShow({ item }: { item: Provider }) {
                 onUploadSuccess={handleUploadSuccess}
             />
             <h2>Users</h2>
+            <ul>
+                {provider.users &&
+                    provider.users.map((user, index) => (
+                        <li key={index}>
+                            {user.full_name} - {user.email}
+                        </li>
+                    ))}
+            </ul>
         </AppLayout>
     );
 }

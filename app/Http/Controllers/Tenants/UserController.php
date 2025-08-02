@@ -34,7 +34,7 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        return Inertia::render('tenants/users/create', ['user' => $user]);
+        return Inertia::render('tenants/users/create', ['user' => $user->load('provider:id,name')]);
     }
 
 
@@ -43,6 +43,6 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        return Inertia::render('tenants/users/show', ['user' => $user]);
+        return Inertia::render('tenants/users/show', ['item' => $user->load('provider:id,name')]);
     }
 }
