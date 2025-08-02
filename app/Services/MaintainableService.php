@@ -20,7 +20,8 @@ class MaintainableService
         $model->maintainable()->updateOrCreate(['maintainable_type' => get_class($model), 'maintainable_id' => $model->id], [...$request->validated()]);
 
         if ($request->validated('providers')) {
-            $model->maintainable->providers()->sync($request->validated('providers'));
+            Debugbar::info(collect($request->validated('providers'))->pluck('id'));
+            $model->maintainable->providers()->sync(collect($request->validated('providers'))->pluck('id'));
         }
         if ($request->validated('maintenance_manager_id')) {
             if ($model->maintainable->manager?->id !== $request->validated('maintenance_manager_id')) {

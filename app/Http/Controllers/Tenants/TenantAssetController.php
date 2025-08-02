@@ -97,7 +97,7 @@ class TenantAssetController extends Controller
      */
     public function show(Asset $asset)
     {
-        return Inertia::render('tenants/assets/show', ['asset' => $asset]);
+        return Inertia::render('tenants/assets/show', ['asset' => $asset->load('maintainable.manager:id,first_name,last_name', 'maintainable.providers:id,name')]);
     }
 
     public function showDeleted($id)
@@ -113,7 +113,7 @@ class TenantAssetController extends Controller
     {
         $categories = CategoryType::where('category', 'asset')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
-        return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents']), 'categories' => $categories, 'documentTypes' => $documentTypes]);
+        return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents', 'maintainable.manager']), 'categories' => $categories, 'documentTypes' => $documentTypes]);
     }
 
     /**

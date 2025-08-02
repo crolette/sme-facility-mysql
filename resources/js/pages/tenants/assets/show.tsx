@@ -39,6 +39,8 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
         }
     };
 
+    console.log(asset.maintainable);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Asset ${asset.maintainable.name}`} />
@@ -86,10 +88,21 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                 <p>Brand : {asset.brand}</p>
                 <p>Model : {asset.model}</p>
                 <p>Serial number : {asset.serial_number}</p>
+                <p>Maintenance manager : {asset.maintainable.manager?.full_name ?? 'No manager'}</p>
                 {asset.qr_code && (
                     <a href={route('api.qr.download', { path: asset.qr_code })} download className="w-fit cursor-pointer">
                         <img src={route('api.qr.show', { path: asset.qr_code })} alt="" className="h-32 w-32" />
                     </a>
+                )}
+                <p>Providers</p>
+                {asset.maintainable.providers && (
+                    <ul>
+                        {asset.maintainable.providers.map((provider, index) => (
+                            <li key={index}>
+                                <a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>
+                            </li>
+                        ))}
+                    </ul>
                 )}
 
                 <>

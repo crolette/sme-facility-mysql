@@ -68,7 +68,6 @@ export default function UserCreateUpdate({ user }: { user?: User }) {
     }, [debouncedSearch]);
 
     const [password, setPassword] = useState();
-    console.log(providers);
 
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();

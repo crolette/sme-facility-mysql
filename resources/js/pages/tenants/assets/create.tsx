@@ -1,16 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import InputError from '@/components/input-error';
+import SearchableInput from '@/components/SearchableInput';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { Asset, AssetCategory, CentralType, type BreadcrumbItem } from '@/types';
+import { Asset, AssetCategory, CentralType, Provider, User, type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
+
+interface Provider {
+    id: number;
+    name: string;
+}
 
 type TypeFormData = {
     q: string;
@@ -29,6 +35,8 @@ type TypeFormData = {
     brand: string;
     model: string;
     serial_number: string;
+    maintenance_manager_id: number | null;
+    maintenance_manager_name: string;
     files: {
         file: File;
         name: string;
@@ -37,6 +45,7 @@ type TypeFormData = {
         typeSlug: string;
     }[];
     pictures: File[];
+    providers: Provider[];
 };
 
 type SearchedLocation = {
@@ -74,6 +83,8 @@ export default function CreateAsset({
         locationType: asset?.location.location_type.level ?? '',
         locationName: asset?.location.maintainable.name ?? '',
         categoryId: asset?.asset_category.id ?? '',
+        maintenance_manager_id: asset?.maintainable?.maintenance_manager_id ?? null,
+        maintenance_manager_name: asset?.maintainable?.manager?.full_name ?? '',
         purchase_date: asset?.maintainable.purchase_date ?? '',
         purchase_cost: asset?.maintainable.purchase_cost ?? null,
         under_warranty: asset?.maintainable.under_warranty ?? false,
@@ -83,6 +94,7 @@ export default function CreateAsset({
         serial_number: asset?.maintainable.serial_number ?? '',
         files: selectedDocuments,
         pictures: [],
+        providers: [],
     });
 
     console.log(data);
@@ -484,6 +496,37 @@ export default function CreateAsset({
                             <InputError className="mt-2" message={errors.end_warranty_date} />
                         </div>
                     )}
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">Maintenance manager</label>
+                        <SearchableInput<User>
+                            searchUrl={route('api.users.search')}
+                            displayValue={data.maintenance_manager_name}
+                            getDisplayText={(user) => user.full_name}
+                            getKey={(user) => user.id}
+                            onSelect={(user) => {
+                                setData('maintenance_manager_id', user.id);
+                                setData('maintenance_manager_name', user.full_name);
+                            }}
+                            placeholder="Rechercher un manager..."
+                            className="mb-4"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">Providers</label>
+                        <SearchableInput<Provider>
+                            multiple={true}
+                            searchUrl={route('api.providers.search')}
+                            selectedItems={data.providers}
+                            getDisplayText={(provider) => provider.name}
+                            getKey={(provider) => provider.id}
+                            onSelect={(providers) => {
+                                setData('providers', providers);
+                            }}
+                            placeholder="Search providers..."
+                        />
+                    </div>
+
                     {!asset && (
                         <div>
                             <Label>Pictures</Label>

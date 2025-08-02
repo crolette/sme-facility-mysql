@@ -47,6 +47,9 @@ export interface Maintainable {
     brand: string;
     model: string;
     serial_number: string;
+    maintenance_manager_id: number;
+    manager?: User;
+    providers?: Provider[];
 }
 
 export interface TenantSite {
