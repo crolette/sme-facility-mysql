@@ -95,7 +95,7 @@ class TenantSiteController extends Controller
      */
     public function show(Site $site)
     {
-        return Inertia::render('tenants/locations/show', ['routeName' => 'sites', 'location' => $site->load(['locationType', 'documents'])]);
+        return Inertia::render('tenants/locations/show', ['routeName' => 'sites', 'location' => $site->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers'])]);
     }
 
     /**

@@ -1,14 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import InputError from '@/components/input-error';
+import SearchableInput from '@/components/SearchableInput';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { CentralType, LocationType, TenantBuilding, TenantFloor, TenantRoom, TenantSite, type BreadcrumbItem } from '@/types';
+import { CentralType, LocationType, TenantBuilding, TenantFloor, TenantRoom, TenantSite, User, type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
+
+interface Provider {
+    id: number;
+    name: string;
+}
 
 type TypeFormData = {
     name: string;
@@ -17,6 +23,8 @@ type TypeFormData = {
     surface_walls: null | number;
     levelType: string | number;
     locationType: string | number;
+    maintenance_manager_id: number | null;
+    maintenance_manager_name: string;
     files: {
         file: File;
         name: string;
@@ -24,6 +32,7 @@ type TypeFormData = {
         typeId: null | number;
         typeSlug: string;
     }[];
+    providers: Provider[];
 };
 
 export default function CreateLocation({
@@ -51,12 +60,15 @@ export default function CreateLocation({
         description: location?.maintainable?.description ?? '',
         surface_floor: location?.surface_floor ?? null,
         surface_walls: location?.surface_walls ?? null,
-        levelType: (location?.level_id ?? levelTypes?.length == 1) ? levelTypes[0].id : '',
-        locationType: (location?.location_type?.id ?? locationTypes.length == 1) ? locationTypes[0].id : '',
+        levelType: location?.level_id ?? '',
+        locationType: location?.location_type?.id ?? '',
         files: selectedDocuments,
+        maintenance_manager_id: location?.maintainable?.maintenance_manager_id ?? null,
+        maintenance_manager_name: location?.maintainable?.manager?.full_name ?? '',
+        providers: [],
     });
 
-    console.log(data);
+    console.log(data, location);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -314,6 +326,35 @@ export default function CreateLocation({
                         placeholder="Description"
                     />
                     <InputError className="mt-2" message={errors.description} />
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">Maintenance manager</label>
+                        <SearchableInput<User>
+                            searchUrl={route('api.users.search')}
+                            displayValue={data.maintenance_manager_name}
+                            getDisplayText={(user) => user.full_name}
+                            getKey={(user) => user.id}
+                            onSelect={(user) => {
+                                setData('maintenance_manager_id', user.id);
+                                setData('maintenance_manager_name', user.full_name);
+                            }}
+                            placeholder="Rechercher un manager..."
+                            className="mb-4"
+                        />
+                    </div>
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">Providers</label>
+                        <SearchableInput<Provider>
+                            multiple={true}
+                            searchUrl={route('api.providers.search')}
+                            selectedItems={data.providers}
+                            getDisplayText={(provider) => provider.name}
+                            getKey={(provider) => provider.id}
+                            onSelect={(providers) => {
+                                setData('providers', providers);
+                            }}
+                            placeholder="Search providers..."
+                        />
+                    </div>
                     {!location && (
                         <div id="files">
                             <Button onClick={() => setShowFileModal(!showFileModal)} type="button">

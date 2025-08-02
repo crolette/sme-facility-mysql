@@ -97,7 +97,7 @@ class TenantRoomController extends Controller
      */
     public function show(Room $room)
     {
-        return Inertia::render('tenants/locations/show', ['routeName' => 'rooms', 'location' => $room->load(['floor', 'documents', 'tickets.pictures'])]);
+        return Inertia::render('tenants/locations/show', ['routeName' => 'rooms', 'location' => $room->load(['floor', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers'])]);
     }
 
     /**
@@ -116,7 +116,6 @@ class TenantRoomController extends Controller
      */
     public function update(TenantRoomRequest $roomRequest, MaintainableRequest $maintainableRequest, Room $room)
     {
-
         if ($roomRequest->validated('locationType') !== $room->locationType->id) {
             $errors = new MessageBag([
                 'locationType' => ['You cannot change the type of a location'],

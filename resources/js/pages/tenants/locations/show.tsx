@@ -51,6 +51,24 @@ export default function ShowLocation({
                         <img src={route('api.qr.show', { path: location.qr_code })} alt="" className="h-32 w-32" />
                     </a>
                 )}
+                <p>
+                    Maintenance manager:
+                    {location.maintainable.manager ? (
+                        <a href={route('tenant.users.show', location.maintainable.manager.id)}>{location.maintainable.manager.full_name}</a>
+                    ) : (
+                        'No manager'
+                    )}
+                </p>
+                <p>Providers</p>
+                {location.maintainable.providers && (
+                    <ul>
+                        {location.maintainable.providers.map((provider, index) => (
+                            <li key={index}>
+                                <a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>
+                            </li>
+                        ))}
+                    </ul>
+                )}
                 <AssetManager itemCode={location.reference_code} type={routeName} />
                 <TicketManager itemCode={location.reference_code} getTicketsUrl={`api.${routeName}.tickets`} locationType={routeName} />
                 <DocumentManager

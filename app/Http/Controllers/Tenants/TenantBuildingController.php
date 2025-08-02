@@ -106,7 +106,7 @@ class TenantBuildingController extends Controller
     {
         // dd($building->load('locationType'));
 
-        return Inertia::render('tenants/locations/show', ['routeName' => 'buildings', 'location' => $building->load('site', 'documents')]);
+        return Inertia::render('tenants/locations/show', ['routeName' => 'buildings', 'location' => $building->load('site', 'documents', 'maintainable.manager', 'maintainable.providers')]);
     }
 
     /**
