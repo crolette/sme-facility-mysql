@@ -6,7 +6,9 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use App\Models\Tenants\Provider;
 use App\Rules\NotDisposableEmail;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\File;
 
 class ProviderRequest extends FormRequest
 {
@@ -21,10 +23,18 @@ class ProviderRequest extends FormRequest
     public function prepareForValidation()
     {
         $data = $this->all();
+        // Debugbar::info($data);
+        // Debugbar::info($data['logo'], gettype($data['logo']), gettype($data['logo']) === "string");
 
         if (isset($data['email'])) {
             $data['email'] = Str::lower($data['email']);
         }
+
+        // if (isset($data['logo'])) {
+        //     $data['logo'] = gettype($data['logo']) === "string" || null ? null : $data['logo'];
+        // }
+
+        // Debugbar::info('after', $data['logo'], gettype($data['logo']), gettype($data['logo']) === "string");
 
         $this->replace($data);
     }

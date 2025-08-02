@@ -166,6 +166,8 @@ export const DocumentManager = ({
         }
     };
 
+    console.log(newFileData);
+
     return (
         <>
             <details>

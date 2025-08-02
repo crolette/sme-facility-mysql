@@ -5,18 +5,24 @@ namespace App\Http\Controllers\API\V1;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Helpers\ApiResponse;
+use App\Services\LogoService;
 use App\Models\Tenants\Provider;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Tenant\ProviderRequest;
-use App\Services\LogoService;
 
 class APIProviderController extends Controller
 {
     public function __construct(
         protected LogoService $logoService
     ) {}
+
+    public function show(Provider $provider)
+    {
+        return ApiResponse::success($provider);
+    }
 
 
     public function store(ProviderRequest $request)
@@ -44,14 +50,16 @@ class APIProviderController extends Controller
 
     public function update(ProviderRequest $request, Provider $provider)
     {
-
+        Debugbar::info(gettype($request->validated('logo')), $request->validated('logo'), $request->validated('logo') != null);
         try {
 
             DB::beginTransaction();
 
             $provider->update($request->validated());
 
-            $provider = $this->logoService->uploadAndAttachLogo($provider, $request->validated('logo'), $request->validated('name'));
+            if (!$request->validated('logo') === null) {
+                $provider = $this->logoService->uploadAndAttachLogo($provider, $request->validated('logo'), $request->validated('name'));
+            }
 
             $provider->save();
 

@@ -13,31 +13,41 @@ use Illuminate\Support\Facades\Storage;
 
 class LogoService
 {
-    public function uploadAndAttachLogo(Provider $provider, $file, string $name): Provider
+    protected $tenantId;
+    protected $directory;
+
+    public function __construct()
     {
+        $this->tenantId = tenancy()->tenant->id ?? null;
+        $this->directory = "$this->tenantId/company/logo";
+    }
 
-        $tenantId = tenancy()->tenant->id;
-        $directory = "$tenantId/company/";
-
-        $files = Storage::disk('tenants')->files($directory);
-
-        if (count($files) > 0) {
-            $this->deleteExistingQR($files);
+    public function uploadAndAttachLogo(Provider $provider, $file, ?string $name = null): Provider
+    {
+        if ($provider->logo !== null) {
+            $provider = $this->deleteExistingFiles($provider);
         }
 
-
-        $fileName = Carbon::now()->isoFormat('YYYYMMDD') . '_logo_' . Str::slug($name, '-') . '.' . $file->extension();
-        $path = Storage::disk('tenants')->putFileAs($directory, $file, $fileName);
+        $fileName = Carbon::now()->isoFormat('YYYYMMDDHHMM') . '_logo_' . Str::slug($name ?? $provider->name, '-') . '.' . $file->extension();
+        $path = Storage::disk('tenants')->putFileAs($this->directory, $file, $fileName);
 
         $provider->logo = $path;
 
         return $provider;
     }
 
-    public function deleteExistingFiles($files)
+    public function deleteExistingFiles(Provider $provider)
     {
-        foreach ($files as $file) {
-            Storage::disk('tenants')->delete($file);
+        $files = Storage::disk('tenants')->files($this->directory);
+        if (count($files) > 0) {
+            foreach ($files as $file) {
+                Storage::disk('tenants')->delete($file);
+            }
         }
+
+        $provider->logo = null;
+        $provider->save();
+
+        return $provider;
     }
 };

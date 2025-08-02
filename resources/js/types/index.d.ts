@@ -212,9 +212,11 @@ export interface Provider {
     id: number;
     name: string;
     email: string;
+    address: string;
     vat_number: string;
     phone_number: string;
-    logo: string;
+    logo?: string;
+    logo_path?: string;
 }
 
 export interface User {

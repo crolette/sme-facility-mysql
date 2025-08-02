@@ -63,12 +63,25 @@ Route::prefix('/v1/')->group(
 
                     $path = $request->path;
 
+
                     if (! Storage::disk('tenants')->exists($path)) {
                         abort(404);
                     }
 
                     return Storage::disk('tenants')->download($path);
                 })->name('api.qr.download');
+
+                // Get image
+                Route::get('/image', function (Request $request) {
+
+                    $path = $request->path;
+
+                    if (! Storage::disk('tenants')->exists($path)) {
+                        abort(404);
+                    }
+
+                    return response()->file(Storage::disk('tenants')->path($path));
+                })->name('api.image.show');
 
                 Route::post('/qr/regen/{asset}', function (Asset $asset, QRCodeService $qRCodeService) {
                     $qRCodeService->createAndAttachQR($asset);

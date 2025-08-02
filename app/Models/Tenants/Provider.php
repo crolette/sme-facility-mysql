@@ -6,6 +6,7 @@ namespace App\Models\Tenants;
 
 use App\Models\Tenants\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -44,6 +45,10 @@ class Provider extends Model
         'updated_at',
     ];
 
+    protected $appends = [
+        'logo_path'
+    ];
+
     public const MAX_UPLOAD_SIZE_MB = 4;
 
     public static function maxUploadSizeKB(): int
@@ -59,5 +64,12 @@ class Provider extends Model
     public function maintainables(): BelongsToMany
     {
         return $this->belongsToMany(Maintainable::class, 'user_maintainable');
+    }
+
+    public function logoPath(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => Storage::disk('tenants')->url($this->logo) ?? null
+        );
     }
 }
