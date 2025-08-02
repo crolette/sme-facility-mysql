@@ -36,9 +36,13 @@ interface ChipProps<T> {
 
 function Chip<T>({ item, getDisplayText, onRemove }: ChipProps<T>) {
     return (
-        <span className="mr-2 mb-2 inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-sm text-blue-800">
+        <span className="mr-2 mb-2 inline-flex items-center rounded-full bg-gray-400 px-2 py-1 text-sm text-blue-800 dark:bg-gray-700 dark:text-gray-200">
             {getDisplayText(item)}
-            <button type="button" onClick={() => onRemove(item)} className="ml-1 text-blue-600 hover:text-blue-800 focus:outline-none">
+            <button
+                type="button"
+                onClick={() => onRemove(item)}
+                className="ml-1 cursor-pointer text-blue-600 hover:text-blue-800 focus:outline-none dark:text-gray-200 dark:hover:text-gray-100"
+            >
                 ×
             </button>
         </span>
@@ -182,11 +186,14 @@ function SearchableSelect<T>(props: SearchableSelectProps<T>) {
             )}
 
             {listIsOpen && (
-                <ul className="absolute z-10 max-h-60 w-full overflow-y-auto rounded-b border border-gray-300 bg-white shadow-lg" role="listbox">
+                <ul
+                    className="absolute z-10 max-h-60 w-full overflow-y-auto rounded-b border border-gray-300 bg-white shadow-lg dark:border-gray-600"
+                    role="listbox"
+                >
                     {isSearching && <li className="p-2 text-sm text-gray-500">Recherche en cours...</li>}
 
                     {!isSearching && items.length === 0 && debouncedSearch.length >= minSearchLength && (
-                        <li className="p-2 text-sm text-gray-500">Aucun résultat trouvé</li>
+                        <li className="bg-background text-foreground p-2 text-sm">Aucun résultat trouvé</li>
                     )}
 
                     {!isSearching &&
@@ -197,10 +204,10 @@ function SearchableSelect<T>(props: SearchableSelectProps<T>) {
                                     key={getKey(item)}
                                     role="option"
                                     onClick={() => handleSelect(item)}
-                                    className={`border-b border-gray-100 p-2 text-sm last:border-b-0 ${
+                                    className={`bg-background text-foreground border-b border-gray-100 p-2 text-sm last:border-b-0 dark:border-gray-600 ${
                                         isSelected
-                                            ? 'cursor-not-allowed bg-gray-100 text-gray-500'
-                                            : 'cursor-pointer hover:bg-blue-50 hover:text-blue-700'
+                                            ? 'cursor-not-allowed bg-gray-100 text-gray-500 dark:bg-gray-600 dark:text-white'
+                                            : 'cursor-pointer hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-gray-500 dark:hover:text-gray-50'
                                     }`}
                                 >
                                     {getDisplayText(item)}

@@ -1,3 +1,4 @@
+import SearchableInput from '@/components/SearchableInput';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -5,7 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Provider, User } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
-import { FormEventHandler, useEffect, useState } from 'react';
+import { FormEventHandler, useState } from 'react';
 
 export default function UserCreateUpdate({ user }: { user?: User }) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -25,47 +26,6 @@ export default function UserCreateUpdate({ user }: { user?: User }) {
         provider_id: user?.provier_id ?? '',
         provider_name: user?.provider?.name ?? '',
     });
-
-    const [providers, setProviders] = useState<Provider[] | null>(null);
-
-    const fetchProviders = async () => {
-        try {
-            const response = await axios.get(route('api.providers.search', { q: search }));
-            setProviders(response.data.data);
-            setIsSearching(false);
-            setListIsOpen(true);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    const [search, setSearch] = useState<string>('');
-    const [debouncedSearch, setDebouncedSearch] = useState(search);
-    const [listIsOpen, setListIsOpen] = useState(false);
-    const [isSearching, setIsSearching] = useState(false);
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedSearch(search);
-        }, 500);
-
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [search]);
-
-    useEffect(() => {
-        if (debouncedSearch.length < 2) {
-            setProviders([]);
-        }
-        if (debouncedSearch.length >= 2) {
-            setIsSearching(true);
-            setListIsOpen(true);
-            if (debouncedSearch) {
-                fetchProviders();
-            }
-        }
-    }, [debouncedSearch]);
 
     const [password, setPassword] = useState();
 
@@ -87,12 +47,10 @@ export default function UserCreateUpdate({ user }: { user?: User }) {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
-                if (response.data.status === 'success') {
-                    console.log(response.data.data, response.data.data.password);
+                if (response.data.status === 'success' && response.data.data.password) {
                     setPassword(response.data.data.password);
-                    reset();
-                    // window.location.href = user ? route('tenant.users.show', user.id) : route('tenant.providers.index');
                 }
+                reset();
             } catch (error) {
                 console.log(error);
             }
@@ -117,7 +75,11 @@ export default function UserCreateUpdate({ user }: { user?: User }) {
                     <Label>Email</Label>
                     <Input type="email" onChange={(e) => setData('email', e.target.value)} value={data.email} />
                     <Label>Can login</Label>
-                    <Input type="checkbox" onChange={(e) => setData('can_login', e.target.checked)} checked={data.can_login ?? false} />
+                    <Input
+                        type="checkbox"
+                        onChange={(e) => setData('can_login', e.target.checked ? true : false)}
+                        checked={data.can_login ?? false}
+                    />
                     {!user && (
                         <>
                             <Label>Avatar</Label>
@@ -131,38 +93,21 @@ export default function UserCreateUpdate({ user }: { user?: User }) {
                             <p className="text-xs">Accepted files: png, jpg - Maximum file size: 4MB</p>
                         </>
                     )}
-                    <Label>Provider</Label>
-                    <Input type="text" onChange={(e) => setSearch(e.target.value)} value={search.length > 0 ? search : data.provider_name} />
-                    {providers && providers.length > 0 && (
-                        <ul className="bg-background absolute z-10 flex w-full flex-col border" aria-autocomplete="list" role="listbox">
-                            {isSearching && (
-                                <li value="0" key="" className="">
-                                    Searching...
-                                </li>
-                            )}
-                            {listIsOpen &&
-                                providers &&
-                                providers.length > 0 &&
-                                providers?.map((provider) => (
-                                    <li
-                                        role="option"
-                                        value={provider.id}
-                                        key={provider.id}
-                                        onClick={() => {
-                                            setData('provider_name', provider.name);
-                                            setData('provider_id', provider.id);
-                                            setSearch('');
-                                            setListIsOpen(false);
-                                            setProviders([]);
-                                        }}
-                                        // onClick={() => setSelectedLocation(location)}
-                                        className="hover:bg-foreground hover:text-background cursor-pointer p-2 text-sm"
-                                    >
-                                        {provider.name}
-                                    </li>
-                                ))}
-                        </ul>
-                    )}
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">Maintenance manager</label>
+                        <SearchableInput<Provider>
+                            searchUrl={route('api.providers.search')}
+                            displayValue={data.provider_name}
+                            getDisplayText={(provider) => provider.name}
+                            getKey={(provider) => provider.id}
+                            onSelect={(provider) => {
+                                setData('provider_id', provider.id);
+                                setData('provider_name', provider.name);
+                            }}
+                            placeholder="Search provider"
+                            className="mb-4"
+                        />
+                    </div>
 
                     <Button>Submit</Button>
                 </form>

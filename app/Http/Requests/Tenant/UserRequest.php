@@ -30,7 +30,7 @@ class UserRequest extends FormRequest
         }
 
         if (isset($data['can_login'])) {
-            $data['can_login'] = $data['can_login'] === "true" || true ? true : false;
+            $data['can_login'] = $data['can_login'] === ("true" || true) ? true : false;
         }
 
         $this->replace($data);

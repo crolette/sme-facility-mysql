@@ -99,10 +99,8 @@ export default function IndexTickets() {
                     </li>
                 </ul>
             </div>
-            <details open>
-                <summary className="">
-                    <h3 className="inline">Tickets ({tickets?.length ?? 0})</h3>
-                </summary>
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+                <h3 className="inline">Tickets ({tickets?.length ?? 0})</h3>
                 {fetchingData && [<p>Loading tickets...</p>]}
                 {!fetchingData && tickets && tickets?.length > 0 && (
                     <Table>
@@ -160,7 +158,7 @@ export default function IndexTickets() {
                         </TableBody>
                     </Table>
                 )}
-            </details>
+            </div>
         </AppLayout>
     );
 }

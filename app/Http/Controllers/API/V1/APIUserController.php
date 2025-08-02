@@ -27,6 +27,7 @@ class APIUserController extends Controller
 
     public function store(UserRequest $request)
     {
+        Debugbar::info($request->validated());
         try {
 
             DB::beginTransaction();

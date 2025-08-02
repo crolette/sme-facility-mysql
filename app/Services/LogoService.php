@@ -19,17 +19,18 @@ class LogoService
     public function __construct()
     {
         $this->tenantId = tenancy()->tenant->id ?? null;
-        $this->directory = "$this->tenantId/company/logo";
+        $this->directory = "$this->tenantId/providers/";
     }
 
     public function uploadAndAttachLogo(Provider $provider, $file, ?string $name = null): Provider
     {
+        $directory = $this->directory . $provider->id . '/logo';
         if ($provider->logo !== null) {
             $provider = $this->deleteExistingFiles($provider);
         }
 
         $fileName = Carbon::now()->isoFormat('YYYYMMDDHHMM') . '_logo_' . Str::slug($name ?? $provider->name, '-') . '.' . $file->extension();
-        $path = Storage::disk('tenants')->putFileAs($this->directory, $file, $fileName);
+        $path = Storage::disk('tenants')->putFileAs($directory, $file, $fileName);
 
         $provider->logo = $path;
 
@@ -38,7 +39,8 @@ class LogoService
 
     public function deleteExistingFiles(Provider $provider)
     {
-        $files = Storage::disk('tenants')->files($this->directory);
+        $directory = $this->directory . $provider->id . '/logo';
+        $files = Storage::disk('tenants')->files($directory);
         if (count($files) > 0) {
             foreach ($files as $file) {
                 Storage::disk('tenants')->delete($file);

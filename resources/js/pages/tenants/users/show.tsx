@@ -52,7 +52,7 @@ export default function UserShow({ item }: { item: User }) {
                 <a href={route(`tenant.users.edit`, user.id)}>
                     <Button>Edit</Button>
                 </a>
-                <Button onClick={() => deleteUser(user)} variant={'destructive'}>
+                <Button onClick={() => deleteUser()} variant={'destructive'}>
                     Delete
                 </Button>
                 <Button onClick={() => setIsModalOpen(true)} variant={'secondary'}>

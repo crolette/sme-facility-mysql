@@ -45,7 +45,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Asset ${asset.maintainable.name}`} />
 
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col justify-between gap-4 rounded-xl p-4">
                 <div>
                     {asset.deleted_at ? (
                         <>
@@ -70,39 +70,76 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                         Generate QR
                     </Button>
                 </div>
-                <p>Code : {asset.code}</p>
-                <p>Reference code : {asset.reference_code}</p>
-                <p>
-                    Location : {asset.location.name} - {asset.location.description} -{' '}
-                    <a href={route(`tenant.${asset.location.location_type.level}s.show`, asset.location.reference_code)}>
-                        {asset.location.reference_code}
-                    </a>
-                </p>
-                <p>Category : {asset.category}</p>
-                <p>Name : {asset.name}</p>
-                <p>Surface : {asset.surface}</p>
-                <p>Description : {asset.description}</p>
-                <p>Purchase date : {asset.maintainable?.purchase_date}</p>
-                <p>Purchase cost : {asset.maintainable?.purchase_cost}</p>
-                <p>End warranty date : {asset.maintainable?.end_warranty_date}</p>
-                <p>Brand : {asset.brand}</p>
-                <p>Model : {asset.model}</p>
-                <p>Serial number : {asset.serial_number}</p>
-                <p>Maintenance manager : {asset.maintainable.manager?.full_name ?? 'No manager'}</p>
-                {asset.qr_code && (
-                    <a href={route('api.qr.download', { path: asset.qr_code })} download className="w-fit cursor-pointer">
-                        <img src={route('api.qr.show', { path: asset.qr_code })} alt="" className="h-32 w-32" />
-                    </a>
-                )}
-                <p>Providers</p>
+
+                <div className="flex items-center gap-2">
+                    <div className="flex w-full shrink-0 justify-between rounded-md border border-gray-200 p-4">
+                        <div>
+                            <h2>Code</h2>
+                            <div>
+                                <p>Code : {asset.code}</p>
+                                <p>Reference code : {asset.reference_code}</p>
+                                <p>
+                                    Location : {asset.location.name} - {asset.location.description} -{' '}
+                                    <a href={route(`tenant.${asset.location.location_type.level}s.show`, asset.location.reference_code)}>
+                                        {asset.location.reference_code}
+                                    </a>
+                                </p>
+                                <p>
+                                    Maintenance manager:
+                                    {asset.maintainable.manager ? (
+                                        <a href={route('tenant.users.show', asset.maintainable.manager.id)}>
+                                            {' '}
+                                            {asset.maintainable.manager.full_name}
+                                        </a>
+                                    ) : (
+                                        'No manager'
+                                    )}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="shrink-1">
+                            {asset.qr_code && (
+                                <a href={route('api.file.download', { path: asset.qr_code })} download className="w-fit cursor-pointer">
+                                    <img src={route('api.image.show', { path: asset.qr_code })} alt="" className="h-32 w-32" />
+                                </a>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                <div className="rounded-md border border-gray-200 p-4">
+                    <h2>Asset information</h2>
+                    <div>
+                        <p>Category : {asset.category}</p>
+                        <p>Name : {asset.name}</p>
+                        <p>Description : {asset.description}</p>
+                        <p>Brand : {asset.brand}</p>
+                        <p>Model : {asset.model}</p>
+                        <p>Serial number : {asset.serial_number}</p>
+                        <p>Surface : {asset.surface}</p>
+                    </div>
+                </div>
+
+                <div className="rounded-md border border-gray-200 p-4">
+                    <h2>Purchase/Warranty</h2>
+                    <div>
+                        <p>Purchase date : {asset.maintainable?.purchase_date}</p>
+                        <p>Purchase cost : {asset.maintainable?.purchase_cost}</p>
+                        <p>End warranty date : {asset.maintainable?.end_warranty_date}</p>
+                    </div>
+                </div>
+
                 {asset.maintainable.providers && (
-                    <ul>
-                        {asset.maintainable.providers.map((provider, index) => (
-                            <li key={index}>
-                                <a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>
-                            </li>
-                        ))}
-                    </ul>
+                    <div className="rounded-md border border-gray-200 p-4">
+                        <h2>Providers</h2>
+                        <ul>
+                            {asset.maintainable.providers.map((provider, index) => (
+                                <li key={index}>
+                                    <a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 )}
 
                 <>
