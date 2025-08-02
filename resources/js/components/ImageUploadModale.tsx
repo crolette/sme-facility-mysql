@@ -3,7 +3,22 @@ import { ImageIcon, Upload, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Button } from './ui/button';
 
-const Modale = ({ isOpen, onClose, children }) => {
+// Props pour ImageUploadModal
+interface ImageUploadModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    uploadUrl: string;
+    onUploadSuccess?: (result: any) => void; // ou un type plus spécifique selon votre API
+}
+
+// Props pour Modal
+interface ModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    children: React.ReactNode;
+}
+
+const Modale = ({ isOpen, onClose, children }: ModalProps) => {
     if (!isOpen) return null;
 
     return (
@@ -28,15 +43,16 @@ const Modale = ({ isOpen, onClose, children }) => {
     );
 };
 
-export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUploadSuccess }) {
-    const [selectedFile, setSelectedFile] = useState(null);
+export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUploadSuccess }: ImageUploadModalProps) {
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [preview, setPreview] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const fileInputRef = useRef(null);
 
-    const handleFileSelect = (event) => {
-        const file = event.target.files[0];
+    console.log(selectedFile);
+    const handleFileSelect = (files: FileList | null) => {
+        const file = files?.[0];
         if (file) {
             const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
 
@@ -105,11 +121,11 @@ export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUpload
         onClose();
     };
 
-    const handleDragOver = (e) => {
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
     };
 
-    const handleDrop = (e) => {
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         const files = e.dataTransfer.files;
         if (files.length > 0) {
@@ -143,7 +159,7 @@ export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUpload
                 </div>
 
                 {/* Input file caché */}
-                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
+                <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => handleFileSelect(e.target.files)} className="hidden" />
 
                 {/* Erreur */}
                 {error && <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>}
@@ -153,7 +169,7 @@ export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUpload
                     <Button onClick={handleClose} disabled={uploading} variant={'secondary'}>
                         Annuler
                     </Button>
-                    <Button onClick={handleUpload} disabled={!selectedFile || uploading} variant={'green'}>
+                    <Button onClick={handleUpload} disabled={!selectedFile || uploading}>
                         {uploading ? (
                             <>
                                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
