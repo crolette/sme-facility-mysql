@@ -45,10 +45,10 @@ class UserService
 
     public function attachProvider(User $user, int $providerId): User
     {
-        if ($user->provider?->id === $providerId)
+        if ($user->provider_id === $providerId)
             return $user;
 
-        if ($user->provider?->id !== $providerId) {
+        if ($user->provider_id !== $providerId) {
             $user = $this->detachProvider($user);
         }
 

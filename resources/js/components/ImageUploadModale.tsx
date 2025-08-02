@@ -159,7 +159,13 @@ export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUpload
                 </div>
 
                 {/* Input file caché */}
-                <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => handleFileSelect(e.target.files)} className="hidden" />
+                <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png, image/jpeg, image/jpg"
+                    onChange={(e) => handleFileSelect(e.target.files)}
+                    className="hidden"
+                />
 
                 {/* Erreur */}
                 {error && <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>}

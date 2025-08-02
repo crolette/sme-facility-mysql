@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use App\Models\Tenants\User;
 use App\Rules\NotDisposableEmail;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UserRequest extends FormRequest
@@ -22,11 +23,20 @@ class UserRequest extends FormRequest
     {
         $data = $this->all();
 
+        Debugbar::info($data);
+
         if (isset($data['email'])) {
             $data['email'] = Str::lower($data['email']);
         }
 
+        if (isset($data['can_login'])) {
+            $data['can_login'] = $data['can_login'] === "true" ? true : false;
+        }
+
         $this->replace($data);
+
+
+        Debugbar::info($data);
     }
 
 

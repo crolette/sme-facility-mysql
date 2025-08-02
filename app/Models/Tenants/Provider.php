@@ -41,6 +41,7 @@ class Provider extends Model
      * @var list<string>
      */
     protected $hidden = [
+
         'created_at',
         'updated_at',
     ];

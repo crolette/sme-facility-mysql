@@ -17,7 +17,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $users = User::all()->load('provider:id,name');
         return Inertia::render('tenants/users/index', ['users' => $users]);
     }
 

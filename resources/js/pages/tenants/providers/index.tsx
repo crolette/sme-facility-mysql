@@ -12,7 +12,6 @@ export default function ProviderIndex({ providers }: { providers: Provider[] }) 
         },
     ];
 
-    console.log(providers);
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sites" />
