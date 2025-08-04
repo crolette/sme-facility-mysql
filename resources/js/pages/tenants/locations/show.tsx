@@ -9,15 +9,11 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { TenantBuilding, TenantFloor, TenantRoom, TenantSite, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
+import axios from 'axios';
 import { useState } from 'react';
 
-export default function ShowLocation({
-    location,
-    routeName,
-}: {
-    location: TenantSite | TenantBuilding | TenantFloor | TenantRoom;
-    routeName: string;
-}) {
+export default function ShowLocation({ item, routeName }: { item: TenantSite | TenantBuilding | TenantFloor | TenantRoom; routeName: string }) {
+    const [location, setLocation] = useState(item);
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `${location.reference_code} - ${location.maintainable.name}`,
@@ -26,6 +22,16 @@ export default function ShowLocation({
     ];
 
     const [showModaleRelocateRoom, setShowModaleRelocateRoom] = useState<boolean>(false);
+
+    const fetchLocation = async () => {
+        const response = await axios.get(route(`api.${routeName}.show`, location?.reference_code));
+        setLocation(response.data.data);
+    };
+
+    const markMaintenanceDone = async () => {
+        const response = await axios.post(route('api.maintenance.done', location.maintainable.id));
+        fetchLocation();
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -36,6 +42,11 @@ export default function ShowLocation({
                         <Button>Edit</Button>
                     </a>
                     {routeName === 'rooms' && <Button onClick={() => setShowModaleRelocateRoom(!showModaleRelocateRoom)}>Redefine room</Button>}
+                    {location.maintainable.need_maintenance && (
+                        <Button onClick={() => markMaintenanceDone()} variant={'green'}>
+                            Mark maintenance as done
+                        </Button>
+                    )}
                 </div>
                 {routeName === 'rooms' && showModaleRelocateRoom && (
                     <RealocateRoomManager room={location} itemCode={location.reference_code} onClose={() => setShowModaleRelocateRoom(false)} />
@@ -47,17 +58,6 @@ export default function ShowLocation({
                             <div>
                                 <p>Code : {location.code}</p>
                                 <p>Reference code : {location.reference_code}</p>
-                                <p>
-                                    Maintenance manager:
-                                    {location.maintainable.manager ? (
-                                        <a href={route('tenant.users.show', location.maintainable.manager.id)}>
-                                            {' '}
-                                            {location.maintainable.manager.full_name}
-                                        </a>
-                                    ) : (
-                                        'No manager'
-                                    )}
-                                </p>
                             </div>
                         </div>
                         <div className="shrink-1">
@@ -66,6 +66,25 @@ export default function ShowLocation({
                                     <img src={route('api.image.show', { path: location.qr_code })} alt="" className="h-32 w-32" />
                                 </a>
                             )}
+                        </div>
+                    </div>
+                    <div className="rounded-md border border-gray-200 p-4">
+                        <h2>Maintenance</h2>
+                        <div>
+                            <p>
+                                Maintenance manager:
+                                {location.maintainable.manager ? (
+                                    <a href={route('tenant.users.show', location.maintainable.manager.id)}>
+                                        {' '}
+                                        {location.maintainable.manager.full_name}
+                                    </a>
+                                ) : (
+                                    'No manager'
+                                )}
+                            </p>
+                            <p>Maintenance frequency : {location.maintainable.maintenance_frequency}</p>
+                            <p>Next maintenance date : {location.maintainable.next_maintenance_date}</p>
+                            <p>Last maintenance date : {location.maintainable.last_maintenance_date}</p>
                         </div>
                     </div>
                     <div className="rounded-md border border-gray-200 p-4">

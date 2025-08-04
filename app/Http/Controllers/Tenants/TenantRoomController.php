@@ -11,13 +11,14 @@ use App\Services\QRCodeService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
+use App\Enums\MaintenanceFrequency;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
+use App\Services\MaintainableService;
 use App\Http\Requests\Tenant\TenantRoomRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
-use App\Services\MaintainableService;
 
 class TenantRoomController extends Controller
 {
@@ -43,7 +44,8 @@ class TenantRoomController extends Controller
         $levelTypes = Floor::all();
         $locationTypes = LocationType::where('level', 'room')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
-        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms', 'documentTypes' => $documentTypes]);
+        $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
+        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
     }
 
     /**
@@ -97,7 +99,7 @@ class TenantRoomController extends Controller
      */
     public function show(Room $room)
     {
-        return Inertia::render('tenants/locations/show', ['routeName' => 'rooms', 'location' => $room->load(['floor', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers'])]);
+        return Inertia::render('tenants/locations/show', ['routeName' => 'rooms', 'item' => $room->load(['floor', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers'])]);
     }
 
     /**
@@ -108,7 +110,8 @@ class TenantRoomController extends Controller
         $levelTypes = Floor::all();
         $locationTypes = LocationType::where('level', 'room')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
-        return Inertia::render('tenants/locations/create', ['location' => $room->makeVisible(['level_id', 'location_type_id'])->load('floor'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms', 'documentTypes' => $documentTypes]);
+        $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
+        return Inertia::render('tenants/locations/create', ['location' => $room->makeVisible(['level_id', 'location_type_id'])->load('floor'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
     }
 
     /**

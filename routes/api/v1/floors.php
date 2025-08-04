@@ -41,6 +41,11 @@ Route::middleware([
     // Route::middleware(['auth'])->group(function () {
 
     Route::prefix('/{floor}')->group(function () {
+
+        Route::get('/', function (Floor $floor) {
+            return ApiResponse::success($floor->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers']));
+        })->name('api.floors.show');
+
         // Get all assets from a floor
         Route::get('/assets/', function (Floor $floor) {
             return ApiResponse::success($floor->load('assets')->assets);

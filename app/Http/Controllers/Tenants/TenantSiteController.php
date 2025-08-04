@@ -12,14 +12,15 @@ use App\Services\QRCodeService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
+use App\Enums\MaintenanceFrequency;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
+use App\Services\MaintainableService;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\TenantSiteRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
-use App\Services\MaintainableService;
 
 class TenantSiteController extends Controller
 {
@@ -46,7 +47,8 @@ class TenantSiteController extends Controller
     {
         $locationTypes = LocationType::where('level', 'site')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
-        return Inertia::render('tenants/locations/create', ['locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes]);
+        $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
+        return Inertia::render('tenants/locations/create', ['locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
     }
 
     /**
@@ -106,7 +108,9 @@ class TenantSiteController extends Controller
         $locationTypes = LocationType::where('level', 'site')->get();
 
         $documentTypes = CategoryType::where('category', 'document')->get();
-        return Inertia::render('tenants/locations/create', ['location' => $site, 'locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes]);
+        $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
+
+        return Inertia::render('tenants/locations/create', ['location' => $site, 'locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
     }
 
     /**
