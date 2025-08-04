@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Foundation\Inspiring;
+use Closure;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
@@ -27,6 +27,20 @@ class HandleInertiaRequests extends Middleware
     {
         return parent::version($request);
     }
+
+
+
+    public function handle(Request $request, Closure $next)
+    {
+        // remove Inertia cache to avoid displaying raw JSON
+        return parent::handle($request, $next)->setCache([
+            'no_cache' => true,
+            'no_store' => true,
+            'must_revalidate' => true,
+            'private' => true,
+        ]);
+    }
+
 
     /**
      * Define the props that are shared by default.
