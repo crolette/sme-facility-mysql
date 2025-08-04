@@ -68,34 +68,29 @@ export default function ShowLocation({
                             )}
                         </div>
                     </div>
-                    <p>{location.name}</p>
-                    <p>{location.description}</p>
-                    <p>Surface floor: {location.surface_floor}</p>
-                    <p>Surface walls: {location.surface_walls}</p>
-                    {/* <p>{location.qr_code_path}</p> */}
-                    {location.qr_code && (
-                        <a href={route(`api.file.download`, { path: location.qr_code })} className="w-fit cursor-pointer">
-                            <img src={route('api.image.show', { path: location.qr_code })} alt="" className="h-32 w-32" />
-                        </a>
-                    )}
-                    <p>
-                        Maintenance manager:
-                        {location.maintainable.manager ? (
-                            <a href={route('tenant.users.show', location.maintainable.manager.id)}>{location.maintainable.manager.full_name}</a>
-                        ) : (
-                            'No manager'
+                    <div className="rounded-md border border-gray-200 p-4">
+                        <h2>Location information</h2>
+                        <div>
+                            <p>Category : {location.category}</p>
+                            <p>Name : {location.name}</p>
+                            <p>Description : {location.description}</p>
+                            <p>Surface floor: {location.surface_floor}</p>
+                            <p>Surface walls: {location.surface_walls}</p>
+                        </div>
+                    </div>
+
+                    <div className="rounded-md border border-gray-200 p-4">
+                        <h2>Providers</h2>
+                        {location.maintainable.providers && (
+                            <ul>
+                                {location.maintainable.providers.map((provider, index) => (
+                                    <li key={index}>
+                                        <a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>
+                                    </li>
+                                ))}
+                            </ul>
                         )}
-                    </p>
-                    <p>Providers</p>
-                    {location.maintainable.providers && (
-                        <ul>
-                            {location.maintainable.providers.map((provider, index) => (
-                                <li key={index}>
-                                    <a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
+                    </div>
                     <AssetManager itemCode={location.reference_code} type={routeName} />
                     <TicketManager itemCode={location.reference_code} getTicketsUrl={`api.${routeName}.tickets`} locationType={routeName} />
                     <DocumentManager
