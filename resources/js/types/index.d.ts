@@ -47,6 +47,15 @@ export interface Maintainable {
     brand: string;
     model: string;
     serial_number: string;
+    need_maintenance: boolean;
+    maintenance_frequency: string;
+    next_maintenance_date: string;
+    last_maintenance_date: string;
+
+    maintenance_manager_id: number;
+    maintainable: TenantSite | TenantBuilding | TenantFloor | TenantRoom | Asset;
+    manager?: User;
+    providers?: Provider[];
 }
 
 export interface TenantSite {
@@ -208,6 +217,18 @@ export interface AssetCategory {
     translations: Translation[];
 }
 
+export interface Provider {
+    id: number;
+    name: string;
+    email: string;
+    address: string;
+    vat_number: string;
+    phone_number: string;
+    logo?: string;
+    logo_path?: string;
+    users?: User[];
+}
+
 export interface User {
     id: number;
     first_name: string;
@@ -216,6 +237,9 @@ export interface User {
     full_name: string;
     email: string;
     avatar?: string;
+    provider_id?: number;
+    provider?: Provider;
+    can_login: boolean;
     email_verified_at: string | null;
     created_at: string;
     updated_at: string;

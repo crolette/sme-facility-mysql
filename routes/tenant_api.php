@@ -48,27 +48,56 @@ Route::prefix('/v1/')->group(
 
 
                 // Get the qr code
-                Route::get('/qr/show', function (Request $request) {
+                // Route::get('/qr/show', function (Request $request) {
+
+                //     $path = $request->path;
+
+                //     if (! Storage::disk('tenants')->exists($path)) {
+                //         abort(404);
+                //     }
+
+
+                //     return response()->file(Storage::disk('tenants')->path($path));
+                // })->name('api.qr.show');
+
+                // Route::get('/qr/download', function (Request $request) {
+
+                //     $path = $request->path;
+
+
+                //     if (! Storage::disk('tenants')->exists($path)) {
+                //         abort(404);
+                //     }
+
+                //     return Storage::disk('tenants')->download($path);
+                // })->name('api.qr.download');
+
+                Route::get('/file', function (Request $request) {
 
                     $path = $request->path;
 
                     if (! Storage::disk('tenants')->exists($path)) {
                         abort(404);
                     }
-
-                    return response()->file(Storage::disk('tenants')->path($path));
-                })->name('api.qr.show');
-
-                Route::get('/qr/download', function (Request $request) {
-
-                    $path = $request->path;
-
-                    if (! Storage::disk('tenants')->exists($path)) {
-                        abort(404);
-                    }
-
+                    Debugbar::info(
+                        Storage::disk('tenants')->path($path)
+                    );
                     return Storage::disk('tenants')->download($path);
-                })->name('api.qr.download');
+                })->name('api.file.download');
+
+                // Get image
+                Route::get('/image', function (Request $request) {
+
+                    $path = $request->path;
+
+                    if (! Storage::disk('tenants')->exists($path)) {
+                        abort(404);
+                    }
+                    Debugbar::info(
+                        Storage::disk('tenants')->path($path)
+                    );
+                    return response()->file(Storage::disk('tenants')->path($path));
+                })->name('api.image.show');
 
                 Route::post('/qr/regen/{asset}', function (Asset $asset, QRCodeService $qRCodeService) {
                     $qRCodeService->createAndAttachQR($asset);

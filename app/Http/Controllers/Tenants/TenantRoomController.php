@@ -17,11 +17,13 @@ use App\Models\Central\CategoryType;
 use App\Http\Requests\Tenant\TenantRoomRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Services\MaintainableService;
 
 class TenantRoomController extends Controller
 {
     public function __construct(
         protected QRCodeService $qrCodeService,
+        protected MaintainableService $maintainableService,
     ) {}
 
     /**
@@ -70,7 +72,7 @@ class TenantRoomController extends Controller
 
             $room->save();
 
-            $room->maintainable()->create($maintainableRequest->validated());
+            $room = $this->maintainableService->createMaintainable($room, $maintainableRequest);
 
             $files = $documentUploadRequest->validated('files');
             if ($files) {
@@ -95,7 +97,7 @@ class TenantRoomController extends Controller
      */
     public function show(Room $room)
     {
-        return Inertia::render('tenants/locations/show', ['routeName' => 'rooms', 'location' => $room->load(['floor', 'documents', 'tickets.pictures'])]);
+        return Inertia::render('tenants/locations/show', ['routeName' => 'rooms', 'location' => $room->load(['floor', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers'])]);
     }
 
     /**
@@ -114,7 +116,6 @@ class TenantRoomController extends Controller
      */
     public function update(TenantRoomRequest $roomRequest, MaintainableRequest $maintainableRequest, Room $room)
     {
-
         if ($roomRequest->validated('locationType') !== $room->locationType->id) {
             $errors = new MessageBag([
                 'locationType' => ['You cannot change the type of a location'],
@@ -137,7 +138,7 @@ class TenantRoomController extends Controller
                 'surface_walls' => $roomRequest->validated('surface_walls'),
             ]);
 
-            $room->maintainable()->update($maintainableRequest->validated());
+            $room = $this->maintainableService->createMaintainable($room, $maintainableRequest);
 
             DB::commit();
 

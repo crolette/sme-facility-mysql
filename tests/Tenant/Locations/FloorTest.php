@@ -9,11 +9,13 @@ use App\Models\Tenants\Floor;
 use App\Models\Tenants\Picture;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
+use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Storage;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
+use function PHPUnit\Framework\assertCount;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
@@ -96,6 +98,24 @@ it('can create a new floor', function () {
         'name' => 'New floor',
         'description' => 'Description new floor',
     ]);
+});
+
+it('can attach a provider to a building\'s maintainable', function () {
+    $provider = Provider::factory()->create();
+
+    $formData = [
+        'name' => 'New floor',
+        'description' => 'Description new floor',
+        'levelType' => $this->building->id,
+        'locationType' => $this->floorType->id,
+        'providers' => [$provider->id]
+    ];
+
+    $response = $this->postToTenant('tenant.floors.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    $floor = Floor::first();
+    assertCount(1, $floor->maintainable->providers);
 });
 
 it('can upload several files to building', function () {
@@ -267,7 +287,8 @@ it('can delete a floor and his maintainable', function () {
         'code' => $floor->code
     ]);
 
-    $response = $this->deleteFromTenant('tenant.floors.destroy', $floor->code);
+    $response = $this->deleteFromTenant('tenant.floors.destroy', $floor->reference_code);
+    $response->assertSessionHasNoErrors();
     $response->assertStatus(302);
     assertDatabaseMissing('floors', [
         'reference_code' => $floor->reference_code

@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, BrickWall, Building, Building2, Cuboid, LayoutDashboard, LayoutGrid, Ticket } from 'lucide-react';
+import { BookOpen, BrickWall, Building, Building2, Cuboid, Handshake, LayoutDashboard, LayoutGrid, Ticket, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -43,11 +43,16 @@ const mainNavItems: NavItem[] = [
         href: '/tickets',
         icon: Ticket,
     },
-    // {
-    //     title: 'Interventions',
-    //     href: '/interventions',
-    //     icon: Wrench,
-    // },
+    {
+        title: 'Providers',
+        href: '/providers',
+        icon: Handshake,
+    },
+    {
+        title: 'Users',
+        href: '/users',
+        icon: Users,
+    },
 ];
 
 const footerNavItems: NavItem[] = [

@@ -35,7 +35,8 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "app/Helpers/TenantHelpers.php"
+            "app/Helpers/TenantHelpers.php",
+            "app/Helpers/MaintenanceDate.php"
         ]
     },
     "autoload-dev": {

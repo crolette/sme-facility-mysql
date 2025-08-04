@@ -166,6 +166,8 @@ export const DocumentManager = ({
         }
     };
 
+    console.log(newFileData);
+
     return (
         <>
             <details>
@@ -226,7 +228,7 @@ export const DocumentManager = ({
                 )}
             </details>
             {showFileModal && (
-                <div className="bg-background/50 absolute inset-0 z-50">
+                <div className="bg-background/50 fixed inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">
                         <div className="bg-background flex items-center justify-center p-4">
                             <div className="flex flex-col gap-2">

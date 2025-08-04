@@ -4,11 +4,15 @@ namespace App\Models\Tenants;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\Tenants\Provider;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class User extends Authenticatable
 {
@@ -25,7 +29,8 @@ class User extends Authenticatable
         'last_name',
         'email',
         'password',
-        'username',
+        'avatar',
+        'can_login'
 
     ];
 
@@ -53,7 +58,30 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'can_login' => 'boolean'
         ];
+    }
+
+    public const MAX_UPLOAD_SIZE_MB = 4;
+
+    public static function maxUploadSizeKB(): int
+    {
+        return self::MAX_UPLOAD_SIZE_MB * 1024;
+    }
+
+    public function maintainables(): BelongsToMany
+    {
+        return $this->belongsToMany(Maintainable::class, 'user_maintainable');
+    }
+
+    public function manager(): HasMany
+    {
+        return $this->hasMany(Maintainable::class, 'maintenance_manager_id');
+    }
+
+    public function provider(): BelongsTo
+    {
+        return $this->belongsTo(Provider::class);
     }
 
     public function fullName(): Attribute

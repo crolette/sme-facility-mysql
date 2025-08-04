@@ -2,36 +2,23 @@
 
 namespace App\Http\Controllers\Tenants;
 
+use App\Enums\MaintenanceFrequency;
 use Exception;
-use Carbon\Carbon;
 use Inertia\Inertia;
-use App\Enums\TicketStatus;
-use App\Services\QRService;
-use Illuminate\Support\Str;
-use App\Models\Tenants\Room;
-use App\Models\Tenants\Site;
-use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
-use App\Models\Tenants\Floor;
 use App\Services\AssetService;
-use App\Models\Tenants\Company;
 use App\Services\QRCodeService;
-use App\Models\Tenants\Building;
-use App\Models\Tenants\Document;
 use App\Services\PictureService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Central\AssetCategory;
-use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Tenant\AssetRequest;
-use App\Http\Requests\Tenant\FileUploadRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Services\MaintainableService;
 
 class TenantAssetController extends Controller
 {
@@ -39,6 +26,7 @@ class TenantAssetController extends Controller
     public function __construct(
         protected QRCodeService $qrCodeService,
         protected AssetService $assetService,
+        protected MaintainableService $maintainableService,
 
     ) {}
 
@@ -58,7 +46,8 @@ class TenantAssetController extends Controller
     {
         $categories = CategoryType::where('category', 'asset')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
-        return Inertia::render('tenants/assets/create', ['categories' => $categories, 'documentTypes' => $documentTypes]);
+        $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
+        return Inertia::render('tenants/assets/create', ['categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
     }
 
     /**
@@ -66,7 +55,6 @@ class TenantAssetController extends Controller
      */
     public function store(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, DocumentService $documentService,)
     {
-
         try {
             DB::beginTransaction();
 
@@ -79,10 +67,9 @@ class TenantAssetController extends Controller
             $asset->assetCategory()->associate($assetRequest->validated('categoryId'));
             $asset->save();
 
-            $asset->maintainable()->create($maintainableRequest->validated());
+            $asset = $this->maintainableService->createMaintainable($asset, $maintainableRequest);
 
             $files = $documentUploadRequest->validated('files');
-
             if ($files) {
                 $documentService->uploadAndAttachDocuments($asset, $files);
             }
@@ -111,7 +98,7 @@ class TenantAssetController extends Controller
      */
     public function show(Asset $asset)
     {
-        return Inertia::render('tenants/assets/show', ['asset' => $asset]);
+        return Inertia::render('tenants/assets/show', ['item' => $asset->load('maintainable.manager:id,first_name,last_name', 'maintainable.providers:id,name')]);
     }
 
     public function showDeleted($id)
@@ -127,7 +114,8 @@ class TenantAssetController extends Controller
     {
         $categories = CategoryType::where('category', 'asset')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
-        return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents']), 'categories' => $categories, 'documentTypes' => $documentTypes]);
+        $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
+        return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents', 'maintainable.manager']), 'categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
     }
 
     /**
@@ -151,10 +139,9 @@ class TenantAssetController extends Controller
                 ...$request->validated(),
             ]);
 
+            $asset = $this->maintainableService->createMaintainable($asset, $maintainableRequest);
 
             $asset->save();
-
-            $asset->maintainable()->update($maintainableRequest->validated());
 
             DB::commit();
 

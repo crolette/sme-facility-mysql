@@ -66,7 +66,7 @@ class APIInterventionController extends Controller
 
                 $model = $modelMap[$request->validated('locationType')];
                 if ($request->validated('locationType') === 'asset') {
-                    $location = $model::where('code', $request->validated('locationId'))->first();
+                    $location = $model::where('reference_code', $request->validated('locationId'))->first();
                 } else {
                     $location = $model::where('id', $request->validated('locationId'))->first();
                 }
