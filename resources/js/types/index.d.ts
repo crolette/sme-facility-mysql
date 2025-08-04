@@ -47,7 +47,13 @@ export interface Maintainable {
     brand: string;
     model: string;
     serial_number: string;
+    need_maintenance: boolean;
+    maintenance_frequency: string;
+    next_maintenance_date: string;
+    last_maintenance_date: string;
+
     maintenance_manager_id: number;
+    maintainable: TenantSite | TenantBuilding | TenantFloor | TenantRoom | Asset;
     manager?: User;
     providers?: Provider[];
 }

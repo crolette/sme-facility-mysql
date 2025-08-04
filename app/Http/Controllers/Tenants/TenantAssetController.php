@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Tenants;
 
+use App\Enums\MaintenanceFrequency;
 use Exception;
 use Inertia\Inertia;
 use App\Models\Tenants\Asset;
@@ -45,7 +46,8 @@ class TenantAssetController extends Controller
     {
         $categories = CategoryType::where('category', 'asset')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
-        return Inertia::render('tenants/assets/create', ['categories' => $categories, 'documentTypes' => $documentTypes]);
+        $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
+        return Inertia::render('tenants/assets/create', ['categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
     }
 
     /**
@@ -53,7 +55,6 @@ class TenantAssetController extends Controller
      */
     public function store(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, DocumentService $documentService,)
     {
-
         try {
             DB::beginTransaction();
 
@@ -97,7 +98,7 @@ class TenantAssetController extends Controller
      */
     public function show(Asset $asset)
     {
-        return Inertia::render('tenants/assets/show', ['asset' => $asset->load('maintainable.manager:id,first_name,last_name', 'maintainable.providers:id,name')]);
+        return Inertia::render('tenants/assets/show', ['item' => $asset->load('maintainable.manager:id,first_name,last_name', 'maintainable.providers:id,name')]);
     }
 
     public function showDeleted($id)
@@ -113,7 +114,8 @@ class TenantAssetController extends Controller
     {
         $categories = CategoryType::where('category', 'asset')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
-        return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents', 'maintainable.manager']), 'categories' => $categories, 'documentTypes' => $documentTypes]);
+        $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
+        return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents', 'maintainable.manager']), 'categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
     }
 
     /**

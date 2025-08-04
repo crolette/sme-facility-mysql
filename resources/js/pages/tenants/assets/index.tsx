@@ -137,7 +137,13 @@ export default function IndexAssets() {
                         <Button>Add asset</Button>
                     </a>
                 </div>
-                {activeAssetsTab && (
+                {isLoading && (
+                    <div className="my-4 flex gap-4">
+                        <Loader2 size={24} className="animate-spin" />
+                        <p className="animate-pulse">Loading...</p>
+                    </div>
+                )}
+                {!isLoading && activeAssetsTab && (
                     <>
                         <Table>
                             <TableHead>
@@ -150,13 +156,8 @@ export default function IndexAssets() {
                                     <TableHeadData></TableHeadData>
                                 </TableHeadRow>
                             </TableHead>
+
                             <TableBody>
-                                {isLoading && (
-                                    <div className="my-4 flex gap-4">
-                                        <Loader2 size={24} className="animate-spin" />
-                                        <p className="animate-pulse">Loading...</p>
-                                    </div>
-                                )}
                                 {assets &&
                                     assets.map((asset, index) => {
                                         return (
@@ -187,7 +188,8 @@ export default function IndexAssets() {
                         </Table>
                     </>
                 )}
-                {trashedAssetsTab && (
+
+                {!isLoading && trashedAssetsTab && (
                     <Table>
                         <TableHead>
                             <TableHeadRow>

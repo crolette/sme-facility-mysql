@@ -21,6 +21,11 @@ class Maintainable extends Model
         'under_warranty',
         'end_warranty_date',
 
+        'need_maintenance',
+        'maintenance_frequency',
+        'next_maintenance_date',
+        'last_maintenance_date',
+
         'maintainable_type',
         'maintainable_id'
     ];
@@ -36,7 +41,10 @@ class Maintainable extends Model
         return [
             'purchase_date' => 'date:Y-m-d',
             'end_warranty_date' => 'date:Y-m-d',
-            'under_warranty' => 'boolean'
+            'under_warranty' => 'boolean',
+            'need_maintenance' => 'boolean',
+            'next_maintenance_date' => 'date:Y-m-d',
+            'last_maintenance_date' => 'date:Y-m-d',
         ];
     }
 

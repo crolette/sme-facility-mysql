@@ -7,18 +7,26 @@ import AppLayout from '@/layouts/app-layout';
 import { Asset, type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
+import { useState } from 'react';
 
-export default function ShowAsset({ asset }: { asset: Asset }) {
+export default function ShowAsset({ item }: { item: Asset }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `${asset.reference_code} - ${asset.maintainable.name}`,
+            title: `${item.reference_code} - ${item.maintainable.name}`,
             href: ``,
         },
     ];
 
-    console.log(asset);
+    console.log(item);
 
     const { post, delete: destroy } = useForm();
+
+    const [asset, setAsset] = useState(item);
+
+    const fetchAsset = async () => {
+        const response = await axios.get(route('api.assets.show', asset.reference_code));
+        if (response.data.status === 'success') setAsset(response.data.data);
+    };
 
     const deleteAsset = (asset: Asset) => {
         destroy(route(`tenant.assets.destroy`, asset.reference_code));
@@ -35,11 +43,14 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
     const generateQR = async () => {
         const response = await axios.post(route('api.qr.regen', asset.reference_code));
         if (response.data.status === 'success') {
-            location.reload();
+            // location.reload();
         }
     };
 
-    console.log(asset.maintainable);
+    const markMaintenanceDone = async () => {
+        const response = await axios.post(route('api.maintenance.done', asset.maintainable.id));
+        fetchAsset();
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -64,10 +75,13 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                             <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
                                 Delete
                             </Button>
+                            <Button onClick={() => markMaintenanceDone()} variant={'green'}>
+                                Mark maintenance as done
+                            </Button>
                         </>
                     )}
                     <Button onClick={generateQR} variant={'secondary'}>
-                        Generate QR
+                        Generate new QR
                     </Button>
                 </div>
 
@@ -84,17 +98,6 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                                         {asset.location.reference_code}
                                     </a>
                                 </p>
-                                <p>
-                                    Maintenance manager:
-                                    {asset.maintainable.manager ? (
-                                        <a href={route('tenant.users.show', asset.maintainable.manager.id)}>
-                                            {' '}
-                                            {asset.maintainable.manager.full_name}
-                                        </a>
-                                    ) : (
-                                        'No manager'
-                                    )}
-                                </p>
                             </div>
                         </div>
                         <div className="shrink-1">
@@ -104,6 +107,23 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                                 </a>
                             )}
                         </div>
+                    </div>
+                </div>
+
+                <div className="rounded-md border border-gray-200 p-4">
+                    <h2>Maintenance</h2>
+                    <div>
+                        <p>
+                            Maintenance manager:
+                            {asset.maintainable.manager ? (
+                                <a href={route('tenant.users.show', asset.maintainable.manager.id)}> {asset.maintainable.manager.full_name}</a>
+                            ) : (
+                                'No manager'
+                            )}
+                        </p>
+                        <p>Maintenance frequency : {asset.maintainable.maintenance_frequency}</p>
+                        <p>Next maintenance date : {asset.maintainable.next_maintenance_date}</p>
+                        <p>Last maintenance date : {asset.maintainable.last_maintenance_date}</p>
                     </div>
                 </div>
 
@@ -129,7 +149,7 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                     </div>
                 </div>
 
-                {asset.maintainable.providers && (
+                {asset.maintainable.providers && asset.maintainable.providers?.length > 0 && (
                     <div className="rounded-md border border-gray-200 p-4">
                         <h2>Providers</h2>
                         <ul>
@@ -143,6 +163,12 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                 )}
 
                 <>
+                    <InterventionManager
+                        itemCodeId={asset.reference_code}
+                        getInterventionsUrl="api.assets.interventions"
+                        type="asset"
+                        closed={asset.deleted_at == null ? false : true}
+                    />
                     <TicketManager
                         itemCode={asset.reference_code}
                         getTicketsUrl={`api.assets.tickets`}
@@ -167,16 +193,8 @@ export default function ShowAsset({ asset }: { asset: Asset }) {
                         showRoute={'api.pictures.show'}
                         canAdd={asset.deleted_at == null ? true : false}
                     />
-                    <InterventionManager
-                        itemCodeId={asset.reference_code}
-                        getInterventionsUrl="api.assets.interventions"
-                        type="asset"
-                        closed={asset.deleted_at == null ? false : true}
-                    />
                 </>
             </div>
-
-            {/* {addPictures && addNewPicturesModal()} */}
         </AppLayout>
     );
 }

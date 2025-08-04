@@ -59,15 +59,15 @@ Route::middleware([
 
     Route::get('/assets/{id}/deleted', [TenantAssetController::class, 'showDeleted'])->name('tenant.assets.deleted');
 
-    Route::get('/assets/{asset}/tickets/create', [AssetTicketController::class, 'createFromAsset'])->name('tenant.assets.tickets.create');
+    // Route::get('/assets/{asset}/tickets/create', [AssetTicketController::class, 'createFromAsset'])->name('tenant.assets.tickets.create');
 
-    Route::get('/sites/{site}/tickets/create', [AssetTicketController::class, 'createFromSite'])->name('tenant.sites.tickets.create');
+    // Route::get('/sites/{site}/tickets/create', [AssetTicketController::class, 'createFromSite'])->name('tenant.sites.tickets.create');
 
-    Route::get('/buildings/{building}/tickets/create', [AssetTicketController::class, 'createFromBuilding'])->name('tenant.buildings.tickets.create');
+    // Route::get('/buildings/{building}/tickets/create', [AssetTicketController::class, 'createFromBuilding'])->name('tenant.buildings.tickets.create');
 
-    Route::get('/floors/{floor}/tickets/create', [AssetTicketController::class, 'createFromFloor'])->name('tenant.floors.tickets.create');
+    // Route::get('/floors/{floor}/tickets/create', [AssetTicketController::class, 'createFromFloor'])->name('tenant.floors.tickets.create');
 
-    Route::get('/rooms/{Room}/tickets/create', [AssetTicketController::class, 'createFromRoom'])->name('tenant.rooms.tickets.create');
+    // Route::get('/rooms/{Room}/tickets/create', [AssetTicketController::class, 'createFromRoom'])->name('tenant.rooms.tickets.create');
 
 
     // PROVIDERS

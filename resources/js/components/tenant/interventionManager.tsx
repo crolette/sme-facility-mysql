@@ -188,10 +188,11 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
 
     return (
         <div>
-            <p>Interventions ({interventions.length})</p>
-            {!closed && <Button onClick={openModale}>add intervention</Button>}
-
-            <ul>
+            <details>
+                <summary className="bg-red-5 border-2 p-2">
+                    <h3 className="inline">Interventions ({interventions?.length ?? 0})</h3>
+                    {!closed && <Button onClick={openModale}>add intervention</Button>}
+                </summary>
                 {interventions &&
                     interventions.length > 0 &&
                     interventions.map((intervention, index) => (
@@ -247,12 +248,15 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                             </TableBody>
                         </Table>
                     ))}
-            </ul>
+            </details>
             {addIntervention && (
-                <div className="bg-background/50 absolute inset-0 z-50">
+                <div className="bg-background/50 fixed inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">
-                        <div className="bg-background flex items-center justify-center p-4">
-                            <form onSubmit={submitType === 'new' ? submitIntervention : submitEditIntervention} className="flex flex-col space-y-2">
+                        <div className="bg-background flex items-center justify-center p-10">
+                            <form
+                                onSubmit={submitType === 'new' ? submitIntervention : submitEditIntervention}
+                                className="flex w-full flex-col space-y-4"
+                            >
                                 <Label>Intervention Type</Label>
                                 <select
                                     name="intervention_type"
@@ -325,53 +329,57 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     }
                                 ></Textarea>
                                 <Label>Planned at</Label>
-                                <Input
-                                    type="date"
-                                    value={interventionDataForm.planned_at ?? ''}
-                                    onChange={(e) =>
-                                        setInterventionDataForm((prev) => ({
-                                            ...prev,
-                                            planned_at: e.target.value,
-                                        }))
-                                    }
-                                />
-                                <Button
-                                    variant={'outline'}
-                                    type="button"
-                                    onClick={() =>
-                                        setInterventionDataForm((prev) => ({
-                                            ...prev,
-                                            planned_at: null,
-                                        }))
-                                    }
-                                >
-                                    Clear planned at
-                                </Button>
+                                <div className="flex gap-2">
+                                    <Input
+                                        type="date"
+                                        value={interventionDataForm.planned_at ?? ''}
+                                        onChange={(e) =>
+                                            setInterventionDataForm((prev) => ({
+                                                ...prev,
+                                                planned_at: e.target.value,
+                                            }))
+                                        }
+                                    />
+                                    <Button
+                                        variant={'outline'}
+                                        type="button"
+                                        onClick={() =>
+                                            setInterventionDataForm((prev) => ({
+                                                ...prev,
+                                                planned_at: null,
+                                            }))
+                                        }
+                                    >
+                                        Clear planned at
+                                    </Button>
+                                </div>
                                 <Label>Repair delay</Label>
-                                <Input
-                                    type="date"
-                                    value={interventionDataForm.repair_delay ?? ''}
-                                    onChange={(e) =>
-                                        setInterventionDataForm((prev) => ({
-                                            ...prev,
-                                            repair_delay: e.target.value,
-                                        }))
-                                    }
-                                />
-                                <Button
-                                    variant={'outline'}
-                                    type="button"
-                                    onClick={() =>
-                                        setInterventionDataForm((prev) => ({
-                                            ...prev,
-                                            repair_delay: null,
-                                        }))
-                                    }
-                                >
-                                    Clear Repair delay
-                                </Button>
+                                <div className="flex gap-2">
+                                    <Input
+                                        type="date"
+                                        value={interventionDataForm.repair_delay ?? ''}
+                                        onChange={(e) =>
+                                            setInterventionDataForm((prev) => ({
+                                                ...prev,
+                                                repair_delay: e.target.value,
+                                            }))
+                                        }
+                                    />
+                                    <Button
+                                        variant={'outline'}
+                                        type="button"
+                                        onClick={() =>
+                                            setInterventionDataForm((prev) => ({
+                                                ...prev,
+                                                repair_delay: null,
+                                            }))
+                                        }
+                                    >
+                                        Clear Repair delay
+                                    </Button>
+                                </div>
                                 <Button type="submit">Submit</Button>
-                                <Button onClick={cancelModale} type="button">
+                                <Button onClick={cancelModale} type="button" variant={'secondary'}>
                                     Cancel
                                 </Button>
                             </form>

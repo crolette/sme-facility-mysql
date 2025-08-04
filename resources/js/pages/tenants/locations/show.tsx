@@ -35,7 +35,7 @@ export default function ShowLocation({
                     <a href={route(`tenant.${routeName}.edit`, location.reference_code)}>
                         <Button>Edit</Button>
                     </a>
-                    <Button onClick={() => setShowModaleRelocateRoom(!showModaleRelocateRoom)}>Redefine room</Button>
+                    {routeName === 'rooms' && <Button onClick={() => setShowModaleRelocateRoom(!showModaleRelocateRoom)}>Redefine room</Button>}
                 </div>
                 {routeName === 'rooms' && showModaleRelocateRoom && (
                     <RealocateRoomManager room={location} itemCode={location.reference_code} onClose={() => setShowModaleRelocateRoom(false)} />
@@ -78,10 +78,9 @@ export default function ShowLocation({
                             <p>Surface walls: {location.surface_walls}</p>
                         </div>
                     </div>
-
-                    <div className="rounded-md border border-gray-200 p-4">
-                        <h2>Providers</h2>
-                        {location.maintainable.providers && (
+                    {location.maintainable.providers && location.maintainable.providers.length > 0 && (
+                        <div className="rounded-md border border-gray-200 p-4">
+                            <h2>Providers</h2>
                             <ul>
                                 {location.maintainable.providers.map((provider, index) => (
                                     <li key={index}>
@@ -89,8 +88,8 @@ export default function ShowLocation({
                                     </li>
                                 ))}
                             </ul>
-                        )}
-                    </div>
+                        </div>
+                    )}
                     <AssetManager itemCode={location.reference_code} type={routeName} />
                     <TicketManager itemCode={location.reference_code} getTicketsUrl={`api.${routeName}.tickets`} locationType={routeName} />
                     <DocumentManager

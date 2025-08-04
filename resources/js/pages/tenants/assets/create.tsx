@@ -37,6 +37,10 @@ type TypeFormData = {
     serial_number: string;
     maintenance_manager_id: number | null;
     maintenance_manager_name: string;
+    need_maintenance: boolean;
+    maintenance_frequency: string | null;
+    next_maintenance_date: string | null;
+    last_maintenance_date: string | null;
     files: {
         file: File;
         name: string;
@@ -60,10 +64,12 @@ export default function CreateAsset({
     asset,
     categories,
     documentTypes,
+    frequencies,
 }: {
     asset?: Asset;
     categories?: AssetCategory[];
     documentTypes: CentralType[];
+    frequencies: string[];
 }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -89,6 +95,10 @@ export default function CreateAsset({
         purchase_cost: asset?.maintainable.purchase_cost ?? null,
         under_warranty: asset?.maintainable.under_warranty ?? false,
         end_warranty_date: asset?.maintainable.end_warranty_date ?? '',
+        need_maintenance: asset?.maintainable.need_maintenance ?? '',
+        maintenance_frequency: asset?.maintainable.maintenance_frequency ?? '',
+        next_maintenance_date: asset?.maintainable.next_maintenance_date ?? '',
+        last_maintenance_date: asset?.maintainable.last_maintenance_date ?? '',
         brand: asset?.maintainable.brand ?? '',
         model: asset?.maintainable.model ?? '',
         serial_number: asset?.maintainable.serial_number ?? '',
@@ -98,6 +108,7 @@ export default function CreateAsset({
     });
 
     console.log(data);
+    console.log(asset);
 
     const [listIsOpen, setListIsOpen] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
@@ -415,39 +426,44 @@ export default function CreateAsset({
                         onChange={(e) => setData('surface', parseFloat(e.target.value))}
                     />
                     <InputError className="mt-2" message={errors.surface} />
-
-                    <Label htmlFor="brand">Brand</Label>
-                    <Input
-                        id="brand"
-                        type="text"
-                        maxLength={100}
-                        value={data.brand}
-                        onChange={(e) => setData('brand', e.target.value)}
-                        placeholder="Asset brand"
-                    />
-                    <InputError className="mt-2" message={errors.brand} />
-
-                    <Label htmlFor="model">Model</Label>
-                    <Input
-                        id="model"
-                        type="text"
-                        maxLength={100}
-                        value={data.model}
-                        onChange={(e) => setData('model', e.target.value)}
-                        placeholder="Asset model"
-                    />
-                    <InputError className="mt-2" message={errors.model} />
-
-                    <Label htmlFor="serial_number">Serial number</Label>
-                    <Input
-                        id="serial_number"
-                        type="text"
-                        maxLength={50}
-                        value={data.serial_number}
-                        onChange={(e) => setData('serial_number', e.target.value)}
-                        placeholder="Asset serial number"
-                    />
-                    <InputError className="mt-2" message={errors.serial_number} />
+                    <div className="flex flex-col gap-4 md:flex-row">
+                        <div className="w-full">
+                            <Label htmlFor="brand">Brand</Label>
+                            <Input
+                                id="brand"
+                                type="text"
+                                maxLength={100}
+                                value={data.brand}
+                                onChange={(e) => setData('brand', e.target.value)}
+                                placeholder="Asset brand"
+                            />
+                            <InputError className="mt-2" message={errors.brand} />
+                        </div>
+                        <div className="w-full">
+                            <Label htmlFor="model">Model</Label>
+                            <Input
+                                id="model"
+                                type="text"
+                                maxLength={100}
+                                value={data.model}
+                                onChange={(e) => setData('model', e.target.value)}
+                                placeholder="Asset model"
+                            />
+                            <InputError className="mt-2" message={errors.model} />
+                        </div>
+                        <div className="w-full">
+                            <Label htmlFor="serial_number">Serial number</Label>
+                            <Input
+                                id="serial_number"
+                                type="text"
+                                maxLength={50}
+                                value={data.serial_number}
+                                onChange={(e) => setData('serial_number', e.target.value)}
+                                placeholder="Asset serial number"
+                            />
+                            <InputError className="mt-2" message={errors.serial_number} />
+                        </div>
+                    </div>
 
                     <div>
                         <Label htmlFor="purchase_date">Date of purchase</Label>
@@ -497,6 +513,78 @@ export default function CreateAsset({
                         </div>
                     )}
                     <div>
+                        <Label htmlFor="need_maintenance">Need maintenance ?</Label>
+                        <Checkbox
+                            id="need_maintenance"
+                            name="need_maintenance"
+                            checked={data.need_maintenance}
+                            onClick={() => setData('need_maintenance', !data.need_maintenance)}
+                        />
+                        <InputError className="mt-2" message={errors.need_maintenance} />
+                    </div>
+
+                    {data.need_maintenance && (
+                        <>
+                            <div className="flex flex-col gap-4 md:flex-row">
+                                <div className="w-full">
+                                    <Label htmlFor="maintenance_frequency">Maintenance frequency</Label>
+                                    <select
+                                        name="maintenance_frequency"
+                                        value={data.maintenance_frequency ?? ''}
+                                        onChange={(e) => setData('maintenance_frequency', e.target.value)}
+                                        id=""
+                                        required={data.need_maintenance}
+                                        className={cn(
+                                            'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                            'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                        )}
+                                    >
+                                        {frequencies && frequencies.length > 0 && (
+                                            <>
+                                                <option value="" disabled className="bg-background text-foreground">
+                                                    Select an option
+                                                </option>
+                                                {frequencies?.map((frequency, index) => (
+                                                    <option value={frequency} key={index} className="bg-background text-foreground">
+                                                        {frequency}
+                                                    </option>
+                                                ))}
+                                            </>
+                                        )}
+                                    </select>
+
+                                    <InputError className="mt-2" message={errors.maintenance_frequency} />
+                                </div>
+
+                                <div className="w-full">
+                                    <Label htmlFor="last_maintenance_date">Date last maintenance</Label>
+                                    <Input
+                                        id="last_maintenance_date"
+                                        type="date"
+                                        value={data.last_maintenance_date ?? ''}
+                                        max={minEndDateWarranty}
+                                        onChange={(e) => setData('last_maintenance_date', e.target.value)}
+                                        placeholder="Date last maintenance"
+                                    />
+                                    <InputError className="mt-2" message={errors.last_maintenance_date} />
+                                </div>
+                                <div className="w-full">
+                                    <Label htmlFor="next_maintenance_date">Date next maintenance</Label>
+                                    <Input
+                                        id="next_maintenance_date"
+                                        type="date"
+                                        value={data.next_maintenance_date ?? ''}
+                                        min={minEndDateWarranty}
+                                        onChange={(e) => setData('next_maintenance_date', e.target.value)}
+                                        placeholder="Date last maintenance"
+                                    />
+                                    <InputError className="mt-2" message={errors.next_maintenance_date} />
+                                </div>
+                            </div>
+                        </>
+                    )}
+                    <div>
                         <label className="mb-2 block text-sm font-medium">Maintenance manager</label>
                         <SearchableInput<User>
                             searchUrl={route('api.users.search')}
@@ -507,7 +595,7 @@ export default function CreateAsset({
                                 setData('maintenance_manager_id', user.id);
                                 setData('maintenance_manager_name', user.full_name);
                             }}
-                            placeholder="Rechercher un manager..."
+                            placeholder="Search maintenance manager..."
                             className="mb-4"
                         />
                     </div>
