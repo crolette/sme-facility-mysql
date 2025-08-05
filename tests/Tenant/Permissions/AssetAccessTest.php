@@ -1,8 +1,8 @@
 <?php
 
 dataset('rolesWithAccess', [
-    ['admin'],
-    ['super-admin'],
+    ['Admin'],
+    ['Maintenance Manager'],
 ]);
 
 it('allows roles to view assets', function (string $role) {

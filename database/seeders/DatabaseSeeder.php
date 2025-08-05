@@ -19,7 +19,6 @@ class DatabaseSeeder extends Seeder
         CentralUser::factory()->create([
             'first_name' => 'Super',
             'last_name' => 'Admin',
-            'username' => 'super.admin',
             'email' => 'super@sme-facility.com',
             'password' => Hash::make('SME_2025!fwebxp')
         ]);

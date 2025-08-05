@@ -15,6 +15,7 @@ export default function UserShow({ item }: { item: User }) {
             href: `/users/${user.id}`,
         },
     ];
+
     const fetchUser = async () => {
         try {
             const response = await axios.get(route('api.users.show', user.id));
