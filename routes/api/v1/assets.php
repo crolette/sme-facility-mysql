@@ -55,6 +55,10 @@ Route::middleware([
         Route::get('/trashed', [ApiSearchTrashedAssetController::class, 'index'])->name('api.assets.trashed');
 
         Route::prefix('{asset}')->group(function () {
+            // Get one asset and his maintainable
+            Route::get('/', function (Asset $asset) {
+                return ApiResponse::success($asset->load('maintainable.manager:id,first_name,last_name', 'maintainable.providers:id,name'));
+            })->name('api.assets.show');
 
             // Get all the documents from an asset
             Route::get('/documents/', function ($asset) {

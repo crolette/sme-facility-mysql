@@ -3,14 +3,16 @@
 use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
+use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Picture;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
+use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
-use App\Models\Tenants\Asset;
 use Illuminate\Support\Facades\Storage;
+use function PHPUnit\Framework\assertCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
@@ -93,6 +95,27 @@ it('can create a new building', function () {
     ]);
 });
 
+it('can attach a provider to a building\'s maintainable', function () {
+    $provider = Provider::factory()->create();
+    $siteType = LocationType::factory()->create(['level' => 'site']);
+    $buildingType = LocationType::factory()->create(['level' => 'building']);
+    $site = Site::factory()->create();
+
+    $formData = [
+        'name' => 'New building',
+        'description' => 'Description new building',
+        'levelType' => $site->id,
+        'locationType' => $buildingType->id,
+        'providers' => [$provider->id]
+    ];
+
+    $response = $this->postToTenant('tenant.buildings.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    $building = Building::first();
+    assertCount(1, $building->maintainable->providers);
+});
+
 it('can upload several files to building', function () {
 
     LocationType::factory()->create(['level' => 'site']);
@@ -141,8 +164,6 @@ it('can upload several files to building', function () {
 
 it('can render the show building page', function () {
 
-
-
     LocationType::factory()->count(3)->create(['level' => 'site']);
     LocationType::factory()->count(3)->create(['level' => 'building']);
     Site::factory()->create();
@@ -163,9 +184,6 @@ it('can render the show building page', function () {
 });
 
 it('can render the update building page', function () {
-
-
-
     LocationType::factory()->count(3)->create(['level' => 'site']);
     LocationType::factory()->count(3)->create(['level' => 'building']);
     $site = Site::factory()->create();
@@ -186,9 +204,6 @@ it('can render the update building page', function () {
 });
 
 it('can update a building', function () {
-
-
-
     $level = LocationType::factory()->create(['level' => 'site']);
     $buildingType = LocationType::factory()->create(['level' => 'building']);
     $site = Site::factory()->create();
@@ -236,9 +251,6 @@ it('can update a building', function () {
 });
 
 it('cannot update a building type of an existing building', function () {
-
-
-
     LocationType::factory()->count(2)->create(['level' => 'site']);
     LocationType::factory()->count(2)->create(['level' => 'building']);
     Site::factory()->count(2)->create();
@@ -270,7 +282,7 @@ it('can delete a building', function () {
         'code' => $building->code
     ]);
 
-    $response = $this->deleteFromTenant('tenant.buildings.destroy', $building->code);
+    $response = $this->deleteFromTenant('tenant.buildings.destroy', $building->reference_code);
     $response->assertStatus(302);
     assertDatabaseMissing('buildings', [
         'reference_code' => $building->reference_code
@@ -305,7 +317,7 @@ it('cannot delete a building which has related floors', function () {
     assertDatabaseCount('floors', 2);
     assertDatabaseCount('maintainables', 4);
 
-    $response = $this->deleteFromTenant('tenant.buildings.destroy', $building->code);
+    $response = $this->deleteFromTenant('tenant.buildings.destroy', $building->reference_code);
     $response->assertStatus(409);
 });
 

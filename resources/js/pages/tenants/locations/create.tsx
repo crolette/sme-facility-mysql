@@ -1,14 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import InputError from '@/components/input-error';
+import SearchableInput from '@/components/SearchableInput';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { CentralType, LocationType, TenantBuilding, TenantFloor, TenantRoom, TenantSite, type BreadcrumbItem } from '@/types';
+import { CentralType, LocationType, TenantBuilding, TenantFloor, TenantRoom, TenantSite, User, type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
+
+interface Provider {
+    id: number;
+    name: string;
+}
 
 type TypeFormData = {
     name: string;
@@ -17,6 +24,12 @@ type TypeFormData = {
     surface_walls: null | number;
     levelType: string | number;
     locationType: string | number;
+    maintenance_manager_id: number | null;
+    maintenance_manager_name: string;
+    need_maintenance: boolean;
+    maintenance_frequency: string | null;
+    next_maintenance_date: string | null;
+    last_maintenance_date: string | null;
     files: {
         file: File;
         name: string;
@@ -24,6 +37,7 @@ type TypeFormData = {
         typeId: null | number;
         typeSlug: string;
     }[];
+    providers: Provider[];
 };
 
 export default function CreateLocation({
@@ -32,11 +46,13 @@ export default function CreateLocation({
     locationTypes,
     routeName,
     documentTypes,
+    frequencies,
 }: {
     location?: TenantSite | TenantBuilding | TenantFloor | TenantRoom;
     levelTypes: LocationType[] | TenantSite[] | TenantFloor[];
     locationTypes: LocationType[];
     documentTypes: CentralType[];
+    frequencies: string[];
     routeName: string;
 }) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -45,18 +61,24 @@ export default function CreateLocation({
             href: '/locations/create',
         },
     ];
+
     const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
     const { data, setData, post, errors } = useForm<TypeFormData>({
         name: location?.maintainable?.name ?? '',
         description: location?.maintainable?.description ?? '',
         surface_floor: location?.surface_floor ?? null,
         surface_walls: location?.surface_walls ?? null,
-        levelType: (location?.level_id ?? levelTypes?.length == 1) ? levelTypes[0].id : '',
-        locationType: (location?.location_type?.id ?? locationTypes.length == 1) ? locationTypes[0].id : '',
+        levelType: location?.level_id ?? '',
+        locationType: location?.location_type?.id ?? '',
         files: selectedDocuments,
+        maintenance_manager_id: location?.maintainable?.maintenance_manager_id ?? null,
+        maintenance_manager_name: location?.maintainable?.manager?.full_name ?? '',
+        need_maintenance: location?.maintainable.need_maintenance ?? '',
+        maintenance_frequency: location?.maintainable.maintenance_frequency ?? '',
+        next_maintenance_date: location?.maintainable.next_maintenance_date ?? '',
+        last_maintenance_date: location?.maintainable.last_maintenance_date ?? '',
+        providers: [],
     });
-
-    console.log(data);
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -122,6 +144,8 @@ export default function CreateLocation({
             return files;
         });
     };
+
+    const todayDate = new Date().toISOString().split('T')[0];
 
     const addFileModalForm = () => {
         return (
@@ -314,6 +338,108 @@ export default function CreateLocation({
                         placeholder="Description"
                     />
                     <InputError className="mt-2" message={errors.description} />
+                    <div>
+                        <Label htmlFor="need_maintenance">Need maintenance ?</Label>
+                        <Checkbox
+                            id="need_maintenance"
+                            name="need_maintenance"
+                            checked={data.need_maintenance}
+                            onClick={() => setData('need_maintenance', !data.need_maintenance)}
+                        />
+                        <InputError className="mt-2" message={errors.need_maintenance} />
+                    </div>
+
+                    {data.need_maintenance && (
+                        <>
+                            <div className="flex flex-col gap-4 md:flex-row">
+                                <div className="w-full">
+                                    <Label htmlFor="maintenance_frequency">Maintenance frequency</Label>
+                                    <select
+                                        name="maintenance_frequency"
+                                        value={data.maintenance_frequency ?? ''}
+                                        onChange={(e) => setData('maintenance_frequency', e.target.value)}
+                                        id=""
+                                        required={data.need_maintenance}
+                                        className={cn(
+                                            'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                            'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                        )}
+                                    >
+                                        {frequencies && frequencies.length > 0 && (
+                                            <>
+                                                <option value="" disabled className="bg-background text-foreground">
+                                                    Select an option
+                                                </option>
+                                                {frequencies?.map((frequency, index) => (
+                                                    <option value={frequency} key={index} className="bg-background text-foreground">
+                                                        {frequency}
+                                                    </option>
+                                                ))}
+                                            </>
+                                        )}
+                                    </select>
+
+                                    <InputError className="mt-2" message={errors.maintenance_frequency} />
+                                </div>
+
+                                <div className="w-full">
+                                    <Label htmlFor="last_maintenance_date">Date last maintenance</Label>
+                                    <Input
+                                        id="last_maintenance_date"
+                                        type="date"
+                                        value={data.last_maintenance_date ?? ''}
+                                        max={todayDate}
+                                        onChange={(e) => setData('last_maintenance_date', e.target.value)}
+                                        placeholder="Date last maintenance"
+                                    />
+                                    <InputError className="mt-2" message={errors.last_maintenance_date} />
+                                </div>
+                                <div className="w-full">
+                                    <Label htmlFor="next_maintenance_date">Date next maintenance</Label>
+                                    <Input
+                                        id="next_maintenance_date"
+                                        type="date"
+                                        value={data.next_maintenance_date ?? ''}
+                                        min={todayDate}
+                                        onChange={(e) => setData('next_maintenance_date', e.target.value)}
+                                        placeholder="Date last maintenance"
+                                    />
+                                    <InputError className="mt-2" message={errors.next_maintenance_date} />
+                                </div>
+                            </div>
+                        </>
+                    )}
+                    <div></div>
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">Maintenance manager</label>
+                        <SearchableInput<User>
+                            searchUrl={route('api.users.search')}
+                            displayValue={data.maintenance_manager_name}
+                            getDisplayText={(user) => user.full_name}
+                            getKey={(user) => user.id}
+                            onSelect={(user) => {
+                                setData('maintenance_manager_id', user.id);
+                                setData('maintenance_manager_name', user.full_name);
+                            }}
+                            placeholder="Rechercher un manager..."
+                            className="mb-4"
+                        />
+                    </div>
+                    <div>
+                        <label className="mb-2 block text-sm font-medium">Providers</label>
+                        <SearchableInput<Provider>
+                            multiple={true}
+                            searchUrl={route('api.providers.search')}
+                            selectedItems={data.providers}
+                            getDisplayText={(provider) => provider.name}
+                            getKey={(provider) => provider.id}
+                            onSelect={(providers) => {
+                                setData('providers', providers);
+                            }}
+                            placeholder="Search providers..."
+                        />
+                    </div>
                     {!location && (
                         <div id="files">
                             <Button onClick={() => setShowFileModal(!showFileModal)} type="button">

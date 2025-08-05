@@ -12,9 +12,11 @@ use App\Models\Tenants\Building;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
+use App\Enums\MaintenanceFrequency;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
+use App\Services\MaintainableService;
 use App\Http\Requests\Tenant\TenantFloorRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
@@ -23,6 +25,7 @@ class TenantFloorController extends Controller
 {
     public function __construct(
         protected QRCodeService $qrCodeService,
+        protected MaintainableService $maintainableService
     ) {}
 
     /**
@@ -42,7 +45,8 @@ class TenantFloorController extends Controller
         $levelTypes = Building::all();
         $locationTypes = LocationType::where('level', 'floor')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
-        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'floors', 'documentTypes' => $documentTypes]);
+        $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
+        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'floors', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
     }
 
     /**
@@ -72,9 +76,11 @@ class TenantFloorController extends Controller
             $floor->building()->associate($building);
             $floor->save();
 
-            $floor->maintainable()->create([
-                ...$maintainableRequest->validated()
-            ]);
+            $floor = $this->maintainableService->createMaintainable($floor, $maintainableRequest);
+
+            if ($maintainableRequest->validated('providers')) {
+                $floor->maintainable->providers()->sync($maintainableRequest->validated('providers'));
+            }
 
             $files = $documentUploadRequest->validated('files');
             if ($files) {
@@ -98,7 +104,7 @@ class TenantFloorController extends Controller
      */
     public function show(Floor $floor)
     {
-        return Inertia::render('tenants/locations/show', ['routeName' => 'floors', 'location' => $floor->load(['locationType', 'documents'])]);
+        return Inertia::render('tenants/locations/show', ['routeName' => 'floors', 'item' => $floor->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers'])]);
     }
 
     /**
@@ -109,7 +115,8 @@ class TenantFloorController extends Controller
         $levelTypes = Building::all();
         $locationTypes = LocationType::where('level', 'floor')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
-        return Inertia::render('tenants/locations/create', ['location' => $floor->load('building'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'floors', 'documentTypes' => $documentTypes]);
+        $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
+        return Inertia::render('tenants/locations/create', ['location' => $floor->load('building'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'floors', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
     }
 
     /**
@@ -141,9 +148,7 @@ class TenantFloorController extends Controller
                 'surface_walls' => $floorRequest->validated('surface_walls'),
             ]);
 
-            $floor->maintainable()->update([
-                ...$maintainableRequest->validated()
-            ]);
+            $floor = $this->maintainableService->createMaintainable($floor, $maintainableRequest);
 
             DB::commit();
             return redirect()->route('tenant.floors.index')->with(['message' => 'Floor updated', 'type' => 'success']);

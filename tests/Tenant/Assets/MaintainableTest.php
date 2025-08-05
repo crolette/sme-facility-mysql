@@ -10,17 +10,20 @@ use App\Models\Tenants\Floor;
 use App\Models\Tenants\Building;
 use App\Models\Central\CategoryType;
 use App\Models\Central\AssetCategory;
+use App\Models\Tenants\Provider;
+
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
+use function PHPUnit\Framework\assertCount;
 
 beforeEach(function () {
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    LocationType::factory()->create(['level' => 'room']);
+    $this->siteType = LocationType::factory()->create(['level' => 'site']);
+    $this->buildingType = LocationType::factory()->create(['level' => 'building']);
+    $this->floorType = LocationType::factory()->create(['level' => 'floor']);
+    $this->roomType = LocationType::factory()->create(['level' => 'room']);
     $this->category = CategoryType::factory()->create(['category' => 'asset']);
 
     $this->site = Site::factory()->create();
@@ -37,9 +40,6 @@ beforeEach(function () {
 });
 
 it('fails when name is more than 100 chars', function () {
-
-
-
     $formData = [
         'name' => str_repeat('A', 101),
         'description' => 'Description new asset',
@@ -57,9 +57,6 @@ it('fails when name is more than 100 chars', function () {
 });
 
 it('fails when description is more than 255 chars', function () {
-
-
-
     $formData = [
         'name' => fake()->text(50),
         'description' => str_repeat('A', 256),
@@ -77,9 +74,6 @@ it('fails when description is more than 255 chars', function () {
 });
 
 it('passes when end_warranty_date is filled and under_warranty is true', function () {
-
-
-
     $formData = [
         'name' => fake()->text(50),
         'description' => fake()->text(250),
@@ -99,8 +93,6 @@ it('passes when end_warranty_date is filled and under_warranty is true', functio
 });
 
 it('fails when end_warranty_date is missing and under_warranty is true', function () {
-
-
     $formData = [
         'name' => fake()->text(50),
         'description' => fake()->text(250),
@@ -119,8 +111,6 @@ it('fails when end_warranty_date is missing and under_warranty is true', functio
 });
 
 it('passes when purchase_cost has max 2 decimals and 7 digits', function () {
-
-
     $formData = [
         'name' => fake()->text(50),
         'description' => fake()->text(250),
@@ -138,8 +128,6 @@ it('passes when purchase_cost has max 2 decimals and 7 digits', function () {
 });
 
 it('fails when purchase_cost is negative', function () {
-
-
     $formData = [
         'name' => fake()->text(50),
         'description' => fake()->text(250),
@@ -157,8 +145,6 @@ it('fails when purchase_cost is negative', function () {
 });
 
 it('fails when purchase_cost has more than 2 decimals', function () {
-
-
     $formData = [
         'name' => fake()->text(50),
         'description' => fake()->text(250),
@@ -176,8 +162,6 @@ it('fails when purchase_cost has more than 2 decimals', function () {
 });
 
 it('passes when purchase_date is equal today', function () {
-
-
     $formData = [
         'name' => fake()->text(50),
         'description' => fake()->text(250),
@@ -195,8 +179,6 @@ it('passes when purchase_date is equal today', function () {
 });
 
 it('fails when purchase_date is after today', function () {
-
-
     $formData = [
         'name' => fake()->text(50),
         'description' => fake()->text(250),
@@ -214,8 +196,6 @@ it('fails when purchase_date is after today', function () {
 });
 
 it('fails when end_warranty_date is before purchase_date', function () {
-
-
     $formData = [
         'name' => fake()->text(50),
         'description' => fake()->text(250),
@@ -232,12 +212,3 @@ it('fails when end_warranty_date is before purchase_date', function () {
         'end_warranty_date' => 'The end warranty date field must be a date after purchase date.',
     ]);
 });
-
-
-// it('', function() {
-
-// });
-
-// it('', function() {
-
-// });

@@ -21,6 +21,10 @@ Route::middleware([
 
     Route::prefix('/{building}')->group(function () {
 
+        Route::get('/', function (Building $building) {
+            return ApiResponse::success($building->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers']));
+        })->name('api.buildings.show');
+
         // Get all assets from a building
         Route::get('/assets/', function (Building $building) {
             return ApiResponse::success($building->load('assets')->assets);

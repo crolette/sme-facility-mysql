@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Tenant;
 
+use App\Enums\MaintenanceFrequency;
 use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -18,13 +19,18 @@ class MaintainableRequest extends FormRequest
     public function prepareForValidation()
     {
 
-        // $data = $this->all();
+        $data = $this->all();
 
-        // if (($data['purchase_cost']) == 0) {
-        //     $data['purchase_cost'] = null;
-        // }
+        if ($data['need_maintenance'] === true) {
+            if (isset($data['next_maintenance_date'])) {
 
-        // $this->replace($data);
+                return;
+            } else {
+                $data['next_maintenance_date'] = calculateNextMaintenanceDate($data['maintenance_frequency']);
+            }
+        }
+
+        $this->replace($data);
     }
 
     /**
@@ -34,13 +40,24 @@ class MaintainableRequest extends FormRequest
      */
     public function rules(): array
     {
+
+        $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
+
         return [
             'name' => 'required|string|min:6|max:100',
             'description' => 'nullable|string|min:10|max:255',
             'purchase_date' => ['nullable', 'date', Rule::date()->beforeOrEqual(today())],
             'purchase_cost' => 'nullable|numeric|gt:0|decimal:0,2',
             'under_warranty' => "boolean",
-            'end_warranty_date' => "nullable|date|required_if_accepted:under_warranty|after:purchase_date"
+            'end_warranty_date' => "nullable|date|required_if_accepted:under_warranty|after:purchase_date",
+            'providers' => 'nullable|array',
+            'providers.*.id' => 'integer|exists:providers,id',
+            'maintenance_manager_id' => 'nullable|exists:users,id',
+
+            'need_maintenance' => "boolean",
+            'maintenance_frequency' => ['required_if_accepted:need_maintenance', Rule::in($frequencies)],
+            'next_maintenance_date' => ['nullable', 'date', Rule::date()->afterToday()],
+            'last_maintenance_date' =>  ['nullable', 'date', Rule::date()->beforeToday()],
         ];
     }
 }

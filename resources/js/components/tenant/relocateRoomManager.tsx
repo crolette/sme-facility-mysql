@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import { Asset, LocationType, TenantRoom } from '@/types';
+import { Asset, LocationType, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from '@/types';
 import { useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { FormEventHandler, useEffect, useState } from 'react';
@@ -27,7 +27,9 @@ type SearchedLocation = {
     code: string;
 };
 
-export default function RealocateRoomManager({ room, itemCode, onClose }: { room: TenantRoom; itemCode: string; onClose: () => void }) {
+type Location = TenantRoom | TenantBuilding | TenantFloor | TenantSite;
+
+export default function RealocateRoomManager({ room, itemCode, onClose }: { room: Location; itemCode: string; onClose: () => void }) {
     const [assets, setAssets] = useState<Asset[]>();
     const relocateRoomData = {
         locationType: room.location_type.id ?? null,

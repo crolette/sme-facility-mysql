@@ -12,9 +12,11 @@ use App\Services\QRCodeService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
+use App\Enums\MaintenanceFrequency;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
+use App\Services\MaintainableService;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\TenantSiteRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
@@ -25,6 +27,7 @@ class TenantSiteController extends Controller
 
     public function __construct(
         protected QRCodeService $qrCodeService,
+        protected MaintainableService $maintainableService
     ) {}
 
     /**
@@ -44,7 +47,8 @@ class TenantSiteController extends Controller
     {
         $locationTypes = LocationType::where('level', 'site')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
-        return Inertia::render('tenants/locations/create', ['locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes]);
+        $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
+        return Inertia::render('tenants/locations/create', ['locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
     }
 
     /**
@@ -68,9 +72,7 @@ class TenantSiteController extends Controller
                 'location_type_id' => $locationType->id
             ]);
 
-            $site->maintainable()->create([
-                ...$maintainableRequest->validated()
-            ]);
+            $site = $this->maintainableService->createMaintainable($site, $maintainableRequest);
 
             $files = $documentUploadRequest->validated('files');
             if ($files) {
@@ -95,7 +97,7 @@ class TenantSiteController extends Controller
      */
     public function show(Site $site)
     {
-        return Inertia::render('tenants/locations/show', ['routeName' => 'sites', 'location' => $site->load(['locationType', 'documents'])]);
+        return Inertia::render('tenants/locations/show', ['routeName' => 'sites', 'location' => $site->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers'])]);
     }
 
     /**
@@ -106,7 +108,9 @@ class TenantSiteController extends Controller
         $locationTypes = LocationType::where('level', 'site')->get();
 
         $documentTypes = CategoryType::where('category', 'document')->get();
-        return Inertia::render('tenants/locations/create', ['location' => $site, 'locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes]);
+        $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
+
+        return Inertia::render('tenants/locations/create', ['location' => $site, 'locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
     }
 
     /**
@@ -131,9 +135,7 @@ class TenantSiteController extends Controller
                 'surface_walls' => $siteRequest->validated('surface_walls'),
             ]);
 
-            $site->maintainable()->update([
-                ...$maintainableRequest->validated()
-            ]);
+            $site = $this->maintainableService->createMaintainable($site, $maintainableRequest);
 
             DB::commit();
             return redirect()->route('tenant.sites.index')->with(['message' => 'Site updated', 'type' => 'success']);

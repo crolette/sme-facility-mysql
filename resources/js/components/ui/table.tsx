@@ -31,7 +31,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-head"
-      className={cn("border-blue-gray-100 bg-accent/50 border-b", className)}
+      className={cn("border-blue-gray-100 bg-accent border-b", className)}
       {...props}
     />
   )
@@ -73,7 +73,7 @@ function TableBodyRow({ className, ...props }: React.ComponentProps<"tr">) {
   return (
     <tr
       data-slot="table-body-row"
-      className={cn("border-b", className)}
+      className={cn("border-b even:bg-gray-50 dark:even:bg-zinc-900", className)}
       {...props}
     />
   )
@@ -83,7 +83,7 @@ function TableBodyData({ className, children, ...props }: React.ComponentProps<"
   return (
     <td
       data-slot="table-body-row"
-      className={cn("p-4", className)}
+      className={cn("p-2", className)}
       {...props}
     >
       {children}

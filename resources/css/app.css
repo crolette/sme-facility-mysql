@@ -161,3 +161,8 @@
 a:hover {
     @apply underline;
 }
+
+h2 {
+    font-size: clamp(2vh, 24px, 2.5vh);
+    font-weight: 800;
+}

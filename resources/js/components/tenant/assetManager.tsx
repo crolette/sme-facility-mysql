@@ -23,8 +23,8 @@ export const AssetManager = ({ itemCode, type }: AssetManagerProps) => {
         fetchAssets();
     }, []);
     return (
-        <>
-            <p>Assets</p>
+        <div className="rounded-md border border-gray-200 p-4">
+            <h2>Assets</h2>
             <ul>
                 {assets &&
                     assets.map((asset) => (
@@ -35,6 +35,6 @@ export const AssetManager = ({ itemCode, type }: AssetManagerProps) => {
                         </li>
                     ))}
             </ul>
-        </>
+        </div>
     );
 };

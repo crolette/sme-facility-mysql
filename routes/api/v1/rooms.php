@@ -24,6 +24,11 @@ Route::middleware([
 
         Route::prefix('{room}')->group(function () {
 
+            Route::get('/', function (Room $room) {
+                return ApiResponse::success($room->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers']));
+            })->name('api.rooms.show');
+
+
             Route::patch('/relocate', [RelocateRoomController::class, 'relocateRoom'])->name('api.rooms.relocate');
 
             // Get all documents from a room

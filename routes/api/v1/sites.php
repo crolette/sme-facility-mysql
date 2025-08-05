@@ -18,7 +18,9 @@ Route::middleware([
 ])->prefix('/v1/sites')->group(
     function () {
 
-        // Route::middleware(['auth'])->group(function () {
+        Route::get('/{site}', function (Site $site) {
+            return ApiResponse::success($site->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers']));
+        })->name('api.site.show');
 
         // Get all assets from a site
         Route::get('/{site}/assets/', function (Site $site) {
