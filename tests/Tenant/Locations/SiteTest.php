@@ -24,12 +24,12 @@ use function PHPUnit\Framework\assertCount;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
+    $this->user->assignRole('Admin');
     $this->actingAs($this->user, 'tenant');
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
 });
 
 it('can render the index sites page', function () {
-    $this->assertAuthenticated();
 
     Site::factory()->count(3)->create();
     $response = $this->getFromTenant('tenant.sites.index');
@@ -66,9 +66,9 @@ it('can create a new site', function () {
         'locationType' => $this->siteType->id,
     ];
 
-    $response = $this->postToTenant('tenant.sites.store', $formData);
-    $response->assertStatus(302);
-    $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.sites.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     assertDatabaseCount('sites', 1);
     assertDatabaseCount('maintainables', 1);
@@ -116,8 +116,9 @@ it('can upload several files to site', function () {
         ]
     ];
 
-    $response = $this->postToTenant('tenant.sites.store', $formData);
-    $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.sites.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     assertDatabaseCount('documents', 2);
     assertDatabaseHas('documentables', [
@@ -174,9 +175,9 @@ it('can update a site maintainable and his name and description', function () {
         'locationType' => $this->siteType->id
     ];
 
-    $response = $this->patchToTenant('tenant.sites.update', $formData, $site);
-    $response->assertStatus(302);
-    $response->assertSessionHasNoErrors();
+    $response = $this->patchToTenant('api.sites.update', $formData, $site);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     assertDatabaseCount('sites', 1);
     assertDatabaseCount('maintainables', 1);
@@ -210,18 +211,17 @@ it('cannot update a site type of an existing site', function () {
         'locationType' => 2
     ];
 
-    $response = $this->patchToTenant('tenant.sites.update', $formData, $site);
-    $response->assertRedirect();
-    $response->assertSessionHasErrors([
-        'locationType' => 'You cannot change the site of a location',
-    ]);
+    $response = $this->patchToTenant('api.sites.update', $formData, $site);
+    $response->assertStatus(400)
+        ->assertJson(['status' => 'error']);
 });
 
 it('can delete a site', function () {
     $site = Site::factory()->create();
 
-    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->reference_code);
-    $response->assertStatus(302);
+    $response = $this->deleteFromTenant('api.sites.destroy', $site->reference_code);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
     assertDatabaseMissing('sites', [
         'reference_code' => $site->reference_code
     ]);
@@ -236,11 +236,8 @@ it('cannot delete a site which has buildings', function () {
     $site = Site::factory()->create();
     Building::factory()->create();
 
-    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->reference_code);
+    $response = $this->deleteFromTenant('api.sites.destroy', $site->reference_code);
     $response->assertStatus(409);
-    // assertDatabaseEmpty('sites');
-    // assertDatabaseEmpty('buildings');
-    // assertDatabaseEmpty('maintainables');
 });
 
 it('cannot delete a site which has related buildings and related floors', function () {
@@ -255,13 +252,8 @@ it('cannot delete a site which has related buildings and related floors', functi
     assertDatabaseCount('floors', 3);
     assertDatabaseCount('maintainables', 5);
 
-    $response = $this->deleteFromTenant('tenant.sites.destroy', $site->reference_code);
+    $response = $this->deleteFromTenant('api.sites.destroy', $site->reference_code);
     $response->assertStatus(409);
-
-    // assertDatabaseEmpty('sites');
-    // assertDatabaseEmpty('buildings');
-    // assertDatabaseEmpty('floors');
-    // assertDatabaseEmpty('maintainables');
 });
 
 it('can update name and description of a document from a site ', function () {
@@ -383,10 +375,10 @@ it('can attach a provider to a site\'s maintainable', function () {
         'name' => 'New site',
         'description' => 'Description new site',
         'locationType' => $this->siteType->id,
-        'providers' => [$provider->id]
+        'providers' => [['id' => $provider->id]]
     ];
 
-    $response = $this->postToTenant('tenant.sites.store', $formData);
+    $response = $this->postToTenant('api.sites.store', $formData);
     $response->assertSessionHasNoErrors();
 
     $site = Site::first();

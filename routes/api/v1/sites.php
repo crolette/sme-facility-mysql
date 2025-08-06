@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\ApiResponse;
+use App\Http\Controllers\API\V1\APISiteController;
 use App\Models\Tenants\Site;
 use App\Services\PictureService;
 use App\Services\DocumentService;
@@ -18,56 +19,86 @@ Route::middleware([
 ])->prefix('/v1/sites')->group(
     function () {
 
-        Route::get('/{site}', function (Site $site) {
-            return ApiResponse::success($site->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers']));
-        })->name('api.site.show');
+        Route::post('/', [APISiteController::class, 'store'])->name('api.sites.store');
 
-        // Get all assets from a site
-        Route::get('/{site}/assets/', function (Site $site) {
-            return ApiResponse::success($site->load('assets')->assets);
-        })->name('api.sites.assets');
+        Route::prefix('{site}')->group(function () {
+            Route::patch('/', [APISiteController::class, 'update'])->name('api.sites.update');
+            Route::delete('/', [APISiteController::class, 'destroy'])->name('api.sites.destroy');
 
-        // Get all documents from a site
-        Route::get('/{site}/documents/', function (Site $site) {
-            return ApiResponse::success($site->load('documents')->documents);
-        })->name('api.sites.documents');
+            Route::get('/', function (Site $site) {
+                if (Auth::user()->cannot('view', $site))
+                    return ApiResponse::notAuthorized();
 
-        // Post a new document to a site
-        Route::post('/{site}/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Site $site) {
+                return ApiResponse::success($site->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers']));
+            })->name('api.site.show');
 
-            $files = $documentUploadRequest->validated('files');
-            if ($files) {
-                $documentService->uploadAndAttachDocuments($site, $files);
-            }
+            // Get all assets from a site
+            Route::get('/assets/', function (Site $site) {
+                if (Auth::user()->cannot('view', $site))
+                    return ApiResponse::notAuthorized();
+                return ApiResponse::success($site->load('assets')->assets);
+            })->name('api.sites.assets');
 
-            return ApiResponse::success(null, 'Document added');
-        })->name('api.sites.documents.post');
+            // Get all documents from a site
+            Route::get('/documents/', function (Site $site) {
+                if (Auth::user()->cannot('view', $site))
+                    return ApiResponse::notAuthorized();
 
-        // Get all tickets from a site
-        Route::get('/{site}/tickets/', function (Site $site) {
-            return ApiResponse::success($site->load('tickets.pictures')->tickets);
-        })->name('api.sites.tickets');
+                return ApiResponse::success($site->load('documents')->documents);
+            })->name('api.sites.documents');
 
-        // Get all interventions from a site
-        Route::get('/{site}/interventions/', function (Site $site) {
-            return ApiResponse::success($site->interventions()->where('ticket_id', null)->get());
-        })->name('api.sites.interventions');
+            // Post a new document to a site
+            Route::post('/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Site $site) {
+                if (Auth::user()->cannot('view', $site))
+                    return ApiResponse::notAuthorized();
 
-        // Get all pictures from a site
-        Route::get('/{site}/pictures/', function (Site $site) {
-            return ApiResponse::success($site->load('pictures')->pictures);
-        })->name('api.sites.pictures');
+                $files = $documentUploadRequest->validated('files');
+                if ($files) {
+                    $documentService->uploadAndAttachDocuments($site, $files);
+                }
 
-        // Post a new picture to a site
-        Route::post('/{site}/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Site $site) {
+                return ApiResponse::success(null, 'Document added');
+            })->name('api.sites.documents.post');
 
-            $files = $pictureUploadRequest->validated('pictures');
-            if ($files) {
-                $pictureService->uploadAndAttachPictures($site, $files);
-            }
+            // Get all tickets from a site
+            Route::get('/tickets/', function (Site $site) {
+                if (Auth::user()->cannot('view', $site))
+                    return ApiResponse::notAuthorized();
 
-            return ApiResponse::success(null, 'Pictures added');
-        })->name('api.sites.pictures.post');
+                return ApiResponse::success($site->load('tickets.pictures')->tickets);
+            })->name('api.sites.tickets');
+
+            // Get all interventions from a site
+            Route::get('/interventions/', function (Site $site) {
+                if (Auth::user()->cannot('view', $site))
+                    return ApiResponse::notAuthorized();
+
+                return ApiResponse::success($site->interventions()->where('ticket_id', null)->get());
+            })->name('api.sites.interventions');
+
+            // Get all pictures from a site
+            Route::get('/pictures/', function (Site $site) {
+                if (Auth::user()->cannot('view', $site))
+                    return ApiResponse::notAuthorized();
+
+                return ApiResponse::success($site->load('pictures')->pictures);
+            })->name('api.sites.pictures');
+
+            // Post a new picture to a site
+            Route::post('/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Site $site) {
+                if (Auth::user()->cannot('view', $site))
+                    return ApiResponse::notAuthorized();
+
+                $files = $pictureUploadRequest->validated('pictures');
+                if ($files) {
+                    $pictureService->uploadAndAttachPictures($site, $files);
+                }
+
+                return ApiResponse::success(null, 'Pictures added');
+            })->name('api.sites.pictures.post');
+        });
+
+
         // });
     }
 );
