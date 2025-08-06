@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Tenants;
 
+use App\Enums\RoleTypes;
 use Inertia\Inertia;
 use App\Models\Tenants\User;
 use Illuminate\Http\Request;
@@ -21,7 +22,7 @@ class UserController extends Controller
         if (Auth::user()->cannot('viewAny', User::class)) {
             abort(403);
         }
-        $users = User::all()->load('provider:id,name');
+        $users = User::withoutRole('Super Admin')->get()->load('roles:id,name', 'provider:id,name');
         return Inertia::render('tenants/users/index', ['users' => $users]);
     }
 
@@ -33,7 +34,8 @@ class UserController extends Controller
         if (Auth::user()->cannot('create', User::class)) {
             abort(403);
         }
-        return Inertia::render('tenants/users/create');
+
+        return Inertia::render('tenants/users/create', ['roles' => array_column(RoleTypes::cases(), 'value')]);
     }
 
     /**
@@ -45,7 +47,7 @@ class UserController extends Controller
             abort(403);
         }
 
-        return Inertia::render('tenants/users/create', ['user' => $user->load('provider:id,name')]);
+        return Inertia::render('tenants/users/create', ['user' => $user->load('roles:id,name', 'provider:id,name'), 'roles' => array_column(RoleTypes::cases(), 'value')]);
     }
 
 
@@ -57,6 +59,6 @@ class UserController extends Controller
         if (Auth::user()->cannot('view', $user)) {
             abort(403);
         }
-        return Inertia::render('tenants/users/show', ['item' => $user->load('provider:id,name')]);
+        return Inertia::render('tenants/users/show', ['item' => $user->load('roles:id,name', 'provider:id,name')]);
     }
 }

@@ -4,11 +4,22 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Provider, User } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { FormEventHandler, useState } from 'react';
 
-export default function UserCreateUpdate({ user }: { user?: User }) {
+interface FormDataUser {
+    first_name: string;
+    last_name: string;
+    email: string;
+    can_login: boolean;
+    avatar: File | string | null;
+    provider_id: string | number;
+    provider_name: string;
+    role: string;
+}
+
+export default function UserCreateUpdate({ user, roles }: { user?: User; roles: [] }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Create/Update providers`,
@@ -16,8 +27,9 @@ export default function UserCreateUpdate({ user }: { user?: User }) {
         },
     ];
     console.log(user);
+    console.log(roles);
 
-    const { data, setData, reset } = useForm({
+    const { data, setData, reset } = useForm<FormDataUser>({
         first_name: user?.first_name ?? '',
         last_name: user?.last_name ?? '',
         email: user?.email ?? '',
@@ -25,6 +37,7 @@ export default function UserCreateUpdate({ user }: { user?: User }) {
         avatar: '',
         provider_id: user?.provier_id ?? '',
         provider_name: user?.provider?.name ?? '',
+        role: user?.roles?.length > 0 ? user?.roles[0].name : '',
     });
 
     const [password, setPassword] = useState();
@@ -35,7 +48,9 @@ export default function UserCreateUpdate({ user }: { user?: User }) {
             try {
                 const response = await axios.patch(route('api.users.update', user.id), data);
                 if (response.data.status === 'success') {
-                    window.location.href = route('tenant.users.show', user.id);
+                    router.visit(route('tenant.users.show', user.id), {
+                        preserveScroll: false,
+                    });
                 }
             } catch (error) {
                 console.log(error);
@@ -93,8 +108,18 @@ export default function UserCreateUpdate({ user }: { user?: User }) {
                             <p className="text-xs">Accepted files: png, jpg - Maximum file size: 4MB</p>
                         </>
                     )}
+                    {data.can_login && (
+                        <select name="role" id="role" value={data.role} onChange={(e) => setData('role', e.target.value)}>
+                            <option value="">Select a role</option>
+                            {roles.map((role, index) => (
+                                <option key={index} value={role}>
+                                    {role}
+                                </option>
+                            ))}
+                        </select>
+                    )}
                     <div>
-                        <label className="mb-2 block text-sm font-medium">Maintenance manager</label>
+                        <label className="mb-2 block text-sm font-medium">Provider</label>
                         <SearchableInput<Provider>
                             searchUrl={route('api.providers.search')}
                             displayValue={data.provider_name}

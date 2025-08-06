@@ -5,15 +5,16 @@ namespace App\Models\Tenants;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Models\Tenants\Provider;
+use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
@@ -42,7 +43,7 @@ class User extends Authenticatable
     ];
 
     protected $appends = [
-        'full_name'
+        'full_name',
     ];
 
     /**
@@ -68,6 +69,14 @@ class User extends Authenticatable
             'can_login' => 'boolean'
         ];
     }
+
+    public static function booted(): void
+    {
+        // static::addGlobalScope('SA', function (Builder $builder) {
+        //     $builder->withoutRole('Super Admin');
+        // });
+    }
+
 
     public const MAX_UPLOAD_SIZE_MB = 4;
 

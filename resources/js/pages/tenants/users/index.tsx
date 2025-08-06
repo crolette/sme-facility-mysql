@@ -27,6 +27,7 @@ export default function UserIndex({ users }: { users: User[] }) {
                             <TableHeadData>Name</TableHeadData>
                             <TableHeadData>Email</TableHeadData>
                             <TableHeadData>Can login</TableHeadData>
+                            <TableHeadData>Role</TableHeadData>
                             <TableHeadData>Provider</TableHeadData>
                         </TableHeadRow>
                     </TableHead>
@@ -40,6 +41,7 @@ export default function UserIndex({ users }: { users: User[] }) {
                                         </TableBodyData>
                                         <TableBodyData>{item.email}</TableBodyData>
                                         <TableBodyData>{item.can_login ? 'YES' : 'NO'}</TableBodyData>
+                                        <TableBodyData>{item.roles.length > 0 ? item.roles[0].name : ''}</TableBodyData>
                                         <TableBodyData>
                                             {item.provider ? (
                                                 <a href={route('tenant.providers.show', item.provider?.id)}>{item.provider?.name}</a>
