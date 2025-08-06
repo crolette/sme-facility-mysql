@@ -55,7 +55,7 @@ Route::middleware([
     Route::resource('buildings', TenantBuildingController::class)->parameters(['buildings' => 'building'])->names('tenant.buildings');
     Route::resource('floors', TenantFloorController::class)->parameters(['floors' => 'floor'])->names('tenant.floors');
     Route::resource('rooms', TenantRoomController::class)->parameters(['rooms' => 'room'])->names('tenant.rooms');
-    Route::resource('assets', TenantAssetController::class)->parameters(['assets' => 'asset'])->names('tenant.assets');
+    Route::resource('assets', TenantAssetController::class)->parameters(['assets' => 'asset'])->only('index', 'show', 'create', 'edit')->names('tenant.assets');
 
     Route::get('/assets/{id}/deleted', [TenantAssetController::class, 'showDeleted'])->name('tenant.assets.deleted');
 

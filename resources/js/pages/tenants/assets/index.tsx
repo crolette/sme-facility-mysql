@@ -39,7 +39,7 @@ export default function IndexAssets() {
     };
 
     const restoreAsset = (asset: Asset) => {
-        post(route('api.tenant.assets.restore', asset.id), {
+        post(route('api.assets.restore', asset.id), {
             onSuccess: () => {
                 setTrashedAssetsTab(!trashedAssetsTab);
                 setActiveAssetsTab(!activeAssetsTab);
@@ -71,7 +71,7 @@ export default function IndexAssets() {
     };
 
     const deleteAsset = (asset: Asset) => {
-        destroy(route(`tenant.assets.destroy`, asset.reference_code), {
+        destroy(route(`api.assets.destroy`, asset.reference_code), {
             onSuccess: () => {
                 setSearch('');
                 fetchAssets();

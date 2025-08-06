@@ -151,7 +151,7 @@ export default function CreateAsset({
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         if (asset) {
-            post(route(`tenant.assets.update`, asset.reference_code), {
+            post(route(`api.assets.update`, asset.reference_code), {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-HTTP-Method-Override': 'PATCH',
@@ -159,7 +159,7 @@ export default function CreateAsset({
                 },
             });
         } else {
-            post(route(`tenant.assets.store`));
+            post(route(`api.assets.store`));
         }
     };
 

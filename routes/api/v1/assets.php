@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\ApiResponse;
+use App\Http\Controllers\API\V1\APIAssetController;
 use App\Http\Controllers\API\V1\APIInterventionActionController;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
@@ -46,11 +47,7 @@ Route::middleware([
             return ApiResponse::success(Asset::withoutTrashed()->get());
         })->name('api.assets.index');
 
-        // Restore a soft deleted asset
-        Route::post('{assetId}/restore', [RestoreSoftDeletedAssetController::class, 'restore'])->name('api.tenant.assets.restore');
-
-        // Force delete a soft deleted asset
-        Route::delete('{assetId}/force', [ForceDeleteAssetController::class, 'forceDelete'])->name('api.tenant.assets.force');
+        Route::post('/', [APIAssetController::class, 'store'])->name('api.assets.store');
 
         Route::get('/trashed', [ApiSearchTrashedAssetController::class, 'index'])->name('api.assets.trashed');
 
@@ -59,6 +56,15 @@ Route::middleware([
             Route::get('/', function (Asset $asset) {
                 return ApiResponse::success($asset->load('maintainable.manager:id,first_name,last_name', 'maintainable.providers:id,name'));
             })->name('api.assets.show');
+
+            Route::patch('/', [APIAssetController::class, 'update'])->name('api.assets.update');
+            Route::delete('/', [APIAssetController::class, 'destroy'])->name('api.assets.destroy');
+
+            // Restore a soft deleted asset
+            Route::post('/restore', [RestoreSoftDeletedAssetController::class, 'restore'])->withTrashed()->name('api.assets.restore');
+
+            // Force delete a soft deleted asset
+            Route::delete('/force', [ForceDeleteAssetController::class, 'forceDelete'])->withTrashed()->name('api.assets.force');
 
             // Get all the documents from an asset
             Route::get('/documents/', function ($asset) {

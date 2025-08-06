@@ -20,6 +20,10 @@ use function Pest\Laravel\assertDatabaseMissing;
 
 
 beforeEach(function () {
+    $this->user = User::factory()->create();
+    $this->user->assignRole('Admin');
+    $this->actingAs($this->user, 'tenant');
+
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
@@ -35,8 +39,6 @@ beforeEach(function () {
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
-    $this->user = User::factory()->create();
-    $this->actingAs($this->user, 'tenant');
 });
 
 it('can render the index assets page', function () {
@@ -83,12 +85,13 @@ it('can create a new asset to site', function () {
         'locationReference' => $this->site->reference_code,
         'surface' => 12,
         'categoryId' => $this->categoryType->id,
+        'need_maintenance' => false
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
-    $response->assertStatus(302);
-    // dump($response);
-    $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
 
     $asset = Asset::first();
 
@@ -120,12 +123,12 @@ it('can create a new asset to building', function () {
         'locationReference' => $this->building->reference_code,
         'locationType' => 'building',
         'categoryId' => $this->categoryType->id,
+        'need_maintenance' => false
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
-    $response->assertStatus(302);
-    $response->assertSessionHasNoErrors();
-
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
     $asset = Asset::first();
 
     assertDatabaseCount('assets', 1);
@@ -164,8 +167,9 @@ it('can create an asset with uploaded pictures', function () {
         ]
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
-    $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
     assertDatabaseCount('pictures', 2);
     assertDatabaseHas('pictures', [
         'imageable_type' => 'App\Models\Tenants\Asset',
@@ -205,7 +209,7 @@ it('cannot create a new asset with non existing building', function () {
         'categoryId' => $this->categoryType->id,
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasErrors([
         'locationId' => 'The selected location id is invalid.'
     ]);
@@ -222,7 +226,7 @@ it('cannot create a new asset with non existing location reference code', functi
         'categoryId' => $this->categoryType->id,
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasErrors([
         'locationReference' => 'The selected location reference is invalid.'
     ]);
@@ -239,7 +243,7 @@ it('cannot create a new asset with unrelated asset category type', function () {
         'categoryId' => 2,
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasErrors([
         'categoryId' => 'The selected category id is invalid.'
     ]);
@@ -255,7 +259,7 @@ it('cannot create a new asset with non existing location type', function () {
         'categoryId' => $this->categoryType->id,
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasErrors([
         'locationType' => 'The selected location type is invalid.'
     ]);
@@ -273,9 +277,9 @@ it('can create a new asset to floor', function () {
         'categoryId' => $this->categoryType->id,
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
-    $response->assertStatus(302);
-    $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     $asset = Asset::first();
 
@@ -313,9 +317,9 @@ it('can create a new asset to room', function () {
         'categoryId' => $this->categoryType->id,
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
-    $response->assertStatus(302);
-    $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     $asset = Asset::first();
 
@@ -342,7 +346,6 @@ it('can create a new asset to room', function () {
 });
 
 it('can show the asset page', function () {
-    $this->actingAs(User::factory()->create());
 
     $asset = Asset::factory()->forLocation($this->room)->create();
 
@@ -350,18 +353,17 @@ it('can show the asset page', function () {
 
     $response->assertInertia(
         fn($page) => $page->component('tenants/assets/show')
-            ->has('asset')
-            ->where('asset.location.code', $this->room->code)
-            ->where('asset.maintainable.description', $asset->maintainable->description)
-            ->where('asset.code', $asset->code)
-            ->where('asset.category', $this->categoryType->label)
-            ->where('asset.reference_code', $asset->reference_code)
-            ->where('asset.location_type', get_class($this->room))
+            ->has('item')
+            ->where('item.location.code', $this->room->code)
+            ->where('item.maintainable.description', $asset->maintainable->description)
+            ->where('item.code', $asset->code)
+            ->where('item.category', $this->categoryType->label)
+            ->where('item.reference_code', $asset->reference_code)
+            ->where('item.location_type', get_class($this->room))
     );
 });
 
 it('can render the update asset page', function () {
-    $this->actingAs(User::factory()->create());
 
     $asset = Asset::factory()->forLocation($this->room)->create();
 
@@ -376,7 +378,6 @@ it('can render the update asset page', function () {
 });
 
 it('can update asset\'s maintainable', function () {
-    $this->actingAs(User::factory()->create());
 
     $asset = Asset::factory()->forLocation($this->room)->create();
 
@@ -389,9 +390,9 @@ it('can update asset\'s maintainable', function () {
         'categoryId' => $asset->assetCategory->id,
     ];
 
-    $response = $this->patchToTenant('tenant.assets.update', $formData, $asset);
-    $response->assertStatus(302);
-    $response->assertSessionHasNoErrors();
+    $response = $this->patchToTenant('api.assets.update', $formData, $asset);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     assertDatabaseHas('maintainables', [
         'name' => "New asset name",
@@ -407,7 +408,6 @@ it('can update asset\'s maintainable', function () {
 });
 
 it('can update asset\'s location', function () {
-    $this->actingAs(User::factory()->create());
 
     $asset = Asset::factory()->forLocation($this->room)->create();
 
@@ -424,9 +424,9 @@ it('can update asset\'s location', function () {
         'categoryId' => $asset->assetCategory->id,
     ];
 
-    $response = $this->patchToTenant('tenant.assets.update', $formData, $asset);
-    $response->assertStatus(302);
-    $response->assertSessionHasNoErrors();
+    $response = $this->patchToTenant('api.assets.update', $formData, $asset);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     assertDatabaseHas('assets', [
         'code' => 'A0001',
@@ -451,7 +451,6 @@ it('can update asset\'s location', function () {
 });
 
 it('can soft delete an asset but kept in DB with his maintainable', function () {
-    $this->actingAs(User::factory()->create());
 
     $asset = Asset::factory()->forLocation($this->room)->create();
 
@@ -462,8 +461,9 @@ it('can soft delete an asset but kept in DB with his maintainable', function () 
         'maintainable_id' => $asset->id
     ]);
 
-    $response = $this->deleteFromTenant('tenant.assets.destroy', $asset);
-    $response->assertStatus(302);
+    $response = $this->deleteFromTenant('api.assets.destroy', $asset);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     $this->assertSoftDeleted('assets', [
         'reference_code' => $this->room->reference_code . '-A0001',
@@ -479,20 +479,22 @@ it('can soft delete an asset but kept in DB with his maintainable', function () 
 });
 
 it('can restore a soft deleted asset', function () {
-    $this->actingAs(User::factory()->create());
+
 
     $asset = Asset::factory()->forLocation($this->room)->create();
 
-    $response = $this->deleteFromTenant('tenant.assets.destroy', $asset);
-    $response->assertStatus(302);
+    $response = $this->deleteFromTenant('api.assets.destroy', $asset);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     $this->assertSoftDeleted('assets', [
         'reference_code' => $this->room->reference_code . '-A0001',
         'code' => 'A0001',
     ]);
 
-    $response = $this->postToTenant('api.tenant.assets.restore', [], $asset->id);
-    $response->assertStatus(302);
+    $response = $this->postToTenant('api.assets.restore', [], $asset->reference_code);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
     $this->assertNull($asset->deleted_at);
 
     assertDatabaseHas('assets', [
@@ -511,7 +513,7 @@ it('can restore a soft deleted asset', function () {
 });
 
 it('can force delete a soft deleted asset', function () {
-    $this->actingAs(User::factory()->create());
+
 
     $asset = Asset::factory()->forLocation($this->room)->create();
 
@@ -519,8 +521,9 @@ it('can force delete a soft deleted asset', function () {
     $assetDescription = $asset->maintainable->description;
     $assetId = $asset->id;
 
-    $response = $this->deleteFromTenant('tenant.assets.destroy', $asset);
-    $response->assertStatus(302);
+    $response = $this->deleteFromTenant('api.assets.destroy', $asset);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     $this->assertSoftDeleted('assets', [
         'reference_code' => $this->room->reference_code . '-A0001',
@@ -528,8 +531,9 @@ it('can force delete a soft deleted asset', function () {
     ]);
     $this->assertNull($asset->deleted_at);
 
-    $response = $this->deleteFromTenant('api.tenant.assets.force', $asset->id);
-    $response->assertStatus(302);
+    $response = $this->deleteFromTenant('api.assets.force', $asset->reference_code);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
     assertDatabaseEmpty('assets');
 
     assertDatabaseMissing('maintainables', [
@@ -552,7 +556,7 @@ it('fails when model has more than 100 chars', function () {
         'model' => str_repeat('A', 101)
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasErrors([
         'model' => 'The model field must not be greater than 100 characters.',
     ]);
@@ -570,7 +574,7 @@ it('fails when brand has more than 100 chars', function () {
         'brand' => str_repeat('A', 101)
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasErrors([
         'brand' => 'The brand field must not be greater than 100 characters.',
     ]);
@@ -589,7 +593,7 @@ it('fails when serial_number has more than 50 chars', function () {
         'serial_number' => str_repeat('A', 51)
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasErrors([
         'serial_number' => 'The serial number field must not be greater than 50 characters.',
     ]);
@@ -608,10 +612,10 @@ it('can attach a provider to an asset\'s maintainable', function () {
         'locationType' => 'site',
         'categoryId' => $this->categoryType->id,
         'purchase_cost' => 9999999.2,
-        'providers' => [$provider->id]
+        'providers' => [['id' => $provider->id]]
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasNoErrors();
 
     $asset = Asset::first();
@@ -629,10 +633,12 @@ it('can update providers to an asset\'s maintainable', function () {
         'name' => "New asset name",
         'description' => "New asset description",
         'categoryId' => $asset->assetCategory->id,
-        'providers' => [...$providers]
+        'providers' => [['id' => $providers[0]], ['id' => $providers[1]], ['id' => $providers[2]],]
     ];
 
-    $response = $this->patchToTenant('tenant.assets.update', $formData, $asset);
+    $response = $this->patchToTenant('api.assets.update', $formData, $asset);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     $asset = Asset::find($asset->id);
     assertCount(3, $asset->maintainable->providers);

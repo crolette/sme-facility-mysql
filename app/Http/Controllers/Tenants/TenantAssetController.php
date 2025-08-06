@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Tenants;
 
-use App\Enums\MaintenanceFrequency;
 use Exception;
 use Inertia\Inertia;
 use App\Models\Tenants\Asset;
@@ -11,14 +10,16 @@ use App\Services\QRCodeService;
 use App\Services\PictureService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
+use App\Enums\MaintenanceFrequency;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Auth;
+use App\Services\MaintainableService;
 use App\Http\Requests\Tenant\AssetRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
-use App\Services\MaintainableService;
 
 class TenantAssetController extends Controller
 {
@@ -35,6 +36,9 @@ class TenantAssetController extends Controller
      */
     public function index()
     {
+        if (Auth::user()->cannot('viewAny', Asset::class))
+            abort(403);
+
         $assets = Asset::orderBy('id')->get();
         return Inertia::render('tenants/assets/index', ['assets' => $assets]);
     }
@@ -44,60 +48,24 @@ class TenantAssetController extends Controller
      */
     public function create()
     {
+        if (Auth::user()->cannot('create', Asset::class))
+            abort(403);
+
         $categories = CategoryType::where('category', 'asset')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
         return Inertia::render('tenants/assets/create', ['categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, DocumentService $documentService,)
-    {
-        try {
-            DB::beginTransaction();
-
-            $asset = new Asset([
-                ...$assetRequest->validated(),
-            ]);
-
-            $asset = $this->assetService->attachLocation($asset, $assetRequest->validated('locationType'), $assetRequest->validated('locationId'));
-
-            $asset->assetCategory()->associate($assetRequest->validated('categoryId'));
-            $asset->save();
-
-            $asset = $this->maintainableService->createMaintainable($asset, $maintainableRequest);
-
-            $files = $documentUploadRequest->validated('files');
-            if ($files) {
-                $documentService->uploadAndAttachDocuments($asset, $files);
-            }
-
-            $pictures = $pictureUploadRequest->validated('pictures');
-
-            if ($pictures) {
-                $pictureService->uploadAndAttachPictures($asset, $pictures);
-            }
-
-            $this->qrCodeService->createAndAttachQR($asset);
-
-            DB::commit();
-
-            return redirect()->route('tenant.assets.index')->with(['message' => 'Asset created', 'type' => 'success']);
-        } catch (Exception $e) {
-            DB::rollback();
-            Log::error($e->getMessage());
-            return redirect()->back()->with(['message' => 'ERROR : ' . $e->getMessage(), 'type' => 'error']);
-        }
-        return back()->withInput();
-    }
 
     /**
      * Display the specified resource.
      */
     public function show(Asset $asset)
     {
+        if (Auth::user()->cannot('view', $asset))
+            abort(403);
+
         return Inertia::render('tenants/assets/show', ['item' => $asset->load('maintainable.manager:id,first_name,last_name', 'maintainable.providers:id,name')]);
     }
 
@@ -112,54 +80,13 @@ class TenantAssetController extends Controller
      */
     public function edit(Asset $asset)
     {
+
+        if (Auth::user()->cannot('update', $asset))
+            abort(403);
+
         $categories = CategoryType::where('category', 'asset')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
         return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents', 'maintainable.manager']), 'categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(AssetRequest $request, MaintainableRequest $maintainableRequest, Asset $asset)
-    {
-        try {
-            DB::beginTransaction();
-
-            if ($request->validated('locationType'))
-                $asset = $this->assetService->attachLocation($asset, $request->validated('locationType'), $request->validated('locationId'));
-
-            $categoryId = $request->validated('categoryId') ?? null;
-            if ($categoryId && $categoryId !== $asset->assetCategory->id) {
-                $asset->assetCategory()->dissociate();
-                $asset->assetCategory()->associate($request->validated('categoryId'));
-            }
-
-            $asset->update([
-                ...$request->validated(),
-            ]);
-
-            $asset = $this->maintainableService->createMaintainable($asset, $maintainableRequest);
-
-            $asset->save();
-
-            DB::commit();
-
-            return redirect()->route('tenant.assets.index')->with(['message' => 'Asset updated', 'type' => 'success']);
-        } catch (Exception $e) {
-            DB::rollback();
-            Log::error($e->getMessage());
-            return redirect()->back()->with(['message' => 'ERROR : ' . $e->getMessage(), 'type' => 'error']);
-        }
-        return back()->withInput();
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Asset $asset)
-    {
-        $asset->delete();
-        return redirect()->route('tenant.assets.index')->with(['message' => 'Asset deleted', 'type' => 'success']);;
     }
 }
