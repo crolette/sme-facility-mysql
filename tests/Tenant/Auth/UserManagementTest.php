@@ -14,13 +14,6 @@ use function PHPUnit\Framework\assertNotNull;
 use function PHPUnit\Framework\assertNull;
 use function PHPUnit\Framework\assertTrue;
 
-
-
-dataset('roles', ['Admin', 'Maintenance Manager', 'Provider']);
-
-
-dataset('rolesWithoutAccess', ['Maintenance Manager', 'Provider']);
-
 test('test access roles to users index', function (string $role, int $expectedStatus) {
     $user = User::factory()->create();
     $user->assignRole($role);

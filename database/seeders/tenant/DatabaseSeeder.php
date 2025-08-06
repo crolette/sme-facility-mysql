@@ -20,5 +20,15 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionsSeeder::class,
         ]);
+
+        $user = User::create([
+            'first_name' => 'Super',
+            'last_name' => 'Admin',
+            'email' => 'super@sme-facility.com',
+            'password' => Hash::make('SME_2025!fwebxp'),
+            'can_login' => true
+        ]);
+
+        $user->assignRole('Super Admin');
     }
 }

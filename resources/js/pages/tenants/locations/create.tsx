@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { CentralType, LocationType, TenantBuilding, TenantFloor, TenantRoom, TenantSite, User, type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
@@ -92,6 +92,9 @@ export default function CreateLocation({
             });
         } else {
             post(route(`tenant.${routeName}.store`));
+            router.visit(route(`tenant.${routeName}.index`), {
+                preserveScroll: false,
+            });
         }
     };
 

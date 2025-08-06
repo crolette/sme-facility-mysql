@@ -1,0 +1,136 @@
+<?php
+
+namespace App\Http\Controllers\API\V1;
+
+use Exception;
+use App\Helpers\ApiResponse;
+use App\Models\LocationType;
+use App\Models\Tenants\Floor;
+use App\Services\QRCodeService;
+use App\Models\Tenants\Building;
+use App\Services\DocumentService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use App\Services\MaintainableService;
+use App\Http\Requests\Tenant\TenantFloorRequest;
+use App\Http\Requests\Tenant\MaintainableRequest;
+use App\Http\Requests\Tenant\DocumentUploadRequest;
+
+class APIFloorController extends Controller
+{
+    public function __construct(
+        protected QRCodeService $qrCodeService,
+        protected MaintainableService $maintainableService
+    ) {}
+
+
+    public function store(TenantFloorRequest $floorRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
+    {
+        if (Auth::user()->cannot('create', Floor::class))
+            abort(403);
+
+        try {
+            DB::beginTransaction();
+
+            $building = Building::find($floorRequest->validated('levelType'));
+            $floorType = LocationType::find($floorRequest->validated('locationType'));
+            $count = Floor::where('location_type_id', $floorType->id)->where('level_id', $building->id)->count();
+
+            $codeNumber = generateCodeNumber($count + 1, $floorType->prefix);
+
+            $referenceCode = $building->reference_code . '-' . $codeNumber;
+
+            $floor = Floor::create([
+                'code' => $codeNumber,
+                'surface_floor' => $floorRequest->validated('surface_floor'),
+                'surface_walls' => $floorRequest->validated('surface_walls'),
+                'reference_code' => $referenceCode,
+                'location_type_id' => $floorType->id
+            ]);
+
+            $floor->building()->associate($building);
+            $floor->save();
+
+            $floor = $this->maintainableService->createMaintainable($floor, $maintainableRequest);
+
+            $files = $documentUploadRequest->validated('files');
+            if ($files) {
+                $documentService->uploadAndAttachDocuments($floor, $files);
+            }
+            $this->qrCodeService->createAndAttachQR($floor);
+
+            DB::commit();
+            return ApiResponse::success('', 'Building created');
+        } catch (Exception $e) {
+            DB::rollback();
+            Log::error($e->getMessage());
+            return ApiResponse::error('ERROR : ' . $e->getMessage());
+            return redirect()->back()->with(['message' => 'ERROR : ' . $e->getMessage(), 'type' => 'error']);
+        }
+        return ApiResponse::error('Error while creating the building');
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(TenantFloorRequest $floorRequest, MaintainableRequest $maintainableRequest, Floor $floor)
+    {
+        if (Auth::user()->cannot('update', $floor))
+            abort(403);
+
+        // TODO Check how to perform a check or be sure that a user can't change the level/location type as it would change every child (building, floor, room)
+
+        if (intval($floorRequest->validated('locationType')) !== $floor->locationType->id) {
+            $errors = new MessageBag([
+                'locationType' => ['You cannot change the floor type of a location'],
+            ]);
+            return ApiResponse::error('You cannot change the floor type of a location', $errors);
+        }
+
+        if (intval($floorRequest->validated('levelType')) !== $floor->building->id) {
+            $errors = new MessageBag([
+                'levelType' => ['You cannot change the level type of a location'],
+            ]);
+            return ApiResponse::error('You cannot change the level type of a location', $errors);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $floor->update([
+                'surface_floor' => $floorRequest->validated('surface_floor'),
+                'surface_walls' => $floorRequest->validated('surface_walls'),
+            ]);
+
+            $floor = $this->maintainableService->createMaintainable($floor, $maintainableRequest);
+
+            DB::commit();
+            return ApiResponse::success('', 'Site updated');
+        } catch (Exception $e) {
+            DB::rollback();
+            Log::error($e->getMessage());
+            return ApiResponse::error('ERROR : ' . $e->getMessage());
+        }
+        return ApiResponse::error('Error while updating the site');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Floor $floor)
+    {
+
+        if (Auth::user()->cannot('delete', $floor))
+            abort(403);
+
+        if (count($floor->assets) > 0 || count($floor->rooms) > 0) {
+            abort(409)->with(['message' => 'Floor cannot be deleted ! Assets and/or rooms are linked to this floor', 'type' => 'warning']);
+        }
+
+        $floor->delete();
+        return ApiResponse::success('', 'site deleted');
+    }
+}

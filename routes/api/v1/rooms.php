@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\ApiResponse;
+use App\Http\Controllers\API\V1\APIRoomController;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use App\Services\PictureService;
@@ -20,14 +21,15 @@ Route::middleware([
 ])->prefix('/v1/rooms')->group(
     function () {
 
-        // Route::middleware(['auth'])->group(function () {
+        Route::post('/', [APIRoomController::class, 'store'])->name('api.rooms.store');
 
         Route::prefix('{room}')->group(function () {
-
             Route::get('/', function (Room $room) {
                 return ApiResponse::success($room->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers']));
             })->name('api.rooms.show');
 
+            Route::patch('/', [APIRoomController::class, 'update'])->name('api.rooms.update');
+            Route::delete('/', [APIRoomController::class, 'destroy'])->name('api.rooms.destroy');
 
             Route::patch('/relocate', [RelocateRoomController::class, 'relocateRoom'])->name('api.rooms.relocate');
 

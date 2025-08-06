@@ -27,25 +27,27 @@ beforeEach(function () {
     $this->user->assignRole('Admin');
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
     $this->buildingType = LocationType::factory()->create(['level' => 'building']);
+    $this->floorType = LocationType::factory()->create(['level' => 'floor']);
     $this->site = Site::factory()->create();
     $this->building = Building::factory()->create();
+    $this->floor = Floor::factory()->create();
 
     $this->formData = [
-        'name' => 'New building',
+        'name' => 'New floor',
         'surface_floor' => 2569.12,
         'surface_walls' => 256.9,
-        'description' => 'Description new building',
-        'levelType' => $this->site->id,
-        'locationType' => $this->buildingType->id
+        'description' => 'Description new floor',
+        'levelType' => $this->building->id,
+        'locationType' => $this->floorType->id
     ];
 });
 
-test('test access roles to building index page', function (string $role, int $expectedStatus) {
+test('test access roles to floor index page', function (string $role, int $expectedStatus) {
     $user = User::factory()->create();
     $user->assignRole($role);
     $this->actingAs($user, 'tenant');
 
-    $response = $this->getFromTenant('tenant.buildings.index');
+    $response = $this->getFromTenant('tenant.floors.index');
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -53,12 +55,12 @@ test('test access roles to building index page', function (string $role, int $ex
     ['Provider', 403]
 ]);
 
-test('test access roles to create building page', function (string $role, int $expectedStatus) {
+test('test access roles to create floor page', function (string $role, int $expectedStatus) {
     $user = User::factory()->create();
     $user->assignRole($role);
     $this->actingAs($user, 'tenant');
 
-    $response = $this->getFromTenant('tenant.buildings.create');
+    $response = $this->getFromTenant('tenant.floors.create');
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -66,12 +68,12 @@ test('test access roles to create building page', function (string $role, int $e
     ['Provider', 403]
 ]);
 
-test('test access roles to view any building page', function (string $role, int $expectedStatus) {
+test('test access roles to view any floor page', function (string $role, int $expectedStatus) {
     $user = User::factory()->create();
     $user->assignRole($role);
     $this->actingAs($user, 'tenant');
 
-    $response = $this->getFromTenant('tenant.buildings.show', $this->building->reference_code);
+    $response = $this->getFromTenant('tenant.floors.show', $this->floor->reference_code);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -79,15 +81,14 @@ test('test access roles to view any building page', function (string $role, int 
     ['Provider', 403]
 ]);
 
-
-test('test access roles to view building with maintenance manager page', function (string $role, int $expectedStatus) {
+test('test access roles to view floor with maintenance manager page', function (string $role, int $expectedStatus) {
     $user = User::factory()->create();
     $user->assignRole($role);
     $this->actingAs($user, 'tenant');
 
-    $this->building->maintainable()->update(['maintenance_manager_id' => $user->id]);
+    $this->floor->maintainable()->update(['maintenance_manager_id' => $user->id]);
 
-    $response = $this->getFromTenant('tenant.buildings.show', $this->building->reference_code);
+    $response = $this->getFromTenant('tenant.floors.show', $this->floor->reference_code);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -95,13 +96,13 @@ test('test access roles to view building with maintenance manager page', functio
     ['Provider', 403]
 ]);
 
-test('test access roles to store a building', function (string $role, int $expectedStatus) {
+test('test access roles to store a floor', function (string $role, int $expectedStatus) {
 
     $user = User::factory()->create();
     $user->assignRole($role);
     $this->actingAs($user, 'tenant');
 
-    $response = $this->postToTenant('api.buildings.store', $this->formData);
+    $response = $this->postToTenant('api.floors.store', $this->formData);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -114,7 +115,7 @@ test('test access roles to update any asset page', function (string $role, int $
     $user->assignRole($role);
     $this->actingAs($user, 'tenant');
 
-    $response = $this->getFromTenant('tenant.buildings.edit', $this->building->reference_code);
+    $response = $this->getFromTenant('tenant.floors.edit', $this->floor->reference_code);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -122,15 +123,15 @@ test('test access roles to update any asset page', function (string $role, int $
     ['Provider', 403]
 ]);
 
-test('test access roles to update building with maintenance manager page', function (string $role, int $expectedStatus) {
+test('test access roles to update floor with maintenance manager page', function (string $role, int $expectedStatus) {
 
     $user = User::factory()->create();
     $user->assignRole($role);
     $this->actingAs($user, 'tenant');
 
-    $this->building->maintainable()->update(['maintenance_manager_id' => $user->id]);
+    $this->floor->maintainable()->update(['maintenance_manager_id' => $user->id]);
 
-    $response = $this->getFromTenant('tenant.buildings.edit', $this->building->reference_code);
+    $response = $this->getFromTenant('tenant.floors.edit', $this->floor->reference_code);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -138,15 +139,15 @@ test('test access roles to update building with maintenance manager page', funct
     ['Provider', 403]
 ]);
 
-test('test access roles to update building with maintenance manager', function (string $role, int $expectedStatus) {
+test('test access roles to update floor with maintenance manager', function (string $role, int $expectedStatus) {
 
     $user = User::factory()->create();
     $user->assignRole($role);
     $this->actingAs($user, 'tenant');
 
-    $this->building->maintainable()->update(['maintenance_manager_id' => $user->id]);
+    $this->floor->maintainable()->update(['maintenance_manager_id' => $user->id]);
 
-    $response = $this->patchToTenant('api.buildings.update', $this->formData, $this->building->reference_code);
+    $response = $this->patchToTenant('api.floors.update', $this->formData, $this->floor->reference_code);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -154,14 +155,14 @@ test('test access roles to update building with maintenance manager', function (
     ['Provider', 403]
 ]);
 
-test('test access roles to delete any building', function (string $role, int $expectedStatus) {
+test('test access roles to delete any floor', function (string $role, int $expectedStatus) {
 
     $user = User::factory()->create();
     $user->assignRole($role);
     $this->actingAs($user, 'tenant');
 
 
-    $response = $this->deleteFromTenant('api.buildings.destroy', $this->builflong->reference_code);
+    $response = $this->deleteFromTenant('api.floors.destroy', $this->floor->reference_code);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -169,15 +170,15 @@ test('test access roles to delete any building', function (string $role, int $ex
     ['Provider', 403]
 ]);
 
-test('test access roles to delete building with maintenance manager', function (string $role, int $expectedStatus) {
+test('test access roles to delete floor with maintenance manager', function (string $role, int $expectedStatus) {
 
     $user = User::factory()->create();
     $user->assignRole($role);
     $this->actingAs($user, 'tenant');
 
-    $this->building->maintainable()->update(['maintenance_manager_id' => $user->id]);
+    $this->floor->maintainable()->update(['maintenance_manager_id' => $user->id]);
 
-    $response = $this->deleteFromTenant('api.buildings.destroy', $this->building->reference_code);
+    $response = $this->deleteFromTenant('api.floors.destroy', $this->floor->reference_code);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],

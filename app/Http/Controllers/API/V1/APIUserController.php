@@ -37,7 +37,6 @@ class APIUserController extends Controller
         }
 
         try {
-
             DB::beginTransaction();
 
             $user = new User($request->validated());
@@ -80,12 +79,12 @@ class APIUserController extends Controller
 
             $user->update($request->safe()->except('avatar'));
 
-            if ($request->validated('can_login') === true) {
+            if (!$user->can_login && $request->validated('can_login') === true) {
                 $password = Str::password(12);
                 $user->password = Hash::make($password);
-                $user->syncRoles($request->validated('role'));
             }
 
+            $user->syncRoles($request->validated('role'));
 
             if ($request->validated('provider_id'))
                 $user = $this->userService->attachProvider($user, $request->validated('provider_id'));

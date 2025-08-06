@@ -12,9 +12,11 @@ use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
 use function PHPUnit\Framework\assertNotNull;
 use function PHPUnit\Framework\assertNull;
+use function PHPUnit\Framework\assertTrue;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
+    $this->user->assignRole('Admin');
     $this->actingAs($this->user, 'tenant');
 });
 
@@ -41,8 +43,8 @@ it('can render the show user page', function () {
         ->assertInertia(
             fn($page) =>
             $page->component('tenants/users/show')
-                ->has('user')
-                ->where('user.id', $user->id)
+                ->has('item')
+                ->where('item.id', $user->id)
         );
 });
 
@@ -77,6 +79,7 @@ it('can post a new "loginable" user and return the password', function () {
         'last_name' => 'Doe',
         'email' => 'janedoe@facilitywebxp.be',
         'can_login' => true,
+        'role' => 'Maintenance Manager',
         'avatar' => $file1
     ];
 
@@ -111,6 +114,7 @@ it('can post a new "non loginable" user and attach a provider', function () {
     $formData = [
         'first_name' => 'Jane',
         'last_name' => 'Doe',
+        'can_login' => false,
         'email' => 'janedoe@facilitywebxp.be',
         'provider_id' => $provider->id
     ];
@@ -158,11 +162,45 @@ it('can update an existing user', function () {
         'first_name' => 'Jane',
         'last_name' => 'Doe',
         'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => false,
         'avatar' => User::find(2)->avatar
     ]);
 
     Storage::disk('tenants')->assertExists(User::find(2)->avatar);
 });
+
+it('can update the role of an existing user', function () {
+
+    $user = User::factory()->create(['can_login' => true]);
+    $user->assignRole('Provider');
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Maintenance Manager',
+    ];
+
+    $response = $this->patchToTenant('api.users.update', $formData, $user);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseCount('users', 2);
+    assertDatabaseHas('users', [
+        'id' => 2,
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+    ]);
+
+    $user->refresh();
+    assertTrue($user->hasRole('Maintenance Manager'));
+});
+
 
 it('can delete an existing user', function () {
     $user = User::factory()->create();
