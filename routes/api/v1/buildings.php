@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\ApiResponse;
+use App\Http\Controllers\API\V1\APIBuildingController;
 use App\Models\Tenants\Building;
 use App\Services\PictureService;
 use App\Services\DocumentService;
@@ -17,9 +18,13 @@ Route::middleware([
     'auth:tenant'
 ])->prefix('/v1/buildings')->group(function () {
 
-    // Route::middleware(['auth'])->group(function () {
+    Route::post('/', [APIBuildingController::class, 'store'])->name('api.buildings.store');
 
     Route::prefix('/{building}')->group(function () {
+
+        Route::patch('/', [APIBuildingController::class, 'update'])->name('api.buildings.update');
+        Route::delete('/', [APIBuildingController::class, 'destroy'])->name('api.buildings.destroy');
+
 
         Route::get('/', function (Building $building) {
             return ApiResponse::success($building->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers']));
