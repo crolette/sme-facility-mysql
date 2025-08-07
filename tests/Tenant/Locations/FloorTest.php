@@ -23,6 +23,7 @@ use function Pest\Laravel\assertDatabaseMissing;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
+    $this->user->assignRole('Admin');
     $this->actingAs($this->user, 'tenant');
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
     $this->buildingType = LocationType::factory()->create(['level' => 'building']);
@@ -71,9 +72,9 @@ it('can create a new floor', function () {
         'locationType' => $this->floorType->id
     ];
 
-    $response = $this->postToTenant('tenant.floors.store', $formData);
-    $response->assertStatus(302);
-    $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.floors.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     $floor = Floor::first();
 
@@ -100,7 +101,7 @@ it('can create a new floor', function () {
     ]);
 });
 
-it('can attach a provider to a building\'s maintainable', function () {
+it('can attach a provider to a floor\'s maintainable', function () {
     $provider = Provider::factory()->create();
 
     $formData = [
@@ -108,11 +109,12 @@ it('can attach a provider to a building\'s maintainable', function () {
         'description' => 'Description new floor',
         'levelType' => $this->building->id,
         'locationType' => $this->floorType->id,
-        'providers' => [$provider->id]
+        'providers' => [['id' => $provider->id]]
     ];
 
-    $response = $this->postToTenant('tenant.floors.store', $formData);
-    $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.floors.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     $floor = Floor::first();
     assertCount(1, $floor->maintainable->providers);
@@ -148,8 +150,9 @@ it('can upload several files to building', function () {
         ]
     ];
 
-    $response = $this->postToTenant('tenant.floors.store', $formData);
-    $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.floors.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     assertDatabaseCount('documents', 2);
     assertDatabaseHas('documentables', [
@@ -169,12 +172,12 @@ it('can render the show floor page', function () {
 
     $response->assertInertia(
         fn($page) => $page->component('tenants/locations/show')
-            ->has('location')
-            ->where('location.location_type.level', $floor->locationType->level)
-            ->where('location.maintainable.description', $floor->maintainable->description)
-            ->where('location.code', $floor->code)
-            ->where('location.reference_code', $floor->reference_code)
-            ->where('location.location_type.level', 'floor')
+            ->has('item')
+            ->where('item.location_type.level', $floor->locationType->level)
+            ->where('item.maintainable.description', $floor->maintainable->description)
+            ->where('item.code', $floor->code)
+            ->where('item.reference_code', $floor->reference_code)
+            ->where('item.location_type.level', 'floor')
     );
 });
 
@@ -214,9 +217,9 @@ it('can update a floor maintainable', function () {
         'locationType' => $this->floorType->id
     ];
 
-    $response = $this->patchToTenant('tenant.floors.update', $formData, $floor);
-    $response->assertStatus(302);
-    $response->assertSessionHasNoErrors();
+    $response = $this->patchToTenant('api.floors.update', $formData, $floor);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     assertDatabaseCount('sites', 1);
     assertDatabaseCount('buildings', 1);
@@ -253,8 +256,7 @@ it('fails when update of an existing floor with a non existing floor type', func
         'locationType' => 5
     ];
 
-    $response = $this->patchToTenant('tenant.floors.update', $formData, $floor);
-    $response->assertRedirect();
+    $response = $this->patchToTenant('api.floors.update', $formData, $floor);
     $response->assertSessionHasErrors([
         'locationType' => 'The selected location type is invalid.',
     ]);
@@ -272,11 +274,9 @@ it('cannot update a floor type of an existing floor', function () {
         'locationType' => 4
     ];
 
-    $response = $this->patchToTenant('tenant.floors.update', $formData, $floor);
-    $response->assertRedirect();
-    $response->assertSessionHasErrors([
-        'locationType' => 'You cannot change the floor type of a location',
-    ]);
+    $response = $this->patchToTenant('api.floors.update', $formData, $floor);
+    $response->assertStatus(400)
+        ->assertJson(['status' => 'error']);
 });
 
 it('can delete a floor and his maintainable', function () {
@@ -287,9 +287,9 @@ it('can delete a floor and his maintainable', function () {
         'code' => $floor->code
     ]);
 
-    $response = $this->deleteFromTenant('tenant.floors.destroy', $floor->reference_code);
-    $response->assertSessionHasNoErrors();
-    $response->assertStatus(302);
+    $response = $this->deleteFromTenant('api.floors.destroy', $floor->reference_code);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
     assertDatabaseMissing('floors', [
         'reference_code' => $floor->reference_code
     ]);

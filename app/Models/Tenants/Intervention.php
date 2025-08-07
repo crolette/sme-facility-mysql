@@ -75,7 +75,7 @@ class Intervention extends Model
     // Asset, Site, Building, Floor, Room
     public function interventionable(): MorphTo
     {
-        return $this->morphTo();
+        return $this->morphTo()->withTrashed();
     }
 
     public function ticket(): BelongsTo

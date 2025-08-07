@@ -23,4 +23,13 @@ class ApiResponse
             'errors' => $errors,
         ], $code);
     }
+
+    public static function notAuthorized($message = 'Not authorized', $code = 403)
+    {
+        return response()->json([
+            'status' => 'error',
+            'message' => $message,
+            'type' => 'error',
+        ], $code);
+    }
 }

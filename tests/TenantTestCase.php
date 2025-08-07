@@ -21,7 +21,11 @@ abstract class TenantTestCase extends BaseTestCase
 
     protected $preservedTables = [
         'migrations',
-        'company'
+        'company',
+        'permissions',
+        'roles',
+        'role_has_permissions'
+
     ];
 
     protected $preservedCentralTables = [

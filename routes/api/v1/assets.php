@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\ApiResponse;
+use App\Http\Controllers\API\V1\APIAssetController;
 use App\Http\Controllers\API\V1\APIInterventionActionController;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
@@ -29,6 +30,7 @@ use App\Http\Controllers\Tenants\ForceDeleteAssetController;
 use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
 use App\Http\Controllers\API\V1\Tickets\InterventionForLocationController;
 use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
+use App\Models\Tenants\Intervention;
 
 Route::middleware([
     'web',
@@ -45,11 +47,7 @@ Route::middleware([
             return ApiResponse::success(Asset::withoutTrashed()->get());
         })->name('api.assets.index');
 
-        // Restore a soft deleted asset
-        Route::post('{assetId}/restore', [RestoreSoftDeletedAssetController::class, 'restore'])->name('api.tenant.assets.restore');
-
-        // Force delete a soft deleted asset
-        Route::delete('{assetId}/force', [ForceDeleteAssetController::class, 'forceDelete'])->name('api.tenant.assets.force');
+        Route::post('/', [APIAssetController::class, 'store'])->name('api.assets.store');
 
         Route::get('/trashed', [ApiSearchTrashedAssetController::class, 'index'])->name('api.assets.trashed');
 
@@ -58,6 +56,15 @@ Route::middleware([
             Route::get('/', function (Asset $asset) {
                 return ApiResponse::success($asset->load('maintainable.manager:id,first_name,last_name', 'maintainable.providers:id,name'));
             })->name('api.assets.show');
+
+            Route::patch('/', [APIAssetController::class, 'update'])->name('api.assets.update');
+            Route::delete('/', [APIAssetController::class, 'destroy'])->name('api.assets.destroy');
+
+            // Restore a soft deleted asset
+            Route::post('/restore', [RestoreSoftDeletedAssetController::class, 'restore'])->withTrashed()->name('api.assets.restore');
+
+            // Force delete a soft deleted asset
+            Route::delete('/force', [ForceDeleteAssetController::class, 'forceDelete'])->withTrashed()->name('api.assets.force');
 
             // Get all the documents from an asset
             Route::get('/documents/', function ($asset) {
@@ -95,15 +102,18 @@ Route::middleware([
             })->name('api.assets.pictures.post');
 
             // Get all tickets from an asset
-            Route::get('/tickets/', function ($asset) {
-                $asset = Asset::withTrashed()->with('tickets')->where('reference_code', $asset)->first();
+            Route::get('/tickets/', function (Asset $asset) {
+                // $asset = Asset::withTrashed()->with('tickets')->where('reference_code', $asset)->first();
                 return ApiResponse::success($asset->tickets);
             })->name('api.assets.tickets');
 
             // Get all interventions from an asset
-            Route::get('/interventions/', function ($asset) {
-                $asset = Asset::withTrashed()->with('interventions')->where('reference_code', $asset)->first();
-                return ApiResponse::success($asset->interventions);
+            Route::get('/interventions/', function (Asset $asset) {
+                // $interventions = Intervention::whereMorphedTo('interventionable', $asset)->where('ticket_id', null)->get();
+                // $interventionsTwo = Intervention::where('ticket_id', null)->where('maintainable_id', $asset->maintainable->id)->get();
+                // Debugbar::info($interventions, $interventionsTwo, $asset->interventions()->where('ticket_id', null)->get());
+                // $asset = Asset::withTrashed()->with('interventions')->where('reference_code', $asset)->first();
+                return ApiResponse::success($asset->interventions()->where('ticket_id', null)->get());
             })->name('api.assets.interventions');
         });
 

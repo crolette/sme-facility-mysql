@@ -1,11 +1,12 @@
 <?php
 
-namespace Database\Seeders;
+namespace Database\Seeders\tenant;
 
 use App\Models\Tenants\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Database\Seeders\tenant\PermissionsSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,10 +17,18 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Super Admin',
-            'email' => 'super@sme-facility.com',
-            'password' => Hash::make('SME_2025!fwebxp')
+        $this->call([
+            PermissionsSeeder::class,
         ]);
+
+        $user = User::create([
+            'first_name' => 'Super',
+            'last_name' => 'Admin',
+            'email' => 'super@sme-facility.com',
+            'password' => Hash::make('SME_2025!fwebxp'),
+            'can_login' => true
+        ]);
+
+        $user->assignRole('Super Admin');
     }
 }

@@ -16,6 +16,7 @@ use App\Enums\MaintenanceFrequency;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
 use App\Http\Requests\Tenant\TenantFloorRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
@@ -33,6 +34,9 @@ class TenantFloorController extends Controller
      */
     public function index()
     {
+        if (Auth::user()->cannot('viewAny', Floor::class))
+            abort(403);
+
         $floors = Floor::with('building')->get();
         return Inertia::render('tenants/locations/index', ['locations' => $floors, 'routeName' => 'floors']);
     }
@@ -42,6 +46,9 @@ class TenantFloorController extends Controller
      */
     public function create()
     {
+        if (Auth::user()->cannot('create', Floor::class))
+            abort(403);
+
         $levelTypes = Building::all();
         $locationTypes = LocationType::where('level', 'floor')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
@@ -50,60 +57,14 @@ class TenantFloorController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     */
-    public function store(TenantFloorRequest $floorRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
-    {
-        try {
-            DB::beginTransaction();
-
-            $building = Building::find($floorRequest->validated('levelType'));
-            $floorType = LocationType::find($floorRequest->validated('locationType'));
-            $count = Floor::where('location_type_id', $floorType->id)->where('level_id', $building->id)->count();
-
-            $codeNumber = generateCodeNumber($count + 1, $floorType->prefix);
-
-            $referenceCode = $building->reference_code . '-' . $codeNumber;
-
-            $floor = Floor::create([
-                'code' => $codeNumber,
-                'surface_floor' => $floorRequest->validated('surface_floor'),
-                'surface_walls' => $floorRequest->validated('surface_walls'),
-                'reference_code' => $referenceCode,
-                'location_type_id' => $floorType->id
-            ]);
-
-            $floor->building()->associate($building);
-            $floor->save();
-
-            $floor = $this->maintainableService->createMaintainable($floor, $maintainableRequest);
-
-            if ($maintainableRequest->validated('providers')) {
-                $floor->maintainable->providers()->sync($maintainableRequest->validated('providers'));
-            }
-
-            $files = $documentUploadRequest->validated('files');
-            if ($files) {
-                $documentService->uploadAndAttachDocuments($floor, $files);
-            }
-            $this->qrCodeService->createAndAttachQR($floor);
-
-            DB::commit();
-
-            return redirect()->route('tenant.floors.index')->with(['message' => 'Floor created', 'type' => 'success']);
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::error($e->getMessage());
-            return redirect()->back()->with(['message' => 'ERROR : ' . $e->getMessage(), 'type' => 'error']);
-        }
-        return back()->withInput();
-    }
-
-    /**
      * Display the specified resource.
      */
     public function show(Floor $floor)
     {
+
+        if (Auth::user()->cannot('view', $floor))
+            abort(403);
+
         return Inertia::render('tenants/locations/show', ['routeName' => 'floors', 'item' => $floor->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers'])]);
     }
 
@@ -112,65 +73,14 @@ class TenantFloorController extends Controller
      */
     public function edit(Floor $floor)
     {
+        if (Auth::user()->cannot('update', $floor))
+            abort(403);
+
+
         $levelTypes = Building::all();
         $locationTypes = LocationType::where('level', 'floor')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
         return Inertia::render('tenants/locations/create', ['location' => $floor->load('building'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'floors', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(TenantFloorRequest $floorRequest, MaintainableRequest $maintainableRequest, Floor $floor)
-    {
-        // TODO Check how to perform a check or be sure that a user can't change the level/location type as it would change every child (building, floor, room)
-
-        if (intval($floorRequest->validated('locationType')) !== $floor->locationType->id) {
-            $errors = new MessageBag([
-                'locationType' => ['You cannot change the floor type of a location'],
-            ]);
-            return back()->withErrors($errors)->withInput()->with(['message' => 'Error !', 'type' => 'error']);
-        }
-
-        if (intval($floorRequest->validated('levelType')) !== $floor->building->id) {
-            $errors = new MessageBag([
-                'levelType' => ['You cannot change the level type of a location'],
-            ]);
-            return back()->withErrors($errors)->withInput()->with(['message' => 'Error !', 'type' => 'error']);
-        }
-
-        try {
-            DB::beginTransaction();
-
-            $floor->update([
-                'surface_floor' => $floorRequest->validated('surface_floor'),
-                'surface_walls' => $floorRequest->validated('surface_walls'),
-            ]);
-
-            $floor = $this->maintainableService->createMaintainable($floor, $maintainableRequest);
-
-            DB::commit();
-            return redirect()->route('tenant.floors.index')->with(['message' => 'Floor updated', 'type' => 'success']);
-        } catch (Exception $e) {
-            DB::rollBack();
-            Log::error($e->getMessage());
-            return redirect()->back()->with(['message' => 'ERROR : ' . $e->getMessage(), 'type' => 'error']);
-        }
-
-        return redirect()->back()->with(['message' => 'Something went wrong', 'type' => 'warning']);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Floor $floor)
-    {
-        if (count($floor->assets) > 0 || count($floor->rooms) > 0) {
-            abort(409)->with(['message' => 'Floor cannot be deleted ! Assets and/or rooms are linked to this floor', 'type' => 'warning']);
-        }
-
-        $floor->delete();
-        return redirect()->route('tenant.floors.index')->with(['message' => 'Floor deleted', 'type' => 'success']);
     }
 }

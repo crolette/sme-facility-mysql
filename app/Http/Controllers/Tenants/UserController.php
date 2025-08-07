@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers\Tenants;
 
-use App\Models\Tenants\Intervention;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Models\Tenants\Provider;
-use App\Models\Tenants\Ticket;
-use App\Models\Tenants\User;
+use App\Enums\RoleTypes;
 use Inertia\Inertia;
+use App\Models\Tenants\User;
+use Illuminate\Http\Request;
+use App\Models\Tenants\Ticket;
+use App\Models\Tenants\Provider;
+use App\Http\Controllers\Controller;
+use App\Models\Tenants\Intervention;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -17,7 +19,10 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all()->load('provider:id,name');
+        if (Auth::user()->cannot('viewAny', User::class)) {
+            abort(403);
+        }
+        $users = User::withoutRole('Super Admin')->get()->load('roles:id,name', 'provider:id,name');
         return Inertia::render('tenants/users/index', ['users' => $users]);
     }
 
@@ -26,7 +31,11 @@ class UserController extends Controller
      */
     public function create()
     {
-        return Inertia::render('tenants/users/create');
+        if (Auth::user()->cannot('create', User::class)) {
+            abort(403);
+        }
+
+        return Inertia::render('tenants/users/create', ['roles' => array_column(RoleTypes::cases(), 'value')]);
     }
 
     /**
@@ -34,7 +43,11 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        return Inertia::render('tenants/users/create', ['user' => $user->load('provider:id,name')]);
+        if (Auth::user()->cannot('update', $user)) {
+            abort(403);
+        }
+
+        return Inertia::render('tenants/users/create', ['user' => $user->load('roles:id,name', 'provider:id,name'), 'roles' => array_column(RoleTypes::cases(), 'value')]);
     }
 
 
@@ -43,6 +56,9 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        return Inertia::render('tenants/users/show', ['item' => $user->load('provider:id,name')]);
+        if (Auth::user()->cannot('view', $user)) {
+            abort(403);
+        }
+        return Inertia::render('tenants/users/show', ['item' => $user->load('roles:id,name', 'provider:id,name')]);
     }
 }

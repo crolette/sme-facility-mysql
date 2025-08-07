@@ -22,6 +22,7 @@ use function Pest\Laravel\assertDatabaseMissing;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
+    $this->user->assignRole('Admin');
     $this->actingAs($this->user, 'tenant');
 });
 
@@ -32,7 +33,6 @@ it('can render the index buildings page', function () {
     Building::factory()->count(3)->create();
     $response = $this->getFromTenant('tenant.buildings.index');
     $response->assertOk();
-
 
     $response->assertInertia(
         fn($page) =>
@@ -49,7 +49,6 @@ it('can render the create building page', function () {
 
     $response = $this->getFromTenant('tenant.buildings.create');
     $response->assertOk();
-
 
     $response->assertInertia(
         fn($page) => $page->component('tenants/locations/create')
@@ -73,9 +72,9 @@ it('can create a new building', function () {
         'locationType' => $buildingType->id
     ];
 
-    $response = $this->postToTenant('tenant.buildings.store', $formData);
-    $response->assertStatus(302);
-    $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.buildings.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     assertDatabaseCount('buildings', 1);
     assertDatabaseCount('maintainables', 2);
@@ -106,11 +105,12 @@ it('can attach a provider to a building\'s maintainable', function () {
         'description' => 'Description new building',
         'levelType' => $site->id,
         'locationType' => $buildingType->id,
-        'providers' => [$provider->id]
+        'providers' => [['id' => $provider->id]]
     ];
 
-    $response = $this->postToTenant('tenant.buildings.store', $formData);
-    $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.buildings.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     $building = Building::first();
     assertCount(1, $building->maintainable->providers);
@@ -149,8 +149,9 @@ it('can upload several files to building', function () {
         ]
     ];
 
-    $response = $this->postToTenant('tenant.buildings.store', $formData);
-    $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.buildings.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     assertDatabaseCount('documents', 2);
     assertDatabaseHas('documentables', [
@@ -174,12 +175,12 @@ it('can render the show building page', function () {
 
     $response->assertInertia(
         fn($page) => $page->component('tenants/locations/show')
-            ->has('location')
-            ->where('location.location_type.level', $building->locationType->level)
-            ->where('location.maintainable.description', $building->maintainable->description)
-            ->where('location.code', $building->code)
-            ->where('location.reference_code', $building->reference_code)
-            ->where('location.location_type.level', 'building')
+            ->has('item')
+            ->where('item.location_type.level', $building->locationType->level)
+            ->where('item.maintainable.description', $building->maintainable->description)
+            ->where('item.code', $building->code)
+            ->where('item.reference_code', $building->reference_code)
+            ->where('item.location_type.level', 'building')
     );
 });
 
@@ -221,9 +222,9 @@ it('can update a building', function () {
         'locationType' => $buildingType->id
     ];
 
-    $response = $this->patchToTenant('tenant.buildings.update', $formData, $building);
-    $response->assertStatus(302);
-    $response->assertSessionHasNoErrors();
+    $response = $this->patchToTenant('api.buildings.update', $formData, $building);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
 
     assertDatabaseCount('sites', 1);
@@ -263,11 +264,9 @@ it('cannot update a building type of an existing building', function () {
         'locationType' => 4
     ];
 
-    $response = $this->patchToTenant('tenant.buildings.update', $formData, $building);
-    $response->assertRedirect();
-    $response->assertSessionHasErrors([
-        'locationType' => 'You cannot change the building type of a location',
-    ]);
+    $response = $this->patchToTenant('api.buildings.update', $formData, $building);
+    $response->assertStatus(400)
+        ->assertJson(['status' => 'error']);
 });
 
 it('can delete a building', function () {
@@ -282,8 +281,9 @@ it('can delete a building', function () {
         'code' => $building->code
     ]);
 
-    $response = $this->deleteFromTenant('tenant.buildings.destroy', $building->reference_code);
-    $response->assertStatus(302);
+    $response = $this->deleteFromTenant('api.buildings.destroy', $building->reference_code);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
     assertDatabaseMissing('buildings', [
         'reference_code' => $building->reference_code
     ]);
@@ -317,7 +317,7 @@ it('cannot delete a building which has related floors', function () {
     assertDatabaseCount('floors', 2);
     assertDatabaseCount('maintainables', 4);
 
-    $response = $this->deleteFromTenant('tenant.buildings.destroy', $building->reference_code);
+    $response = $this->deleteFromTenant('api.buildings.destroy', $building->reference_code);
     $response->assertStatus(409);
 });
 
@@ -346,7 +346,8 @@ it('can update name and description of a document from a building ', function ()
     ];
 
     $response = $this->patchToTenant('api.documents.update', $formData, $document->id);
-    $response->assertOk();
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
     $this->assertDatabaseHas('documents', [
         'id' => $document->id,
         'name' => 'New document name',
@@ -373,7 +374,8 @@ it('can add pictures to a building', function () {
     ];
 
     $response = $this->postToTenant('api.buildings.pictures.post', $formData, $building);
-    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
     assertDatabaseCount('pictures', 2);
     assertDatabaseHas('pictures', [
         'imageable_type' => 'App\Models\Tenants\Building',

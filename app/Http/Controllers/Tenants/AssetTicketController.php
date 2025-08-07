@@ -10,11 +10,14 @@ use App\Models\Tenants\Floor;
 use App\Models\Tenants\Building;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Model;
+use Inertia\Inertia;
 
 class AssetTicketController extends Controller
 {
-    public function createFromAsset(Asset $asset)
+    public function createFromAsset(string $assetCode)
     {
+        // dd($assetCode);
+        $asset = Asset::where('code', $assetCode)->first();
         return $this->create($asset);
     }
 
@@ -40,6 +43,6 @@ class AssetTicketController extends Controller
 
     public function create(Model $model)
     {
-        dd($model);
+        return Inertia::render('tenants/tickets/create', ['item' => $model->load('maintainable')]);
     }
 }

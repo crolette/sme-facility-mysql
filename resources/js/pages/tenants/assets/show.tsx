@@ -29,7 +29,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
     };
 
     const deleteAsset = (asset: Asset) => {
-        destroy(route(`tenant.assets.destroy`, asset.reference_code));
+        destroy(route(`api.assets.destroy`, asset.reference_code));
     };
 
     const restoreAsset = (asset: Asset) => {

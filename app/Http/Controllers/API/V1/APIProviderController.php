@@ -60,6 +60,9 @@ class APIProviderController extends Controller
 
             $provider->update($request->safe()->except('logo'));
 
+            if (!$request->validated('logo') === null)
+                $provider = $this->logoService->uploadAndAttachLogo($provider, $request->validated('logo'), $request->validated('name'));
+
             $categoryId = $request->validated('categoryId') ?? null;
             if ($categoryId && $categoryId !== $provider->providerCategory->id) {
                 $provider->providerCategory()->dissociate();

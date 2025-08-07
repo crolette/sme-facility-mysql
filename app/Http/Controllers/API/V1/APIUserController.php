@@ -9,6 +9,7 @@ use App\Services\UserService;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Password;
@@ -22,14 +23,20 @@ class APIUserController extends Controller
 
     public function show(User $user)
     {
+        if (Auth::user()->cannot('view', $user)) {
+            abort(403);
+        }
+
         return ApiResponse::success($user->load('provider:id,name'));
     }
 
     public function store(UserRequest $request)
     {
-        Debugbar::info($request->validated());
-        try {
+        if ($request->user()->cannot('create', User::class)) {
+            abort(403);
+        }
 
+        try {
             DB::beginTransaction();
 
             $user = new User($request->validated());
@@ -37,6 +44,7 @@ class APIUserController extends Controller
             if ($request->validated('can_login') === true) {
                 $password = Str::password(12);
                 $user->password = Hash::make($password);
+                $user->assignRole($request->validated('role'));
             }
 
             if ($request->validated('avatar'))
@@ -61,12 +69,22 @@ class APIUserController extends Controller
     public function update(UserRequest $request, User $user)
     {
 
-        Debugbar::info($request->validated());
+        if ($request->user()->cannot('update', $user)) {
+            abort(403);
+        }
+
         try {
 
             DB::beginTransaction();
 
             $user->update($request->safe()->except('avatar'));
+
+            if (!$user->can_login && $request->validated('can_login') === true) {
+                $password = Str::password(12);
+                $user->password = Hash::make($password);
+            }
+
+            $user->syncRoles($request->validated('role'));
 
             if ($request->validated('provider_id'))
                 $user = $this->userService->attachProvider($user, $request->validated('provider_id'));

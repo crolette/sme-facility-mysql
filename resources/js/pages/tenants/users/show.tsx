@@ -15,6 +15,7 @@ export default function UserShow({ item }: { item: User }) {
             href: `/users/${user.id}`,
         },
     ];
+
     const fetchUser = async () => {
         try {
             const response = await axios.get(route('api.users.show', user.id));
@@ -45,6 +46,8 @@ export default function UserShow({ item }: { item: User }) {
         fetchUser();
     };
 
+    console.log(user.roles);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sites" />
@@ -64,6 +67,7 @@ export default function UserShow({ item }: { item: User }) {
                 <p>Name : {user.full_name}</p>
                 <p>Email : {user.email}</p>
                 <p>Can login : {user.can_login ? 'YES' : 'NO'}</p>
+                <p>Role: {item.roles?.length > 0 ? item.roles[0].name : ''}</p>
                 {user.provider && (
                     <p>
                         Provider: <a href={route('tenant.providers.show', user.provider?.id)}>{user.provider?.name}</a>

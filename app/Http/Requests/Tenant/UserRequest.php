@@ -2,9 +2,10 @@
 
 namespace App\Http\Requests\Tenant;
 
+use App\Enums\RoleTypes;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rule;
 use App\Models\Tenants\User;
+use Illuminate\Validation\Rule;
 use App\Rules\NotDisposableEmail;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Foundation\Http\FormRequest;
@@ -16,6 +17,15 @@ class UserRequest extends FormRequest
      */
     public function authorize(): bool
     {
+        $isUpdate = $this->isMethod('patch');
+
+        if ($isUpdate) {
+            // $user = $this->route('user');
+            if ($this->user() == $this->route('user'))
+                return false;
+        }
+
+
         return true;
     }
 
@@ -47,12 +57,15 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
+        $roles = array_column(RoleTypes::cases(), 'value');
+
         return [
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', new NotDisposableEmail, Rule::unique(User::class)->ignore($this->route('user'))],
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'avatar' => 'nullable|file|mimes:png,jpg,jpeg|max:' . User::maxUploadSizeKB(),
             'can_login' => 'nullable|boolean',
+            'role' => ['nullable', 'string', 'required_if_accepted:can_login', Rule::in($roles)],
             'provider_id' => 'nullable|integer|exists:providers,id'
         ];
     }
