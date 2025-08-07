@@ -23,6 +23,7 @@ export default function ProviderIndex({ providers }: { providers: Provider[] }) 
                     <TableHead>
                         <TableHeadRow>
                             <TableHeadData>Company name</TableHeadData>
+                            <TableHeadData>Category</TableHeadData>
                             <TableHeadData>Phone number</TableHeadData>
                             <TableHeadData>Email</TableHeadData>
                             <TableHeadData></TableHeadData>
@@ -36,6 +37,7 @@ export default function ProviderIndex({ providers }: { providers: Provider[] }) 
                                         <TableBodyData>
                                             <a href={route('tenant.providers.show', item.id)}>{item.name}</a>
                                         </TableBodyData>
+                                        <TableBodyData>{item.category ?? ''}</TableBodyData>
                                         <TableBodyData>{item.phone_number}</TableBodyData>
                                         <TableBodyData>{item.email}</TableBodyData>
 

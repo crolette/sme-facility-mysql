@@ -5,12 +5,14 @@ namespace App\Models\Tenants;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Models\Tenants\User;
+use App\Models\Central\CategoryType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -32,6 +34,7 @@ class Provider extends Model
         'address',
         'logo',
         'phone_number',
+        'website'
     ];
 
 
@@ -47,7 +50,8 @@ class Provider extends Model
     ];
 
     protected $appends = [
-        'logo_path'
+        'logo_path',
+        'category',
     ];
 
     public const MAX_UPLOAD_SIZE_MB = 4;
@@ -65,6 +69,20 @@ class Provider extends Model
     public function maintainables(): BelongsToMany
     {
         return $this->belongsToMany(Maintainable::class, 'user_maintainable');
+    }
+
+    public function providerCategory(): BelongsTo
+    {
+        return $this->belongsTo(CategoryType::class, 'category_type_id');
+    }
+
+    public function category($locale = null): Attribute
+    {
+        $locale = $locale ?? app()->getLocale();
+
+        return Attribute::make(
+            get: fn() => $this->providerCategory?->translations->where('locale', $locale)->first()?->label ?? $this->providerCategory?->translations->where('locale', config('app.fallback_locale'))?->label ?? ''
+        );
     }
 
     public function logoPath(): Attribute

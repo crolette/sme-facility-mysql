@@ -32,7 +32,7 @@ export interface Flash {
 
 export type LocationLevel = 'site' | 'building' | 'floor' | 'room';
 export type TicketStatus = 'open' | 'ongoing' | 'closed';
-export type CategoryTypeEnum = 'document' | 'intervention' | 'asset';
+export type CategoryTypeEnum = 'document' | 'intervention' | 'asset' | 'provider' | 'outdoor materials' | 'floor materials' | 'wall materials';
 export type PriorityLevel = 'low' | 'middle' | 'high' | 'urgent';
 export type InterventionStatus = 'draft' | 'planned' | 'in progress' | 'waiting for parts' | 'completed' | 'cancelled';
 
@@ -221,11 +221,14 @@ export interface Provider {
     id: number;
     name: string;
     email: string;
+    website: string;
     address: string;
     vat_number: string;
     phone_number: string;
     logo?: string;
     logo_path?: string;
+    category: string;
+    category_type_id: number;
     users?: User[];
 }
 

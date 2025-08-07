@@ -94,7 +94,7 @@ export default function UserCreateUpdate({ user }: { user?: User }) {
                         </>
                     )}
                     <div>
-                        <label className="mb-2 block text-sm font-medium">Maintenance manager</label>
+                        <label className="mb-2 block text-sm font-medium">Providers</label>
                         <SearchableInput<Provider>
                             searchUrl={route('api.providers.search')}
                             displayValue={data.provider_name}

@@ -2,6 +2,7 @@
 
 namespace Database\Factories\Tenants;
 
+use App\Models\Central\CategoryType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,6 +18,7 @@ class ProviderFactory extends Factory
     public function definition(): array
     {
         $faker = \Faker\Factory::create('fr_BE');
+        $category = CategoryType::where('category', 'provider')->first();
 
         return [
             'name' => $faker->company(),
@@ -24,6 +26,8 @@ class ProviderFactory extends Factory
             'vat_number' => $faker->vat,
             'address' => $faker->address(),
             'phone_number' => $faker->phoneNumber(),
+            'category_type_id' => $category->id,
+            'website' => 'https://www.' . fake()->domainName()
         ];
     }
 }

@@ -21,7 +21,7 @@ class CentralCategoryTypeController extends Controller
      */
     public function index()
     {
-        $documentTypes = CategoryType::all();
+        $documentTypes = CategoryType::all()->groupBy('category');
         return Inertia::render('central/types/index', ['types' => $documentTypes]);
     }
 

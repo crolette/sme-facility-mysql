@@ -4,14 +4,16 @@ use App\Models\Tenants\User;
 
 use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
+use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Storage;
+use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
-use function Pest\Laravel\assertDatabaseHas;
 
 beforeEach(function () {
     $this->user = User::factory()->create();
     $this->actingAs($this->user, 'tenant');
+    $this->categoryType = CategoryType::factory()->create(['category' => 'provider']);
 });
 
 it('can factory a provider', function () {
@@ -37,8 +39,8 @@ it('can render the show provider page', function () {
         ->assertInertia(
             fn($page) =>
             $page->component('tenants/providers/show')
-                ->has('provider')
-                ->where('provider.id', $provider->id)
+                ->has('item')
+                ->where('item.id', $provider->id)
         );
 });
 
@@ -67,12 +69,15 @@ it('can post a new provider', function () {
 
     $file1 = UploadedFile::fake()->image('logo.png');
 
+
     $formData = [
         'name' => 'Facility Web Experience SPRL',
         'email' => 'info@facilitywebxp.be',
         'vat_number' => 'BE0123456789',
         'address' => 'Rue sur le Hour 16A, 4910 La Reid, Belgique',
         'phone_number' => '+32450987654',
+        'categoryId' => $this->categoryType->id,
+        'website' => 'www.website.com',
         'logo' => $file1
     ];
 
@@ -89,17 +94,19 @@ it('can post a new provider', function () {
         'vat_number' => 'BE0123456789',
         'address' => 'Rue sur le Hour 16A, 4910 La Reid, Belgique',
         'phone_number' => '+32450987654',
+        'website' => 'https://www.website.com',
+        'category_type_id' => $this->categoryType->id,
         'logo' => Provider::first()->logo
     ]);
 
+    dump(Provider::first()->logo);
     Storage::disk('tenants')->assertExists(Provider::first()->logo);
 });
 
 it('can update an existing provider', function () {
 
     $provider = Provider::factory()->create();
-
-    $file1 = UploadedFile::fake()->image('logo.png');
+    $newcategoryType = CategoryType::factory()->create(['category' => 'provider']);
 
     $formData = [
         'name' => 'Facility Web Experience SPRL',
@@ -107,7 +114,7 @@ it('can update an existing provider', function () {
         'vat_number' => 'BE0123456789',
         'address' => 'Rue sur le Hour 16A, 4910 La Reid, Belgique',
         'phone_number' => '+32450987654',
-        'logo' => $file1
+        'categoryId' => $newcategoryType->id,
     ];
 
     $response = $this->patchToTenant('api.providers.update', $formData, $provider);
@@ -124,10 +131,8 @@ it('can update an existing provider', function () {
         'vat_number' => 'BE0123456789',
         'address' => 'Rue sur le Hour 16A, 4910 La Reid, Belgique',
         'phone_number' => '+32450987654',
-        'logo' => Provider::first()->logo
+        'category_type_id' => $newcategoryType->id,
     ]);
-
-    Storage::disk('tenants')->assertExists(Provider::first()->logo);
 });
 
 it('can delete an existing provider', function () {

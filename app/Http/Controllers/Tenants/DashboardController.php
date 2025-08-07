@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Tenants;
 
+use App\Enums\CategoryTypes;
+use App\Enums\MaintenanceFrequency;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
@@ -13,6 +15,8 @@ class DashboardController extends Controller
 {
     public function show()
     {
+        $test = 'annual';
+        dd($test, MaintenanceFrequency::ANNUAL->value);
         $assets = Asset::count();
         $tickets = Ticket::where('status', '!=', 'closed')->count();
         $maintainables = Maintainable::select('id', 'name', 'next_maintenance_date', 'maintenance_frequency', 'maintainable_id', 'maintainable_type')->where('need_maintenance', true)->whereNotNull('next_maintenance_date')->orderBy('next_maintenance_date')->limit(10)->get()->load('maintainable');

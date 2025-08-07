@@ -2,12 +2,24 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, Provider } from '@/types';
+import { cn } from '@/lib/utils';
+import { BreadcrumbItem, CentralType, Provider } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { FormEventHandler } from 'react';
 
-export default function ProviderCreateUpdate({ provider }: { provider?: Provider }) {
+type TypeFormData = {
+    name: string;
+    phone_number: string;
+    email: string;
+    website: string;
+    vat_number: string;
+    address: string;
+    categoryId: number | string;
+    logo: File | null;
+};
+
+export default function ProviderCreateUpdate({ provider, providerCategories }: { provider?: Provider; providerCategories: CentralType[] }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Create/Update providers`,
@@ -16,12 +28,15 @@ export default function ProviderCreateUpdate({ provider }: { provider?: Provider
     ];
 
     console.log(provider);
-    const { data, setData } = useForm({
+    const { data, setData } = useForm<TypeFormData>({
         name: provider?.name ?? '',
         phone_number: provider?.phone_number ?? '',
         email: provider?.email ?? '',
+        website: provider?.website ?? '',
         vat_number: provider?.vat_number ?? '',
         address: provider?.address ?? '',
+        categoryId: provider?.category_type_id ?? '',
+        logo: null,
     });
 
     const submit: FormEventHandler = async (e) => {
@@ -58,14 +73,42 @@ export default function ProviderCreateUpdate({ provider }: { provider?: Provider
                 <form onSubmit={submit}>
                     <Label>Company Name</Label>
                     <Input type="text" onChange={(e) => setData('name', e.target.value)} value={data.name} />
+                    <Label htmlFor="name">Category</Label>
+                    <select
+                        name="level"
+                        required
+                        value={data.categoryId === '' ? 0 : data.categoryId}
+                        onChange={(e) => setData('categoryId', e.target.value)}
+                        id=""
+                        className={cn(
+                            'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                            'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                        )}
+                    >
+                        {providerCategories && providerCategories.length > 0 && (
+                            <>
+                                <option value="0" disabled className="bg-background text-foreground">
+                                    Select an option
+                                </option>
+                                {providerCategories?.map((category) => (
+                                    <option value={category.id} key={category.id} className="bg-background text-foreground">
+                                        {category.label}
+                                    </option>
+                                ))}
+                            </>
+                        )}
+                    </select>
                     <Label>Email</Label>
                     <Input type="email" onChange={(e) => setData('email', e.target.value)} value={data.email} />
+                    <Label>Website</Label>
+                    <Input type="text" onChange={(e) => setData('website', e.target.value)} value={data.website} />
                     <Label>Address</Label>
-                    <Input type="address" onChange={(e) => setData('address', e.target.value)} value={data.address} />
+                    <Input type="text" onChange={(e) => setData('address', e.target.value)} value={data.address} />
                     <Label>VAT</Label>
-                    <Input type="vat_number" onChange={(e) => setData('vat_number', e.target.value)} value={data.vat_number} />
+                    <Input type="text" onChange={(e) => setData('vat_number', e.target.value)} value={data.vat_number} />
                     <Label>Phone</Label>
-                    <Input type="phone_number" onChange={(e) => setData('phone_number', e.target.value)} value={data.phone_number} />
+                    <Input type="text" onChange={(e) => setData('phone_number', e.target.value)} value={data.phone_number} />
                     {!provider && (
                         <>
                             <Label>Logo</Label>

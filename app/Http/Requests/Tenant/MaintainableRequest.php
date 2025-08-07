@@ -23,7 +23,10 @@ class MaintainableRequest extends FormRequest
 
         if ($data['need_maintenance'] === true) {
             if (isset($data['next_maintenance_date'])) {
+                return;
+            }
 
+            if (isset($data['maintenance_frequency']) && $data['maintenance_frequency'] === MaintenanceFrequency::ONDEMAND->value) {
                 return;
             } else {
                 $data['next_maintenance_date'] = calculateNextMaintenanceDate($data['maintenance_frequency']);

@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/central/app-layout';
 import { CentralType, type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -10,12 +10,12 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function DocumentTypesIndex({ types }: { types: CentralType[] }) {
-    const { delete: destroy } = useForm();
+export default function DocumentTypesIndex({ types }: { types: object }) {
+    // const { delete: destroy } = useForm();
 
-    const submit = (type: CentralType) => {
-        destroy(route(`central.types.destroy`, type.slug));
-    };
+    // const submit = (type: CentralType) => {
+    //     destroy(route(`central.types.destroy`, type.slug));
+    // };
 
     // TODO FETCH Types to render different types in different tabs
 
@@ -27,26 +27,31 @@ export default function DocumentTypesIndex({ types }: { types: CentralType[] }) 
                     <Button>Create</Button>
                 </a>
                 <h2>Category types</h2>
+                <div></div>
                 <ul>
-                    {types.length > 0 &&
-                        types.map((type: CentralType) => (
-                            <li key={type.id} className="grid grid-cols-2">
-                                <p>
-                                    {type.label} - {type.category}
-                                </p>
-                                <div className="space-x-4">
-                                    <Button onClick={() => submit(type)} variant={'destructive'}>
-                                        Delete
-                                    </Button>
-                                    <a href={route(`central.types.edit`, type.slug)}>
-                                        <Button>Edit</Button>
-                                    </a>
-                                    <a href={route(`central.types.show`, type.slug)}>
-                                        <Button variant={'outline'}>See</Button>
-                                    </a>
-                                </div>
-                            </li>
-                        ))}
+                    {Object.entries(types).map(([key, items]) => (
+                        <div key={key} className="mb-8">
+                            <h3 className="">{key}</h3>
+                            <ul>
+                                {items.map((item: CentralType) => (
+                                    <li key={item.id} className="grid grid-cols-2 space-y-2">
+                                        <span>{item.label}</span>
+                                        <div className="space-x-4">
+                                            {/* <Button onClick={() => submit(item)} variant={'destructive'}>
+                                                Delete
+                                            </Button> */}
+                                            <a href={route(`central.types.edit`, item.slug)}>
+                                                <Button>Edit</Button>
+                                            </a>
+                                            <a href={route(`central.types.show`, item.slug)}>
+                                                <Button variant={'outline'}>See</Button>
+                                            </a>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
                 </ul>
             </div>
         </AppLayout>
