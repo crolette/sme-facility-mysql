@@ -2,8 +2,9 @@
 
 namespace App\Http\Requests\Tenant;
 
-use App\Enums\MaintenanceFrequency;
 use Illuminate\Validation\Rule;
+use App\Enums\MaintenanceFrequency;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Foundation\Http\FormRequest;
 
 class MaintainableRequest extends FormRequest
@@ -44,6 +45,7 @@ class MaintainableRequest extends FormRequest
     {
 
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
+        Debugbar::info($this->input('need_maintenance'));
 
         return [
             'name' => 'required|string|min:6|max:100',
@@ -57,7 +59,7 @@ class MaintainableRequest extends FormRequest
             'maintenance_manager_id' => 'nullable|exists:users,id',
 
             'need_maintenance' => "boolean",
-            'maintenance_frequency' => ['required_if_accepted:need_maintenance', Rule::in($frequencies)],
+            'maintenance_frequency' => ['nullable', 'required_if_accepted:need_maintenance', Rule::in($frequencies)],
             'next_maintenance_date' => ['nullable', 'date', Rule::date()->afterToday()],
             'last_maintenance_date' =>  ['nullable', 'date', Rule::date()->beforeToday()],
         ];

@@ -111,9 +111,9 @@ it('can create a new site with other matherials', function () {
         'need_maintenance' => false
     ];
 
-    $response = $this->postToTenant('tenant.sites.store', $formData);
-    $response->assertStatus(302);
-    $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.sites.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     assertDatabaseCount('sites', 1);
     assertDatabaseCount('maintainables', 1);
@@ -213,11 +213,15 @@ it('can update a site maintainable and his name and description', function () {
 
     $oldName = $site->maintainable->name;
     $oldDescription = $site->maintainable->description;
+    $wallMaterial = CategoryType::factory()->create(['category' => 'wall_materials']);
+    $floorMaterial = CategoryType::factory()->create(['category' => 'floor_materials']);
 
     $formData = [
         'name' => 'New site',
         'surface_floor' => 2569.12,
         'surface_walls' => 256.9,
+        'wall_material_id' => $wallMaterial->id,
+        'floor_material_id' => $floorMaterial->id,
         'description' => 'Description new site',
         'locationType' => $this->siteType->id
     ];
@@ -234,6 +238,8 @@ it('can update a site maintainable and his name and description', function () {
         'code' => $this->siteType->prefix . '01',
         'surface_floor' => 2569.12,
         'surface_walls' => 256.9,
+        'wall_material_id' => $wallMaterial->id,
+        'floor_material_id' => $floorMaterial->id,
         'reference_code' => $this->siteType->prefix . '01',
     ]);
 
@@ -416,6 +422,7 @@ it('can retrieve all assets from a site', function () {
 });
 
 it('can attach a provider to a site\'s maintainable', function () {
+    CategoryType::factory()->create(['category' => 'provider']);
     $provider = Provider::factory()->create();
 
     $formData = [

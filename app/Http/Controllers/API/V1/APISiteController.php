@@ -47,7 +47,11 @@ class APISiteController extends Controller
             $site = Site::create([
                 'code' => $codeNumber,
                 'surface_floor' => $siteRequest->validated('surface_floor'),
+                'floor_material_id'  => $siteRequest->validated('floor_material_id') === 'other' ? null :  $siteRequest->validated('floor_material_id'),
+                'floor_material_other'  => $siteRequest->validated('floor_material_other'),
                 'surface_walls' => $siteRequest->validated('surface_walls'),
+                'wall_material_id'  => $siteRequest->validated('wall_material_id') === 'other' ? null :  $siteRequest->validated('wall_material_id'),
+                'wall_material_other'  => $siteRequest->validated('wall_material_other'),
                 'reference_code' => $codeNumber,
                 'location_type_id' => $locationType->id
             ]);
@@ -93,7 +97,11 @@ class APISiteController extends Controller
 
             $site->update([
                 'surface_floor' => $siteRequest->validated('surface_floor'),
+                'floor_material_id'  => $siteRequest->validated('floor_material_id') === 'other' ? null :  $siteRequest->validated('floor_material_id'),
+                'floor_material_other'  => $siteRequest->validated('floor_material_other'),
                 'surface_walls' => $siteRequest->validated('surface_walls'),
+                'wall_material_id'  => $siteRequest->validated('wall_material_id') === 'other' ? null :  $siteRequest->validated('wall_material_id'),
+                'wall_material_other'  => $siteRequest->validated('wall_material_other'),
             ]);
 
             $site = $this->maintainableService->createMaintainable($site, $maintainableRequest);

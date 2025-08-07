@@ -67,7 +67,13 @@ export interface TenantSite {
     qr_code: string;
     reference_code: string;
     surface_walls: number;
+    wall_material: string;
+    wall_material_id: number;
+    wall_material_other: string;
     surface_floor: number;
+    floor_material: string;
+    floor_material_id: number;
+    floor_material_other: string;
     category: string;
     level_id: number;
     location_type: LocationType;

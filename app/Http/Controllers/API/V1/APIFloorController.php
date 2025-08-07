@@ -46,7 +46,11 @@ class APIFloorController extends Controller
             $floor = Floor::create([
                 'code' => $codeNumber,
                 'surface_floor' => $floorRequest->validated('surface_floor'),
+                'floor_material_id'  => $floorRequest->validated('floor_material_id') === 'other' ? null :  $floorRequest->validated('floor_material_id'),
+                'floor_material_other'  => $floorRequest->validated('floor_material_other'),
                 'surface_walls' => $floorRequest->validated('surface_walls'),
+                'wall_material_id'  => $floorRequest->validated('wall_material_id') === 'other' ? null :  $floorRequest->validated('wall_material_id'),
+                'wall_material_other'  => $floorRequest->validated('wall_material_other'),
                 'reference_code' => $referenceCode,
                 'location_type_id' => $floorType->id
             ]);
@@ -102,7 +106,11 @@ class APIFloorController extends Controller
 
             $floor->update([
                 'surface_floor' => $floorRequest->validated('surface_floor'),
+                'floor_material_id'  => $floorRequest->validated('floor_material_id') === 'other' ? null :  $floorRequest->validated('floor_material_id'),
+                'floor_material_other'  => $floorRequest->validated('floor_material_other'),
                 'surface_walls' => $floorRequest->validated('surface_walls'),
+                'wall_material_id'  => $floorRequest->validated('wall_material_id') === 'other' ? null :  $floorRequest->validated('wall_material_id'),
+                'wall_material_other'  => $floorRequest->validated('wall_material_other'),
             ]);
 
             $floor = $this->maintainableService->createMaintainable($floor, $maintainableRequest);

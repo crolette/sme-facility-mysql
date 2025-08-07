@@ -52,7 +52,11 @@ class APIBuildingController extends Controller
             $building = Building::create([
                 'code' => $code,
                 'surface_floor' => $buildingRequest->validated('surface_floor'),
+                'floor_material_id'  => $buildingRequest->validated('floor_material_id') === 'other' ? null :  $buildingRequest->validated('floor_material_id'),
+                'floor_material_other'  => $buildingRequest->validated('floor_material_other'),
                 'surface_walls' => $buildingRequest->validated('surface_walls'),
+                'wall_material_id'  => $buildingRequest->validated('wall_material_id') === 'other' ? null :  $buildingRequest->validated('wall_material_id'),
+                'wall_material_other'  => $buildingRequest->validated('wall_material_other'),
                 'reference_code' => $referenceCode,
                 'location_type_id' => $buildingType->id
             ]);
@@ -103,7 +107,11 @@ class APIBuildingController extends Controller
 
             $building->update([
                 'surface_floor' => $buildingRequest->validated('surface_floor'),
+                'floor_material_id'  => $buildingRequest->validated('floor_material_id') === 'other' ? null :  $buildingRequest->validated('floor_material_id'),
+                'floor_material_other'  => $buildingRequest->validated('floor_material_other'),
                 'surface_walls' => $buildingRequest->validated('surface_walls'),
+                'wall_material_id'  => $buildingRequest->validated('wall_material_id') === 'other' ? null :  $buildingRequest->validated('wall_material_id'),
+                'wall_material_other'  => $buildingRequest->validated('wall_material_other'),
             ]);
 
             $building = $this->maintainableService->createMaintainable($building, $maintainableRequest);

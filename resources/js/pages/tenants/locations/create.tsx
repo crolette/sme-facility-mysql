@@ -9,6 +9,7 @@ import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { CentralType, LocationType, TenantBuilding, TenantFloor, TenantRoom, TenantSite, User, type BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
+import axios from 'axios';
 import { FormEventHandler, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
@@ -21,7 +22,11 @@ type TypeFormData = {
     name: string;
     description: string;
     surface_floor: null | number;
+    floor_material_id: number | string | null;
+    floor_material_other: string;
     surface_walls: null | number;
+    wall_material_id: number | string | null;
+    wall_material_other: string;
     levelType: string | number;
     locationType: string | number;
     maintenance_manager_id: number | null;
@@ -47,11 +52,15 @@ export default function CreateLocation({
     routeName,
     documentTypes,
     frequencies,
+    wallMaterials,
+    floorMaterials,
 }: {
     location?: TenantSite | TenantBuilding | TenantFloor | TenantRoom;
     levelTypes: LocationType[] | TenantSite[] | TenantFloor[];
     locationTypes: LocationType[];
     documentTypes: CentralType[];
+    wallMaterials: CentralType[];
+    floorMaterials: CentralType[];
     frequencies: string[];
     routeName: string;
 }) {
@@ -63,13 +72,17 @@ export default function CreateLocation({
     ];
 
     const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
-    const { data, setData, post, errors } = useForm<TypeFormData>({
+    const { data, setData, errors } = useForm<TypeFormData>({
         name: location?.maintainable?.name ?? '',
         description: location?.maintainable?.description ?? '',
         surface_floor: location?.surface_floor ?? null,
+        floor_material_id: location?.floor_material_other != null ? 'other' : (location?.floor_material_id ?? null),
+        floor_material_other: location?.floor_material_other ?? '',
         surface_walls: location?.surface_walls ?? null,
+        wall_material_id: location?.wall_material_other != null ? 'other' : (location?.wall_material_id ?? null),
+        wall_material_other: location?.wall_material_other ?? '',
         levelType: location?.level_id ?? '',
-        locationType: location?.location_type?.id ?? '',
+        locationType: locationTypes.length == 1 ? locationTypes[0].id : (location?.location_type?.id ?? ''),
         files: selectedDocuments,
         maintenance_manager_id: location?.maintainable?.maintenance_manager_id ?? null,
         maintenance_manager_name: location?.maintainable?.manager?.full_name ?? '',
@@ -80,21 +93,32 @@ export default function CreateLocation({
         providers: [],
     });
 
-    const submit: FormEventHandler = (e) => {
+    console.log(location?.floor_material_other != null);
+
+    const submit: FormEventHandler = async (e) => {
         e.preventDefault();
         if (location) {
-            post(route(`api.${routeName}.update`, location.reference_code), {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-HTTP-Method-Override': 'PATCH',
-                    Accept: 'application/json',
-                },
-            });
+            try {
+                const response = await axios.patch(route(`api.${routeName}.update`, location.reference_code), data);
+                if (response.data.status === 'success') {
+                    router.visit(route(`tenant.${routeName}.show`, location.reference_code), {
+                        preserveScroll: false,
+                    });
+                }
+            } catch (error) {
+                console.log(error);
+            }
         } else {
-            post(route(`api.${routeName}.store`));
-            router.visit(route(`tenant.${routeName}.index`), {
-                preserveScroll: false,
-            });
+            try {
+                const response = await axios.post(route(`api.${routeName}.store`), data);
+                if (response.data.status === 'success') {
+                    router.visit(route(`tenant.${routeName}.index`), {
+                        preserveScroll: false,
+                    });
+                }
+            } catch (error) {
+                console.log(error);
+            }
         }
     };
 
@@ -223,7 +247,6 @@ export default function CreateLocation({
             </div>
         );
     };
-    console.log(location);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -306,29 +329,122 @@ export default function CreateLocation({
                     />
                     <InputError className="mt-2" message={errors.name} />
 
-                    <Label htmlFor="surface_floor">Surface floor</Label>
-                    <Input
-                        id="surface_floor"
-                        type="number"
-                        min={0}
-                        step="0.01"
-                        value={data.surface_floor ?? ''}
-                        placeholder="Surface floor (max. 2 decimals) : 4236.3"
-                        onChange={(e) => setData('surface_floor', parseFloat(e.target.value))}
-                    />
-                    <InputError className="mt-2" message={errors.surface_floor} />
+                    <div className="flex">
+                        <div className="w-full">
+                            <Label htmlFor="surface_floor">Surface floor</Label>
+                            <Input
+                                id="surface_floor"
+                                type="number"
+                                min={0}
+                                step="0.01"
+                                value={data.surface_floor ?? ''}
+                                placeholder="Surface floor (max. 2 decimals) : 4236.3"
+                                onChange={(e) => setData('surface_floor', parseFloat(e.target.value))}
+                            />
+                            <InputError className="mt-2" message={errors.surface_floor} />
+                        </div>
+                        {floorMaterials && (
+                            <div className="w-full">
+                                <Label htmlFor="floor_material_id">floor material</Label>
+                                <select
+                                    name="floor_material_id-type"
+                                    value={data.floor_material_id ?? ''}
+                                    onChange={(e) => {
+                                        if (e.target.value !== 'other') {
+                                            setData('floor_material_other', '');
+                                        }
+                                        setData('floor_material_id', e.target.value);
+                                    }}
+                                    id="floor_material_id"
+                                    className={cn(
+                                        'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                    )}
+                                >
+                                    <option value="" disabled>
+                                        -- Select a floor material --
+                                    </option>
 
-                    <Label htmlFor="surface_walls">Surface walls</Label>
-                    <Input
-                        id="surface_walls"
-                        type="number"
-                        min={0}
-                        step="0.01"
-                        value={data.surface_walls ?? ''}
-                        onChange={(e) => setData('surface_walls', parseFloat(e.target.value))}
-                        placeholder="Surface walls (max. 2 decimals) : 4236.3"
-                    />
-                    <InputError className="mt-2" message={errors.surface_walls} />
+                                    {floorMaterials.map((type) => (
+                                        <option value={type.id} key={type.id}>
+                                            {type.label}
+                                        </option>
+                                    ))}
+                                    <option value="other">Other</option>
+                                </select>
+                                <InputError className="mt-2" message={errors.locationType} />
+                                {data.floor_material_id === 'other' && (
+                                    <div>
+                                        <Input
+                                            type="text"
+                                            value={data.floor_material_other}
+                                            placeholder="other floor material"
+                                            onChange={(e) => setData('floor_material_other', e.target.value)}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                    <div className="flex">
+                        <div className="w-full">
+                            <Label htmlFor="surface_walls">Surface walls</Label>
+                            <Input
+                                id="surface_walls"
+                                type="number"
+                                min={0}
+                                step="0.01"
+                                value={data.surface_walls ?? ''}
+                                onChange={(e) => setData('surface_walls', parseFloat(e.target.value))}
+                                placeholder="Surface walls (max. 2 decimals) : 4236.3"
+                            />
+                            <InputError className="mt-2" message={errors.surface_walls} />
+                        </div>
+                        {wallMaterials && (
+                            <div className="w-full">
+                                <Label htmlFor="wall_material_id">Wall material</Label>
+                                <select
+                                    name="wall_material_id"
+                                    value={data.wall_material_id ?? ''}
+                                    onChange={(e) => {
+                                        if (e.target.value !== 'other') {
+                                            setData('wall_material_other', '');
+                                        }
+                                        setData('wall_material_id', e.target.value);
+                                    }}
+                                    id="wall_material_id"
+                                    className={cn(
+                                        'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                    )}
+                                >
+                                    <option value="" disabled>
+                                        -- Select a wall material --
+                                    </option>
+
+                                    {wallMaterials.map((type) => (
+                                        <option value={type.id} key={type.id}>
+                                            {type.label}
+                                        </option>
+                                    ))}
+                                    <option value="other">Other</option>
+                                </select>
+                                <InputError className="mt-2" message={errors.locationType} />
+                                {data.wall_material_id === 'other' && (
+                                    <div>
+                                        <Input
+                                            type="text"
+                                            value={data.wall_material_other}
+                                            placeholder="other wall material"
+                                            onChange={(e) => setData('wall_material_other', e.target.value)}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
 
                     <Label htmlFor="name">Description</Label>
                     <Input

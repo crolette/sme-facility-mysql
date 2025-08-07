@@ -5,6 +5,7 @@ namespace App\Http\Requests\Tenant;
 use App\Models\LocationType;
 use App\Models\Tenants\Floor;
 use Illuminate\Validation\Rule;
+use App\Models\Central\CategoryType;
 use Illuminate\Foundation\Http\FormRequest;
 
 class TenantRoomRequest extends FormRequest
@@ -31,7 +32,11 @@ class TenantRoomRequest extends FormRequest
             'levelType' => ['required', Rule::in([...$floors])],
             'locationType' => ['required', Rule::in([...$locationTypes])],
             'surface_floor' => 'nullable|numeric|gt:0|decimal:0,2',
+            'floor_material_id' => ['nullable', Rule::anyOf([Rule::in(CategoryType::where('category', 'floor_materials')->pluck('id')->toArray()), Rule::in('other')])],
+            'floor_material_other' => ['nullable', 'required_if:floor_material_id,other'],
             'surface_walls' => 'nullable|numeric|gt:0|decimal:0,2',
+            'wall_material_id' => ['nullable', Rule::anyOf([Rule::in(CategoryType::where('category', 'wall_materials')->pluck('id')->toArray()), Rule::in('other')])],
+            'wall_material_other' => ['nullable', 'required_if:wall_material_id,other'],
         ];
     }
 }

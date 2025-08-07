@@ -55,7 +55,10 @@ class TenantBuildingController extends Controller
         $locationTypes = LocationType::where('level', 'building')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
+        $floorMaterials = CategoryType::where('category', 'floor_materials')->get();
+        $wallMaterials = CategoryType::where('category', 'wall_materials')->get();
+
+        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials]);
     }
 
     /**
@@ -81,6 +84,8 @@ class TenantBuildingController extends Controller
         $locationTypes = LocationType::where('level', 'building')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-        return Inertia::render('tenants/locations/create', ['location' => $building->load('site'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
+        $floorMaterials = CategoryType::where('category', 'floor_materials')->get();
+        $wallMaterials = CategoryType::where('category', 'wall_materials')->get();
+        return Inertia::render('tenants/locations/create', ['location' => $building->load('site'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials]);
     }
 }

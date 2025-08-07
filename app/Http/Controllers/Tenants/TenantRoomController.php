@@ -54,7 +54,10 @@ class TenantRoomController extends Controller
         $locationTypes = LocationType::where('level', 'room')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
+        $floorMaterials = CategoryType::where('category', 'floor_materials')->get();
+        $wallMaterials = CategoryType::where('category', 'wall_materials')->get();
+
+        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials]);
     }
 
 
@@ -83,6 +86,9 @@ class TenantRoomController extends Controller
         $locationTypes = LocationType::where('level', 'room')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-        return Inertia::render('tenants/locations/create', ['location' => $room->makeVisible(['level_id', 'location_type_id'])->load('floor'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
+        $floorMaterials = CategoryType::where('category', 'floor_materials')->get();
+        $wallMaterials = CategoryType::where('category', 'wall_materials')->get();
+
+        return Inertia::render('tenants/locations/create', ['location' => $room->makeVisible(['level_id', 'location_type_id'])->load('floor'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials]);
     }
 }

@@ -55,7 +55,9 @@ class TenantSiteController extends Controller
         $locationTypes = LocationType::where('level', 'site')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-        return Inertia::render('tenants/locations/create', ['locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
+        $floorMaterials = CategoryType::where('category', 'floor_materials')->get();
+        $wallMaterials = CategoryType::where('category', 'wall_materials')->get();
+        return Inertia::render('tenants/locations/create', ['locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials]);
     }
 
     /**
@@ -81,7 +83,9 @@ class TenantSiteController extends Controller
 
         $documentTypes = CategoryType::where('category', 'document')->get();
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
+        $floorMaterials = CategoryType::where('category', 'floor_materials')->get();
+        $wallMaterials = CategoryType::where('category', 'wall_materials')->get();
 
-        return Inertia::render('tenants/locations/create', ['location' => $site, 'locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
+        return Inertia::render('tenants/locations/create', ['location' => $site, 'locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials]);
     }
 }

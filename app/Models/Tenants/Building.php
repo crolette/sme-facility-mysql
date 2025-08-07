@@ -7,6 +7,7 @@ use App\Models\Tenants\Site;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Document;
+use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -27,7 +28,11 @@ class Building extends Model
         'code',
         'qr_code',
         'surface_floor',
+        'floor_material_id',
+        'floor_material_other',
         'surface_walls',
+        'wall_material_id',
+        'wall_material_other',
         'location_type_id',
         'level_id'
     ];
@@ -46,6 +51,8 @@ class Building extends Model
         'name',
         'description',
         'category',
+        'floor_material',
+        'wall_material',
     ];
 
     // Ensure route model binding use the slug instead of ID
@@ -73,6 +80,16 @@ class Building extends Model
     public function locationType(): BelongsTo
     {
         return $this->belongsTo(LocationType::class, 'location_type_id');
+    }
+
+    public function floorMaterialType(): BelongsTo
+    {
+        return $this->belongsTo(CategoryType::class, 'floor_material_id');
+    }
+
+    public function wallMaterialType(): BelongsTo
+    {
+        return $this->belongsTo(CategoryType::class, 'wall_material_id');
     }
 
     public function maintainable(): MorphOne
@@ -121,6 +138,24 @@ class Building extends Model
 
         return Attribute::make(
             get: fn() => $this->locationType->translations->where('locale', $locale)->first()?->label ?? $this->locationType->translations->where('locale', config('app.fallback_locale'))?->label
+        );
+    }
+
+    public function floorMaterial($locale = null): Attribute
+    {
+        $locale = $locale ?? app()->getLocale();
+
+        return Attribute::make(
+            get: fn() => $this->floorMaterialType ? $this->floorMaterialType->translations->where('locale', $locale)->first()?->label ?? $this->wallMaterialType->translations->where('locale', config('app.fallback_locale'))?->label : $this->floor_material_other ?? null
+        );
+    }
+
+    public function wallMaterial($locale = null): Attribute
+    {
+        $locale = $locale ?? app()->getLocale();
+
+        return Attribute::make(
+            get: fn() => $this->wallMaterialType ? $this->wallMaterialType->translations->where('locale', $locale)->first()?->label ?? $this->wallMaterialType->translations->where('locale', config('app.fallback_locale'))?->label : $this->wall_material_other  ?? null
         );
     }
 

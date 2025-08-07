@@ -40,7 +40,15 @@ class APIRoomController extends Controller
 
             $floor = Floor::find($roomRequest->validated('levelType'));
             $roomType = LocationType::find($roomRequest->validated('locationType'));
-            $room = new Room($roomRequest->validated());
+            $room = new Room([
+                ...$roomRequest->validated(),
+                'surface_floor' => $roomRequest->validated('surface_floor'),
+                'floor_material_id'  => $roomRequest->validated('floor_material_id') === 'other' ? null :  $roomRequest->validated('floor_material_id'),
+                'floor_material_other'  => $roomRequest->validated('floor_material_other'),
+                'surface_walls' => $roomRequest->validated('surface_walls'),
+                'wall_material_id'  => $roomRequest->validated('wall_material_id') === 'other' ? null :  $roomRequest->validated('wall_material_id'),
+                'wall_material_other'  => $roomRequest->validated('wall_material_other'),
+            ]);
 
             $count = Room::where('location_type_id', $roomType->id)->where('level_id', $floor->id)->count();
 
@@ -102,7 +110,11 @@ class APIRoomController extends Controller
 
             $room->update([
                 'surface_floor' => $roomRequest->validated('surface_floor'),
+                'floor_material_id'  => $roomRequest->validated('floor_material_id') === 'other' ? null :  $roomRequest->validated('floor_material_id'),
+                'floor_material_other'  => $roomRequest->validated('floor_material_other'),
                 'surface_walls' => $roomRequest->validated('surface_walls'),
+                'wall_material_id'  => $roomRequest->validated('wall_material_id') === 'other' ? null :  $roomRequest->validated('wall_material_id'),
+                'wall_material_other'  => $roomRequest->validated('wall_material_other'),
             ]);
 
             $room = $this->maintainableService->createMaintainable($room, $maintainableRequest);

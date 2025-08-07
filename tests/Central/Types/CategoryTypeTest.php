@@ -218,7 +218,6 @@ it('can update an existing category type', function () {
 });
 
 
-
 it('deletes a location type and translations', function () {
     $this->actingAs($user = CentralUser::factory()->create());
 

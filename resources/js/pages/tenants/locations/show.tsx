@@ -21,6 +21,8 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
         },
     ];
 
+    console.log(location);
+
     const [showModaleRelocateRoom, setShowModaleRelocateRoom] = useState<boolean>(false);
 
     const fetchLocation = async () => {
@@ -93,8 +95,12 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                             <p>Category : {location.category}</p>
                             <p>Name : {location.name}</p>
                             <p>Description : {location.description}</p>
-                            <p>Surface floor: {location.surface_floor}</p>
-                            <p>Surface walls: {location.surface_walls}</p>
+                            <p>
+                                Floor: {location.surface_floor} ({location.floor_material})
+                            </p>
+                            <p>
+                                Walls: {location.surface_walls} ({location.wall_material})
+                            </p>
                         </div>
                     </div>
                     {location.maintainable.providers && location.maintainable.providers.length > 0 && (
