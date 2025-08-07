@@ -73,6 +73,7 @@ export default function ProviderShow({ item }: { item: Provider }) {
                         <div>
                             <h2>Provider information</h2>
                             <div>
+                                <p>Category : {provider.category}</p>
                                 <p>Name : {provider.name}</p>
                                 <p>Address : {provider.address}</p>
                                 <p>Phone number : {provider.phone_number}</p>

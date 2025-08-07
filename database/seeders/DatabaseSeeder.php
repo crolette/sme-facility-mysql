@@ -14,8 +14,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
         CentralUser::factory()->create([
             'first_name' => 'Super',
             'last_name' => 'Admin',

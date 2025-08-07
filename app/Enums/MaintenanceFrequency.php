@@ -11,6 +11,7 @@ enum MaintenanceFrequency: string
     case BIANNUAL = 'biannual';
     case ANNUAL = 'annual';
     case BIENNIAL = 'biennial';
+    case ONDEMAND = 'on demand';
 
     public function days(): int
     {

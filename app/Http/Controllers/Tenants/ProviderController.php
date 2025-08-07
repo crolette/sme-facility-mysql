@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Provider;
 use App\Http\Controllers\Controller;
+use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
 
 class ProviderController extends Controller
@@ -26,7 +27,8 @@ class ProviderController extends Controller
      */
     public function create()
     {
-        return Inertia::render('tenants/providers/create');
+        $categories = CategoryType::where('category', 'provider')->get();
+        return Inertia::render('tenants/providers/create', ['providerCategories' => $categories]);
     }
 
     /**
@@ -34,7 +36,8 @@ class ProviderController extends Controller
      */
     public function edit(Provider $provider)
     {
-        return Inertia::render('tenants/providers/create', ['provider' => $provider]);
+        $categories = CategoryType::where('category', 'provider')->get();
+        return Inertia::render('tenants/providers/create', ['provider' => $provider, 'providerCategories' => $categories]);
     }
 
 

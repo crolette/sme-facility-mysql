@@ -58,12 +58,19 @@ it('can render the create site page', function () {
 });
 
 it('can create a new site', function () {
+
+    $wallMaterial = CategoryType::factory()->create(['category' => 'wall_materials']);
+    $floorMaterial = CategoryType::factory()->create(['category' => 'floor_materials']);
+
     $formData = [
         'name' => 'New site',
         'surface_floor' => 2569.12,
+        'floor_material_id' => $floorMaterial->id,
         'surface_walls' => 256.9,
+        'wall_material_id' => $wallMaterial->id,
         'description' => 'Description new site',
         'locationType' => $this->siteType->id,
+        'need_maintenance' => false
     ];
 
     $response = $this->postToTenant('api.sites.store', $formData);
@@ -77,7 +84,47 @@ it('can create a new site', function () {
         'location_type_id' => $this->siteType->id,
         'code' => $this->siteType->prefix . '01',
         'surface_floor' => 2569.12,
+        'floor_material_id' => $floorMaterial->id,
         'surface_walls' => 256.9,
+        'wall_material_id' => $wallMaterial->id,
+        'reference_code' => $this->siteType->prefix . '01',
+    ]);
+
+    assertDatabaseHas('maintainables', [
+        'name' => 'New site',
+        'description' => 'Description new site',
+    ]);
+});
+
+it('can create a new site with other matherials', function () {
+
+    $formData = [
+        'name' => 'New site',
+        'surface_floor' => 2569.12,
+        'floor_material_id' => 'other',
+        'floor_material_other' => 'Concrete',
+        'surface_walls' => 256.9,
+        'wall_material_id' => 'other',
+        'wall_material_other' => 'Van Gogh',
+        'description' => 'Description new site',
+        'locationType' => $this->siteType->id,
+        'need_maintenance' => false
+    ];
+
+    $response = $this->postToTenant('tenant.sites.store', $formData);
+    $response->assertStatus(302);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseCount('sites', 1);
+    assertDatabaseCount('maintainables', 1);
+
+    assertDatabaseHas('sites', [
+        'location_type_id' => $this->siteType->id,
+        'code' => $this->siteType->prefix . '01',
+        'surface_floor' => 2569.12,
+        'floor_material_other' => 'Concrete',
+        'surface_walls' => 256.9,
+        'wall_material_other' => 'Van Gogh',
         'reference_code' => $this->siteType->prefix . '01',
     ]);
 

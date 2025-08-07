@@ -119,7 +119,8 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
                         </select>
                     )}
                     <div>
-                        <label className="mb-2 block text-sm font-medium">Provider</label>
+                        <label className="mb-2 block text-sm font-medium">Providers</label>
+
                         <SearchableInput<Provider>
                             searchUrl={route('api.providers.search')}
                             displayValue={data.provider_name}

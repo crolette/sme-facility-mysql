@@ -31,12 +31,15 @@ class APIProviderController extends Controller
 
             DB::beginTransaction();
 
-            $provider = new Provider($request->validated());
-
-            if ($request->validated('logo'))
-                $provider = $this->logoService->uploadAndAttachLogo($provider, $request->validated('logo'), $request->validated('name'));
+            $provider = new Provider($request->safe()->except('logo'));
+            $provider->providerCategory()->associate($request->validated('categoryId'));
 
             $provider->save();
+
+            if ($request->validated('logo')) {
+                $provider = $this->logoService->uploadAndAttachLogo($provider, $request->validated('logo'), $request->validated('name'));
+                $provider->save();
+            }
 
             DB::commit();
 
@@ -51,16 +54,20 @@ class APIProviderController extends Controller
 
     public function update(ProviderRequest $request, Provider $provider)
     {
-        Debugbar::info(gettype($request->validated('logo')), $request->validated('logo'), $request->validated('logo') != null);
         try {
 
             DB::beginTransaction();
 
-            $provider->update($request->validated());
+            $provider->update($request->safe()->except('logo'));
 
             if (!$request->validated('logo') === null)
                 $provider = $this->logoService->uploadAndAttachLogo($provider, $request->validated('logo'), $request->validated('name'));
 
+            $categoryId = $request->validated('categoryId') ?? null;
+            if ($categoryId && $categoryId !== $provider->providerCategory->id) {
+                $provider->providerCategory()->dissociate();
+                $provider->providerCategory()->associate($request->validated('categoryId'));
+            }
 
             $provider->save();
 

@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\Tenant;
 
+use Illuminate\Http\File;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use App\Models\Tenants\Provider;
 use App\Rules\NotDisposableEmail;
+use App\Models\Central\CategoryType;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\File;
 
 class ProviderRequest extends FormRequest
 {
@@ -23,18 +24,14 @@ class ProviderRequest extends FormRequest
     public function prepareForValidation()
     {
         $data = $this->all();
-        // Debugbar::info($data);
-        // Debugbar::info($data['logo'], gettype($data['logo']), gettype($data['logo']) === "string");
 
         if (isset($data['email'])) {
             $data['email'] = Str::lower($data['email']);
         }
 
-        // if (isset($data['logo'])) {
-        //     $data['logo'] = gettype($data['logo']) === "string" || null ? null : $data['logo'];
-        // }
-
-        // Debugbar::info('after', $data['logo'], gettype($data['logo']), gettype($data['logo']) === "string");
+        if (isset($data['website'])) {
+            $data['website'] = Str::startsWith($data['website'], ['http', 'https']) ? Str::lower($data['website']) : Str::lower('https://' . $data['website']);
+        }
 
         $this->replace($data);
     }
@@ -52,8 +49,11 @@ class ProviderRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'address' => 'nullable|string',
             'vat_number' => ['nullable', 'string', 'regex:/^[A-Z]{2}[0-9A-Z]{2,12}$/', 'max:14', Rule::unique(Provider::class)->ignore($this->route('provider'))],
-            'phone_number' => 'nullable|string',
+            'phone_number' => 'required|string|regex:/^\+\d{8,15}$/|max:16',
+            'website' => 'nullable|url:http,https',
             'logo' => 'nullable|file|mimes:png,jpg,jpeg|max:' . Provider::maxUploadSizeKB(),
+            'categoryId' => ['required', Rule::in(CategoryType::where('category', 'provider')->pluck('id')->toArray())],
+
         ];
     }
 }

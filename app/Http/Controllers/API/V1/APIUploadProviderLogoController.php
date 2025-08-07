@@ -23,7 +23,6 @@ class APIUploadProviderLogoController extends Controller
 
     public function store(ImageUploadRequest $request, Provider $provider)
     {
-        Debugbar::info($request->validated('image'));
         $provider = $this->logoService->uploadAndAttachLogo($provider, $request->validated('image'));
         $provider->save();
         return ApiResponse::success('', 'Logo uploaded');
