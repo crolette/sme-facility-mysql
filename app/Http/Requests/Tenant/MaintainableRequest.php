@@ -21,11 +21,10 @@ class MaintainableRequest extends FormRequest
 
         $data = $this->all();
 
-        if ($data['need_maintenance'] === true) {
+        if (isset($data['need_maintenance']) && $data['need_maintenance'] === true) {
             if (isset($data['next_maintenance_date'])) {
                 return;
             }
-
             if (isset($data['maintenance_frequency']) && $data['maintenance_frequency'] === MaintenanceFrequency::ONDEMAND->value) {
                 return;
             } else {
