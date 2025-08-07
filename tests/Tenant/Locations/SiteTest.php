@@ -138,11 +138,11 @@ it('can render the show site page', function () {
 
     $response->assertInertia(
         fn($page) => $page->component('tenants/locations/show')
-            ->has('location')
-            ->where('location.location_type.level', $site->locationType->level)
-            ->where('location.maintainable.description', $site->maintainable->description)
-            ->where('location.code', $site->code)
-            ->where('location.location_type.level', 'site')
+            ->has('item')
+            ->where('item.location_type.level', $site->locationType->level)
+            ->where('item.maintainable.description', $site->maintainable->description)
+            ->where('item.code', $site->code)
+            ->where('item.location_type.level', 'site')
     );
 });
 

@@ -33,7 +33,8 @@ class APIProviderController extends Controller
 
             $provider = new Provider($request->validated());
 
-            $provider = $this->logoService->uploadAndAttachLogo($provider, $request->validated('logo'), $request->validated('name'));
+            if ($request->validated('logo'))
+                $provider = $this->logoService->uploadAndAttachLogo($provider, $request->validated('logo'), $request->validated('name'));
 
             $provider->save();
 
@@ -57,9 +58,9 @@ class APIProviderController extends Controller
 
             $provider->update($request->validated());
 
-            if (!$request->validated('logo') === null) {
+            if (!$request->validated('logo') === null)
                 $provider = $this->logoService->uploadAndAttachLogo($provider, $request->validated('logo'), $request->validated('name'));
-            }
+
 
             $provider->save();
 

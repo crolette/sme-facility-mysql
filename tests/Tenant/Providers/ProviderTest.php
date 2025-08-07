@@ -37,8 +37,8 @@ it('can render the show provider page', function () {
         ->assertInertia(
             fn($page) =>
             $page->component('tenants/providers/show')
-                ->has('provider')
-                ->where('provider.id', $provider->id)
+                ->has('item')
+                ->where('item.id', $provider->id)
         );
 });
 

@@ -83,7 +83,7 @@ export default function CreateLocation({
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
         if (location) {
-            post(route(`tenant.${routeName}.update`, location.reference_code), {
+            post(route(`api.${routeName}.update`, location.reference_code), {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-HTTP-Method-Override': 'PATCH',
@@ -91,7 +91,7 @@ export default function CreateLocation({
                 },
             });
         } else {
-            post(route(`tenant.${routeName}.store`));
+            post(route(`api.${routeName}.store`));
             router.visit(route(`tenant.${routeName}.index`), {
                 preserveScroll: false,
             });
@@ -223,6 +223,7 @@ export default function CreateLocation({
             </div>
         );
     };
+    console.log(location);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

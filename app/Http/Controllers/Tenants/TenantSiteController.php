@@ -66,7 +66,7 @@ class TenantSiteController extends Controller
         if (Auth::user()->cannot('view', $site))
             abort(403);
 
-        return Inertia::render('tenants/locations/show', ['routeName' => 'sites', 'location' => $site->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers'])]);
+        return Inertia::render('tenants/locations/show', ['routeName' => 'sites', 'item' => $site->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers'])]);
     }
 
     /**
