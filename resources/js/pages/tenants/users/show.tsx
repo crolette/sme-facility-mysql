@@ -16,6 +16,8 @@ export default function UserShow({ item }: { item: User }) {
         },
     ];
 
+    console.log(user);
+
     const fetchUser = async () => {
         try {
             const response = await axios.get(route('api.users.show', user.id));
@@ -50,7 +52,7 @@ export default function UserShow({ item }: { item: User }) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Sites" />
+            <Head title={user.full_name} />
             <div>
                 <a href={route(`tenant.users.edit`, user.id)}>
                     <Button>Edit</Button>
@@ -82,14 +84,33 @@ export default function UserShow({ item }: { item: User }) {
                         </Button> */}
                     </div>
                 )}
-                <ImageUploadModale
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    uploadUrl={route('api.users.picture.store', user.id)}
-                    onUploadSuccess={handleUploadSuccess}
-                    title={'Upload profile picture'}
-                />
+                <div>
+                    <h3>Assets</h3>
+                    {user.assets &&
+                        user.assets.map((asset) => (
+                            <div key={asset.id}>
+                                <p>
+                                    Code: <a href={route('tenant.assets.show', asset.reference_code)}>{asset.code}</a>
+                                </p>
+                                <p>Name: {asset.name}</p>
+                                <p>Description: {asset.description}</p>
+                                <p>
+                                    Model: {asset.brand} - {asset.model}
+                                </p>
+                                <p>Last maintenance date: {asset.maintainable.last_maintenance_date}</p>
+                                <p>Next maintenance date: {asset.maintainable.next_maintenance_date}</p>
+                            </div>
+                        ))}
+                </div>
             </div>
+
+            <ImageUploadModale
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                uploadUrl={route('api.users.picture.store', user.id)}
+                onUploadSuccess={handleUploadSuccess}
+                title={'Upload profile picture'}
+            />
         </AppLayout>
     );
 }

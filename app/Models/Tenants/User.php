@@ -4,6 +4,7 @@ namespace App\Models\Tenants;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Models\Tenants\Asset;
 use App\Models\Tenants\Provider;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
@@ -12,6 +13,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -99,6 +101,11 @@ class User extends Authenticatable
     public function provider(): BelongsTo
     {
         return $this->belongsTo(Provider::class);
+    }
+
+    public function assets(): MorphMany
+    {
+        return $this->morphMany(Asset::class, 'location');
     }
 
     public function fullName(): Attribute

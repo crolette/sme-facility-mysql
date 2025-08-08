@@ -260,6 +260,7 @@ export interface User {
     created_at: string;
     updated_at: string;
     roles: [];
+    assets?: Asset[];
     [key: string]: unknown;
 }
 
