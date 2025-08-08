@@ -1,13 +1,14 @@
 <?php
 
 use App\Helpers\ApiResponse;
-use App\Http\Controllers\API\V1\APIBuildingController;
+use App\Services\QRCodeService;
 use App\Models\Tenants\Building;
 use App\Services\PictureService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\Route;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Http\Controllers\API\V1\APIBuildingController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 
 Route::middleware([
@@ -25,6 +26,10 @@ Route::middleware([
         Route::patch('/', [APIBuildingController::class, 'update'])->name('api.buildings.update');
         Route::delete('/', [APIBuildingController::class, 'destroy'])->name('api.buildings.destroy');
 
+        Route::post('/qr/regen', function (Building $building, QRCodeService $qRCodeService) {
+            $qRCodeService->createAndAttachQR($building);
+            return ApiResponse::success();
+        })->name('api.buildings.qr.regen');
 
         Route::get('/', function (Building $building) {
             return ApiResponse::success($building->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers']));

@@ -21,7 +21,7 @@ class DocumentService
         foreach ($files as $file) {
             Debugbar::info('documentservice', $file);
             $directory = "$tenantId/$modelType/$modelId/documents";
-            $fileName = Carbon::now()->isoFormat('YYYYMMDD') . '_' . Str::slug($file['name'], '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $file['file']->extension();
+            $fileName = Carbon::now()->isoFormat('YYYYMMDDHHMM') . '_' . Str::slug($file['name'], '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $file['file']->extension();
 
             $path = Storage::disk('tenants')->putFileAs($directory, $file['file'], $fileName);
 

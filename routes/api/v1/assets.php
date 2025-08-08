@@ -1,8 +1,6 @@
 <?php
 
 use App\Helpers\ApiResponse;
-use App\Http\Controllers\API\V1\APIAssetController;
-use App\Http\Controllers\API\V1\APIInterventionActionController;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
@@ -10,14 +8,17 @@ use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Picture;
+use App\Services\QRCodeService;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use App\Services\PictureService;
 use App\Services\DocumentService;
 use App\Models\Central\CategoryType;
+use App\Models\Tenants\Intervention;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\PictureUploadRequest;
+use App\Http\Controllers\API\V1\APIAssetController;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Controllers\API\V1\APITicketController;
 use App\Http\Controllers\API\V1\DestroyPictureController;
@@ -27,10 +28,10 @@ use App\Http\Controllers\API\V1\DestroyDocumentController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\API\V1\ApiSearchLocationController;
 use App\Http\Controllers\Tenants\ForceDeleteAssetController;
+use App\Http\Controllers\API\V1\APIInterventionActionController;
 use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
-use App\Http\Controllers\API\V1\Tickets\InterventionForLocationController;
 use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
-use App\Models\Tenants\Intervention;
+use App\Http\Controllers\API\V1\Tickets\InterventionForLocationController;
 
 Route::middleware([
     'web',
@@ -51,6 +52,8 @@ Route::middleware([
 
         Route::get('/trashed', [ApiSearchTrashedAssetController::class, 'index'])->name('api.assets.trashed');
 
+
+
         Route::prefix('{asset}')->group(function () {
             // Get one asset and his maintainable
             Route::get('/', function (Asset $asset) {
@@ -65,6 +68,12 @@ Route::middleware([
 
             // Force delete a soft deleted asset
             Route::delete('/force', [ForceDeleteAssetController::class, 'forceDelete'])->withTrashed()->name('api.assets.force');
+
+
+            Route::post('/qr/regen', function (Asset $asset, QRCodeService $qRCodeService) {
+                $qRCodeService->createAndAttachQR($asset);
+                return ApiResponse::success();
+            })->name('api.assets.qr.regen');
 
             // Get all the documents from an asset
             Route::get('/documents/', function ($asset) {

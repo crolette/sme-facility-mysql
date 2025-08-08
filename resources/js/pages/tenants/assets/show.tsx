@@ -41,9 +41,9 @@ export default function ShowAsset({ item }: { item: Asset }) {
     };
 
     const generateQR = async () => {
-        const response = await axios.post(route('api.qr.regen', asset.reference_code));
+        const response = await axios.post(route('api.assets.qr.regen', asset.reference_code));
         if (response.data.status === 'success') {
-            // location.reload();
+            fetchAsset();
         }
     };
 
@@ -109,7 +109,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                         <div className="shrink-1">
                             {asset.qr_code && (
                                 <a href={route('api.file.download', { path: asset.qr_code })} download className="w-fit cursor-pointer">
-                                    <img src={route('api.image.show', { path: asset.qr_code })} alt="" className="h-32 w-32" />
+                                    <img key={asset.qr_code} src={route('api.image.show', { path: asset.qr_code })} alt="" className="h-32 w-32" />
                                 </a>
                             )}
                         </div>

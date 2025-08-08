@@ -1,12 +1,13 @@
 <?php
 
 use App\Helpers\ApiResponse;
-use App\Http\Controllers\API\V1\APIRoomController;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
+use App\Services\QRCodeService;
 use App\Services\PictureService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\V1\APIRoomController;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Controllers\API\V1\RelocateRoomController;
@@ -32,6 +33,11 @@ Route::middleware([
             Route::delete('/', [APIRoomController::class, 'destroy'])->name('api.rooms.destroy');
 
             Route::patch('/relocate', [RelocateRoomController::class, 'relocateRoom'])->name('api.rooms.relocate');
+
+            Route::post('/qr/regen', function (Room $room, QRCodeService $qRCodeService) {
+                $qRCodeService->createAndAttachQR($room);
+                return ApiResponse::success();
+            })->name('api.rooms.qr.regen');
 
             // Get all documents from a room
             Route::get('/assets/', function (Room $room) {

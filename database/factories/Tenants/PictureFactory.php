@@ -32,7 +32,7 @@ class PictureFactory extends Factory
 
             $directory = tenancy()->tenant->id . '/' . $directoryName . '/' . $model->id . '/pictures';
 
-            $fileName = now()->isoFormat('YYYYMMDD') . '_' . Str::slug($fakeName, '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $extension;
+            $fileName = now()->isoFormat('YYYYMMDDHHMM') . '_' . Str::slug($fakeName, '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $extension;
 
             return [
                 'path' => $directory . '/' . $fileName,

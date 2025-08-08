@@ -99,10 +99,7 @@ Route::prefix('/v1/')->group(
                     return response()->file(Storage::disk('tenants')->path($path));
                 })->name('api.image.show');
 
-                Route::post('/qr/regen/{asset}', function (Asset $asset, QRCodeService $qRCodeService) {
-                    $qRCodeService->createAndAttachQR($asset);
-                    return ApiResponse::success();
-                })->name('api.qr.regen');
+
 
                 // Return the category type searched
                 Route::get('category-types/', function (Request $request) {

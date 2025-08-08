@@ -21,13 +21,18 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
         },
     ];
 
-    console.log(location);
-
     const [showModaleRelocateRoom, setShowModaleRelocateRoom] = useState<boolean>(false);
 
     const fetchLocation = async () => {
         const response = await axios.get(route(`api.${routeName}.show`, location?.reference_code));
         setLocation(response.data.data);
+    };
+
+    const generateQR = async () => {
+        const response = await axios.post(route(`api.${routeName}.qr.regen`, location.reference_code));
+        if (response.data.status === 'success') {
+            fetchLocation();
+        }
     };
 
     const markMaintenanceDone = async () => {
@@ -49,7 +54,11 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                             Mark maintenance as done
                         </Button>
                     )}
+                    <Button onClick={generateQR} variant={'secondary'}>
+                        Generate new QR
+                    </Button>
                 </div>
+
                 {routeName === 'rooms' && showModaleRelocateRoom && (
                     <RealocateRoomManager room={location} itemCode={location.reference_code} onClose={() => setShowModaleRelocateRoom(false)} />
                 )}
@@ -65,7 +74,12 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                         <div className="shrink-1">
                             {location.qr_code && (
                                 <a href={route('api.file.download', { path: location.qr_code })} download className="w-fit cursor-pointer">
-                                    <img src={route('api.image.show', { path: location.qr_code })} alt="" className="h-32 w-32" />
+                                    <img
+                                        key={location.qr_code}
+                                        src={route('api.image.show', { path: location.qr_code })}
+                                        alt=""
+                                        className="h-32 w-32"
+                                    />
                                 </a>
                             )}
                         </div>

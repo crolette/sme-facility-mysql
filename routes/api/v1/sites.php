@@ -1,11 +1,12 @@
 <?php
 
 use App\Helpers\ApiResponse;
-use App\Http\Controllers\API\V1\APISiteController;
 use App\Models\Tenants\Site;
+use App\Services\QRCodeService;
 use App\Services\PictureService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\V1\APISiteController;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
@@ -25,12 +26,17 @@ Route::middleware([
             Route::patch('/', [APISiteController::class, 'update'])->name('api.sites.update');
             Route::delete('/', [APISiteController::class, 'destroy'])->name('api.sites.destroy');
 
+            Route::post('/qr/regen', function (Site $site, QRCodeService $qRCodeService) {
+                $qRCodeService->createAndAttachQR($site);
+                return ApiResponse::success();
+            })->name('api.sites.qr.regen');
+
             Route::get('/', function (Site $site) {
                 if (Auth::user()->cannot('view', $site))
                     return ApiResponse::notAuthorized();
 
                 return ApiResponse::success($site->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers']));
-            })->name('api.site.show');
+            })->name('api.sites.show');
 
             // Get all assets from a site
             Route::get('/assets/', function (Site $site) {

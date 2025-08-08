@@ -1,12 +1,13 @@
 <?php
 
 use App\Helpers\ApiResponse;
-use App\Http\Controllers\API\V1\APIFloorController;
 use App\Models\Tenants\Floor;
+use App\Services\QRCodeService;
 use App\Services\PictureService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\Route;
 use App\Http\Requests\Tenant\PictureUploadRequest;
+use App\Http\Controllers\API\V1\APIFloorController;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 
@@ -30,7 +31,10 @@ Route::middleware([
         Route::patch('/', [APIFloorController::class, 'update'])->name('api.floors.update');
         Route::delete('/', [APIFloorController::class, 'destroy'])->name('api.floors.destroy');
 
-
+        Route::post('/qr/regen', function (Floor $floor, QRCodeService $qRCodeService) {
+            $qRCodeService->createAndAttachQR($floor);
+            return ApiResponse::success();
+        })->name('api.floors.qr.regen');
 
         // Get all assets from a floor
         Route::get('/assets/', function (Floor $floor) {
