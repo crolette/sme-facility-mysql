@@ -33,9 +33,9 @@ export default function IndexTypes({ types, routeName }: { types: Record<Locatio
                                     {type.label} ({type.prefix})
                                 </p>
                                 <div className="space-x-4">
-                                    <Button onClick={() => submit(type)} variant={'destructive'}>
+                                    {/* <Button onClick={() => submit(type)} variant={'destructive'}>
                                         Delete
-                                    </Button>
+                                    </Button> */}
                                     <a href={route(`central.${routeName}.edit`, type.slug)}>
                                         <Button>Edit</Button>
                                     </a>
@@ -55,9 +55,9 @@ export default function IndexTypes({ types, routeName }: { types: Record<Locatio
                                     {type.label} ({type.prefix})
                                 </p>
                                 <div className="space-x-4">
-                                    <Button onClick={() => submit(type)} variant={'destructive'}>
+                                    {/* <Button onClick={() => submit(type)} variant={'destructive'}>
                                         Delete
-                                    </Button>
+                                    </Button> */}
                                     <a href={route(`central.${routeName}.edit`, type.slug)}>
                                         <Button>Edit</Button>
                                     </a>
@@ -77,9 +77,9 @@ export default function IndexTypes({ types, routeName }: { types: Record<Locatio
                                     {type.label} ({type.prefix})
                                 </p>
                                 <div className="space-x-4">
-                                    <Button onClick={() => submit(type)} variant={'destructive'}>
+                                    {/* <Button onClick={() => submit(type)} variant={'destructive'}>
                                         Delete
-                                    </Button>
+                                    </Button> */}
                                     <a href={route(`central.${routeName}.edit`, type.slug)}>
                                         <Button>Edit</Button>
                                     </a>
@@ -99,9 +99,9 @@ export default function IndexTypes({ types, routeName }: { types: Record<Locatio
                                     {type.label} ({type.prefix})
                                 </p>
                                 <div className="space-x-4">
-                                    <Button onClick={() => submit(type)} variant={'destructive'}>
+                                    {/* <Button onClick={() => submit(type)} variant={'destructive'}>
                                         Delete
-                                    </Button>
+                                    </Button> */}
                                     <a href={route(`central.${routeName}.edit`, type.slug)}>
                                         <Button>Edit</Button>
                                     </a>
