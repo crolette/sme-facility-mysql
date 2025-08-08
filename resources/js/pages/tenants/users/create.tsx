@@ -12,6 +12,7 @@ interface FormDataUser {
     first_name: string;
     last_name: string;
     email: string;
+    job_position: string;
     can_login: boolean;
     avatar: File | string | null;
     provider_id: string | number;
@@ -35,6 +36,7 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
         email: user?.email ?? '',
         can_login: user?.can_login ?? false,
         avatar: '',
+        job_position: user?.job_position ?? '',
         provider_id: user?.provier_id ?? '',
         provider_name: user?.provider?.name ?? '',
         role: user?.roles?.length > 0 ? user?.roles[0].name : '',
@@ -87,6 +89,8 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
                     <Input type="text" onChange={(e) => setData('first_name', e.target.value)} value={data.first_name} />
                     <Label>Last name</Label>
                     <Input type="text" onChange={(e) => setData('last_name', e.target.value)} value={data.last_name} />
+                    <Label>Job position</Label>
+                    <Input type="text" onChange={(e) => setData('job_position', e.target.value)} value={data.job_position} />
                     <Label>Email</Label>
                     <Input type="email" onChange={(e) => setData('email', e.target.value)} value={data.email} />
                     <Label>Can login</Label>

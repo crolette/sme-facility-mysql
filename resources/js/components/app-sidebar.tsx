@@ -19,7 +19,7 @@ const mainNavItems: NavItem[] = [
         icon: Building2,
     },
     {
-        title: 'Buildings',
+        title: 'Buildings/Outdoor',
         href: '/buildings',
         icon: Building,
     },

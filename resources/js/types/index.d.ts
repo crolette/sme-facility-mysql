@@ -245,6 +245,7 @@ export interface User {
     last_name: string;
     username: string;
     full_name: string;
+    job_position?: string;
     email: string;
     avatar?: string;
     provider_id?: number;

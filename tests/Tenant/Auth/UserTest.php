@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Central\CategoryType;
 use App\Models\Tenants\User;
 
 use App\Models\Tenants\Provider;
@@ -80,6 +81,7 @@ it('can post a new "loginable" user and return the password', function () {
         'email' => 'janedoe@facilitywebxp.be',
         'can_login' => true,
         'role' => 'Maintenance Manager',
+        'job_position' => 'Manager',
         'avatar' => $file1
     ];
 
@@ -99,6 +101,7 @@ it('can post a new "loginable" user and return the password', function () {
     assertDatabaseHas('users', [
         'first_name' => 'Jane',
         'last_name' => 'Doe',
+        'job_position' => 'Manager',
         'email' => 'janedoe@facilitywebxp.be',
         'can_login' => 1,
         'avatar' => $createdUser->avatar
@@ -108,13 +111,14 @@ it('can post a new "loginable" user and return the password', function () {
 });
 
 it('can post a new "non loginable" user and attach a provider', function () {
-
+    CategoryType::factory()->create(['category' => 'provider']);
     $provider = Provider::factory()->create();
 
     $formData = [
         'first_name' => 'Jane',
         'last_name' => 'Doe',
         'can_login' => false,
+        'job_position' => 'Manager',
         'email' => 'janedoe@facilitywebxp.be',
         'provider_id' => $provider->id
     ];
@@ -130,6 +134,7 @@ it('can post a new "non loginable" user and attach a provider', function () {
     assertDatabaseHas('users', [
         'first_name' => 'Jane',
         'last_name' => 'Doe',
+        'job_position' => 'Manager',
         'email' => 'janedoe@facilitywebxp.be',
         'provider_id' => $provider->id,
         'can_login' => 0
@@ -146,6 +151,7 @@ it('can update an existing user', function () {
     $formData = [
         'first_name' => 'Jane',
         'last_name' => 'Doe',
+        'job_position' => 'Manager',
         'email' => 'janedoe@facilitywebxp.be',
         'avatar' => $file1
     ];
@@ -161,6 +167,7 @@ it('can update an existing user', function () {
         'id' => 2,
         'first_name' => 'Jane',
         'last_name' => 'Doe',
+        'job_position' => 'Manager',
         'email' => 'janedoe@facilitywebxp.be',
         'can_login' => false,
         'avatar' => User::find(2)->avatar

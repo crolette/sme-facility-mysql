@@ -66,6 +66,7 @@ export default function UserShow({ item }: { item: User }) {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <p>Name : {user.full_name}</p>
                 <p>Email : {user.email}</p>
+                <p>John position: {user.job_position}</p>
                 <p>Can login : {user.can_login ? 'YES' : 'NO'}</p>
                 <p>Role: {item.roles?.length > 0 ? item.roles[0].name : ''}</p>
                 {user.provider && (
