@@ -74,8 +74,8 @@ class APIBuildingController extends Controller
             if ($files) {
                 $documentService->uploadAndAttachDocuments($building, $files);
             }
-
-            $this->qrCodeService->createAndAttachQR($building);
+            if ($buildingRequest->validated('need_qr_code') === true)
+                $this->qrCodeService->createAndAttachQR($building);
 
             DB::commit();
             return ApiResponse::success('', 'Building created');

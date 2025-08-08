@@ -70,7 +70,8 @@ class APIRoomController extends Controller
                 $documentService->uploadAndAttachDocuments($room, $files);
             }
 
-            $this->qrCodeService->createAndAttachQR($room);
+            if ($roomRequest->validated('need_qr_code') === true)
+                $this->qrCodeService->createAndAttachQR($room);
 
             DB::commit();
             return ApiResponse::success('', 'Room created');

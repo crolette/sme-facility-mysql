@@ -29,6 +29,7 @@ class TenantSiteRequest extends FormRequest
         $siteTypes = LocationType::where('level', 'site')->pluck('id');
 
         return [
+            'need_qr_code' => 'sometimes|boolean',
             'address' => 'nullable|string',
             'locationType' => ['required', Rule::in([...$siteTypes])],
             'surface_floor' => 'nullable|numeric|gt:0|decimal:0,2',

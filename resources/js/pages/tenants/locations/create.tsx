@@ -21,6 +21,7 @@ interface Provider {
 type TypeFormData = {
     name: string;
     description: string;
+    need_qr_code?: boolean;
     surface_floor: null | number;
     floor_material_id: number | string | null;
     floor_material_other: string;
@@ -81,6 +82,7 @@ export default function CreateLocation({
     const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
     const { data, setData, errors } = useForm<TypeFormData>({
         name: location?.maintainable?.name ?? '',
+
         description: location?.maintainable?.description ?? '',
         surface_floor: location?.surface_floor ?? null,
         floor_material_id: location?.floor_material_other != null ? 'other' : (location?.floor_material_id ?? null),
@@ -92,12 +94,13 @@ export default function CreateLocation({
         wall_material_id: location?.wall_material_other != null ? 'other' : (location?.wall_material_id ?? null),
         wall_material_other: location?.wall_material_other ?? '',
         levelType: location?.level_id ?? '',
+        need_qr_code: true,
         locationType: locationTypes.length == 1 ? locationTypes[0].id : (location?.location_type?.id ?? ''),
         locationTypeName: locationTypes.find((type) => type.id === location?.location_type.id)?.slug ?? '',
         files: selectedDocuments,
         maintenance_manager_id: location?.maintainable?.maintenance_manager_id ?? null,
         maintenance_manager_name: location?.maintainable?.manager?.full_name ?? '',
-        need_maintenance: location?.maintainable.need_maintenance ?? '',
+        need_maintenance: location?.maintainable.need_maintenance ?? false,
         maintenance_frequency: location?.maintainable.maintenance_frequency ?? '',
         next_maintenance_date: location?.maintainable.next_maintenance_date ?? '',
         last_maintenance_date: location?.maintainable.last_maintenance_date ?? '',
@@ -369,6 +372,19 @@ export default function CreateLocation({
                         placeholder="Name"
                     />
                     <InputError className="mt-2" message={errors.name} />
+
+                    {!location && (
+                        <div>
+                            <Label htmlFor="need_qr_code">Need QR Code ?</Label>
+                            <Checkbox
+                                id="need_qr_code"
+                                name="need_qr_code"
+                                checked={data.need_qr_code ?? true}
+                                onClick={() => setData('need_qr_code', !data.need_qr_code)}
+                            />
+                            <InputError className="mt-2" message={errors.need_qr_code} />
+                        </div>
+                    )}
 
                     {routeName === 'sites' && (
                         <>

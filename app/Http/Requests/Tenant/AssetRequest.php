@@ -36,6 +36,7 @@ class AssetRequest extends FormRequest
         $data = $this->all();
 
         $rules = [
+            'need_qr_code' => 'sometimes|boolean',
             'locationType' => ['nullable', 'in:site,building,floor,room'],
             'locationId' => ['nullable'],
             'surface' => 'nullable|numeric|gt:0|decimal:0,2',

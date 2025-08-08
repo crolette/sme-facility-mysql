@@ -64,7 +64,8 @@ class APISiteController extends Controller
                 $documentService->uploadAndAttachDocuments($site, $files);
             }
 
-            $this->qrCodeService->createAndAttachQR($site);
+            if ($siteRequest->validated('need_qr_code') === true)
+                $this->qrCodeService->createAndAttachQR($site);
 
             DB::commit();
             return ApiResponse::success('', 'Site created');

@@ -64,7 +64,8 @@ class APIFloorController extends Controller
             if ($files) {
                 $documentService->uploadAndAttachDocuments($floor, $files);
             }
-            $this->qrCodeService->createAndAttachQR($floor);
+            if ($floorRequest->validated('need_qr_code') === true)
+                $this->qrCodeService->createAndAttachQR($floor);
 
             DB::commit();
             return ApiResponse::success('', 'Building created');

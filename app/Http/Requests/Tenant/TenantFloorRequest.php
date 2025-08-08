@@ -31,6 +31,7 @@ class TenantFloorRequest extends FormRequest
         $locationTypes = LocationType::where('level', 'floor')->pluck('id');
 
         return [
+            'need_qr_code' => 'sometimes|boolean',
             'levelType' => ['required', 'integer', Rule::in([...$buildings])],
             'locationType' => ['required', 'integer', Rule::in([...$locationTypes])],
             'surface_floor' => 'nullable|numeric|gt:0|decimal:0,2',

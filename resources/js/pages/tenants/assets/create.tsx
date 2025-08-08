@@ -21,6 +21,7 @@ interface Provider {
 type TypeFormData = {
     q: string;
     name: string;
+    need_qr_code?: boolean;
     surface: null | number;
     description: string;
     locationId: number;
@@ -95,7 +96,8 @@ export default function CreateAsset({
         purchase_cost: asset?.maintainable.purchase_cost ?? null,
         under_warranty: asset?.maintainable.under_warranty ?? false,
         end_warranty_date: asset?.maintainable.end_warranty_date ?? '',
-        need_maintenance: asset?.maintainable.need_maintenance ?? '',
+        need_qr_code: false,
+        need_maintenance: asset?.maintainable.need_maintenance ?? false,
         maintenance_frequency: asset?.maintainable.maintenance_frequency ?? '',
         next_maintenance_date: asset?.maintainable.next_maintenance_date ?? '',
         last_maintenance_date: asset?.maintainable.last_maintenance_date ?? '',
@@ -300,8 +302,6 @@ export default function CreateAsset({
         );
     };
 
-    console.log(locations);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Create asset`} />
@@ -400,6 +400,19 @@ export default function CreateAsset({
                         placeholder="Asset name"
                     />
                     <InputError className="mt-2" message={errors.name} />
+
+                    {!asset && (
+                        <div>
+                            <Label htmlFor="need_qr_code">Need QR Code ?</Label>
+                            <Checkbox
+                                id="need_qr_code"
+                                name="need_qr_code"
+                                checked={data.need_qr_code ?? true}
+                                onClick={() => setData('need_qr_code', !data.need_qr_code)}
+                            />
+                            <InputError className="mt-2" message={errors.need_qr_code} />
+                        </div>
+                    )}
 
                     <Label htmlFor="description">Description</Label>
                     <Input

@@ -58,7 +58,8 @@ class APIAssetController extends Controller
                 $pictureService->uploadAndAttachPictures($asset, $pictures);
             }
 
-            $this->qrCodeService->createAndAttachQR($asset);
+            if ($assetRequest->validated('need_qr_code') === true)
+                $this->qrCodeService->createAndAttachQR($asset);
 
             DB::commit();
 
