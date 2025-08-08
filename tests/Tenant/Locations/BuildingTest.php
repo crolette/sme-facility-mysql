@@ -62,14 +62,19 @@ it('can create a new building', function () {
     $siteType = LocationType::factory()->create(['level' => 'site']);
     $buildingType = LocationType::factory()->create(['level' => 'building']);
     $site = Site::factory()->create();
+    $wallMaterial = CategoryType::factory()->create(['category' => 'wall_materials']);
+    $floorMaterial = CategoryType::factory()->create(['category' => 'floor_materials']);
 
     $formData = [
         'name' => 'New building',
         'surface_floor' => 2569.12,
+        'floor_material_id' => $floorMaterial->id,
         'surface_walls' => 256.9,
+        'wall_material_id' => $wallMaterial->id,
         'description' => 'Description new building',
         'levelType' => $site->id,
-        'locationType' => $buildingType->id
+        'locationType' => $buildingType->id,
+        'need_maintenance' => false
     ];
 
     $response = $this->postToTenant('api.buildings.store', $formData);
@@ -83,18 +88,68 @@ it('can create a new building', function () {
         'location_type_id' => $buildingType->id,
         'code' => $buildingType->prefix . '01',
         'surface_floor' => 2569.12,
+        'floor_material_id' => $floorMaterial->id,
         'surface_walls' => 256.9,
+        'wall_material_id' => $wallMaterial->id,
         'reference_code' => $site->reference_code . '-' . $buildingType->prefix . '01',
-        'level_id' => $siteType->id
+        'level_id' => $siteType->id,
+
     ]);
 
     assertDatabaseHas('maintainables', [
         'name' => 'New building',
         'description' => 'Description new building',
+        'need_maintenance' => false
+    ]);
+});
+
+it('can create a new building with other materials', function () {
+
+    $siteType = LocationType::factory()->create(['level' => 'site']);
+    $buildingType = LocationType::factory()->create(['level' => 'building']);
+    $site = Site::factory()->create();
+
+    $formData = [
+        'name' => 'New building',
+        'surface_floor' => 2569.12,
+        'floor_material_id' => 'other',
+        'floor_material_other' => 'Concrete',
+        'surface_walls' => 256.9,
+        'wall_material_id' => 'other',
+        'wall_material_other' => 'Van Gogh',
+        'description' => 'Description new building',
+        'levelType' => $site->id,
+        'locationType' => $buildingType->id,
+        'need_maintenance' => false
+    ];
+
+    $response = $this->postToTenant('api.buildings.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    assertDatabaseCount('buildings', 1);
+    assertDatabaseCount('maintainables', 2);
+
+    assertDatabaseHas('buildings', [
+        'location_type_id' => $buildingType->id,
+        'code' => $buildingType->prefix . '01',
+        'surface_floor' => 2569.12,
+        'floor_material_other' => 'Concrete',
+        'surface_walls' => 256.9,
+        'wall_material_other' => 'Van Gogh',
+        'reference_code' => $site->reference_code . '-' . $buildingType->prefix . '01',
+        'level_id' => $siteType->id,
+    ]);
+
+    assertDatabaseHas('maintainables', [
+        'name' => 'New building',
+        'description' => 'Description new building',
+        'need_maintenance' => false
     ]);
 });
 
 it('can attach a provider to a building\'s maintainable', function () {
+    CategoryType::factory()->create(['category' => 'provider']);
     $provider = Provider::factory()->create();
     $siteType = LocationType::factory()->create(['level' => 'site']);
     $buildingType = LocationType::factory()->create(['level' => 'building']);
@@ -209,6 +264,8 @@ it('can update a building', function () {
     $buildingType = LocationType::factory()->create(['level' => 'building']);
     $site = Site::factory()->create();
     $building = Building::factory()->create();
+    $wallMaterial = CategoryType::factory()->create(['category' => 'wall_materials']);
+    $floorMaterial = CategoryType::factory()->create(['category' => 'floor_materials']);
 
     $oldName = $building->maintainable->name;
     $oldDescription = $building->maintainable->description;
@@ -217,6 +274,8 @@ it('can update a building', function () {
         'name' => 'New building',
         'surface_floor' => 2569.12,
         'surface_walls' => 256.9,
+        'wall_material_id' => $wallMaterial->id,
+        'floor_material_id' => $floorMaterial->id,
         'description' => 'Description new building',
         'levelType' => $level->id,
         'locationType' => $buildingType->id
@@ -236,6 +295,8 @@ it('can update a building', function () {
         'level_id' => $site->id,
         'surface_floor' => 2569.12,
         'surface_walls' => 256.9,
+        'wall_material_id' => $wallMaterial->id,
+        'floor_material_id' => $floorMaterial->id,
         'code' => $buildingType->prefix . '01',
         'reference_code' => $site->code . '-' . $buildingType->prefix . '01',
     ]);

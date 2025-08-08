@@ -63,10 +63,15 @@ it('can render the create floor page', function () {
 });
 
 it('can create a new floor', function () {
+    $wallMaterial = CategoryType::factory()->create(['category' => 'wall_materials']);
+    $floorMaterial = CategoryType::factory()->create(['category' => 'floor_materials']);
+
     $formData = [
         'name' => 'New floor',
         'surface_floor' => 2569.12,
+        'floor_material_id' => $floorMaterial->id,
         'surface_walls' => 256.9,
+        'wall_material_id' => $wallMaterial->id,
         'description' => 'Description new floor',
         'levelType' => $this->building->id,
         'locationType' => $this->floorType->id
@@ -88,7 +93,9 @@ it('can create a new floor', function () {
         'location_type_id' => $this->floorType->id,
         'code' => $this->floorType->prefix . '01',
         'surface_floor' => 2569.12,
+        'floor_material_id' => $floorMaterial->id,
         'surface_walls' => 256.9,
+        'wall_material_id' => $wallMaterial->id,
         'reference_code' => $this->building->reference_code . '-' . $this->floorType->prefix . '01',
         'level_id' => $this->building->id
     ]);
@@ -98,10 +105,59 @@ it('can create a new floor', function () {
         'maintainable_id' => $floor->id,
         'name' => 'New floor',
         'description' => 'Description new floor',
+        'need_maintenance' => false
+    ]);
+});
+
+it('can create a new floor with other materials', function () {
+
+    $formData = [
+        'name' => 'New floor',
+        'surface_floor' => 2569.12,
+        'floor_material_id' => 'other',
+        'floor_material_other' => 'Concrete',
+        'surface_walls' => 256.9,
+        'wall_material_id' => 'other',
+        'wall_material_other' => 'Van Gogh',
+        'description' => 'Description new floor',
+        'levelType' => $this->building->id,
+        'locationType' => $this->floorType->id
+    ];
+
+    $response = $this->postToTenant('api.floors.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    $floor = Floor::first();
+
+    assertDatabaseCount('sites', 1);
+    assertDatabaseCount('buildings', 1);
+    assertDatabaseCount('floors', 1);
+    assertDatabaseCount('maintainables', 3);
+
+
+    assertDatabaseHas('floors', [
+        'location_type_id' => $this->floorType->id,
+        'code' => $this->floorType->prefix . '01',
+        'surface_floor' => 2569.12,
+        'floor_material_other' => 'Concrete',
+        'surface_walls' => 256.9,
+        'wall_material_other' => 'Van Gogh',
+        'reference_code' => $this->building->reference_code . '-' . $this->floorType->prefix . '01',
+        'level_id' => $this->building->id
+    ]);
+
+    assertDatabaseHas('maintainables', [
+        'maintainable_type' => get_class($floor),
+        'maintainable_id' => $floor->id,
+        'name' => 'New floor',
+        'description' => 'Description new floor',
+        'need_maintenance' => false
     ]);
 });
 
 it('can attach a provider to a floor\'s maintainable', function () {
+    CategoryType::factory()->create(['category' => 'provider']);
     $provider = Provider::factory()->create();
 
     $formData = [

@@ -79,25 +79,26 @@ it('can render the create floor page', function () {
 
 it('can create a new room', function () {
     $location = LocationType::where('level', 'room')->first();
+    $wallMaterial = CategoryType::factory()->create(['category' => 'wall_materials']);
+    $floorMaterial = CategoryType::factory()->create(['category' => 'floor_materials']);
 
     $formData = [
         'name' => 'New room',
         'surface_floor' => 2569.12,
+        'floor_material_id' => $floorMaterial->id,
         'surface_walls' => 256.9,
+        'wall_material_id' => $wallMaterial->id,
         'description' => 'Description new room',
         'levelType' => $this->floor->id,
         'locationType' => $location->id
     ];
 
-    $response = $this->postToTenant('tenant.rooms.store', $formData);
-    $response->assertStatus(302);
-    $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.rooms.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     $room = Room::first();
 
-    assertDatabaseCount('sites', 1);
-    assertDatabaseCount('buildings', 1);
-    assertDatabaseCount('floors', 1);
     assertDatabaseCount('rooms', 1);
     assertDatabaseCount('maintainables', 4);
 
@@ -106,7 +107,56 @@ it('can create a new room', function () {
         'location_type_id' => $location->id,
         'code' => $location->prefix . '001',
         'surface_floor' => 2569.12,
+        'floor_material_id' => $floorMaterial->id,
         'surface_walls' => 256.9,
+        'wall_material_id' => $wallMaterial->id,
+        'reference_code' => $this->floor->reference_code . '-' . $location->prefix . '001',
+        'level_id' => $this->floor->id
+    ]);
+
+    assertDatabaseHas('maintainables', [
+        'maintainable_type' => get_class($room),
+        'maintainable_id' => $room->id,
+        'name' => 'New room',
+        'description' => 'Description new room',
+    ]);
+});
+
+it('can create a new room with other materials', function () {
+    $location = LocationType::where('level', 'room')->first();
+
+    $formData = [
+        'name' => 'New room',
+        'surface_floor' => 2569.12,
+        'floor_material_id' => 'other',
+        'floor_material_other' => 'Concrete',
+        'surface_walls' => 256.9,
+        'wall_material_id' => 'other',
+        'wall_material_other' => 'Van Gogh',
+        'description' => 'Description new room',
+        'levelType' => $this->floor->id,
+        'locationType' => $location->id
+    ];
+
+    $response = $this->postToTenant('api.rooms.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    $room = Room::first();
+
+    assertDatabaseCount('rooms', 1);
+    assertDatabaseCount('maintainables', 4);
+
+    assertNull($room->floor_material_id);
+    assertNull($room->wall_material_id);
+
+    assertDatabaseHas('rooms', [
+        'location_type_id' => $location->id,
+        'code' => $location->prefix . '001',
+        'surface_floor' => 2569.12,
+        'floor_material_other' => 'Concrete',
+        'surface_walls' => 256.9,
+        'wall_material_other' => 'Van Gogh',
         'reference_code' => $this->floor->reference_code . '-' . $location->prefix . '001',
         'level_id' => $this->floor->id
     ]);
@@ -120,6 +170,7 @@ it('can create a new room', function () {
 });
 
 it('can attach a provider to a building\'s maintainable', function () {
+    CategoryType::factory()->create(['category' => 'provider']);
     $provider = Provider::factory()->create();
 
     $location = LocationType::where('level', 'room')->first();
@@ -132,16 +183,15 @@ it('can attach a provider to a building\'s maintainable', function () {
         'providers' => [$provider->id]
     ];
 
-    $response = $this->postToTenant('tenant.rooms.store', $formData);
-    $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.rooms.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     $room = Room::first();
     assertCount(1, $room->maintainable->providers);
 });
 
 it('can upload several files to site', function () {
-
-
     $location = LocationType::where('level', 'room')->first();
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
@@ -171,8 +221,9 @@ it('can upload several files to site', function () {
         ]
     ];
 
-    $response = $this->postToTenant('tenant.rooms.store', $formData);
-    $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.rooms.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
     assertDatabaseCount('documents', 2);
     assertDatabaseHas('documentables', [
@@ -230,7 +281,8 @@ it('can render the update floor page', function () {
 
 
 it('can update a room maintainable', function () {
-
+    $wallMaterial = CategoryType::factory()->create(['category' => 'wall_materials']);
+    $floorMaterial = CategoryType::factory()->create(['category' => 'floor_materials']);
     $locationType = LocationType::where('level', 'room')->first();
     $room = Room::factory()
         ->for(LocationType::where('level', 'room')->first())
@@ -244,18 +296,17 @@ it('can update a room maintainable', function () {
         'name' => 'New room',
         'surface_floor' => 2569.12,
         'surface_walls' => 256.9,
+        'wall_material_id' => $wallMaterial->id,
+        'floor_material_id' => $floorMaterial->id,
         'description' => 'Description new room',
         'levelType' => $this->floor->id,
         'locationType' => $locationType->id
     ];
 
-    $response = $this->patchToTenant('tenant.rooms.update', $formData, $room);
-    $response->assertStatus(302);
-    $response->assertSessionHasNoErrors();
+    $response = $this->patchToTenant('api.rooms.update', $formData, $room);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
-    assertDatabaseCount('sites', 1);
-    assertDatabaseCount('buildings', 1);
-    assertDatabaseCount('floors', 1);
     assertDatabaseCount('rooms', 1);
     assertDatabaseCount('maintainables', 4);
 
@@ -264,6 +315,8 @@ it('can update a room maintainable', function () {
         'level_id' => $this->floor->id,
         'surface_floor' => 2569.12,
         'surface_walls' => 256.9,
+        'wall_material_id' => $wallMaterial->id,
+        'floor_material_id' => $floorMaterial->id,
         'code' => $locationType->prefix . '001',
         'reference_code' => $this->floor->reference_code . '-' . $locationType->prefix . '001',
     ]);
@@ -296,8 +349,9 @@ it('cannot update a room type of an existing room', function () {
         'locationType' => 5
     ];
 
-    $response = $this->patchToTenant('tenant.rooms.update', $formData, $room);
-    $response->assertRedirect();
+    $response = $this->patchToTenant('api.rooms.update', $formData, $room);
+    $response->assertStatus(400)
+        ->assertJson(['status' => 'error']);
     $response->assertSessionHasErrors([
         'locationType' => 'You cannot change the type of a location',
     ]);
@@ -315,8 +369,9 @@ it('can delete a room and his maintainable', function () {
         'code' => $room->code
     ]);
 
-    $response = $this->deleteFromTenant('tenant.rooms.destroy', $room->reference_code);
-    $response->assertStatus(302);
+    $response = $this->deleteFromTenant('api.rooms.destroy', $room->reference_code);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
     assertDatabaseMissing('rooms', [
         'reference_code' => $room->reference_code
     ]);

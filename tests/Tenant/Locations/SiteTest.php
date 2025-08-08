@@ -88,11 +88,13 @@ it('can create a new site', function () {
         'surface_walls' => 256.9,
         'wall_material_id' => $wallMaterial->id,
         'reference_code' => $this->siteType->prefix . '01',
+        'need_maintenance' => false
     ]);
 
     assertDatabaseHas('maintainables', [
         'name' => 'New site',
         'description' => 'Description new site',
+        'need_maintenance' => false
     ]);
 });
 
@@ -131,6 +133,7 @@ it('can create a new site with other matherials', function () {
     assertDatabaseHas('maintainables', [
         'name' => 'New site',
         'description' => 'Description new site',
+        'need_maintenance' => false
     ]);
 });
 
