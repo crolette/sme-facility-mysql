@@ -5,6 +5,7 @@ import { Input } from './ui/input';
 // Types conditionnels pour une API propre
 interface BaseSearchableSelectProps<T> {
     searchUrl: string;
+    searchParams?: object;
     getDisplayText: (item: T) => string;
     getKey: (item: T) => string | number;
     placeholder?: string;
@@ -52,6 +53,7 @@ function Chip<T>({ item, getDisplayText, onRemove }: ChipProps<T>) {
 function SearchableSelect<T>(props: SearchableSelectProps<T>) {
     const {
         searchUrl,
+        searchParams,
         onSelect,
         getDisplayText,
         getKey,
@@ -88,7 +90,7 @@ function SearchableSelect<T>(props: SearchableSelectProps<T>) {
         try {
             setIsSearching(true);
             const response = await axios.get(searchUrl, {
-                params: { q: query },
+                params: { q: query, ...searchParams },
             });
             setItems(response.data.data || response.data);
             setIsSearching(false);

@@ -67,10 +67,10 @@ class APIAssetController extends Controller
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
-            return ApiResponse::success('', 'ERROR : ' . $e->getMessage());
+            return ApiResponse::error('', 'ERROR : ' . $e->getMessage());
             return redirect()->back()->with(['message' => 'ERROR : ' . $e->getMessage(), 'type' => 'error']);
         }
-        return ApiResponse::success('', 'Error while creating an asset');
+        return ApiResponse::error('', 'Error while creating an asset');
     }
 
     /**
@@ -103,7 +103,7 @@ class APIAssetController extends Controller
 
             DB::commit();
 
-            return ApiResponse::success('', 'Asset updated');
+            return ApiResponse::success(['reference_code' => $asset->reference_code], 'Asset updated');
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());

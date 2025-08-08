@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
+use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Company;
@@ -20,11 +21,15 @@ class AssetService
         try {
             DB::beginTransaction();
             $location = match ($locationType) {
+                'user'  => User::findOrFail($locationId),
                 'site'  => Site::findOrFail($locationId),
                 'building' => Building::findOrFail($locationId),
                 'floor' => Floor::findOrFail($locationId),
                 'room' => Room::findOrFail($locationId),
             };
+
+            if (!$location)
+                throw new Exception("No location found");
 
             if (!$asset->code) {
                 $count = Company::incrementAndGetAssetNumber();
@@ -32,7 +37,8 @@ class AssetService
                 $asset->code = $codeNumber;
             }
 
-            $referenceCode = $location->reference_code . '-' . $asset->code;
+            $referenceCode = $locationType === 'user' ? $asset->code : $location->reference_code . '-' . $asset->code;
+            // $referenceCode = $location->reference_code . '-' . $asset->code;
 
             if ($asset->location) {
                 $asset->location()->dissociate();

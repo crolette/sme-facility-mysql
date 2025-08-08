@@ -114,6 +114,50 @@ it('can create a new asset to site', function () {
     ]);
 });
 
+
+it('can create a new mobile asset', function () {
+
+    $formData = [
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+        'is_mobile' => true,
+        'locationId' => $this->user->id,
+        'locationType' => 'user',
+        'surface' => 12,
+        'categoryId' => $this->categoryType->id,
+        'need_maintenance' => false
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+
+    $asset = Asset::first();
+
+    assertDatabaseCount('assets', 1);
+
+    assertDatabaseHas('assets', [
+        'code' => 'A0001',
+        'reference_code' => 'A0001',
+        'location_type' => get_class($this->user),
+        'location_id' => $this->user->id,
+        'category_type_id' => $this->categoryType->id,
+        'surface' => 12,
+    ]);
+
+    assertDatabaseHas('maintainables', [
+        'maintainable_type' => get_class($asset),
+        'maintainable_id' => $asset->id,
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+    ]);
+});
+
+
+
+
+
 it('can create a new asset to building', function () {
 
     $formData = [
@@ -212,23 +256,6 @@ it('cannot create a new asset with non existing building', function () {
     $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasErrors([
         'locationId' => 'The selected location id is invalid.'
-    ]);
-});
-
-it('cannot create a new asset with non existing location reference code', function () {
-
-    $formData = [
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'locationId' => $this->building->id,
-        'locationReference' => 'ABC123',
-        'locationType' => 'building',
-        'categoryId' => $this->categoryType->id,
-    ];
-
-    $response = $this->postToTenant('api.assets.store', $formData);
-    $response->assertSessionHasErrors([
-        'locationReference' => 'The selected location reference is invalid.'
     ]);
 });
 
@@ -601,7 +628,7 @@ it('fails when serial_number has more than 50 chars', function () {
 
 
 it('can attach a provider to an asset\'s maintainable', function () {
-
+    CategoryType::factory()->create(['category' => 'provider']);
     $provider = Provider::factory()->create();
 
     $formData = [
@@ -624,7 +651,7 @@ it('can attach a provider to an asset\'s maintainable', function () {
 
 
 it('can update providers to an asset\'s maintainable', function () {
-
+    CategoryType::factory()->create(['category' => 'provider']);
     Provider::factory()->count(3)->create();
     $providers = Provider::all()->pluck('id');
     $asset = Asset::factory()->forLocation($this->room)->create();

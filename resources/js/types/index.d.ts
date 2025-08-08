@@ -101,6 +101,7 @@ export interface TenantRoom extends TenantSite {
 
 export interface Asset {
     id: number;
+    is_mobile: boolean;
     name: string;
     description: string;
     code: string;
@@ -122,7 +123,7 @@ export interface Asset {
     updated_at?: string;
     asset_category: AssetCategory;
     maintainable: Maintainable;
-    location: TenantSite | TenantBuilding | TenantFloor | TenantRoom;
+    location: TenantSite | TenantBuilding | TenantFloor | TenantRoom | User;
 }
 
 export interface Picture {

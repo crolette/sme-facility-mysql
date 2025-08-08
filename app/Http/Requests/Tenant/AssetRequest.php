@@ -37,10 +37,10 @@ class AssetRequest extends FormRequest
 
         $rules = [
             'need_qr_code' => 'sometimes|boolean',
-            'locationType' => ['nullable', 'in:site,building,floor,room'],
+            'is_mobile' => 'sometimes|boolean',
+            'locationType' => ['nullable', 'in:user,site,building,floor,room'],
             'locationId' => ['nullable'],
             'surface' => 'nullable|numeric|gt:0|decimal:0,2',
-            'locationReference' => ['nullable'],
             'categoryId' => ['required', Rule::in(CategoryType::where('category', 'asset')->pluck('id')->toArray())],
             'model' => ['nullable', 'string', 'max:100'],
             'brand' => ['nullable', 'string', 'max:100'],
@@ -57,7 +57,7 @@ class AssetRequest extends FormRequest
             ]);;
         }
 
-        if ($type !== null && !in_array($type, ['site', 'building', 'floor', 'room'], true)) {
+        if ($type !== null && !in_array($type, ['user', 'site', 'building', 'floor', 'room'], true)) {
             throw ValidationException::withMessages([
                 'locationType' => __('validation.in', ['attribute' => 'location type'])
             ]);
@@ -66,8 +66,9 @@ class AssetRequest extends FormRequest
 
 
 
-        if (in_array($type, ['site', 'building', 'floor', 'room'], true)) {
+        if (in_array($type, ['user', 'site', 'building', 'floor', 'room'], true)) {
             $modelMap = [
+                'user' => \App\Models\Tenants\User::class,
                 'site' => \App\Models\Tenants\Site::class,
                 'building' => \App\Models\Tenants\Building::class,
                 'floor' => \App\Models\Tenants\Floor::class,
@@ -80,14 +81,12 @@ class AssetRequest extends FormRequest
         // TODO Required_with rule ?
 
         if ($isCreate) {
-            $rules['locationType'] = ['required', 'in:site,building,floor,room'];
+            $rules['locationType'] = ['required', 'in:user,site,building,floor,room'];
             $rules['locationId'] = ['required', Rule::in($model::pluck('id')->toArray())];
-            $rules['locationReference'] = ['required', Rule::in($model::pluck('reference_code')->toArray())];
         } else {
-            if ($this->filled('locationType') || $this->filled('locationId') || $this->filled('locationReference')) {
-                $rules['locationType'] = ['required', 'in:site,building,floor,room'];
+            if ($this->filled('locationType') || $this->filled('locationId')) {
+                $rules['locationType'] = ['required', 'in:user,site,building,floor,room'];
                 $rules['locationId'] = ['required', Rule::in($model::pluck('id')->toArray())];
-                $rules['locationReference'] = ['required', Rule::in($model::pluck('reference_code')->toArray())];
             }
         }
 

@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { Asset, AssetCategory, CentralType, Provider, User, type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
@@ -21,6 +21,7 @@ interface Provider {
 type TypeFormData = {
     q: string;
     name: string;
+    is_mobile?: boolean;
     need_qr_code?: boolean;
     surface: null | number;
     description: string;
@@ -79,6 +80,8 @@ export default function CreateAsset({
         },
     ];
 
+    console.log(asset);
+
     const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
     const { data, setData, post, errors } = useForm<TypeFormData>({
         q: '',
@@ -86,9 +89,9 @@ export default function CreateAsset({
         description: asset?.maintainable.description ?? '',
         surface: asset?.surface ?? null,
         locationId: asset?.location_id ?? '',
-        locationReference: asset?.location.reference_code ?? '',
-        locationType: asset?.location.location_type.level ?? '',
-        locationName: asset?.location.maintainable.name ?? '',
+        locationReference: asset?.is_mobile ? '' : (asset?.location.reference_code ?? ''),
+        locationType: asset?.is_mobile ? 'user' : (asset?.location.location_type.level ?? ''),
+        locationName: asset?.is_mobile ? asset.location.full_name : (asset?.location.maintainable.name ?? ''),
         categoryId: asset?.asset_category.id ?? '',
         maintenance_manager_id: asset?.maintainable?.maintenance_manager_id ?? null,
         maintenance_manager_name: asset?.maintainable?.manager?.full_name ?? '',
@@ -96,6 +99,7 @@ export default function CreateAsset({
         purchase_cost: asset?.maintainable.purchase_cost ?? null,
         under_warranty: asset?.maintainable.under_warranty ?? false,
         end_warranty_date: asset?.maintainable.end_warranty_date ?? '',
+        is_mobile: asset?.is_mobile ?? false,
         need_qr_code: false,
         need_maintenance: asset?.maintainable.need_maintenance ?? false,
         maintenance_frequency: asset?.maintainable.maintenance_frequency ?? '',
@@ -108,6 +112,8 @@ export default function CreateAsset({
         pictures: [],
         providers: [],
     });
+
+    console.log(data);
 
     const [listIsOpen, setListIsOpen] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
@@ -147,18 +153,31 @@ export default function CreateAsset({
         }
     }, [debouncedSearch]);
 
-    const submit: FormEventHandler = (e) => {
+    const submit: FormEventHandler = async (e) => {
         e.preventDefault();
+
         if (asset) {
-            post(route(`api.assets.update`, asset.reference_code), {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-HTTP-Method-Override': 'PATCH',
-                    Accept: 'application/json',
-                },
-            });
+            try {
+                const response = await axios.patch(route(`api.assets.update`, asset.reference_code), data);
+                if (response.data.status === 'success') {
+                    router.visit(route(`tenant.assets.show`, response.data.data.reference_code), {
+                        preserveScroll: false,
+                    });
+                }
+            } catch (error) {
+                console.log(error);
+            }
         } else {
-            post(route(`api.assets.store`));
+            try {
+                const response = await axios.post(route(`api.assets.store`), data);
+                if (response.data.status === 'success') {
+                    router.visit(route(`tenant.assets.index`), {
+                        preserveScroll: false,
+                    });
+                }
+            } catch (error) {
+                console.log(error);
+            }
         }
     };
 
@@ -310,55 +329,133 @@ export default function CreateAsset({
                     <div>
                         <p>Asset Reference: {asset.reference_code}</p>
                         <p>Asset Code: {asset.code} </p>
-                        <p>
-                            Asset attached to : {asset.location.maintainable.name} - {asset.location.location_type.label}
-                        </p>
+                        {asset?.is_mobile ? (
+                            <p>Asset attached to : {asset.location.full_name}</p>
+                        ) : (
+                            <p>
+                                Asset attached to : {asset.location.maintainable.name} - {asset.location.location_type.label}
+                            </p>
+                        )}
                     </div>
                 )}
                 <form onSubmit={submit}>
-                    <Label htmlFor="search">Search</Label>
-                    <div className="relative">
-                        <Input type="search" value={data.q} onChange={(e) => setData('q', e.target.value)} placeholder="Search by code or name" />
-                        <ul className="bg-background absolute z-10 flex w-full flex-col border" aria-autocomplete="list" role="listbox">
-                            {isSearching && (
-                                <li value="0" key="" className="">
-                                    Searching...
-                                </li>
-                            )}
-                            {listIsOpen &&
-                                locations &&
-                                locations.length > 0 &&
-                                locations?.map((location) => (
-                                    <li
-                                        role="option"
-                                        value={location.reference_code}
-                                        key={location.reference_code}
-                                        onClick={() => setSelectedLocation(location)}
-                                        className="hover:bg-foreground hover:text-background cursor-pointer p-2 text-sm"
-                                    >
-                                        {location.name + ' (' + location.reference_code + ')'}
-                                    </li>
-                                ))}
-                            {listIsOpen && locations && locations.length == 0 && (
-                                <>
-                                    <li value="0" key="">
-                                        No results
-                                    </li>
-                                </>
-                            )}
-                        </ul>
-                    </div>
-                    {/* {data.locationName && ( */}
-                    <>
-                        <Label htmlFor="locationType">Level</Label>
-                        <Input
-                            type="text"
-                            disabled
-                            value={data.locationName ? data.locationName + ' - ' + data.locationReference : 'No location selected'}
+                    <div>
+                        <Label htmlFor="is_mobile">Mobile asset ?</Label>
+                        <Checkbox
+                            id="is_mobile"
+                            name="is_mobile"
+                            checked={data.is_mobile ?? true}
+                            onClick={() =>
+                                setData((prev) => ({
+                                    ...prev,
+                                    is_mobile: !data.is_mobile,
+                                    locationId: '',
+                                    locationName: '',
+                                    locationReference: '',
+                                    locationType: '',
+                                }))
+                            }
                         />
-                        <InputError className="mt-2" message={errors.locationType} />
-                    </>
-                    {/* )} */}
+                        <InputError className="mt-2" message={errors.is_mobile} />
+                    </div>
+                    {data.is_mobile ? (
+                        <>
+                            <div>
+                                <label className="mb-2 block text-sm font-medium">User of the mobile asset</label>
+                                <SearchableInput<User>
+                                    searchUrl={route('api.users.search')}
+                                    searchParams={{ interns: 1 }}
+                                    displayValue={data.locationName}
+                                    getDisplayText={(user) => user.full_name}
+                                    getKey={(user) => user.id}
+                                    onSelect={(user) => {
+                                        setData('locationId', user.id);
+                                        setData('locationName', user.full_name);
+                                        setData('locationType', 'user');
+                                    }}
+                                    placeholder="Search user..."
+                                    className="mb-4"
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <Label htmlFor="search">Search</Label>
+                            <div className="relative">
+                                <Input
+                                    type="search"
+                                    value={data.q}
+                                    onChange={(e) => setData('q', e.target.value)}
+                                    placeholder="Search by code or name"
+                                />
+                                <ul className="bg-background absolute z-10 flex w-full flex-col border" aria-autocomplete="list" role="listbox">
+                                    {isSearching && (
+                                        <li value="0" key="" className="">
+                                            Searching...
+                                        </li>
+                                    )}
+                                    {listIsOpen &&
+                                        locations &&
+                                        locations.length > 0 &&
+                                        locations?.map((location) => (
+                                            <li
+                                                role="option"
+                                                value={location.reference_code}
+                                                key={location.reference_code}
+                                                onClick={() => setSelectedLocation(location)}
+                                                className="hover:bg-foreground hover:text-background cursor-pointer p-2 text-sm"
+                                            >
+                                                {location.name + ' (' + location.reference_code + ')'}
+                                            </li>
+                                        ))}
+                                    {listIsOpen && locations && locations.length == 0 && (
+                                        <>
+                                            <li value="0" key="">
+                                                No results
+                                            </li>
+                                        </>
+                                    )}
+                                </ul>
+                            </div>
+                            {/* {data.locationName && ( */}
+                            <>
+                                <Label htmlFor="locationType">Level</Label>
+                                <Input
+                                    type="text"
+                                    disabled
+                                    value={data.locationName ? data.locationName + ' - ' + data.locationReference : 'No location selected'}
+                                />
+                                <InputError className="mt-2" message={errors.locationType} />
+                            </>
+                            {/* )} */}
+                        </>
+                    )}
+
+                    <Label htmlFor="name">Name</Label>
+                    <Input
+                        id="name"
+                        type="text"
+                        required
+                        autoFocus
+                        maxLength={100}
+                        value={data.name}
+                        onChange={(e) => setData('name', e.target.value)}
+                        placeholder="Asset name"
+                    />
+                    <InputError className="mt-2" message={errors.name} />
+
+                    {!asset && (
+                        <div>
+                            <Label htmlFor="need_qr_code">Need QR Code ?</Label>
+                            <Checkbox
+                                id="need_qr_code"
+                                name="need_qr_code"
+                                checked={data.need_qr_code ?? true}
+                                onClick={() => setData('need_qr_code', !data.need_qr_code)}
+                            />
+                            <InputError className="mt-2" message={errors.need_qr_code} />
+                        </div>
+                    )}
 
                     <Label htmlFor="name">Category</Label>
                     <select
@@ -387,32 +484,6 @@ export default function CreateAsset({
                         )}
                     </select>
                     <InputError className="mt-2" message={errors.categoryId} />
-
-                    <Label htmlFor="name">Name</Label>
-                    <Input
-                        id="name"
-                        type="text"
-                        required
-                        autoFocus
-                        maxLength={100}
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
-                        placeholder="Asset name"
-                    />
-                    <InputError className="mt-2" message={errors.name} />
-
-                    {!asset && (
-                        <div>
-                            <Label htmlFor="need_qr_code">Need QR Code ?</Label>
-                            <Checkbox
-                                id="need_qr_code"
-                                name="need_qr_code"
-                                checked={data.need_qr_code ?? true}
-                                onClick={() => setData('need_qr_code', !data.need_qr_code)}
-                            />
-                            <InputError className="mt-2" message={errors.need_qr_code} />
-                        </div>
-                    )}
 
                     <Label htmlFor="description">Description</Label>
                     <Input
@@ -598,6 +669,7 @@ export default function CreateAsset({
                         <label className="mb-2 block text-sm font-medium">Maintenance manager</label>
                         <SearchableInput<User>
                             searchUrl={route('api.users.search')}
+                            searchParams={{ interns: 1 }}
                             displayValue={data.maintenance_manager_name}
                             getDisplayText={(user) => user.full_name}
                             getKey={(user) => user.id}

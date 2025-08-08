@@ -50,7 +50,7 @@ class MaintainableRequest extends FormRequest
         return [
             'name' => 'required|string|min:6|max:100',
             'description' => 'nullable|string|min:10|max:255',
-            'purchase_date' => ['nullable', 'date', Rule::date()->beforeOrEqual(today())],
+            'purchase_date' => ['nullable', 'date', Rule::date()->todayOrBefore()],
             'purchase_cost' => 'nullable|numeric|gt:0|decimal:0,2',
             'under_warranty' => "boolean",
             'end_warranty_date' => "nullable|date|required_if_accepted:under_warranty|after:purchase_date",
@@ -60,8 +60,8 @@ class MaintainableRequest extends FormRequest
 
             'need_maintenance' => "boolean",
             'maintenance_frequency' => ['nullable', 'required_if_accepted:need_maintenance', Rule::in($frequencies)],
-            'next_maintenance_date' => ['nullable', 'date', Rule::date()->afterToday()],
-            'last_maintenance_date' =>  ['nullable', 'date', Rule::date()->beforeToday()],
+            'next_maintenance_date' => ['nullable', 'date', Rule::date()->todayOrAfter()],
+            'last_maintenance_date' =>  ['nullable', 'date', Rule::date()->todayOrBefore()],
         ];
     }
 }

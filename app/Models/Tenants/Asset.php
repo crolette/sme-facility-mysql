@@ -31,7 +31,8 @@ class Asset extends Model
         'serial_number',
         'brand',
         'model',
-        'qr_code'
+        'qr_code',
+        'is_mobile'
     ];
 
     protected $hidden = [
@@ -48,6 +49,10 @@ class Asset extends Model
         'name',
         'description',
         'category',
+    ];
+
+    protected $casts = [
+        'is_mobile' => 'boolean',
     ];
 
     // Ensure route model binding use the slug instead of ID

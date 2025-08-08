@@ -28,7 +28,11 @@ Route::middleware([
             });
         }
 
-        Debugbar::info($query->get());
+
+        if ($request->query('interns') === '1')
+            $query->whereDoesntHave('provider');
+
+        Debugbar::info($request->query('interns') === '1');
 
         return ApiResponse::success($query->get());
     })->name('api.users.search');

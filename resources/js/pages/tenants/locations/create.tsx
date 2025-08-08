@@ -108,8 +108,6 @@ export default function CreateLocation({
         address: location?.address ?? '',
     });
 
-    console.log(data);
-
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
         if (location) {

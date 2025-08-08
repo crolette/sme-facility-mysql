@@ -49,7 +49,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
 
     const markMaintenanceDone = async () => {
         const response = await axios.post(route('api.maintenance.done', asset.maintainable.id));
-        fetchAsset();
+        if (response.data.status === 'success') fetchAsset();
     };
 
     return (
@@ -92,12 +92,18 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             <div>
                                 <p>Code : {asset.code}</p>
                                 <p>Reference code : {asset.reference_code}</p>
-                                <p>
-                                    Location : {asset.location.name} - {asset.location.description} -{' '}
-                                    <a href={route(`tenant.${asset.location.location_type.level}s.show`, asset.location.reference_code)}>
-                                        {asset.location.reference_code}
-                                    </a>
-                                </p>
+                                {asset.is_mobile ? (
+                                    <p>
+                                        Location :<a href={route(`tenant.users.show`, asset.location.id)}>{asset.location.full_name}</a>
+                                    </p>
+                                ) : (
+                                    <p>
+                                        Location : {asset.location.name} - {asset.location.description} -{' '}
+                                        <a href={route(`tenant.${asset.location.location_type.level}s.show`, asset.location.reference_code)}>
+                                            {asset.location.reference_code}
+                                        </a>
+                                    </p>
+                                )}
                             </div>
                         </div>
                         <div className="shrink-1">
