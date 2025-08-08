@@ -25,6 +25,7 @@ class Site extends Model
         'reference_code',
         'code',
         'qr_code',
+        'address',
         'surface_floor',
         'floor_material_id',
         'floor_material_other',

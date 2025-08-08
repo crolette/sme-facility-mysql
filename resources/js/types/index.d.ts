@@ -61,6 +61,7 @@ export interface Maintainable {
 export interface TenantSite {
     id: number;
     name: string;
+    address: string;
     description: string;
     code: string;
     label: string;

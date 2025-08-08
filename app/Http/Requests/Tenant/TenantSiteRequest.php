@@ -29,6 +29,7 @@ class TenantSiteRequest extends FormRequest
         $siteTypes = LocationType::where('level', 'site')->pluck('id');
 
         return [
+            'address' => 'nullable|string',
             'locationType' => ['required', Rule::in([...$siteTypes])],
             'surface_floor' => 'nullable|numeric|gt:0|decimal:0,2',
             'floor_material_id' => ['nullable', Rule::anyOf([Rule::in(CategoryType::where('category', 'floor_materials')->pluck('id')->toArray()), Rule::in('other')])],

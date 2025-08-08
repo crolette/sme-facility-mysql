@@ -53,7 +53,8 @@ class APISiteController extends Controller
                 'wall_material_id'  => $siteRequest->validated('wall_material_id') === 'other' ? null :  $siteRequest->validated('wall_material_id'),
                 'wall_material_other'  => $siteRequest->validated('wall_material_other'),
                 'reference_code' => $codeNumber,
-                'location_type_id' => $locationType->id
+                'location_type_id' => $locationType->id,
+                'address' => $siteRequest->validated('address')
             ]);
 
             $site = $this->maintainableService->createMaintainable($site, $maintainableRequest);
@@ -102,6 +103,7 @@ class APISiteController extends Controller
                 'surface_walls' => $siteRequest->validated('surface_walls'),
                 'wall_material_id'  => $siteRequest->validated('wall_material_id') === 'other' ? null :  $siteRequest->validated('wall_material_id'),
                 'wall_material_other'  => $siteRequest->validated('wall_material_other'),
+                'address' => $siteRequest->validated('address')
             ]);
 
             $site = $this->maintainableService->createMaintainable($site, $maintainableRequest);

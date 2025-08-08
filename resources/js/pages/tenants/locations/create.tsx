@@ -43,6 +43,7 @@ type TypeFormData = {
         typeSlug: string;
     }[];
     providers: Provider[];
+    address: string;
 };
 
 export default function CreateLocation({
@@ -91,6 +92,7 @@ export default function CreateLocation({
         next_maintenance_date: location?.maintainable.next_maintenance_date ?? '',
         last_maintenance_date: location?.maintainable.last_maintenance_date ?? '',
         providers: [],
+        address: location?.address ?? '',
     });
 
     console.log(location?.floor_material_other != null);
@@ -329,6 +331,23 @@ export default function CreateLocation({
                     />
                     <InputError className="mt-2" message={errors.name} />
 
+                    {routeName === 'sites' && (
+                        <>
+                            <Label htmlFor="address">Address</Label>
+                            <Input
+                                id="address"
+                                type="text"
+                                required
+                                autoFocus
+                                maxLength={100}
+                                value={data.address}
+                                onChange={(e) => setData('address', e.target.value)}
+                                placeholder="address"
+                            />
+                            <InputError className="mt-2" message={errors.address} />
+                        </>
+                    )}
+
                     <div className="flex">
                         <div className="w-full">
                             <Label htmlFor="surface_floor">Surface floor</Label>
@@ -561,9 +580,10 @@ export default function CreateLocation({
                         />
                     </div>
                     {!location && (
-                        <div id="files">
+                        <div id="files" className="flex w-fit flex-col space-y-2">
+                            <Label>Document</Label>
                             <Button onClick={() => setShowFileModal(!showFileModal)} type="button">
-                                Add file
+                                Add document
                             </Button>
                             {selectedDocuments.length > 0 && (
                                 <ul className="flex gap-4">
@@ -595,13 +615,14 @@ export default function CreateLocation({
                             )}
                         </div>
                     )}
-
-                    <Button type="submit">{location ? 'Update' : 'Submit'}</Button>
-                    <a href={location ? route(`tenant.${routeName}.show`, location.reference_code) : route(`tenant.${routeName}.index`)}>
-                        <Button type="button" tabIndex={6} variant={'secondary'}>
-                            Cancel
-                        </Button>
-                    </a>
+                    <div className="mt-2 flex gap-2">
+                        <Button type="submit">{location ? 'Update' : 'Submit'}</Button>
+                        <a href={location ? route(`tenant.${routeName}.show`, location.reference_code) : route(`tenant.${routeName}.index`)}>
+                            <Button type="button" tabIndex={6} variant={'secondary'}>
+                                Cancel
+                            </Button>
+                        </a>
+                    </div>
                 </form>
                 {showFileModal && addFileModalForm()}
             </div>

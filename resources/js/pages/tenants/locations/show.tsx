@@ -94,6 +94,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                         <div>
                             <p>Category : {location.category}</p>
                             <p>Name : {location.name}</p>
+                            <p>Address : {location.address}</p>
                             <p>Description : {location.description}</p>
                             <p>
                                 Floor: {location.surface_floor} ({location.floor_material})

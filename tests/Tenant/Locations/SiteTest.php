@@ -65,6 +65,7 @@ it('can create a new site', function () {
     $formData = [
         'name' => 'New site',
         'surface_floor' => 2569.12,
+        'address' => 'Rue du Buisson 22, 4000 Liège, Belgique',
         'floor_material_id' => $floorMaterial->id,
         'surface_walls' => 256.9,
         'wall_material_id' => $wallMaterial->id,
@@ -83,12 +84,12 @@ it('can create a new site', function () {
     assertDatabaseHas('sites', [
         'location_type_id' => $this->siteType->id,
         'code' => $this->siteType->prefix . '01',
+        'address' => 'Rue du Buisson 22, 4000 Liège, Belgique',
         'surface_floor' => 2569.12,
         'floor_material_id' => $floorMaterial->id,
         'surface_walls' => 256.9,
         'wall_material_id' => $wallMaterial->id,
         'reference_code' => $this->siteType->prefix . '01',
-        'need_maintenance' => false
     ]);
 
     assertDatabaseHas('maintainables', [
@@ -221,6 +222,7 @@ it('can update a site maintainable and his name and description', function () {
 
     $formData = [
         'name' => 'New site',
+        'address' => 'Rue du Buisson 22, 4000 Liège, Belgique',
         'surface_floor' => 2569.12,
         'surface_walls' => 256.9,
         'wall_material_id' => $wallMaterial->id,
@@ -239,6 +241,7 @@ it('can update a site maintainable and his name and description', function () {
     assertDatabaseHas('sites', [
         'location_type_id' => $this->siteType->id,
         'code' => $this->siteType->prefix . '01',
+        'address' => 'Rue du Buisson 22, 4000 Liège, Belgique',
         'surface_floor' => 2569.12,
         'surface_walls' => 256.9,
         'wall_material_id' => $wallMaterial->id,
