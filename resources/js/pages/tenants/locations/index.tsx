@@ -15,7 +15,7 @@ export default function IndexSites({ locations, routeName }: { locations: Tenant
     const { delete: destroy } = useForm();
 
     const deleteLocation = (locationCode: string) => {
-        destroy(route(`tenant.${routeName}.destroy`, locationCode));
+        destroy(route(`api.${routeName}.destroy`, locationCode));
     };
 
     return (

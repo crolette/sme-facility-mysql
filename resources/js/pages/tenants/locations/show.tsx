@@ -96,12 +96,22 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                             <p>Name : {location.name}</p>
                             <p>Address : {location.address}</p>
                             <p>Description : {location.description}</p>
-                            <p>
-                                Floor: {location.surface_floor} ({location.floor_material})
-                            </p>
-                            <p>
-                                Walls: {location.surface_walls} ({location.wall_material})
-                            </p>
+                            {location.location_type.slug === 'outdoor' ? (
+                                <>
+                                    <p>
+                                        Outdoor: {location.surface_outdoor} ({location.outdoor_material})
+                                    </p>
+                                </>
+                            ) : (
+                                <>
+                                    <p>
+                                        Floor: {location.surface_floor} ({location.floor_material})
+                                    </p>
+                                    <p>
+                                        Walls: {location.surface_walls} ({location.wall_material})
+                                    </p>
+                                </>
+                            )}
                         </div>
                     </div>
                     {location.maintainable.providers && location.maintainable.providers.length > 0 && (

@@ -57,6 +57,9 @@ class APIBuildingController extends Controller
                 'surface_walls' => $buildingRequest->validated('surface_walls'),
                 'wall_material_id'  => $buildingRequest->validated('wall_material_id') === 'other' ? null :  $buildingRequest->validated('wall_material_id'),
                 'wall_material_other'  => $buildingRequest->validated('wall_material_other'),
+                'surface_outdoor' => $buildingRequest->validated('surface_outdoor'),
+                'outdoor_material_id'  => $buildingRequest->validated('outdoor_material_id') === 'other' ? null :  $buildingRequest->validated('outdoor_material_id'),
+                'outdoor_material_other'  => $buildingRequest->validated('outdoor_material_other'),
                 'reference_code' => $referenceCode,
                 'location_type_id' => $buildingType->id
             ]);
@@ -112,6 +115,9 @@ class APIBuildingController extends Controller
                 'surface_walls' => $buildingRequest->validated('surface_walls'),
                 'wall_material_id'  => $buildingRequest->validated('wall_material_id') === 'other' ? null :  $buildingRequest->validated('wall_material_id'),
                 'wall_material_other'  => $buildingRequest->validated('wall_material_other'),
+                'surface_outdoor' => $buildingRequest->validated('surface_outdoor'),
+                'outdoor_material_id'  => $buildingRequest->validated('outdoor_material_id') === 'other' ? null :  $buildingRequest->validated('outdoor_material_id'),
+                'outdoor_material_other'  => $buildingRequest->validated('outdoor_material_other'),
             ]);
 
             $building = $this->maintainableService->createMaintainable($building, $maintainableRequest);

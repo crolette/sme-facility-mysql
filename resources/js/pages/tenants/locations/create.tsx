@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { CentralType, LocationType, TenantBuilding, TenantFloor, TenantRoom, TenantSite, User, type BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
-import { FormEventHandler, useState } from 'react';
+import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
 interface Provider {
@@ -27,8 +27,12 @@ type TypeFormData = {
     surface_walls: null | number;
     wall_material_id: number | string | null;
     wall_material_other: string;
+    surface_outdoor?: null | number;
+    outdoor_material_id?: number | string | null;
+    outdoor_material_other?: string;
     levelType: string | number;
     locationType: string | number;
+    locationTypeName: string;
     maintenance_manager_id: number | null;
     maintenance_manager_name: string;
     need_maintenance: boolean;
@@ -55,6 +59,7 @@ export default function CreateLocation({
     frequencies,
     wallMaterials,
     floorMaterials,
+    outdoorMaterials,
 }: {
     location?: TenantSite | TenantBuilding | TenantFloor | TenantRoom;
     levelTypes: LocationType[] | TenantSite[] | TenantFloor[];
@@ -62,6 +67,7 @@ export default function CreateLocation({
     documentTypes: CentralType[];
     wallMaterials: CentralType[];
     floorMaterials: CentralType[];
+    outdoorMaterials: CentralType[];
     frequencies: string[];
     routeName: string;
 }) {
@@ -79,11 +85,15 @@ export default function CreateLocation({
         surface_floor: location?.surface_floor ?? null,
         floor_material_id: location?.floor_material_other != null ? 'other' : (location?.floor_material_id ?? null),
         floor_material_other: location?.floor_material_other ?? '',
+        surface_outdoor: location?.surface_outdoor ?? null,
+        outdoor_material_id: location?.outdoor_material_other != null ? 'other' : (location?.outdoor_material_id ?? null),
+        outdoor_material_other: location?.outdoor_material_other ?? '',
         surface_walls: location?.surface_walls ?? null,
         wall_material_id: location?.wall_material_other != null ? 'other' : (location?.wall_material_id ?? null),
         wall_material_other: location?.wall_material_other ?? '',
         levelType: location?.level_id ?? '',
         locationType: locationTypes.length == 1 ? locationTypes[0].id : (location?.location_type?.id ?? ''),
+        locationTypeName: locationTypes.find((type) => type.id === location?.location_type.id)?.slug ?? '',
         files: selectedDocuments,
         maintenance_manager_id: location?.maintainable?.maintenance_manager_id ?? null,
         maintenance_manager_name: location?.maintainable?.manager?.full_name ?? '',
@@ -95,7 +105,7 @@ export default function CreateLocation({
         address: location?.address ?? '',
     });
 
-    console.log(location?.floor_material_other != null);
+    console.log(data);
 
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
@@ -250,6 +260,32 @@ export default function CreateLocation({
         );
     };
 
+    useEffect(() => {
+        if (routeName === 'buildings') {
+            if (data.locationTypeName === 'outdoor') {
+                setData((prev) => ({
+                    ...prev,
+                    surface_floor: null,
+                    floor_material_id: '',
+                    floor_material_other: '',
+                    surface_walls: null,
+                    wall_material_id: '',
+                    wall_material_other: '',
+                }));
+            } else if (
+                data.locationTypeName !== 'outdoor' &&
+                (data.surface_outdoor !== null || data.outdoor_material_id !== '' || data.outdoor_material_other !== '')
+            ) {
+                setData((prev) => ({
+                    ...prev,
+                    surface_outdoor: null,
+                    outdoor_material_id: '',
+                    outdoor_material_other: '',
+                }));
+            }
+        }
+    }, [data.locationTypeName]);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Create location type`} />
@@ -296,7 +332,10 @@ export default function CreateLocation({
                             <select
                                 name="location-type"
                                 value={data.locationType}
-                                onChange={(e) => setData('locationType', e.target.value)}
+                                onChange={(e) => {
+                                    setData('locationType', e.target.value);
+                                    setData('locationTypeName', locationTypes.find((type) => type.id === parseInt(e.target.value))?.slug ?? '');
+                                }}
                                 disabled={location ? true : false}
                                 id="location-type"
                                 className={cn(
@@ -348,122 +387,187 @@ export default function CreateLocation({
                         </>
                     )}
 
-                    <div className="flex">
-                        <div className="w-full">
-                            <Label htmlFor="surface_floor">Surface floor</Label>
-                            <Input
-                                id="surface_floor"
-                                type="number"
-                                min={0}
-                                step="0.01"
-                                value={data.surface_floor ?? ''}
-                                placeholder="Surface floor (max. 2 decimals) : 4236.3"
-                                onChange={(e) => setData('surface_floor', parseFloat(e.target.value))}
-                            />
-                            <InputError className="mt-2" message={errors.surface_floor} />
-                        </div>
-                        {floorMaterials && (
+                    {data.locationTypeName === 'outdoor' && (
+                        <div className="flex">
                             <div className="w-full">
-                                <Label htmlFor="floor_material_id">floor material</Label>
-                                <select
-                                    name="floor_material_id-type"
-                                    value={data.floor_material_id ?? ''}
-                                    onChange={(e) => {
-                                        if (e.target.value !== 'other') {
-                                            setData('floor_material_other', '');
-                                        }
-                                        setData('floor_material_id', e.target.value);
-                                    }}
-                                    id="floor_material_id"
-                                    className={cn(
-                                        'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                                    )}
-                                >
-                                    <option value="" disabled>
-                                        -- Select a floor material --
-                                    </option>
-
-                                    {floorMaterials.map((type) => (
-                                        <option value={type.id} key={type.id}>
-                                            {type.label}
+                                <Label htmlFor="surface_floor">Surface outdoor</Label>
+                                <Input
+                                    id="surface_outdoor"
+                                    type="number"
+                                    min={0}
+                                    step="0.01"
+                                    value={data.surface_outdoor ?? ''}
+                                    placeholder="Surface outdoor (max. 2 decimals) : 4236.3"
+                                    onChange={(e) => setData('surface_outdoor', parseFloat(e.target.value))}
+                                />
+                                <InputError className="mt-2" message={errors.surface_outdoor} />
+                            </div>
+                            {outdoorMaterials && (
+                                <div className="w-full">
+                                    <Label htmlFor="outdoor_material_id">outdoor material</Label>
+                                    <select
+                                        name="outdoor_material_id-type"
+                                        value={data.outdoor_material_id ?? ''}
+                                        onChange={(e) => {
+                                            if (e.target.value !== 'other') {
+                                                setData('outdoor_material_other', '');
+                                            }
+                                            setData('outdoor_material_id', e.target.value);
+                                        }}
+                                        id="outdoor_material_id"
+                                        className={cn(
+                                            'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                            'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                        )}
+                                    >
+                                        <option value="" disabled>
+                                            -- Select a outdoor material --
                                         </option>
-                                    ))}
-                                    <option value="other">Other</option>
-                                </select>
-                                <InputError className="mt-2" message={errors.locationType} />
-                                {data.floor_material_id === 'other' && (
-                                    <div>
-                                        <Input
-                                            type="text"
-                                            value={data.floor_material_other}
-                                            placeholder="other floor material"
-                                            onChange={(e) => setData('floor_material_other', e.target.value)}
-                                        />
+
+                                        {outdoorMaterials.map((type) => (
+                                            <option value={type.id} key={type.id}>
+                                                {type.label}
+                                            </option>
+                                        ))}
+                                        <option value="other">Other</option>
+                                    </select>
+                                    <InputError className="mt-2" message={errors.locationType} />
+                                    {data.outdoor_material_id === 'other' && (
+                                        <div>
+                                            <Input
+                                                type="text"
+                                                value={data.outdoor_material_other}
+                                                placeholder="other outdoor material"
+                                                onChange={(e) => setData('outdoor_material_other', e.target.value)}
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {data.locationTypeName !== 'outdoor' && (
+                        <>
+                            <div className="flex">
+                                <div className="w-full">
+                                    <Label htmlFor="surface_floor">Surface floor</Label>
+                                    <Input
+                                        id="surface_floor"
+                                        type="number"
+                                        min={0}
+                                        step="0.01"
+                                        value={data.surface_floor ?? ''}
+                                        placeholder="Surface floor (max. 2 decimals) : 4236.3"
+                                        onChange={(e) => setData('surface_floor', parseFloat(e.target.value))}
+                                    />
+                                    <InputError className="mt-2" message={errors.surface_floor} />
+                                </div>
+                                {floorMaterials && (
+                                    <div className="w-full">
+                                        <Label htmlFor="floor_material_id">floor material</Label>
+                                        <select
+                                            name="floor_material_id-type"
+                                            value={data.floor_material_id ?? ''}
+                                            onChange={(e) => {
+                                                if (e.target.value !== 'other') {
+                                                    setData('floor_material_other', '');
+                                                }
+                                                setData('floor_material_id', e.target.value);
+                                            }}
+                                            id="floor_material_id"
+                                            className={cn(
+                                                'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                            )}
+                                        >
+                                            <option value="" disabled>
+                                                -- Select a floor material --
+                                            </option>
+
+                                            {floorMaterials.map((type) => (
+                                                <option value={type.id} key={type.id}>
+                                                    {type.label}
+                                                </option>
+                                            ))}
+                                            <option value="other">Other</option>
+                                        </select>
+                                        <InputError className="mt-2" message={errors.locationType} />
+                                        {data.floor_material_id === 'other' && (
+                                            <div>
+                                                <Input
+                                                    type="text"
+                                                    value={data.floor_material_other}
+                                                    placeholder="other floor material"
+                                                    onChange={(e) => setData('floor_material_other', e.target.value)}
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
-                        )}
-                    </div>
-                    <div className="flex">
-                        <div className="w-full">
-                            <Label htmlFor="surface_walls">Surface walls</Label>
-                            <Input
-                                id="surface_walls"
-                                type="number"
-                                min={0}
-                                step="0.01"
-                                value={data.surface_walls ?? ''}
-                                onChange={(e) => setData('surface_walls', parseFloat(e.target.value))}
-                                placeholder="Surface walls (max. 2 decimals) : 4236.3"
-                            />
-                            <InputError className="mt-2" message={errors.surface_walls} />
-                        </div>
-                        {wallMaterials && (
-                            <div className="w-full">
-                                <Label htmlFor="wall_material_id">Wall material</Label>
-                                <select
-                                    name="wall_material_id"
-                                    value={data.wall_material_id ?? ''}
-                                    onChange={(e) => {
-                                        if (e.target.value !== 'other') {
-                                            setData('wall_material_other', '');
-                                        }
-                                        setData('wall_material_id', e.target.value);
-                                    }}
-                                    id="wall_material_id"
-                                    className={cn(
-                                        'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                                    )}
-                                >
-                                    <option value="" disabled>
-                                        -- Select a wall material --
-                                    </option>
+                            <div className="flex">
+                                <div className="w-full">
+                                    <Label htmlFor="surface_walls">Surface walls</Label>
+                                    <Input
+                                        id="surface_walls"
+                                        type="number"
+                                        min={0}
+                                        step="0.01"
+                                        value={data.surface_walls ?? ''}
+                                        onChange={(e) => setData('surface_walls', parseFloat(e.target.value))}
+                                        placeholder="Surface walls (max. 2 decimals) : 4236.3"
+                                    />
+                                    <InputError className="mt-2" message={errors.surface_walls} />
+                                </div>
+                                {wallMaterials && (
+                                    <div className="w-full">
+                                        <Label htmlFor="wall_material_id">Wall material</Label>
+                                        <select
+                                            name="wall_material_id"
+                                            value={data.wall_material_id ?? ''}
+                                            onChange={(e) => {
+                                                if (e.target.value !== 'other') {
+                                                    setData('wall_material_other', '');
+                                                }
+                                                setData('wall_material_id', e.target.value);
+                                            }}
+                                            id="wall_material_id"
+                                            className={cn(
+                                                'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                            )}
+                                        >
+                                            <option value="" disabled>
+                                                -- Select a wall material --
+                                            </option>
 
-                                    {wallMaterials.map((type) => (
-                                        <option value={type.id} key={type.id}>
-                                            {type.label}
-                                        </option>
-                                    ))}
-                                    <option value="other">Other</option>
-                                </select>
-                                <InputError className="mt-2" message={errors.locationType} />
-                                {data.wall_material_id === 'other' && (
-                                    <div>
-                                        <Input
-                                            type="text"
-                                            value={data.wall_material_other}
-                                            placeholder="other wall material"
-                                            onChange={(e) => setData('wall_material_other', e.target.value)}
-                                        />
+                                            {wallMaterials.map((type) => (
+                                                <option value={type.id} key={type.id}>
+                                                    {type.label}
+                                                </option>
+                                            ))}
+                                            <option value="other">Other</option>
+                                        </select>
+                                        <InputError className="mt-2" message={errors.locationType} />
+                                        {data.wall_material_id === 'other' && (
+                                            <div>
+                                                <Input
+                                                    type="text"
+                                                    value={data.wall_material_other}
+                                                    placeholder="other wall material"
+                                                    onChange={(e) => setData('wall_material_other', e.target.value)}
+                                                />
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
-                        )}
-                    </div>
+                        </>
+                    )}
 
                     <Label htmlFor="name">Description</Label>
                     <Input

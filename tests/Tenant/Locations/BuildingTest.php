@@ -103,6 +103,49 @@ it('can create a new building', function () {
     ]);
 });
 
+
+it('can create a new outdoor zone', function () {
+
+    $siteType = LocationType::factory()->create(['level' => 'site']);
+    $buildingType = LocationType::factory()->create(['level' => 'building', 'slug' => 'outdoor']);
+    $site = Site::factory()->create();
+    $outdoorMaterial = CategoryType::factory()->create(['category' => 'outdoor_materials']);
+
+    $formData = [
+        'name' => 'New building',
+        'surface_outdoor' => 256.9,
+        'outdoor_material_id' => $outdoorMaterial->id,
+        'description' => 'Description new building',
+        'levelType' => $site->id,
+        'locationType' => $buildingType->id,
+        'locationTypeName' => $buildingType->slug,
+        'need_maintenance' => false
+    ];
+
+    $response = $this->postToTenant('api.buildings.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    assertDatabaseCount('buildings', 1);
+    assertDatabaseCount('maintainables', 2);
+
+    assertDatabaseHas('buildings', [
+        'location_type_id' => $buildingType->id,
+        'code' => $buildingType->prefix . '01',
+        'surface_outdoor' => 256.9,
+        'outdoor_material_id' => $outdoorMaterial->id,
+        'reference_code' => $site->reference_code . '-' . $buildingType->prefix . '01',
+        'level_id' => $siteType->id,
+
+    ]);
+
+    assertDatabaseHas('maintainables', [
+        'name' => 'New building',
+        'description' => 'Description new building',
+        'need_maintenance' => false
+    ]);
+});
+
 it('can create a new building with other materials', function () {
 
     $siteType = LocationType::factory()->create(['level' => 'site']);

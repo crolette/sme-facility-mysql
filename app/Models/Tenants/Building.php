@@ -33,6 +33,9 @@ class Building extends Model
         'surface_walls',
         'wall_material_id',
         'wall_material_other',
+        'surface_outdoor',
+        'outdoor_material_id',
+        'outdoor_material_other',
         'location_type_id',
         'level_id'
     ];
@@ -53,6 +56,7 @@ class Building extends Model
         'category',
         'floor_material',
         'wall_material',
+        'outdoor_material'
     ];
 
     // Ensure route model binding use the slug instead of ID
@@ -90,6 +94,11 @@ class Building extends Model
     public function wallMaterialType(): BelongsTo
     {
         return $this->belongsTo(CategoryType::class, 'wall_material_id');
+    }
+
+    public function outdoorMaterialType(): BelongsTo
+    {
+        return $this->belongsTo(CategoryType::class, 'outdoor_material_id');
     }
 
     public function maintainable(): MorphOne
@@ -156,6 +165,15 @@ class Building extends Model
 
         return Attribute::make(
             get: fn() => $this->wallMaterialType ? $this->wallMaterialType->translations->where('locale', $locale)->first()?->label ?? $this->wallMaterialType->translations->where('locale', config('app.fallback_locale'))?->label : $this->wall_material_other  ?? null
+        );
+    }
+
+    public function outdoorMaterial($locale = null): Attribute
+    {
+        $locale = $locale ?? app()->getLocale();
+
+        return Attribute::make(
+            get: fn() => $this->outdoorMaterialType ? $this->outdoorMaterialType->translations->where('locale', $locale)->first()?->label ?? $this->outdoorMaterialType->translations->where('locale', config('app.fallback_locale'))?->label : $this->outdoor_material_other  ?? null
         );
     }
 
