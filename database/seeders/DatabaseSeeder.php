@@ -14,11 +14,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        CentralUser::factory()->create([
-            'first_name' => 'Super',
-            'last_name' => 'Admin',
-            'email' => 'super@sme-facility.com',
-            'password' => Hash::make('SME_2025!fwebxp')
-        ]);
+
+        if (!CentralUser::where('email', 'super@sme-facility.com')->first()) {
+
+            CentralUser::factory()->create([
+                'first_name' => 'Super',
+                'last_name' => 'Admin',
+                'email' => 'super@sme-facility.com',
+                'password' => Hash::make('SME_2025!fwebxp')
+            ]);
+        }
     }
 }

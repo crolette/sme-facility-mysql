@@ -21,14 +21,18 @@ class DatabaseSeeder extends Seeder
             PermissionsSeeder::class,
         ]);
 
-        $user = User::create([
-            'first_name' => 'Super',
-            'last_name' => 'Admin',
-            'email' => 'super@sme-facility.com',
-            'password' => Hash::make('SME_2025!fwebxp'),
-            'can_login' => true
-        ]);
+        if (!User::where('email', 'super@sme-facility.com')->first()) {
 
-        $user->assignRole('Super Admin');
+            $user = User::create([
+                'first_name' => 'Super',
+                'last_name' => 'Admin',
+                'email' => 'super@sme-facility.com',
+                'password' => Hash::make('SME_2025!fwebxp'),
+                'can_login' => true
+            ]);
+        } else {
+            $user = User::where('email', 'super@sme-facility.com')->first();
+            $user->assignRole('Super Admin');
+        }
     }
 }

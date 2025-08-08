@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('providers', function (Blueprint $table) {
-            $table->unsignedBigInteger('category_type_id')->nullable(true)->change();
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('username');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('providers', function (Blueprint $table) {
-            $table->unsignedBigInteger('category_type_id')->nullable(false)->change();
+        Schema::table('users', function (Blueprint $table) {
+            $table->text('username', 50)->nullable();
         });
     }
 };
