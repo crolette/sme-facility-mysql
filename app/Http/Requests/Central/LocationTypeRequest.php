@@ -49,8 +49,8 @@ class LocationTypeRequest extends FormRequest
             'prefix' => ['required', 'string', 'min:1', 'max:2',  Rule::unique('location_types')->where(fn($query) => $query->where('level', $this->input('level')))->ignore($type)],
             // 'prefix' => ['required', 'string', 'min:1', 'max:2', Rule::unique(LocationType::class, 'prefix')->ignore($type)],
             'level' => ['required', 'string', Rule::in([...$types])],
-            'translations.en' => 'required|string|max:20',
-            'translations.*' => 'nullable|string|max:20'
+            'translations.en' => 'required|string|max:50',
+            'translations.*' => 'nullable|string|max:50'
         ];
     }
 }
