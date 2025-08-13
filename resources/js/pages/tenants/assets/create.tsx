@@ -24,6 +24,11 @@ type TypeFormData = {
     is_mobile?: boolean;
     need_qr_code?: boolean;
     surface: null | number;
+    depreciable: boolean;
+    depreciation_start_date: null | string;
+    depreciation_end_date: null | string;
+    depreciation_duration: null | number;
+    residual_value: null | number;
     description: string;
     locationId: number;
     locationReference: string;
@@ -88,6 +93,11 @@ export default function CreateAsset({
         name: asset?.maintainable.name ?? '',
         description: asset?.maintainable.description ?? '',
         surface: asset?.surface ?? null,
+        depreciable: asset?.depreciable ?? false,
+        depreciation_start_date: asset?.depreciation_start_date ?? null,
+        depreciation_end_date: asset?.depreciation_end_date ?? null,
+        depreciation_duration: asset?.depreciation_duration ?? null,
+        residual_value: asset?.residual_value ?? null,
         locationId: asset?.location_id ?? '',
         locationReference: asset?.is_mobile ? '' : (asset?.location.reference_code ?? ''),
         locationType: asset?.is_mobile ? 'user' : (asset?.location.location_type.level ?? ''),
@@ -570,6 +580,71 @@ export default function CreateAsset({
                     />
                     <InputError className="mt-2" message={errors.purchase_cost} />
 
+                    {/* Depreciation */}
+                    <div>
+                        <Label htmlFor="depreciable">depreciable ?</Label>
+                        <Checkbox
+                            id="depreciable"
+                            name="depreciable"
+                            checked={data.depreciable}
+                            onClick={() => setData('depreciable', !data.depreciable)}
+                        />
+                    </div>
+                    <InputError className="mt-2" message={errors.depreciable} />
+                    {data.depreciable && (
+                        <div className="flex flex-col gap-4 md:flex-row">
+                            <div className="w-full">
+                                <Label htmlFor="depreciation_start_date">Depreciation start date</Label>
+                                <Input
+                                    id="depreciation_start_date"
+                                    type="date"
+                                    value={data.depreciation_start_date ?? ''}
+                                    onChange={(e) => setData('depreciation_start_date', e.target.value)}
+                                    placeholder="Depreciation start date"
+                                />
+                                <InputError className="mt-2" message={errors.depreciation_start_date} />
+                            </div>
+                            <div className="w-full">
+                                <Label htmlFor="depreciation_duration">Depreciation duration (in years)</Label>
+                                <Input
+                                    id="depreciation_duration"
+                                    type="number"
+                                    min={1}
+                                    step="1"
+                                    value={data.depreciation_duration ?? ''}
+                                    placeholder="Asset depreciation_duration"
+                                    onChange={(e) => setData('depreciation_duration', parseFloat(e.target.value))}
+                                />
+                                <InputError className="mt-2" message={errors.depreciation_start_date} />
+                            </div>
+                            <div className="w-full">
+                                <Label htmlFor="depreciation_end_date">Depreciation end date</Label>
+                                <Input
+                                    id="depreciation_end_date"
+                                    type="date"
+                                    value={data.depreciation_end_date ?? ''}
+                                    onChange={(e) => setData('depreciation_end_date', e.target.value)}
+                                    placeholder="Depreciation end date"
+                                />
+                                <InputError className="mt-2" message={errors.depreciation_end_date} />
+                            </div>
+                            <div className="w-full">
+                                <Label htmlFor="residual_value">Residual value</Label>
+                                <Input
+                                    id="residual_value"
+                                    type="number"
+                                    min={0}
+                                    step="0.01"
+                                    value={data.residual_value ?? ''}
+                                    onChange={(e) => setData('residual_value', parseFloat(e.target.value))}
+                                    placeholder="Purchase cost (max. 2 decimals) : 4236.36"
+                                />
+                                <InputError className="mt-2" message={errors.residual_value} />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Warranty */}
                     <Label htmlFor="under_warranty">Still under warranty ?</Label>
                     <Checkbox
                         id="under_warranty"

@@ -117,6 +117,11 @@ export interface Asset {
     asset_category_id: number;
     tickets?: Ticket[];
     pictures?: Picture[];
+    depreciable: boolean;
+    depreciation_start_date: string;
+    depreciation_end_date: string;
+    depreciation_duration: number;
+    residual_value: number;
     documents?: Documents[];
     deleted_at?: string;
     created_at: string;

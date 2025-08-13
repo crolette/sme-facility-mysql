@@ -29,6 +29,11 @@ class Asset extends Model
         'surface',
         'reference_code',
         'serial_number',
+        'depreciable',
+        "depreciation_start_date",
+        "depreciation_end_date",
+        "depreciation_duration",
+        "residual_value",
         'brand',
         'model',
         'qr_code',
@@ -53,6 +58,7 @@ class Asset extends Model
 
     protected $casts = [
         'is_mobile' => 'boolean',
+        'depreciable' => 'boolean',
     ];
 
     // Ensure route model binding use the slug instead of ID

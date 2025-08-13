@@ -7,6 +7,7 @@ use App\Models\Tenants\Company;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
 use App\Models\Central\AssetCategory;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -25,11 +26,19 @@ class AssetFactory extends Factory
     {
 
         $category = CategoryType::where('category', 'asset')->first();
-        // Remplissage temporaire avant de définir les 
+
+        $randomDepreciationDuration = fake()->randomDigitNotZero();
 
         return [
             'surface' => fake()->numberBetween(1, 10),
             'category_type_id' => $category->id,
+            'brand' => fake()->company,
+            'model' => fake()->word(),
+            'serial_number' => fake()->randomLetter() . fake()->randomNumber(4, true),
+            'depreciable' => true,
+            "depreciation_start_date" => Carbon::now(),
+            "depreciation_end_date" => Carbon::now()->addYear($randomDepreciationDuration),
+            "depreciation_duration" =>  $randomDepreciationDuration,
             'location_type' => null,
             'location_id' => null,
             'reference_code' => null,

@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use App\Models\LocationType;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
@@ -7,8 +8,8 @@ use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Building;
-use App\Models\Tenants\Provider;
 
+use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
 use function PHPUnit\Framework\assertCount;
@@ -80,6 +81,11 @@ it('can create a new asset to site', function () {
     $formData = [
         'name' => 'New asset',
         'description' => 'Description new asset',
+        'depreciable' => true,
+        'depreciation_start_date' => Carbon::now(),
+        'depreciation_end_date' => Carbon::now()->addYear(3),
+        'depreciation_duration' => 3,
+        'residual_value' => 1250.69,
         'locationId' => $this->site->id,
         'locationType' => 'site',
         'locationReference' => $this->site->reference_code,
@@ -104,6 +110,10 @@ it('can create a new asset to site', function () {
         'location_id' => $this->site->id,
         'category_type_id' => $this->categoryType->id,
         'surface' => 12,
+        'depreciation_start_date' => Carbon::now()->toDateString(),
+        'depreciation_end_date' => Carbon::now()->addYear(3)->toDateString(),
+        'depreciation_duration' => 3,
+        'residual_value' => 1250.69,
     ]);
 
     assertDatabaseHas('maintainables', [
@@ -404,7 +414,7 @@ it('can render the update asset page', function () {
     );
 });
 
-it('can update asset\'s maintainable', function () {
+it('can update asset and his maintainable', function () {
 
     $asset = Asset::factory()->forLocation($this->room)->create();
 
@@ -412,15 +422,29 @@ it('can update asset\'s maintainable', function () {
     $oldDescription = $asset->maintainable->description;
 
     $formData = [
+        'depreciable' => true,
+        'depreciation_start_date' => Carbon::now()->toDateString(),
+        'depreciation_end_date' => Carbon::now()->addYear(3)->toDateString(),
+        'depreciation_duration' => 3,
+        'residual_value' => 1250.69,
         'name' => "New asset name",
         'description' => "New asset description",
         'categoryId' => $asset->assetCategory->id,
+
     ];
 
     $response = $this->patchToTenant('api.assets.update', $formData, $asset);
     $response->assertStatus(200)
         ->assertJson(['status' => 'success']);
 
+    assertDatabaseHas('assets', [
+        'id' => $asset->id,
+        'depreciable' => true,
+        'depreciation_start_date' => Carbon::now()->toDateString(),
+        'depreciation_end_date' => Carbon::now()->addYear(3)->toDateString(),
+        'depreciation_duration' => 3,
+        'residual_value' => 1250.69,
+    ]);
     assertDatabaseHas('maintainables', [
         'name' => "New asset name",
         'description' => "New asset description",

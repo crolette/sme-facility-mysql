@@ -116,22 +116,24 @@ export default function ShowAsset({ item }: { item: Asset }) {
                     </div>
                 </div>
 
-                <div className="rounded-md border border-gray-200 p-4">
-                    <h2>Maintenance</h2>
-                    <div>
-                        <p>
-                            Maintenance manager:
-                            {asset.maintainable.manager ? (
-                                <a href={route('tenant.users.show', asset.maintainable.manager.id)}> {asset.maintainable.manager.full_name}</a>
-                            ) : (
-                                'No manager'
-                            )}
-                        </p>
-                        <p>Maintenance frequency : {asset.maintainable.maintenance_frequency}</p>
-                        <p>Next maintenance date : {asset.maintainable.next_maintenance_date}</p>
-                        <p>Last maintenance date : {asset.maintainable.last_maintenance_date}</p>
+                {asset.maintainable.need_maintenance && (
+                    <div className="rounded-md border border-gray-200 p-4">
+                        <h2>Maintenance</h2>
+                        <div>
+                            <p>
+                                Maintenance manager:
+                                {asset.maintainable.manager ? (
+                                    <a href={route('tenant.users.show', asset.maintainable.manager.id)}> {asset.maintainable.manager.full_name}</a>
+                                ) : (
+                                    'No manager'
+                                )}
+                            </p>
+                            <p>Maintenance frequency : {asset.maintainable.maintenance_frequency}</p>
+                            <p>Next maintenance date : {asset.maintainable.next_maintenance_date}</p>
+                            <p>Last maintenance date : {asset.maintainable.last_maintenance_date}</p>
+                        </div>
                     </div>
-                </div>
+                )}
 
                 <div className="rounded-md border border-gray-200 p-4">
                     <h2>Asset information</h2>
@@ -146,14 +148,28 @@ export default function ShowAsset({ item }: { item: Asset }) {
                     </div>
                 </div>
 
-                <div className="rounded-md border border-gray-200 p-4">
-                    <h2>Purchase/Warranty</h2>
-                    <div>
-                        <p>Purchase date : {asset.maintainable?.purchase_date}</p>
-                        <p>Purchase cost : {asset.maintainable?.purchase_cost}</p>
-                        <p>End warranty date : {asset.maintainable?.end_warranty_date}</p>
+                {asset.depreciable && (
+                    <div className="rounded-md border border-gray-200 p-4">
+                        <h2>Depreciation</h2>
+                        <div>
+                            <p>depreciation_duration : {asset.depreciation_duration}</p>
+                            <p>depreciation_start_date : {asset.depreciation_start_date}</p>
+                            <p>depreciation_end_d : {asset.depreciation_end_date}</p>
+                            <p>residual_value : {asset.residual_value}</p>
+                        </div>
                     </div>
-                </div>
+                )}
+
+                {asset.maintainable.purchase_date && (
+                    <div className="rounded-md border border-gray-200 p-4">
+                        <h2>Purchase/Warranty</h2>
+                        <div>
+                            <p>Purchase date : {asset.maintainable.purchase_date}</p>
+                            <p>Purchase cost : {asset.maintainable.purchase_cost}</p>
+                            <p>End warranty date : {asset.maintainable.end_warranty_date}</p>
+                        </div>
+                    </div>
+                )}
 
                 {asset.maintainable.providers && asset.maintainable.providers?.length > 0 && (
                     <div className="rounded-md border border-gray-200 p-4">
