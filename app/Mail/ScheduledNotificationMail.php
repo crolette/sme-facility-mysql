@@ -28,7 +28,7 @@ class ScheduledNotificationMail extends Mailable
 
         return new Envelope(
             subject: $subject,
-            from: config('mail.from.address', 'noreply@yourapp.com'),
+            from: config('mail.from.address'),
         );
     }
 
@@ -53,9 +53,13 @@ class ScheduledNotificationMail extends Mailable
     protected function getSubjectByType(): string
     {
         return match ($this->notification->notification_type) {
-            'contract_expiry' => 'Expiration de contrat à venir - ' . ($this->data['contract_name'] ?? 'Contrat'),
-            'maintenance_due' => 'Maintenance programmée - ' . ($this->data['asset_name'] ?? 'Asset'),
-            'warranty_end' => 'Fin de garantie prochaine - ' . ($this->data['asset_name'] ?? 'Asset'),
+
+            // types : maintenance, warranty, depreciation, contract, intervention
+            'maintenance' => 'Maintenance programmée - ' . ($this->data['asset_name'] ?? 'Asset'),
+            'warranty' => 'Fin de garantie prochaine - ' . ($this->data['asset_name'] ?? 'Asset'),
+            'depreciation' => 'Fin de l\'amortissement - ' . ($this->data['asset_name'] ?? 'Asset'),
+            'contract' => 'Expiration de contrat à venir - ' . ($this->data['contract_name'] ?? 'Contrat'),
+            'intervention' => 'Intervention à prévoir - ' . ($this->data['contract_name'] ?? 'Contrat'),
             default => 'Notification - ' . $this->notification->notification_type
         };
     }

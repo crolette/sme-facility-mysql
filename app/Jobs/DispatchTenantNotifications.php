@@ -28,7 +28,7 @@ class DispatchTenantNotifications implements ShouldQueue
         Log::info('Starting tenant notifications dispatch');
 
         // Récupère tous les tenants actifs depuis la DB centrale
-        $tenants = Tenant::where('status', 'active')->get();
+        $tenants = Tenant::all();
 
         Log::info("Found {$tenants->count()} active tenants to process");
 

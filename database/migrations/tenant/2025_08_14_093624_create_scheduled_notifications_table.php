@@ -15,13 +15,33 @@ return new class extends Migration
             $table->id();
             $table->string('notifiable_type');
             $table->unsignedBigInteger('notifiable_id');
+
+            // types : maintenance, warranty, depreciation, contract, intervention
             $table->string('notification_type');
 
             $table->date('scheduled_at');
+            $table->timestamp('sent_at')->nullable();
+
             $table->string('recipient_email', 255);
             $table->string('recipient_name')->nullable();
+
+            // status : pending, sent, failed, cancelled
             $table->string('status')->default('pending');
-            $table->timestamp('sent_at')->nullable();
+
+            $table->string('error_message')->nullable();
+            $table->unsignedTinyInteger('retry_count')->nullable();
+
+
+            // Exemple de JSON
+            // [
+            //     'asset/location name' => 'Photocopieur Xerox'/'Rez-de-chaussée',
+            //     'due_date' => '2024-12-31',
+            //     'dashboard_url' => 'https://app.com/contracts/15'
+            //      
+            //     'contract_name' => 'Contrat nettoyage',
+            //     'supplier_name' => 'Entreprise XYZ',
+            //     'contract_reference' => 'CNT-2024-001',
+            // ]
             $table->json('data')->nullable();
             $table->timestamps();
         });
