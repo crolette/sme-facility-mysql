@@ -59,6 +59,7 @@ class Asset extends Model
     protected $casts = [
         'is_mobile' => 'boolean',
         'depreciable' => 'boolean',
+        'residual_value' => 'decimal:2',
     ];
 
     // Ensure route model binding use the slug instead of ID

@@ -20,6 +20,15 @@ class TenantFloorRequest extends FormRequest
         return true;
     }
 
+    public function prepareForValidation()
+    {
+
+        $data = $this->all();
+
+        isset($data['need_qr_code']) && ($data['need_qr_code'] === 'true' || $data['need_qr_code'] === true) ? $data['need_qr_code'] = true : $data['need_qr_code'] = false;
+
+        $this->replace($data);
+    }
     /**
      * Get the validation rules that apply to the request.
      *

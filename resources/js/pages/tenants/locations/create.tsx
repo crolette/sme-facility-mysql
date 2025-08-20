@@ -123,7 +123,11 @@ export default function CreateLocation({
             }
         } else {
             try {
-                const response = await axios.post(route(`api.${routeName}.store`), data);
+                const response = await axios.post(route(`api.${routeName}.store`), data, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
                 if (response.data.status === 'success') {
                     router.visit(route(`tenant.${routeName}.index`), {
                         preserveScroll: false,
