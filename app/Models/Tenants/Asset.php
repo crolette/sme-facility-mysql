@@ -92,11 +92,6 @@ class Asset extends Model
         return $this->morphOne(Maintainable::class, 'maintainable');
     }
 
-    public function notifiable(): MorphOne
-    {
-        return $this->morphOne(ScheduledNotification::class, 'notifiable');
-    }
-
     public function documents(): MorphToMany
     {
         return $this->morphToMany(Document::class, 'documentable');

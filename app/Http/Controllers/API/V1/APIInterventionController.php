@@ -65,7 +65,11 @@ class APIInterventionController extends Controller
                 ];
 
                 $model = $modelMap[$request->validated('locationType')];
-                $location = $model::where('reference_code', $request->validated('locationId'))->first();
+                if ($request->validated('locationType') === 'asset') {
+                    $location = $model::where('reference_code', $request->validated('locationId'))->first();
+                } else {
+                    $location = $model::where('id', $request->validated('locationId'))->first();
+                }
                 $intervention->interventionable()->associate($location);
                 $intervention->maintainable()->associate($location->maintainable->id);
             }

@@ -75,11 +75,9 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
                                 Delete
                             </Button>
-                            {asset.maintainable.need_maintenance && (
-                                <Button onClick={() => markMaintenanceDone()} variant={'green'}>
-                                    Mark maintenance as done
-                                </Button>
-                            )}
+                            <Button onClick={() => markMaintenanceDone()} variant={'green'}>
+                                Mark maintenance as done
+                            </Button>
                         </>
                     )}
                     <Button onClick={generateQR} variant={'secondary'}>

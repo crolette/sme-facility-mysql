@@ -24,7 +24,6 @@ beforeEach(function () {
     LocationType::factory()->create(['level' => 'floor']);
     LocationType::factory()->create(['level' => 'room']);
     CategoryType::factory()->create(['category' => 'asset']);
-    User::factory()->create();
     $this->interventionType = CategoryType::factory()->create(['category' => 'intervention']);
     $this->interventionActionType = CategoryType::factory()->create(['category' => 'action']);
     $this->site = Site::factory()->create();
@@ -142,7 +141,7 @@ it('can create a new intervention for an ASSET', function () {
         'planned_at' => Carbon::now()->add('day', 7),
         'description' => fake()->paragraph(),
         'repair_delay' => Carbon::now()->add('month', 1),
-        'locationId' => $this->asset->reference_code,
+        'locationId' => $this->asset->code,
         'locationType' => 'asset'
     ];
 
@@ -165,7 +164,7 @@ it('can create a new intervention for an ASSET', function () {
 
 it('can get all interventions for an ASSET', function () {
     Intervention::factory()->forLocation($this->asset)->count(2)->create();
-    $response = $this->getFromTenant('api.assets.interventions', $this->asset->reference_code);
+    $response = $this->getFromTenant('api.assets.interventions', $this->asset);
 
     $response->assertStatus(200)
         ->assertJson([
@@ -183,7 +182,7 @@ it('can create a new intervention for a SITE', function () {
         'planned_at' => Carbon::now()->add('day', 7),
         'description' => fake()->paragraph(),
         'repair_delay' => Carbon::now()->add('month', 1),
-        'locationId' => $this->site->reference_code,
+        'locationId' => $this->site->id,
         'locationType' => 'sites'
     ];
 
@@ -223,7 +222,7 @@ it('can create a new intervention for a BUILDING', function () {
         'planned_at' => Carbon::now()->add('day', 7),
         'description' => fake()->paragraph(),
         'repair_delay' => Carbon::now()->add('month', 1),
-        'locationId' => $this->building->reference_code,
+        'locationId' => $this->building->id,
         'locationType' => 'buildings'
     ];
 
@@ -264,7 +263,7 @@ it('can create a new intervention for a FLOOR', function () {
         'planned_at' => Carbon::now()->add('day', 7),
         'description' => fake()->paragraph(),
         'repair_delay' => Carbon::now()->add('month', 1),
-        'locationId' => $this->floor->reference_code,
+        'locationId' => $this->floor->id,
         'locationType' => 'floors'
     ];
 
@@ -304,7 +303,7 @@ it('can create a new intervention for a ROOM', function () {
         'planned_at' => Carbon::now()->add('day', 7),
         'description' => fake()->paragraph(),
         'repair_delay' => Carbon::now()->add('month', 1),
-        'locationId' => $this->room->reference_code,
+        'locationId' => $this->room->id,
         'locationType' => 'rooms'
     ];
 
@@ -326,7 +325,7 @@ it('can create a new intervention for a ROOM', function () {
 
 it('can get all interventions for a ROOM', function () {
     Intervention::factory()->forLocation($this->room)->count(2)->create();
-    $response = $this->getFromTenant('api.rooms.interventions', $this->room->reference_code);
+    $response = $this->getFromTenant('api.rooms.interventions', $this->room);
 
     $response->assertStatus(200)
         ->assertJson([
@@ -346,7 +345,7 @@ it('can update an existing intervention', function () {
         'planned_at' => Carbon::now()->add('day', 20),
         'description' => 'New intervention description',
         'repair_delay' => Carbon::now()->add('month', 5),
-        'locationId' => $this->room->reference_code,
+        'locationId' => $this->room->id,
         'locationType' => 'rooms'
     ];
 

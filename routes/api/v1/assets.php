@@ -118,7 +118,10 @@ Route::middleware([
 
             // Get all interventions from an asset
             Route::get('/interventions/', function (Asset $asset) {
-
+                // $interventions = Intervention::whereMorphedTo('interventionable', $asset)->where('ticket_id', null)->get();
+                // $interventionsTwo = Intervention::where('ticket_id', null)->where('maintainable_id', $asset->maintainable->id)->get();
+                // Debugbar::info($interventions, $interventionsTwo, $asset->interventions()->where('ticket_id', null)->get());
+                // $asset = Asset::withTrashed()->with('interventions')->where('reference_code', $asset)->first();
                 return ApiResponse::success($asset->interventions()->where('ticket_id', null)->get());
             })->name('api.assets.interventions');
         });
