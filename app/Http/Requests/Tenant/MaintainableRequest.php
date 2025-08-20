@@ -22,6 +22,9 @@ class MaintainableRequest extends FormRequest
 
         $data = $this->all();
 
+        isset($data['need_maintenance']) && ($data['need_maintenance'] === 'true' || $data['need_maintenance'] === true) ? $data['need_maintenance'] = true : $data['need_maintenance'] = false;
+        isset($data['under_warranty']) && ($data['under_warranty'] === 'true' || $data['under_warranty'] === true) ? $data['under_warranty'] = true : $data['under_warranty'] = false;
+
         if (isset($data['need_maintenance']) && $data['need_maintenance'] === true) {
             if (isset($data['next_maintenance_date'])) {
                 return;

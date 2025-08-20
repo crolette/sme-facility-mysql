@@ -85,8 +85,6 @@ export default function CreateAsset({
         },
     ];
 
-    console.log(asset);
-
     const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
     const { data, setData, post, errors } = useForm<TypeFormData>({
         q: '',
@@ -179,7 +177,12 @@ export default function CreateAsset({
             }
         } else {
             try {
-                const response = await axios.post(route(`api.assets.store`), data);
+                const response = await axios.post(route(`api.assets.store`), data, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                console.log(response.data);
                 if (response.data.status === 'success') {
                     router.visit(route(`tenant.assets.index`), {
                         preserveScroll: false,
@@ -190,6 +193,8 @@ export default function CreateAsset({
             }
         }
     };
+
+    console.log(data);
 
     const setSelectedLocation = (location: SearchedLocation) => {
         if (!location) {

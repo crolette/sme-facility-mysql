@@ -32,6 +32,8 @@ class TenantBuildingRequest extends FormRequest
             $data['wall_material_other'] = null;
         }
 
+        isset($data['need_qr_code']) && ($data['need_qr_code'] === 'true' || $data['need_qr_code'] === true) ? $data['need_qr_code'] = true : $data['need_qr_code'] = false;
+
         $this->replace($data);
     }
 
