@@ -6,11 +6,13 @@ use Inertia\Inertia;
 use App\Models\Tenants\Asset;
 use App\Services\AssetService;
 use App\Services\QRCodeService;
+use App\Enums\ContractStatusEnum;
 use App\Enums\MaintenanceFrequency;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
+use App\Enums\ContractRenewalTypesEnum;
 
 class TenantAssetController extends Controller
 {
@@ -45,7 +47,9 @@ class TenantAssetController extends Controller
         $categories = CategoryType::where('category', 'asset')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-        return Inertia::render('tenants/assets/create', ['categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
+        $statuses = array_column(ContractStatusEnum::cases(), 'value');
+        $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
+        return Inertia::render('tenants/assets/create', ['categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
     }
 
 

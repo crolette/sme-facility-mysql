@@ -32,8 +32,6 @@ class ContractService
 
         foreach ($request['contractables'] as $contractable) {
 
-            dump($contractable);
-
             $modelMap = [
                 'site' => \App\Models\Tenants\Site::class,
                 'building' => \App\Models\Tenants\Building::class,
@@ -42,7 +40,6 @@ class ContractService
                 'asset' => \App\Models\Tenants\Asset::class,
             ];
 
-            dump($modelMap[$contractable['locationType']]);
             $model = $modelMap[$contractable['locationType']]::where('code', $contractable['locationCode'])->first();
 
             $model->contracts()->attach($contract);

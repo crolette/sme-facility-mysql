@@ -60,7 +60,6 @@ class AssetUpdateRequest extends FormRequest
             "depreciation_start_date" => 'nullable|date|required_if_accepted:depreciation',
             "depreciation_end_date" => 'nullable|date',
             "depreciation_duration" => 'nullable|required_with:depreciation_start_date|numeric|gt:0',
-            "contract_end_date" => 'nullable|date',
             "residual_value" => 'nullable|numeric|decimal:0,2',
             'categoryId' => ['required', Rule::in(CategoryType::where('category', 'asset')->pluck('id')->toArray())],
             'model' => ['nullable', 'string', 'max:100'],

@@ -10,12 +10,27 @@ import { cn } from '@/lib/utils';
 import { Asset, AssetCategory, CentralType, Provider, User, type BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
+import { MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
 interface Provider {
     id: number;
     name: string;
+}
+
+interface Contract {
+    provider_id: number | null;
+    provider_name: string | null;
+    name: string | null;
+    type: string | null;
+    notes: string | null;
+    internal_reference: string | null;
+    provider_reference: string | null;
+    start_date: string | null;
+    end_date: string | null;
+    renewal_type: string;
+    status: string;
 }
 
 type TypeFormData = {
@@ -28,7 +43,6 @@ type TypeFormData = {
     depreciation_start_date: null | string;
     depreciation_end_date: null | string;
     depreciation_duration: null | number;
-    contract_end_date: null | string;
     residual_value: null | number;
     description: string;
     locationId: number;
@@ -49,6 +63,7 @@ type TypeFormData = {
     maintenance_frequency: string | null;
     next_maintenance_date: string | null;
     last_maintenance_date: string | null;
+    contracts: Contract[];
     files: {
         file: File;
         name: string;
@@ -73,11 +88,15 @@ export default function CreateAsset({
     categories,
     documentTypes,
     frequencies,
+    statuses,
+    renewalTypes,
 }: {
     asset?: Asset;
     categories?: AssetCategory[];
     documentTypes: CentralType[];
     frequencies: string[];
+    statuses: string[];
+    renewalTypes: string[];
 }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -120,6 +139,7 @@ export default function CreateAsset({
         serial_number: asset?.maintainable.serial_number ?? '',
         files: selectedDocuments,
         pictures: [],
+        contracts: [],
         providers: asset?.maintainable.providers ?? [],
     });
 
@@ -333,6 +353,30 @@ export default function CreateAsset({
             </div>
         );
     };
+
+    const [countContracts, setCountContracts] = useState(0);
+
+    const handleChangeContracts = (index: number, field: keyof Contract, value: any) => {
+        setData((prev) => {
+            const updatedContracts = [...prev.contracts];
+            updatedContracts[index] = {
+                ...updatedContracts[index],
+                [field]: value,
+            };
+            return { ...prev, contracts: updatedContracts };
+        });
+    };
+
+    const handleRemoveContract = (index: number) => {
+        setData((prev) => {
+            const updatedContracts = prev.contracts.filter((_, i) => i !== index);
+
+            return { ...prev, contracts: updatedContracts };
+        });
+
+        setCountContracts((prev) => prev - 1);
+    };
+    console.log(data);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -774,17 +818,117 @@ export default function CreateAsset({
                             placeholder="Search providers..."
                         />
                     </div>
-                    <div className="w-full">
-                        <Label htmlFor="contract_end_date">Contract end date</Label>
-                        <Input
-                            id="contract_end_date"
-                            type="date"
-                            value={data.contract_end_date ?? ''}
-                            onChange={(e) => setData('contract_end_date', e.target.value)}
-                            placeholder="Contract end date"
-                        />
-                        <InputError className="mt-2" message={errors.contract_end_date} />
+
+                    {/* provider_id: number | null;
+                        name: string | null;
+                        type: string | null;
+                        notes: string | null;
+                        internal_reference: string | null;
+                        provider_reference: string | null;
+                        start_date: string | null;
+                        end_date: string | null;
+                        renewal_type: string;
+                        status: string; */}
+
+                    {/* Contracts */}
+                    <div className="flex items-center gap-2">
+                        <h5>Contract</h5>
+                        <PlusCircleIcon onClick={() => setCountContracts((prev) => prev + 1)} />
                     </div>
+                    {countContracts}
+
+                    {countContracts &&
+                        [...Array(countContracts)].map((_, index) => (
+                            <div key={index} className="flex flex-col gap-2">
+                                <p>Contract {index + 1}</p>
+                                <MinusCircleIcon onClick={() => handleRemoveContract(index)} />
+                                <Label className="font-medium">Name</Label>
+                                <Input
+                                    type="text"
+                                    value={data.contracts[index]?.name ?? ''}
+                                    placeholder={`Nom du document ${index + 1}`}
+                                    className="rounded border px-2 py-1"
+                                    onChange={(e) => handleChangeContracts(index, 'name', e.target.value)}
+                                />
+                                <Label className="font-medium">Type</Label>
+                                <Input
+                                    type="text"
+                                    // value={data.contracts[index].name ?? ''}
+                                    placeholder={`Type ${index + 1}`}
+                                    className="rounded border px-2 py-1"
+                                    onChange={(e) => handleChangeContracts(index, 'type', e.target.value)}
+                                />
+                                <Label className="font-medium">Provider</Label>
+                                <SearchableInput<Provider>
+                                    searchUrl={route('api.providers.search')}
+                                    getKey={(provider) => provider.id}
+                                    displayValue={data.contracts[index]?.provider_name ?? ''}
+                                    getDisplayText={(provider) => provider.name}
+                                    onSelect={(provider) => {
+                                        handleChangeContracts(index, 'provider_id', provider.id);
+                                        handleChangeContracts(index, 'provider_name', provider.name);
+                                    }}
+                                    placeholder="Search provider..."
+                                    // className="mb-4"
+                                />
+                                <Label htmlFor="renewal_type">Renewal type</Label>
+                                <select
+                                    name="renewal_type"
+                                    // value={data.renewal_type ?? ''}
+                                    onChange={(e) => handleChangeContracts(index, 'renewal_type', e.target.value)}
+                                    id=""
+                                    defaultValue={''}
+                                    // required={data.need_maintenance}
+                                    className={cn(
+                                        'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                    )}
+                                >
+                                    {renewalTypes && renewalTypes.length > 0 && (
+                                        <>
+                                            <option value="" disabled className="bg-background text-foreground">
+                                                Select an option
+                                            </option>
+                                            {renewalTypes?.map((type, index) => (
+                                                <option value={type} key={index} className="bg-background text-foreground">
+                                                    {type}
+                                                </option>
+                                            ))}
+                                        </>
+                                    )}
+                                </select>
+                                <div className="w-full">
+                                    <Label htmlFor="status">Status</Label>
+                                    <select
+                                        name="status"
+                                        // value={data.status ?? ''}
+                                        defaultValue={''}
+                                        onChange={(e) => handleChangeContracts(index, 'status', e.target.value)}
+                                        id=""
+                                        // required={data.need_maintenance}
+                                        className={cn(
+                                            'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                            'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                        )}
+                                    >
+                                        {statuses && statuses.length > 0 && (
+                                            <>
+                                                <option value="" disabled className="bg-background text-foreground">
+                                                    Select an option
+                                                </option>
+                                                {statuses?.map((status, index) => (
+                                                    <option value={status} key={index} className="bg-background text-foreground">
+                                                        {status}
+                                                    </option>
+                                                ))}
+                                            </>
+                                        )}
+                                    </select>
+                                </div>
+                            </div>
+                        ))}
 
                     {!asset && (
                         <div>

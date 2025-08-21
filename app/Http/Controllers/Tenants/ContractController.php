@@ -22,7 +22,10 @@ class ContractController extends Controller
     public function index()
     {
         $contracts = Contract::all();
-        // return Inertia::render('tenants/providers/index', ['providers' => $providers]);
+        $statuses = array_column(ContractStatusEnum::cases(), 'value');
+        $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
+
+        return Inertia::render('tenants/contracts/index', ['contracts' => $contracts, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
     }
 
     /**
@@ -33,7 +36,7 @@ class ContractController extends Controller
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
 
-        // return Inertia::render('tenants/providers/create', ['providerCategories' => $categories]);
+        return Inertia::render('tenants/contracts/create', ['statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
     }
 
     /**
@@ -43,7 +46,7 @@ class ContractController extends Controller
     {
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
-        // return Inertia::render('tenants/providers/create', ['provider' => $provider, 'providerCategories' => $categories]);
+        return Inertia::render('tenants/contracts/create', ['contract' => $contract, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
     }
 
 
@@ -52,6 +55,6 @@ class ContractController extends Controller
      */
     public function show(Contract $contract)
     {
-        // return Inertia::render('tenants/providers/show', ['item' => $provider->load('users')]);
+        return Inertia::render('tenants/contracts/show', ['contract' => $contract]);
     }
 }

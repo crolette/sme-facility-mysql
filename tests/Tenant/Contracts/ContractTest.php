@@ -90,7 +90,7 @@ it('can factory a contract', function () {
     assertEquals(1, $this->asset->contracts()->count());
 });
 
-it('can store a contract with ', function () {
+it('can store a contract with asset and locations', function () {
 
     $formData = [
         'provider_id' => $this->provider->id,
@@ -105,7 +105,10 @@ it('can store a contract with ', function () {
         'status' => ContractStatusEnum::ACTIVE->value,
         'contractables' => [
             ['locationType' => 'site', 'locationCode' => $this->site->code],
-            ['locationType' => 'asset', 'locationCode' => $this->asset->code]
+            ['locationType' => 'asset', 'locationCode' => $this->asset->code],
+            ['locationType' => 'building', 'locationCode' => $this->building->code],
+            ['locationType' => 'floor', 'locationCode' => $this->floor->code],
+            ['locationType' => 'room', 'locationCode' => $this->room->code]
         ]
     ];
 
@@ -116,6 +119,7 @@ it('can store a contract with ', function () {
         ->assertJson(['status' => 'success']);
 
     assertDatabaseCount('contracts', 1);
+    assertDatabaseCount('contractables', 5);
 });
 
 it('can store an asset with contracts', function () {
@@ -178,8 +182,8 @@ it('can update an existing contract', function () {
     assertDatabaseHas(
         'contracts',
         [
-            'provider_id' => $provider->id,
             'id' => $contract->id,
+            'provider_id' => $provider->id,
             'name' => 'Contrat de bail',
             'type' => 'Bail',
             'notes' => 'Nouveau contrat de bail 2025',
@@ -190,5 +194,59 @@ it('can update an existing contract', function () {
             'renewal_type' => ContractRenewalTypesEnum::MANUAL->value,
             'status' => ContractStatusEnum::CANCELLED->value
         ]
+    );
+});
+
+it('can render the index page with all contracts', function () {
+
+    $statuses = array_column(ContractStatusEnum::cases(), 'value');
+    $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
+
+    Contract::factory()->forLocation($this->asset)->count(2)->create();
+    Contract::factory()->forLocation($this->site)->count(2)->create();
+
+    $response = $this->getFromTenant('tenant.contracts.index');
+
+    $response->assertInertia(
+        fn($page) =>
+        $page->component('tenants/contracts/index')
+            ->has('contracts', 4)
+            ->has('statuses', count($statuses))
+            ->has('renewalTypes', count($renewalTypes))
+    );
+});
+
+it('can render the show contract page', function () {
+
+    $contract = Contract::factory()->forLocation($this->asset)->create();
+
+    $response = $this->getFromTenant('tenant.contracts.show', $contract->id);
+
+    $response->assertInertia(
+        fn($page) =>
+        $page->component('tenants/contracts/show')
+            ->has('contract')
+            ->where('contract.id', $contract->id)
+    );
+});
+
+it('can render the create contract page', function () {
+
+    $response = $this->getFromTenant('tenant.contracts.create');
+
+    $response->assertInertia(
+        fn($page) =>
+        $page->component('tenants/contracts/create')
+    );
+});
+
+it('can render the edit contract page', function () {
+    $contract = Contract::factory()->forLocation($this->asset)->create();
+    $response = $this->getFromTenant('tenant.contracts.edit', $contract->id);
+
+    $response->assertInertia(
+        fn($page) =>
+        $page->component('tenants/contracts/create')
+            ->has('contract')
     );
 });

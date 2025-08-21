@@ -81,7 +81,6 @@ class AssetCreateRequest extends FormRequest
             "depreciation_end_date" => 'nullable|date',
             "depreciation_duration" => 'nullable|required_with:depreciation_start_date|numeric|gt:0',
             "residual_value" => 'nullable|numeric|decimal:0,2',
-            "contract_end_date" => 'nullable|date',
             'model' => ['nullable', 'string', 'max:100'],
             'brand' => ['nullable', 'string', 'max:100'],
             'serial_number' => ['nullable', 'string', 'max:50'],
