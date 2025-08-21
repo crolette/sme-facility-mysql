@@ -28,6 +28,7 @@ type TypeFormData = {
     depreciation_start_date: null | string;
     depreciation_end_date: null | string;
     depreciation_duration: null | number;
+    contract_end_date: null | string;
     residual_value: null | number;
     description: string;
     locationId: number;
@@ -95,6 +96,7 @@ export default function CreateAsset({
         depreciation_start_date: asset?.depreciation_start_date ?? null,
         depreciation_end_date: asset?.depreciation_end_date ?? null,
         depreciation_duration: asset?.depreciation_duration ?? null,
+        contract_end_date: asset?.contract_end_date ?? null,
         residual_value: asset?.residual_value ?? null,
         locationId: asset?.location_id ?? '',
         locationReference: asset?.is_mobile ? '' : (asset?.location.reference_code ?? ''),
@@ -118,8 +120,10 @@ export default function CreateAsset({
         serial_number: asset?.maintainable.serial_number ?? '',
         files: selectedDocuments,
         pictures: [],
-        providers: [],
+        providers: asset?.maintainable.providers ?? [],
     });
+
+    console.log(asset?.maintainable.providers);
 
     console.log(data);
 
@@ -193,8 +197,6 @@ export default function CreateAsset({
             }
         }
     };
-
-    console.log(data);
 
     const setSelectedLocation = (location: SearchedLocation) => {
         if (!location) {
@@ -775,6 +777,17 @@ export default function CreateAsset({
                             }}
                             placeholder="Search providers..."
                         />
+                    </div>
+                    <div className="w-full">
+                        <Label htmlFor="contract_end_date">Contract end date</Label>
+                        <Input
+                            id="contract_end_date"
+                            type="date"
+                            value={data.contract_end_date ?? ''}
+                            onChange={(e) => setData('contract_end_date', e.target.value)}
+                            placeholder="Contract end date"
+                        />
+                        <InputError className="mt-2" message={errors.contract_end_date} />
                     </div>
 
                     {!asset && (

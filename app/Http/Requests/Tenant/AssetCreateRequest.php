@@ -24,6 +24,19 @@ class AssetCreateRequest extends FormRequest
         return true;
     }
 
+    public function prepareForValidation()
+    {
+
+        $data = $this->all();
+
+        isset($data['need_qr_code']) && ($data['need_qr_code'] === 'true' || $data['need_qr_code'] === true) ? $data['need_qr_code'] = true : $data['need_qr_code'] = false;
+        isset($data['is_mobile']) && ($data['is_mobile'] === 'true' || $data['is_mobile'] === true) ? $data['is_mobile'] = true : $data['is_mobile'] = false;
+        isset($data['depreciable']) && ($data['depreciable'] === 'true' || $data['depreciable'] === true) ? $data['depreciable'] = true : $data['depreciable'] = false;
+
+
+        $this->replace($data);
+    }
+
 
     /**
      * Get the validation rules that apply to the request.

@@ -20,7 +20,7 @@ Route::middleware([
 ])->prefix('/v1/providers')->group(function () {
 
     Route::get('/search', function (Request $request) {
-        $query  = Provider::select('id', 'name');
+        $query  = Provider::select('id', 'name', 'category_type_id');
 
         if ($request->query('q')) {
             $query->where(function ($subquery) use ($request) {

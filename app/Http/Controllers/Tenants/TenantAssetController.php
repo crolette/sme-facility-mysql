@@ -78,6 +78,6 @@ class TenantAssetController extends Controller
         $categories = CategoryType::where('category', 'asset')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-        return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents', 'maintainable.manager']), 'categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
+        return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents', 'maintainable.manager', 'maintainable.providers:id,name,category_type_id']), 'categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
     }
 }
