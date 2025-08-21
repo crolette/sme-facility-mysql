@@ -34,6 +34,7 @@ class Asset extends Model
         "depreciation_end_date",
         "depreciation_duration",
         "residual_value",
+        'contract_end_date',
         'brand',
         'model',
         'qr_code',

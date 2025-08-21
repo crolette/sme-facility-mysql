@@ -121,6 +121,7 @@ export interface Asset {
     depreciation_start_date: string;
     depreciation_end_date: string;
     depreciation_duration: number;
+    contract_end_date: string;
     residual_value: number;
     documents?: Documents[];
     deleted_at?: string;

@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
-use App\Http\Requests\Tenant\AssetRequest;
+use App\Http\Requests\Tenant\AssetCreateRequest;
+use App\Http\Requests\Tenant\AssetUpdateRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
@@ -28,7 +29,7 @@ class APIAssetController extends Controller
 
     ) {}
 
-    public function store(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, DocumentService $documentService,)
+    public function store(AssetCreateRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, DocumentService $documentService,)
     {
         if (Auth::user()->cannot('create', Asset::class))
             abort(403);
@@ -76,7 +77,7 @@ class APIAssetController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AssetRequest $request, MaintainableRequest $maintainableRequest, Asset $asset)
+    public function update(AssetUpdateRequest $request, MaintainableRequest $maintainableRequest, Asset $asset)
     {
         if (Auth::user()->cannot('update', $asset))
             abort(403);
