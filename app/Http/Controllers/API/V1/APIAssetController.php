@@ -8,6 +8,7 @@ use App\Models\Tenants\Asset;
 use App\Services\AssetService;
 use App\Services\QRCodeService;
 use App\Services\PictureService;
+use App\Services\ContractService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -19,6 +20,7 @@ use App\Http\Requests\Tenant\AssetUpdateRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
 
 class APIAssetController extends Controller
 {
@@ -26,10 +28,11 @@ class APIAssetController extends Controller
         protected QRCodeService $qrCodeService,
         protected AssetService $assetService,
         protected MaintainableService $maintainableService,
+        protected ContractService $contractService
 
     ) {}
 
-    public function store(AssetCreateRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, DocumentService $documentService,)
+    public function store(AssetCreateRequest $assetRequest, MaintainableRequest $maintainableRequest, ContractWithModelStoreRequest $contractRequest, DocumentUploadRequest $documentUploadRequest, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, DocumentService $documentService,)
     {
         if (Auth::user()->cannot('create', Asset::class))
             abort(403);
@@ -47,6 +50,8 @@ class APIAssetController extends Controller
             $asset->save();
 
             $asset = $this->maintainableService->createMaintainable($asset, $maintainableRequest);
+
+            $this->contractService->createWithModel($asset, $contractRequest->validated('contracts'));
 
             $files = $documentUploadRequest->validated('files');
             if ($files) {

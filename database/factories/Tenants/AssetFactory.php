@@ -30,6 +30,7 @@ class AssetFactory extends Factory
         $randomDepreciationDuration = fake()->randomDigitNotZero();
 
         return [
+
             'surface' => fake()->numberBetween(1, 10),
             'category_type_id' => $category->id,
             'brand' => fake()->company,
