@@ -123,10 +123,6 @@ export default function CreateAsset({
         providers: asset?.maintainable.providers ?? [],
     });
 
-    console.log(asset?.maintainable.providers);
-
-    console.log(data);
-
     const [listIsOpen, setListIsOpen] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [locations, setLocations] = useState<SearchedLocation[]>();

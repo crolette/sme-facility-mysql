@@ -11,8 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('assets', function (Blueprint $table) {
-            $table->date('contract_end_date')->nullable();
+        Schema::create('contractables', function (Blueprint $table) {
+            $table->id();
+
+            $table->foreignId('contract_id')->constrained('contracts')->cascadeOnDelete();
+
+            $table->morphs('contractable');
+
+            $table->timestamps();
         });
     }
 
@@ -21,8 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('assets', function (Blueprint $table) {
-            $table->dropColumn('contract_end_date');
-        });
+        Schema::dropIfExists('contractables');
     }
 };
