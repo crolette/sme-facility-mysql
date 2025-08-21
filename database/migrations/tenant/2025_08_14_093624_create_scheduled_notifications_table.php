@@ -32,6 +32,19 @@ return new class extends Migration
             $table->unsignedTinyInteger('retry_count')->nullable();
 
 
+            //             {
+            //     "contract_name": "Contrat nettoyage bureaux",
+            //     "contract_reference": "CNT-2024-001",
+            //     "supplier_name": "Entreprise XYZ",
+            //     "supplier_contact": "contact@xyz.com",
+            //     "expiry_date": "2024-12-31",
+            //     "location": "Bâtiment A - Étage 3",
+            //     "asset_serial": "ABC123",
+            //     "dashboard_url": "https://app.com/contracts/15",
+            //     "responsible_person": "John Doe",
+            //     "responsible_email": "john@company.com"
+            // }
+
             // Exemple de JSON
             // [
             //     'asset/location name' => 'Photocopieur Xerox'/'Rez-de-chaussée',
