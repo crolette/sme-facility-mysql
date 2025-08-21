@@ -90,7 +90,33 @@ it('can factory a contract', function () {
     assertEquals(1, $this->asset->contracts()->count());
 });
 
-// it('can store a contract with an asset', function () {});
+it('can store a contract with ', function () {
+
+    $formData = [
+        'provider_id' => $this->provider->id,
+        'name' => 'Contrat de bail',
+        'type' => 'Bail',
+        'notes' => 'Nouveau contrat de bail 2025',
+        'internal_reference' => 'Bail Site 2025',
+        'provider_reference' => 'Provider reference 2025',
+        'start_date' => Carbon::now()->toDateString(),
+        'end_date' => Carbon::now()->addYear()->toDateString(),
+        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
+        'status' => ContractStatusEnum::ACTIVE->value,
+        'contractables' => [
+            ['locationType' => 'site', 'locationCode' => $this->site->code],
+            ['locationType' => 'asset', 'locationCode' => $this->asset->code]
+        ]
+    ];
+
+    $response = $this->postToTenant('api.contracts.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    assertDatabaseCount('contracts', 1);
+});
 
 it('can store an asset with contracts', function () {
 
@@ -129,10 +155,11 @@ it('can store an asset with contracts', function () {
 
 it('can update an existing contract', function () {
     $contract = Contract::factory()->forLocation($this->asset)->create();
+    $provider = Provider::factory()->create();
 
     $formData =
         [
-            'provider_id' => $this->provider->id,
+            'provider_id' => $provider->id,
             'name' => 'Contrat de bail',
             'type' => 'Bail',
             'notes' => 'Nouveau contrat de bail 2025',
@@ -151,6 +178,7 @@ it('can update an existing contract', function () {
     assertDatabaseHas(
         'contracts',
         [
+            'provider_id' => $provider->id,
             'id' => $contract->id,
             'name' => 'Contrat de bail',
             'type' => 'Bail',

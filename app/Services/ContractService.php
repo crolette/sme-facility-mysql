@@ -24,7 +24,35 @@ class ContractService
         }
     }
 
-    public function create($request) {}
+    public function create($request): Contract | string
+    {
+        $contract = new Contract([...$request]);
+        $contract->provider()->associate($request['provider_id']);
+        $contract->save();
+
+        foreach ($request['contractables'] as $contractable) {
+
+            dump($contractable);
+
+            $modelMap = [
+                'site' => \App\Models\Tenants\Site::class,
+                'building' => \App\Models\Tenants\Building::class,
+                'floor' => \App\Models\Tenants\Floor::class,
+                'room' => \App\Models\Tenants\Room::class,
+                'asset' => \App\Models\Tenants\Asset::class,
+            ];
+
+            dump($modelMap[$contractable['locationType']]);
+            $model = $modelMap[$contractable['locationType']]::where('code', $contractable['locationCode'])->first();
+
+            $model->contracts()->attach($contract);
+            $model->save();
+        }
+
+
+
+        return $contract;
+    }
 
     public function update(Contract $contract, $request)
     {
@@ -32,7 +60,7 @@ class ContractService
         $contract->update([...$request]);
 
         if ($contract->provider->id !== $request['provider_id']) {
-            $contract->provider()->deassociate();
+            $contract->provider()->disassociate();
             $contract->provider()->associate($request['provider_id']);
         }
 

@@ -29,10 +29,11 @@ class APIContractController extends Controller
         try {
             DB::beginTransaction();
 
+            $contract = $this->contractService->create($request->validated());
 
             DB::commit();
 
-            return ApiResponse::success('', 'Asset created');
+            return ApiResponse::success(['id' => $contract->id], 'Contract created');
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());

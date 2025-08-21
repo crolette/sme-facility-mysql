@@ -13,7 +13,7 @@ Route::middleware([
     'auth:tenant'
 ])->prefix('/v1/contracts')->group(function () {
 
-    Route::post('/', [APIBuildingController::class, 'store'])->name('api.contracts.store');
+    Route::post('/', [APIContractController::class, 'store'])->name('api.contracts.store');
 
     Route::prefix('/{contract}')->group(function () {
         Route::patch('/', [APIContractController::class, 'update'])->name('api.contracts.update');
