@@ -28,25 +28,31 @@ export default function IndexAssets() {
 
     const { post, delete: destroy } = useForm();
 
-    const deleteDefinitelyAsset = (asset: Asset) => {
-        destroy(route(`api.tenant.assets.force`, asset.id), {
-            onSuccess: () => {
+    const deleteDefinitelyAsset = async (asset: Asset) => {
+        try {
+            const response = await axios.delete(route(`api.assets.force`, asset.reference_code));
+            if (response.data.status === 'success') {
                 setTrashedAssetsTab(true);
                 setActiveAssetsTab(false);
                 fetchTrashedAssets();
-            },
-        });
+            }
+        } catch (error) {
+            console.log(error);
+        }
     };
 
-    const restoreAsset = (asset: Asset) => {
-        post(route('api.assets.restore', asset.id), {
-            onSuccess: () => {
+    const restoreAsset = async (asset: Asset) => {
+        try {
+            const response = await axios.post(route(`api.assets.restore`, asset.reference_code));
+            if (response.data.status === 'success') {
                 setTrashedAssetsTab(!trashedAssetsTab);
                 setActiveAssetsTab(!activeAssetsTab);
                 setSearch('');
                 fetchAssets();
-            },
-        });
+            }
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     const fetchAssets = async () => {
@@ -70,13 +76,16 @@ export default function IndexAssets() {
         }
     };
 
-    const deleteAsset = (asset: Asset) => {
-        destroy(route(`api.assets.destroy`, asset.reference_code), {
-            onSuccess: () => {
+    const deleteAsset = async (asset: Asset) => {
+        try {
+            const response = await axios.delete(route(`api.assets.destroy`, asset.reference_code));
+            if (response.data.status === 'success') {
                 setSearch('');
                 fetchAssets();
-            },
-        });
+            }
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     const [search, setSearch] = useState('');

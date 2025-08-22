@@ -50,9 +50,6 @@ class DashboardController extends Controller
             ->limit(10)
             ->with('maintainable') // on eager-load correctement
             ->get();
-        // dd($maintainables);
-
-        // dd($assets, $tickets);
 
         return Inertia::render('tenants/dashboard', ['assets' => $assets, 'tickets' => $tickets, 'maintainables' => $maintainables]);
     }

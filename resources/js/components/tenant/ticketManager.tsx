@@ -62,7 +62,7 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
 
     const closeTicket = async (id: number) => {
         try {
-            const response = await axios.patch(route('api.tickets.status', id), { status: close });
+            const response = await axios.patch(route('api.tickets.status', id), { status: 'closed' });
             if (response.data.status === 'success') {
                 fetchTickets();
             }
@@ -107,6 +107,8 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
             console.log(error);
         }
     };
+
+    console.log(newTicketData);
 
     const submitNewTicket: FormEventHandler = async (e) => {
         e.preventDefault();
