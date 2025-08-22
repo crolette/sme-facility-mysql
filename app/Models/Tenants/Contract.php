@@ -12,6 +12,7 @@ use App\Models\Central\CategoryType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -31,12 +32,9 @@ class Contract extends Model
         'notes',
     ];
 
-
     protected function casts(): array
     {
         return [
-            'start_date' => 'date:d-m-Y',
-            'end_date' => 'date:d-m-Y',
             'created_at' => 'date:d-m-Y',
             'updated_at' => 'date:d-m-Y',
             'renewal_type' => ContractRenewalTypesEnum::class,
@@ -72,5 +70,73 @@ class Contract extends Model
     public function rooms()
     {
         return $this->morphedByMany(Room::class, 'contractable');
+    }
+
+    /**
+     * contractable
+     *
+     * @return MorphTo
+     */
+    public function contractables(): MorphTo
+    {
+        return $this->morphTo()->withTrashed();
+    }
+
+
+    public function getObjects($columns = ['id', 'code', 'reference_code', 'category_type_id', 'location_type_id'])
+    {
+        // if (!$this->relationLoaded('assets')) {
+        $this->loadObjectsWithColumns($columns);
+        // }
+
+        return collect()
+            ->merge($this->assets)
+            ->merge($this->sites)
+            ->merge($this->buildings)
+            ->merge($this->floors)
+            ->merge($this->rooms);
+    }
+
+    public function loadObjectsWithColumns($columns = ['id', 'code', 'reference_code', 'category_type_id'])
+    {
+        if (!in_array('id', $columns)) {
+            array_unshift($columns, 'id');
+        }
+
+        $assetColumns = array_filter($columns, function ($value) {
+            return $value != 'location_type_id';
+        });
+        $locationColumns = array_filter($columns, function ($value) {
+            return $value != 'category_type_id';
+        });
+
+        $this->load([
+            'assets:' . implode(',', $assetColumns),
+            'sites:' . implode(',', $locationColumns),
+            'buildings:' . implode(',', $locationColumns),
+            'floors:' . implode(',', $locationColumns),
+            'rooms:' . implode(',', $locationColumns),
+        ]);
+
+        return $this;
+    }
+
+
+    public function scopeWithObjects($query, $columns = ['id', 'code', 'reference_code'])
+    {
+        // Assure-toi d'inclure l'id pour les relations
+        if (!in_array('id', $columns)) {
+            array_unshift($columns, 'id');
+        }
+
+        $columnString = implode(',', $columns);
+
+        return $query->with([
+            'assets:' . $columnString,
+            'sites:' . $columnString,
+            'buildings:' . $columnString,
+            'floors:' . $columnString,
+            'rooms:' . $columnString,
+        ]);
     }
 }

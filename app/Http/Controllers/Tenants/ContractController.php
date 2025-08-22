@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers\Tenants;
 
-use App\Enums\ContractRenewalTypesEnum;
-use App\Enums\ContractStatusEnum;
 use Carbon\Carbon;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use App\Models\Tenants\Asset;
 use App\Models\Tenants\Ticket;
+use App\Models\Tenants\Contract;
 use App\Models\Tenants\Provider;
+use App\Enums\ContractStatusEnum;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
-use App\Models\Tenants\Contract;
 use App\Models\Tenants\Intervention;
+use App\Enums\ContractRenewalTypesEnum;
 
 class ContractController extends Controller
 {
@@ -21,11 +22,11 @@ class ContractController extends Controller
      */
     public function index()
     {
-        $contracts = Contract::all();
+        $contracts = Contract::select('id', 'name', 'type', 'provider_id', 'status', 'renewal_type', 'end_date')->with('provider:id,name,category_type_id')->get();
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
 
-        return Inertia::render('tenants/contracts/index', ['contracts' => $contracts, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
+        return Inertia::render('tenants/contracts/index', ['items' => $contracts, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
     }
 
     /**
@@ -46,7 +47,8 @@ class ContractController extends Controller
     {
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
-        return Inertia::render('tenants/contracts/create', ['contract' => $contract, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
+        // dd($contract->withObjects()->find($contract->id));
+        return Inertia::render('tenants/contracts/create', ['contract' => $contract->load('provider'), 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'objects' => $contract->getObjects()]);
     }
 
 
@@ -55,6 +57,6 @@ class ContractController extends Controller
      */
     public function show(Contract $contract)
     {
-        return Inertia::render('tenants/contracts/show', ['contract' => $contract]);
+        return Inertia::render('tenants/contracts/show', ['item' => $contract->load('provider'), 'objects' => $contract->getObjects()]);
     }
 }

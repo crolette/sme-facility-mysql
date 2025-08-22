@@ -104,11 +104,11 @@ it('can store a contract with asset and locations', function () {
         'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
         'status' => ContractStatusEnum::ACTIVE->value,
         'contractables' => [
-            ['locationType' => 'site', 'locationCode' => $this->site->code],
-            ['locationType' => 'asset', 'locationCode' => $this->asset->code],
-            ['locationType' => 'building', 'locationCode' => $this->building->code],
-            ['locationType' => 'floor', 'locationCode' => $this->floor->code],
-            ['locationType' => 'room', 'locationCode' => $this->room->code]
+            ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
+            ['locationType' => 'asset', 'locationCode' => $this->asset->code, 'locationId' => $this->asset->id],
+            ['locationType' => 'building', 'locationCode' => $this->building->code, 'locationId' => $this->building->id],
+            ['locationType' => 'floor', 'locationCode' => $this->floor->code, 'locationId' => $this->floor->id],
+            ['locationType' => 'room', 'locationCode' => $this->room->code, 'locationId' => $this->room->id]
         ]
     ];
 
@@ -197,6 +197,17 @@ it('can update an existing contract', function () {
     );
 });
 
+it('can delete a contract', function () {
+
+    $contract = Contract::factory()->forLocation($this->asset)->create();
+
+    $response = $this->deleteFromTenant('api.contracts.destroy', $contract->id);
+    $response->assertStatus(200)->assertJson(['status' => 'success']);
+
+    assertDatabaseEmpty('contracts');
+    assertDatabaseEmpty('contractables');
+});
+
 it('can render the index page with all contracts', function () {
 
     $statuses = array_column(ContractStatusEnum::cases(), 'value');
@@ -210,7 +221,7 @@ it('can render the index page with all contracts', function () {
     $response->assertInertia(
         fn($page) =>
         $page->component('tenants/contracts/index')
-            ->has('contracts', 4)
+            ->has('items', 4)
             ->has('statuses', count($statuses))
             ->has('renewalTypes', count($renewalTypes))
     );
@@ -225,8 +236,8 @@ it('can render the show contract page', function () {
     $response->assertInertia(
         fn($page) =>
         $page->component('tenants/contracts/show')
-            ->has('contract')
-            ->where('contract.id', $contract->id)
+            ->has('item')
+            ->where('item.id', $contract->id)
     );
 });
 

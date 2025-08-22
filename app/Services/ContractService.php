@@ -30,22 +30,8 @@ class ContractService
         $contract->provider()->associate($request['provider_id']);
         $contract->save();
 
-        foreach ($request['contractables'] as $contractable) {
-
-            $modelMap = [
-                'site' => \App\Models\Tenants\Site::class,
-                'building' => \App\Models\Tenants\Building::class,
-                'floor' => \App\Models\Tenants\Floor::class,
-                'room' => \App\Models\Tenants\Room::class,
-                'asset' => \App\Models\Tenants\Asset::class,
-            ];
-
-            $model = $modelMap[$contractable['locationType']]::where('code', $contractable['locationCode'])->first();
-
-            $model->contracts()->attach($contract);
-            $model->save();
-        }
-
+        if (isset($request['contractables']))
+            $contract = $this->syncContractables($contract, $request['contractables']);
 
 
         return $contract;
@@ -61,6 +47,26 @@ class ContractService
             $contract->provider()->associate($request['provider_id']);
         }
 
+        if (isset($request['contractables']))
+            $contract = $this->syncContractables($contract, $request['contractables']);
+
         $contract->save();
+
+        return $contract;
+    }
+
+    protected function syncContractables(Contract $contract, array $contractables)
+    {
+        $groupedAssetLocations = collect($contractables)->groupBy('locationType')->map(function ($items) {
+            return $items->pluck('locationId')->toArray();
+        });
+
+        $morphs = ['asset', 'site', 'building', 'floor', 'room'];
+
+        foreach ($morphs as $morph) {
+            $contract->{$morph . 's'}()->sync($groupedAssetLocations[$morph] ?? []);
+        }
+
+        return $contract;
     }
 };

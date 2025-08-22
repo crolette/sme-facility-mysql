@@ -14,7 +14,7 @@ import { MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
-interface Provider {
+interface ProviderForm {
     id: number;
     name: string;
 }
@@ -72,7 +72,7 @@ type TypeFormData = {
         typeSlug: string;
     }[];
     pictures: File[];
-    providers: Provider[];
+    providers: ProviderForm[];
 };
 
 type SearchedLocation = {
@@ -106,7 +106,7 @@ export default function CreateAsset({
     ];
 
     const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
-    const { data, setData, post, errors } = useForm<TypeFormData>({
+    const { data, setData, errors } = useForm<TypeFormData>({
         q: '',
         name: asset?.maintainable.name ?? '',
         description: asset?.maintainable.description ?? '',
@@ -376,8 +376,6 @@ export default function CreateAsset({
 
         setCountContracts((prev) => prev - 1);
     };
-    console.log(data);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Create asset`} />
@@ -835,77 +833,52 @@ export default function CreateAsset({
                         <h5>Contract</h5>
                         <PlusCircleIcon onClick={() => setCountContracts((prev) => prev + 1)} />
                     </div>
-                    {countContracts}
 
                     {countContracts &&
                         [...Array(countContracts)].map((_, index) => (
-                            <div key={index} className="flex flex-col gap-2">
-                                <p>Contract {index + 1}</p>
-                                <MinusCircleIcon onClick={() => handleRemoveContract(index)} />
-                                <Label className="font-medium">Name</Label>
-                                <Input
-                                    type="text"
-                                    value={data.contracts[index]?.name ?? ''}
-                                    placeholder={`Nom du document ${index + 1}`}
-                                    className="rounded border px-2 py-1"
-                                    onChange={(e) => handleChangeContracts(index, 'name', e.target.value)}
-                                />
-                                <Label className="font-medium">Type</Label>
-                                <Input
-                                    type="text"
-                                    // value={data.contracts[index].name ?? ''}
-                                    placeholder={`Type ${index + 1}`}
-                                    className="rounded border px-2 py-1"
-                                    onChange={(e) => handleChangeContracts(index, 'type', e.target.value)}
-                                />
-                                <Label className="font-medium">Provider</Label>
-                                <SearchableInput<Provider>
-                                    searchUrl={route('api.providers.search')}
-                                    getKey={(provider) => provider.id}
-                                    displayValue={data.contracts[index]?.provider_name ?? ''}
-                                    getDisplayText={(provider) => provider.name}
-                                    onSelect={(provider) => {
-                                        handleChangeContracts(index, 'provider_id', provider.id);
-                                        handleChangeContracts(index, 'provider_name', provider.name);
-                                    }}
-                                    placeholder="Search provider..."
-                                    // className="mb-4"
-                                />
-                                <Label htmlFor="renewal_type">Renewal type</Label>
-                                <select
-                                    name="renewal_type"
-                                    // value={data.renewal_type ?? ''}
-                                    onChange={(e) => handleChangeContracts(index, 'renewal_type', e.target.value)}
-                                    id=""
-                                    defaultValue={''}
-                                    // required={data.need_maintenance}
-                                    className={cn(
-                                        'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                                    )}
-                                >
-                                    {renewalTypes && renewalTypes.length > 0 && (
-                                        <>
-                                            <option value="" disabled className="bg-background text-foreground">
-                                                Select an option
-                                            </option>
-                                            {renewalTypes?.map((type, index) => (
-                                                <option value={type} key={index} className="bg-background text-foreground">
-                                                    {type}
-                                                </option>
-                                            ))}
-                                        </>
-                                    )}
-                                </select>
-                                <div className="w-full">
-                                    <Label htmlFor="status">Status</Label>
+                            <div key={index} className="flex flex-col gap-2 rounded-md border-2 border-slate-400 p-4">
+                                <div className="flex w-fit gap-2">
+                                    <p>Contract {index + 1}</p>
+                                    <MinusCircleIcon onClick={() => handleRemoveContract(index)} />
+                                </div>
+                                <div>
+                                    <Label className="font-medium">Name</Label>
+                                    <Input
+                                        type="text"
+                                        value={data.contracts[index]?.name ?? ''}
+                                        placeholder={`Contract name ${index + 1}`}
+                                        className="rounded border px-2 py-1"
+                                        onChange={(e) => handleChangeContracts(index, 'name', e.target.value)}
+                                    />
+                                    <Label className="font-medium">Type</Label>
+                                    <Input
+                                        type="text"
+                                        // value={data.contracts[index].name ?? ''}
+                                        placeholder={`Type ${index + 1}`}
+                                        className="rounded border px-2 py-1"
+                                        onChange={(e) => handleChangeContracts(index, 'type', e.target.value)}
+                                    />
+
+                                    <Label className="font-medium">Provider</Label>
+                                    <SearchableInput<Provider>
+                                        searchUrl={route('api.providers.search')}
+                                        getKey={(provider) => provider.id}
+                                        displayValue={data.contracts[index]?.provider_name ?? ''}
+                                        getDisplayText={(provider) => provider.name}
+                                        onSelect={(provider) => {
+                                            handleChangeContracts(index, 'provider_id', provider.id);
+                                            handleChangeContracts(index, 'provider_name', provider.name);
+                                        }}
+                                        placeholder="Search provider..."
+                                        // className="mb-4"
+                                    />
+                                    <Label htmlFor="renewal_type">Renewal type</Label>
                                     <select
-                                        name="status"
-                                        // value={data.status ?? ''}
-                                        defaultValue={''}
-                                        onChange={(e) => handleChangeContracts(index, 'status', e.target.value)}
+                                        name="renewal_type"
+                                        // value={data.renewal_type ?? ''}
+                                        onChange={(e) => handleChangeContracts(index, 'renewal_type', e.target.value)}
                                         id=""
+                                        defaultValue={''}
                                         // required={data.need_maintenance}
                                         className={cn(
                                             'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
@@ -913,19 +886,48 @@ export default function CreateAsset({
                                             'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
                                         )}
                                     >
-                                        {statuses && statuses.length > 0 && (
+                                        {renewalTypes && renewalTypes.length > 0 && (
                                             <>
                                                 <option value="" disabled className="bg-background text-foreground">
                                                     Select an option
                                                 </option>
-                                                {statuses?.map((status, index) => (
-                                                    <option value={status} key={index} className="bg-background text-foreground">
-                                                        {status}
+                                                {renewalTypes?.map((type, index) => (
+                                                    <option value={type} key={index} className="bg-background text-foreground">
+                                                        {type}
                                                     </option>
                                                 ))}
                                             </>
                                         )}
                                     </select>
+                                    <div className="w-full">
+                                        <Label htmlFor="status">Status</Label>
+                                        <select
+                                            name="status"
+                                            // value={data.status ?? ''}
+                                            defaultValue={''}
+                                            onChange={(e) => handleChangeContracts(index, 'status', e.target.value)}
+                                            id=""
+                                            // required={data.need_maintenance}
+                                            className={cn(
+                                                'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                            )}
+                                        >
+                                            {statuses && statuses.length > 0 && (
+                                                <>
+                                                    <option value="" disabled className="bg-background text-foreground">
+                                                        Select an option
+                                                    </option>
+                                                    {statuses?.map((status, index) => (
+                                                        <option value={status} key={index} className="bg-background text-foreground">
+                                                            {status}
+                                                        </option>
+                                                    ))}
+                                                </>
+                                            )}
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         ))}

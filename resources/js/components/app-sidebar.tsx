@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, BrickWall, Building, Building2, Cuboid, Handshake, LayoutDashboard, LayoutGrid, Ticket, Users } from 'lucide-react';
+import { BookOpen, BrickWall, Building, Building2, Cuboid, Handshake, LayoutDashboard, LayoutGrid, ScrollText, Ticket, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -47,6 +47,11 @@ const mainNavItems: NavItem[] = [
         title: 'Providers',
         href: '/providers',
         icon: Handshake,
+    },
+    {
+        title: 'Contracts',
+        href: '/contracts',
+        icon: ScrollText,
     },
     {
         title: 'Users',

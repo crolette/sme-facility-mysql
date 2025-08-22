@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\ContractStoreRequest;
 use App\Http\Requests\Tenant\ContractUpdateRequest;
 
@@ -23,6 +24,7 @@ class APIContractController extends Controller
 
     public function store(ContractStoreRequest $request)
     {
+
         if (Auth::user()->cannot('create', Asset::class))
             abort(403);
 
@@ -52,18 +54,18 @@ class APIContractController extends Controller
             abort(403);
 
         try {
-            DB::beginTransaction();
+            // DB::beginTransaction();
 
-            $this->contractService->update($contract, $request->validated());
+            $contract = $this->contractService->update($contract, $request->validated());
+            Debugbar::info($contract);
 
-            DB::commit();
+            // DB::commit();
 
             return ApiResponse::success('', 'Contract updated');
         } catch (Exception $e) {
-            DB::rollback();
+            // DB::rollback();
             Log::error($e->getMessage());
             return ApiResponse::error('ERROR : ' . $e->getMessage());
-            return redirect()->back()->with(['message' => 'ERROR : ' . $e->getMessage(), 'type' => 'error']);
         }
         return ApiResponse::error('Error while updating the contract');
     }
@@ -71,12 +73,12 @@ class APIContractController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Asset $asset)
+    public function destroy(Contract $contract)
     {
-        if (Auth::user()->cannot('delete', $asset))
+        if (Auth::user()->cannot('create', Asset::class))
             abort(403);
 
-        $asset->delete();
-        return ApiResponse::success('', 'Asset deleted');
+        $contract->delete();
+        return ApiResponse::success('', 'Contract deleted');
     }
 }

@@ -22,6 +22,7 @@ use App\Http\Controllers\API\V1\APITicketController;
 use App\Http\Controllers\API\V1\DestroyPictureController;
 use App\Http\Controllers\API\V1\UpdateDocumentController;
 use App\Http\Controllers\API\V1\APIInterventionController;
+use App\Http\Controllers\API\V1\APISearchAssetsLocationController;
 use App\Http\Controllers\API\V1\DestroyDocumentController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\API\V1\ApiSearchLocationController;
@@ -45,32 +46,7 @@ Route::prefix('/v1/')->group(
 
             Route::middleware(['auth'])->group(function () {
                 Route::get('/locations', [ApiSearchLocationController::class, 'index'])->name('api.locations');
-
-
-                // Get the qr code
-                // Route::get('/qr/show', function (Request $request) {
-
-                //     $path = $request->path;
-
-                //     if (! Storage::disk('tenants')->exists($path)) {
-                //         abort(404);
-                //     }
-
-
-                //     return response()->file(Storage::disk('tenants')->path($path));
-                // })->name('api.qr.show');
-
-                // Route::get('/qr/download', function (Request $request) {
-
-                //     $path = $request->path;
-
-
-                //     if (! Storage::disk('tenants')->exists($path)) {
-                //         abort(404);
-                //     }
-
-                //     return Storage::disk('tenants')->download($path);
-                // })->name('api.qr.download');
+                Route::get('/all', [APISearchAssetsLocationController::class, 'index'])->name('api.search.all');
 
                 Route::get('/file', function (Request $request) {
 

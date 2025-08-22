@@ -40,6 +40,10 @@ class ContractUpdateRequest extends FormRequest
             'renewal_type' => ['required', Rule::in(array_column(ContractRenewalTypesEnum::cases(), 'value'))],
             'status' => ['required', Rule::in(array_column(ContractStatusEnum::cases(), 'value'))],
 
+            'contractables' => 'nullable|array',
+            'contractables.*.locationType' => 'required|in:site,building,floor,room,asset',
+            'contractables.*.locationId' => ['required', 'integer'],
+            'contractables.*.locationCode' => ['required', 'string'],
         ];
     }
 }
