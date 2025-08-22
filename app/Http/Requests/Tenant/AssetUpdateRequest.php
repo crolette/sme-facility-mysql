@@ -14,7 +14,7 @@ use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
 
-class AssetRequest extends FormRequest
+class AssetUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

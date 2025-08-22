@@ -56,7 +56,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Asset ${asset.maintainable.name}`} />
 
-            <div className="flex h-full flex-1 flex-col justify-between gap-4 rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div>
                     {asset.deleted_at ? (
                         <>
@@ -176,6 +176,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                 {asset.maintainable.providers && asset.maintainable.providers?.length > 0 && (
                     <div className="rounded-md border border-gray-200 p-4">
                         <h2>Providers</h2>
+                        <p>End contract date : {asset.contract_end_date}</p>
                         <ul>
                             {asset.maintainable.providers.map((provider, index) => (
                                 <li key={index}>

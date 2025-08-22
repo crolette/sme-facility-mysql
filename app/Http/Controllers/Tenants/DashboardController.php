@@ -51,7 +51,6 @@ class DashboardController extends Controller
             ->with('maintainable') // on eager-load correctement
             ->get();
 
-
         return Inertia::render('tenants/dashboard', ['assets' => $assets, 'tickets' => $tickets, 'maintainables' => $maintainables]);
     }
 }

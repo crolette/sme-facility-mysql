@@ -5,6 +5,7 @@ namespace App\Models\Tenants;
 use App\Models\LocationType;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Models\Tenants\Contract;
 use App\Models\Tenants\Document;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
@@ -93,6 +94,11 @@ class Room extends Model
     public function floor(): BelongsTo
     {
         return $this->belongsTo(Floor::class, 'level_id');
+    }
+
+    public function contracts(): MorphToMany
+    {
+        return $this->morphToMany(Contract::class, 'contractable');
     }
 
     public function assets(): MorphMany

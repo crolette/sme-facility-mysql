@@ -165,9 +165,6 @@ it('can create a new mobile asset', function () {
 });
 
 
-
-
-
 it('can create a new asset to building', function () {
 
     $formData = [
@@ -352,6 +349,7 @@ it('can create a new asset to room', function () {
         'brand' => 'Alpine',
         'serial_number' => '123-AZ-65-XF',
         'categoryId' => $this->categoryType->id,
+        'contract_end_date' => Carbon::now()->addYear(3)->toDateString(),
     ];
 
     $response = $this->postToTenant('api.assets.store', $formData);
@@ -371,6 +369,7 @@ it('can create a new asset to room', function () {
         'model' => 'Blue daba di daba da',
         'brand' => 'Alpine',
         'serial_number' => '123-AZ-65-XF',
+        'contract_end_date' => Carbon::now()->addYear(3)->toDateString(),
         'category_type_id' => $this->categoryType->id,
     ]);
 
@@ -381,6 +380,7 @@ it('can create a new asset to room', function () {
         'description' => 'Description new asset',
     ]);
 });
+
 
 it('can show the asset page', function () {
 

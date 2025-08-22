@@ -34,6 +34,7 @@ class Asset extends Model
         "depreciation_end_date",
         "depreciation_duration",
         "residual_value",
+        'contract_end_date',
         'brand',
         'model',
         'qr_code',
@@ -95,6 +96,11 @@ class Asset extends Model
     public function documents(): MorphToMany
     {
         return $this->morphToMany(Document::class, 'documentable');
+    }
+
+    public function contracts(): MorphToMany
+    {
+        return $this->morphToMany(Contract::class, 'contractable');
     }
 
     public function interventions(): MorphMany

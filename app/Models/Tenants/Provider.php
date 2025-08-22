@@ -66,6 +66,11 @@ class Provider extends Model
         return $this->hasMany(User::class);
     }
 
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(Contract::class);
+    }
+
     public function maintainables(): BelongsToMany
     {
         return $this->belongsToMany(Maintainable::class, 'user_maintainable');

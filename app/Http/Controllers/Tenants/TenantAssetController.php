@@ -2,24 +2,17 @@
 
 namespace App\Http\Controllers\Tenants;
 
-use Exception;
 use Inertia\Inertia;
 use App\Models\Tenants\Asset;
 use App\Services\AssetService;
 use App\Services\QRCodeService;
-use App\Services\PictureService;
-use App\Services\DocumentService;
-use Illuminate\Support\Facades\DB;
+use App\Enums\ContractStatusEnum;
 use App\Enums\MaintenanceFrequency;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
-use App\Http\Requests\Tenant\AssetRequest;
-use App\Http\Requests\Tenant\MaintainableRequest;
-use App\Http\Requests\Tenant\PictureUploadRequest;
-use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Enums\ContractRenewalTypesEnum;
 
 class TenantAssetController extends Controller
 {
@@ -54,7 +47,9 @@ class TenantAssetController extends Controller
         $categories = CategoryType::where('category', 'asset')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-        return Inertia::render('tenants/assets/create', ['categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
+        $statuses = array_column(ContractStatusEnum::cases(), 'value');
+        $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
+        return Inertia::render('tenants/assets/create', ['categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
     }
 
 
@@ -87,6 +82,6 @@ class TenantAssetController extends Controller
         $categories = CategoryType::where('category', 'asset')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-        return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents', 'maintainable.manager']), 'categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
+        return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents', 'maintainable.manager', 'maintainable.providers:id,name,category_type_id']), 'categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
     }
 }

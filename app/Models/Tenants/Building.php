@@ -6,6 +6,7 @@ use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Models\Tenants\Contract;
 use App\Models\Tenants\Document;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
@@ -104,6 +105,11 @@ class Building extends Model
     public function maintainable(): MorphOne
     {
         return $this->morphOne(Maintainable::class, 'maintainable');
+    }
+
+    public function contracts(): MorphToMany
+    {
+        return $this->morphToMany(Contract::class, 'contractable');
     }
 
     public function site(): BelongsTo

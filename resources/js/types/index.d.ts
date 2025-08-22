@@ -99,6 +99,22 @@ export interface TenantRoom extends TenantSite {
     floor: TenantFloor;
 }
 
+export interface Contract {
+    id: number;
+    name: string;
+    type: string;
+    internal_reference: string;
+    provider_reference: string;
+    start_date: string;
+    end_date: string;
+    renewal_type: string;
+    status: string;
+    notes: string;
+    provider_id: number;
+    provider_name: string;
+    provider: Provider;
+}
+
 export interface Asset {
     id: number;
     is_mobile: boolean;
@@ -121,6 +137,7 @@ export interface Asset {
     depreciation_start_date: string;
     depreciation_end_date: string;
     depreciation_duration: number;
+    contract_end_date: string;
     residual_value: number;
     documents?: Documents[];
     deleted_at?: string;
@@ -128,7 +145,7 @@ export interface Asset {
     updated_at?: string;
     asset_category: AssetCategory;
     maintainable: Maintainable;
-    location: TenantSite | TenantBuilding | TenantFloor | TenantRoom | User;
+    location: Partial<TenantSite | TenantBuilding | TenantFloor | TenantRoom | User>;
 }
 
 export interface Picture {
