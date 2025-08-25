@@ -75,7 +75,6 @@ class TenantAssetController extends Controller
      */
     public function edit(Asset $asset)
     {
-
         if (Auth::user()->cannot('update', $asset))
             abort(403);
 

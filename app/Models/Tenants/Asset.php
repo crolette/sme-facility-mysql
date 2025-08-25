@@ -69,7 +69,7 @@ class Asset extends Model
         return 'reference_code';
     }
 
-
+    public const DEFAULT_NOTIFICATION_DELAY = 30;
 
     public static function boot()
     {
@@ -106,6 +106,11 @@ class Asset extends Model
     public function interventions(): MorphMany
     {
         return $this->morphMany(Intervention::class, 'interventionable');
+    }
+
+    public function notifications(): MorphMany
+    {
+        return $this->morphMany(ScheduledNotification::class, 'notifiable');
     }
 
     public function location(): MorphTo
@@ -155,6 +160,13 @@ class Asset extends Model
     {
         return $this->interventions()->where('ticket_id', null);
     }
+
+    // public function manager(): Attribute
+    // {
+    //     return Attribute::make(
+    //         get: fn() => $this->maintainable->manager ?? $this->location->maintainable->manager
+    //     );
+    // }
 
 
 

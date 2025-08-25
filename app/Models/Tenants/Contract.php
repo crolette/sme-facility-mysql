@@ -2,19 +2,20 @@
 
 namespace App\Models\Tenants;
 
-use App\Enums\ContractRenewalTypesEnum;
-use App\Enums\ContractStatusEnum;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Enums\ContractStatusEnum;
 use App\Models\Central\CategoryType;
+use App\Enums\ContractRenewalTypesEnum;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Contract extends Model
 {
@@ -41,6 +42,8 @@ class Contract extends Model
             'status' => ContractStatusEnum::class
         ];
     }
+
+    public const DEFAULT_NOTIFICATION_DELAY = 30;
 
     public function provider(): BelongsTo
     {
@@ -81,7 +84,6 @@ class Contract extends Model
     {
         return $this->morphTo()->withTrashed();
     }
-
 
     public function getObjects($columns = ['id', 'code', 'reference_code', 'category_type_id', 'location_type_id'])
     {

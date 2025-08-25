@@ -48,6 +48,8 @@ class Maintainable extends Model
         ];
     }
 
+    public const DEFAULT_NOTIFICATION_DELAY = 30;
+
 
     public function maintainable()
     {

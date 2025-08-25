@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('scheduled_notifications', function (Blueprint $table) {
             $table->id();
+            // relation polymorphique : type: Asset, Ticket, Site, Contract, ...
             $table->string('notifiable_type');
             $table->unsignedBigInteger('notifiable_id');
 
