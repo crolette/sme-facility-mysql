@@ -45,6 +45,7 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                     <div className="flex w-full shrink-0 justify-between rounded-md border border-gray-200 p-4">
                         <div>
                             <p>Name: {contract.name}</p>
+                            <p>Type: {contract.type}</p>
                             <p>Internal reference: {contract.internal_reference}</p>
                             <p>Status: {contract.status}</p>
                             <p>Renewal Type: {contract.renewal_type}</p>

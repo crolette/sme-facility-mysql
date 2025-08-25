@@ -80,9 +80,9 @@ export default function IndexContracts({ items }: { contracts: Contract[] }) {
                                             <Button onClick={() => deleteContract(contract)} variant={'destructive'}>
                                                 Delete
                                             </Button>
-                                            {/* <a href={route(`tenant.assets.edit`, asset.reference_code)}>
-                                                        <Button>Edit</Button>
-                                                    </a> */}
+                                            <a href={route(`tenant.contracts.edit`, contract.id)}>
+                                                <Button>Edit</Button>
+                                            </a>
                                             <a href={route(`tenant.contracts.show`, contract.id)}>
                                                 <Button variant={'outline'}>See</Button>
                                             </a>
