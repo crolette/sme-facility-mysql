@@ -13,9 +13,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function DocumentTypesIndex({ types }: { types: object }) {
     // const { delete: destroy } = useForm();
 
-    // const submit = (type: CentralType) => {
-    //     destroy(route(`central.types.destroy`, type.slug));
-    // };
+    const submit = (type: CentralType) => {
+        destroy(route(`central.types.destroy`, type.slug));
+    };
 
     // TODO FETCH Types to render different types in different tabs
 
@@ -37,9 +37,9 @@ export default function DocumentTypesIndex({ types }: { types: object }) {
                                     <li key={item.id} className="grid grid-cols-2 space-y-2">
                                         <span>{item.label}</span>
                                         <div className="space-x-4">
-                                            {/* <Button onClick={() => submit(item)} variant={'destructive'}>
+                                            <Button onClick={() => submit(item)} variant={'destructive'}>
                                                 Delete
-                                            </Button> */}
+                                            </Button>
                                             <a href={route(`central.types.edit`, item.slug)}>
                                                 <Button>Edit</Button>
                                             </a>

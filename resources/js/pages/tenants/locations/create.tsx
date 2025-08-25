@@ -5,17 +5,35 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { CentralType, LocationType, TenantBuilding, TenantFloor, TenantRoom, TenantSite, User, type BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
+import { MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
 interface Provider {
     id: number;
     name: string;
+}
+
+interface Contract {
+    provider_id: number | null;
+    provider_name: string | null;
+    name: string | null;
+    type: string | null;
+    notes: string | null;
+    internal_reference: string | null;
+    provider_reference: string | null;
+    start_date: string | null;
+    end_date: string | null;
+    contract_duration: string;
+    notice_period: string;
+    renewal_type: string;
+    status: string;
 }
 
 type TypeFormData = {
@@ -40,6 +58,7 @@ type TypeFormData = {
     maintenance_frequency: string | null;
     next_maintenance_date: string | null;
     last_maintenance_date: string | null;
+    contracts: Contract[];
     files: {
         file: File;
         name: string;
@@ -61,6 +80,10 @@ export default function CreateLocation({
     wallMaterials,
     floorMaterials,
     outdoorMaterials,
+    statuses,
+    renewalTypes,
+    contractDurations,
+    noticePeriods,
 }: {
     location?: TenantSite | TenantBuilding | TenantFloor | TenantRoom;
     levelTypes: LocationType[] | TenantSite[] | TenantFloor[];
@@ -71,6 +94,10 @@ export default function CreateLocation({
     outdoorMaterials: CentralType[];
     frequencies: string[];
     routeName: string;
+    statuses: string[];
+    renewalTypes: string[];
+    contractDurations?: string[];
+    noticePeriods?: string[];
 }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -80,7 +107,7 @@ export default function CreateLocation({
     ];
 
     const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
-    const { data, setData, errors } = useForm<TypeFormData>({
+    const { data, setData } = useForm<TypeFormData>({
         name: location?.maintainable?.name ?? '',
 
         description: location?.maintainable?.description ?? '',
@@ -105,9 +132,10 @@ export default function CreateLocation({
         next_maintenance_date: location?.maintainable.next_maintenance_date ?? '',
         last_maintenance_date: location?.maintainable.last_maintenance_date ?? '',
         providers: [],
+        contracts: [],
         address: location?.address ?? '',
     });
-
+    const [errors, setErrors] = useState({});
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
         if (location) {
@@ -120,6 +148,7 @@ export default function CreateLocation({
                 }
             } catch (error) {
                 console.log(error);
+                setErrors(error.response.data.errors);
             }
         } else {
             try {
@@ -135,9 +164,12 @@ export default function CreateLocation({
                 }
             } catch (error) {
                 console.log(error);
+                setErrors(error.response.data.errors);
             }
         }
     };
+
+    console.log(errors);
 
     const [showFileModal, setShowFileModal] = useState(false);
     const [newFileName, setNewFileName] = useState('');
@@ -237,6 +269,8 @@ export default function CreateLocation({
                                     type="text"
                                     name="name"
                                     required
+                                    minLength={4}
+                                    maxLength={100}
                                     placeholder="Document name"
                                     onChange={(e) => setNewFileName(e.target.value)}
                                 />
@@ -290,6 +324,31 @@ export default function CreateLocation({
             }
         }
     }, [data.locationTypeName]);
+
+    const [countContracts, setCountContracts] = useState(0);
+
+    const handleChangeContracts = (index: number, field: keyof Contract, value: any) => {
+        setData((prev) => {
+            const updatedContracts = [...prev.contracts];
+            updatedContracts[index] = {
+                ...updatedContracts[index],
+                [field]: value,
+            };
+            return { ...prev, contracts: updatedContracts };
+        });
+    };
+
+    const handleRemoveContract = (index: number) => {
+        setData((prev) => {
+            const updatedContracts = prev.contracts.filter((_, i) => i !== index);
+
+            return { ...prev, contracts: updatedContracts };
+        });
+
+        setCountContracts((prev) => prev - 1);
+    };
+
+    // console.log(errors.contracts[1].status);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -358,7 +417,7 @@ export default function CreateLocation({
                                     </option>
                                 ))}
                             </select>
-                            <InputError className="mt-2" message={errors.locationType} />
+                            <InputError className="mt-2" message={errors.locationType ?? ''} />
                         </div>
                     )}
 
@@ -373,7 +432,7 @@ export default function CreateLocation({
                         onChange={(e) => setData('name', e.target.value)}
                         placeholder="Name"
                     />
-                    <InputError className="mt-2" message={errors.name} />
+                    <InputError className="mt-2" message={errors.name ?? ''} />
 
                     {!location && (
                         <div>
@@ -384,7 +443,7 @@ export default function CreateLocation({
                                 checked={data.need_qr_code ?? true}
                                 onClick={() => setData('need_qr_code', !data.need_qr_code)}
                             />
-                            <InputError className="mt-2" message={errors.need_qr_code} />
+                            <InputError className="mt-2" message={errors.need_qr_code ?? ''} />
                         </div>
                     )}
 
@@ -401,7 +460,7 @@ export default function CreateLocation({
                                 onChange={(e) => setData('address', e.target.value)}
                                 placeholder="address"
                             />
-                            <InputError className="mt-2" message={errors.address} />
+                            <InputError className="mt-2" message={errors.address ?? ''} />
                         </>
                     )}
 
@@ -418,7 +477,7 @@ export default function CreateLocation({
                                     placeholder="Surface outdoor (max. 2 decimals) : 4236.3"
                                     onChange={(e) => setData('surface_outdoor', parseFloat(e.target.value))}
                                 />
-                                <InputError className="mt-2" message={errors.surface_outdoor} />
+                                <InputError className="mt-2" message={errors.surface_outdoor ?? ''} />
                             </div>
                             {outdoorMaterials && (
                                 <div className="w-full">
@@ -450,7 +509,7 @@ export default function CreateLocation({
                                         ))}
                                         <option value="other">Other</option>
                                     </select>
-                                    <InputError className="mt-2" message={errors.locationType} />
+                                    <InputError className="mt-2" message={errors.locationType ?? ''} />
                                     {data.outdoor_material_id === 'other' && (
                                         <div>
                                             <Input
@@ -480,7 +539,7 @@ export default function CreateLocation({
                                         placeholder="Surface floor (max. 2 decimals) : 4236.3"
                                         onChange={(e) => setData('surface_floor', parseFloat(e.target.value))}
                                     />
-                                    <InputError className="mt-2" message={errors.surface_floor} />
+                                    <InputError className="mt-2" message={errors.surface_floor ?? ''} />
                                 </div>
                                 {floorMaterials && (
                                     <div className="w-full">
@@ -512,7 +571,7 @@ export default function CreateLocation({
                                             ))}
                                             <option value="other">Other</option>
                                         </select>
-                                        <InputError className="mt-2" message={errors.locationType} />
+                                        <InputError className="mt-2" message={errors.locationType ?? ''} />
                                         {data.floor_material_id === 'other' && (
                                             <div>
                                                 <Input
@@ -538,7 +597,7 @@ export default function CreateLocation({
                                         onChange={(e) => setData('surface_walls', parseFloat(e.target.value))}
                                         placeholder="Surface walls (max. 2 decimals) : 4236.3"
                                     />
-                                    <InputError className="mt-2" message={errors.surface_walls} />
+                                    <InputError className="mt-2" message={errors.surface_walls ?? ''} />
                                 </div>
                                 {wallMaterials && (
                                     <div className="w-full">
@@ -570,7 +629,7 @@ export default function CreateLocation({
                                             ))}
                                             <option value="other">Other</option>
                                         </select>
-                                        <InputError className="mt-2" message={errors.locationType} />
+                                        <InputError className="mt-2" message={errors.locationType ?? ''} />
                                         {data.wall_material_id === 'other' && (
                                             <div>
                                                 <Input
@@ -598,7 +657,7 @@ export default function CreateLocation({
                         onChange={(e) => setData('description', e.target.value)}
                         placeholder="Description"
                     />
-                    <InputError className="mt-2" message={errors.description} />
+                    <InputError className="mt-2" message={errors.description ?? ''} />
                     <div>
                         <Label htmlFor="need_maintenance">Need maintenance ?</Label>
                         <Checkbox
@@ -607,7 +666,7 @@ export default function CreateLocation({
                             checked={data.need_maintenance}
                             onClick={() => setData('need_maintenance', !data.need_maintenance)}
                         />
-                        <InputError className="mt-2" message={errors.need_maintenance} />
+                        <InputError className="mt-2" message={errors.need_maintenance ?? ''} />
                     </div>
 
                     {data.need_maintenance && (
@@ -641,7 +700,7 @@ export default function CreateLocation({
                                         )}
                                     </select>
 
-                                    <InputError className="mt-2" message={errors.maintenance_frequency} />
+                                    <InputError className="mt-2" message={errors.maintenance_frequency ?? ''} />
                                 </div>
 
                                 <div className="w-full">
@@ -654,7 +713,7 @@ export default function CreateLocation({
                                         onChange={(e) => setData('last_maintenance_date', e.target.value)}
                                         placeholder="Date last maintenance"
                                     />
-                                    <InputError className="mt-2" message={errors.last_maintenance_date} />
+                                    <InputError className="mt-2" message={errors.last_maintenance_date ?? ''} />
                                 </div>
                                 <div className="w-full">
                                     <Label htmlFor="next_maintenance_date">Date next maintenance</Label>
@@ -666,7 +725,7 @@ export default function CreateLocation({
                                         onChange={(e) => setData('next_maintenance_date', e.target.value)}
                                         placeholder="Date last maintenance"
                                     />
-                                    <InputError className="mt-2" message={errors.next_maintenance_date} />
+                                    <InputError className="mt-2" message={errors.next_maintenance_date ?? ''} />
                                 </div>
                             </div>
                         </>
@@ -701,6 +760,214 @@ export default function CreateLocation({
                             placeholder="Search providers..."
                         />
                     </div>
+
+                    {!location && (
+                        <>
+                            {/* Contracts */}
+                            <div className="flex items-center gap-2">
+                                <h5>Contract</h5>
+                                <PlusCircleIcon onClick={() => setCountContracts((prev) => prev + 1)} />
+                            </div>
+
+                            {countContracts &&
+                                countContracts > 0 &&
+                                [...Array(countContracts)].map((_, index) => (
+                                    <div key={index} className="flex flex-col gap-2 rounded-md border-2 border-slate-400 p-4">
+                                        <div className="flex w-fit gap-2">
+                                            <p>Contract {index + 1}</p>
+                                            <MinusCircleIcon onClick={() => handleRemoveContract(index)} />
+                                        </div>
+                                        <div>
+                                            <Label className="font-medium">Name</Label>
+                                            <Input
+                                                type="text"
+                                                value={data.contracts[index]?.name ?? ''}
+                                                placeholder={`Contract name ${index + 1}`}
+                                                className="rounded border px-2 py-1"
+                                                minLength={4}
+                                                maxLength={100}
+                                                onChange={(e) => handleChangeContracts(index, 'name', e.target.value)}
+                                            />
+                                            <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.name : ''} />
+                                            <Label className="font-medium">Type</Label>
+                                            <Input
+                                                type="text"
+                                                // value={data.contracts[index].name ?? ''}
+                                                placeholder={`Type ${index + 1}`}
+                                                className="rounded border px-2 py-1"
+                                                minLength={4}
+                                                maxLength={100}
+                                                onChange={(e) => handleChangeContracts(index, 'type', e.target.value)}
+                                            />
+                                            <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.type : ''} />
+
+                                            <Label className="font-medium">Provider</Label>
+                                            <SearchableInput<Provider>
+                                                searchUrl={route('api.providers.search')}
+                                                getKey={(provider) => provider.id}
+                                                displayValue={data.contracts[index]?.provider_name ?? ''}
+                                                getDisplayText={(provider) => provider.name}
+                                                onSelect={(provider) => {
+                                                    handleChangeContracts(index, 'provider_id', provider.id);
+                                                    handleChangeContracts(index, 'provider_name', provider.name);
+                                                }}
+                                                placeholder="Search provider..."
+                                                // className="mb-4"
+                                            />
+                                            <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.provider_id : ''} />
+
+                                            <Label htmlFor="start_date">Start date</Label>
+                                            <Input
+                                                id="start_date"
+                                                type="date"
+                                                value={data.contracts[index]?.start_date ?? ''}
+                                                onChange={(e) => handleChangeContracts(index, 'start_date', e.target.value)}
+                                            />
+                                            <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.start_date : ''} />
+                                            <Label htmlFor="contract_duration">Contract duration</Label>
+                                            <select
+                                                name="contract_duration"
+                                                onChange={(e) => handleChangeContracts(index, 'contract_duration', e.target.value)}
+                                                id=""
+                                                required
+                                                value={data.contracts[index]?.contract_duration ?? ''}
+                                                className={cn(
+                                                    'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                    'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                    'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                                )}
+                                            >
+                                                {contractDurations && contractDurations.length > 0 && (
+                                                    <>
+                                                        <option value="" disabled className="bg-background text-foreground">
+                                                            Select a duration
+                                                        </option>
+                                                        {contractDurations?.map((type, index) => (
+                                                            <option value={type} key={index} className="bg-background text-foreground">
+                                                                {type}
+                                                            </option>
+                                                        ))}
+                                                    </>
+                                                )}
+                                            </select>
+                                            <InputError
+                                                className="mt-2"
+                                                message={errors?.contracts ? errors?.contracts[index]?.contract_duration : ''}
+                                            />
+                                            <Label>Notes</Label>
+                                            <Textarea
+                                                onChange={(e) => handleChangeContracts(index, 'notes', e.target.value)}
+                                                value={data.contracts[index]?.notes ?? ''}
+                                                minLength={4}
+                                                maxLength={250}
+                                            />
+                                            <InputError message={errors?.contracts ? errors?.contracts[index]?.notes : ''} />
+                                            <Label>Internal reference</Label>
+                                            <Input
+                                                type="text"
+                                                onChange={(e) => handleChangeContracts(index, 'internal_reference', e.target.value)}
+                                                value={data.contracts[index]?.internal_reference ?? ''}
+                                                maxLength={50}
+                                            />
+                                            <InputError message={errors?.contracts ? errors?.contracts[index]?.internal_reference : ''} />
+                                            <Label>Provider reference</Label>
+                                            <Input
+                                                type="text"
+                                                onChange={(e) => handleChangeContracts(index, 'provider_reference', e.target.value)}
+                                                value={data.contracts[index]?.provider_reference ?? ''}
+                                                maxLength={50}
+                                            />
+                                            <InputError message={errors?.contracts ? errors?.contracts[index]?.provider_reference : ''} />
+                                            <Label htmlFor="notice_period">Notice period</Label>
+                                            <select
+                                                name="notice_period"
+                                                onChange={(e) => handleChangeContracts(index, 'notice_period', e.target.value)}
+                                                id=""
+                                                // required
+                                                value={data.contracts[index]?.notice_period ?? ''}
+                                                className={cn(
+                                                    'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                    'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                    'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                                )}
+                                            >
+                                                {noticePeriods && noticePeriods.length > 0 && (
+                                                    <>
+                                                        {/* <option value="" disabled className="bg-background text-foreground">
+                                                                                                Select a duration
+                                                                                            </option> */}
+                                                        {noticePeriods?.map((type, index) => (
+                                                            <option value={type} key={index} className="bg-background text-foreground">
+                                                                {type}
+                                                            </option>
+                                                        ))}
+                                                    </>
+                                                )}
+                                            </select>
+                                            <InputError className="mt-2" message={errors?.notice_period ?? ''} />
+                                            <Label htmlFor="renewal_type">Renewal type</Label>
+                                            <select
+                                                name="renewal_type"
+                                                // value={data.renewal_type ?? ''}
+                                                onChange={(e) => handleChangeContracts(index, 'renewal_type', e.target.value)}
+                                                id=""
+                                                defaultValue={''}
+                                                // required={data.need_maintenance}
+                                                className={cn(
+                                                    'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                    'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                    'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                                )}
+                                            >
+                                                {renewalTypes && renewalTypes.length > 0 && (
+                                                    <>
+                                                        <option value="" disabled className="bg-background text-foreground">
+                                                            Select an option
+                                                        </option>
+                                                        {renewalTypes?.map((type, index) => (
+                                                            <option value={type} key={index} className="bg-background text-foreground">
+                                                                {type}
+                                                            </option>
+                                                        ))}
+                                                    </>
+                                                )}
+                                            </select>
+                                            <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.renewal_type : ''} />
+                                            <div className="w-full">
+                                                <Label htmlFor="status">Status</Label>
+                                                <select
+                                                    name="status"
+                                                    // value={data.status ?? ''}
+                                                    defaultValue={''}
+                                                    onChange={(e) => handleChangeContracts(index, 'status', e.target.value)}
+                                                    id=""
+                                                    // required={data.need_maintenance}
+                                                    className={cn(
+                                                        'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                                    )}
+                                                >
+                                                    {statuses && statuses.length > 0 && (
+                                                        <>
+                                                            <option value="" disabled className="bg-background text-foreground">
+                                                                Select an option
+                                                            </option>
+                                                            {statuses?.map((status, index) => (
+                                                                <option value={status} key={index} className="bg-background text-foreground">
+                                                                    {status}
+                                                                </option>
+                                                            ))}
+                                                        </>
+                                                    )}
+                                                </select>
+                                                <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.status : ''} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                        </>
+                    )}
                     {!location && (
                         <div id="files" className="flex w-fit flex-col space-y-2">
                             <Label>Document</Label>

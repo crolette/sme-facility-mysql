@@ -1,9 +1,10 @@
+import Modale from '@/components/Modale';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { Asset, BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -26,20 +27,24 @@ export default function IndexAssets() {
     const [activeAssetsTab, setActiveAssetsTab] = useState(true);
     const [trashedAssetsTab, setTrashedAssetsTab] = useState(false);
 
-    const { post, delete: destroy } = useForm();
+    const [assetToDeleteDefinitely, setAssetToDeleteDefinitely] = useState('');
+    const [showDeleteDefinitelyModale, setShowDeleteDefinitelyModale] = useState<boolean>(false);
 
-    const deleteDefinitelyAsset = async (asset: Asset) => {
+    const deleteDefinitelyAsset = async () => {
         try {
-            const response = await axios.delete(route(`api.assets.force`, asset.reference_code));
+            const response = await axios.delete(route(`api.assets.force`, assetToDeleteDefinitely));
             if (response.data.status === 'success') {
                 setTrashedAssetsTab(true);
                 setActiveAssetsTab(false);
                 fetchTrashedAssets();
+                setShowDeleteDefinitelyModale(false);
             }
         } catch (error) {
             console.log(error);
         }
     };
+
+    const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
 
     const restoreAsset = async (asset: Asset) => {
         try {
@@ -76,12 +81,15 @@ export default function IndexAssets() {
         }
     };
 
-    const deleteAsset = async (asset: Asset) => {
+    const [assetToDelete, setAssetToDelete] = useState('');
+
+    const deleteAsset = async () => {
         try {
-            const response = await axios.delete(route(`api.assets.destroy`, asset.reference_code));
+            const response = await axios.delete(route(`api.assets.destroy`, assetToDelete));
             if (response.data.status === 'success') {
                 setSearch('');
                 fetchAssets();
+                setShowDeleteModale(!showDeleteModale);
             }
         } catch (error) {
             console.log(error);
@@ -120,6 +128,7 @@ export default function IndexAssets() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Assets" />
+
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="b flex justify-between border-b-2">
                     <ul className="flex pl-4">
@@ -180,15 +189,22 @@ export default function IndexAssets() {
                                                 <TableBodyData>{asset.maintainable.description}</TableBodyData>
 
                                                 <TableBodyData>
-                                                    <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
-                                                        Delete
-                                                    </Button>
-                                                    <a href={route(`tenant.assets.edit`, asset.reference_code)}>
-                                                        <Button>Edit</Button>
-                                                    </a>
                                                     <a href={route(`tenant.assets.show`, asset.reference_code)}>
                                                         <Button variant={'outline'}>See</Button>
                                                     </a>
+
+                                                    <a href={route(`tenant.assets.edit`, asset.reference_code)}>
+                                                        <Button>Edit</Button>
+                                                    </a>
+                                                    <Button
+                                                        onClick={() => {
+                                                            setAssetToDelete(asset.reference_code);
+                                                            setShowDeleteModale(true);
+                                                        }}
+                                                        variant={'destructive'}
+                                                    >
+                                                        Delete
+                                                    </Button>
                                                 </TableBodyData>
                                             </TableBodyRow>
                                         );
@@ -225,15 +241,21 @@ export default function IndexAssets() {
                                             <TableBodyData>{asset.maintainable.description}</TableBodyData>
 
                                             <TableBodyData>
-                                                <Button onClick={() => deleteDefinitelyAsset(asset)} variant={'destructive'}>
-                                                    Delete definitely
-                                                </Button>
-                                                <Button onClick={() => restoreAsset(asset)} variant={'green'}>
-                                                    Restore
-                                                </Button>
                                                 <a href={route('tenant.assets.deleted', asset.id)}>
                                                     <Button>Show</Button>
                                                 </a>
+                                                <Button onClick={() => restoreAsset(asset)} variant={'green'}>
+                                                    Restore
+                                                </Button>
+                                                <Button
+                                                    onClick={() => {
+                                                        setAssetToDeleteDefinitely(asset.reference_code);
+                                                        setShowDeleteDefinitelyModale(true);
+                                                    }}
+                                                    variant={'destructive'}
+                                                >
+                                                    Delete definitely
+                                                </Button>
                                             </TableBodyData>
                                         </TableBodyRow>
                                     );
@@ -242,6 +264,28 @@ export default function IndexAssets() {
                     </Table>
                 )}
             </div>
+            <Modale
+                title={'Delete asset'}
+                message={'Are you sure you want to delete this asset ?'}
+                isOpen={showDeleteModale}
+                onConfirm={deleteAsset}
+                onCancel={() => {
+                    setAssetToDelete('');
+                    setShowDeleteModale(false);
+                }}
+            />
+            <Modale
+                title={'Delete definitely'}
+                message={
+                    'Are you sure to delete this asset DEFINITELY ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.'
+                }
+                isOpen={showDeleteDefinitelyModale}
+                onConfirm={deleteDefinitelyAsset}
+                onCancel={() => {
+                    setAssetToDeleteDefinitely('');
+                    setShowDeleteDefinitelyModale(false);
+                }}
+            />
         </AppLayout>
     );
 }

@@ -18,9 +18,11 @@ Route::middleware([
     \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
     'auth:tenant'
 ])->prefix('/v1/floors')->group(function () {
+    Route::get('/', function () {
+        return ApiResponse::success(Floor::all());
+    })->name('api.floors.index');
 
     Route::post('/', [APIFloorController::class, 'store'])->name('api.floors.store');
-
 
     Route::prefix('/{floor}')->group(function () {
 

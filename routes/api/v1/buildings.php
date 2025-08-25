@@ -18,6 +18,9 @@ Route::middleware([
     \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
     'auth:tenant'
 ])->prefix('/v1/buildings')->group(function () {
+    Route::get('/', function () {
+        return ApiResponse::success(Building::all());
+    })->name('api.buildings.index');
 
     Route::post('/', [APIBuildingController::class, 'store'])->name('api.buildings.store');
 

@@ -94,6 +94,7 @@ function SearchableSelect<T>(props: SearchableSelectProps<T>) {
             const response = await axios.get(searchUrl, {
                 params: { q: query, ...searchParams },
             });
+            console.log(response.data.data);
             setItems(response.data.data || response.data);
             setIsSearching(false);
             setListIsOpen(true);

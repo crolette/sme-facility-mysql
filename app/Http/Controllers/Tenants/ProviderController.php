@@ -2,14 +2,10 @@
 
 namespace App\Http\Controllers\Tenants;
 
-use Carbon\Carbon;
 use Inertia\Inertia;
-use Illuminate\Http\Request;
-use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Provider;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
-use App\Models\Tenants\Intervention;
 
 class ProviderController extends Controller
 {
@@ -46,6 +42,6 @@ class ProviderController extends Controller
      */
     public function show(Provider $provider)
     {
-        return Inertia::render('tenants/providers/show', ['item' => $provider->load('users')]);
+        return Inertia::render('tenants/providers/show', ['item' => $provider->load('users', 'contracts')]);
     }
 }

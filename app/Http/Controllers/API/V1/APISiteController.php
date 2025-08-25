@@ -7,6 +7,7 @@ use App\Helpers\ApiResponse;
 use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use App\Services\QRCodeService;
+use App\Services\ContractService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
@@ -17,16 +18,18 @@ use App\Services\MaintainableService;
 use App\Http\Requests\Tenant\TenantSiteRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
 
 class APISiteController extends Controller
 {
     public function __construct(
         protected QRCodeService $qrCodeService,
-        protected MaintainableService $maintainableService
+        protected MaintainableService $maintainableService,
+        protected ContractService $contractService
     ) {}
 
 
-    public function store(TenantSiteRequest $siteRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
+    public function store(TenantSiteRequest $siteRequest, ContractWithModelStoreRequest $contractRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
     {
         if (Auth::user()->cannot('create', Site::class))
             abort(403);
@@ -58,6 +61,9 @@ class APISiteController extends Controller
             if ($files) {
                 $documentService->uploadAndAttachDocuments($site, $files);
             }
+
+            if ($contractRequest->validated('contracts'))
+                $this->contractService->createWithModel($site, $contractRequest->validated('contracts'));
 
             if ($siteRequest->validated('need_qr_code') === true)
                 $this->qrCodeService->createAndAttachQR($site);

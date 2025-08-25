@@ -21,6 +21,9 @@ Route::middleware([
     'auth:tenant'
 ])->prefix('/v1/rooms')->group(
     function () {
+        Route::get('/', function () {
+            return ApiResponse::success(Room::all());
+        })->name('api.rooms.index');
 
         Route::post('/', [APIRoomController::class, 'store'])->name('api.rooms.store');
 

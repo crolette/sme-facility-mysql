@@ -8,6 +8,7 @@ use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use App\Services\QRCodeService;
 use App\Models\Tenants\Building;
+use App\Services\ContractService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
@@ -18,16 +19,18 @@ use App\Services\MaintainableService;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Requests\Tenant\TenantBuildingRequest;
+use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
 
 class APIBuildingController extends Controller
 {
     public function __construct(
         protected QRCodeService $qrCodeService,
-        protected MaintainableService $maintainableService
+        protected MaintainableService $maintainableService,
+        protected ContractService $contractService
     ) {}
 
 
-    public function store(TenantBuildingRequest $buildingRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
+    public function store(TenantBuildingRequest $buildingRequest, MaintainableRequest $maintainableRequest, ContractWithModelStoreRequest $contractRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
     {
 
         if (Auth::user()->cannot('create', Building::class))
@@ -63,6 +66,8 @@ class APIBuildingController extends Controller
 
             $building = $this->maintainableService->createMaintainable($building, $maintainableRequest);
 
+            if ($contractRequest->validated('contracts'))
+                $this->contractService->createWithModel($building, $contractRequest->validated('contracts'));
 
             $files = $documentUploadRequest->validated('files');
             if ($files) {

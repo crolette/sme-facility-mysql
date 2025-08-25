@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Tenant;
 
+use App\Enums\ContractDurationEnum;
 use App\Enums\ContractRenewalTypesEnum;
 use App\Enums\ContractStatusEnum;
+use App\Enums\NoticePeriodEnum;
 use Illuminate\Validation\Rule;
 use App\Models\Tenants\Document;
 use App\Models\Central\CategoryType;
@@ -18,6 +20,13 @@ class ContractStoreRequest extends FormRequest
     {
         return true;
     }
+
+    // public function prepareForValidation() 
+    // {
+
+    //     $data = $this->all();
+
+    // }
 
     /**
      * Get the validation rules that apply to the request.
@@ -45,7 +54,10 @@ class ContractStoreRequest extends FormRequest
             'provider_reference' => 'nullable|string|max:50',
 
             'start_date' => 'nullable|date',
+            'contract_duration' => ['nullable', Rule::in(array_column(ContractDurationEnum::cases(), 'value'))],
             'end_date' => 'nullable|date',
+
+            'notice_period' => ['nullable', Rule::in(array_column(NoticePeriodEnum::cases(), 'value'))],
 
             'renewal_type' => ['required', Rule::in(array_column(ContractRenewalTypesEnum::cases(), 'value'))],
             'status' => ['required', Rule::in(array_column(ContractStatusEnum::cases(), 'value'))],

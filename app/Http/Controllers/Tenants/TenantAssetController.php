@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Tenants;
 use Inertia\Inertia;
 use App\Models\Tenants\Asset;
 use App\Services\AssetService;
+use App\Enums\NoticePeriodEnum;
 use App\Services\QRCodeService;
 use App\Enums\ContractStatusEnum;
+use App\Enums\ContractDurationEnum;
 use App\Enums\MaintenanceFrequency;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
@@ -49,7 +51,10 @@ class TenantAssetController extends Controller
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
-        return Inertia::render('tenants/assets/create', ['categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
+        $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
+        $noticePeriods = array_column(NoticePeriodEnum::cases(), 'value');
+
+        return Inertia::render('tenants/assets/create', ['categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
     }
 
 
@@ -79,9 +84,12 @@ class TenantAssetController extends Controller
         if (Auth::user()->cannot('update', $asset))
             abort(403);
 
+
         $categories = CategoryType::where('category', 'asset')->get();
         $documentTypes = CategoryType::where('category', 'document')->get();
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-        return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents', 'maintainable.manager', 'maintainable.providers:id,name,category_type_id']), 'categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies]);
+        $statuses = array_column(ContractStatusEnum::cases(), 'value');
+        $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
+        return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents', 'maintainable.manager', 'maintainable.providers:id,name,category_type_id', 'contracts']), 'categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
     }
 }

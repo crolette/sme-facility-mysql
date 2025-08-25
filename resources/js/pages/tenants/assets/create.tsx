@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { Asset, AssetCategory, CentralType, Provider, User, type BreadcrumbItem } from '@/types';
@@ -29,6 +30,8 @@ interface Contract {
     provider_reference: string | null;
     start_date: string | null;
     end_date: string | null;
+    contract_duration: string;
+    notice_period: string;
     renewal_type: string;
     status: string;
 }
@@ -90,6 +93,8 @@ export default function CreateAsset({
     frequencies,
     statuses,
     renewalTypes,
+    contractDurations,
+    noticePeriods,
 }: {
     asset?: Asset;
     categories?: AssetCategory[];
@@ -97,6 +102,8 @@ export default function CreateAsset({
     frequencies: string[];
     statuses: string[];
     renewalTypes: string[];
+    contractDurations?: string[];
+    noticePeriods: string[];
 }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -104,9 +111,9 @@ export default function CreateAsset({
             href: '/assets/create',
         },
     ];
-
+    const [errors, setErrors] = useState<TypeFormData>();
     const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
-    const { data, setData, errors } = useForm<TypeFormData>({
+    const { data, setData } = useForm<TypeFormData>({
         q: '',
         name: asset?.maintainable.name ?? '',
         description: asset?.maintainable.description ?? '',
@@ -194,6 +201,7 @@ export default function CreateAsset({
                 }
             } catch (error) {
                 console.log(error);
+                setErrors(error.response.data.errors);
             }
         } else {
             try {
@@ -210,6 +218,7 @@ export default function CreateAsset({
                 }
             } catch (error) {
                 console.log(error);
+                setErrors(error.response.data.errors);
             }
         }
     };
@@ -376,6 +385,9 @@ export default function CreateAsset({
 
         setCountContracts((prev) => prev - 1);
     };
+
+    console.log(data.contracts);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Create asset`} />
@@ -411,7 +423,7 @@ export default function CreateAsset({
                                 }))
                             }
                         />
-                        <InputError className="mt-2" message={errors.is_mobile} />
+                        <InputError className="mt-2" message={errors?.is_mobile ?? ''} />
                     </div>
                     {data.is_mobile ? (
                         <>
@@ -480,7 +492,7 @@ export default function CreateAsset({
                                     disabled
                                     value={data.locationName ? data.locationName + ' - ' + data.locationReference : 'No location selected'}
                                 />
-                                <InputError className="mt-2" message={errors.locationType} />
+                                <InputError className="mt-2" message={errors?.locationType ?? ''} />
                             </>
                             {/* )} */}
                         </>
@@ -497,7 +509,7 @@ export default function CreateAsset({
                         onChange={(e) => setData('name', e.target.value)}
                         placeholder="Asset name"
                     />
-                    <InputError className="mt-2" message={errors.name} />
+                    <InputError className="mt-2" message={errors?.name ?? ''} />
 
                     {!asset && (
                         <div>
@@ -508,7 +520,7 @@ export default function CreateAsset({
                                 checked={data.need_qr_code ?? true}
                                 onClick={() => setData('need_qr_code', !data.need_qr_code)}
                             />
-                            <InputError className="mt-2" message={errors.need_qr_code} />
+                            <InputError className="mt-2" message={errors?.need_qr_code ?? ''} />
                         </div>
                     )}
 
@@ -538,7 +550,7 @@ export default function CreateAsset({
                             </>
                         )}
                     </select>
-                    <InputError className="mt-2" message={errors.categoryId} />
+                    <InputError className="mt-2" message={errors?.categoryId ?? ''} />
 
                     <Label htmlFor="description">Description</Label>
                     <Input
@@ -549,7 +561,7 @@ export default function CreateAsset({
                         onChange={(e) => setData('description', e.target.value)}
                         placeholder="Asset description"
                     />
-                    <InputError className="mt-2" message={errors.description} />
+                    <InputError className="mt-2" message={errors?.description ?? ''} />
 
                     <Label htmlFor="surface">Surface</Label>
                     <Input
@@ -561,7 +573,7 @@ export default function CreateAsset({
                         placeholder="Asset surface"
                         onChange={(e) => setData('surface', parseFloat(e.target.value))}
                     />
-                    <InputError className="mt-2" message={errors.surface} />
+                    <InputError className="mt-2" message={errors?.surface ?? ''} />
                     <div className="flex flex-col gap-4 md:flex-row">
                         <div className="w-full">
                             <Label htmlFor="brand">Brand</Label>
@@ -573,7 +585,7 @@ export default function CreateAsset({
                                 onChange={(e) => setData('brand', e.target.value)}
                                 placeholder="Asset brand"
                             />
-                            <InputError className="mt-2" message={errors.brand} />
+                            <InputError className="mt-2" message={errors?.brand ?? ''} />
                         </div>
                         <div className="w-full">
                             <Label htmlFor="model">Model</Label>
@@ -585,7 +597,7 @@ export default function CreateAsset({
                                 onChange={(e) => setData('model', e.target.value)}
                                 placeholder="Asset model"
                             />
-                            <InputError className="mt-2" message={errors.model} />
+                            <InputError className="mt-2" message={errors?.model ?? ''} />
                         </div>
                         <div className="w-full">
                             <Label htmlFor="serial_number">Serial number</Label>
@@ -597,7 +609,7 @@ export default function CreateAsset({
                                 onChange={(e) => setData('serial_number', e.target.value)}
                                 placeholder="Asset serial number"
                             />
-                            <InputError className="mt-2" message={errors.serial_number} />
+                            <InputError className="mt-2" message={errors?.serial_number ?? ''} />
                         </div>
                     </div>
 
@@ -611,7 +623,7 @@ export default function CreateAsset({
                             onChange={(e) => setData('purchase_date', e.target.value)}
                             placeholder="Date of purchase"
                         />
-                        <InputError className="mt-2" message={errors.purchase_date} />
+                        <InputError className="mt-2" message={errors?.purchase_date ?? ''} />
                     </div>
                     <Label htmlFor="purchase_cost">Purchase cost</Label>
                     <Input
@@ -623,7 +635,7 @@ export default function CreateAsset({
                         onChange={(e) => setData('purchase_cost', parseFloat(e.target.value))}
                         placeholder="Purchase cost (max. 2 decimals) : 4236.36"
                     />
-                    <InputError className="mt-2" message={errors.purchase_cost} />
+                    <InputError className="mt-2" message={errors?.purchase_cost ?? ''} />
 
                     {/* Depreciation */}
                     <div>
@@ -635,7 +647,7 @@ export default function CreateAsset({
                             onClick={() => setData('depreciable', !data.depreciable)}
                         />
                     </div>
-                    <InputError className="mt-2" message={errors.depreciable} />
+                    <InputError className="mt-2" message={errors?.depreciable ?? ''} />
                     {data.depreciable && (
                         <div className="flex flex-col gap-4 md:flex-row">
                             <div className="w-full">
@@ -647,7 +659,7 @@ export default function CreateAsset({
                                     onChange={(e) => setData('depreciation_start_date', e.target.value)}
                                     placeholder="Depreciation start date"
                                 />
-                                <InputError className="mt-2" message={errors.depreciation_start_date} />
+                                <InputError className="mt-2" message={errors?.depreciation_start_date ?? ''} />
                             </div>
                             <div className="w-full">
                                 <Label htmlFor="depreciation_duration">Depreciation duration (in years)</Label>
@@ -660,7 +672,7 @@ export default function CreateAsset({
                                     placeholder="Asset depreciation_duration"
                                     onChange={(e) => setData('depreciation_duration', parseFloat(e.target.value))}
                                 />
-                                <InputError className="mt-2" message={errors.depreciation_start_date} />
+                                <InputError className="mt-2" message={errors?.depreciation_start_date ?? ''} />
                             </div>
                             <div className="w-full">
                                 <Label htmlFor="depreciation_end_date">Depreciation end date</Label>
@@ -671,7 +683,7 @@ export default function CreateAsset({
                                     onChange={(e) => setData('depreciation_end_date', e.target.value)}
                                     placeholder="Depreciation end date"
                                 />
-                                <InputError className="mt-2" message={errors.depreciation_end_date} />
+                                <InputError className="mt-2" message={errors?.depreciation_end_date ?? ''} />
                             </div>
                             <div className="w-full">
                                 <Label htmlFor="residual_value">Residual value</Label>
@@ -684,7 +696,7 @@ export default function CreateAsset({
                                     onChange={(e) => setData('residual_value', parseFloat(e.target.value))}
                                     placeholder="Purchase cost (max. 2 decimals) : 4236.36"
                                 />
-                                <InputError className="mt-2" message={errors.residual_value} />
+                                <InputError className="mt-2" message={errors?.residual_value ?? ''} />
                             </div>
                         </div>
                     )}
@@ -697,7 +709,7 @@ export default function CreateAsset({
                         checked={data.under_warranty}
                         onClick={() => setData('under_warranty', !data.under_warranty)}
                     />
-                    <InputError className="mt-2" message={errors.under_warranty} />
+                    <InputError className="mt-2" message={errors?.under_warranty ?? ''} />
 
                     {data.under_warranty && (
                         <div>
@@ -710,7 +722,7 @@ export default function CreateAsset({
                                 onChange={(e) => setData('end_warranty_date', e.target.value)}
                                 placeholder="Date end of warranty"
                             />
-                            <InputError className="mt-2" message={errors.end_warranty_date} />
+                            <InputError className="mt-2" message={errors?.end_warranty_date ?? ''} />
                         </div>
                     )}
                     <div>
@@ -721,7 +733,7 @@ export default function CreateAsset({
                             checked={data.need_maintenance}
                             onClick={() => setData('need_maintenance', !data.need_maintenance)}
                         />
-                        <InputError className="mt-2" message={errors.need_maintenance} />
+                        <InputError className="mt-2" message={errors?.need_maintenance ?? ''} />
                     </div>
 
                     {data.need_maintenance && (
@@ -755,7 +767,7 @@ export default function CreateAsset({
                                         )}
                                     </select>
 
-                                    <InputError className="mt-2" message={errors.maintenance_frequency} />
+                                    <InputError className="mt-2" message={errors?.maintenance_frequency ?? ''} />
                                 </div>
 
                                 <div className="w-full">
@@ -768,7 +780,7 @@ export default function CreateAsset({
                                         onChange={(e) => setData('last_maintenance_date', e.target.value)}
                                         placeholder="Date last maintenance"
                                     />
-                                    <InputError className="mt-2" message={errors.last_maintenance_date} />
+                                    <InputError className="mt-2" message={errors?.last_maintenance_date ?? ''} />
                                 </div>
                                 <div className="w-full">
                                     <Label htmlFor="next_maintenance_date">Date next maintenance</Label>
@@ -780,7 +792,7 @@ export default function CreateAsset({
                                         onChange={(e) => setData('next_maintenance_date', e.target.value)}
                                         placeholder="Date last maintenance"
                                     />
-                                    <InputError className="mt-2" message={errors.next_maintenance_date} />
+                                    <InputError className="mt-2" message={errors?.next_maintenance_date ?? ''} />
                                 </div>
                             </div>
                         </>
@@ -817,120 +829,208 @@ export default function CreateAsset({
                         />
                     </div>
 
-                    {/* provider_id: number | null;
-                        name: string | null;
-                        type: string | null;
-                        notes: string | null;
-                        internal_reference: string | null;
-                        provider_reference: string | null;
-                        start_date: string | null;
-                        end_date: string | null;
-                        renewal_type: string;
-                        status: string; */}
-
-                    {/* Contracts */}
-                    <div className="flex items-center gap-2">
-                        <h5>Contract</h5>
-                        <PlusCircleIcon onClick={() => setCountContracts((prev) => prev + 1)} />
-                    </div>
-
-                    {countContracts &&
-                        [...Array(countContracts)].map((_, index) => (
-                            <div key={index} className="flex flex-col gap-2 rounded-md border-2 border-slate-400 p-4">
-                                <div className="flex w-fit gap-2">
-                                    <p>Contract {index + 1}</p>
-                                    <MinusCircleIcon onClick={() => handleRemoveContract(index)} />
-                                </div>
-                                <div>
-                                    <Label className="font-medium">Name</Label>
-                                    <Input
-                                        type="text"
-                                        value={data.contracts[index]?.name ?? ''}
-                                        placeholder={`Contract name ${index + 1}`}
-                                        className="rounded border px-2 py-1"
-                                        onChange={(e) => handleChangeContracts(index, 'name', e.target.value)}
-                                    />
-                                    <Label className="font-medium">Type</Label>
-                                    <Input
-                                        type="text"
-                                        // value={data.contracts[index].name ?? ''}
-                                        placeholder={`Type ${index + 1}`}
-                                        className="rounded border px-2 py-1"
-                                        onChange={(e) => handleChangeContracts(index, 'type', e.target.value)}
-                                    />
-
-                                    <Label className="font-medium">Provider</Label>
-                                    <SearchableInput<Provider>
-                                        searchUrl={route('api.providers.search')}
-                                        getKey={(provider) => provider.id}
-                                        displayValue={data.contracts[index]?.provider_name ?? ''}
-                                        getDisplayText={(provider) => provider.name}
-                                        onSelect={(provider) => {
-                                            handleChangeContracts(index, 'provider_id', provider.id);
-                                            handleChangeContracts(index, 'provider_name', provider.name);
-                                        }}
-                                        placeholder="Search provider..."
-                                        // className="mb-4"
-                                    />
-                                    <Label htmlFor="renewal_type">Renewal type</Label>
-                                    <select
-                                        name="renewal_type"
-                                        // value={data.renewal_type ?? ''}
-                                        onChange={(e) => handleChangeContracts(index, 'renewal_type', e.target.value)}
-                                        id=""
-                                        defaultValue={''}
-                                        // required={data.need_maintenance}
-                                        className={cn(
-                                            'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                            'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                                        )}
-                                    >
-                                        {renewalTypes && renewalTypes.length > 0 && (
-                                            <>
-                                                <option value="" disabled className="bg-background text-foreground">
-                                                    Select an option
-                                                </option>
-                                                {renewalTypes?.map((type, index) => (
-                                                    <option value={type} key={index} className="bg-background text-foreground">
-                                                        {type}
-                                                    </option>
-                                                ))}
-                                            </>
-                                        )}
-                                    </select>
-                                    <div className="w-full">
-                                        <Label htmlFor="status">Status</Label>
-                                        <select
-                                            name="status"
-                                            // value={data.status ?? ''}
-                                            defaultValue={''}
-                                            onChange={(e) => handleChangeContracts(index, 'status', e.target.value)}
-                                            id=""
-                                            // required={data.need_maintenance}
-                                            className={cn(
-                                                'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                                            )}
-                                        >
-                                            {statuses && statuses.length > 0 && (
-                                                <>
-                                                    <option value="" disabled className="bg-background text-foreground">
-                                                        Select an option
-                                                    </option>
-                                                    {statuses?.map((status, index) => (
-                                                        <option value={status} key={index} className="bg-background text-foreground">
-                                                            {status}
-                                                        </option>
-                                                    ))}
-                                                </>
-                                            )}
-                                        </select>
-                                    </div>
-                                </div>
+                    {!asset && (
+                        <>
+                            {/* Contracts */}
+                            <div className="flex items-center gap-2">
+                                <h5>Contract</h5>
+                                <PlusCircleIcon onClick={() => setCountContracts((prev) => prev + 1)} />
                             </div>
-                        ))}
+
+                            {countContracts > 0 &&
+                                [...Array(countContracts)].map((_, index) => (
+                                    <div key={index} className="flex flex-col gap-2 rounded-md border-2 border-slate-400 p-4">
+                                        <div className="flex w-fit gap-2">
+                                            <p>Contract {index + 1}</p>
+                                            <MinusCircleIcon onClick={() => handleRemoveContract(index)} />
+                                        </div>
+                                        <div>
+                                            <Label className="font-medium">Name</Label>
+                                            <Input
+                                                type="text"
+                                                value={data.contracts[index]?.name ?? ''}
+                                                placeholder={`Contract name ${index + 1}`}
+                                                className="rounded border px-2 py-1"
+                                                minLength={4}
+                                                maxLength={100}
+                                                onChange={(e) => handleChangeContracts(index, 'name', e.target.value)}
+                                            />
+                                            <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.name : ''} />
+                                            <Label className="font-medium">Type</Label>
+                                            <Input
+                                                type="text"
+                                                // value={data.contracts[index].name ?? ''}
+                                                placeholder={`Type ${index + 1}`}
+                                                className="rounded border px-2 py-1"
+                                                minLength={4}
+                                                maxLength={100}
+                                                onChange={(e) => handleChangeContracts(index, 'type', e.target.value)}
+                                            />
+                                            <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.type : ''} />
+
+                                            <Label className="font-medium">Provider</Label>
+                                            <SearchableInput<Provider>
+                                                searchUrl={route('api.providers.search')}
+                                                getKey={(provider) => provider.id}
+                                                displayValue={data.contracts[index]?.provider_name ?? ''}
+                                                getDisplayText={(provider) => provider.name}
+                                                onSelect={(provider) => {
+                                                    handleChangeContracts(index, 'provider_id', provider.id);
+                                                    handleChangeContracts(index, 'provider_name', provider.name);
+                                                }}
+                                                placeholder="Search provider..."
+                                                // className="mb-4"
+                                            />
+
+                                            <Label htmlFor="start_date">Start date</Label>
+                                            <Input
+                                                id="start_date"
+                                                type="date"
+                                                value={data.contracts[index]?.start_date ?? ''}
+                                                onChange={(e) => handleChangeContracts(index, 'start_date', e.target.value)}
+                                            />
+                                            <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.start_date : ''} />
+                                            <Label htmlFor="contract_duration">Contract duration</Label>
+                                            <select
+                                                name="contract_duration"
+                                                onChange={(e) => handleChangeContracts(index, 'contract_duration', e.target.value)}
+                                                id=""
+                                                required
+                                                value={data.contracts[index]?.contract_duration ?? ''}
+                                                className={cn(
+                                                    'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                    'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                    'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                                )}
+                                            >
+                                                {contractDurations && contractDurations.length > 0 && (
+                                                    <>
+                                                        <option value="" disabled className="bg-background text-foreground">
+                                                            Select a duration
+                                                        </option>
+                                                        {contractDurations?.map((type, index) => (
+                                                            <option value={type} key={index} className="bg-background text-foreground">
+                                                                {type}
+                                                            </option>
+                                                        ))}
+                                                    </>
+                                                )}
+                                            </select>
+                                            <InputError
+                                                className="mt-2"
+                                                message={errors?.contracts ? errors?.contracts[index]?.contract_duration : ''}
+                                            />
+                                            <Label>Notes</Label>
+                                            <Textarea
+                                                onChange={(e) => handleChangeContracts(index, 'notes', e.target.value)}
+                                                value={data.contracts[index]?.notes ?? ''}
+                                                minLength={4}
+                                                maxLength={250}
+                                            />
+                                            <InputError message={errors?.contracts ? errors?.contracts[index]?.notes : ''} />
+                                            <Label>Internal reference</Label>
+                                            <Input
+                                                type="text"
+                                                onChange={(e) => handleChangeContracts(index, 'internal_reference', e.target.value)}
+                                                value={data.contracts[index]?.internal_reference ?? ''}
+                                                maxLength={50}
+                                            />
+                                            <InputError message={errors?.contracts ? errors?.contracts[index]?.internal_reference : ''} />
+                                            <Label>Provider reference</Label>
+                                            <Input
+                                                type="text"
+                                                onChange={(e) => handleChangeContracts(index, 'provider_reference', e.target.value)}
+                                                value={data.contracts[index]?.provider_reference ?? ''}
+                                                maxLength={50}
+                                            />
+                                            <InputError message={errors?.contracts ? errors?.contracts[index]?.provider_reference : ''} />
+                                            <Label htmlFor="notice_period">Notice period</Label>
+                                            <select
+                                                name="notice_period"
+                                                onChange={(e) => handleChangeContracts(index, 'notice_period', e.target.value)}
+                                                id=""
+                                                // required
+                                                value={data.contracts[index]?.notice_period ?? ''}
+                                                className={cn(
+                                                    'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                    'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                    'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                                )}
+                                            >
+                                                {noticePeriods && noticePeriods.length > 0 && (
+                                                    <>
+                                                        {/* <option value="" disabled className="bg-background text-foreground">
+                                                                            Select a duration
+                                                                        </option> */}
+                                                        {noticePeriods?.map((type, index) => (
+                                                            <option value={type} key={index} className="bg-background text-foreground">
+                                                                {type}
+                                                            </option>
+                                                        ))}
+                                                    </>
+                                                )}
+                                            </select>
+                                            <InputError className="mt-2" message={errors?.notice_period ?? ''} />
+                                            <Label htmlFor="renewal_type">Renewal type</Label>
+                                            <select
+                                                name="renewal_type"
+                                                // value={data.renewal_type ?? ''}
+                                                onChange={(e) => handleChangeContracts(index, 'renewal_type', e.target.value)}
+                                                id=""
+                                                defaultValue={''}
+                                                className={cn(
+                                                    'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                    'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                    'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                                )}
+                                            >
+                                                {renewalTypes && renewalTypes.length > 0 && (
+                                                    <>
+                                                        <option value="" disabled className="bg-background text-foreground">
+                                                            Select an option
+                                                        </option>
+                                                        {renewalTypes?.map((type, index) => (
+                                                            <option value={type} key={index} className="bg-background text-foreground">
+                                                                {type}
+                                                            </option>
+                                                        ))}
+                                                    </>
+                                                )}
+                                            </select>
+                                            <div className="w-full">
+                                                <Label htmlFor="status">Status</Label>
+                                                <select
+                                                    name="status"
+                                                    // value={data.status ?? ''}
+                                                    defaultValue={''}
+                                                    onChange={(e) => handleChangeContracts(index, 'status', e.target.value)}
+                                                    id=""
+                                                    // required={data.need_maintenance}
+                                                    className={cn(
+                                                        'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                                    )}
+                                                >
+                                                    {statuses && statuses.length > 0 && (
+                                                        <>
+                                                            <option value="" disabled className="bg-background text-foreground">
+                                                                Select an option
+                                                            </option>
+                                                            {statuses?.map((status, index) => (
+                                                                <option value={status} key={index} className="bg-background text-foreground">
+                                                                    {status}
+                                                                </option>
+                                                            ))}
+                                                        </>
+                                                    )}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                        </>
+                    )}
 
                     {!asset && (
                         <div>

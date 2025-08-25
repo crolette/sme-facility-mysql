@@ -177,3 +177,33 @@ h4 {
 h5 {
     font-size: clamp(1.125rem, 2.5vw, 1.5rem);
 }
+
+label:has(input:required) {
+    /* color: oklch(38.385% 0.05163 19.666); */
+    font-weight: bold;
+}
+
+div:has(+ input:required)::after {
+    content: '*';
+    color: var(--color-destructive);
+    font-size: large;
+    font-weight: bold;
+}
+
+label:has(+ select:required)::after {
+    content: '*';
+    color: var(--color-destructive);
+    font-size: large;
+    font-weight: bold;
+}
+
+label:has(+ input:required)::after {
+    content: '*';
+    color: var(--color-destructive);
+    font-size: large;
+    font-weight: bold;
+}
+
+*:required {
+    background-color: oklch(28.606% 0.00145 16.005);
+}

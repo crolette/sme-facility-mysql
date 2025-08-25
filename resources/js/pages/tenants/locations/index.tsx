@@ -1,10 +1,13 @@
+import Modale from '@/components/Modale';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, TenantBuilding, TenantFloor, TenantSite } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { BreadcrumbItem, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from '@/types';
+import { Head } from '@inertiajs/react';
+import axios from 'axios';
+import { useState } from 'react';
 
-export default function IndexSites({ locations, routeName }: { locations: TenantSite[] | TenantBuilding[] | TenantFloor[]; routeName: string }) {
+export default function IndexSites({ items, routeName }: { locations: TenantSite[] | TenantBuilding[] | TenantFloor[]; routeName: string }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index ${routeName}`,
@@ -12,10 +15,32 @@ export default function IndexSites({ locations, routeName }: { locations: Tenant
         },
     ];
 
-    const { delete: destroy } = useForm();
+    const [locations, setLocations] = useState(items);
+    const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
+    const [locationToDelete, setLocationToDelete] = useState<TenantSite | TenantBuilding | TenantFloor | TenantRoom | null>(null);
 
-    const deleteLocation = (locationCode: string) => {
-        destroy(route(`api.${routeName}.destroy`, locationCode));
+    const deleteLocation = async () => {
+        try {
+            const response = await axios.delete(route(`api.${routeName}.destroy`, locationToDelete?.reference_code));
+            if (response.data.status === 'success') {
+                setShowDeleteModale(false);
+                setLocationToDelete(null);
+                fetchLocations();
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const fetchLocations = async () => {
+        try {
+            const response = await axios.get(route(`api.${routeName}.index`));
+            if (response.data.status === 'success') {
+                setLocations(response.data.data);
+            }
+        } catch (error) {
+            console.log(error);
+        }
     };
 
     return (
@@ -46,19 +71,26 @@ export default function IndexSites({ locations, routeName }: { locations: Tenant
                                         </TableBodyData>
                                         <TableBodyData>{item.code}</TableBodyData>
                                         <TableBodyData>{item.category}</TableBodyData>
-                                        <TableBodyData>{item.maintainable.name}</TableBodyData>
-                                        <TableBodyData>{item.maintainable.description}</TableBodyData>
+                                        <TableBodyData>{item.name}</TableBodyData>
+                                        <TableBodyData>{item.description}</TableBodyData>
 
                                         <TableBodyData>
-                                            <Button onClick={() => deleteLocation(item.reference_code)} variant={'destructive'}>
-                                                Delete
-                                            </Button>
-                                            <a href={route(`tenant.${routeName}.edit`, item.reference_code)}>
-                                                <Button>Edit</Button>
-                                            </a>
                                             <a href={route(`tenant.${routeName}.show`, item.reference_code)}>
                                                 <Button variant={'outline'}>See</Button>
                                             </a>
+
+                                            <a href={route(`tenant.${routeName}.edit`, item.reference_code)}>
+                                                <Button>Edit</Button>
+                                            </a>
+                                            <Button
+                                                onClick={() => {
+                                                    setShowDeleteModale(true);
+                                                    setLocationToDelete(item);
+                                                }}
+                                                variant={'destructive'}
+                                            >
+                                                Delete
+                                            </Button>
                                         </TableBodyData>
                                     </TableBodyRow>
                                 );
@@ -66,6 +98,16 @@ export default function IndexSites({ locations, routeName }: { locations: Tenant
                     </TableBody>
                 </Table>
             </div>
+            <Modale
+                title={`Delete ${routeName}`}
+                message={`Are you sure you want to delete ${locationToDelete?.name}`}
+                isOpen={showDeleteModale}
+                onConfirm={deleteLocation}
+                onCancel={() => {
+                    setLocationToDelete(null);
+                    setShowDeleteModale(false);
+                }}
+            />
         </AppLayout>
     );
 }
