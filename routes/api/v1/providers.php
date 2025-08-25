@@ -33,6 +33,13 @@ Route::middleware([
         return ApiResponse::success($query->get());
     })->name('api.providers.search');
 
+    Route::get('/{provider}/contracts', function (Provider $provider) {
+
+        $provider->contracts;
+
+        return ApiResponse::success($provider->contracts);
+    })->name('api.providers.contracts');
+
     Route::post('/', [APIProviderController::class, 'store'])->name('api.providers.store');
     Route::get('/{provider}', [APIProviderController::class, 'show'])->name('api.providers.show');
     Route::patch('/{provider}', [APIProviderController::class, 'update'])->name('api.providers.update');

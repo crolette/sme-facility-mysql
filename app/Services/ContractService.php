@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Enums\ContractDurationEnum;
+use App\Enums\NoticePeriodEnum;
 use App\Models\Tenants\Contract;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -17,6 +19,12 @@ class ContractService
     {
         foreach ($request as $key => $contractRequest) {
             $contract = new Contract([...$contractRequest]);
+
+            if (isset($contractRequest['contract_duration']))
+                $contract = $this->updateContractEndDate($contract, $contractRequest['contract_duration']);
+
+            $contract = $this->updateNoticeDate($contract, isset($contractRequest['notice_period']) ? $contractRequest['notice_period'] : 'default');
+
             $contract->provider()->associate($contractRequest['provider_id']);
             $contract->save();
             $model->contracts()->attach($contract);
@@ -27,13 +35,40 @@ class ContractService
     public function create($request): Contract | string
     {
         $contract = new Contract([...$request]);
+
+        if (isset($request['contract_duration']))
+            $contract = $this->updateContractEndDate($contract, $request['contract_duration']);
+
+        $contract = $this->updateNoticeDate($contract, isset($request['notice_period']) ? $request['notice_period'] : 'default');
+
         $contract->provider()->associate($request['provider_id']);
         $contract->save();
 
         if (isset($request['contractables']))
             $contract = $this->syncContractables($contract, $request['contractables']);
 
+        return $contract;
+    }
 
+    public function updateContractEndDate(Contract $contract, $contract_duration): Contract
+    {
+        $contractDuration = ContractDurationEnum::tryFrom($contract_duration);
+
+        if ($contract->start_date)
+            $endDate = $contractDuration->addTo(Carbon::createFromFormat('Y-m-d', $contract->start_date));
+        else {
+            $endDate = $contractDuration->addTo(Carbon::now());
+        }
+
+        $contract->end_date = $endDate;
+
+        return $contract;
+    }
+
+    public function updateNoticeDate(Contract $contract, $notice_period): Contract
+    {
+        $noticePeriod = NoticePeriodEnum::tryFrom($notice_period);
+        $contract->notice_date = $noticePeriod->subFrom(Carbon::parse($contract->end_date));
         return $contract;
     }
 
@@ -41,6 +76,11 @@ class ContractService
     {
 
         $contract->update([...$request]);
+
+        if (isset($request['contract_duration']))
+            $contract = $this->updateContractEndDate($contract, $request['contract_duration']);
+
+        $contract = $this->updateNoticeDate($contract, isset($request['notice_period']) ? $request['notice_period'] : 'default');
 
         if ($contract->provider->id !== $request['provider_id']) {
             $contract->provider()->disassociate();

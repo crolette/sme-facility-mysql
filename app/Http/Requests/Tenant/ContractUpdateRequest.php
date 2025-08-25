@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests\Tenant;
 
-use App\Enums\ContractRenewalTypesEnum;
-use App\Enums\ContractStatusEnum;
+use App\Enums\NoticePeriodEnum;
 use Illuminate\Validation\Rule;
+use App\Enums\ContractStatusEnum;
+use App\Enums\ContractDurationEnum;
+use App\Enums\ContractRenewalTypesEnum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ContractUpdateRequest extends FormRequest
@@ -15,6 +17,17 @@ class ContractUpdateRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
+    }
+
+    public function prepareForValidation()
+    {
+
+        $data = $this->all();
+
+        $data['notice_period'] = !isset($data['notice_period']) ? 'default' : $data['notice_period'];
+
+
+        $this->replace($data);
     }
 
     /**
@@ -35,7 +48,11 @@ class ContractUpdateRequest extends FormRequest
             'provider_reference' => 'nullable|string|max:50',
 
             'start_date' => 'nullable|date',
+            'contract_duration' => ['nullable', Rule::in(array_column(ContractDurationEnum::cases(), 'value'))],
             'end_date' => 'nullable|date',
+
+            'notice_date' => 'nullable|date',
+            'notice_period' => ['nullable', Rule::in(array_column(NoticePeriodEnum::cases(), 'value'))],
 
             'renewal_type' => ['required', Rule::in(array_column(ContractRenewalTypesEnum::cases(), 'value'))],
             'status' => ['required', Rule::in(array_column(ContractStatusEnum::cases(), 'value'))],

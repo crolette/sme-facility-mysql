@@ -25,6 +25,8 @@ export default function ShowContract({ item, objects }: { item: Contract; object
         }
     };
 
+    console.log(objects);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Contract" />
@@ -47,7 +49,10 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                             <p>Status: {contract.status}</p>
                             <p>Renewal Type: {contract.renewal_type}</p>
                             <p>Start date: {contract.start_date}</p>
+                            <p>Contract duration: {contract.contract_duration}</p>
                             <p>End date : {contract.end_date}</p>
+                            <p>Notice period: {contract.notice_period}</p>
+                            <p>Notice date: {contract.notice_date}</p>
                             <p>Notes: {contract.notes}</p>
                             <p>Provider: {contract.provider.name}</p>
                             <p>Provider reference: {contract.provider_reference}</p>
@@ -60,7 +65,13 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                         {objects.map((object: Partial<Asset | TenantBuilding | TenantSite | TenantFloor | TenantRoom>) => (
                             <li key={object.id}>
                                 <p>
-                                    <a href={route('tenant.assets.show', object.reference_code)}>
+                                    <a
+                                        href={
+                                            object.pivot.contractable_type.includes('Asset')
+                                                ? route('tenant.assets.show', object.reference_code)
+                                                : route(`tenant.${object.location_type.level}s.show`, object.reference_code)
+                                        }
+                                    >
                                         {object.name} - {object.category}- {object.code}
                                     </a>
                                 </p>

@@ -2,11 +2,13 @@
 
 namespace App\Http\Requests\Tenant;
 
-use App\Enums\ContractRenewalTypesEnum;
-use App\Enums\ContractStatusEnum;
+use App\Enums\NoticePeriodEnum;
 use Illuminate\Validation\Rule;
 use App\Models\Tenants\Document;
+use App\Enums\ContractStatusEnum;
+use App\Enums\ContractDurationEnum;
 use App\Models\Central\CategoryType;
+use App\Enums\ContractRenewalTypesEnum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ContractWithModelStoreRequest extends FormRequest
@@ -38,7 +40,10 @@ class ContractWithModelStoreRequest extends FormRequest
             'contracts.*.provider_reference' => 'nullable|string|max:50',
 
             'contracts.*.start_date' => 'nullable|date',
+            'contracts.*.contract_duration' => ['nullable', Rule::in(array_column(ContractDurationEnum::cases(), 'value'))],
             'contracts.*.end_date' => 'nullable|date',
+
+            'contracts.*.notice_period' => ['nullable', Rule::in(array_column(NoticePeriodEnum::cases(), 'value'))],
 
             'contracts.*.renewal_type' => ['required', Rule::in(array_column(ContractRenewalTypesEnum::cases(), 'value'))],
             'contracts.*.status' => ['required', Rule::in(array_column(ContractStatusEnum::cases(), 'value'))],

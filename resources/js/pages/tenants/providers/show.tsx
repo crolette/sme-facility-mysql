@@ -112,6 +112,20 @@ export default function ProviderShow({ item }: { item: Provider }) {
                             ))}
                     </ul>
                 </div>
+                <div className="rounded-md border border-gray-200 p-4">
+                    <h2>Contracts</h2>
+
+                    <ul>
+                        {provider.contracts &&
+                            provider.contracts.map((contract, index) => (
+                                <li key={index}>
+                                    <a href={route('tenant.contracts.show', contract.id)}>
+                                        {contract.name} - {contract.internal_reference} - {contract.provider_reference}
+                                    </a>
+                                </li>
+                            ))}
+                    </ul>
+                </div>
             </div>
         </AppLayout>
     );

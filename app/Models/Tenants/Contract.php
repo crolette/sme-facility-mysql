@@ -2,8 +2,10 @@
 
 namespace App\Models\Tenants;
 
+use App\Enums\ContractDurationEnum;
 use App\Enums\ContractRenewalTypesEnum;
 use App\Enums\ContractStatusEnum;
+use App\Enums\NoticePeriodEnum;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
@@ -26,7 +28,10 @@ class Contract extends Model
         'internal_reference',
         'provider_reference',
         'start_date',
+        'contract_duration',
         'end_date',
+        'notice_date',
+        'notice_period',
         'renewal_type',
         'status',
         'notes',
@@ -37,6 +42,11 @@ class Contract extends Model
         return [
             'created_at' => 'date:d-m-Y',
             'updated_at' => 'date:d-m-Y',
+            'notice_date' => 'date:d-m-Y',
+            // 'start_date' => 'date:d-m-Y',
+            // 'end_date' => 'date:d-m-Y',
+            'notice_period' => NoticePeriodEnum::class,
+            'contract_duration' => ContractDurationEnum::class,
             'renewal_type' => ContractRenewalTypesEnum::class,
             'status' => ContractStatusEnum::class
         ];

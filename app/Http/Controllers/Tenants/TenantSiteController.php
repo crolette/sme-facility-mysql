@@ -8,16 +8,20 @@ use App\Services\QRService;
 use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
+use App\Enums\NoticePeriodEnum;
 use App\Services\QRCodeService;
+use App\Enums\ContractStatusEnum;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
+use App\Enums\ContractDurationEnum;
 use App\Enums\MaintenanceFrequency;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
+use App\Enums\ContractRenewalTypesEnum;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\TenantSiteRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
@@ -57,7 +61,12 @@ class TenantSiteController extends Controller
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
         $floorMaterials = CategoryType::where('category', 'floor_materials')->get();
         $wallMaterials = CategoryType::where('category', 'wall_materials')->get();
-        return Inertia::render('tenants/locations/create', ['locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials]);
+        $statuses = array_column(ContractStatusEnum::cases(), 'value');
+        $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
+        $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
+        $noticePeriods = array_column(NoticePeriodEnum::cases(), 'value');
+
+        return Inertia::render('tenants/locations/create', ['locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
     }
 
     /**

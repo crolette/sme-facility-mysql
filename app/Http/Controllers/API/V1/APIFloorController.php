@@ -8,6 +8,7 @@ use App\Models\LocationType;
 use App\Models\Tenants\Floor;
 use App\Services\QRCodeService;
 use App\Models\Tenants\Building;
+use App\Services\ContractService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
@@ -18,16 +19,18 @@ use App\Services\MaintainableService;
 use App\Http\Requests\Tenant\TenantFloorRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
 
 class APIFloorController extends Controller
 {
     public function __construct(
         protected QRCodeService $qrCodeService,
-        protected MaintainableService $maintainableService
+        protected MaintainableService $maintainableService,
+        protected ContractService $contractService
     ) {}
 
 
-    public function store(TenantFloorRequest $floorRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
+    public function store(TenantFloorRequest $floorRequest, MaintainableRequest $maintainableRequest, ContractWithModelStoreRequest $contractRequest,  DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
     {
         if (Auth::user()->cannot('create', Floor::class))
             abort(403);
@@ -59,6 +62,8 @@ class APIFloorController extends Controller
             $floor->save();
 
             $floor = $this->maintainableService->createMaintainable($floor, $maintainableRequest);
+
+            $this->contractService->createWithModel($floor, $contractRequest->validated('contracts'));
 
             $files = $documentUploadRequest->validated('files');
             if ($files) {

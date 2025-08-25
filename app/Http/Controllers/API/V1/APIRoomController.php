@@ -9,6 +9,7 @@ use App\Models\Tenants\Room;
 use App\Models\Tenants\Floor;
 use App\Services\QRCodeService;
 use App\Models\Tenants\Building;
+use App\Services\ContractService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
@@ -20,16 +21,18 @@ use App\Http\Requests\Tenant\TenantRoomRequest;
 use App\Http\Requests\Tenant\TenantFloorRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
 
 class APIRoomController extends Controller
 {
     public function __construct(
         protected QRCodeService $qrCodeService,
-        protected MaintainableService $maintainableService
+        protected MaintainableService $maintainableService,
+        protected ContractService $contractService
     ) {}
 
 
-    public function store(TenantRoomRequest $roomRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
+    public function store(TenantRoomRequest $roomRequest, ContractWithModelStoreRequest $contractRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
     {
         if (Auth::user()->cannot('create', Room::class))
             abort(403);
@@ -64,6 +67,7 @@ class APIRoomController extends Controller
             $room->save();
 
             $room = $this->maintainableService->createMaintainable($room, $maintainableRequest);
+            $this->contractService->createWithModel($room, $contractRequest->validated('contracts'));
 
             $files = $documentUploadRequest->validated('files');
             if ($files) {
