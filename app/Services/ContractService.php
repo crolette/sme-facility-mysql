@@ -57,6 +57,7 @@ class ContractService
         if ($contract->start_date)
             $endDate = $contractDuration->addTo(Carbon::createFromFormat('Y-m-d', $contract->start_date));
         else {
+            $contract->start_date = Carbon::now();
             $endDate = $contractDuration->addTo(Carbon::now());
         }
 
