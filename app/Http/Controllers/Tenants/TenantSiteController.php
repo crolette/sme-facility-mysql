@@ -45,7 +45,7 @@ class TenantSiteController extends Controller
 
         $sites = Site::all();
 
-        return Inertia::render('tenants/locations/index', ['locations' => $sites, 'routeName' => 'sites']);
+        return Inertia::render('tenants/locations/index', ['items' => $sites, 'routeName' => 'sites']);
     }
 
     /**

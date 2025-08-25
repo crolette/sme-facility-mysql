@@ -42,7 +42,7 @@ class TenantFloorController extends Controller
             abort(403);
 
         $floors = Floor::with('building')->get();
-        return Inertia::render('tenants/locations/index', ['locations' => $floors, 'routeName' => 'floors']);
+        return Inertia::render('tenants/locations/index', ['items' => $floors, 'routeName' => 'floors']);
     }
 
     /**

@@ -62,7 +62,8 @@ class APISiteController extends Controller
                 $documentService->uploadAndAttachDocuments($site, $files);
             }
 
-            $this->contractService->createWithModel($site, $contractRequest->validated('contracts'));
+            if ($contractRequest->validated('contracts'))
+                $this->contractService->createWithModel($site, $contractRequest->validated('contracts'));
 
             if ($siteRequest->validated('need_qr_code') === true)
                 $this->qrCodeService->createAndAttachQR($site);

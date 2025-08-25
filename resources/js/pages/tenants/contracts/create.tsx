@@ -331,7 +331,8 @@ export default function CreateContract({
                         </select>
                         <InputError className="mt-2" message={errors?.notice_period ?? ''} />
                         <Label htmlFor="end_date">End date</Label>
-                        <Input id="end_date" type="date" value={data.end_date} onChange={(e) => setData('end_date', e.target.value)} />
+                        <Input id="end_date" type="date" value={data.end_date} onChange={(e) => setData('end_date', e.target.value)} disabled />
+                        <p className="text-sm">The end date is automatically calculated based on the contract duration.</p>
                         <InputError className="mt-2" message={errors?.end_date ?? ''} />
                         <Button type="submit">{contract ? 'Update' : 'Submit'}</Button>
                         <Button

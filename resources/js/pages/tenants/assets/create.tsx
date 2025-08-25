@@ -113,7 +113,7 @@ export default function CreateAsset({
     ];
     const [errors, setErrors] = useState<TypeFormData>();
     const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
-    const { data, setData, errors } = useForm<TypeFormData>({
+    const { data, setData } = useForm<TypeFormData>({
         q: '',
         name: asset?.maintainable.name ?? '',
         description: asset?.maintainable.description ?? '',
@@ -423,7 +423,7 @@ export default function CreateAsset({
                                 }))
                             }
                         />
-                        <InputError className="mt-2" message={errors.is_mobile} />
+                        <InputError className="mt-2" message={errors?.is_mobile ?? ''} />
                     </div>
                     {data.is_mobile ? (
                         <>
@@ -492,7 +492,7 @@ export default function CreateAsset({
                                     disabled
                                     value={data.locationName ? data.locationName + ' - ' + data.locationReference : 'No location selected'}
                                 />
-                                <InputError className="mt-2" message={errors.locationType} />
+                                <InputError className="mt-2" message={errors?.locationType ?? ''} />
                             </>
                             {/* )} */}
                         </>
@@ -509,7 +509,7 @@ export default function CreateAsset({
                         onChange={(e) => setData('name', e.target.value)}
                         placeholder="Asset name"
                     />
-                    <InputError className="mt-2" message={errors.name} />
+                    <InputError className="mt-2" message={errors?.name ?? ''} />
 
                     {!asset && (
                         <div>
@@ -520,7 +520,7 @@ export default function CreateAsset({
                                 checked={data.need_qr_code ?? true}
                                 onClick={() => setData('need_qr_code', !data.need_qr_code)}
                             />
-                            <InputError className="mt-2" message={errors.need_qr_code} />
+                            <InputError className="mt-2" message={errors?.need_qr_code ?? ''} />
                         </div>
                     )}
 
@@ -550,7 +550,7 @@ export default function CreateAsset({
                             </>
                         )}
                     </select>
-                    <InputError className="mt-2" message={errors.categoryId} />
+                    <InputError className="mt-2" message={errors?.categoryId ?? ''} />
 
                     <Label htmlFor="description">Description</Label>
                     <Input
@@ -561,7 +561,7 @@ export default function CreateAsset({
                         onChange={(e) => setData('description', e.target.value)}
                         placeholder="Asset description"
                     />
-                    <InputError className="mt-2" message={errors.description} />
+                    <InputError className="mt-2" message={errors?.description ?? ''} />
 
                     <Label htmlFor="surface">Surface</Label>
                     <Input
@@ -573,7 +573,7 @@ export default function CreateAsset({
                         placeholder="Asset surface"
                         onChange={(e) => setData('surface', parseFloat(e.target.value))}
                     />
-                    <InputError className="mt-2" message={errors.surface} />
+                    <InputError className="mt-2" message={errors?.surface ?? ''} />
                     <div className="flex flex-col gap-4 md:flex-row">
                         <div className="w-full">
                             <Label htmlFor="brand">Brand</Label>
@@ -585,7 +585,7 @@ export default function CreateAsset({
                                 onChange={(e) => setData('brand', e.target.value)}
                                 placeholder="Asset brand"
                             />
-                            <InputError className="mt-2" message={errors.brand} />
+                            <InputError className="mt-2" message={errors?.brand ?? ''} />
                         </div>
                         <div className="w-full">
                             <Label htmlFor="model">Model</Label>
@@ -597,7 +597,7 @@ export default function CreateAsset({
                                 onChange={(e) => setData('model', e.target.value)}
                                 placeholder="Asset model"
                             />
-                            <InputError className="mt-2" message={errors.model} />
+                            <InputError className="mt-2" message={errors?.model ?? ''} />
                         </div>
                         <div className="w-full">
                             <Label htmlFor="serial_number">Serial number</Label>
@@ -609,7 +609,7 @@ export default function CreateAsset({
                                 onChange={(e) => setData('serial_number', e.target.value)}
                                 placeholder="Asset serial number"
                             />
-                            <InputError className="mt-2" message={errors.serial_number} />
+                            <InputError className="mt-2" message={errors?.serial_number ?? ''} />
                         </div>
                     </div>
 
@@ -623,7 +623,7 @@ export default function CreateAsset({
                             onChange={(e) => setData('purchase_date', e.target.value)}
                             placeholder="Date of purchase"
                         />
-                        <InputError className="mt-2" message={errors.purchase_date} />
+                        <InputError className="mt-2" message={errors?.purchase_date ?? ''} />
                     </div>
                     <Label htmlFor="purchase_cost">Purchase cost</Label>
                     <Input
@@ -635,7 +635,7 @@ export default function CreateAsset({
                         onChange={(e) => setData('purchase_cost', parseFloat(e.target.value))}
                         placeholder="Purchase cost (max. 2 decimals) : 4236.36"
                     />
-                    <InputError className="mt-2" message={errors.purchase_cost} />
+                    <InputError className="mt-2" message={errors?.purchase_cost ?? ''} />
 
                     {/* Depreciation */}
                     <div>
@@ -647,7 +647,7 @@ export default function CreateAsset({
                             onClick={() => setData('depreciable', !data.depreciable)}
                         />
                     </div>
-                    <InputError className="mt-2" message={errors.depreciable} />
+                    <InputError className="mt-2" message={errors?.depreciable ?? ''} />
                     {data.depreciable && (
                         <div className="flex flex-col gap-4 md:flex-row">
                             <div className="w-full">
@@ -659,7 +659,7 @@ export default function CreateAsset({
                                     onChange={(e) => setData('depreciation_start_date', e.target.value)}
                                     placeholder="Depreciation start date"
                                 />
-                                <InputError className="mt-2" message={errors.depreciation_start_date} />
+                                <InputError className="mt-2" message={errors?.depreciation_start_date ?? ''} />
                             </div>
                             <div className="w-full">
                                 <Label htmlFor="depreciation_duration">Depreciation duration (in years)</Label>
@@ -672,7 +672,7 @@ export default function CreateAsset({
                                     placeholder="Asset depreciation_duration"
                                     onChange={(e) => setData('depreciation_duration', parseFloat(e.target.value))}
                                 />
-                                <InputError className="mt-2" message={errors.depreciation_start_date} />
+                                <InputError className="mt-2" message={errors?.depreciation_start_date ?? ''} />
                             </div>
                             <div className="w-full">
                                 <Label htmlFor="depreciation_end_date">Depreciation end date</Label>
@@ -683,7 +683,7 @@ export default function CreateAsset({
                                     onChange={(e) => setData('depreciation_end_date', e.target.value)}
                                     placeholder="Depreciation end date"
                                 />
-                                <InputError className="mt-2" message={errors.depreciation_end_date} />
+                                <InputError className="mt-2" message={errors?.depreciation_end_date ?? ''} />
                             </div>
                             <div className="w-full">
                                 <Label htmlFor="residual_value">Residual value</Label>
@@ -696,7 +696,7 @@ export default function CreateAsset({
                                     onChange={(e) => setData('residual_value', parseFloat(e.target.value))}
                                     placeholder="Purchase cost (max. 2 decimals) : 4236.36"
                                 />
-                                <InputError className="mt-2" message={errors.residual_value} />
+                                <InputError className="mt-2" message={errors?.residual_value ?? ''} />
                             </div>
                         </div>
                     )}
@@ -709,7 +709,7 @@ export default function CreateAsset({
                         checked={data.under_warranty}
                         onClick={() => setData('under_warranty', !data.under_warranty)}
                     />
-                    <InputError className="mt-2" message={errors.under_warranty} />
+                    <InputError className="mt-2" message={errors?.under_warranty ?? ''} />
 
                     {data.under_warranty && (
                         <div>
@@ -722,7 +722,7 @@ export default function CreateAsset({
                                 onChange={(e) => setData('end_warranty_date', e.target.value)}
                                 placeholder="Date end of warranty"
                             />
-                            <InputError className="mt-2" message={errors.end_warranty_date} />
+                            <InputError className="mt-2" message={errors?.end_warranty_date ?? ''} />
                         </div>
                     )}
                     <div>
@@ -733,7 +733,7 @@ export default function CreateAsset({
                             checked={data.need_maintenance}
                             onClick={() => setData('need_maintenance', !data.need_maintenance)}
                         />
-                        <InputError className="mt-2" message={errors.need_maintenance} />
+                        <InputError className="mt-2" message={errors?.need_maintenance ?? ''} />
                     </div>
 
                     {data.need_maintenance && (
@@ -767,7 +767,7 @@ export default function CreateAsset({
                                         )}
                                     </select>
 
-                                    <InputError className="mt-2" message={errors.maintenance_frequency} />
+                                    <InputError className="mt-2" message={errors?.maintenance_frequency ?? ''} />
                                 </div>
 
                                 <div className="w-full">
@@ -780,7 +780,7 @@ export default function CreateAsset({
                                         onChange={(e) => setData('last_maintenance_date', e.target.value)}
                                         placeholder="Date last maintenance"
                                     />
-                                    <InputError className="mt-2" message={errors.last_maintenance_date} />
+                                    <InputError className="mt-2" message={errors?.last_maintenance_date ?? ''} />
                                 </div>
                                 <div className="w-full">
                                     <Label htmlFor="next_maintenance_date">Date next maintenance</Label>
@@ -792,7 +792,7 @@ export default function CreateAsset({
                                         onChange={(e) => setData('next_maintenance_date', e.target.value)}
                                         placeholder="Date last maintenance"
                                     />
-                                    <InputError className="mt-2" message={errors.next_maintenance_date} />
+                                    <InputError className="mt-2" message={errors?.next_maintenance_date ?? ''} />
                                 </div>
                             </div>
                         </>
@@ -837,8 +837,7 @@ export default function CreateAsset({
                                 <PlusCircleIcon onClick={() => setCountContracts((prev) => prev + 1)} />
                             </div>
 
-                            {countContracts &&
-                                countContracts > 0 &&
+                            {countContracts > 0 &&
                                 [...Array(countContracts)].map((_, index) => (
                                     <div key={index} className="flex flex-col gap-2 rounded-md border-2 border-slate-400 p-4">
                                         <div className="flex w-fit gap-2">
@@ -979,7 +978,6 @@ export default function CreateAsset({
                                                 onChange={(e) => handleChangeContracts(index, 'renewal_type', e.target.value)}
                                                 id=""
                                                 defaultValue={''}
-                                                // required={data.need_maintenance}
                                                 className={cn(
                                                     'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
                                                     'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',

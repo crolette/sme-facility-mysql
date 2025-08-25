@@ -54,12 +54,14 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                             <p>Notice period: {contract.notice_period}</p>
                             <p>Notice date: {contract.notice_date}</p>
                             <p>Notes: {contract.notes}</p>
-                            <p>Provider: {contract.provider.name}</p>
+                            <p>
+                                Provider: <a href={route('tenant.providers.show', contract.provider_id)}>{contract.provider.name}</a>
+                            </p>
                             <p>Provider reference: {contract.provider_reference}</p>
                         </div>
                     </div>
                 </div>
-                <div className="">
+                <div className="flex w-full shrink-0 justify-between rounded-md border border-gray-200 p-4">
                     <h3>Assets</h3>
                     <ul>
                         {objects.map((object: Partial<Asset | TenantBuilding | TenantSite | TenantFloor | TenantRoom>) => (

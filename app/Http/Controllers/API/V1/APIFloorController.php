@@ -63,7 +63,8 @@ class APIFloorController extends Controller
 
             $floor = $this->maintainableService->createMaintainable($floor, $maintainableRequest);
 
-            $this->contractService->createWithModel($floor, $contractRequest->validated('contracts'));
+            if ($contractRequest->validated('contracts'))
+                $this->contractService->createWithModel($floor, $contractRequest->validated('contracts'));
 
             $files = $documentUploadRequest->validated('files');
             if ($files) {

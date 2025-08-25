@@ -34,7 +34,7 @@ class TenantRoomController extends Controller
             abort(403);
 
         $locations = Room::with('floor')->get();
-        return Inertia::render('tenants/locations/index', ['locations' => $locations, 'routeName' => 'rooms']);
+        return Inertia::render('tenants/locations/index', ['items' => $locations, 'routeName' => 'rooms']);
     }
 
     /**

@@ -67,7 +67,8 @@ class APIRoomController extends Controller
             $room->save();
 
             $room = $this->maintainableService->createMaintainable($room, $maintainableRequest);
-            $this->contractService->createWithModel($room, $contractRequest->validated('contracts'));
+            if ($contractRequest->validated('contracts'))
+                $this->contractService->createWithModel($room, $contractRequest->validated('contracts'));
 
             $files = $documentUploadRequest->validated('files');
             if ($files) {

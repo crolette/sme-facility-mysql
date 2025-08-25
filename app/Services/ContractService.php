@@ -77,10 +77,11 @@ class ContractService
 
         $contract->update([...$request]);
 
-        if (isset($request['contract_duration']))
+        if (isset($request['contract_duration']) && $contract->wasChanged('contract_duration'))
             $contract = $this->updateContractEndDate($contract, $request['contract_duration']);
 
-        $contract = $this->updateNoticeDate($contract, isset($request['notice_period']) ? $request['notice_period'] : 'default');
+        if ($contract->wasChanged('notice_period'))
+            $contract = $this->updateNoticeDate($contract, isset($request['notice_period']) ? $request['notice_period'] : 'default');
 
         if ($contract->provider->id !== $request['provider_id']) {
             $contract->provider()->disassociate();

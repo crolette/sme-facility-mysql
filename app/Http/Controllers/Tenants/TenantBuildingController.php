@@ -44,7 +44,7 @@ class TenantBuildingController extends Controller
             abort(403);
 
         $buildings = Building::all();
-        return Inertia::render('tenants/locations/index', ['locations' => $buildings, 'routeName' => 'buildings']);
+        return Inertia::render('tenants/locations/index', ['items' => $buildings, 'routeName' => 'buildings']);
     }
 
     /**

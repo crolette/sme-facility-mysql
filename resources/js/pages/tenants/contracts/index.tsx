@@ -1,3 +1,4 @@
+import Modale from '@/components/Modale';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
@@ -27,13 +28,16 @@ export default function IndexContracts({ items }: { contracts: Contract[] }) {
         }
     };
 
-    console.log(contracts);
-    const deleteContract = async (contract: Contract) => {
+    const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
+    const [contractToDelete, setContractToDelete] = useState<Contract | null>(null);
+
+    const deleteContract = async () => {
         try {
-            const response = await axios.delete(route('api.contracts.destroy', contract.id));
+            const response = await axios.delete(route('api.contracts.destroy', contractToDelete.id));
             if (response.data.status === 'success') {
                 console.log('Contract deleted');
                 fetchContracts();
+                setShowDeleteModale(false);
             }
         } catch (error) {
             console.log(error);
@@ -85,7 +89,13 @@ export default function IndexContracts({ items }: { contracts: Contract[] }) {
                                             <a href={route(`tenant.contracts.edit`, contract.id)}>
                                                 <Button>Edit</Button>
                                             </a>
-                                            <Button onClick={() => deleteContract(contract)} variant={'destructive'}>
+                                            <Button
+                                                onClick={() => {
+                                                    setContractToDelete(contract);
+                                                    setShowDeleteModale(true);
+                                                }}
+                                                variant={'destructive'}
+                                            >
                                                 Delete
                                             </Button>
                                         </TableBodyData>
@@ -95,6 +105,16 @@ export default function IndexContracts({ items }: { contracts: Contract[] }) {
                     </TableBody>
                 </Table>
             </div>
+            <Modale
+                title={'Delete contract'}
+                message={`Are you sure you want to delete this contract ${contractToDelete?.name} ?`}
+                isOpen={showDeleteModale}
+                onConfirm={deleteContract}
+                onCancel={() => {
+                    setShowDeleteModale(false);
+                    setContractToDelete(null);
+                }}
+            />
         </AppLayout>
     );
 }

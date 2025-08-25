@@ -19,6 +19,9 @@ Route::middleware([
     'auth:tenant'
 ])->prefix('/v1/sites')->group(
     function () {
+        Route::get('/', function () {
+            return ApiResponse::success(Site::all());
+        })->name('api.sites.index');
 
         Route::post('/', [APISiteController::class, 'store'])->name('api.sites.store');
 

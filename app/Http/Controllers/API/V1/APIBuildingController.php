@@ -65,7 +65,9 @@ class APIBuildingController extends Controller
             $building->save();
 
             $building = $this->maintainableService->createMaintainable($building, $maintainableRequest);
-            $this->contractService->createWithModel($building, $contractRequest->validated('contracts'));
+
+            if ($contractRequest->validated('contracts'))
+                $this->contractService->createWithModel($building, $contractRequest->validated('contracts'));
 
             $files = $documentUploadRequest->validated('files');
             if ($files) {
