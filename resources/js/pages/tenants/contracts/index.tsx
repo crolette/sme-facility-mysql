@@ -70,22 +70,24 @@ export default function IndexContracts({ items }: { contracts: Contract[] }) {
                                             <a href={route(`tenant.contracts.show`, contract.id)}> {contract.name} </a>
                                         </TableBodyData>
                                         <TableBodyData>{contract.type}</TableBodyData>
-                                        <TableBodyData>{contract.status}</TableBodyData>
+                                        <TableBodyData>
+                                            <span className="rounded-full bg-gray-500 p-2">{contract.status}</span>
+                                        </TableBodyData>
                                         <TableBodyData>{contract.renewal_type}</TableBodyData>
                                         <TableBodyData>{contract.provider.name}</TableBodyData>
                                         <TableBodyData>{contract.provider.category}</TableBodyData>
                                         <TableBodyData>{contract.end_date}</TableBodyData>
 
                                         <TableBodyData>
-                                            <Button onClick={() => deleteContract(contract)} variant={'destructive'}>
-                                                Delete
-                                            </Button>
-                                            <a href={route(`tenant.contracts.edit`, contract.id)}>
-                                                <Button>Edit</Button>
-                                            </a>
                                             <a href={route(`tenant.contracts.show`, contract.id)}>
                                                 <Button variant={'outline'}>See</Button>
                                             </a>
+                                            <a href={route(`tenant.contracts.edit`, contract.id)}>
+                                                <Button>Edit</Button>
+                                            </a>
+                                            <Button onClick={() => deleteContract(contract)} variant={'destructive'}>
+                                                Delete
+                                            </Button>
                                         </TableBodyData>
                                     </TableBodyRow>
                                 );

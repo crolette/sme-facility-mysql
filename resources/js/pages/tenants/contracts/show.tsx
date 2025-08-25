@@ -14,13 +14,10 @@ export default function ShowContract({ item, objects }: { item: Contract; object
         },
     ];
 
-    console.log(objects);
-
     const deleteContract = async (contract: Contract) => {
         try {
             const response = await axios.delete(route('api.contracts.destroy', contract.id));
             if (response.data.status === 'success') {
-                console.log('Contract deleted');
                 router.visit(route('tenant.contracts.index'));
             }
         } catch (error) {
@@ -57,20 +54,20 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <h3>Assets</h3>
-                <ul>
-                    {objects.map((object: Partial<Asset | TenantBuilding | TenantSite | TenantFloor | TenantRoom>) => (
-                        <li key={object.id}>
-                            <p>
-                                <a href={route('tenant.assets.show', object.reference_code)}>
-                                    {object.name} - {object.category}- {object.code}
-                                </a>
-                            </p>
-                        </li>
-                    ))}
-                </ul>
+                <div className="">
+                    <h3>Assets</h3>
+                    <ul>
+                        {objects.map((object: Partial<Asset | TenantBuilding | TenantSite | TenantFloor | TenantRoom>) => (
+                            <li key={object.id}>
+                                <p>
+                                    <a href={route('tenant.assets.show', object.reference_code)}>
+                                        {object.name} - {object.category}- {object.code}
+                                    </a>
+                                </p>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </div>
         </AppLayout>
     );
