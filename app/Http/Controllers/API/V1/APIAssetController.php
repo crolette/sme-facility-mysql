@@ -8,16 +8,19 @@ use App\Models\Tenants\Asset;
 use App\Services\AssetService;
 use App\Services\QRCodeService;
 use App\Services\PictureService;
+use App\Services\ContractService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
-use App\Http\Requests\Tenant\AssetRequest;
+use App\Http\Requests\Tenant\AssetCreateRequest;
+use App\Http\Requests\Tenant\AssetUpdateRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
 
 class APIAssetController extends Controller
 {
@@ -25,10 +28,11 @@ class APIAssetController extends Controller
         protected QRCodeService $qrCodeService,
         protected AssetService $assetService,
         protected MaintainableService $maintainableService,
+        protected ContractService $contractService
 
     ) {}
 
-    public function store(AssetRequest $assetRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, DocumentService $documentService,)
+    public function store(AssetCreateRequest $assetRequest, MaintainableRequest $maintainableRequest, ContractWithModelStoreRequest $contractRequest, DocumentUploadRequest $documentUploadRequest, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, DocumentService $documentService,)
     {
         if (Auth::user()->cannot('create', Asset::class))
             abort(403);
@@ -46,6 +50,8 @@ class APIAssetController extends Controller
             $asset->save();
 
             $asset = $this->maintainableService->createMaintainable($asset, $maintainableRequest);
+
+            $this->contractService->createWithModel($asset, $contractRequest->validated('contracts'));
 
             $files = $documentUploadRequest->validated('files');
             if ($files) {
@@ -76,7 +82,7 @@ class APIAssetController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AssetRequest $request, MaintainableRequest $maintainableRequest, Asset $asset)
+    public function update(AssetUpdateRequest $request, MaintainableRequest $maintainableRequest, Asset $asset)
     {
         if (Auth::user()->cannot('update', $asset))
             abort(403);

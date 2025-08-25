@@ -67,7 +67,7 @@ class APITicketController extends Controller
                 'sites'     => \App\Models\Tenants\Site::class,
             ];
 
-            $location = $models[$request->validated('location_type')]::where('code', $request->validated('location_code'))->first();
+            $location = $models[$request->validated('location_type')]::where('reference_code', $request->validated('location_code'))->first();
 
             $ticket->ticketable()->associate($location);
 
@@ -127,7 +127,7 @@ class APITicketController extends Controller
 
     public function changeStatus(Request $request, Ticket $ticket)
     {
-
+        Debugbar::info($request);
         if (in_array($request->status, ['open', 'closed', 'ongoing'])) {
             if ($request->status === 'closed') {
                 $ticket->closeTicket();

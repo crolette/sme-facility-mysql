@@ -72,7 +72,7 @@ export default function ProviderCreateUpdate({ provider, providerCategories }: {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <form onSubmit={submit}>
                     <Label>Company Name</Label>
-                    <Input type="text" onChange={(e) => setData('name', e.target.value)} value={data.name} />
+                    <Input type="text" onChange={(e) => setData('name', e.target.value)} value={data.name} required />
                     <Label htmlFor="name">Category</Label>
                     <select
                         name="level"
@@ -100,7 +100,7 @@ export default function ProviderCreateUpdate({ provider, providerCategories }: {
                         )}
                     </select>
                     <Label>Email</Label>
-                    <Input type="email" onChange={(e) => setData('email', e.target.value)} value={data.email} />
+                    <Input type="email" onChange={(e) => setData('email', e.target.value)} value={data.email} required />
                     <Label>Website</Label>
                     <Input type="text" onChange={(e) => setData('website', e.target.value)} value={data.website} />
                     <Label>Address</Label>
@@ -108,7 +108,7 @@ export default function ProviderCreateUpdate({ provider, providerCategories }: {
                     <Label>VAT</Label>
                     <Input type="text" onChange={(e) => setData('vat_number', e.target.value)} value={data.vat_number} />
                     <Label>Phone</Label>
-                    <Input type="text" onChange={(e) => setData('phone_number', e.target.value)} value={data.phone_number} />
+                    <Input type="text" onChange={(e) => setData('phone_number', e.target.value)} value={data.phone_number} required />
                     {!provider && (
                         <>
                             <Label>Logo</Label>

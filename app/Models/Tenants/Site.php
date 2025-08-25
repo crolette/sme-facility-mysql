@@ -5,6 +5,7 @@ namespace App\Models\Tenants;
 use App\Models\LocationType;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Building;
+use App\Models\Tenants\Contract;
 use App\Models\Tenants\Document;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
@@ -100,6 +101,11 @@ class Site extends Model
     public function assets(): MorphMany
     {
         return $this->morphMany(Asset::class, 'location');
+    }
+
+    public function contracts(): MorphToMany
+    {
+        return $this->morphToMany(Contract::class, 'contractable');
     }
 
     public function documents(): MorphToMany

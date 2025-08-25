@@ -2,9 +2,7 @@
 
 use Illuminate\Foundation\Application;
 use App\Http\Middleware\HandleAppearance;
-use App\Jobs\DispatchTenantNotifications;
 use Illuminate\Http\Middleware\HandleCors;
-use Illuminate\Console\Scheduling\Schedule;
 use App\Http\Middleware\AddUserContextToLogs;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -27,11 +25,6 @@ return Application::configure(basePath: dirname(__DIR__))
             AddUserContextToLogs::class,
             HandleCors::class
         ]);
-    })
-    ->withSchedule(function (Schedule $schedule) {
-        $schedule->job(new DispatchTenantNotifications())
-            ->dailyAt('08:00')
-            ->withoutOverlapping();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

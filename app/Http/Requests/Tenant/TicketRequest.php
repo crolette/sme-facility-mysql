@@ -69,7 +69,7 @@ class TicketRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->sometimes('location_code', [
-            'exists:' . $this->input('location_type') . ',code'
+            'exists:' . $this->input('location_type') . ',reference_code'
         ], function () {
             return in_array($this->input('location_type'), ['sites', 'buildings', 'floors', 'rooms', 'assets']);
         });

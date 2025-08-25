@@ -6,10 +6,7 @@ use Exception;
 use App\Helpers\ApiResponse;
 use App\Models\LocationType;
 use App\Models\Tenants\Site;
-use App\Models\Tenants\Asset;
-use App\Services\AssetService;
 use App\Services\QRCodeService;
-use App\Services\PictureService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
@@ -17,10 +14,8 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
-use App\Http\Requests\Tenant\AssetRequest;
 use App\Http\Requests\Tenant\TenantSiteRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
-use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 
 class APISiteController extends Controller

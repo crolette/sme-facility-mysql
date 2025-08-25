@@ -27,8 +27,6 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
             href: `/providers`,
         },
     ];
-    console.log(user);
-    console.log(roles);
 
     const { data, setData, reset } = useForm<FormDataUser>({
         first_name: user?.first_name ?? '',

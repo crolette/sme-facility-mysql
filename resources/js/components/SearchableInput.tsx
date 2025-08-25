@@ -12,6 +12,7 @@ interface BaseSearchableSelectProps<T> {
     className?: string;
     minSearchLength?: number;
     debounceDelay?: number;
+    required?: boolean;
 }
 
 interface SingleSelectProps<T> extends BaseSearchableSelectProps<T> {
@@ -62,6 +63,7 @@ function SearchableSelect<T>(props: SearchableSelectProps<T>) {
         minSearchLength = 2,
         debounceDelay = 500,
         multiple = false,
+        required = false,
     } = props;
 
     const [items, setItems] = useState<T[]>([]);
@@ -165,6 +167,7 @@ function SearchableSelect<T>(props: SearchableSelectProps<T>) {
         <div className={`relative ${className}`}>
             <Input
                 type="text"
+                required={required}
                 value={search.length > 0 ? search : displayValue}
                 onChange={handleInputChange}
                 onBlur={handleBlur}
