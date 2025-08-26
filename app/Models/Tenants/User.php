@@ -6,10 +6,12 @@ namespace App\Models\Tenants;
 
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Provider;
+use App\Observers\UserObserver;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,6 +20,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+#[ObservedBy([UserObserver::class])]
 class User extends Authenticatable
 {
     protected string $guard_name = 'tenant';
@@ -96,6 +99,11 @@ class User extends Authenticatable
     public function manager(): HasMany
     {
         return $this->hasMany(Maintainable::class, 'maintenance_manager_id');
+    }
+
+    public function notification_preferences(): HasMany
+    {
+        return $this->hasMany(UserNotificationPreference::class);
     }
 
     public function provider(): BelongsTo

@@ -59,7 +59,7 @@ class ContractController extends Controller
     public function show(Contract $contract)
     {
         $users = User::role('Admin')->get();
-        dd($users);
+        // dd($users);
 
         return Inertia::render('tenants/contracts/show', ['item' => $contract->load('provider'), 'objects' => $contract->getObjects()]);
     }

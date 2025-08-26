@@ -367,6 +367,7 @@ export default function CreateLocation({
                                 <Label htmlFor="level">Level</Label>
                                 <select
                                     name="level"
+                                    required
                                     value={data.levelType}
                                     onChange={(e) => setData('levelType', e.target.value)}
                                     disabled={location ? true : false}
@@ -395,6 +396,7 @@ export default function CreateLocation({
                             <Label htmlFor="location-type">Location type</Label>
                             <select
                                 name="location-type"
+                                required
                                 value={data.locationType}
                                 onChange={(e) => {
                                     setData('locationType', e.target.value);

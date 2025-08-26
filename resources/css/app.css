@@ -49,6 +49,7 @@
     --color-chart-4: var(--chart-4);
     --color-chart-5: var(--chart-5);
 
+    --color-required: var(--required);
     --color-sidebar: var(--sidebar);
     --color-sidebar-foreground: var(--sidebar-foreground);
     --color-sidebar-primary: var(--sidebar-primary);
@@ -94,6 +95,7 @@
     --accent-foreground: oklch(0.205 0 0);
     --destructive: oklch(54.662% 0.22366 28.305);
     --destructive-foreground: oklch(0.577 0.245 27.325);
+    --required: oklch(93.003% 0.03545 17.644);
     --border: oklch(0.922 0 0);
     --input: oklch(0.922 0 0);
     --ring: oklch(0.87 0 0);
@@ -128,6 +130,7 @@
     --muted-foreground: oklch(0.708 0 0);
     --accent: oklch(0.269 0 0);
     --accent-foreground: oklch(0.985 0 0);
+    --required: oklch(28.606% 0.00145 16.005);
     --destructive: oklch(0.396 0.141 25.723);
     --destructive-foreground: oklch(0.637 0.237 25.331);
     --border: oklch(0.269 0 0);
@@ -205,5 +208,5 @@ label:has(+ input:required)::after {
 }
 
 *:required {
-    background-color: oklch(28.606% 0.00145 16.005);
+    background-color: var(--color-required);
 }

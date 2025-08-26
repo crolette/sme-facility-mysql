@@ -48,17 +48,5 @@ class NotificationSchedulingService
                 'recipient_email' => $user->email,
             ]);
         }
-
-        // $contract->notifications()->create([
-        //     'recipient_name' => 'TEST',
-        //     'recipient_email' => 'test@test.com',
-        //     'notification_type' => 'contract',
-        //     'scheduled_at' => Carbon::now()->subDays(15),
-        //     'status' => ScheduledNotificationStatusEnum::PENDING->value,
-        //     'data' => [
-        //         'subject' => 'test',
-        //         'notice_date' => $contract->notice_date
-        //     ]
-        // ]);
     }
 }

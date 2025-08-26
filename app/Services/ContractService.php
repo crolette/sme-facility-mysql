@@ -23,7 +23,9 @@ class ContractService
             if (isset($contractRequest['contract_duration']))
                 $contract = $this->updateContractEndDate($contract, $contractRequest['contract_duration']);
 
-            $contract = $this->updateNoticeDate($contract, isset($contractRequest['notice_period']) ? $contractRequest['notice_period'] : 'default');
+            $contract->notice_period = isset($contractRequest['notice_period']) ? $contractRequest['notice_period'] : 'default';
+
+            $contract = $this->updateNoticeDate($contract, $contract->notice_period);
 
             $contract->provider()->associate($contractRequest['provider_id']);
             $contract->save();
@@ -39,7 +41,9 @@ class ContractService
         if (isset($request['contract_duration']))
             $contract = $this->updateContractEndDate($contract, $request['contract_duration']);
 
-        $contract = $this->updateNoticeDate($contract, isset($request['notice_period']) ? $request['notice_period'] : 'default');
+        $contract->notice_period = isset($contractRequest['notice_period']) ? $contractRequest['notice_period'] : 'default';
+
+        $contract = $this->updateNoticeDate($contract, $contract->notice_period);
 
         $contract->provider()->associate($request['provider_id']);
         $contract->save();
@@ -107,8 +111,8 @@ class ContractService
 
     public function updateNoticeDate(Contract $contract, $notice_period): Contract
     {
-        $noticePeriod = NoticePeriodEnum::tryFrom($notice_period);
-        $contract->notice_date = $noticePeriod->subFrom(Carbon::parse($contract->end_date));
+
+        $contract->notice_date = $notice_period->subFrom(Carbon::parse($contract->end_date));
         return $contract;
     }
 };

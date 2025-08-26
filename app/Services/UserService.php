@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use App\Models\Tenants\Document;
 use App\Models\Tenants\Provider;
 use App\Models\Tenants\User;
+use App\Models\Tenants\UserNotificationPreference;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Exception;
@@ -63,5 +64,34 @@ class UserService
     {
         $user->provider()->disassociate()->save();
         return $user;
+    }
+
+
+    public function createDefaultUserNotificationPreferences(User $user)
+    {
+
+        if ($user->hasAnyRole(['Admin', 'Maintenance Manager'])) {
+
+            $preferences = config('notifications');
+
+            // dump($preferences);
+            foreach ($preferences as $notificationTypes) {
+                // dump($notificationTypes);
+                foreach ($notificationTypes as $assetType => $notificationType) {
+                    // dump($assetType);
+                    // dump($notificationType);
+                    foreach ($notificationType as $type) {
+
+                        // dump($type);
+                        $user->notification_preferences()->create([
+                            'asset_type' => $assetType,
+                            'notification_type' => $type,
+                            'notification_delay_days' => 7,
+                            'enabled' => true
+                        ]);
+                    }
+                }
+            };
+        }
     }
 };
