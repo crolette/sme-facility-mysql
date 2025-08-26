@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Tenants;
 
-use App\Enums\ContractDurationEnum;
 use Carbon\Carbon;
 use Inertia\Inertia;
+use App\Models\Tenants\User;
+use App\Enums\NoticePeriodEnum;
 use App\Models\Tenants\Contract;
 use App\Enums\ContractStatusEnum;
+use App\Enums\ContractDurationEnum;
 use App\Http\Controllers\Controller;
 use App\Enums\ContractRenewalTypesEnum;
-use App\Enums\NoticePeriodEnum;
 
 class ContractController extends Controller
 {
@@ -57,7 +58,8 @@ class ContractController extends Controller
      */
     public function show(Contract $contract)
     {
-
+        $users = User::role('Admin')->get();
+        dd($users);
 
         return Inertia::render('tenants/contracts/show', ['item' => $contract->load('provider'), 'objects' => $contract->getObjects()]);
     }

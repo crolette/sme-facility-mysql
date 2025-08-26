@@ -2,19 +2,24 @@
 
 namespace App\Models\Tenants;
 
-use App\Enums\ContractDurationEnum;
-use App\Enums\ContractRenewalTypesEnum;
-use App\Enums\ContractStatusEnum;
-use App\Enums\NoticePeriodEnum;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Enums\NoticePeriodEnum;
+use App\Enums\ContractStatusEnum;
+use App\Enums\ContractDurationEnum;
+use App\Observers\ContractObserver;
+use App\Enums\ContractRenewalTypesEnum;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Tenants\ScheduledNotification;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
+#[ObservedBy([ContractObserver::class])]
 class Contract extends Model
 {
     use HasFactory;
@@ -90,6 +95,14 @@ class Contract extends Model
     {
         return $this->morphTo()->withTrashed();
     }
+
+
+    public function notifications(): MorphMany
+    {
+        return $this->morphMany(ScheduledNotification::class, 'notifiable');
+    }
+
+
 
     public function getObjects($columns = ['id', 'code', 'reference_code', 'category_type_id', 'location_type_id'])
     {

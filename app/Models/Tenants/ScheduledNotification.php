@@ -25,6 +25,9 @@ class ScheduledNotification extends Model
     protected function casts(): array
     {
         return [
+            'data' => 'array',
+            'scheduled_at' => 'date',
+            'sent_at' => 'date',
             'status' => ScheduledNotificationStatusEnum::class
         ];
     }

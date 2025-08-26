@@ -30,8 +30,6 @@ class ContractFactory extends Factory
      */
     public function definition(): array
     {
-
-
         return [
             'provider_id' => Provider::first()->id,
             'name' => fake()->word(),
