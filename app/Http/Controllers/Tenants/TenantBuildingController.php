@@ -7,21 +7,25 @@ use Inertia\Inertia;
 use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
+use App\Enums\NoticePeriodEnum;
 use App\Services\QRCodeService;
 use App\Models\Tenants\Building;
+use App\Enums\ContractStatusEnum;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
+use App\Enums\ContractDurationEnum;
 use App\Enums\MaintenanceFrequency;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
+use App\Enums\ContractRenewalTypesEnum;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Requests\Tenant\TenantBuildingRequest;
-use Illuminate\Support\Facades\Auth;
 
 class TenantBuildingController extends Controller
 {
@@ -40,7 +44,7 @@ class TenantBuildingController extends Controller
             abort(403);
 
         $buildings = Building::all();
-        return Inertia::render('tenants/locations/index', ['locations' => $buildings, 'routeName' => 'buildings']);
+        return Inertia::render('tenants/locations/index', ['items' => $buildings, 'routeName' => 'buildings']);
     }
 
     /**
@@ -58,8 +62,12 @@ class TenantBuildingController extends Controller
         $floorMaterials = CategoryType::where('category', 'floor_materials')->get();
         $wallMaterials = CategoryType::where('category', 'wall_materials')->get();
         $outdoorMaterials = CategoryType::where('category', 'outdoor_materials')->get();
+        $statuses = array_column(ContractStatusEnum::cases(), 'value');
+        $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
+        $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
+        $noticePeriods = array_column(NoticePeriodEnum::cases(), 'value');
 
-        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'outdoorMaterials' => $outdoorMaterials]);
+        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'outdoorMaterials' => $outdoorMaterials, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
     }
 
     /**

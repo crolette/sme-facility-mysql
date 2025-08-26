@@ -51,7 +51,7 @@ class MaintainableRequest extends FormRequest
         Debugbar::info($this->input('need_maintenance'));
 
         return [
-            'name' => 'required|string|min:6|max:100',
+            'name' => 'required|string|min:4|max:100',
             'description' => 'nullable|string|min:10|max:255',
             'purchase_date' => ['nullable', 'date', Rule::date()->todayOrBefore()],
             'purchase_cost' => 'nullable|numeric|gt:0|decimal:0,2',

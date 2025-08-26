@@ -27,14 +27,12 @@ export default function IndexTickets() {
         }
     };
 
-    const [tickets, setTickets] = useState<Ticket[]>();
+    const [tickets, setTickets] = useState<Ticket[]>([]);
 
     useEffect(() => {
         setFetchingData(true);
         fetchTickets();
     }, [fetchTicketStatus]);
-
-    console.log(tickets);
 
     const changeStatusTicket = async (id: number, status: string) => {
         try {
@@ -100,7 +98,7 @@ export default function IndexTickets() {
                 </ul>
             </div>
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <h3 className="inline">Tickets ({tickets?.length ?? 0})</h3>
+                <h3 className="inline">Tickets {!fetchingData && `(${tickets?.length ?? 0})`}</h3>
                 {fetchingData && [<p>Loading tickets...</p>]}
                 {!fetchingData && tickets && tickets?.length > 0 && (
                     <Table>

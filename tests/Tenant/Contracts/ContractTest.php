@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\ContractDurationEnum;
 use Carbon\Carbon;
 use App\Models\LocationType;
 use App\Models\Tenants\Room;
@@ -16,6 +17,8 @@ use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
 
 use App\Enums\ContractRenewalTypesEnum;
+use App\Enums\NoticePeriodEnum;
+
 use function PHPUnit\Framework\assertCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -28,10 +31,10 @@ beforeEach(function () {
     $this->user->assignRole('Admin');
     $this->actingAs($this->user, 'tenant');
 
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    LocationType::factory()->create(['level' => 'room']);
+    $this->siteType = LocationType::factory()->create(['level' => 'site']);
+    $this->buildingType = LocationType::factory()->create(['level' => 'building']);
+    $this->floorType = LocationType::factory()->create(['level' => 'floor']);
+    $this->roomType = LocationType::factory()->create(['level' => 'room']);
     CategoryType::factory()->count(2)->create(['category' => 'document']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
     CategoryType::factory()->count(2)->create(['category' => 'provider']);
@@ -55,7 +58,8 @@ beforeEach(function () {
         'internal_reference' => 'Bail Site 2025',
         'provider_reference' => 'Provider reference 2025',
         'start_date' => Carbon::now()->toDateString(),
-        'end_date' => Carbon::now()->addYear()->toDateString(),
+        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
+        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
         'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
         'status' => ContractStatusEnum::ACTIVE->value
     ];
@@ -68,7 +72,8 @@ beforeEach(function () {
         'internal_reference' => 'Sécurité Site 2025',
         'provider_reference' => 'Provider reference 2025',
         'start_date' => Carbon::now()->toDateString(),
-        'end_date' => Carbon::now()->addYear()->toDateString(),
+        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
+        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
         'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
         'status' => ContractStatusEnum::ACTIVE->value
     ];
@@ -100,7 +105,8 @@ it('can store a contract with asset and locations', function () {
         'internal_reference' => 'Bail Site 2025',
         'provider_reference' => 'Provider reference 2025',
         'start_date' => Carbon::now()->toDateString(),
-        'end_date' => Carbon::now()->addYear()->toDateString(),
+        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
+        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
         'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
         'status' => ContractStatusEnum::ACTIVE->value,
         'contractables' => [
@@ -118,7 +124,21 @@ it('can store a contract with asset and locations', function () {
     $response->assertStatus(200)
         ->assertJson(['status' => 'success']);
 
-    assertDatabaseCount('contracts', 1);
+    assertDatabaseHas('contracts', [
+        'provider_id' => $this->provider->id,
+        'name' => 'Contrat de bail',
+        'type' => 'Bail',
+        'notes' => 'Nouveau contrat de bail 2025',
+        'internal_reference' => 'Bail Site 2025',
+        'provider_reference' => 'Provider reference 2025',
+        'start_date' => Carbon::now()->toDateString(),
+        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
+        'end_date' => Carbon::now()->addMonth()->toDateString(),
+        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
+        'notice_date' => Carbon::now()->addMonth()->subDays(14)->toDateString(),
+        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
+        'status' => ContractStatusEnum::ACTIVE->value,
+    ]);
     assertDatabaseCount('contractables', 5);
 });
 
@@ -157,6 +177,134 @@ it('can store an asset with contracts', function () {
     assertEquals(2, $asset->contracts()->count());
 });
 
+it('can store a site with contracts', function () {
+
+    $formData = [
+        'name' => 'New site',
+        'description' => 'Description new site',
+        'locationType' => $this->siteType->id,
+
+        'contracts' => [
+            $this->contractOneData,
+            $this->contractTwoData
+        ]
+    ];
+
+    $response = $this->postToTenant('api.sites.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    assertDatabaseCount('contracts', 2);
+    assertDatabaseHas(
+        'contracts',
+        $this->contractOneData,
+    );
+    assertDatabaseHas(
+        'contracts',
+        $this->contractTwoData
+    );
+
+    $site = Site::find(2);
+    assertEquals(2, $site->contracts()->count());
+});
+
+it('can store a building with contracts', function () {
+
+    $formData = [
+        'name' => 'New building',
+        'description' => 'Description new building',
+        'levelType' => $this->site->id,
+        'locationType' => $this->buildingType->id,
+
+        'contracts' => [
+            $this->contractOneData,
+            $this->contractTwoData
+        ]
+    ];
+
+    $response = $this->postToTenant('api.buildings.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    assertDatabaseCount('contracts', 2);
+    assertDatabaseHas(
+        'contracts',
+        $this->contractOneData,
+    );
+    assertDatabaseHas(
+        'contracts',
+        $this->contractTwoData
+    );
+
+    $building = Building::find(2);
+    assertEquals(2, $building->contracts()->count());
+});
+
+it('can store a floor with contracts', function () {
+
+    $formData = [
+        'name' => 'New floor',
+        'description' => 'Description new floor',
+        'levelType' => $this->building->id,
+        'locationType' => $this->floorType->id,
+
+        'contracts' => [
+            $this->contractOneData,
+            $this->contractTwoData
+        ]
+    ];
+
+    $response = $this->postToTenant('api.floors.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    assertDatabaseCount('contracts', 2);
+    assertDatabaseHas(
+        'contracts',
+        $this->contractOneData,
+    );
+    assertDatabaseHas(
+        'contracts',
+        $this->contractTwoData
+    );
+
+    $floor = Floor::find(2);
+    assertEquals(2, $floor->contracts()->count());
+});
+
+it('can store a room with contracts', function () {
+
+    $formData = [
+        'name' => 'New room',
+        'description' => 'Description new room',
+        'levelType' => $this->floor->id,
+        'locationType' => $this->roomType->id,
+
+        'contracts' => [
+            $this->contractOneData,
+            $this->contractTwoData
+        ]
+    ];
+
+    $response = $this->postToTenant('api.rooms.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    assertDatabaseCount('contracts', 2);
+    assertDatabaseHas(
+        'contracts',
+        $this->contractOneData,
+    );
+    assertDatabaseHas(
+        'contracts',
+        $this->contractTwoData
+    );
+
+    $room = Room::find(2);
+    assertEquals(2, $room->contracts()->count());
+});
+
+
 it('can update an existing contract', function () {
     $contract = Contract::factory()->forLocation($this->asset)->create();
     $provider = Provider::factory()->create();
@@ -170,7 +318,10 @@ it('can update an existing contract', function () {
             'internal_reference' => 'Bail Site 2025',
             'provider_reference' => 'Provider reference 2025',
             'start_date' => Carbon::now()->toDateString(),
-            'end_date' => Carbon::now()->addYear()->toDateString(),
+            'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
+            'end_date' => Carbon::now()->addMonth()->toDateString(),
+            'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
+            'notice_date' => Carbon::now()->addMonth()->subDays(14)->toDateString(),
             'renewal_type' => ContractRenewalTypesEnum::MANUAL->value,
             'status' => ContractStatusEnum::CANCELLED->value
 
@@ -190,7 +341,10 @@ it('can update an existing contract', function () {
             'internal_reference' => 'Bail Site 2025',
             'provider_reference' => 'Provider reference 2025',
             'start_date' => Carbon::now()->toDateString(),
-            'end_date' => Carbon::now()->addYear()->toDateString(),
+            'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
+            'end_date' => Carbon::now()->addMonth()->toDateString(),
+            'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
+            'notice_date' => Carbon::now()->addMonth()->subDays(14)->toDateString(),
             'renewal_type' => ContractRenewalTypesEnum::MANUAL->value,
             'status' => ContractStatusEnum::CANCELLED->value
         ]

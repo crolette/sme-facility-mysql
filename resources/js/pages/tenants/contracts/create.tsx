@@ -10,7 +10,7 @@ import { Asset, BreadcrumbItem, Contract, Provider, TenantBuilding, TenantFloor,
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { XIcon } from 'lucide-react';
-import { FormEventHandler, useEffect } from 'react';
+import { FormEventHandler, useEffect, useState } from 'react';
 
 interface Contractable {
     locationId: number;
@@ -31,6 +31,8 @@ type TypeFormData = {
     end_date: string;
     renewal_type: string;
     status: string;
+    contract_duration: string;
+    notice_period: string;
     contractables?: Contractable[];
 };
 
@@ -39,10 +41,14 @@ export default function CreateContract({
     statuses,
     renewalTypes,
     objects,
+    contractDurations,
+    noticePeriods,
 }: {
     contract?: Contract;
     statuses: string[];
     renewalTypes: string[];
+    contractDurations: string[];
+    noticePeriods: string[];
     objects: [];
 }) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -53,7 +59,7 @@ export default function CreateContract({
     ];
 
     // const [contractables, setContractables] = useState<Contractable[]>([]);
-
+    console.log(objects);
     useEffect(() => {
         const updatedContractables: Contractable[] = [];
         if (objects?.length > 0) {
@@ -61,7 +67,7 @@ export default function CreateContract({
                 updatedContractables.push({
                     locationId: object.id,
                     locationCode: object.code,
-                    locationType: object.asset_category ? 'asset' : object.location_type.slug,
+                    locationType: object.asset_category ? 'asset' : object.location_type.level,
                     name: object.name,
                 }),
             );
@@ -70,7 +76,7 @@ export default function CreateContract({
         }
     }, [objects]);
 
-    const { data, setData, errors } = useForm<TypeFormData>({
+    const { data, setData } = useForm<TypeFormData>({
         provider_id: contract?.provider_id ?? null,
         provider_name: contract?.provider.name ?? null,
         name: contract?.name ?? '',
@@ -82,8 +88,12 @@ export default function CreateContract({
         end_date: contract?.end_date ?? '',
         renewal_type: contract?.renewal_type ?? '',
         status: contract?.status ?? '',
+        contract_duration: contract?.contract_duration ?? '',
+        notice_period: contract?.notice_period ?? '',
         contractables: [],
     });
+
+    const [errors, setErrors] = useState<TypeFormData>();
 
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
@@ -106,10 +116,13 @@ export default function CreateContract({
                     router.visit(route('tenant.contracts.show', response.data.data.id));
                 }
             } catch (error) {
-                console.log(error);
+                console.log(error.response.data.errors);
+                setErrors(error.response.data.errors);
             }
         }
     };
+
+    console.log(data);
 
     const handleAddAssetOrLocation = (location) => {
         const updatedContractables = [...data.contractables];
@@ -142,20 +155,30 @@ export default function CreateContract({
                 <h1>{contract?.name ?? 'New contract'}</h1>
                 <form onSubmit={submit}>
                     <Label>Name</Label>
-                    <Input type="text" onChange={(e) => setData('name', e.target.value)} required value={data.name} />
-                    <InputError message={errors.name} />
+                    <Input type="text" onChange={(e) => setData('name', e.target.value)} required value={data.name} minLength={4} maxLength={100} />
+                    <InputError message={errors?.name ?? ''} />
                     <Label>Type</Label>
-                    <Input type="text" onChange={(e) => setData('type', e.target.value)} required value={data.type} />
-                    <InputError message={errors.type} />
+                    <Input type="text" onChange={(e) => setData('type', e.target.value)} required value={data.type} minLength={4} maxLength={100} />
+                    <InputError message={errors?.type ?? ''} />
                     <Label>Notes</Label>
-                    <Textarea onChange={(e) => setData('notes', e.target.value)} value={data.notes} />
-                    <InputError message={errors.notes} />
+                    <Textarea onChange={(e) => setData('notes', e.target.value)} value={data.notes} minLength={4} maxLength={250} />
+                    <InputError message={errors?.notes ?? ''} />
                     <Label>Internal reference</Label>
-                    <Input type="text" onChange={(e) => setData('internal_reference', e.target.value)} value={data.internal_reference} />
-                    <InputError message={errors.internal_reference} />
+                    <Input
+                        type="text"
+                        onChange={(e) => setData('internal_reference', e.target.value)}
+                        value={data.internal_reference}
+                        maxLength={50}
+                    />
+                    <InputError message={errors?.internal_reference ?? ''} />
                     <Label>Provider reference</Label>
-                    <Input type="text" onChange={(e) => setData('provider_reference', e.target.value)} value={data.provider_reference} />
-                    <InputError message={errors.provider_reference} />
+                    <Input
+                        type="text"
+                        onChange={(e) => setData('provider_reference', e.target.value)}
+                        value={data.provider_reference}
+                        maxLength={50}
+                    />
+                    <InputError message={errors?.provider_reference ?? ''} />
                     <Label className="font-medium">Provider</Label>
                     <SearchableInput<Provider>
                         required
@@ -252,10 +275,65 @@ export default function CreateContract({
                         </select>
                         <Label htmlFor="start_date">Start date</Label>
                         <Input id="start_date" type="date" value={data.start_date} onChange={(e) => setData('start_date', e.target.value)} />
-                        <InputError className="mt-2" message={errors.start_date} />
+                        <InputError className="mt-2" message={errors?.start_date ?? ''} />
+                        <Label htmlFor="contract_duration">Contract duration</Label>
+                        <select
+                            name="contract_duration"
+                            onChange={(e) => setData('contract_duration', e.target.value)}
+                            id=""
+                            required
+                            value={data.contract_duration}
+                            className={cn(
+                                'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                            )}
+                        >
+                            {contractDurations && contractDurations.length > 0 && (
+                                <>
+                                    <option value="" disabled className="bg-background text-foreground">
+                                        Select a duration
+                                    </option>
+                                    {contractDurations?.map((type, index) => (
+                                        <option value={type} key={index} className="bg-background text-foreground">
+                                            {type}
+                                        </option>
+                                    ))}
+                                </>
+                            )}
+                        </select>
+                        <InputError className="mt-2" message={errors?.contract_duration ?? ''} />
+                        <Label htmlFor="notice_period">Notice period</Label>
+                        <select
+                            name="notice_period"
+                            onChange={(e) => setData('notice_period', e.target.value)}
+                            id=""
+                            // required
+                            value={data.notice_period}
+                            className={cn(
+                                'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                            )}
+                        >
+                            {noticePeriods && noticePeriods.length > 0 && (
+                                <>
+                                    {/* <option value="" disabled className="bg-background text-foreground">
+                                        Select a duration
+                                    </option> */}
+                                    {noticePeriods?.map((type, index) => (
+                                        <option value={type} key={index} className="bg-background text-foreground">
+                                            {type}
+                                        </option>
+                                    ))}
+                                </>
+                            )}
+                        </select>
+                        <InputError className="mt-2" message={errors?.notice_period ?? ''} />
                         <Label htmlFor="end_date">End date</Label>
-                        <Input id="end_date" type="date" value={data.end_date} onChange={(e) => setData('end_date', e.target.value)} />
-                        <InputError className="mt-2" message={errors.end_date} />
+                        <Input id="end_date" type="date" value={data.end_date} onChange={(e) => setData('end_date', e.target.value)} disabled />
+                        <p className="text-sm">The end date is automatically calculated based on the contract duration.</p>
+                        <InputError className="mt-2" message={errors?.end_date ?? ''} />
                         <Button type="submit">{contract ? 'Update' : 'Submit'}</Button>
                         <Button
                             variant={'secondary'}

@@ -14,19 +14,18 @@ export default function ShowContract({ item, objects }: { item: Contract; object
         },
     ];
 
-    console.log(objects);
-
     const deleteContract = async (contract: Contract) => {
         try {
             const response = await axios.delete(route('api.contracts.destroy', contract.id));
             if (response.data.status === 'success') {
-                console.log('Contract deleted');
                 router.visit(route('tenant.contracts.index'));
             }
         } catch (error) {
             console.log(error);
         }
     };
+
+    console.log(objects);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -50,27 +49,38 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                             <p>Status: {contract.status}</p>
                             <p>Renewal Type: {contract.renewal_type}</p>
                             <p>Start date: {contract.start_date}</p>
+                            <p>Contract duration: {contract.contract_duration}</p>
                             <p>End date : {contract.end_date}</p>
+                            <p>Notice period: {contract.notice_period}</p>
+                            <p>Notice date: {contract.notice_date}</p>
                             <p>Notes: {contract.notes}</p>
-                            <p>Provider: {contract.provider.name}</p>
+                            <p>
+                                Provider: <a href={route('tenant.providers.show', contract.provider_id)}>{contract.provider.name}</a>
+                            </p>
                             <p>Provider reference: {contract.provider_reference}</p>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <h3>Assets</h3>
-                <ul>
-                    {objects.map((object: Partial<Asset | TenantBuilding | TenantSite | TenantFloor | TenantRoom>) => (
-                        <li key={object.id}>
-                            <p>
-                                <a href={route('tenant.assets.show', object.reference_code)}>
-                                    {object.name} - {object.category}- {object.code}
-                                </a>
-                            </p>
-                        </li>
-                    ))}
-                </ul>
+                <div className="flex w-full shrink-0 justify-between rounded-md border border-gray-200 p-4">
+                    <h3>Assets</h3>
+                    <ul>
+                        {objects.map((object: Partial<Asset | TenantBuilding | TenantSite | TenantFloor | TenantRoom>) => (
+                            <li key={object.id}>
+                                <p>
+                                    <a
+                                        href={
+                                            object.pivot.contractable_type.includes('Asset')
+                                                ? route('tenant.assets.show', object.reference_code)
+                                                : route(`tenant.${object.location_type.level}s.show`, object.reference_code)
+                                        }
+                                    >
+                                        {object.name} - {object.category}- {object.code}
+                                    </a>
+                                </p>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </div>
         </AppLayout>
     );

@@ -51,7 +51,8 @@ class APIAssetController extends Controller
 
             $asset = $this->maintainableService->createMaintainable($asset, $maintainableRequest);
 
-            $this->contractService->createWithModel($asset, $contractRequest->validated('contracts'));
+            if ($contractRequest->validated('contracts'))
+                $this->contractService->createWithModel($asset, $contractRequest->validated('contracts'));
 
             $files = $documentUploadRequest->validated('files');
             if ($files) {

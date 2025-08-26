@@ -112,6 +112,9 @@ export interface Contract {
     notes: string;
     provider_id: number;
     provider_name: string;
+    contract_duration: string;
+    notice_period: string;
+    notice_date: string;
     provider: Provider;
 }
 
@@ -264,6 +267,7 @@ export interface Provider {
     category: string;
     category_type_id: number;
     users?: User[];
+    contracts?: Contract[];
 }
 
 export interface User {
