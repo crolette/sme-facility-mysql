@@ -49,6 +49,14 @@ class UserPolicy
     /**
      * Determine whether the user can update the model.
      */
+    public function updateOwn(User $user, User $model): bool
+    {
+        return $user->can('update users') && $user->id === $model->id;
+    }
+
+    /**
+     * Determine whether the user can update the model.
+     */
     public function update(User $user, User $model): bool
     {
         return $user->can('update users') && $user->id !== $model->id;

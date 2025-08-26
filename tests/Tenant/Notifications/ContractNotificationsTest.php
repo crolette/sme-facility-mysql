@@ -96,7 +96,7 @@ it('creates a notification for a new created contract', function () {
     $response = $this->postToTenant('api.contracts.store', $formData);
     $response->assertSessionHasNoErrors();
 
-    assertDatabaseCount('scheduled_notifications', 2);
+    assertDatabaseCount('scheduled_notifications', 4);
     assertDatabaseHas(
         'scheduled_notifications',
         [

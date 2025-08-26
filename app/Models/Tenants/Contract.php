@@ -45,13 +45,22 @@ class Contract extends Model
             'created_at' => 'date:d-m-Y',
             'updated_at' => 'date:d-m-Y',
             'notice_date' => 'date:d-m-Y',
+            'end_date' => 'date:d-m-Y',
             // 'start_date' => 'date:d-m-Y',
-            // 'end_date' => 'date:d-m-Y',
             'notice_period' => NoticePeriodEnum::class,
             'contract_duration' => ContractDurationEnum::class,
             'renewal_type' => ContractRenewalTypesEnum::class,
             'status' => ContractStatusEnum::class
         ];
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($contract) {
+            $contract->notifications()->delete();
+        });
     }
 
     public const DEFAULT_NOTIFICATION_DELAY = 30;

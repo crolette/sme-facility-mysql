@@ -20,10 +20,11 @@ class UserNotificationPreferenceController extends Controller
      */
     public function index()
     {
-        dd($preferences = config('notifications'));
+        dd(config('notifications.notification_types.Asset'));
+        dd($preferences = collect(config('notifications.notification_types'))->keys());
         // dd(Auth::user()->notification_preferences);
 
-        return Inertia::render('tenants/contracts/index', []);
+        return Inertia::render('settings/notification_preferences', []);
     }
 
     /**

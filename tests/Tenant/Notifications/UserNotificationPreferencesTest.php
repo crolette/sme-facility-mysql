@@ -86,3 +86,81 @@ it('creates default notification when user is created', function () {
     assertDatabaseCount('user_notification_preferences', 7);
     assertEquals($createdUser->notification_preferences()->count(), 7);
 });
+
+it('can create a new notification preference', function () {
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Maintenance Manager',
+        'job_position' => 'Manager',
+    ];
+
+    $this->postToTenant('api.users.store', $formData);
+
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    $this->actingAs($createdUser, 'tenant');
+
+    $formData = [
+        'asset_type' => 'asset',
+        'notification_type' => 'depreciation_end_date',
+        'notification_delay_days' => 30,
+        'enabled' => true,
+    ];
+
+    $response = $this->postToTenant('api.notification-preferences.store', $formData);
+    $response->assertStatus(200);
+
+    assertDatabaseHas(
+        'user_notification_preferences',
+        [
+            'user_id' => $createdUser->id,
+            'asset_type' => 'asset',
+            'notification_type' => 'depreciation_end_date',
+            'notification_delay_days' => 30,
+            'enabled' => true,
+        ]
+    );
+});
+
+it('can update notification preferences', function () {
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Maintenance Manager',
+        'job_position' => 'Manager',
+    ];
+
+    $this->postToTenant('api.users.store', $formData);
+
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    $preference = $createdUser->notification_preferences()->first();
+
+    $formData = [
+        'asset_type' => $preference->asset_type,
+        'notification_type' => $preference->notification_type,
+        'notification_delay_days' => 30,
+        'enabled' => true,
+    ];
+
+    $response = $this->patchToTenant('api.notification-preferences.update', $formData, $preference->id);
+    $response->assertStatus(200);
+
+    assertDatabaseHas(
+        'user_notification_preferences',
+        [
+            'user_id' => $createdUser->id,
+            'asset_type' => $preference->asset_type,
+            'notification_type' => $preference->notification_type,
+            'notification_delay_days' => 30,
+            'enabled' => true,
+        ]
+    );
+});

@@ -25,7 +25,7 @@ Route::middleware([
     Route::get('settings/password', [PasswordController::class, 'edit'])->name('password.edit');
     Route::put('settings/password', [PasswordController::class, 'update'])->name('password.update');
 
-    Route::resource('notification-preferences', UserNotificationPreferenceController::class)->parameters(['notification-preferences' => 'notification-preference'])->only('index', 'show', 'create', 'edit')->names('tenant.notification-preferences');
+    Route::resource('settings/notification-preferences', UserNotificationPreferenceController::class)->parameters(['notification-preferences' => 'preference'])->only('index', 'show', 'create', 'edit')->names('tenant.notification-preferences');
 
 
     Route::get('settings/appearance', function () {

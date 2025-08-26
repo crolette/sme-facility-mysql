@@ -14,7 +14,6 @@ class NotificationSchedulingService
     public function scheduleForContract(Contract $contract)
     {
         Debugbar::info('NotificationSchedulingService - scheduleForContract');
-        dump('NotificationSchedulingService - scheduleForContract', $contract->name);
 
         // Exemple de JSON
         // [
@@ -27,11 +26,9 @@ class NotificationSchedulingService
         //     'contract_reference' => 'CNT-2024-001',
         // ]
 
+        $notificationTypes = collect(config('notifications.notification_types.contract'));
+
         $notification = [
-            'recipient_name' => 'TEST',
-            'recipient_email' => 'test@test.com',
-            'notification_type' => 'contract',
-            'scheduled_at' => Carbon::now()->subDays(15),
             'status' => ScheduledNotificationStatusEnum::PENDING->value,
             'data' => [
                 'subject' => 'test',
@@ -41,12 +38,21 @@ class NotificationSchedulingService
 
         $users = User::role('Admin')->get();
 
-        foreach ($users as $user) {
-            $contract->notifications()->create([
-                ...$notification,
-                'recipient_name' => $user->fullName,
-                'recipient_email' => $user->email,
-            ]);
+        foreach ($notificationTypes as $notificationType) {
+            foreach ($users as $user) {
+                $delay = $user->notification_preferences()->where('notification_type', $notificationType)->first()?->pluck('notification_delay_days') ?? 7;
+                $date = $contract->$notificationType;
+
+                $contract->notifications()->create([
+                    ...$notification,
+                    'scheduled_at' => $date->subDays($delay),
+                    'notification_type' => $notificationType,
+                    'recipient_name' => $user->fullName,
+                    'recipient_email' => $user->email,
+                ]);
+            }
         }
     }
+
+    public function updateScheduleOfUserForNotificationType(User $user, string $notification_type) {}
 }

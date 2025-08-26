@@ -14,7 +14,7 @@ const sidebarNavItems: NavItem[] = [
     },
     {
         title: 'Notifications',
-        href: '/notification-preferences',
+        href: '/settings/notification-preferences',
         icon: null,
     },
     {

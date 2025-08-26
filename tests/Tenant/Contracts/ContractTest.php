@@ -140,6 +140,16 @@ it('can store a contract with asset and locations', function () {
         'status' => ContractStatusEnum::ACTIVE->value,
     ]);
     assertDatabaseCount('contractables', 5);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_email' => $this->user->email,
+            'recipient_name' => $this->user->fullName,
+            'notification_type' => 'notice_date',
+            'scheduled_at' => Carbon::now()->addMonth()->subDays(21)->toDateString()
+        ]
+    );
 });
 
 it('can store an asset with contracts', function () {
