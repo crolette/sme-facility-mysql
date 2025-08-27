@@ -21,9 +21,8 @@ use App\Http\Controllers\Tenants\Auth\TenantAuthenticatedSessionController;
 Route::middleware([
     'web',
     InitializeTenancyBySubdomain::class,
-    ScopeSessions::class,
-    PreventAccessFromCentralDomains::class,
-    'auth:tenant'
+    \Stancl\Tenancy\Middleware\ScopeSessions::class,
+    \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
 ])->group(function () {
 
     Route::get('/', function () {

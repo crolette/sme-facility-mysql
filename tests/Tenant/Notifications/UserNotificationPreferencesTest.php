@@ -111,7 +111,7 @@ it('can create a new notification preference', function () {
         'enabled' => true,
     ];
 
-    $response = $this->postToTenant('api.notification-preferences.store', $formData);
+    $response = $this->postToTenant('api.notifications.store', $formData);
     $response->assertStatus(200);
 
     assertDatabaseHas(
@@ -150,7 +150,7 @@ it('can update notification preferences', function () {
         'enabled' => true,
     ];
 
-    $response = $this->patchToTenant('api.notification-preferences.update', $formData, $preference->id);
+    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
     $response->assertStatus(200);
 
     assertDatabaseHas(

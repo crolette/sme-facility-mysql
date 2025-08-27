@@ -17,11 +17,11 @@ Route::middleware([
     'auth:tenant'
 ])->prefix('/v1/notification-preferences')->group(
     function () {
-        Route::post('/', [APIUserNotificationPreferencesController::class, 'store'])->name('api.notification-preferences.store');
+        Route::post('/', [APIUserNotificationPreferencesController::class, 'store'])->name('api.notifications.store');
 
         Route::prefix('{preference}')->group(function () {
 
-            Route::patch('/', [APIUserNotificationPreferencesController::class, 'update'])->name('api.notification-preferences.update');
+            Route::patch('/', [APIUserNotificationPreferencesController::class, 'update'])->name('api.notifications.update');
         });
     }
 );

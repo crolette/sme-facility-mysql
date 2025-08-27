@@ -37,8 +37,17 @@ Route::middleware([
         return ApiResponse::success($query->get());
     })->name('api.users.search');
 
+    Route::get('/notifications', function () {
+
+        $user = Auth::user();
+
+        return ApiResponse::success(
+            collect($user->notification_preferences)->groupBy('asset_type')->toArray()
+        );
+    })->name('api.users.notifications');
     Route::post('/', [APIUserController::class, 'store'])->name('api.users.store');
     Route::get('/{user}', [APIUserController::class, 'show'])->name('api.users.show');
+
     Route::patch('/{user}', [APIUserController::class, 'update'])->name('api.users.update');
     Route::delete('/{user}', [APIUserController::class, 'destroy'])->name('api.users.destroy');
     Route::post('/{user}/logo', [APIUploadProfilePictureController::class, 'store'])->name('api.users.picture.store');

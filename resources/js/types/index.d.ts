@@ -290,6 +290,15 @@ export interface User {
     [key: string]: unknown;
 }
 
+export interface NotificationPreference {
+    id: number;
+    asset_type: string;
+    notification_type: string;
+    notification_delay_days: number;
+    enabled: boolean;
+    user_id: number;
+}
+
 export interface Role {
     id: number;
     name: string;

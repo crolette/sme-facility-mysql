@@ -24,7 +24,7 @@ class UserNotificationPreferenceController extends Controller
         // dd($preferences = collect(config('notifications.notification_types'))->keys());
         // dd(collect(Auth::user()->notification_preferences)->groupBy('asset_type'));
 
-        return Inertia::render('settings/notification_preferences', ['preferences' => collect(Auth::user()->notification_preferences)->groupBy('asset_type')]);
+        return Inertia::render('settings/notification_preferences', ['items' => collect(Auth::user()->notification_preferences)->groupBy('asset_type')->toArray()]);
     }
 
     /**

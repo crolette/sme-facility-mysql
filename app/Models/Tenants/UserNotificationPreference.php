@@ -23,6 +23,7 @@ class UserNotificationPreference extends Model
     protected function casts(): array
     {
         return [
+            'notification_delay_days' => 'integer',
             'enabled' => 'boolean',
         ];
     }
