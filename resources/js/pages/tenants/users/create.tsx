@@ -1,5 +1,6 @@
 import SearchableInput from '@/components/SearchableInput';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
@@ -63,6 +64,7 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
                     },
                 });
                 if (response.data.status === 'success' && response.data.data.password) {
+                    console.log(response);
                     setPassword(response.data.data.password);
                 }
                 reset();
@@ -84,21 +86,30 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
                 )}
                 <form onSubmit={submit}>
                     <Label>First name</Label>
-                    <Input type="text" onChange={(e) => setData('first_name', e.target.value)} value={data.first_name} />
+                    <Input type="text" onChange={(e) => setData('first_name', e.target.value)} value={data.first_name} required />
                     <Label>Last name</Label>
-                    <Input type="text" onChange={(e) => setData('last_name', e.target.value)} value={data.last_name} />
+                    <Input type="text" onChange={(e) => setData('last_name', e.target.value)} value={data.last_name} required />
                     <Label>Job position</Label>
                     <Input type="text" onChange={(e) => setData('job_position', e.target.value)} value={data.job_position} />
                     <Label>Email</Label>
-                    <Input type="email" onChange={(e) => setData('email', e.target.value)} value={data.email} />
+                    <Input type="email" onChange={(e) => setData('email', e.target.value)} value={data.email} required />
                     <Label>Can login</Label>
-                    <Input
-                        type="checkbox"
-                        onChange={(e) => setData('can_login', e.target.checked ? true : false)}
-                        checked={data.can_login ?? false}
-                    />
+                    <Checkbox onClick={() => setData('can_login', !data.can_login)} checked={data.can_login ?? false} />
+                    {data.can_login && (
+                        <div>
+                            <Label>User role</Label>
+                            <select name="role" id="role" value={data.role} onChange={(e) => setData('role', e.target.value)}>
+                                <option value="">Select a role</option>
+                                {roles.map((role, index) => (
+                                    <option key={index} value={role}>
+                                        {role}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
                     {!user && (
-                        <>
+                        <div>
                             <Label>Avatar</Label>
                             <Input
                                 type="file"
@@ -108,18 +119,9 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
                                 accept="image/png, image/jpeg, image/jpg"
                             />
                             <p className="text-xs">Accepted files: png, jpg - Maximum file size: 4MB</p>
-                        </>
+                        </div>
                     )}
-                    {data.can_login && (
-                        <select name="role" id="role" value={data.role} onChange={(e) => setData('role', e.target.value)}>
-                            <option value="">Select a role</option>
-                            {roles.map((role, index) => (
-                                <option key={index} value={role}>
-                                    {role}
-                                </option>
-                            ))}
-                        </select>
-                    )}
+
                     <div>
                         <label className="mb-2 block text-sm font-medium">Providers</label>
 

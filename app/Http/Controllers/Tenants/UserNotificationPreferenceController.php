@@ -20,7 +20,7 @@ class UserNotificationPreferenceController extends Controller
      */
     public function index()
     {
-        dd(config('notifications.notification_types.Asset'));
+        dd(config('notifications.notification_types.asset'));
         dd($preferences = collect(config('notifications.notification_types'))->keys());
         // dd(Auth::user()->notification_preferences);
 
