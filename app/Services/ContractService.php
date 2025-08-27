@@ -48,6 +48,8 @@ class ContractService
         $contract->provider()->associate($request['provider_id']);
         $contract->save();
 
+        Debugbar::info('contractables', $request['contractables'], isset($request['contractables']));
+
         if (isset($request['contractables']))
             $contract = $this->syncContractables($contract, $request['contractables']);
 

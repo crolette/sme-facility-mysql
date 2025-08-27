@@ -139,12 +139,12 @@ export default function NotificationPreferences({ items }: { items: Notification
                                                         }}
                                                         className={cn(
                                                             'flex items-center rounded-md px-3.5 py-1.5 transition-colors',
-                                                            preference.enabled === true
-                                                                ? 'bg-white shadow-xs dark:bg-neutral-700 dark:text-neutral-100'
-                                                                : 'text-neutral-500 hover:bg-neutral-200/60 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-700/60',
+                                                            preference.enabled
+                                                                ? 'bg-white shadow-xs dark:bg-emerald-700 dark:text-neutral-100'
+                                                                : 'cursor-pointer text-neutral-500 hover:bg-neutral-200/60 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-700/60',
                                                         )}
                                                     >
-                                                        <span className="ml-1.5 text-sm">Yes</span>
+                                                        <span className="text-sm">Yes</span>
                                                     </button>
                                                     <button
                                                         key={'no'}
@@ -153,12 +153,12 @@ export default function NotificationPreferences({ items }: { items: Notification
                                                         }}
                                                         className={cn(
                                                             'flex items-center rounded-md px-3.5 py-1.5 transition-colors',
-                                                            preference.enabled === false
-                                                                ? 'bg-white shadow-xs dark:bg-neutral-700 dark:text-neutral-100'
-                                                                : 'text-neutral-500 hover:bg-neutral-200/60 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-700/60',
+                                                            !preference.enabled
+                                                                ? 'bg-white shadow-xs dark:bg-red-700 dark:text-neutral-100'
+                                                                : 'cursor-pointer text-neutral-500 hover:bg-neutral-200/60 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-700/60',
                                                         )}
                                                     >
-                                                        <span className="ml-1.5 text-sm">No</span>
+                                                        <span className="text-sm">No</span>
                                                     </button>
                                                 </div>
                                             </li>

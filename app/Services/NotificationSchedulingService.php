@@ -7,7 +7,8 @@ use App\Models\Tenants\User;
 use App\Models\Tenants\Contract;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Enums\ScheduledNotificationStatusEnum;
-
+use App\Models\Tenants\ScheduledNotification;
+use App\Models\Tenants\UserNotificationPreference;
 
 class NotificationSchedulingService
 {
@@ -39,9 +40,10 @@ class NotificationSchedulingService
         $users = User::role('Admin')->get();
 
         foreach ($notificationTypes as $notificationType) {
+            $date = $contract->$notificationType;
+
             foreach ($users as $user) {
-                $delay = $user->notification_preferences()->where('notification_type', $notificationType)->first()?->pluck('notification_delay_days') ?? 7;
-                $date = $contract->$notificationType;
+                $delay = $user->notification_preferences()->where('notification_type', $notificationType)->value('notification_delay_days') ?? 7;
 
                 $contract->notifications()->create([
                     ...$notification,
@@ -54,5 +56,19 @@ class NotificationSchedulingService
         }
     }
 
-    public function updateScheduleOfUserForNotificationType(User $user, string $notification_type) {}
+    public function updateScheduleOfUserForNotificationType(UserNotificationPreference $preference)
+    {
+        // 1. il faut rechercher toutes les  scheduled_notifications avec le notification_type et le user_id ET l'asset_type
+
+
+        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
+
+        dump($scheduledNotifications);
+        // asset_type : asset, location, contract, intervention
+        // 2. Mettre à jour la date scheduled_at de chaque scheduled_notification en prenant en compte le nouveau notification_delay_days
+
+
+
+        Debugbar::info('updateScheduleOfUserForNotificationType', $preference);
+    }
 }

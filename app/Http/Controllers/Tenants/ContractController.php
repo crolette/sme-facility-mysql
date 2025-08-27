@@ -10,6 +10,7 @@ use App\Models\Tenants\Contract;
 use App\Enums\ContractStatusEnum;
 use App\Enums\ContractDurationEnum;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Enums\ContractRenewalTypesEnum;
 
 class ContractController extends Controller
@@ -31,6 +32,7 @@ class ContractController extends Controller
      */
     public function create()
     {
+
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
         $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
@@ -58,8 +60,6 @@ class ContractController extends Controller
      */
     public function show(Contract $contract)
     {
-        $users = User::role('Admin')->get();
-        // dd($users);
 
         return Inertia::render('tenants/contracts/show', ['item' => $contract->load('provider'), 'objects' => $contract->getObjects()]);
     }

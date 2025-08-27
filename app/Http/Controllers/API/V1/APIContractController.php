@@ -32,6 +32,7 @@ class APIContractController extends Controller
             DB::beginTransaction();
 
             $contract = $this->contractService->create($request->validated());
+            Debugbar::info('after contractService store');
 
             DB::commit();
 
@@ -40,7 +41,6 @@ class APIContractController extends Controller
             DB::rollback();
             Log::error($e->getMessage());
             return ApiResponse::error('', 'ERROR : ' . $e->getMessage());
-            return redirect()->back()->with(['message' => 'ERROR : ' . $e->getMessage(), 'type' => 'error']);
         }
         return ApiResponse::error('', 'Error while creating an asset');
     }

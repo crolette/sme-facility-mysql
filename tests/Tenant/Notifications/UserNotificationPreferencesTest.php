@@ -83,8 +83,9 @@ it('creates default notification when user is created', function () {
 
     $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
 
-    assertDatabaseCount('user_notification_preferences', 7);
-    assertEquals($createdUser->notification_preferences()->count(), 7);
+    $nbNotifications = collect(config('notifications.notification_types'))->flatten()->count();
+    assertDatabaseCount('user_notification_preferences', $nbNotifications);
+    assertEquals($createdUser->notification_preferences()->count(), $nbNotifications);
 });
 
 it('can create a new notification preference', function () {

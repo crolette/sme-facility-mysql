@@ -4,8 +4,11 @@ namespace App\Models\Tenants;
 
 use App\Models\Tenants\User;
 use Illuminate\Database\Eloquent\Model;
+use App\Observers\NotificationPreferenceObserver;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
+#[ObservedBy([NotificationPreferenceObserver::class])]
 class UserNotificationPreference extends Model
 {
     protected $fillable = [
