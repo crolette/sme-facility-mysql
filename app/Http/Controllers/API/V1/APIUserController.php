@@ -45,6 +45,7 @@ class APIUserController extends Controller
                 $password = Str::password(12);
                 $user->password = Hash::make($password);
                 $user->assignRole($request->validated('role'));
+                //TODO check how to send password reset link instead of creating password
             }
 
             if ($request->validated('avatar'))

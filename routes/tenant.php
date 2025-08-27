@@ -114,6 +114,6 @@ Route::middleware([
     Route::get('/rooms/{Room}/tickets/create', [AssetTicketController::class, 'createFromRoom'])->name('tenant.rooms.tickets.create');
 });
 
-
+require __DIR__ . '/settings.php';
 require __DIR__ . '/tenant_auth.php';
 require __DIR__ . '/tenant_api.php';
