@@ -63,7 +63,7 @@ class Contract extends Model
         });
     }
 
-    public const DEFAULT_NOTIFICATION_DELAY = 30;
+    public const DEFAULT_NOTIFICATION_DELAY = 7;
 
     public function provider(): BelongsTo
     {

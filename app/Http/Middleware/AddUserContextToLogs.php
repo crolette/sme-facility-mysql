@@ -20,14 +20,13 @@ class AddUserContextToLogs
         if (Auth::check()) {
             $user = Auth::user();
             Log::withContext([
-                'user_id' => $user->id,
-                'user_email' => $user->email,
-                'user_name' => $user->name,
+                'auth_user_id' => $user->id,
+                'auth_user_email' => $user->email,
                 // 'user_roles' => $user->getRoleNames(),
             ]);
         } else {
             Log::withContext([
-                'user' => 'guest',
+                'guest_user' => 'guest',
             ]);
         }
 

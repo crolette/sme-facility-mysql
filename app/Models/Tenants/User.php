@@ -23,7 +23,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 #[ObservedBy([UserObserver::class])]
 class User extends Authenticatable
 {
+    public $afterCommit = true;
     protected string $guard_name = 'tenant';
+
     protected function getDefaultGuardName(): string
     {
         return $this->guard_name;
@@ -78,11 +80,15 @@ class User extends Authenticatable
 
     public static function booted(): void
     {
-        // static::addGlobalScope('SA', function (Builder $builder) {
-        //     $builder->withoutRole('Super Admin');
-        // });
-    }
+        parent::boot();
 
+        static::deleting(function ($user) {
+            $notifications = ScheduledNotification::where('recipient_email', $user->email)->get();
+            foreach ($notifications as $notification) {
+                $notification->delete();
+            }
+        });
+    }
 
     public const MAX_UPLOAD_SIZE_MB = 4;
 

@@ -2,20 +2,50 @@
 
 namespace App\Services;
 
+use Exception;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use App\Models\Tenants\User;
 use App\Models\Tenants\Document;
 use App\Models\Tenants\Provider;
-use App\Models\Tenants\User;
-use App\Models\Tenants\UserNotificationPreference;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Barryvdh\Debugbar\Facades\Debugbar;
-use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Tenants\UserNotificationPreference;
 
 class UserService
 {
+    public function create($request): array | Exception
+    {
+        try {
+            DB::beginTransaction();
+            $user = new User([...$request]);
+
+            if (isset($request['avatar']))
+                $user = $this->uploadAndAttachAvatar($user, $request['avatar'], $request['first_name'] . ' ' . $request['last_name']);
+
+            if (isset($request['provider_id']))
+                $user = $this->attachProvider($user, $request['provider_id']);
+
+            if ($request['can_login'] === true) {
+                $password = Str::password(12);
+                $user->password = Hash::make($password);
+                $user->assignRole($request['role']);
+                //TODO check how to send password reset link instead of creating password
+            }
+
+            $user->save();
+
+            DB::commit();
+            return [$user, $password ?? ''];
+        } catch (Exception $e) {
+            DB::rollBack();
+            return $e;
+        }
+    }
     public function uploadAndAttachAvatar(User $user, $file, string $name): User
     {
 

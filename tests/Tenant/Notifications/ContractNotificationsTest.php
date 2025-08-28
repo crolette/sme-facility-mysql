@@ -103,7 +103,7 @@ it('creates a notification for a new created contract', function () {
             'recipient_name' => $this->user->fullName,
             'recipient_email' => $this->user->email,
             'notification_type' => 'notice_date',
-            'scheduled_at' => Carbon::now()->addMonth(1)->subDays(14)->toDateString(),
+            'scheduled_at' => Carbon::now()->addMonth(1)->subDays(21)->toDateString(),
             'notifiable_type' => 'App\Models\Tenants\Contract',
             'notifiable_id' => 1,
         ]
@@ -123,14 +123,14 @@ it('creates a notification for a new created contract', function () {
 });
 
 
-it('can update notification preferences', function () {
+it('update notifications when notification preference notice_date of user changes', function () {
 
     $formData = [
         'first_name' => 'Jane',
         'last_name' => 'Doe',
         'email' => 'janedoe@facilitywebxp.be',
         'can_login' => true,
-        'role' => 'Maintenance Manager',
+        'role' => 'Admin',
         'job_position' => 'Manager',
     ];
 
@@ -157,23 +157,19 @@ it('can update notification preferences', function () {
 
 
     $response = $this->postToTenant('api.contracts.store', $formData);
-    dump(Contract::select('notice_period', 'start_date', 'end_date', 'notice_date')->first());
     $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
-    dump($createdUser->notification_preferences()->where('notification_type', 'notice_date')->first());
 
     assertDatabaseHas(
         'scheduled_notifications',
         [
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
             'notification_type' => 'notice_date',
             'scheduled_at' => Carbon::now()->addMonth(1)->subDays(21)->toDateString(),
             'notifiable_type' => 'App\Models\Tenants\Contract',
             'notifiable_id' => 1,
         ]
     );
-
-
 
     $preference = $createdUser->notification_preferences()->where('notification_type', 'notice_date')->first();
 
@@ -190,10 +186,83 @@ it('can update notification preferences', function () {
     assertDatabaseHas(
         'scheduled_notifications',
         [
-            'recipient_name' => $this->createdUser->fullName,
-            'recipient_email' => $this->createdUser->email,
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
             'notification_type' => 'notice_date',
             'scheduled_at' => Carbon::now()->addMonth(1)->subDays(15)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Contract',
+            'notifiable_id' => 1,
+        ]
+    );
+});
+
+it('update notifications when notification preference end_date of user changes', function () {
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Admin',
+        'job_position' => 'Manager',
+    ];
+
+    $this->postToTenant('api.users.store', $formData);
+
+
+    $formData = [
+        'provider_id' => $this->provider->id,
+        'name' => 'Contrat de bail',
+        'type' => 'Bail',
+        'notes' => 'Nouveau contrat de bail 2025',
+        'internal_reference' => 'Bail Site 2025',
+        'provider_reference' => 'Provider reference 2025',
+        'start_date' => Carbon::now()->toDateString(),
+        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
+        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
+        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
+        'status' => ContractStatusEnum::ACTIVE->value,
+        'contractables' => [
+            ['locationType' => 'asset', 'locationCode' => $this->asset->code, 'locationId' => $this->asset->id],
+            ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
+        ]
+    ];
+
+
+    $response = $this->postToTenant('api.contracts.store', $formData);
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => Carbon::now()->addMonth(1)->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Contract',
+            'notifiable_id' => 1,
+        ]
+    );
+
+    $preference = $createdUser->notification_preferences()->where('notification_type', 'end_date')->first();
+
+    $formData = [
+        'asset_type' => 'contract',
+        'notification_type' => 'end_date',
+        'notification_delay_days' => 1,
+        'enabled' => true,
+    ];
+
+    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+    $response->assertStatus(200);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => Carbon::now()->addMonth(1)->subDays(1)->toDateString(),
             'notifiable_type' => 'App\Models\Tenants\Contract',
             'notifiable_id' => 1,
         ]

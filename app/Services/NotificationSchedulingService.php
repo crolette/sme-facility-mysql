@@ -40,10 +40,10 @@ class NotificationSchedulingService
         $users = User::role('Admin')->get();
 
         foreach ($notificationTypes as $notificationType) {
-            $date = $contract->$notificationType;
 
             foreach ($users as $user) {
                 $delay = $user->notification_preferences()->where('notification_type', $notificationType)->value('notification_delay_days') ?? 7;
+                $date = $contract->$notificationType;
 
                 $contract->notifications()->create([
                     ...$notification,
@@ -60,15 +60,44 @@ class NotificationSchedulingService
     {
         // 1. il faut rechercher toutes les  scheduled_notifications avec le notification_type et le user_id ET l'asset_type
 
+        match ($preference->notification_type) {
+            'notice_date'  => $this->updateScheduleForContractNoticeDate($preference),
+            'end_date'  => $this->updateScheduleForContractEndDate($preference),
+            default => null
+            // 'site'  => Site::findOrFail($locationId),
+            // 'building' => Building::findOrFail($locationId),
+            // 'floor' => Floor::findOrFail($locationId),
+            // 'room' => Room::findOrFail($locationId),
+        };
 
-        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
 
-        dump($scheduledNotifications);
+
+        // dump($scheduledNotifications);
         // asset_type : asset, location, contract, intervention
         // 2. Mettre à jour la date scheduled_at de chaque scheduled_notification en prenant en compte le nouveau notification_delay_days
 
 
 
         Debugbar::info('updateScheduleOfUserForNotificationType', $preference);
+    }
+
+    public function updateScheduleForContractNoticeDate(UserNotificationPreference $preference)
+    {
+        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
+
+        foreach ($scheduledNotifications as $notification) {
+            $newDate = $notification->notifiable->notice_date->subDays($preference->notification_delay_days);
+            $notification->update(['scheduled_at' => $newDate]);
+        }
+    }
+
+    public function updateScheduleForContractEndDate(UserNotificationPreference $preference)
+    {
+        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
+
+        foreach ($scheduledNotifications as $notification) {
+            $newDate = $notification->notifiable->end_date->subDays($preference->notification_delay_days);
+            $notification->update(['scheduled_at' => $newDate]);
+        }
     }
 }

@@ -66,12 +66,34 @@ beforeEach(function () {
     // ];
 });
 
-it('creates default notification when user is created', function () {
+it('creates default notification preferences when admin is created', function () {
 
     $formData = [
         'first_name' => 'Jane',
         'last_name' => 'Doe',
         'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Admin',
+        'job_position' => 'Manager',
+    ];
+
+    $response = $this->postToTenant('api.users.store', $formData);
+    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200);
+
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    $nbNotifications = collect(config('notifications.notification_types'))->flatten()->count();
+    assertDatabaseCount('user_notification_preferences', $nbNotifications);
+    assertEquals($createdUser->notification_preferences()->count(), $nbNotifications);
+});
+
+it('creates default notification preferences when maintenance manager is created', function () {
+
+    $formData = [
+        'first_name' => 'John',
+        'last_name' => 'Doe',
+        'email' => 'johndoe@facilitywebxp.be',
         'can_login' => true,
         'role' => 'Maintenance Manager',
         'job_position' => 'Manager',
@@ -81,7 +103,7 @@ it('creates default notification when user is created', function () {
     $response->assertSessionHasNoErrors();
     $response->assertStatus(200);
 
-    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+    $createdUser = User::where('email', 'johndoe@facilitywebxp.be')->first();
 
     $nbNotifications = collect(config('notifications.notification_types'))->flatten()->count();
     assertDatabaseCount('user_notification_preferences', $nbNotifications);

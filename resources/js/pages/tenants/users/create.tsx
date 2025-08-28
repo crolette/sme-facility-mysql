@@ -63,8 +63,8 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
                         'Content-Type': 'multipart/form-data',
                     },
                 });
+                console.log(response);
                 if (response.data.status === 'success' && response.data.data.password) {
-                    console.log(response);
                     setPassword(response.data.data.password);
                 }
                 reset();

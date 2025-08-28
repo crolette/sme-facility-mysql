@@ -25,12 +25,11 @@ class UserNotificationPreferenceService
      */
     public function createDefaultUserNotificationPreferences(User $user)
     {
-
         if ($user->hasAnyRole(['Admin', 'Maintenance Manager'])) {
-
             $preferences = config('notifications.notification_types');
 
             foreach ($preferences as $assetType => $notificationType) {
+
                 foreach ($notificationType as $type) {
 
                     $user->notification_preferences()->create([
@@ -42,12 +41,14 @@ class UserNotificationPreferenceService
                 }
             }
         }
+
+        // dump('END createDefaultUserNotificationPreferences');
     }
 
     /**
      * storeUserNotificationPreference
      *
-     * @param  mixed $user
+     * @param  User $user
      * @param  mixed $request
      * @return bool
      */
@@ -65,6 +66,13 @@ class UserNotificationPreferenceService
         return true;
     }
 
+    /**
+     * update
+     *
+     * @param  UserNotificationPreference $preference
+     * @param  mixed $request
+     * @return bool
+     */
     public function update(UserNotificationPreference $preference, $request): bool
     {
         $preference->update([...$request]);
