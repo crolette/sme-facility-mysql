@@ -558,6 +558,7 @@ export default function CreateAsset({
                         id="description"
                         type="text"
                         maxLength={255}
+                        required
                         value={data.description}
                         onChange={(e) => setData('description', e.target.value)}
                         placeholder="Asset description"

@@ -48,8 +48,8 @@ beforeEach(function () {
     CategoryType::factory()->create(['category' => 'asset']);
 
     $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    Building::factory()->create();
+    Floor::factory()->create();
     $this->provider = Provider::factory()->create();
 
     $this->room = Room::factory()
@@ -59,22 +59,7 @@ beforeEach(function () {
 
     $this->asset = Asset::factory()->forLocation(Room::first())->create();
 
-    // $this->basicAssetData = [
-    //     'name' => 'New asset',
-    //     'description' => 'Description new asset',
-    //     'locationId' => $this->site->id,
-    //     'locationType' => 'site',
-    //     'locationReference' => $this->site->reference_code,
-    //     'surface' => 12,
-    //     'categoryId' => $this->categoryType->id,
-    //     'maintenance_manager_id' => $this->manager->id
-    // ];
-});
-
-it('creates a notification for a new created contract', function () {
-
-    // Contract::factory()->forLocation($this->asset)->create();
-    $formData = [
+    $this->basicContractData = [
         'provider_id' => $this->provider->id,
         'name' => 'Contrat de bail',
         'type' => 'Bail',
@@ -91,6 +76,12 @@ it('creates a notification for a new created contract', function () {
             ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
         ]
     ];
+});
+
+it('creates a notification for a new created contract', function () {
+
+    // Contract::factory()->forLocation($this->asset)->create();
+    $formData = $this->basicContractData;
 
     $response = $this->postToTenant('api.contracts.store', $formData);
 
@@ -137,23 +128,7 @@ it('update notifications when notification preference notice_date of user change
     $this->postToTenant('api.users.store', $formData);
 
 
-    $formData = [
-        'provider_id' => $this->provider->id,
-        'name' => 'Contrat de bail',
-        'type' => 'Bail',
-        'notes' => 'Nouveau contrat de bail 2025',
-        'internal_reference' => 'Bail Site 2025',
-        'provider_reference' => 'Provider reference 2025',
-        'start_date' => Carbon::now()->toDateString(),
-        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
-        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
-        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
-        'status' => ContractStatusEnum::ACTIVE->value,
-        'contractables' => [
-            ['locationType' => 'asset', 'locationCode' => $this->asset->code, 'locationId' => $this->asset->id],
-            ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
-        ]
-    ];
+    $formData = $this->basicContractData;
 
 
     $response = $this->postToTenant('api.contracts.store', $formData);
@@ -210,23 +185,7 @@ it('update notifications when notification preference end_date of user changes',
     $this->postToTenant('api.users.store', $formData);
 
 
-    $formData = [
-        'provider_id' => $this->provider->id,
-        'name' => 'Contrat de bail',
-        'type' => 'Bail',
-        'notes' => 'Nouveau contrat de bail 2025',
-        'internal_reference' => 'Bail Site 2025',
-        'provider_reference' => 'Provider reference 2025',
-        'start_date' => Carbon::now()->toDateString(),
-        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
-        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
-        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
-        'status' => ContractStatusEnum::ACTIVE->value,
-        'contractables' => [
-            ['locationType' => 'asset', 'locationCode' => $this->asset->code, 'locationId' => $this->asset->id],
-            ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
-        ]
-    ];
+    $formData = $this->basicContractData;
 
 
     $response = $this->postToTenant('api.contracts.store', $formData);
@@ -283,23 +242,7 @@ it('deletes notifications when notification preference notice_date of user is di
     $this->postToTenant('api.users.store', $formData);
 
 
-    $formData = [
-        'provider_id' => $this->provider->id,
-        'name' => 'Contrat de bail',
-        'type' => 'Bail',
-        'notes' => 'Nouveau contrat de bail 2025',
-        'internal_reference' => 'Bail Site 2025',
-        'provider_reference' => 'Provider reference 2025',
-        'start_date' => Carbon::now()->toDateString(),
-        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
-        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
-        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
-        'status' => ContractStatusEnum::ACTIVE->value,
-        'contractables' => [
-            ['locationType' => 'asset', 'locationCode' => $this->asset->code, 'locationId' => $this->asset->id],
-            ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
-        ]
-    ];
+    $formData = $this->basicContractData;
 
 
     $response = $this->postToTenant('api.contracts.store', $formData);
@@ -356,23 +299,7 @@ it('deletes notifications when notification preference end_date of user is disab
     $this->postToTenant('api.users.store', $formData);
 
 
-    $formData = [
-        'provider_id' => $this->provider->id,
-        'name' => 'Contrat de bail',
-        'type' => 'Bail',
-        'notes' => 'Nouveau contrat de bail 2025',
-        'internal_reference' => 'Bail Site 2025',
-        'provider_reference' => 'Provider reference 2025',
-        'start_date' => Carbon::now()->toDateString(),
-        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
-        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
-        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
-        'status' => ContractStatusEnum::ACTIVE->value,
-        'contractables' => [
-            ['locationType' => 'asset', 'locationCode' => $this->asset->code, 'locationId' => $this->asset->id],
-            ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
-        ]
-    ];
+    $formData = $this->basicContractData;
 
 
     $response = $this->postToTenant('api.contracts.store', $formData);
@@ -429,23 +356,7 @@ it('creates notifications when notification preference notice_date of user is en
     $this->postToTenant('api.users.store', $formData);
 
 
-    $formData = [
-        'provider_id' => $this->provider->id,
-        'name' => 'Contrat de bail',
-        'type' => 'Bail',
-        'notes' => 'Nouveau contrat de bail 2025',
-        'internal_reference' => 'Bail Site 2025',
-        'provider_reference' => 'Provider reference 2025',
-        'start_date' => Carbon::now()->toDateString(),
-        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
-        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
-        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
-        'status' => ContractStatusEnum::ACTIVE->value,
-        'contractables' => [
-            ['locationType' => 'asset', 'locationCode' => $this->asset->code, 'locationId' => $this->asset->id],
-            ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
-        ]
-    ];
+    $formData = $this->basicContractData;
 
 
     $response = $this->postToTenant('api.contracts.store', $formData);
@@ -501,23 +412,7 @@ it('creates notifications when notification preference end_date of user is enabl
     $this->postToTenant('api.users.store', $formData);
 
 
-    $formData = [
-        'provider_id' => $this->provider->id,
-        'name' => 'Contrat de bail',
-        'type' => 'Bail',
-        'notes' => 'Nouveau contrat de bail 2025',
-        'internal_reference' => 'Bail Site 2025',
-        'provider_reference' => 'Provider reference 2025',
-        'start_date' => Carbon::now()->toDateString(),
-        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
-        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
-        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
-        'status' => ContractStatusEnum::ACTIVE->value,
-        'contractables' => [
-            ['locationType' => 'asset', 'locationCode' => $this->asset->code, 'locationId' => $this->asset->id],
-            ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
-        ]
-    ];
+    $formData = $this->basicContractData;
 
 
     $response = $this->postToTenant('api.contracts.store', $formData);

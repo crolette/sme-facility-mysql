@@ -60,6 +60,9 @@ class ContractController extends Controller
      */
     public function show(Contract $contract)
     {
+        $preference = Auth::user()->notification_preferences()->where('notification_type', 'end_warranty_date')->first();
+        // $preference = null;
+        dd(!$preference);
         // dd(Contract::where('notice_date', '>', Carbon::now())->get());
         // dd($contract->end_date, $contract->end_date->subYears(5) < $contract->start_date);
         return Inertia::render('tenants/contracts/show', ['item' => $contract->load('provider'), 'objects' => $contract->getObjects()]);

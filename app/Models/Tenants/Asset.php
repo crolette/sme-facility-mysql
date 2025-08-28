@@ -2,6 +2,7 @@
 
 namespace App\Models\Tenants;
 
+use App\Observers\AssetObserver;
 use App\Models\Central\AssetType;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
@@ -19,8 +20,10 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
+#[ObservedBy([AssetObserver::class])]
 class Asset extends Model
 {
     use HasFactory, SoftDeletes;
@@ -35,7 +38,6 @@ class Asset extends Model
         "depreciation_end_date",
         "depreciation_duration",
         "residual_value",
-        'contract_end_date',
         'brand',
         'model',
         'qr_code',
@@ -62,6 +64,8 @@ class Asset extends Model
         'is_mobile' => 'boolean',
         'depreciable' => 'boolean',
         'residual_value' => 'decimal:2',
+        'depreciation_start_date' => 'date:Y-m-d',
+        'depreciation_end_date' => 'date:Y-m-d',
     ];
 
     // Ensure route model binding use the slug instead of ID
