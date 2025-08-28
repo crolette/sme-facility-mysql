@@ -97,7 +97,10 @@ export default function NotificationPreferences({ items }: { items: Notification
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Notification preferences" description="Change your notification preferences" />
+                    <HeadingSmall
+                        title="Notification preferences"
+                        description="Change your notification preferences. How many days prior to the date do you want to receive an e-mail?"
+                    />
                     <ul>
                         {Object.keys(preferences).map((key: string) => (
                             <div key={key}>

@@ -13,7 +13,6 @@ class ContractObserver implements ShouldHandleEventsAfterCommit
 {
     public function created(Contract $contract)
     {
-
         app(NotificationSchedulingService::class)->scheduleForContract($contract);
     }
 
