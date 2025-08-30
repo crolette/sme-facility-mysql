@@ -28,7 +28,6 @@ class AssetFactory extends Factory
         $category = CategoryType::where('category', 'asset')->first();
 
         $randomDepreciationDuration = fake()->randomDigitNotZero();
-
         return [
 
             'surface' => fake()->numberBetween(1, 10),
@@ -69,7 +68,6 @@ class AssetFactory extends Factory
         return $this->afterCreating(
 
             function (Asset $asset) {
-
                 $asset->maintainable()->save(
                     Maintainable::factory()->make()
                 );

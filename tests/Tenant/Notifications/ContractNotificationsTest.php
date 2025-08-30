@@ -57,8 +57,7 @@ beforeEach(function () {
         ->for(Floor::first())
         ->create();
 
-    $this->asset = Asset::factory()->forLocation(Room::first())->create();
-
+    $this->asset = Asset::factory()->forLocation($this->room)->create();
     $this->basicContractData = [
         'provider_id' => $this->provider->id,
         'name' => 'Contrat de bail',

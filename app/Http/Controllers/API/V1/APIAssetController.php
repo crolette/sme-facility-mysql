@@ -48,7 +48,6 @@ class APIAssetController extends Controller
 
             $asset->assetCategory()->associate($assetRequest->validated('categoryId'));
             $asset->save();
-
             $asset = $this->maintainableService->createMaintainable($asset, $maintainableRequest);
 
             if ($contractRequest->validated('contracts'))
@@ -69,13 +68,12 @@ class APIAssetController extends Controller
                 $this->qrCodeService->createAndAttachQR($asset);
 
             DB::commit();
-
             return ApiResponse::success('', 'Asset created');
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
+            dump($e->getMessage());
             return ApiResponse::error('', 'ERROR : ' . $e->getMessage());
-            return redirect()->back()->with(['message' => 'ERROR : ' . $e->getMessage(), 'type' => 'error']);
         }
         return ApiResponse::error('', 'Error while creating an asset');
     }

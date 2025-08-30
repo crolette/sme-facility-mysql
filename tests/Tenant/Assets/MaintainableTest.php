@@ -20,6 +20,10 @@ use function Pest\Laravel\assertDatabaseMissing;
 use function PHPUnit\Framework\assertCount;
 
 beforeEach(function () {
+    $this->user = User::factory()->create();
+    $this->user->assignRole('Admin');
+    $this->actingAs($this->user, 'tenant');
+
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
     $this->buildingType = LocationType::factory()->create(['level' => 'building']);
     $this->floorType = LocationType::factory()->create(['level' => 'floor']);
@@ -34,9 +38,6 @@ beforeEach(function () {
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
-
-    $this->user = User::factory()->create();
-    $this->actingAs($this->user, 'tenant');
 });
 
 it('fails when name is more than 100 chars', function () {
@@ -49,7 +50,7 @@ it('fails when name is more than 100 chars', function () {
         'categoryId' => $this->category->id,
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
 
     $response->assertSessionHasErrors([
         'name' => 'The name field must not be greater than 100 characters.',
@@ -66,7 +67,7 @@ it('fails when description is more than 255 chars', function () {
         'categoryId' => $this->category->id,
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
 
     $response->assertSessionHasErrors([
         'description' => 'The description field must not be greater than 255 characters.',
@@ -74,6 +75,7 @@ it('fails when description is more than 255 chars', function () {
 });
 
 it('passes when end_warranty_date is filled and under_warranty is true', function () {
+    // $name = 
     $formData = [
         'name' => fake()->text(50),
         'description' => fake()->text(250),
@@ -85,10 +87,11 @@ it('passes when end_warranty_date is filled and under_warranty is true', functio
         'end_warranty_date' => Carbon::now()->add(1, 'month')->toDateString()
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
 
     $response->assertSessionHasNoErrors();
     $asset = Asset::first();
+    // dump($asset);
     $this->assertNotNull($asset->maintainable->end_warranty_date);
 });
 
@@ -103,7 +106,7 @@ it('fails when end_warranty_date is missing and under_warranty is true', functio
         'under_warranty' => true,
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
 
     $response->assertSessionHasErrors([
         'end_warranty_date' => 'The end warranty date field is required when under warranty is accepted.',
@@ -121,7 +124,7 @@ it('passes when purchase_cost has max 2 decimals and 7 digits', function () {
         'purchase_cost' => 9999999.2
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasNoErrors();
     $asset = Asset::first();
     $this->assertNotNull($asset->maintainable->purchase_cost);
@@ -138,7 +141,7 @@ it('fails when purchase_cost is negative', function () {
         'purchase_cost' => -10
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasErrors([
         'purchase_cost' => 'The purchase cost field must be greater than 0.',
     ]);
@@ -155,7 +158,7 @@ it('fails when purchase_cost has more than 2 decimals', function () {
         'purchase_cost' => 123456.123
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasErrors([
         'purchase_cost' => 'The purchase cost field must have 0-2 decimal places.',
     ]);
@@ -172,7 +175,7 @@ it('passes when purchase_date is equal today', function () {
         'purchase_date' => Carbon::now()->toDateString()
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasNoErrors();
     $asset = Asset::first();
     $this->assertNotNull($asset->maintainable->purchase_date);
@@ -189,9 +192,9 @@ it('fails when purchase_date is after today', function () {
         'purchase_date' => Carbon::now()->add(1, 'month')->toDateString()
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasErrors([
-        'purchase_date' => 'The purchase date field must be a date before or equal to ' . Carbon::now()->toDateString() . '.',
+        'purchase_date' => 'The purchase date field must be a date before or equal to today.',
     ]);
 });
 
@@ -207,7 +210,7 @@ it('fails when end_warranty_date is before purchase_date', function () {
         'purchase_date' => Carbon::now()
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasErrors([
         'end_warranty_date' => 'The end warranty date field must be a date after purchase date.',
     ]);
