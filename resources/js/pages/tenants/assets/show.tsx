@@ -162,16 +162,16 @@ export default function ShowAsset({ item }: { item: Asset }) {
                     </div>
                 )}
 
-                {asset.maintainable.purchase_date && (
-                    <div className="rounded-md border border-gray-200 p-4">
-                        <h2>Purchase/Warranty</h2>
-                        <div>
-                            <p>Purchase date : {asset.maintainable.purchase_date}</p>
-                            <p>Purchase cost : {asset.maintainable.purchase_cost}</p>
-                            <p>End warranty date : {asset.maintainable.end_warranty_date}</p>
-                        </div>
+                {/* {asset.maintainable.purchase_date && ( */}
+                <div className="rounded-md border border-gray-200 p-4">
+                    <h2>Purchase/Warranty</h2>
+                    <div>
+                        <p>Purchase date : {asset.maintainable.purchase_date}</p>
+                        <p>Purchase cost : {asset.maintainable.purchase_cost}</p>
+                        <p>End warranty date : {asset.maintainable.end_warranty_date}</p>
                     </div>
-                )}
+                </div>
+                {/* )} */}
 
                 {asset.maintainable.providers && asset.maintainable.providers?.length > 0 && (
                     <div className="rounded-md border border-gray-200 p-4">

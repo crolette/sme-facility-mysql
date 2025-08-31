@@ -384,6 +384,69 @@ it('update notifications when notification preference depreciation_end_date of u
     );
 });
 
+it('update notifications when notification preference next_maintenance_date of user changes', function () {
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Admin',
+        'job_position' => 'Manager',
+    ];
+
+    $this->postToTenant('api.users.store', $formData);
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_manager_id' => $createdUser->id,
+        'maintenance_frequency' => 'annual',
+        'need_maintenance' => true,
+        'next_maintenance_date' => Carbon::now()->addYear(),
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+
+    $preference = $createdUser->notification_preferences()->where('notification_type', 'next_maintenance_date')->first();
+
+    $formData = [
+        'asset_type' => 'maintenance',
+        'notification_type' => 'next_maintenance_date',
+        'notification_delay_days' => 1,
+        'enabled' => true,
+    ];
+
+    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+    $response->assertStatus(200);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addYear()->subDays(1)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+});
+
 it('deletes notifications when notification preference end_warranty_date of user is disabled', function () {
 
     $formData = [
@@ -514,6 +577,72 @@ it('deletes notifications when notification preference depreciation_end_date of 
     );
 });
 
+it('deletes notifications when notification preference next_maintenance_date of user is disabled', function () {
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Admin',
+        'job_position' => 'Manager',
+    ];
+
+    $this->postToTenant('api.users.store', $formData);
+
+
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_manager_id' => $createdUser->id,
+        'maintenance_frequency' => 'annual',
+        'need_maintenance' => true,
+        'next_maintenance_date' => Carbon::now()->addYear(),
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+
+    $preference = $createdUser->notification_preferences()->where('notification_type', 'next_maintenance_date')->first();
+
+    $formData = [
+        'asset_type' => 'maintenance',
+        'notification_type' => 'next_maintenance_date',
+        'notification_delay_days' => $preference->notification_delay_days,
+        'enabled' => false,
+    ];
+
+    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+    $response->assertStatus(200);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+});
+
 it('creates notifications when notification preference warranty_end_date of user is enabled', function () {
 
     $formData = [
@@ -632,6 +761,68 @@ it('creates notifications when notification preference depreciation_end_date of 
             'recipient_email' => $createdUser->email,
             'notification_type' => 'depreciation_end_date',
             'scheduled_at' => Carbon::now()->addYears(3)->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+});
+
+it('creates notifications when notification preference next_maintenance_date of user is enabled', function () {
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Admin',
+        'job_position' => 'Manager',
+    ];
+
+    $this->postToTenant('api.users.store', $formData);
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_manager_id' => $createdUser->id,
+        'maintenance_frequency' => 'annual',
+        'need_maintenance' => true,
+        'next_maintenance_date' => Carbon::now()->addYear(),
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+    ];
+
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+
+
+    $preference = $createdUser->notification_preferences()->where('notification_type', 'next_maintenance_date')->first();
+
+    $formData = [
+        'asset_type' => 'maintenance',
+        'notification_type' => 'next_maintenance_date',
+        'notification_delay_days' => $preference->notification_delay_days,
+        'enabled' => false,
+    ];
+
+    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+    $response->assertStatus(200);
+
+    $formData = [
+        'asset_type' => 'maintenance',
+        'notification_type' => 'next_maintenance_date',
+        'notification_delay_days' => $preference->notification_delay_days,
+        'enabled' => true,
+    ];
+
+    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+    $response->assertStatus(200);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
             'notifiable_type' => 'App\Models\Tenants\Asset',
             'notifiable_id' => 1,
         ]

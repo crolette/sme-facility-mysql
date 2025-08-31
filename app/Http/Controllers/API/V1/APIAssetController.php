@@ -72,7 +72,6 @@ class APIAssetController extends Controller
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
-            dump($e->getMessage());
             return ApiResponse::error('', 'ERROR : ' . $e->getMessage());
         }
         return ApiResponse::error('', 'Error while creating an asset');

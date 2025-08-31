@@ -3,12 +3,15 @@
 namespace App\Models\Tenants;
 
 use App\Models\Tenants\Intervention;
+use App\Observers\MaintainableObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+#[ObservedBy([MaintainableObserver::class])]
 class Maintainable extends Model
 {
     use HasFactory;

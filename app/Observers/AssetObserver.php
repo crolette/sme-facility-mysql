@@ -18,4 +18,10 @@ class AssetObserver implements ShouldHandleEventsAfterCommit
         if ($asset->maintainable)
             app(AssetNotificationSchedulingService::class)->scheduleForAsset($asset);
     }
+
+    public function updated(Asset $asset)
+    {
+        Debugbar::info('Asset Observer updated');
+        app(AssetNotificationSchedulingService::class)->updateForAsset($asset);
+    }
 }

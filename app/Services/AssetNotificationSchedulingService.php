@@ -16,20 +16,7 @@ class AssetNotificationSchedulingService
 {
     public function scheduleForAsset(Asset $asset)
     {
-        // Debugbar::info('AssetNotificationSchedulingService - scheduleForAsset');
-
-        // Exemple de JSON
-        // [
-        //     'asset/location name' => 'Photocopieur Xerox'/'Rez-de-chaussée',
-        //     'due_date' => '2024-12-31',
-        //     'dashboard_url' => 'https://app.com/contracts/15'
-        //      
-        //     'contract_name' => 'Contrat nettoyage',
-        //     'supplier_name' => 'Entreprise XYZ',
-        //     'contract_reference' => 'CNT-2024-001',
-        // ]
-
-        $notificationTypes = collect(config('notifications.notification_types.asset'));
+        // $notificationTypes = collect(config('notifications.notification_types.asset'));
 
         // warranty date : maintainable under warranty
         // depcriation : depreciable (true/false)
@@ -89,7 +76,6 @@ class AssetNotificationSchedulingService
         }
 
         if ($asset->maintainable->need_maintenance) {
-
 
             $notification = [
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
@@ -189,32 +175,23 @@ class AssetNotificationSchedulingService
             }
         }
         //
-        // $notification = [
-        //     'status' => ScheduledNotificationStatusEnum::PENDING->value,
-        //     'data' => [
-        //         'subject' => 'test',
-        //         'notice_date' => $contract->notice_date
-        //     ]
-        // ];
 
-        // $users = User::role('Admin')->get();
+    }
 
-        // foreach ($notificationTypes as $notificationType) {
+    public function updateForAsset(Asset $asset)
+    {
+        Debugbar::info('updateForAsset');
+        if ($asset->maintainable->wasChanged('end_warranty_date')) {
+            Debugbar::info('updateForAsset end_warranty_date changed');
+        }
 
-        //     foreach ($users as $user) {
-        //         $delay = $user->notification_preferences()->where('notification_type', $notificationType)->where('enabled', true)->value('notification_delay_days') ?? 7;
-        //         // get the date of the notification type : i.e. notice_date or end_date
-        //         $date = $contract->$notificationType;
+        if ($asset->maintainable->wasChanged('next_maintenance_date')) {
+            Debugbar::info('updateForAsset next_maintenance_date changed');
+        }
 
-        //         $contract->notifications()->create([
-        //             ...$notification,
-        //             'scheduled_at' => $date->subDays($delay),
-        //             'notification_type' => $notificationType,
-        //             'recipient_name' => $user->fullName,
-        //             'recipient_email' => $user->email,
-        //         ]);
-        //     }
-        // }
+        if ($asset->wasChanged('depreciation_end_date')) {
+            Debugbar::info('updateForAsset depreciation_end_date changed');
+        }
     }
 
     public function updateScheduleOfAssetForNotificationType(UserNotificationPreference $preference)
@@ -227,10 +204,6 @@ class AssetNotificationSchedulingService
                 'end_warranty_date'  => $this->updateScheduleForEndWarrantyDate($preference),
                 'depreciation_end_date'  => $this->updateScheduleForDepreciationEndDate($preference),
                 default => null
-                // 'site'  => Site::findOrFail($locationId),
-                // 'building' => Building::findOrFail($locationId),
-                // 'floor' => Floor::findOrFail($locationId),
-                // 'room' => Room::findOrFail($locationId),
             };
         };
 
@@ -244,21 +217,8 @@ class AssetNotificationSchedulingService
                 'end_warranty_date'  => $this->createScheduleForWarrantyEndDate($preference),
                 'depreciation_end_date'  => $this->createScheduleForDepreciationEndDate($preference),
                 default => null
-                // 'site'  => Site::findOrFail($locationId),
-                // 'building' => Building::findOrFail($locationId),
-                // 'floor' => Floor::findOrFail($locationId),
-                // 'room' => Room::findOrFail($locationId),
             };
         }
-
-
-
-        //     // dump($scheduledNotifications);
-        //     // asset_type : asset, location, contract, intervention
-        //     // 2. Mettre à jour la date scheduled_at de chaque scheduled_notification en prenant en compte le nouveau notification_delay_days
-
-
-
     }
 
     public function updateScheduleForEndWarrantyDate(UserNotificationPreference $preference)
