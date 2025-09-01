@@ -122,6 +122,11 @@ class User extends Authenticatable
         return $this->morphMany(Asset::class, 'location');
     }
 
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(ScheduledNotification::class);
+    }
+
     public function fullName(): Attribute
     {
         return Attribute::make(

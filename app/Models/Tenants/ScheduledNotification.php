@@ -4,6 +4,7 @@ namespace App\Models\Tenants;
 
 use App\Enums\ScheduledNotificationStatusEnum;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ScheduledNotification extends Model
 {
@@ -36,5 +37,10 @@ class ScheduledNotification extends Model
     public function notifiable()
     {
         return $this->morphTo();
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
