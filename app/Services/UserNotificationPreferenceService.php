@@ -41,8 +41,6 @@ class UserNotificationPreferenceService
                 }
             }
         }
-
-        // dump('END createDefaultUserNotificationPreferences');
     }
 
     /**

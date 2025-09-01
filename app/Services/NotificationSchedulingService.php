@@ -4,61 +4,15 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use App\Models\Tenants\User;
+use App\Models\Tenants\Asset;
 use App\Models\Tenants\Contract;
 use Barryvdh\Debugbar\Facades\Debugbar;
-use App\Enums\ScheduledNotificationStatusEnum;
 use App\Models\Tenants\ScheduledNotification;
+use App\Enums\ScheduledNotificationStatusEnum;
 use App\Models\Tenants\UserNotificationPreference;
 
 class NotificationSchedulingService
 {
-    public function scheduleForContract(Contract $contract)
-    {
-        Debugbar::info('NotificationSchedulingService - scheduleForContract');
-
-        // Exemple de JSON
-        // [
-        //     'asset/location name' => 'Photocopieur Xerox'/'Rez-de-chaussée',
-        //     'due_date' => '2024-12-31',
-        //     'dashboard_url' => 'https://app.com/contracts/15'
-        //      
-        //     'contract_name' => 'Contrat nettoyage',
-        //     'supplier_name' => 'Entreprise XYZ',
-        //     'contract_reference' => 'CNT-2024-001',
-        // ]
-
-        $notificationTypes = collect(config('notifications.notification_types.contract'));
-
-        $notification = [
-            'status' => ScheduledNotificationStatusEnum::PENDING->value,
-            'data' => [
-                'subject' => 'test',
-                'notice_date' => $contract->notice_date
-            ]
-        ];
-
-        $users = User::role('Admin')->get();
-
-        foreach ($notificationTypes as $notificationType) {
-
-            foreach ($users as $user) {
-                $delay = $user->notification_preferences()->where('notification_type', $notificationType)->where('enabled', true)->value('notification_delay_days') ?? 7;
-                // get the date of the notification type : i.e. notice_date or end_date
-                $date = $contract->$notificationType;
-
-                $createdNotification = $contract->notifications()->create([
-                    ...$notification,
-                    'scheduled_at' => $date->subDays($delay),
-                    'notification_type' => $notificationType,
-                    'recipient_name' => $user->fullName,
-                    'recipient_email' => $user->email,
-                ]);
-
-                $createdNotification->user()->associate($user);
-                $createdNotification->save();
-            }
-        }
-    }
 
     public function updateScheduleOfUserForNotificationType(UserNotificationPreference $preference)
     {
@@ -69,6 +23,9 @@ class NotificationSchedulingService
             match ($preference->notification_type) {
                 'notice_date'  => $this->updateScheduleForContractNoticeDate($preference),
                 'end_date'  => $this->updateScheduleForContractEndDate($preference),
+                'end_warranty_date' => $this->updateScheduleForEndWarrantyDate($preference),
+                'depreciation_end_date' => $this->updateScheduleForDepreciationEndDate($preference),
+                'next_maintenance_date' => $this->updateScheduleForNextMaintenanceDate($preference),
                 default => null
                 // 'site'  => Site::findOrFail($locationId),
                 // 'building' => Building::findOrFail($locationId),
@@ -86,6 +43,9 @@ class NotificationSchedulingService
             match ($preference->notification_type) {
                 'notice_date'  => $this->createScheduleForContractNoticeDate($preference),
                 'end_date'  => $this->createScheduleForContractEndDate($preference),
+                'end_warranty_date' => $this->createScheduleForWarrantyEndDate($preference),
+                'depreciation_end_date' => $this->createScheduleForDepreciationEndDate($preference),
+                'next_maintenance_date' => $this->createScheduleForNextMaintenanceDate($preference),
                 default => null
                 // 'site'  => Site::findOrFail($locationId),
                 // 'building' => Building::findOrFail($locationId),
@@ -103,6 +63,39 @@ class NotificationSchedulingService
 
 
         Debugbar::info('updateScheduleOfUserForNotificationType', $preference);
+    }
+
+    public function updateScheduleForNextMaintenanceDate(UserNotificationPreference $preference)
+    {
+
+        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
+
+        foreach ($scheduledNotifications as $notification) {
+            $newDate = $notification->notifiable->maintainable->next_maintenance_date->subDays($preference->notification_delay_days);
+            $notification->update(['scheduled_at' => $newDate]);
+        }
+    }
+
+    public function updateScheduleForDepreciationEndDate(UserNotificationPreference $preference)
+    {
+        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
+
+        foreach ($scheduledNotifications as $notification) {
+            $newDate = $notification->notifiable->depreciation_end_date->subDays($preference->notification_delay_days);
+            $notification->update(['scheduled_at' => $newDate]);
+        }
+    }
+
+
+    public function updateScheduleForEndWarrantyDate(UserNotificationPreference $preference)
+    {
+
+        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
+
+        foreach ($scheduledNotifications as $notification) {
+            $newDate = $notification->notifiable->maintainable->end_warranty_date->subDays($preference->notification_delay_days);
+            $notification->update(['scheduled_at' => $newDate]);
+        }
     }
 
     public function updateScheduleForContractNoticeDate(UserNotificationPreference $preference)
@@ -193,6 +186,83 @@ class NotificationSchedulingService
 
             $createdNotification->user()->associate($user);
             $createdNotification->save();
+        }
+    }
+
+
+    public function createScheduleForWarrantyEndDate(UserNotificationPreference $preference)
+    {
+        $delayDays = $preference->notification_delay_days;
+        $assets = Asset::whereHas('maintainable', fn($query) => $query->where('end_warranty_date', '>', Carbon::now()->addDays($delayDays)))->get();
+        $user = $preference->user;
+
+        foreach ($assets as $asset) {
+            $notification = [
+                'status' => ScheduledNotificationStatusEnum::PENDING->value,
+                'data' => [
+                    'subject' => 'test',
+                    'notice_date' => $asset->maintainable->end_warranty_date
+                ]
+            ];
+
+            $asset->notifications()->create([
+                ...$notification,
+                'scheduled_at' => $asset->maintainable->end_warranty_date->subDays($delayDays),
+                'notification_type' => 'end_warranty_date',
+                'recipient_name' => $user->fullName,
+                'recipient_email' => $user->email,
+            ]);
+        }
+    }
+
+
+    public function createScheduleForDepreciationEndDate(UserNotificationPreference $preference)
+    {
+        $delayDays = $preference->notification_delay_days;
+        $assets = Asset::where('depreciation_end_date', '>', Carbon::now()->addDays($delayDays))->get();
+        $user = $preference->user;
+
+        foreach ($assets as $asset) {
+            $notification = [
+                'status' => ScheduledNotificationStatusEnum::PENDING->value,
+                'data' => [
+                    'subject' => 'test',
+                    'notice_date' => $asset->end_date
+                ]
+            ];
+
+            $asset->notifications()->create([
+                ...$notification,
+                'scheduled_at' => $asset->depreciation_end_date->subDays($delayDays),
+                'notification_type' => 'depreciation_end_date',
+                'recipient_name' => $user->fullName,
+                'recipient_email' => $user->email,
+            ]);
+        }
+    }
+
+    public function createScheduleForNextMaintenanceDate(UserNotificationPreference $preference)
+    {
+        $delayDays = $preference->notification_delay_days;
+        $assets = Asset::whereHas('maintainable', fn($query) => $query->where('next_maintenance_date', '>', Carbon::now()->addDays($delayDays)))->get();
+        $user = $preference->user;
+
+        foreach ($assets as $asset) {
+            $notification = [
+                'status' => ScheduledNotificationStatusEnum::PENDING->value,
+                'data' => [
+                    'subject' => 'test',
+                    'notice_date' => $asset->maintainable->next_maintenance_date
+                ]
+            ];
+
+            $asset->notifications()->create([
+                ...$notification,
+                'scheduled_at' => $asset->maintainable->next_maintenance_date->subDays($delayDays),
+                'notification_type' => 'next_maintenance_date',
+                'recipient_name' => $user->fullName,
+                'recipient_email' => $user->email,
+            ]);
         }
     }
 }

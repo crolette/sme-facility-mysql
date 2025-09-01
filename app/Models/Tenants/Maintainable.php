@@ -39,6 +39,10 @@ class Maintainable extends Model
         'updated_at'
     ];
 
+    protected $with = [
+        // 'manager',
+    ];
+
     protected function casts(): array
     {
         return [

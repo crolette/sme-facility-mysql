@@ -73,10 +73,6 @@ beforeEach(function () {
             ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
         ]
     ];
-
-
-
-    // $response = $this->postToTenant('api.contracts.store', $formData);
 });
 
 it('creates the notifications for a new created contract', function () {

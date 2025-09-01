@@ -18,17 +18,21 @@ class MaintainableService
     public function createMaintainable(Model $model, $request): Model
     {
         $model->maintainable()->updateOrCreate(['maintainable_type' => get_class($model), 'maintainable_id' => $model->id], [...$request->validated()]);
-
         $model->maintainable->providers()->sync(collect($request->validated('providers'))->pluck('id'));
 
-
         if ($request->validated('maintenance_manager_id')) {
-            if ($model->maintainable->manager?->id !== $request->validated('maintenance_manager_id')) {
+
+            if ($model->maintainable->manager && ($model->maintainable->manager?->id !== $request->validated('maintenance_manager_id'))) {
+                app(MaintainableNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($model->maintainable, $model->maintainable->manager);
                 $model->maintainable->manager()->disassociate()->save();
             }
-            $model->maintainable->manager()->associate($request->validated('maintenance_manager_id'))->save();
+
+            if ($model->maintainable->manager === null) {
+                $model->maintainable->manager()->associate($request->validated('maintenance_manager_id'))->save();
+            }
         }
 
+        dump('--- END CREATE MAINTAINABLE ---');
         return $model;
     }
 };
