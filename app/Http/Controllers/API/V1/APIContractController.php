@@ -54,16 +54,15 @@ class APIContractController extends Controller
             abort(403);
 
         try {
-            // DB::beginTransaction();
+            DB::beginTransaction();
 
             $contract = $this->contractService->update($contract, $request->validated());
-            Debugbar::info($contract);
 
-            // DB::commit();
+            DB::commit();
 
             return ApiResponse::success('', 'Contract updated');
         } catch (Exception $e) {
-            // DB::rollback();
+            DB::rollback();
             Log::error($e->getMessage());
             return ApiResponse::error('ERROR : ' . $e->getMessage());
         }

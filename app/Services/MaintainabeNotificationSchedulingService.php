@@ -12,11 +12,9 @@ use App\Enums\ScheduledNotificationStatusEnum;
 use App\Models\Tenants\Maintainable;
 use App\Models\Tenants\UserNotificationPreference;
 
-class MaintenanceSchedulingService
+class MaintainabeNotificationSchedulingService
 {
-
-
-    public function updateScheduleMaintenanceForNotificationType(UserNotificationPreference $preference)
+    public function updateScheduleOfMaintainableForNotificationType(UserNotificationPreference $preference)
     {
         // 1. il faut rechercher toutes les  scheduled_notifications avec le notification_type et le user_id ET l'asset_type
 
@@ -49,8 +47,6 @@ class MaintenanceSchedulingService
     {
 
         $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
-
-
 
         foreach ($scheduledNotifications as $notification) {
             $newDate = $notification->notifiable->maintainable->next_maintenance_date->subDays($preference->notification_delay_days);

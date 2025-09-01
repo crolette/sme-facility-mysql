@@ -45,7 +45,7 @@ class AssetNotificationSchedulingService
                 if ($preference && $preference->enabled) {
                     $delay = $preference->notification_delay_days;
 
-                    $asset->notifications()->create(
+                    $createdNotification = $asset->notifications()->create(
                         [
                             ...$notification,
                             'recipient_name' => $manager->fullName,
@@ -53,6 +53,9 @@ class AssetNotificationSchedulingService
                             'scheduled_at' => $asset->depreciation_end_date->subDays($delay),
                         ]
                     );
+
+                    $createdNotification->user()->associate($manager);
+                    $createdNotification->save();
                 }
             }
 
@@ -64,7 +67,7 @@ class AssetNotificationSchedulingService
 
                 $delay = $preference->notification_delay_days;
 
-                $asset->notifications()->create(
+                $createdNotification = $asset->notifications()->create(
                     [
                         ...$notification,
                         'recipient_name' => $user->fullName,
@@ -72,6 +75,9 @@ class AssetNotificationSchedulingService
                         'scheduled_at' => $asset->depreciation_end_date->subDays($delay),
                     ]
                 );
+
+                $createdNotification->user()->associate($user);
+                $createdNotification->save();
             }
         }
 
@@ -95,7 +101,7 @@ class AssetNotificationSchedulingService
                 if ($preference && $preference->enabled) {
                     $delay = $preference->notification_delay_days;
 
-                    $asset->notifications()->create(
+                    $createdNotification = $asset->notifications()->create(
                         [
                             ...$notification,
                             'recipient_name' => $manager->fullName,
@@ -103,6 +109,9 @@ class AssetNotificationSchedulingService
                             'scheduled_at' => $asset->maintainable->next_maintenance_date->subDays($delay),
                         ]
                     );
+
+                    $createdNotification->user()->associate($manager);
+                    $createdNotification->save();
                 }
             }
 
@@ -114,7 +123,7 @@ class AssetNotificationSchedulingService
 
                 $delay = $preference->notification_delay_days;
 
-                $asset->notifications()->create(
+                $createdNotification = $asset->notifications()->create(
                     [
                         ...$notification,
                         'recipient_name' => $user->fullName,
@@ -122,6 +131,9 @@ class AssetNotificationSchedulingService
                         'scheduled_at' => $asset->maintainable->next_maintenance_date->subDays($delay),
                     ]
                 );
+
+                $createdNotification->user()->associate($user);
+                $createdNotification->save();
             }
         }
 
@@ -145,7 +157,7 @@ class AssetNotificationSchedulingService
                 if ($preference && $preference->enabled) {
                     $delay = $preference->notification_delay_days;
 
-                    $asset->notifications()->create(
+                    $createdNotification = $asset->notifications()->create(
                         [
                             ...$notification,
                             'recipient_name' => $manager->fullName,
@@ -153,6 +165,9 @@ class AssetNotificationSchedulingService
                             'scheduled_at' => $asset->maintainable->end_warranty_date->subDays($delay),
                         ]
                     );
+
+                    $createdNotification->user()->associate($manager);
+                    $createdNotification->save();
                 }
             }
 
@@ -164,7 +179,7 @@ class AssetNotificationSchedulingService
 
                 $delay = $preference->notification_delay_days;
 
-                $asset->notifications()->create(
+                $createdNotification = $asset->notifications()->create(
                     [
                         ...$notification,
                         'recipient_name' => $user->fullName,
@@ -172,6 +187,9 @@ class AssetNotificationSchedulingService
                         'scheduled_at' => $asset->maintainable->end_warranty_date->subDays($delay),
                     ]
                 );
+
+                $createdNotification->user()->associate($user);
+                $createdNotification->save();
             }
         }
         //

@@ -328,12 +328,12 @@ it('can update an existing contract', function () {
             'internal_reference' => 'Bail Site 2025',
             'provider_reference' => 'Provider reference 2025',
             'start_date' => Carbon::now()->toDateString(),
-            'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
-            'end_date' => Carbon::now()->addMonth()->toDateString(),
+            'contract_duration' => ContractDurationEnum::ONE_YEAR->value,
+            // 'end_date' => Carbon::now()->addYear()->toDateString(),
             'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
-            'notice_date' => Carbon::now()->addMonth()->subDays(14)->toDateString(),
+            // 'notice_date' => Carbon::now()->addMonth()->subDays(14)->toDateString(),
             'renewal_type' => ContractRenewalTypesEnum::MANUAL->value,
-            'status' => ContractStatusEnum::CANCELLED->value
+            'status' => ContractStatusEnum::ACTIVE->value
 
         ];
 
@@ -351,12 +351,12 @@ it('can update an existing contract', function () {
             'internal_reference' => 'Bail Site 2025',
             'provider_reference' => 'Provider reference 2025',
             'start_date' => Carbon::now()->toDateString(),
-            'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
-            'end_date' => Carbon::now()->addMonth()->toDateString(),
+            'contract_duration' => ContractDurationEnum::ONE_YEAR->value,
+            'end_date' => Carbon::now()->addYear()->toDateString(),
             'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
-            'notice_date' => Carbon::now()->addMonth()->subDays(14)->toDateString(),
+            'notice_date' => Carbon::now()->addYear()->subDays(14)->toDateString(),
             'renewal_type' => ContractRenewalTypesEnum::MANUAL->value,
-            'status' => ContractStatusEnum::CANCELLED->value
+            'status' => ContractStatusEnum::ACTIVE->value
         ]
     );
 });

@@ -21,7 +21,7 @@ class ContractService
             $contract = new Contract([...$contractRequest]);
 
             if (isset($contractRequest['contract_duration']))
-                $contract = $this->updateContractEndDate($contract, $contractRequest['contract_duration']);
+                $contract = $this->updateContractEndDate($contract,  $contract->contract_duration);
 
             $contract->notice_period = isset($contractRequest['notice_period']) ? $contractRequest['notice_period'] : 'default';
 
@@ -39,7 +39,7 @@ class ContractService
         $contract = new Contract([...$request]);
 
         if (isset($request['contract_duration']))
-            $contract = $this->updateContractEndDate($contract, $request['contract_duration']);
+            $contract = $this->updateContractEndDate($contract, $contract->contract_duration);
 
         $contract->notice_period = isset($request['notice_period']) ? $request['notice_period'] : 'default';
 
@@ -62,10 +62,13 @@ class ContractService
         $contract->update([...$request]);
 
         if (isset($request['contract_duration']) && ($contract->wasChanged('contract_duration') || $contract->wasChanged('start_date')))
-            $contract = $this->updateContractEndDate($contract, $request['contract_duration']);
+            $contract = $this->updateContractEndDate($contract, $contract->contract_duration);
 
-        if ($contract->wasChanged('notice_period') || $contract->wasChanged('contract_duration') || $contract->wasChanged('start_date'))
-            $contract = $this->updateNoticeDate($contract, isset($request['notice_period']) ? $request['notice_period'] : 'default');
+        if ($contract->wasChanged('notice_period') || $contract->wasChanged('contract_duration') || $contract->wasChanged('start_date')) {
+
+            // dump('update contract', $contract->wasChanged('notice_period'), $contract->wasChanged('contract_duration'));
+            $contract = $this->updateNoticeDate($contract, $contract->notice_period);
+        }
 
         if ($contract->provider->id !== $request['provider_id']) {
             $contract->provider()->disassociate();
@@ -95,15 +98,13 @@ class ContractService
         return $contract;
     }
 
-    public function updateContractEndDate(Contract $contract, $contract_duration): Contract
+    public function updateContractEndDate(Contract $contract, ContractDurationEnum $contract_duration): Contract
     {
-        $contractDuration = ContractDurationEnum::tryFrom($contract_duration);
-
         if ($contract->start_date)
-            $endDate = $contractDuration->addTo(Carbon::createFromFormat('Y-m-d', $contract->start_date));
+            $endDate = $contract_duration->addTo(Carbon::createFromFormat('Y-m-d', $contract->start_date));
         else {
             $contract->start_date = Carbon::now();
-            $endDate = $contractDuration->addTo(Carbon::now());
+            $endDate = $contract_duration->addTo(Carbon::now());
         }
 
         $contract->end_date = $endDate;
@@ -111,8 +112,10 @@ class ContractService
         return $contract;
     }
 
-    public function updateNoticeDate(Contract $contract, $notice_period): Contract
+    public function updateNoticeDate(Contract $contract, NoticePeriodEnum $notice_period): Contract
     {
+        // TODO check if the notice date is > then start_date
+
         $contract->notice_date = $notice_period->subFrom(Carbon::parse($contract->end_date));
         return $contract;
     }

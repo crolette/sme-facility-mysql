@@ -2,9 +2,11 @@
 
 namespace Database\Factories\Tenants;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use App\Models\Tenants\User;
+use Illuminate\Support\Facades\Hash;
+use App\Services\UserNotificationPreferenceService;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Tenants\User>
@@ -42,4 +44,23 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    public function withRole($role)
+    {
+        return $this->afterCreating(function (User $user) use ($role) {
+            $user->assignRole($role);
+            if ($user->hasAnyRole(['Admin', 'Maintenance Manager']))
+                app(UserNotificationPreferenceService::class)->createDefaultUserNotificationPreferences($user);
+        });
+    }
+
+    // public function configure()
+    // {
+    //     return $this->afterCreating(
+    //         function (User $user) {
+    //             dump('user pref factory');
+
+    //         }
+    //     );
+    // }
 }

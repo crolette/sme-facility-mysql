@@ -10,23 +10,10 @@ use App\Enums\ScheduledNotificationStatusEnum;
 use App\Models\Tenants\ScheduledNotification;
 use App\Models\Tenants\UserNotificationPreference;
 
-class NotificationSchedulingService
+class ContractNotificationSchedulingService
 {
     public function scheduleForContract(Contract $contract)
     {
-        Debugbar::info('NotificationSchedulingService - scheduleForContract');
-
-        // Exemple de JSON
-        // [
-        //     'asset/location name' => 'Photocopieur Xerox'/'Rez-de-chaussée',
-        //     'due_date' => '2024-12-31',
-        //     'dashboard_url' => 'https://app.com/contracts/15'
-        //      
-        //     'contract_name' => 'Contrat nettoyage',
-        //     'supplier_name' => 'Entreprise XYZ',
-        //     'contract_reference' => 'CNT-2024-001',
-        // ]
-
         $notificationTypes = collect(config('notifications.notification_types.contract'));
 
         $notification = [
@@ -54,77 +41,51 @@ class NotificationSchedulingService
                     'recipient_email' => $user->email,
                 ]);
 
+                // dump($createdNotification);
+
                 $createdNotification->user()->associate($user);
                 $createdNotification->save();
             }
         }
     }
 
-    public function updateScheduleOfUserForNotificationType(UserNotificationPreference $preference)
+    public function updateScheduleForContract(Contract $contract)
     {
-        // 1. il faut rechercher toutes les  scheduled_notifications avec le notification_type et le user_id ET l'asset_type
+        // 1. reprendre les notifications liées au contrat
+        // 2. reprendre les utilisateurs admin avec leur préférence
+        // 3. boucler sur chaque user et actualiser avec les préférences
 
-
-        if ($preference->wasChanged('notification_delay_days')) {
-            match ($preference->notification_type) {
-                'notice_date'  => $this->updateScheduleForContractNoticeDate($preference),
-                'end_date'  => $this->updateScheduleForContractEndDate($preference),
-                default => null
-                // 'site'  => Site::findOrFail($locationId),
-                // 'building' => Building::findOrFail($locationId),
-                // 'floor' => Floor::findOrFail($locationId),
-                // 'room' => Room::findOrFail($locationId),
-            };
-        };
-
-        if ($preference->wasChanged('enabled') && $preference->enabled === false) {
-            $this->deleteScheduledNotificationForNotificationType($preference);
+        if ($contract->wasChanged('end_date')) {
+            $notifications = $contract->notifications()->where('notification_type', 'end_date')->get();
+            foreach ($notifications as $notification) {
+                $this->updateScheduleForContractEndDate($contract, $notification);
+            }
         }
 
+        if ($contract->wasChanged('notice_date')) {
+            $notifications = $contract->notifications()->where('notification_type', 'notice_date')->get();
 
-        if ($preference->wasChanged('enabled') && $preference->enabled === true) {
-            match ($preference->notification_type) {
-                'notice_date'  => $this->createScheduleForContractNoticeDate($preference),
-                'end_date'  => $this->createScheduleForContractEndDate($preference),
-                default => null
-                // 'site'  => Site::findOrFail($locationId),
-                // 'building' => Building::findOrFail($locationId),
-                // 'floor' => Floor::findOrFail($locationId),
-                // 'room' => Room::findOrFail($locationId),
-            };
-        }
-
-
-
-        // dump($scheduledNotifications);
-        // asset_type : asset, location, contract, intervention
-        // 2. Mettre à jour la date scheduled_at de chaque scheduled_notification en prenant en compte le nouveau notification_delay_days
-
-
-
-        Debugbar::info('updateScheduleOfUserForNotificationType', $preference);
-    }
-
-    public function updateScheduleForContractNoticeDate(UserNotificationPreference $preference)
-    {
-
-        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
-
-        foreach ($scheduledNotifications as $notification) {
-            $newDate = $notification->notifiable->notice_date->subDays($preference->notification_delay_days);
-            $notification->update(['scheduled_at' => $newDate]);
+            foreach ($notifications as $notification) {
+                $this->updateScheduleForContractNoticeDate($contract, $notification);
+            }
         }
     }
 
-
-    public function updateScheduleForContractEndDate(UserNotificationPreference $preference)
+    public function updateScheduleForContractNoticeDate(Contract $contract, ScheduledNotification $notification)
     {
-        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
+        // TODO check if the date is > then start_date
 
-        foreach ($scheduledNotifications as $notification) {
-            $newDate = $notification->notifiable->end_date->subDays($preference->notification_delay_days);
-            $notification->update(['scheduled_at' => $newDate]);
-        }
+        $newDate = $contract->notice_date->subDays($notification->user->notification_preferences()->where('notification_type', 'notice_date')->first()->notification_delay_days);
+        $notification->update(['scheduled_at' => $newDate]);
+    }
+
+
+    public function updateScheduleForContractEndDate(Contract $contract, ScheduledNotification $notification)
+    {
+
+
+        $newDate = $contract->end_date->subDays($notification->user->notification_preferences()->where('notification_type', 'end_date')->first()->notification_delay_days);
+        $notification->update(['scheduled_at' => $newDate]);
     }
 
 
