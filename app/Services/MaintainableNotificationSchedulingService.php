@@ -11,6 +11,7 @@ use App\Models\Tenants\ScheduledNotification;
 use App\Enums\ScheduledNotificationStatusEnum;
 use App\Models\Tenants\Maintainable;
 use App\Models\Tenants\UserNotificationPreference;
+use Illuminate\Database\Eloquent\Collection;
 
 class MaintainableNotificationSchedulingService
 {
@@ -77,16 +78,16 @@ class MaintainableNotificationSchedulingService
         };
 
         if (($maintainable->wasChanged('need_maintenance') && $maintainable->need_maintenance === true) || $maintainable->wasChanged('next_maintenance_date')) {
-            dump('--- update maintainable next_maintenance_date to TRUE ---');
+            // dump('--- update maintainable next_maintenance_date to TRUE ---');
 
             $notifications = $maintainable->maintainable->notifications()->where('notification_type', 'next_maintenance_date')->where('scheduled_at', '>', now())->get();
-
+            // dump('notifications : ' . count($notifications));
             if (count($notifications)) {
                 $this->updateScheduleForNextMaintenanceDate($maintainable, $notifications);
             } else {
                 if ($maintainable->manager) {
 
-                    dump('manager id : ' . $maintainable->manager->id);
+                    // dump('manager id : ' . $maintainable->manager->id);
                     $this->createScheduleForNextMaintenanceDate($maintainable, $maintainable->manager);
                 }
 
@@ -107,12 +108,12 @@ class MaintainableNotificationSchedulingService
         };
     }
 
-    public function updateScheduleForNextMaintenanceDate(Maintainable $maintainable, ScheduledNotification $notifications)
+    public function updateScheduleForNextMaintenanceDate(Maintainable $maintainable, Collection $notifications)
     {
 
         foreach ($notifications as $notification) {
             // changer scheduled_at en fonction de la nouvelle date de maintenance et en fonction des préférences utilisateurs
-            $notificationPreference = $notification->user->notification_preferences()->where('notification_type', 'next_maintenance_date')->get();
+            $notificationPreference = $notification->user->notification_preferences()->where('notification_type', 'next_maintenance_date')->first();
 
             $notification->update(['scheduled_at' => $maintainable->next_maintenance_date->subDays($notificationPreference->notification_delay_days)]);
         }
@@ -120,7 +121,8 @@ class MaintainableNotificationSchedulingService
 
     public function createScheduleForNextMaintenanceDate(Maintainable $maintainable, User $user)
     {
-        dump('createScheduleForNextMaintenanceDate');
+        // dump('createScheduleForNextMaintenanceDate');
+        // dump('maintainable next_maintenance_date : ' . $maintainable->next_maintenance_date);
 
         $preference = $user->notification_preferences()->where('notification_type', 'next_maintenance_date')->first();
 
@@ -150,8 +152,6 @@ class MaintainableNotificationSchedulingService
             $createdNotification->user()->associate($user);
             $createdNotification->save();
         }
-
-        dump('createdNotification');
     }
 
     public function removeScheduleForNextMaintenanceDate(Maintainable $maintainable)

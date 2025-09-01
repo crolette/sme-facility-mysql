@@ -32,7 +32,6 @@ class MaintainableService
             }
         }
 
-        dump('--- END CREATE MAINTAINABLE ---');
         return $model;
     }
 };

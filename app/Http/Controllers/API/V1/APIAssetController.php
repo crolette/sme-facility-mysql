@@ -106,14 +106,10 @@ class APIAssetController extends Controller
             $asset->save();
 
             DB::commit();
-            dump('--- END UPDATE COMMIT ---');
-            dump('reference_code', $asset->reference_code);
 
             return ApiResponse::success(['reference_code' => $asset->reference_code], 'Asset updated');
         } catch (Exception $e) {
             DB::rollback();
-            dump('--- EXCEPTION UPDATE ---');
-            dump($e->getMessage());
             Log::error($e->getMessage());
             return ApiResponse::error('ERROR : ' . $e->getMessage());
         }

@@ -60,8 +60,6 @@ beforeEach(function () {
 
 // it('creates end of warranty notification for a new created asset', function () {
 
-//     dump($this->admin->fullName, $this->manager->fullName);
-
 //     $formData = [
 //         ...$this->basicAssetData,
 //         'under_warranty' => true,
@@ -241,7 +239,7 @@ beforeEach(function () {
 //     ];
 
 //     $response = $this->postToTenant('api.assets.store', $formData);
-
+//     assertDatabaseCount('scheduled_notifications', 2);
 //     assertDatabaseHas(
 //         'scheduled_notifications',
 //         [
@@ -689,18 +687,25 @@ it('updates notification when updating next_maintenance_date of the asset', func
         ]
     );
 
-    $formData = [
+    $newformData = [
         ...$this->basicAssetData,
+        'maintenance_manager_id' => $this->manager->id,
         'maintenance_frequency' => 'annual',
         'need_maintenance' => true,
         'next_maintenance_date' => Carbon::now()->addYear(),
         'last_maintenance_date' => Carbon::now()->toDateString(),
     ];
 
-    $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
-    $this->withoutExceptionHandling();
-    $response->assertSessionHasNoErrors();
+    $asset->refresh();
+    $response = $this->patchToTenant('api.assets.update', $newformData, $asset->reference_code);
     $response->assertStatus(200);
+
+    $response->assertSessionHasNoErrors();
+    dump($this->admin->email, $this->manager->email);
+    dump(ScheduledNotification::select('id', 'recipient_email', 'notification_type', 'scheduled_at')->get());
+    assertDatabaseCount('scheduled_notifications', 2);
+
+
 
     assertDatabaseHas(
         'scheduled_notifications',
