@@ -166,7 +166,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                     <div>
                         <p>Purchase date : {asset.maintainable.purchase_date}</p>
                         <p>Purchase cost : {asset.maintainable.purchase_cost}</p>
-                        <p>End warranty date : {asset.maintainable.end_warranty_date}</p>
+                        {asset.maintainable.under_warranty && <p>End warranty date : {asset.maintainable.end_warranty_date}</p>}
                     </div>
                 </div>
                 {/* )} */}

@@ -74,7 +74,7 @@ it('can upload several files to asset', function () {
         ]
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasNoErrors();
 
     assertDatabaseCount('documents', 2);
@@ -119,7 +119,7 @@ it('fails when upload wrong image mime (ie. webp)', function () {
         ]
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasErrors([
         'files.0.file' => "The files.0.file field must be a file of type: jpg, jpeg, png, pdf.",
         'files.1.file' => "The files.1.file field must be a file of type: jpg, jpeg, png, pdf."
@@ -149,7 +149,7 @@ it('fails when upload exceeding document size : ' . Document::maxUploadSizeKB() 
         ]
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasErrors([
         'files.0.file' => "The files.0.file field must not be greater than " . Document::maxUploadSizeKB() . " kilobytes.",
     ]);
