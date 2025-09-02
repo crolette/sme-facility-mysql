@@ -33,13 +33,19 @@ class ContractNotificationSchedulingService
                 // get the date of the notification type : i.e. notice_date or end_date
                 $date = $contract->$notificationType;
 
-                $createdNotification = $contract->notifications()->create([
-                    ...$notification,
-                    'scheduled_at' => $date->subDays($delay),
-                    'notification_type' => $notificationType,
-                    'recipient_name' => $user->fullName,
-                    'recipient_email' => $user->email,
-                ]);
+                $createdNotification = $contract->notifications()->updateOrCreate(
+                    [
+                        'recipient_email' => $user->email,
+                        'notification_type' => $notificationType,
+                    ],
+                    [
+                        ...$notification,
+                        'scheduled_at' => $date->subDays($delay),
+                        'notification_type' => $notificationType,
+                        'recipient_name' => $user->fullName,
+                        'recipient_email' => $user->email,
+                    ]
+                );
 
                 // dump($createdNotification);
 
@@ -76,14 +82,17 @@ class ContractNotificationSchedulingService
         // TODO check if the date is > then start_date
 
         $newDate = $contract->notice_date->subDays($notification->user->notification_preferences()->where('notification_type', 'notice_date')->first()->notification_delay_days);
-        $notification->update(['scheduled_at' => $newDate]);
+        if ($newDate > now())
+            $notification->update(['scheduled_at' => $newDate]);
     }
 
 
     public function updateScheduleForContractEndDate(Contract $contract, ScheduledNotification $notification)
     {
+
         $newDate = $contract->end_date->subDays($notification->user->notification_preferences()->where('notification_type', 'end_date')->first()->notification_delay_days);
-        $notification->update(['scheduled_at' => $newDate]);
+        if ($newDate > now())
+            $notification->update(['scheduled_at' => $newDate]);
     }
 
 
@@ -112,13 +121,19 @@ class ContractNotificationSchedulingService
                 ]
             ];
 
-            $createdNotification = $contract->notifications()->create([
-                ...$notification,
-                'scheduled_at' => $contract->notice_date->subDays($delayDays),
-                'notification_type' => 'notice_date',
-                'recipient_name' => $user->fullName,
-                'recipient_email' => $user->email,
-            ]);
+            $createdNotification = $contract->notifications()->updateOrCreate(
+                [
+                    'recipient_email' => $user->email,
+                    'notification_type' => 'notice_date',
+                ],
+                [
+                    ...$notification,
+                    'scheduled_at' => $contract->notice_date->subDays($delayDays),
+                    'notification_type' => 'notice_date',
+                    'recipient_name' => $user->fullName,
+                    'recipient_email' => $user->email,
+                ]
+            );
 
             $createdNotification->user()->associate($user);
             $createdNotification->save();
