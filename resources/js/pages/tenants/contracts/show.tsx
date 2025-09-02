@@ -41,7 +41,7 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                     </Button>
                 </div>
                 <div className="flex items-center gap-2">
-                    <div className="flex w-full shrink-0 justify-between rounded-md border border-gray-200 p-4">
+                    <div className="flex w-full shrink-0 justify-between rounded-md border p-4">
                         <div>
                             <p>Name: {contract.name}</p>
                             <p>Type: {contract.type}</p>
@@ -61,7 +61,7 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                         </div>
                     </div>
                 </div>
-                <div className="flex w-full shrink-0 justify-between rounded-md border border-gray-200 p-4">
+                <div className="flex w-full shrink-0 justify-between rounded-md border p-4">
                     <h3>Assets</h3>
                     <ul>
                         {objects.map((object: Partial<Asset | TenantBuilding | TenantSite | TenantFloor | TenantRoom>) => (

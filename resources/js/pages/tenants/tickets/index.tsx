@@ -52,8 +52,8 @@ export default function IndexTickets() {
                 <ul className="flex border-b-2 pl-4">
                     <li
                         className={cn(
-                            'cursor-pointer border-x-2 border-t-2 px-4 py-1',
-                            fetchTicketStatus === null ? 'bg-secondary' : 'bg-transparent',
+                            'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-4 py-1',
+                            fetchTicketStatus === null ? 'bg-primary text-background' : 'bg-secondary',
                         )}
                         onClick={() => {
                             setFetchTicketStatus(null);
@@ -64,8 +64,8 @@ export default function IndexTickets() {
 
                     <li
                         className={cn(
-                            'cursor-pointer border-x-2 border-t-2 px-4 py-1',
-                            fetchTicketStatus === 'open' ? 'bg-secondary' : 'bg-transparent',
+                            'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-4 py-1',
+                            fetchTicketStatus === 'open' ? 'bg-primary text-background' : 'bg-secondary',
                         )}
                         onClick={() => {
                             setFetchTicketStatus('open');
@@ -75,8 +75,8 @@ export default function IndexTickets() {
                     </li>
                     <li
                         className={cn(
-                            'cursor-pointer border-x-2 border-t-2 px-4 py-1',
-                            fetchTicketStatus === 'ongoing' ? 'bg-secondary' : 'bg-transparent',
+                            'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-4 py-1',
+                            fetchTicketStatus === 'ongoing' ? 'bg-primary text-background' : 'bg-secondary',
                         )}
                         onClick={() => {
                             setFetchTicketStatus('ongoing');
@@ -86,8 +86,8 @@ export default function IndexTickets() {
                     </li>
                     <li
                         className={cn(
-                            'cursor-pointer border-x-2 border-t-2 px-4 py-1',
-                            fetchTicketStatus === 'closed' ? 'bg-secondary' : 'bg-transparent',
+                            'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-4 py-1',
+                            fetchTicketStatus === 'closed' ? 'bg-primary text-background' : 'bg-secondary',
                         )}
                         onClick={() => {
                             setFetchTicketStatus('closed');

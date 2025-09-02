@@ -23,7 +23,7 @@ export const AssetManager = ({ itemCode, type }: AssetManagerProps) => {
         fetchAssets();
     }, []);
     return (
-        <div className="rounded-md border border-gray-200 p-4">
+        <div className="rounded-md border p-4">
             <h2>Assets</h2>
             <ul>
                 {assets &&

@@ -69,7 +69,7 @@ export default function ProviderShow({ item }: { item: Provider }) {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <div className="flex w-full shrink-0 justify-between rounded-md border border-gray-200 p-4">
+                    <div className="flex w-full shrink-0 justify-between rounded-md border p-4">
                         <div>
                             <h2>Provider information</h2>
                             <div>
@@ -100,7 +100,7 @@ export default function ProviderShow({ item }: { item: Provider }) {
                     uploadUrl={route('api.providers.logo.store', provider.id)}
                     onUploadSuccess={handleUploadSuccess}
                 />
-                <div className="rounded-md border border-gray-200 p-4">
+                <div className="rounded-md border p-4">
                     <h2>Users</h2>
 
                     <ul>
@@ -112,7 +112,7 @@ export default function ProviderShow({ item }: { item: Provider }) {
                             ))}
                     </ul>
                 </div>
-                <div className="rounded-md border border-gray-200 p-4">
+                <div className="rounded-md border p-4">
                     <h2>Contracts</h2>
 
                     <ul>

@@ -86,7 +86,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <div className="flex w-full shrink-0 justify-between rounded-md border border-gray-200 p-4">
+                    <div className="flex w-full shrink-0 justify-between rounded-md border p-4">
                         <div>
                             <h2>Code</h2>
                             <div>
@@ -117,7 +117,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                 </div>
 
                 {asset.maintainable.need_maintenance && (
-                    <div className="rounded-md border border-gray-200 p-4">
+                    <div className="rounded-md border p-4">
                         <h2>Maintenance</h2>
                         <div>
                             <p>
@@ -135,7 +135,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                     </div>
                 )}
 
-                <div className="rounded-md border border-gray-200 p-4">
+                <div className="rounded-md border p-4">
                     <h2>Asset information</h2>
                     <div>
                         <p>Category : {asset.category}</p>
@@ -149,7 +149,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                 </div>
 
                 {asset.depreciable && (
-                    <div className="rounded-md border border-gray-200 p-4">
+                    <div className="rounded-md border p-4">
                         <h2>Depreciation</h2>
                         <div>
                             <p>depreciation_duration : {asset.depreciation_duration}</p>
@@ -161,7 +161,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                 )}
 
                 {/* {asset.maintainable.purchase_date && ( */}
-                <div className="rounded-md border border-gray-200 p-4">
+                <div className="rounded-md border p-4">
                     <h2>Purchase/Warranty</h2>
                     <div>
                         <p>Purchase date : {asset.maintainable.purchase_date}</p>
@@ -172,7 +172,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                 {/* )} */}
 
                 {asset.maintainable.providers && asset.maintainable.providers?.length > 0 && (
-                    <div className="rounded-md border border-gray-200 p-4">
+                    <div className="rounded-md border p-4">
                         <h2>Providers</h2>
                         <p>End contract date : {asset.contract_end_date}</p>
                         <ul>

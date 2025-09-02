@@ -133,7 +133,10 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                 <div className="b flex justify-between border-b-2">
                     <ul className="flex pl-4">
                         <li
-                            className={cn('cursor-pointer border-x-2 border-t-2 px-4 py-1', activeAssetsTab ? 'bg-secondary' : 'bg-transparent')}
+                            className={cn(
+                                'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-4 py-1',
+                                activeAssetsTab ? 'bg-primary text-background' : 'bg-secondary',
+                            )}
                             onClick={() => {
                                 setActiveAssetsTab(!activeAssetsTab);
                                 setTrashedAssetsTab(!trashedAssetsTab);
@@ -142,7 +145,10 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                             active
                         </li>
                         <li
-                            className={cn('cursor-pointer border-x-2 border-t-2 px-4 py-1', trashedAssetsTab ? 'bg-secondary' : 'bg-transparent')}
+                            className={cn(
+                                'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-4 py-1',
+                                trashedAssetsTab ? 'bg-primary text-background' : 'bg-secondary',
+                            )}
                             onClick={() => {
                                 setActiveAssetsTab(!activeAssetsTab);
                                 setTrashedAssetsTab(!trashedAssetsTab);
