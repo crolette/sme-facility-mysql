@@ -107,7 +107,7 @@ class MaintainableNotificationSchedulingService
                 $this->updateScheduleForNextMaintenanceDate($maintainable, $notifications);
             } else {
                 if ($maintainable->manager) {
-                    dump('--- MAINTAINABLE MANAGER ---');
+                    // dump('--- MAINTAINABLE MANAGER ---');
                     $this->createScheduleForNextMaintenanceDate($maintainable, $maintainable->manager);
                 }
 
@@ -117,16 +117,16 @@ class MaintainableNotificationSchedulingService
             }
         };
 
+        if ($maintainable->wasChanged('need_maintenance') && $maintainable->need_maintenance === false) {
+            $this->removeScheduleForNextMaintenanceDate($maintainable);
+        };
+
         if ($maintainable->wasChanged('maintenance_manager_id') && $maintainable->manager) {
             // dump('--- MAINTENANCE MANAGER CHANGED ---');
             // dump($maintainable->getOriginal('maintenance_manager_id'));
             // dump($maintainable->getChanges());
             $this->createScheduleForUser($maintainable, $maintainable->manager);
         }
-
-        if ($maintainable->wasChanged('need_maintenance') && $maintainable->need_maintenance === false) {
-            $this->removeScheduleForNextMaintenanceDate($maintainable);
-        };
     }
 
     public function updateScheduleForEndWarrantyDate(Maintainable $maintainable, Collection $notifications)
@@ -200,7 +200,7 @@ class MaintainableNotificationSchedulingService
         // dump('maintainable next_maintenance_date : ' . $maintainable->next_maintenance_date);
 
         $preference = $user->notification_preferences()->where('notification_type', 'end_warranty_date')->first();
-        Debugbar::info('preference');
+        // Debugbar::info('preference');
 
         if ($preference && $preference->enabled) {
 
@@ -215,7 +215,7 @@ class MaintainableNotificationSchedulingService
             ];
 
             $delay = $preference->notification_delay_days;
-            Debugbar::info('delay');
+            // Debugbar::info('delay');
 
             $createdNotification = $maintainable->maintainable->notifications()->updateOrCreate(
                 [
@@ -232,7 +232,7 @@ class MaintainableNotificationSchedulingService
 
             $createdNotification->user()->associate($user);
             $createdNotification->save();
-            Debugbar::info('createdNotification');
+            // Debugbar::info('createdNotification');
         }
     }
 
