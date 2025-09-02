@@ -182,6 +182,23 @@ it('updates notification when updating next_maintenance_date of the asset', func
     );
 });
 
+
+it('creates no notification if next_maintenance_date is in the past', function () {
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_manager_id' => $this->manager->id,
+        'maintenance_frequency' => 'annual',
+        'need_maintenance' => true,
+        'next_maintenance_date' => Carbon::now(),
+        'last_maintenance_date' => Carbon::now()->subDays(120),
+    ];
+
+    $this->postToTenant('api.assets.store', $formData);
+
+    assertDatabaseCount('scheduled_notifications', 0);
+});
+
 it('creates notification when need_maintenance passes from false to true', function () {
 
     $formData = [

@@ -240,7 +240,25 @@ it(
     }
 );
 
-it('deletes depreciation notification when depreciables passes from true to false', function () {
+it('creates no notification if depreciation_end_date is in the past', function () {
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_manager_id' => $this->manager->id,
+        'depreciable' => true,
+        'depreciation_start_date' => Carbon::now()->subYears(2)->toDateString(),
+        'depreciation_end_date' => Carbon::now()->toDateString(),
+        'depreciation_duration' => 3,
+        'residual_value' => 1250.69,
+    ];
+
+    $this->postToTenant('api.assets.store', $formData);
+
+    assertDatabaseCount('scheduled_notifications', 0);
+});
+
+
+it('deletes depreciation notification when depreciable passes from true to false', function () {
 
     $formData = [
         ...$this->basicAssetData,

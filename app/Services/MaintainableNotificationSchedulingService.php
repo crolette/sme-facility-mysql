@@ -38,34 +38,7 @@ class MaintainableNotificationSchedulingService
         }
 
         if ($maintainable->under_warranty) {
-            $preference = $user->notification_preferences()->where('notification_type', 'end_warranty_date')->first();
-
-            if ($preference && $preference->enabled) {
-
-                $notification = [
-                    'status' => ScheduledNotificationStatusEnum::PENDING->value,
-                    'notification_type' => 'end_warranty_date',
-
-                    'data' => [
-                        'subject' => $maintainable->name,
-                        'end_warranty_date' => $maintainable->end_warranty_date
-                    ]
-                ];
-
-                $delay = $preference->notification_delay_days;
-
-                $createdNotification = $maintainable->maintainable->notifications()->create(
-                    [
-                        ...$notification,
-                        'recipient_name' => $user->fullName,
-                        'recipient_email' => $user->email,
-                        'scheduled_at' => $maintainable->end_warranty_date->subDays($delay),
-                    ]
-                );
-
-                $createdNotification->user()->associate($user);
-                $createdNotification->save();
-            }
+            $this->createScheduleForEndWarrantyDate($maintainable, $user);
         }
     }
 
@@ -136,6 +109,9 @@ class MaintainableNotificationSchedulingService
             // changer scheduled_at en fonction de la nouvelle date de maintenance et en fonction des préférences utilisateurs
             $notificationPreference = $notification->user->notification_preferences()->where('notification_type', 'end_warranty_date')->first();
 
+            if ($maintainable->end_warranty_date->subDays($notificationPreference->notification_delay_days) < now())
+                continue;
+
             $notification->update(['scheduled_at' => $maintainable->end_warranty_date->subDays($notificationPreference->notification_delay_days)]);
         }
     }
@@ -150,6 +126,9 @@ class MaintainableNotificationSchedulingService
             Debugbar::info($notification->user);
             $notificationPreference = $notification->user->notification_preferences()->where('notification_type', 'next_maintenance_date')->first();
 
+            if ($maintainable->next_maintenance_date->subDays($notificationPreference->notification_delay_days) < now())
+                continue;
+
             $notification->update(['scheduled_at' => $maintainable->next_maintenance_date->subDays($notificationPreference->notification_delay_days)]);
         }
     }
@@ -161,7 +140,7 @@ class MaintainableNotificationSchedulingService
 
         $preference = $user->notification_preferences()->where('notification_type', 'next_maintenance_date')->first();
 
-        if ($preference && $preference->enabled) {
+        if ($preference && $preference->enabled && $maintainable->next_maintenance_date->subDays($preference->notification_delay_days) > now()) {
             $notification = [
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
                 'notification_type' => 'next_maintenance_date',
@@ -202,7 +181,7 @@ class MaintainableNotificationSchedulingService
         $preference = $user->notification_preferences()->where('notification_type', 'end_warranty_date')->first();
         // Debugbar::info('preference');
 
-        if ($preference && $preference->enabled) {
+        if ($preference && $preference->enabled  && $maintainable->end_warranty_date->subDays($preference->notification_delay_days) > now()) {
 
             $notification = [
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,

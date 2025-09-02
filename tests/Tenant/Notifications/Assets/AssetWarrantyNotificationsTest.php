@@ -98,6 +98,21 @@ it('creates end of warranty notification for a new created asset', function () {
     );
 });
 
+it('creates no notification if end of warranty is in the past', function () {
+
+    $formData = [
+        ...$this->basicAssetData,
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::now()->subDay(),
+        'maintenance_manager_id' => $this->manager->id,
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseCount('scheduled_notifications', 0);
+});
+
 it('updates end of warranty notification when end_warranty_date changes', function () {
 
     $formData = [
