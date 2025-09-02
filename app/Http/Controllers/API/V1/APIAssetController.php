@@ -84,6 +84,8 @@ class APIAssetController extends Controller
      */
     public function update(AssetUpdateRequest $request, MaintainableRequest $maintainableRequest, Asset $asset)
     {
+        Debugbar::info('--- ASSET UPDATE ---');
+        Debugbar::info($maintainableRequest->validated());
         if (Auth::user()->cannot('update', $asset))
             abort(403);
 

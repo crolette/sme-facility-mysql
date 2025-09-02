@@ -19,22 +19,29 @@ class MaintainableRequest extends FormRequest
 
     public function prepareForValidation()
     {
-
+        Debugbar::info('--- MAINTAINABEL REQUEST --- ');
         $data = $this->all();
 
         isset($data['need_maintenance']) && ($data['need_maintenance'] === 'true' || $data['need_maintenance'] === true) ? $data['need_maintenance'] = true : $data['need_maintenance'] = false;
         isset($data['under_warranty']) && ($data['under_warranty'] === 'true' || $data['under_warranty'] === true) ? $data['under_warranty'] = true : $data['under_warranty'] = false;
 
-        if (isset($data['need_maintenance']) && $data['need_maintenance'] === true) {
-            if (isset($data['next_maintenance_date'])) {
-                return;
-            }
-            if (isset($data['maintenance_frequency']) && $data['maintenance_frequency'] === MaintenanceFrequency::ONDEMAND->value) {
-                return;
-            } else {
+        Debugbar::info('--- need_maintenance true --- ');
+        if (isset($data['need_maintenance']) && $data['need_maintenance'] === true && !isset($data['next_maintenance_date'])) {
+            if (isset($data['maintenance_frequency']) && $data['maintenance_frequency'] !== MaintenanceFrequency::ONDEMAND->value) {
                 $data['next_maintenance_date'] = isset($data['last_maintenance_date']) ? calculateNextMaintenanceDate($data['maintenance_frequency'], $data['last_maintenance_date']) : calculateNextMaintenanceDate($data['maintenance_frequency']);
             }
         }
+        Debugbar::info('--- NEED MAINTENANCE --- ');
+        if ($data['need_maintenance'] === false) {
+            $data['next_maintenance_date'] = null;
+            $data['last_maintenance_date'] = null;
+        }
+
+
+        Debugbar::info('--- under_warranty --- ');
+        // if ($data['under_warranty'] === false) {
+        //     $data['end_warranty_date'] = null;
+        // }
 
         $this->replace($data);
     }
@@ -56,7 +63,7 @@ class MaintainableRequest extends FormRequest
             'purchase_date' => ['nullable', 'date', Rule::date()->todayOrBefore()],
             'purchase_cost' => 'nullable|numeric|gt:0|decimal:0,2',
             'under_warranty' => "boolean",
-            'end_warranty_date' => "nullable|date|required_if_accepted:under_warranty|after:purchase_date",
+            'end_warranty_date' => ['nullable', 'date', 'required_if_accepted:under_warranty',  Rule::when($this->input('under_warranty') === true, 'after:today'),   Rule::when($this->filled('purchase_date'), 'after:purchase_date')],
             'providers' => 'nullable|array',
             'providers.*.id' => 'integer|exists:providers,id',
             'maintenance_manager_id' => 'nullable|exists:users,id',

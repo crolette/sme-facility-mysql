@@ -49,7 +49,7 @@ class MaintainableNotificationSchedulingService
         $maintainable->refresh();
         $users = User::role('Admin')->get();
 
-        if (($maintainable->wasChanged('under_warranty') && $maintainable->under_warranty === true)  || $maintainable->wasChanged('end_warranty_date')) {
+        if (($maintainable->wasChanged('under_warranty') && $maintainable->under_warranty === true)  || ($maintainable->under_warranty === true && $maintainable->wasChanged('end_warranty_date'))) {
             // dump('update maintainable end_warranty_date');
             $notifications = $maintainable->maintainable->notifications()->where('notification_type', 'end_warranty_date')->where('scheduled_at', '>', now())->get();
 
@@ -68,11 +68,10 @@ class MaintainableNotificationSchedulingService
         };
 
         if ($maintainable->wasChanged('under_warranty') && $maintainable->under_warranty === false) {
-            Debugbar::info('update maintainable end_warranty_date TO FALSE');
             $this->removeScheduleForEndWarrantyDate($maintainable);
         };
 
-        if (($maintainable->wasChanged('need_maintenance') && $maintainable->need_maintenance === true) || $maintainable->wasChanged('next_maintenance_date')) {
+        if (($maintainable->wasChanged('need_maintenance') && $maintainable->need_maintenance === true) || ($maintainable->need_maintenance === true && $maintainable->wasChanged('next_maintenance_date'))) {
 
             $notifications = $maintainable->maintainable->notifications()->where('notification_type', 'next_maintenance_date')->where('scheduled_at', '>', now())->get();
 

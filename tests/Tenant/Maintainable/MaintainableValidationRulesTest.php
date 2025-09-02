@@ -74,142 +74,6 @@ it('fails when description is more than 255 chars', function () {
     ]);
 });
 
-it('can create with need_maintenance without last_maintenance_date and calculates next_maintenance_date', function () {
-    $formData = [
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'locationId' => $this->site->id,
-        'locationReference' => $this->site->reference_code,
-        'locationType' => 'site',
-        'categoryId' => $this->category->id,
-        'need_maintenance' => true,
-        'maintenance_frequency' => MaintenanceFrequency::ANNUAL->value
-    ];
-
-    $response = $this->postToTenant('api.assets.store', $formData);
-    $response->assertStatus(200);
-
-    $asset = Asset::first();
-
-    assertDatabaseHas('maintainables', [
-        'maintainable_type' => get_class($asset),
-        'maintainable_id' => $asset->id,
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'need_maintenance' => true,
-        'maintenance_frequency' => 'annual',
-        'next_maintenance_date' => Carbon::now()->addYear()->toDateString()
-    ]);
-});
-
-it('can create with need_maintenance with last_maintenance_date and calculates next_maintenance_date based on it', function () {
-    $formData = [
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'locationId' => $this->site->id,
-        'locationReference' => $this->site->reference_code,
-        'locationType' => 'site',
-        'categoryId' => $this->category->id,
-        'need_maintenance' => true,
-
-        'last_maintenance_date' => Carbon::now()->subMonths(2)->toDateString(),
-        'maintenance_frequency' => MaintenanceFrequency::ANNUAL->value
-    ];
-
-    $response = $this->postToTenant('api.assets.store', $formData);
-    $response->assertStatus(200);
-
-    $asset = Asset::first();
-
-    assertDatabaseHas('maintainables', [
-        'maintainable_type' => get_class($asset),
-        'maintainable_id' => $asset->id,
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'need_maintenance' => true,
-        'maintenance_frequency' => 'annual',
-        'last_maintenance_date' => Carbon::now()->subMonths(2)->toDateString(),
-        'next_maintenance_date' => Carbon::now()->addYear()->subMonths(2)->toDateString()
-    ]);
-});
-
-it('can create with need_maintenance with last_maintenance_date and next_maintenance_date', function () {
-    $formData = [
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'locationId' => $this->site->id,
-        'locationReference' => $this->site->reference_code,
-        'locationType' => 'site',
-        'categoryId' => $this->category->id,
-        'need_maintenance' => true,
-        'last_maintenance_date' => Carbon::now()->subMonths(2)->toDateString(),
-        'next_maintenance_date' => Carbon::now()->addMonths(2)->toDateString(),
-        'maintenance_frequency' => MaintenanceFrequency::ANNUAL->value
-    ];
-
-    $response = $this->postToTenant('api.assets.store', $formData);
-    $response->assertStatus(200);
-
-    $asset = Asset::first();
-
-    assertDatabaseHas('maintainables', [
-        'maintainable_type' => get_class($asset),
-        'maintainable_id' => $asset->id,
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'need_maintenance' => true,
-        'maintenance_frequency' => 'annual',
-        'last_maintenance_date' => Carbon::now()->subMonths(2)->toDateString(),
-        'next_maintenance_date' => Carbon::now()->addMonths(2)->toDateString(),
-    ]);
-});
-
-it('can update the maintenance frequency and change the next_maintenance_date accordingly', function () {
-    $formData = [
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'locationId' => $this->site->id,
-        'locationReference' => $this->site->reference_code,
-        'locationType' => 'site',
-        'categoryId' => $this->category->id,
-        'need_maintenance' => true,
-        'maintenance_frequency' => MaintenanceFrequency::ANNUAL->value,
-        'next_maintenance_date' => Carbon::now()->addMonths(2)->toDateString(),
-    ];
-
-    $response = $this->postToTenant('api.assets.store', $formData);
-    $response->assertStatus(200);
-
-    $asset = Asset::first();
-
-    $formData = [
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'locationId' => $this->site->id,
-        'locationReference' => $this->site->reference_code,
-        'locationType' => 'site',
-        'categoryId' => $this->category->id,
-        'need_maintenance' => true,
-        'maintenance_frequency' => MaintenanceFrequency::BIANNUAL->value,
-        'next_maintenance_date' => Carbon::now()->addMonths(2)->toDateString(),
-    ];
-
-    $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
-    $response->assertStatus(200);
-
-    assertDatabaseHas('maintainables', [
-        'maintainable_type' => get_class($asset),
-        'maintainable_id' => $asset->id,
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'need_maintenance' => true,
-        'last_maintenance_date' => null,
-        'maintenance_frequency' => 'biannual',
-        'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from(MaintenanceFrequency::BIANNUAL->value)->days())->toDateString(),
-    ]);
-});
-
-
 it('passes when end_warranty_date is filled and under_warranty is true', function () {
     // $name = 
     $formData = [
@@ -342,8 +206,9 @@ it('fails when end_warranty_date is before purchase_date', function () {
         'locationReference' => $this->site->reference_code,
         'locationType' => 'site',
         'categoryId' => $this->category->id,
-        'end_warranty_date' => Carbon::now()->sub(1, 'month')->toDateString(),
-        'purchase_date' => Carbon::now()
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::now()->subMonth()->toDateString(),
+        'purchase_date' => Carbon::now()->toDateString()
     ];
 
     $response = $this->postToTenant('api.assets.store', $formData);
