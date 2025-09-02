@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\V1;
 
 use Exception;
+use Carbon\Carbon;
 use App\Helpers\ApiResponse;
 use App\Models\Tenants\Asset;
 use App\Services\AssetService;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\AssetCreateRequest;
 use App\Http\Requests\Tenant\AssetUpdateRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
@@ -82,6 +84,10 @@ class APIAssetController extends Controller
      */
     public function update(AssetUpdateRequest $request, MaintainableRequest $maintainableRequest, Asset $asset)
     {
+        // Debugbar::info($request->validated('depreciation_duration'), $request->validated('depreciation_start_date'));
+        // Debugbar::info(Carbon::createFromFormat('Y-m-d', $request->validated('depreciation_start_date')));
+        // Debugbar::info(Carbon::createFromFormat('Y-m-d', $request->validated('depreciation_start_date'))->addYears($request->validated('depreciation_duration')));
+
         if (Auth::user()->cannot('update', $asset))
             abort(403);
 
@@ -96,6 +102,8 @@ class APIAssetController extends Controller
                 $asset->assetCategory()->dissociate();
                 $asset->assetCategory()->associate($request->validated('categoryId'));
             }
+
+
 
             $asset->update([
                 ...$request->validated(),

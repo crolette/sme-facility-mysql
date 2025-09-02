@@ -386,7 +386,17 @@ export default function CreateAsset({
         setCountContracts((prev) => prev - 1);
     };
 
-    console.log(data.contracts);
+    useEffect(() => {
+        console.log(data.depreciation_duration, data.depreciation_end_date);
+        console.log(new Date().toLocaleString());
+        if (data.depreciation_duration && data.depreciation_duration > 0 && data.depreciation_start_date !== null) {
+            const date = new Date(data.depreciation_start_date); // Convertit la chaîne en objet Date
+            date.setFullYear(date.getFullYear() + data.depreciation_duration); // Ajoute les années
+            setData('depreciation_end_date', date.toISOString().split('T')[0]);
+        }
+    }, [data.depreciation_duration]);
+
+    console.log(data);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

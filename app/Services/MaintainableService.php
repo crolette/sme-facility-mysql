@@ -2,16 +2,7 @@
 
 namespace App\Services;
 
-use Carbon\Carbon;
-use Illuminate\Support\Str;
-use App\Models\Tenants\Document;
-use App\Models\Tenants\Provider;
-use App\Models\Tenants\User;
-use Illuminate\Support\Facades\Auth;
-use Barryvdh\Debugbar\Facades\Debugbar;
-use Exception;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class MaintainableService
 {
