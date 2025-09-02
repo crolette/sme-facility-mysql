@@ -33,20 +33,17 @@ class UserRequest extends FormRequest
     {
         $data = $this->all();
 
-        Debugbar::info($data);
-
         if (isset($data['email'])) {
             $data['email'] = Str::lower($data['email']);
         }
 
-        if (isset($data['can_login'])) {
-            $data['can_login'] = $data['can_login'] === ("true" || true) ? true : false;
+        if (isset($data['can_login']) && ($data['can_login'] === "true" || $data['can_login'] === true)) {
+            $data['can_login'] = true;
+        } else {
+            $data['can_login'] = false;
         }
 
         $this->replace($data);
-
-
-        Debugbar::info($data);
     }
 
 

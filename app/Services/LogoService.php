@@ -25,7 +25,6 @@ class LogoService
     public function uploadAndAttachLogo(Provider $provider, $file, ?string $name = null): Provider
     {
         $directory = $this->directory . $provider->id . '/logo';
-        dump('provider logo', $provider->logo !== null);
         if ($provider->logo !== null) {
             $provider = $this->deleteExistingFiles($provider);
         }
@@ -40,11 +39,8 @@ class LogoService
 
     public function deleteExistingFiles(Provider $provider)
     {
-        dump('DELETEFILES');
         $directory = $this->directory . $provider->id . '/logo';
-        dump($directory);
         $files = Storage::disk('tenants')->files($directory);
-        dump($files);
         if (count($files) > 0) {
             foreach ($files as $file) {
                 Storage::disk('tenants')->delete($file);
@@ -53,8 +49,6 @@ class LogoService
 
         $provider->logo = null;
         $provider->save();
-        dump($provider->logo);
-        dump('END');
 
         return $provider;
     }

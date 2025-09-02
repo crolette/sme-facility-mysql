@@ -107,6 +107,7 @@ export default function CreateContract({
                 }
             } catch (error) {
                 console.log(error);
+                setErrors(error.response.data.errors);
             }
         } else {
             try {

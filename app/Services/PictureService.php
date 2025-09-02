@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Models\Tenants\Picture;
 use App\Models\Tenants\Document;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
@@ -47,7 +48,7 @@ class PictureService
 
                 $model->pictures()->save($picture);
             } catch (Exception $e) {
-                dump('Erreur:', $e->getMessage());
+                Log::info('Erreur:', $e->getMessage());
             }
         }
     }

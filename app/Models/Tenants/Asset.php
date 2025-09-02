@@ -2,6 +2,7 @@
 
 namespace App\Models\Tenants;
 
+use App\Observers\AssetObserver;
 use App\Models\Central\AssetType;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
@@ -10,6 +11,7 @@ use App\Models\Central\AssetCategory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\Tenants\ScheduledNotification;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -18,8 +20,10 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
+#[ObservedBy([AssetObserver::class])]
 class Asset extends Model
 {
     use HasFactory, SoftDeletes;
@@ -34,7 +38,6 @@ class Asset extends Model
         "depreciation_end_date",
         "depreciation_duration",
         "residual_value",
-        'contract_end_date',
         'brand',
         'model',
         'qr_code',
@@ -61,6 +64,8 @@ class Asset extends Model
         'is_mobile' => 'boolean',
         'depreciable' => 'boolean',
         'residual_value' => 'decimal:2',
+        'depreciation_start_date' => 'date:Y-m-d',
+        'depreciation_end_date' => 'date:Y-m-d',
     ];
 
     // Ensure route model binding use the slug instead of ID
@@ -69,13 +74,15 @@ class Asset extends Model
         return 'reference_code';
     }
 
-
+    public const DEFAULT_NOTIFICATION_DELAY = 30;
 
     public static function boot()
     {
         parent::boot();
 
         static::deleting(function ($asset) {
+            $asset->notifications()->delete();
+
             $tickets = $asset->tickets;
             foreach ($tickets as $ticket) {
                 $ticket->closeTicket();
@@ -106,6 +113,11 @@ class Asset extends Model
     public function interventions(): MorphMany
     {
         return $this->morphMany(Intervention::class, 'interventionable');
+    }
+
+    public function notifications(): MorphMany
+    {
+        return $this->morphMany(ScheduledNotification::class, 'notifiable');
     }
 
     public function location(): MorphTo
@@ -155,6 +167,13 @@ class Asset extends Model
     {
         return $this->interventions()->where('ticket_id', null);
     }
+
+    // public function manager(): Attribute
+    // {
+    //     return Attribute::make(
+    //         get: fn() => $this->maintainable->manager ?? $this->location->maintainable->manager
+    //     );
+    // }
 
 
 

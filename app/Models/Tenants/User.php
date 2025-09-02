@@ -6,10 +6,12 @@ namespace App\Models\Tenants;
 
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Provider;
+use App\Observers\UserObserver;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,9 +20,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+#[ObservedBy([UserObserver::class])]
 class User extends Authenticatable
 {
+    public $afterCommit = true;
     protected string $guard_name = 'tenant';
+
     protected function getDefaultGuardName(): string
     {
         return $this->guard_name;
@@ -75,11 +80,15 @@ class User extends Authenticatable
 
     public static function booted(): void
     {
-        // static::addGlobalScope('SA', function (Builder $builder) {
-        //     $builder->withoutRole('Super Admin');
-        // });
-    }
+        parent::boot();
 
+        static::deleting(function ($user) {
+            $notifications = ScheduledNotification::where('recipient_email', $user->email)->get();
+            foreach ($notifications as $notification) {
+                $notification->delete();
+            }
+        });
+    }
 
     public const MAX_UPLOAD_SIZE_MB = 4;
 
@@ -98,6 +107,11 @@ class User extends Authenticatable
         return $this->hasMany(Maintainable::class, 'maintenance_manager_id');
     }
 
+    public function notification_preferences(): HasMany
+    {
+        return $this->hasMany(UserNotificationPreference::class);
+    }
+
     public function provider(): BelongsTo
     {
         return $this->belongsTo(Provider::class);
@@ -106,6 +120,11 @@ class User extends Authenticatable
     public function assets(): MorphMany
     {
         return $this->morphMany(Asset::class, 'location');
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(ScheduledNotification::class);
     }
 
     public function fullName(): Attribute

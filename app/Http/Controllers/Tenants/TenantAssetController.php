@@ -34,8 +34,9 @@ class TenantAssetController extends Controller
         if (Auth::user()->cannot('viewAny', Asset::class))
             abort(403);
 
-        $assets = Asset::orderBy('id')->get();
-        return Inertia::render('tenants/assets/index', ['assets' => $assets]);
+        $assets = Asset::withoutTrashed()->get();
+
+        return Inertia::render('tenants/assets/index', ['items' => $assets]);
     }
 
     /**
@@ -80,7 +81,6 @@ class TenantAssetController extends Controller
      */
     public function edit(Asset $asset)
     {
-
         if (Auth::user()->cannot('update', $asset))
             abort(403);
 

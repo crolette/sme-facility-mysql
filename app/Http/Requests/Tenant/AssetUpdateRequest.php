@@ -2,14 +2,15 @@
 
 namespace App\Http\Requests\Tenant;
 
+use Carbon\Carbon;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\Floor;
 use Illuminate\Validation\Rule;
 use App\Models\Tenants\Building;
+use App\Models\Central\CategoryType;
 use Illuminate\Validation\Validator;
 use App\Models\Central\AssetCategory;
-use App\Models\Central\CategoryType;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\ValidationException;
@@ -33,6 +34,16 @@ class AssetUpdateRequest extends FormRequest
         isset($data['is_mobile']) && ($data['is_mobile'] === 'true' || $data['is_mobile'] === true) ? $data['is_mobile'] = true : $data['is_mobile'] = false;
         isset($data['depreciable']) && ($data['depreciable'] === 'true' || $data['depreciable'] === true) ? $data['depreciable'] = true : $data['depreciable'] = false;
 
+        if ($data['depreciable'] === false) {
+            $data['depreciation_start_date'] = null;
+            $data['depreciation_end_date'] = null;
+            $data['depreciation_duration'] = null;
+            $data['residual_value'] = null;
+        }
+
+        if ($data['depreciable'] === true && $data['depreciation_end_date'] === null) {
+            $data['depreciation_end_date'] = Carbon::createFromFormat('Y-m-d', $data['depreciation_start_date'])->addYears($data['depreciation_duration']);
+        }
 
         $this->replace($data);
     }

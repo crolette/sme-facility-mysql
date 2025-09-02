@@ -38,9 +38,6 @@ beforeEach(function () {
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
-
-    $this->user = User::factory()->create();
-    $this->actingAs($this->user, 'tenant');
 });
 
 it('fails when name is more than 100 chars', function () {
@@ -214,6 +211,7 @@ it('can update the maintenance frequency and change the next_maintenance_date ac
 
 
 it('passes when end_warranty_date is filled and under_warranty is true', function () {
+    // $name = 
     $formData = [
         'name' => fake()->text(50),
         'description' => fake()->text(250),
@@ -229,6 +227,7 @@ it('passes when end_warranty_date is filled and under_warranty is true', functio
 
     $response->assertSessionHasNoErrors();
     $asset = Asset::first();
+    // dump($asset);
     $this->assertNotNull($asset->maintainable->end_warranty_date);
 });
 
@@ -331,7 +330,7 @@ it('fails when purchase_date is after today', function () {
 
     $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasErrors([
-        'purchase_date' => 'The purchase date field must be a date before or equal to ' . Carbon::now()->toDateString() . '.',
+        'purchase_date' => 'The purchase date field must be a date before or equal to today.',
     ]);
 });
 

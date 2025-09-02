@@ -2,22 +2,24 @@
 
 namespace App\Models\Tenants;
 
-use App\Enums\ContractDurationEnum;
-use App\Enums\ContractRenewalTypesEnum;
-use App\Enums\ContractStatusEnum;
-use App\Enums\NoticePeriodEnum;
 use App\Models\Tenants\Site;
-use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
-use App\Models\Central\CategoryType;
+use App\Enums\NoticePeriodEnum;
+use App\Enums\ContractStatusEnum;
+use App\Enums\ContractDurationEnum;
+use App\Observers\ContractObserver;
+use App\Enums\ContractRenewalTypesEnum;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Models\Tenants\ScheduledNotification;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
+#[ObservedBy([ContractObserver::class])]
 class Contract extends Model
 {
     use HasFactory;
@@ -43,14 +45,25 @@ class Contract extends Model
             'created_at' => 'date:d-m-Y',
             'updated_at' => 'date:d-m-Y',
             'notice_date' => 'date:d-m-Y',
+            'end_date' => 'date:d-m-Y',
             // 'start_date' => 'date:d-m-Y',
-            // 'end_date' => 'date:d-m-Y',
             'notice_period' => NoticePeriodEnum::class,
             'contract_duration' => ContractDurationEnum::class,
             'renewal_type' => ContractRenewalTypesEnum::class,
             'status' => ContractStatusEnum::class
         ];
     }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($contract) {
+            $contract->notifications()->delete();
+        });
+    }
+
+    public const DEFAULT_NOTIFICATION_DELAY = 7;
 
     public function provider(): BelongsTo
     {
@@ -91,6 +104,13 @@ class Contract extends Model
     {
         return $this->morphTo()->withTrashed();
     }
+
+
+    public function notifications(): MorphMany
+    {
+        return $this->morphMany(ScheduledNotification::class, 'notifiable');
+    }
+
 
 
     public function getObjects($columns = ['id', 'code', 'reference_code', 'category_type_id', 'location_type_id'])

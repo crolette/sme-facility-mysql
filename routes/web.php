@@ -52,5 +52,5 @@ foreach (config('tenancy.central_domains') as $domain) {
     });
 }
 
-require __DIR__ . '/settings.php';
+
 require __DIR__ . '/central_auth.php';

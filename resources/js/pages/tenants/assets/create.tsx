@@ -386,7 +386,17 @@ export default function CreateAsset({
         setCountContracts((prev) => prev - 1);
     };
 
-    console.log(data.contracts);
+    useEffect(() => {
+        console.log(data.depreciation_duration, data.depreciation_end_date);
+        console.log(new Date().toLocaleString());
+        if (data.depreciation_duration && data.depreciation_duration > 0 && data.depreciation_start_date !== null) {
+            const date = new Date(data.depreciation_start_date); // Convertit la chaîne en objet Date
+            date.setFullYear(date.getFullYear() + data.depreciation_duration); // Ajoute les années
+            setData('depreciation_end_date', date.toISOString().split('T')[0]);
+        }
+    }, [data.depreciation_duration]);
+
+    console.log(data);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -488,6 +498,7 @@ export default function CreateAsset({
                             <>
                                 <Label htmlFor="locationType">Level</Label>
                                 <Input
+                                    required
                                     type="text"
                                     disabled
                                     value={data.locationName ? data.locationName + ' - ' + data.locationReference : 'No location selected'}
@@ -524,13 +535,13 @@ export default function CreateAsset({
                         </div>
                     )}
 
-                    <Label htmlFor="name">Category</Label>
+                    <Label htmlFor="category">Category</Label>
                     <select
-                        name="level"
+                        name="category"
                         required
                         value={data.categoryId === '' ? 0 : data.categoryId}
                         onChange={(e) => setData('categoryId', e.target.value)}
-                        id=""
+                        id="category"
                         className={cn(
                             'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
                             'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
@@ -557,6 +568,7 @@ export default function CreateAsset({
                         id="description"
                         type="text"
                         maxLength={255}
+                        required
                         value={data.description}
                         onChange={(e) => setData('description', e.target.value)}
                         placeholder="Asset description"
@@ -853,6 +865,7 @@ export default function CreateAsset({
                                                 className="rounded border px-2 py-1"
                                                 minLength={4}
                                                 maxLength={100}
+                                                required
                                                 onChange={(e) => handleChangeContracts(index, 'name', e.target.value)}
                                             />
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.name : ''} />
@@ -864,6 +877,7 @@ export default function CreateAsset({
                                                 className="rounded border px-2 py-1"
                                                 minLength={4}
                                                 maxLength={100}
+                                                required
                                                 onChange={(e) => handleChangeContracts(index, 'type', e.target.value)}
                                             />
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.type : ''} />
@@ -872,6 +886,7 @@ export default function CreateAsset({
                                             <SearchableInput<Provider>
                                                 searchUrl={route('api.providers.search')}
                                                 getKey={(provider) => provider.id}
+                                                required
                                                 displayValue={data.contracts[index]?.provider_name ?? ''}
                                                 getDisplayText={(provider) => provider.name}
                                                 onSelect={(provider) => {
@@ -975,6 +990,7 @@ export default function CreateAsset({
                                             <select
                                                 name="renewal_type"
                                                 // value={data.renewal_type ?? ''}
+                                                required
                                                 onChange={(e) => handleChangeContracts(index, 'renewal_type', e.target.value)}
                                                 id=""
                                                 defaultValue={''}
@@ -1002,6 +1018,7 @@ export default function CreateAsset({
                                                 <select
                                                     name="status"
                                                     // value={data.status ?? ''}
+                                                    required
                                                     defaultValue={''}
                                                     onChange={(e) => handleChangeContracts(index, 'status', e.target.value)}
                                                     id=""

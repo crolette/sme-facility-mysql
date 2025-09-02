@@ -99,7 +99,6 @@ it('can post a new provider', function () {
         'logo' => Provider::first()->logo
     ]);
 
-    dump(Provider::first()->logo);
     Storage::disk('tenants')->assertExists(Provider::first()->logo);
 });
 

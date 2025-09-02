@@ -9,7 +9,7 @@ import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-export default function IndexAssets() {
+export default function IndexAssets({ items }: { items: Asset[] }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index assets`,
@@ -17,12 +17,12 @@ export default function IndexAssets() {
         },
     ];
 
-    const [assets, setAssets] = useState<Asset[]>();
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [assets, setAssets] = useState<Asset[]>(items);
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    useEffect(() => {
-        fetchAssets();
-    }, []);
+    // useEffect(() => {
+    //     fetchAssets();
+    // }, []);
 
     const [activeAssetsTab, setActiveAssetsTab] = useState(true);
     const [trashedAssetsTab, setTrashedAssetsTab] = useState(false);

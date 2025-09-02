@@ -51,15 +51,17 @@ it('can render the index assets page', function () {
     $response = $this->getFromTenant('tenant.assets.index');
     $response->assertOk();
 
+    $asset = Asset::find($asset->id);
+
     $response->assertInertia(
         fn($page) =>
         $page->component('tenants/assets/index')
-            ->has('assets', 4)
-            ->where('assets.0.maintainable.name', $asset->maintainable->name)
-            ->where('assets.0.location.id', $this->site->id)
-            ->where('assets.0.category', $asset->assetCategory->label)
-            ->where('assets.0.location_type', get_class($this->site))
-            ->where('assets.0.location_id', $this->site->id)
+            ->has('items', 4)
+            ->where('items.0.maintainable.name', $asset->maintainable->name)
+            ->where('items.0.location.id', $this->site->id)
+            ->where('items.0.category', $asset->assetCategory->label)
+            ->where('items.0.location_type', get_class($this->site))
+            ->where('items.0.location_id', $this->site->id)
     );
 });
 
@@ -348,7 +350,6 @@ it('can create a new asset to room', function () {
         'brand' => 'Alpine',
         'serial_number' => '123-AZ-65-XF',
         'categoryId' => $this->categoryType->id,
-        'contract_end_date' => Carbon::now()->addYear(3)->toDateString(),
     ];
 
     $response = $this->postToTenant('api.assets.store', $formData);
@@ -368,7 +369,6 @@ it('can create a new asset to room', function () {
         'model' => 'Blue daba di daba da',
         'brand' => 'Alpine',
         'serial_number' => '123-AZ-65-XF',
-        'contract_end_date' => Carbon::now()->addYear(3)->toDateString(),
         'category_type_id' => $this->categoryType->id,
     ]);
 
@@ -384,6 +384,8 @@ it('can create a new asset to room', function () {
 it('can show the asset page', function () {
 
     $asset = Asset::factory()->forLocation($this->room)->create();
+
+    $asset = Asset::find($asset->id);
 
     $response = $this->getFromTenant('tenant.assets.show', $asset);
 
@@ -416,6 +418,7 @@ it('can render the update asset page', function () {
 it('can update asset and his maintainable', function () {
 
     $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::find($asset->id);
 
     $oldName = $asset->maintainable->name;
     $oldDescription = $asset->maintainable->description;
@@ -461,6 +464,8 @@ it('can update asset\'s location', function () {
 
     $asset = Asset::factory()->forLocation($this->room)->create();
 
+    $asset = Asset::find($asset->id);
+
     $name = $asset->maintainable->name;
     $description = $asset->maintainable->description;
     $oldReference = $asset->reference_code;
@@ -503,6 +508,7 @@ it('can update asset\'s location', function () {
 it('can soft delete an asset but kept in DB with his maintainable', function () {
 
     $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::find($asset->id);
 
     assertDatabaseHas('maintainables', [
         'name' => $asset->maintainable->name,
@@ -529,10 +535,8 @@ it('can soft delete an asset but kept in DB with his maintainable', function () 
 });
 
 it('can restore a soft deleted asset', function () {
-
-
     $asset = Asset::factory()->forLocation($this->room)->create();
-
+    $asset = Asset::find($asset->id);
     $response = $this->deleteFromTenant('api.assets.destroy', $asset);
     $response->assertStatus(200)
         ->assertJson(['status' => 'success']);
@@ -563,9 +567,8 @@ it('can restore a soft deleted asset', function () {
 });
 
 it('can force delete a soft deleted asset', function () {
-
-
     $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::find($asset->id);
 
     $assetName = $asset->maintainable->name;
     $assetDescription = $asset->maintainable->description;
@@ -678,6 +681,7 @@ it('can update providers to an asset\'s maintainable', function () {
     Provider::factory()->count(3)->create();
     $providers = Provider::all()->pluck('id');
     $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::find($asset->id);
 
     $formData = [
         'name' => "New asset name",

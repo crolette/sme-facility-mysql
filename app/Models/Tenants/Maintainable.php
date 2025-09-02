@@ -4,12 +4,15 @@ namespace App\Models\Tenants;
 
 use App\Enums\MaintenanceFrequency;
 use App\Models\Tenants\Intervention;
+use App\Observers\MaintainableObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+#[ObservedBy([MaintainableObserver::class])]
 class Maintainable extends Model
 {
     use HasFactory;
@@ -37,6 +40,10 @@ class Maintainable extends Model
         'updated_at'
     ];
 
+    protected $with = [
+        // 'manager',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -49,6 +56,8 @@ class Maintainable extends Model
             'maintenance_frequecy' => MaintenanceFrequency::class
         ];
     }
+
+    public const DEFAULT_NOTIFICATION_DELAY = 30;
 
 
     public function maintainable()

@@ -27,6 +27,18 @@ class AssetCreateRequest extends FormRequest
         isset($data['depreciable']) && ($data['depreciable'] === 'true' || $data['depreciable'] === true) ? $data['depreciable'] = true : $data['depreciable'] = false;
 
 
+        if ($data['depreciable'] === false) {
+            $data['depreciation_start_date'] = null;
+            $data['depreciation_end_date'] = null;
+            $data['depreciation_duration'] = null;
+            $data['residual_value'] = null;
+        }
+
+        if ($data['depreciable'] === true && $data['depreciation_end_date'] === null) {
+            $data['depreciation_end_date'] = Carbon::createFromFormat('Y-m-d', $data['depreciation_start_date'])->addYears($data['depreciation_duration']);
+        }
+
+
         $this->replace($data);
     }
 

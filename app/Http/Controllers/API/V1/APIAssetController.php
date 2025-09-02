@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\V1;
 
 use Exception;
+use Carbon\Carbon;
 use App\Helpers\ApiResponse;
 use App\Models\Tenants\Asset;
 use App\Services\AssetService;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\AssetCreateRequest;
 use App\Http\Requests\Tenant\AssetUpdateRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
@@ -68,13 +70,11 @@ class APIAssetController extends Controller
                 $this->qrCodeService->createAndAttachQR($asset);
 
             DB::commit();
-
             return ApiResponse::success('', 'Asset created');
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
             return ApiResponse::error('', 'ERROR : ' . $e->getMessage());
-            return redirect()->back()->with(['message' => 'ERROR : ' . $e->getMessage(), 'type' => 'error']);
         }
         return ApiResponse::error('', 'Error while creating an asset');
     }
@@ -108,13 +108,12 @@ class APIAssetController extends Controller
             $asset->save();
 
             DB::commit();
-
+            // dump('ASSET UPDATE');
             return ApiResponse::success(['reference_code' => $asset->reference_code], 'Asset updated');
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
             return ApiResponse::error('ERROR : ' . $e->getMessage());
-            return redirect()->back()->with(['message' => 'ERROR : ' . $e->getMessage(), 'type' => 'error']);
         }
         return ApiResponse::error('Error while updating the asset');
     }

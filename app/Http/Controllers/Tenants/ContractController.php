@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\Tenants;
 
-use App\Enums\ContractDurationEnum;
 use Carbon\Carbon;
 use Inertia\Inertia;
+use App\Models\Tenants\User;
+use App\Enums\NoticePeriodEnum;
 use App\Models\Tenants\Contract;
 use App\Enums\ContractStatusEnum;
+use App\Enums\ContractDurationEnum;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Enums\ContractRenewalTypesEnum;
-use App\Enums\NoticePeriodEnum;
 
 class ContractController extends Controller
 {
@@ -30,6 +32,7 @@ class ContractController extends Controller
      */
     public function create()
     {
+
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
         $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
@@ -57,8 +60,9 @@ class ContractController extends Controller
      */
     public function show(Contract $contract)
     {
-
-
+        // $preference = null;
+        // dd(Contract::where('notice_date', '>', Carbon::now())->get());
+        // dd($contract->end_date, $contract->end_date->subYears(5) < $contract->start_date);
         return Inertia::render('tenants/contracts/show', ['item' => $contract->load('provider'), 'objects' => $contract->getObjects()]);
     }
 }

@@ -6,7 +6,6 @@ use App\Enums\MaintenanceFrequency;
 use App\Models\Tenants\Maintainable;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class MaintainableService
 {
