@@ -27,7 +27,7 @@ beforeEach(function () {
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
     CategoryType::factory()->count(2)->create(['category' => 'asset']);
 
-    $this->user = User::factory()->create();
+    $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
 
     // on créée les différentes "locations" possibles pour attacher un asset

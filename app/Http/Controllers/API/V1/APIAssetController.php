@@ -48,8 +48,7 @@ class APIAssetController extends Controller
 
             $asset->assetCategory()->associate($assetRequest->validated('categoryId'));
             $asset->save();
-
-            $asset = $this->maintainableService->createMaintainable($asset, $maintainableRequest);
+            $this->maintainableService->create($asset, $maintainableRequest);
 
             if ($contractRequest->validated('contracts'))
                 $this->contractService->createWithModel($asset, $contractRequest->validated('contracts'));
@@ -104,7 +103,7 @@ class APIAssetController extends Controller
                 ...$request->validated(),
             ]);
 
-            $asset = $this->maintainableService->createMaintainable($asset, $maintainableRequest);
+            $this->maintainableService->update($asset->maintainable, $maintainableRequest);
 
             $asset->save();
 
