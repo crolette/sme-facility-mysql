@@ -88,45 +88,31 @@ class AssetNotificationSchedulingService
 
     public function updateForAsset(Asset $asset)
     {
-        // dump('updateForAsset');
+        dump('updateForAsset');
         // dump($asset->maintainable->wasChanged('next_maintenance_date'));
         // dump($asset, $asset->maintainable->wasChanged('maintenance_manager_id'), $asset->maintainable->getOriginal('maintenance_manager_id'));
 
-        if ($asset->wasChanged('depreciation_end_date')) {
-            dump('updateForAsset depreciation_end_date changed');
+        if ($asset->wasChanged('depreciable') && $asset->depreciable === false) {
+            dump('updateForAsset depreciation_end_date changed to FALSE');
+            $this->removeScheduleForDepreciable($asset);
         }
-    }
 
-    public function updateScheduleOfAssetForNotificationType(UserNotificationPreference $preference)
-    {
-        // 1. il faut rechercher toutes les scheduled_notifications avec le notification_type et le user_id ET l'asset_type
-
-        if ($preference->wasChanged('notification_delay_days')) {
-            match ($preference->notification_type) {
-
-                'depreciation_end_date'  => $this->updateScheduleForDepreciationEndDate($preference),
-                default => null
-            };
-        };
-
-
-        if ($preference->wasChanged('enabled') && $preference->enabled === true) {
-            match ($preference->notification_type) {
-
-                'depreciation_end_date'  => $this->createScheduleForDepreciationEndDate($preference),
-                default => null
-            };
+        if ($asset->wasChanged('depreciable') && $asset->depreciable === true) {
+            dump('updateForAsset depreciation_end_date changed to TRUE');
         }
     }
 
 
-
-    public function deleteScheduledNotificationForNotificationType(UserNotificationPreference $preference)
+    public function removeScheduleForDepreciable(Asset $asset)
     {
-        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
+        // dump('--- removeScheduleForEndWarrantyDate ---');
+        $notifications = $asset->notifications()->where('notification_type', 'depreciation_end_date')->where('scheduled_at', '>', now())->get();
 
-        foreach ($scheduledNotifications as $notification) {
-            $notification->delete();
-        }
+        if (count($notifications) > 0)
+            foreach ($notifications as $notification) {
+                // dump('--- DELETE NOTIF ---');
+                // dump($notification->id);
+                $notification->delete();
+            }
     }
 }

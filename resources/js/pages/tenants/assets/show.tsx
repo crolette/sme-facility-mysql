@@ -17,8 +17,6 @@ export default function ShowAsset({ item }: { item: Asset }) {
         },
     ];
 
-    console.log(item);
-
     const { post, delete: destroy } = useForm();
 
     const [asset, setAsset] = useState(item);

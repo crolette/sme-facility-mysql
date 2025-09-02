@@ -106,7 +106,7 @@ class APIAssetController extends Controller
             $asset->save();
 
             DB::commit();
-
+            // dump('ASSET UPDATE');
             return ApiResponse::success(['reference_code' => $asset->reference_code], 'Asset updated');
         } catch (Exception $e) {
             DB::rollback();

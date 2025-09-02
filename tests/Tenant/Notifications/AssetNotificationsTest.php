@@ -58,6 +58,7 @@ beforeEach(function () {
     ];
 });
 
+// // END OF WARRANTY
 // it('creates end of warranty notification for a new created asset', function () {
 
 //     $formData = [
@@ -71,6 +72,7 @@ beforeEach(function () {
 //     $response->assertSessionHasNoErrors();
 
 //     assertDatabaseCount('scheduled_notifications', 2);
+
 //     assertDatabaseHas(
 //         'scheduled_notifications',
 //         [
@@ -95,6 +97,135 @@ beforeEach(function () {
 //         ]
 //     );
 // });
+
+// it('updates end of warranty notification when end_warranty_date changes', function () {
+
+//     $formData = [
+//         ...$this->basicAssetData,
+//         'under_warranty' => true,
+//         'end_warranty_date' => Carbon::now()->addMonths(10),
+//         'maintenance_manager_id' => $this->manager->id,
+//     ];
+
+//     $response = $this->postToTenant('api.assets.store', $formData);
+//     $response->assertSessionHasNoErrors();
+
+//     assertDatabaseCount('scheduled_notifications', 2);
+
+//     $formData = [
+//         ...$this->basicAssetData,
+//         'under_warranty' => true,
+//         'end_warranty_date' => Carbon::now()->addYears(2),
+//         'maintenance_manager_id' => $this->manager->id,
+//     ];
+
+//     $asset = Asset::find(1);
+//     $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+//     $response->assertSessionHasNoErrors();
+//     $response->assertStatus(200);
+
+//     assertDatabaseCount('scheduled_notifications', 2);
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'recipient_name' => $this->admin->fullName,
+//             'recipient_email' => $this->admin->email,
+//             'notification_type' => 'end_warranty_date',
+//             'scheduled_at' => Carbon::now()->addYears(2)->subDays(7)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Asset',
+//             'notifiable_id' => 1,
+//         ]
+//     );
+
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'recipient_name' => $this->manager->fullName,
+//             'recipient_email' => $this->manager->email,
+//             'notification_type' => 'end_warranty_date',
+//             'scheduled_at' => Carbon::now()->addYears(2)->subDays(7)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Asset',
+//             'notifiable_id' => 1,
+//         ]
+//     );
+// });
+
+// it('creates warranty notifications when under_warranty passes from false to true', function () {
+
+//     $formData = [
+//         ...$this->basicAssetData,
+//     ];
+
+//     $response = $this->postToTenant('api.assets.store', $formData);
+//     assertDatabaseCount('scheduled_notifications', 0);
+//     $response->assertSessionHasNoErrors();
+//     $response->assertStatus(200);
+
+//     $formData = [
+//         ...$this->basicAssetData,
+//         'under_warranty' => true,
+//         'end_warranty_date' => Carbon::now()->addMonths(10),
+//     ];
+//     $asset = Asset::find(1);
+//     $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+
+//     $response->assertSessionHasNoErrors();
+//     $response->assertStatus(200);
+
+//     assertDatabaseCount('scheduled_notifications', 1);
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'recipient_name' => $this->admin->fullName,
+//             'recipient_email' => $this->admin->email,
+//             'notification_type' => 'end_warranty_date',
+//             'scheduled_at' => Carbon::now()->addMonths(10)->subDays(7)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Asset',
+//             'notifiable_id' => $asset->id,
+//         ]
+//     );
+// });
+
+// it('deletes warranty notifications when under_warranty passes from true to false', function () {
+
+//     $formData = [
+//         ...$this->basicAssetData,
+//         'under_warranty' => true,
+//         'end_warranty_date' => Carbon::now()->addMonths(10),
+//     ];
+
+//     $response = $this->postToTenant('api.assets.store', $formData);
+//     $response->assertSessionHasNoErrors();
+//     $response->assertStatus(200);
+//     $asset = Asset::find(1);
+
+//     assertDatabaseCount('scheduled_notifications', 1);
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'recipient_name' => $this->admin->fullName,
+//             'recipient_email' => $this->admin->email,
+//             'notification_type' => 'end_warranty_date',
+//             'scheduled_at' => Carbon::now()->addMonths(10)->subDays(7)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Asset',
+//             'notifiable_id' => $asset->id,
+//         ]
+//     );
+
+//     $formData = [
+//         ...$this->basicAssetData,
+//         'under_warranty' => false,
+//     ];
+
+//     $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+
+//     $response->assertSessionHasNoErrors();
+//     $response->assertStatus(200);
+
+//     assertDatabaseCount('scheduled_notifications', 0);
+// });
+
+// // DEPRECIATION
 
 // it('creates depreciation notification for a new created asset', function () {
 
@@ -136,7 +267,62 @@ beforeEach(function () {
 //     );
 // });
 
-// it('creates maintenance notification for a new created asset', function () {
+it('deletes depreciation notification when depreciables passes from true to false', function () {
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_manager_id' => $this->manager->id,
+        'depreciable' => true,
+        'depreciation_start_date' => Carbon::now()->toDateString(),
+        'depreciation_end_date' => Carbon::now()->addYear(3)->toDateString(),
+        'depreciation_duration' => 3,
+        'residual_value' => 1250.69,
+    ];
+
+    $this->postToTenant('api.assets.store', $formData);
+
+    assertDatabaseCount('scheduled_notifications', 2);
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->admin->fullName,
+            'recipient_email' => $this->admin->email,
+            'notification_type' => 'depreciation_end_date',
+            'scheduled_at' => Carbon::now()->addYear(3)->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'depreciation_end_date',
+            'scheduled_at' => Carbon::now()->addYear(3)->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_manager_id' => $this->manager->id,
+        'depreciable' => false,
+    ];
+
+    $asset = Asset::find(1);
+    $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200);
+
+    assertDatabaseCount('scheduled_notifications', 0);
+});
+
+// // NEED MAINTENANCE
+
+// it('creates next maintenance date notification for a new created asset', function () {
 
 //     $formData = [
 //         ...$this->basicAssetData,
@@ -175,6 +361,125 @@ beforeEach(function () {
 //         ]
 //     );
 // });
+
+
+// it('updates notification when next_maintenance_date changes', function () {
+
+//     $formData = [
+//         ...$this->basicAssetData,
+//         'maintenance_manager_id' => $this->manager->id,
+//         'maintenance_frequency' => 'annual',
+//         'need_maintenance' => true,
+//         'next_maintenance_date' => Carbon::now()->addYear(),
+//         'last_maintenance_date' => Carbon::now()->toDateString(),
+//     ];
+
+//     $response =  $this->postToTenant('api.assets.store', $formData);
+//     $response->assertSessionHasNoErrors();
+
+//     assertDatabaseCount('scheduled_notifications', 2);
+
+//     $formData = [
+//         ...$this->basicAssetData,
+//         'maintenance_manager_id' => $this->manager->id,
+//         'maintenance_frequency' => 'annual',
+//         'need_maintenance' => true,
+//         'next_maintenance_date' => Carbon::now()->addMonths(6),
+//         'last_maintenance_date' => Carbon::now()->toDateString(),
+//     ];
+
+
+//     $asset = Asset::find(1);
+//     $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+//     $response->assertSessionHasNoErrors();
+//     $response->assertStatus(200);
+
+//     assertDatabaseCount('scheduled_notifications', 2);
+
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'recipient_name' => $this->admin->fullName,
+//             'recipient_email' => $this->admin->email,
+//             'notification_type' => 'next_maintenance_date',
+//             'scheduled_at' => Carbon::now()->addMonths(6)->subDays(7)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Asset',
+//             'notifiable_id' => 1,
+//         ]
+//     );
+
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'recipient_name' => $this->manager->fullName,
+//             'recipient_email' => $this->manager->email,
+//             'notification_type' => 'next_maintenance_date',
+//             'scheduled_at' => Carbon::now()->addMonths(6)->subDays(7)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Asset',
+//             'notifiable_id' => 1,
+//         ]
+//     );
+// });
+
+// it('creates notification when need_maintenance passes from false to true', function () {
+
+//     $formData = [
+//         ...$this->basicAssetData,
+//     ];
+
+//     $response = $this->postToTenant('api.assets.store', $formData);
+//     assertDatabaseCount('scheduled_notifications', 0);
+//     $response->assertSessionHasNoErrors();
+//     $response->assertStatus(200);
+
+//     $formData = [
+//         ...$this->basicAssetData,
+//         'maintenance_frequency' => 'annual',
+//         'need_maintenance' => true,
+//         'next_maintenance_date' => Carbon::now()->addYear(),
+//         'last_maintenance_date' => Carbon::now()->toDateString(),
+//     ];
+//     $asset = Asset::find(1);
+//     $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+
+//     $response->assertSessionHasNoErrors();
+//     $response->assertStatus(200);
+
+//     assertDatabaseCount('scheduled_notifications', 1);
+// });
+
+// it('deletes notification when need_maintenance passes from true to false', function () {
+
+//     $formData = [
+//         ...$this->basicAssetData,
+//         'maintenance_frequency' => 'annual',
+//         'need_maintenance' => true,
+//         'next_maintenance_date' => Carbon::now()->addYear(),
+//         'last_maintenance_date' => Carbon::now()->toDateString(),
+//     ];
+
+//     $response = $this->postToTenant('api.assets.store', $formData);
+//     $response->assertSessionHasNoErrors();
+//     $response->assertStatus(200);
+
+//     assertDatabaseCount('scheduled_notifications', 1);
+
+//     $asset = Asset::find(1);
+
+//     $formData = [
+//         ...$this->basicAssetData,
+//         'maintenance_manager_id' => $this->manager->id,
+//         'need_maintenance' => false,
+//     ];
+
+//     $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+//     $response->assertSessionHasNoErrors();
+//     $response->assertStatus(200);
+
+//     assertDatabaseCount('scheduled_notifications', 0);
+// });
+
+
 
 // it('update notifications when notification preference end_warranty_date of user changes', function () {
 
@@ -630,15 +935,41 @@ beforeEach(function () {
 //     );
 // });
 
-// it('creates notification for new maintenance manager for the asset', function () {
 
-//     $asset = Asset::factory()->forLocation($this->room)->create();
+// it('creates notification when adding maintenance manager to existing asset without maintenance manager', function () {
+
+//     $formData = [
+//         ...$this->basicAssetData,
+//         'maintenance_frequency' => 'annual',
+//         'need_maintenance' => true,
+//         'next_maintenance_date' => Carbon::now()->addYear(),
+//         'last_maintenance_date' => Carbon::now()->toDateString(),
+//     ];
+
+//     $response = $this->postToTenant('api.assets.store', $formData);
+//     $response->assertSessionHasNoErrors();
+//     $response->assertStatus(200);
+
+//     assertDatabaseCount('scheduled_notifications', 1);
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'recipient_name' => $this->admin->fullName,
+//             'recipient_email' => $this->admin->email,
+//             'notification_type' => 'next_maintenance_date',
+//             'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Asset',
+//             'notifiable_id' => 1,
+//         ]
+//     );
+
+//     $asset = Asset::find(1);
 
 //     $formData = [
 //         ...$this->basicAssetData,
 //         'maintenance_manager_id' => $this->manager->id,
-//         'maintenance_frequency' => 'annual',
 //         'need_maintenance' => true,
+//         'maintenance_frequency' => 'annual',
 //         'next_maintenance_date' => Carbon::now()->addYear(),
 //         'last_maintenance_date' => Carbon::now()->toDateString(),
 //     ];
@@ -655,67 +986,161 @@ beforeEach(function () {
 //             'notification_type' => 'next_maintenance_date',
 //             'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
 //             'notifiable_type' => 'App\Models\Tenants\Asset',
+//             'notifiable_id' => 1,
+//         ]
+//     );
+// });
+
+// it('creates notification when replacing maintenance manager for the asset and removes notifications for old maintenance manager', function () {
+
+//     $asset = Asset::factory()->forLocation($this->room)->create();
+
+//     $formData = [
+//         ...$this->basicAssetData,
+//         'maintenance_manager_id' => $this->manager->id,
+//         'maintenance_frequency' => 'annual',
+//         'need_maintenance' => true,
+//         'next_maintenance_date' => Carbon::now()->addYear(),
+//         'last_maintenance_date' => Carbon::now()->toDateString(),
+//     ];
+
+//     $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+//     $response->assertSessionHasNoErrors();
+//     $response->assertStatus(200);
+
+//     assertDatabaseCount('scheduled_notifications', 2);
+
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'recipient_name' => $this->manager->fullName,
+//             'recipient_email' => $this->manager->email,
+//             'notification_type' => 'next_maintenance_date',
+//             'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Asset',
 //             'notifiable_id' => $asset->id,
 //         ]
 //     );
 // });
 
-it('updates notification when updating next_maintenance_date of the asset', function () {
+// it('deletes notification when removing maintenance_manager from existing asset', function () {
+//     $formData = [
+//         ...$this->basicAssetData,
+//         'maintenance_frequency' => 'annual',
+//         'need_maintenance' => true,
+//         'next_maintenance_date' => Carbon::now()->addYear(),
+//         'last_maintenance_date' => Carbon::now()->toDateString(),
+//         'maintenance_manager_id' => $this->manager->id,
+//     ];
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+//     $response = $this->postToTenant('api.assets.store', $formData);
+//     $response->assertSessionHasNoErrors();
+//     $response->assertStatus(200);
 
-    $formData = [
-        ...$this->basicAssetData,
-        'maintenance_manager_id' => $this->manager->id,
-        'maintenance_frequency' => 'annual',
-        'need_maintenance' => true,
-        'next_maintenance_date' => Carbon::now()->addMonth(),
-        'last_maintenance_date' => Carbon::now()->toDateString(),
-    ];
+//     assertDatabaseCount('scheduled_notifications', 2);
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'recipient_name' => $this->manager->fullName,
+//             'recipient_email' => $this->manager->email,
+//             'notification_type' => 'next_maintenance_date',
+//             'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Asset',
+//             'notifiable_id' => 1,
+//         ]
+//     );
 
-    $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+//     $formData = [
+//         ...$this->basicAssetData,
+//         'maintenance_frequency' => 'annual',
+//         'need_maintenance' => true,
+//         'next_maintenance_date' => Carbon::now()->addYear(),
+//         'last_maintenance_date' => Carbon::now()->toDateString(),
+//     ];
 
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'next_maintenance_date',
-            'scheduled_at' => Carbon::now()->addMonth()->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Asset',
-            'notifiable_id' => $asset->id,
-        ]
-    );
+//     $asset = Asset::find(1);
+//     $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
 
-    $newformData = [
-        ...$this->basicAssetData,
-        'maintenance_manager_id' => $this->manager->id,
-        'maintenance_frequency' => 'annual',
-        'need_maintenance' => true,
-        'next_maintenance_date' => Carbon::now()->addYear(),
-        'last_maintenance_date' => Carbon::now()->toDateString(),
-    ];
+//     $response->assertSessionHasNoErrors();
+//     $response->assertStatus(200);
 
-    $asset->refresh();
-    $response = $this->patchToTenant('api.assets.update', $newformData, $asset->reference_code);
-    $response->assertStatus(200);
+//     assertDatabaseCount('scheduled_notifications', 1);
+//     assertDatabaseMissing(
+//         'scheduled_notifications',
+//         [
+//             'recipient_name' => $this->manager->fullName,
+//             'recipient_email' => $this->manager->email,
+//             'notification_type' => 'next_maintenance_date',
+//             'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Asset',
+//             'notifiable_id' => 1,
+//         ]
+//     );
+// });
 
-    $response->assertSessionHasNoErrors();
-    dump($this->admin->email, $this->manager->email);
-    dump(ScheduledNotification::select('id', 'recipient_email', 'notification_type', 'scheduled_at')->get());
-    assertDatabaseCount('scheduled_notifications', 2);
+// it('updates notification when updating next_maintenance_date of the asset', function () {
 
+//     $asset = Asset::factory()->forLocation($this->room)->create();
 
+//     $formData = [
+//         ...$this->basicAssetData,
+//         'maintenance_manager_id' => $this->manager->id,
+//         'maintenance_frequency' => 'annual',
+//         'need_maintenance' => true,
+//         'next_maintenance_date' => Carbon::now()->addMonth(),
+//         'last_maintenance_date' => Carbon::now()->toDateString(),
+//     ];
 
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'next_maintenance_date',
-            'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Asset',
-            'notifiable_id' => $asset->id,
-        ]
-    );
-});
+//     $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'recipient_name' => $this->manager->fullName,
+//             'recipient_email' => $this->manager->email,
+//             'notification_type' => 'next_maintenance_date',
+//             'scheduled_at' => Carbon::now()->addMonth()->subDays(7)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Asset',
+//             'notifiable_id' => $asset->id,
+//         ]
+//     );
+
+//     $newformData = [
+//         ...$this->basicAssetData,
+//         'maintenance_manager_id' => $this->manager->id,
+//         'maintenance_frequency' => 'annual',
+//         'need_maintenance' => true,
+//         'next_maintenance_date' => Carbon::now()->addYear(),
+//         'last_maintenance_date' => Carbon::now()->toDateString(),
+//     ];
+
+//     $asset->refresh();
+//     $response = $this->patchToTenant('api.assets.update', $newformData, $asset->reference_code);
+//     $response->assertStatus(200);
+//     $response->assertSessionHasNoErrors();
+//     assertDatabaseCount('scheduled_notifications', 2);
+
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'recipient_name' => $this->admin->fullName,
+//             'recipient_email' => $this->admin->email,
+//             'notification_type' => 'next_maintenance_date',
+//             'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Asset',
+//             'notifiable_id' => $asset->id,
+//         ]
+//     );
+
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'recipient_name' => $this->manager->fullName,
+//             'recipient_email' => $this->manager->email,
+//             'notification_type' => 'next_maintenance_date',
+//             'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Asset',
+//             'notifiable_id' => $asset->id,
+//         ]
+//     );
+// });

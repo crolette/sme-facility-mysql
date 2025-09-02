@@ -17,19 +17,20 @@ class MaintainableService
 {
     public function createMaintainable(Model $model, $request): Model
     {
+        // dump('VALID REQUEST MAINTAINABLE');
+        // dump($request->validated());
         $model->maintainable()->updateOrCreate(['maintainable_type' => get_class($model), 'maintainable_id' => $model->id], [...$request->validated()]);
         $model->maintainable->providers()->sync(collect($request->validated('providers'))->pluck('id'));
 
-        if ($request->validated('maintenance_manager_id')) {
+        if ($model->maintainable->manager && ($model->maintainable->manager?->id !== $request->validated('maintenance_manager_id'))) {
+            // dump('--- REMOVE maintainable Maintenance Manager ---');
+            app(MaintainableNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($model->maintainable, $model->maintainable->manager);
+            $model->maintainable->manager()->disassociate()->save();
+        }
 
-            if ($model->maintainable->manager && ($model->maintainable->manager?->id !== $request->validated('maintenance_manager_id'))) {
-                app(MaintainableNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($model->maintainable, $model->maintainable->manager);
-                $model->maintainable->manager()->disassociate()->save();
-            }
-
-            if ($model->maintainable->manager === null) {
-                $model->maintainable->manager()->associate($request->validated('maintenance_manager_id'))->save();
-            }
+        if ($model->maintainable->manager === null && $request->validated('maintenance_manager_id')) {
+            // dump('--- CREATE maintainable Maintenance Manager NULL ---');
+            $model->maintainable->manager()->associate($request->validated('maintenance_manager_id'))->save();
         }
 
         return $model;

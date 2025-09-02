@@ -82,8 +82,6 @@ class ContractNotificationSchedulingService
 
     public function updateScheduleForContractEndDate(Contract $contract, ScheduledNotification $notification)
     {
-
-
         $newDate = $contract->end_date->subDays($notification->user->notification_preferences()->where('notification_type', 'end_date')->first()->notification_delay_days);
         $notification->update(['scheduled_at' => $newDate]);
     }
