@@ -18,11 +18,9 @@ class MaintainableNotificationSchedulingService
 
     public function createScheduleForMaintainable(Maintainable $maintainable)
     {
-        // dump('--- CREATE SCHEDULE FOR MAINTAINABLE --');
         $users = User::role('Admin')->get();
 
         if ($maintainable->manager) {
-            // dump('--- MAINTAINABLE MANAGER --- ');
             $this->createScheduleForUser($maintainable, $maintainable->manager);
         }
 
@@ -46,7 +44,8 @@ class MaintainableNotificationSchedulingService
     {
         // 1. il faut rechercher toutes les  scheduled_notifications avec le notification_type et le user_id ET l'asset_type
         // dump('--- UPDATE SCHEDULE OF MAINTAINABLE ---');
-        $maintainable->refresh();
+
+        // $maintainable->refresh();
         $users = User::role('Admin')->get();
 
         if (($maintainable->wasChanged('under_warranty') && $maintainable->under_warranty === true)  || ($maintainable->under_warranty === true && $maintainable->wasChanged('end_warranty_date'))) {
@@ -71,7 +70,8 @@ class MaintainableNotificationSchedulingService
             $this->removeScheduleForEndWarrantyDate($maintainable);
         };
 
-        if (($maintainable->wasChanged('need_maintenance') && $maintainable->need_maintenance === true) || ($maintainable->need_maintenance === true && $maintainable->wasChanged('next_maintenance_date'))) {
+        if ($maintainable->need_maintenance === true || ($maintainable->need_maintenance === true && $maintainable->wasChanged('next_maintenance_date'))) {
+            // if (($maintainable->wasChanged('need_maintenance') && $maintainable->need_maintenance === true) || ($maintainable->need_maintenance === true && $maintainable->wasChanged('next_maintenance_date'))) {
 
             $notifications = $maintainable->maintainable->notifications()->where('notification_type', 'next_maintenance_date')->where('scheduled_at', '>', now())->get();
 
@@ -79,7 +79,6 @@ class MaintainableNotificationSchedulingService
                 $this->updateScheduleForNextMaintenanceDate($maintainable, $notifications);
             } else {
                 if ($maintainable->manager) {
-                    // dump('--- MAINTAINABLE MANAGER ---');
                     $this->createScheduleForNextMaintenanceDate($maintainable, $maintainable->manager);
                 }
 
@@ -89,12 +88,14 @@ class MaintainableNotificationSchedulingService
             }
         };
 
-        if ($maintainable->wasChanged('need_maintenance') && $maintainable->need_maintenance === false) {
+        if ($maintainable->need_maintenance === false) {
+            // if ($maintainable->wasChanged('need_maintenance') && $maintainable->need_maintenance === false) {
             $this->removeScheduleForNextMaintenanceDate($maintainable);
         };
 
         if ($maintainable->wasChanged('maintenance_manager_id') && $maintainable->manager) {
             // dump('--- MAINTENANCE MANAGER CHANGED ---');
+            // dump($maintainable->manager->id);
             // dump($maintainable->getOriginal('maintenance_manager_id'));
             // dump($maintainable->getChanges());
             $this->createScheduleForUser($maintainable, $maintainable->manager);
@@ -134,9 +135,6 @@ class MaintainableNotificationSchedulingService
 
     public function createScheduleForNextMaintenanceDate(Maintainable $maintainable, User $user)
     {
-        // dump('createScheduleForNextMaintenanceDate');
-        // dump('maintainable next_maintenance_date : ' . $maintainable->next_maintenance_date);
-
         $preference = $user->notification_preferences()->where('notification_type', 'next_maintenance_date')->first();
 
         if ($preference && $preference->enabled && $maintainable->next_maintenance_date->subDays($preference->notification_delay_days) > now()) {
@@ -152,7 +150,6 @@ class MaintainableNotificationSchedulingService
 
 
             $delay = $preference->notification_delay_days;
-
             $createdNotification = $maintainable->maintainable->notifications()->updateOrCreate(
                 [
                     'recipient_email' => $user->email,
@@ -174,7 +171,6 @@ class MaintainableNotificationSchedulingService
     public function createScheduleForEndWarrantyDate(Maintainable $maintainable, User $user)
     {
         // dump('createScheduleForEndWarrantyDate');
-        Debugbar::info('createScheduleForEndWarrantyDate');
         // dump('maintainable next_maintenance_date : ' . $maintainable->next_maintenance_date);
 
         $preference = $user->notification_preferences()->where('notification_type', 'end_warranty_date')->first();
