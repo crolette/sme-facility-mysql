@@ -26,19 +26,19 @@ class MaintainableService
 
         $maintainable->providers()->sync(collect($request->validated('providers'))->pluck('id'));
 
+        if ($maintainable->manager === null && $request->validated('maintenance_manager_id')) {
+            $maintainable->manager()->associate($request->validated('maintenance_manager_id'))->save();
+        }
+
         if ($maintainable->manager && ($maintainable->manager?->id !== $request->validated('maintenance_manager_id'))) {
-            // dump('--- REMOVE maintainable Maintenance Manager ---');
             app(MaintainableNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($maintainable, $maintainable->manager);
-            $maintainable->manager()->disassociate()->save();
+            $maintainable->manager()->associate($request->validated('maintenance_manager_id'))->save();
         }
 
         if ($maintainable->wasChanged('maintenance_frequency'))
             $maintainable->next_maintenance_date = calculateNextMaintenanceDate($request->validated('maintenance_frequency'), $request->validated('last_maintenance_date') ?? null);
 
-        if ($maintainable->manager === null && $request->validated('maintenance_manager_id')) {
-            // dump('--- CREATE maintainable Maintenance Manager NULL ---');
-            $maintainable->manager()->associate($request->validated('maintenance_manager_id'))->save();
-        }
+
 
         $maintainable->save();
     }

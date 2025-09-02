@@ -100,6 +100,8 @@ it('creates notification when adding maintenance manager to existing asset witho
     $response->assertSessionHasNoErrors();
     $response->assertStatus(200);
 
+    assertDatabaseCount('scheduled_notifications', 2);
+
     assertDatabaseHas(
         'scheduled_notifications',
         [

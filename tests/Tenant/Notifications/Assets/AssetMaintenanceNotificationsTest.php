@@ -75,6 +75,7 @@ it('creates next maintenance date notification for a new created asset', functio
     $response->assertSessionHasNoErrors();
 
     assertDatabaseCount('scheduled_notifications', 2);
+
     assertDatabaseHas(
         'scheduled_notifications',
         [
