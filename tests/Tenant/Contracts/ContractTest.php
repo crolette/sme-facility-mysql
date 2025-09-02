@@ -27,8 +27,7 @@ use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->user->assignRole('Admin');
+    $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
 
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
@@ -329,9 +328,7 @@ it('can update an existing contract', function () {
             'provider_reference' => 'Provider reference 2025',
             'start_date' => Carbon::now()->toDateString(),
             'contract_duration' => ContractDurationEnum::ONE_YEAR->value,
-            // 'end_date' => Carbon::now()->addYear()->toDateString(),
             'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
-            // 'notice_date' => Carbon::now()->addMonth()->subDays(14)->toDateString(),
             'renewal_type' => ContractRenewalTypesEnum::MANUAL->value,
             'status' => ContractStatusEnum::ACTIVE->value
 

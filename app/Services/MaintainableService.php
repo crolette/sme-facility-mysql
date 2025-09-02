@@ -2,28 +2,44 @@
 
 namespace App\Services;
 
+use App\Enums\MaintenanceFrequency;
+use App\Models\Tenants\Maintainable;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
 
 class MaintainableService
 {
-    public function createMaintainable(Model $model, $request): Model
+    public function create(Model $model, $request)
     {
-        // dump('VALID REQUEST MAINTAINABLE');
-        // dump($request->validated());
-        $model->maintainable()->updateOrCreate(['maintainable_type' => get_class($model), 'maintainable_id' => $model->id], [...$request->validated()]);
-        $model->maintainable->providers()->sync(collect($request->validated('providers'))->pluck('id'));
+        $maintainable = $model->maintainable()->create([...$request->validated()]);
 
-        if ($model->maintainable->manager && ($model->maintainable->manager?->id !== $request->validated('maintenance_manager_id'))) {
+        $maintainable->providers()->sync(collect($request->validated('providers'))->pluck('id'));
+
+        if ($request->validated('maintenance_manager_id')) {
+            $maintainable->manager()->associate($request->validated('maintenance_manager_id'))->save();
+        }
+    }
+
+    public function update(Maintainable $maintainable, $request)
+    {
+        $maintainable->update([...$request->validated()]);
+
+        $maintainable->providers()->sync(collect($request->validated('providers'))->pluck('id'));
+
+        if ($maintainable->manager && ($maintainable->manager?->id !== $request->validated('maintenance_manager_id'))) {
             // dump('--- REMOVE maintainable Maintenance Manager ---');
-            app(MaintainableNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($model->maintainable, $model->maintainable->manager);
-            $model->maintainable->manager()->disassociate()->save();
+            app(MaintainableNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($maintainable, $maintainable->manager);
+            $maintainable->manager()->disassociate()->save();
         }
 
-        if ($model->maintainable->manager === null && $request->validated('maintenance_manager_id')) {
+        if ($maintainable->wasChanged('maintenance_frequency'))
+            $maintainable->next_maintenance_date = calculateNextMaintenanceDate($request->validated('maintenance_frequency'), $request->validated('last_maintenance_date') ?? null);
+
+        if ($maintainable->manager === null && $request->validated('maintenance_manager_id')) {
             // dump('--- CREATE maintainable Maintenance Manager NULL ---');
-            $model->maintainable->manager()->associate($request->validated('maintenance_manager_id'))->save();
+            $maintainable->manager()->associate($request->validated('maintenance_manager_id'))->save();
         }
 
-        return $model;
+        $maintainable->save();
     }
 };

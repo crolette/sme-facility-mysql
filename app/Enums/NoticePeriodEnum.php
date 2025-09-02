@@ -6,7 +6,7 @@ use Carbon\Carbon;
 
 enum NoticePeriodEnum: string
 {
-    case DEFAULT = 'default';
+    case DEFAULT = '7_days';
     case FOURTEEN_DAYS = '14_days';
     case ONE_MONTH = '1_month';
     case THREE_MONTHS = '3_months';
@@ -15,7 +15,7 @@ enum NoticePeriodEnum: string
     public function label(): string
     {
         return match ($this) {
-            self::DEFAULT => 'default',
+            self::DEFAULT => '7 days',
             self::FOURTEEN_DAYS => '14 days',
             self::ONE_MONTH => '1 month',
             self::THREE_MONTHS => '3 months',

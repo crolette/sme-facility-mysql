@@ -2,6 +2,7 @@
 
 namespace App\Models\Tenants;
 
+use App\Enums\MaintenanceFrequency;
 use App\Models\Tenants\Intervention;
 use App\Observers\MaintainableObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -52,6 +53,7 @@ class Maintainable extends Model
             'need_maintenance' => 'boolean',
             'next_maintenance_date' => 'date:Y-m-d',
             'last_maintenance_date' => 'date:Y-m-d',
+            'maintenance_frequecy' => MaintenanceFrequency::class
         ];
     }
 
