@@ -21,8 +21,7 @@ use function Pest\Laravel\assertDatabaseMissing;
 
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->user->assignRole('Admin');
+    $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
 });
 
@@ -37,8 +36,8 @@ it('can render the index buildings page', function () {
     $response->assertInertia(
         fn($page) =>
         $page->component('tenants/locations/index')
-            ->has('locations', 3)
-            ->has('locations.0.maintainable')
+            ->has('items', 3)
+            ->has('items.0.maintainable')
     );
 });
 

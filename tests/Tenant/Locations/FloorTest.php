@@ -22,8 +22,7 @@ use function Pest\Laravel\assertDatabaseMissing;
 
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->user->assignRole('Admin');
+    $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
     $this->buildingType = LocationType::factory()->create(['level' => 'building']);
@@ -41,8 +40,8 @@ it('can render the index floors page', function () {
     $response->assertInertia(
         fn($page) =>
         $page->component('tenants/locations/index')
-            ->has('locations', 3)
-            ->has('locations.0.maintainable')
+            ->has('items', 3)
+            ->has('items.0.maintainable')
     );
 });
 
@@ -332,7 +331,12 @@ it('cannot update a floor type of an existing floor', function () {
 
     $response = $this->patchToTenant('api.floors.update', $formData, $floor);
     $response->assertStatus(400)
-        ->assertJson(['status' => 'error']);
+        ->assertJson(['status' => 'error'])
+        ->assertJson(['message' => 'You cannot change the type of a location']);
+
+    // $response->assertSessionHasErrors([
+    //     'locationType' => 'You cannot change the type of a location',
+    // ]);
 });
 
 it('can delete a floor and his maintainable', function () {

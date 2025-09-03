@@ -38,6 +38,8 @@ class RoomFactory extends Factory
             'surface_walls' => fake()->numberBetween(100, 3000),
             'reference_code' => $code,
             'code' => $codeNumber,
+            'location_type_id' => $locationType->id,
+            'level_id' => $level->id
         ];
     }
 

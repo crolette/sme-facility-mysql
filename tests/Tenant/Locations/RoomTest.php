@@ -21,9 +21,10 @@ use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
 use function PHPUnit\Framework\assertCount;
+use function PHPUnit\Framework\assertNull;
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
+    $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
     LocationType::factory()->count(1)->create(['level' => 'site']);
     LocationType::factory()->count(1)->create(['level' => 'building']);
@@ -36,7 +37,7 @@ beforeEach(function () {
 });
 
 
-it('can render the index floors page', function () {
+it('can render the index rooms page', function () {
     $room = Room::factory()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
@@ -53,14 +54,14 @@ it('can render the index floors page', function () {
     $response->assertInertia(
         fn($page) =>
         $page->component('tenants/locations/index')
-            ->has('locations', 2)
-            ->has('locations.0.maintainable')
-            ->where('locations.0.floor.id', $room->floor->id)
+            ->has('items', 2)
+            ->has('items.0.maintainable')
+            ->where('items.0.floor.id', $room->floor->id)
     );
 });
 
 
-it('can render the create floor page', function () {
+it('can render the create room page', function () {
     LocationType::factory()->create(['level' => 'room']);
     Floor::factory()->count(3)->create();
 
@@ -180,7 +181,7 @@ it('can attach a provider to a building\'s maintainable', function () {
         'description' => 'Description new room',
         'levelType' => $this->floor->id,
         'locationType' => $location->id,
-        'providers' => [$provider->id]
+        'providers' => [['id' => $provider->id]]
     ];
 
     $response = $this->postToTenant('api.rooms.store', $formData);
@@ -247,17 +248,17 @@ it('can render the show room page', function () {
 
     $response->assertInertia(
         fn($page) => $page->component('tenants/locations/show')
-            ->has('location')
-            ->where('location.location_type.level', $room->locationType->level)
-            ->where('location.maintainable.description', $room->maintainable->description)
-            ->where('location.code', $room->code)
-            ->where('location.reference_code', $room->reference_code)
-            ->where('location.location_type.level', 'room')
+            ->has('item')
+            ->where('item.location_type.level', $room->locationType->level)
+            ->where('item.maintainable.description', $room->maintainable->description)
+            ->where('item.code', $room->code)
+            ->where('item.reference_code', $room->reference_code)
+            ->where('item.location_type.level', 'room')
     );
 });
 
 
-it('can render the update floor page', function () {
+it('can render the update room page', function () {
     LocationType::factory()->count(2)->create(['level' => 'room']);
     Floor::factory()->count(2)->create();
     $room = Room::factory()
@@ -349,12 +350,14 @@ it('cannot update a room type of an existing room', function () {
         'locationType' => 5
     ];
 
-    $response = $this->patchToTenant('api.rooms.update', $formData, $room);
+    $response = $this->patchToTenant('api.rooms.update', $formData, $room->reference_code);
     $response->assertStatus(400)
-        ->assertJson(['status' => 'error']);
-    $response->assertSessionHasErrors([
-        'locationType' => 'You cannot change the type of a location',
-    ]);
+        ->assertJson(['status' => 'error'])
+        ->assertJson(['message' => 'You cannot change the type of a location']);
+
+    // $response->assertSessionHasErrors([
+    //     'locationType' => 'You cannot change the type of a location',
+    // ]);
 });
 
 

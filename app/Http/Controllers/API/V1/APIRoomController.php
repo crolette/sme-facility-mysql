@@ -66,7 +66,7 @@ class APIRoomController extends Controller
 
             $room->save();
 
-            $room = $this->maintainableService->createMaintainable($room, $maintainableRequest);
+            $this->maintainableService->create($room, $maintainableRequest);
             if ($contractRequest->validated('contracts'))
                 $this->contractService->createWithModel($room, $contractRequest->validated('contracts'));
 
@@ -101,14 +101,14 @@ class APIRoomController extends Controller
             $errors = new MessageBag([
                 'locationType' => ['You cannot change the type of a location'],
             ]);
-            return back()->withErrors($errors)->withInput()->with(['message' => 'Error !', 'type' => 'error']);
+            return ApiResponse::error('You cannot change the type of a location', $errors);
         }
 
         if ($roomRequest->validated('levelType') !== $room->floor->id) {
             $errors = new MessageBag([
-                'levelType' => ['You cannot change the type of a location'],
+                'levelType' => ['You cannot change the level type of a location'],
             ]);
-            return back()->withErrors($errors)->withInput()->with(['message' => 'Error !', 'type' => 'error']);
+            return ApiResponse::error('You cannot change the level type of a location', $errors);
         }
 
         try {
@@ -123,7 +123,7 @@ class APIRoomController extends Controller
                 'wall_material_other'  => $roomRequest->validated('wall_material_other'),
             ]);
 
-            $room = $this->maintainableService->createMaintainable($room, $maintainableRequest);
+            $this->maintainableService->update($room->maintainable, $maintainableRequest);
 
             DB::commit();
             return ApiResponse::success('', 'Room updated');

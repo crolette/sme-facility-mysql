@@ -23,8 +23,7 @@ use function PHPUnit\Framework\assertCount;
 
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->user->assignRole('Admin');
+    $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
 });
@@ -39,7 +38,7 @@ it('can render the index sites page', function () {
     $response->assertInertia(
         fn($page) =>
         $page->component('tenants/locations/index')
-            ->has('locations', 3)
+            ->has('items', 3)
     );
 });
 

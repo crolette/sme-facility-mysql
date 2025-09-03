@@ -43,9 +43,7 @@ class MaintainableNotificationSchedulingService
     public function updateScheduleOfMaintainable(Maintainable $maintainable)
     {
         // 1. il faut rechercher toutes les  scheduled_notifications avec le notification_type et le user_id ET l'asset_type
-        dump('--- UPDATE SCHEDULE OF MAINTAINABLE ---');
-
-        dump($maintainable->maintainable);
+        // dump('--- UPDATE SCHEDULE OF MAINTAINABLE ---');
 
         // $maintainable->refresh();
         $users = User::role('Admin')->get();
@@ -101,6 +99,13 @@ class MaintainableNotificationSchedulingService
             // dump($maintainable->getOriginal('maintenance_manager_id'));
             // dump($maintainable->getChanges());
             $this->createScheduleForUser($maintainable, $maintainable->manager);
+
+            // add notifications to the manager for the interventions linked to the maintainable
+            $interventions = $maintainable->maintainable->interventions;
+            if (count($interventions) > 0)
+                foreach ($interventions as $intervention) {
+                    app(InterventionNotificationSchedulingService::class)->scheduleForIntervention($intervention, $maintainable->manager);
+                }
         }
     }
 
