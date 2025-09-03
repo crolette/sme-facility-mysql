@@ -30,10 +30,10 @@ class InterventionController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function edit(Intervention $intervention)
-    {
-        return Inertia::render('tenants/tickets/interventions/create', ['ticket' => $ticket]);
-    }
+    // public function edit(Intervention $intervention)
+    // {
+    //     return Inertia::render('tenants/tickets/interventions/create', ['ticket' => $ticket]);
+    // }
 
 
     /**

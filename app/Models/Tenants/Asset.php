@@ -156,6 +156,13 @@ class Asset extends Model
         );
     }
 
+    public function manager(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->maintainable->manager
+        );
+    }
+
     public function description(): Attribute
     {
         return Attribute::make(

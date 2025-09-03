@@ -9,6 +9,7 @@ use App\Models\Tenants\Contract;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Models\Tenants\ScheduledNotification;
 use App\Enums\ScheduledNotificationStatusEnum;
+use App\Models\Tenants\Intervention;
 use App\Models\Tenants\UserNotificationPreference;
 
 class NotificationSchedulingService
@@ -26,11 +27,8 @@ class NotificationSchedulingService
                 'end_warranty_date' => $this->updateScheduleForEndWarrantyDate($preference),
                 'depreciation_end_date' => $this->updateScheduleForDepreciationEndDate($preference),
                 'next_maintenance_date' => $this->updateScheduleForNextMaintenanceDate($preference),
+                'planned_at' => $this->updateScheduleForPlannedAtDate($preference),
                 default => null
-                // 'site'  => Site::findOrFail($locationId),
-                // 'building' => Building::findOrFail($locationId),
-                // 'floor' => Floor::findOrFail($locationId),
-                // 'room' => Room::findOrFail($locationId),
             };
         };
 
@@ -46,23 +44,10 @@ class NotificationSchedulingService
                 'end_warranty_date' => $this->createScheduleForWarrantyEndDate($preference),
                 'depreciation_end_date' => $this->createScheduleForDepreciationEndDate($preference),
                 'next_maintenance_date' => $this->createScheduleForNextMaintenanceDate($preference),
+                'planned_at' => $this->createScheduleForPlannedAtDate($preference),
                 default => null
-                // 'site'  => Site::findOrFail($locationId),
-                // 'building' => Building::findOrFail($locationId),
-                // 'floor' => Floor::findOrFail($locationId),
-                // 'room' => Room::findOrFail($locationId),
             };
         }
-
-
-
-        // dump($scheduledNotifications);
-        // asset_type : asset, location, contract, intervention
-        // 2. Mettre à jour la date scheduled_at de chaque scheduled_notification en prenant en compte le nouveau notification_delay_days
-
-
-
-        Debugbar::info('updateScheduleOfUserForNotificationType', $preference);
     }
 
     public function updateScheduleForNextMaintenanceDate(UserNotificationPreference $preference)
@@ -120,6 +105,16 @@ class NotificationSchedulingService
         }
     }
 
+    public function updateScheduleForPlannedAtDate(UserNotificationPreference $preference)
+    {
+        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
+
+        foreach ($scheduledNotifications as $notification) {
+            $newDate = $notification->notifiable->planned_at->subDays($preference->notification_delay_days);
+            $notification->update(['scheduled_at' => $newDate]);
+        }
+    }
+
 
     public function deleteScheduledNotificationForNotificationType(UserNotificationPreference $preference)
     {
@@ -127,6 +122,35 @@ class NotificationSchedulingService
 
         foreach ($scheduledNotifications as $notification) {
             $notification->delete();
+        }
+    }
+
+    public function createScheduleForPlannedAtDate(UserNotificationPreference $preference)
+    {
+        $delayDays = $preference->notification_delay_days;
+        $interventions = Intervention::where('planned_at', '>', Carbon::now()->addDays($delayDays))->get();
+
+        $user = $preference->user;
+
+        foreach ($interventions as $intervention) {
+            $notification = [
+                'status' => ScheduledNotificationStatusEnum::PENDING->value,
+                'data' => [
+                    'subject' => 'test',
+                    'notice_date' => $intervention->planned_at
+                ]
+            ];
+
+            $createdNotification = $intervention->notifications()->create([
+                ...$notification,
+                'scheduled_at' => $intervention->planned_at->subDays($delayDays),
+                'notification_type' => 'planned_at',
+                'recipient_name' => $user->fullName,
+                'recipient_email' => $user->email,
+            ]);
+
+            $createdNotification->user()->associate($user);
+            $createdNotification->save();
         }
     }
 
