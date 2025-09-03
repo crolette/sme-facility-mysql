@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\InterventionStatus;
 use Carbon\Carbon;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Contract;
@@ -17,9 +18,7 @@ class InterventionNotificationSchedulingService
     {
         $notificationTypes = collect(config('notifications.notification_types.intervention'));
 
-        if ($intervention->planned_at) {
-            // dump('--- Intervention is planned ---');
-
+        if ($intervention->planned_at && in_array($intervention->status, [InterventionStatus::PLANNED, InterventionStatus::IN_PROGRESS, InterventionStatus::WAITING_PARTS])) {
             if ($intervention->interventionable->manager) {
                 $this->createScheduleForPlannedAtDate($intervention, $intervention->interventionable->manager);
             }
@@ -29,14 +28,6 @@ class InterventionNotificationSchedulingService
                 $this->createScheduleForPlannedAtDate($intervention, $user);
             }
         }
-
-
-
-
-        // foreach ($notificationTypes as $notificationType) {
-
-
-        // }
     }
 
     public function updateScheduleForIntervention(Intervention $intervention)
@@ -51,6 +42,12 @@ class InterventionNotificationSchedulingService
 
             foreach ($notifications as $notification) {
                 $this->updateScheduleForPlannedAtDate($intervention, $notification);
+            }
+        }
+
+        if ($intervention->wasChanged('status')) {
+            if ($intervention->status === InterventionStatus::CANCELLED || $intervention->status === InterventionStatus::COMPLETED) {
+                $this->removeScheduleForPlannedAtDate($intervention);
             }
         }
     }
@@ -108,6 +105,16 @@ class InterventionNotificationSchedulingService
             foreach ($notifications as $notification) {
                 // dump('--- DELETE NOTIF ---');
                 // dump($notification->id);
+                $notification->delete();
+            }
+    }
+
+    public function removeNotificationsForOldMaintenanceManager(Intervention $intervention, User $user)
+    {
+        $notifications = $intervention->notifications()->where('user_id', $user->id)->get();
+
+        if (count($notifications) > 0)
+            foreach ($notifications as $notification) {
                 $notification->delete();
             }
     }

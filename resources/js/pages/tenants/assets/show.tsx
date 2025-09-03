@@ -116,24 +116,26 @@ export default function ShowAsset({ item }: { item: Asset }) {
                     </div>
                 </div>
 
-                {asset.maintainable.need_maintenance && (
-                    <div className="rounded-md border border-gray-200 p-4">
-                        <h2>Maintenance</h2>
-                        <div>
-                            <p>
-                                Maintenance manager:
-                                {asset.maintainable.manager ? (
-                                    <a href={route('tenant.users.show', asset.maintainable.manager.id)}> {asset.maintainable.manager.full_name}</a>
-                                ) : (
-                                    'No manager'
-                                )}
-                            </p>
-                            <p>Maintenance frequency : {asset.maintainable.maintenance_frequency}</p>
-                            <p>Next maintenance date : {asset.maintainable.next_maintenance_date}</p>
-                            <p>Last maintenance date : {asset.maintainable.last_maintenance_date}</p>
-                        </div>
+                <div className="rounded-md border border-gray-200 p-4">
+                    <h2>Maintenance</h2>
+                    <div>
+                        <p>
+                            Maintenance manager:
+                            {asset.maintainable.manager ? (
+                                <a href={route('tenant.users.show', asset.maintainable.manager.id)}> {asset.maintainable.manager.full_name}</a>
+                            ) : (
+                                'No manager'
+                            )}
+                        </p>
+                        {asset.maintainable.need_maintenance && (
+                            <>
+                                <p>Maintenance frequency : {asset.maintainable.maintenance_frequency}</p>
+                                <p>Next maintenance date : {asset.maintainable.next_maintenance_date}</p>
+                                <p>Last maintenance date : {asset.maintainable.last_maintenance_date}</p>
+                            </>
+                        )}
                     </div>
-                )}
+                </div>
 
                 <div className="rounded-md border border-gray-200 p-4">
                     <h2>Asset information</h2>

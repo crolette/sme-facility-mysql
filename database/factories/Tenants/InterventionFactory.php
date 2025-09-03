@@ -27,7 +27,7 @@ class InterventionFactory extends Factory
         return [
             'intervention_type_id' => $category->id,
             'priority' => 'medium',
-            'status' => 'draft',
+            'status' => 'planned',
             'planned_at' => Carbon::now()->addMonth(),
             'description' => fake()->paragraph(),
             'repair_delay' => Carbon::now()->addMonth(),

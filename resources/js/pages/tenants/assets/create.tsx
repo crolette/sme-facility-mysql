@@ -194,6 +194,7 @@ export default function CreateAsset({
         if (asset) {
             try {
                 const response = await axios.patch(route(`api.assets.update`, asset.reference_code), data);
+
                 if (response.data.status === 'success') {
                     router.visit(route(`tenant.assets.show`, response.data.data.reference_code), {
                         preserveScroll: false,
@@ -812,14 +813,18 @@ export default function CreateAsset({
                     <div>
                         <label className="mb-2 block text-sm font-medium">Maintenance manager</label>
                         <SearchableInput<User>
-                            searchUrl={route('api.users.search')}
-                            searchParams={{ interns: 1 }}
+                            searchUrl={route('api.users.maintenance')}
+                            // searchParams={{ interns: 1 }}
                             displayValue={data.maintenance_manager_name}
                             getDisplayText={(user) => user.full_name}
                             getKey={(user) => user.id}
                             onSelect={(user) => {
                                 setData('maintenance_manager_id', user.id);
                                 setData('maintenance_manager_name', user.full_name);
+                            }}
+                            onDelete={() => {
+                                setData('maintenance_manager_id', null);
+                                setData('maintenance_manager_name', null);
                             }}
                             placeholder="Search maintenance manager..."
                             className="mb-4"
