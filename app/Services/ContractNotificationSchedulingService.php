@@ -95,16 +95,6 @@ class ContractNotificationSchedulingService
             $notification->update(['scheduled_at' => $newDate]);
     }
 
-
-    public function deleteScheduledNotificationForNotificationType(UserNotificationPreference $preference)
-    {
-        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
-
-        foreach ($scheduledNotifications as $notification) {
-            $notification->delete();
-        }
-    }
-
     public function createScheduleForContractNoticeDate(UserNotificationPreference $preference)
     {
         $delayDays = $preference->notification_delay_days;

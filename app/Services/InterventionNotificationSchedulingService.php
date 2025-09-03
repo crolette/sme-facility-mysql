@@ -18,7 +18,7 @@ class InterventionNotificationSchedulingService
         $notificationTypes = collect(config('notifications.notification_types.intervention'));
 
         if ($intervention->planned_at) {
-            dump('--- Intervention is planned ---');
+            // dump('--- Intervention is planned ---');
 
             if ($intervention->interventionable->manager) {
                 $this->createScheduleForPlannedAtDate($intervention, $intervention->interventionable->manager);
@@ -46,7 +46,9 @@ class InterventionNotificationSchedulingService
         // 3. boucler sur chaque user et actualiser avec les préférences
 
         if ($intervention->wasChanged('planned_at')) {
+
             $notifications = $intervention->notifications()->where('notification_type', 'planned_at')->get();
+
             foreach ($notifications as $notification) {
                 $this->updateScheduleForPlannedAtDate($intervention, $notification);
             }
@@ -56,9 +58,8 @@ class InterventionNotificationSchedulingService
     public function createScheduleForPlannedAtDate(Intervention $intervention, User $user)
     {
         $preference = $user->notification_preferences()->where('notification_type', 'planned_at')->first();
-        $delay = $preference->notification_delay_days;
 
-        if ($preference && $preference->enabled && $intervention->planned_at->subDays($delay) > now()) {
+        if ($preference && $preference->enabled && $intervention->planned_at->subDays($preference->notification_delay_days) > now()) {
 
             $notification = [
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
@@ -75,7 +76,7 @@ class InterventionNotificationSchedulingService
                 ],
                 [
                     ...$notification,
-                    'scheduled_at' => $intervention->planned_at->subDays($delay),
+                    'scheduled_at' => $intervention->planned_at->subDays($preference->notification_delay_days),
                     'notification_type' => 'planned_at',
                     'recipient_name' => $user->fullName,
                     'recipient_email' => $user->email,
@@ -98,7 +99,7 @@ class InterventionNotificationSchedulingService
             $notification->update(['scheduled_at' => $newDate]);
     }
 
-    public function removeScheduleForPlanned(Intervention $intervention)
+    public function removeScheduleForPlannedAtDate(Intervention $intervention)
     {
         // dump('--- removeScheduleForEndWarrantyDate ---');
         $notifications = $intervention->notifications()->where('notification_type', 'planned_at')->where('scheduled_at', '>', now())->get();

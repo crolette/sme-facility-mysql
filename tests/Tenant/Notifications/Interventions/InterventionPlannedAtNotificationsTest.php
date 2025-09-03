@@ -174,45 +174,72 @@ it('does not create a planned_at notification when planned_at is not defined for
     );
 });
 
-// it('updates notification when planned_at changes for an intervention', function(
-// $formData = [
-//     'intervention_type_id' => $this->interventionType->id,
-//     'priority' => 'medium',
-//     'status' => 'planned',
-//     'planned_at' => Carbon::now()->addWeeks(2),
-//     'description' => fake()->paragraph(),
-//     'repair_delay' => Carbon::now()->addMonth(1),
-//     'locationId' => $this->asset->reference_code,
-//     'locationType' => 'asset'
-// ];
+it(
+    'updates notification when planned_at changes for an intervention',
+    function () {
 
-// $intervention = Intervention::first();
+        Intervention::factory()->forLocation($this->asset)->create();
 
-// $response = $this->patchToTenant('api.interventions.update', $formData, $intervention->id);
-// $response->assertStatus(200)
-//     ->assertJson([
-//         'status' => 'success',
-//     ]);
+        assertDatabaseHas(
+            'scheduled_notifications',
+            [
+                'user_id' => $this->admin->id,
+                'recipient_name' => $this->admin->fullName,
+                'recipient_email' => $this->admin->email,
+                'notification_type' => 'planned_at',
+                'scheduled_at' => Carbon::now()->addMonth()->subDays(7)->toDateString(),
+                'notifiable_type' => 'App\Models\Tenants\Intervention',
+                'notifiable_id' => 1,
+            ]
+        );
 
-// assertDatabaseCount('scheduled_notifications', 1);
+        $formData = [
+            'intervention_type_id' => $this->interventionType->id,
+            'priority' => 'medium',
+            'status' => 'planned',
+            'planned_at' => Carbon::now()->addWeeks(2),
+            'description' => fake()->paragraph(),
+            'repair_delay' => Carbon::now()->addMonth(1),
+            'locationId' => $this->asset->reference_code,
+            'locationType' => 'asset'
+        ];
 
-// assertDatabaseHas(
-//     'scheduled_notifications',
-//     [
-//         'user_id' => $this->admin->id,
-//         'recipient_name' => $this->admin->fullName,
-//         'recipient_email' => $this->admin->email,
-//         'notification_type' => 'planned_at',
-//         'scheduled_at' => Carbon::now()->addWeeks(2)->subDays(7)->toDateString(),
-//         'notifiable_type' => 'App\Models\Tenants\Intervention',
-//         'notifiable_id' => 1,
-//     ]
-// );
-// ) {
+        $intervention = Intervention::first();
 
-// });
+        $response = $this->patchToTenant('api.interventions.update', $formData, $intervention->id);
+        $response->assertStatus(200)
+            ->assertJson([
+                'status' => 'success',
+            ]);
 
-// it('deletes notification when intervention is deleted', function () {});
+        assertDatabaseCount('scheduled_notifications', 1);
+
+        assertDatabaseHas(
+            'scheduled_notifications',
+            [
+                'user_id' => $this->admin->id,
+                'recipient_name' => $this->admin->fullName,
+                'recipient_email' => $this->admin->email,
+                'notification_type' => 'planned_at',
+                'scheduled_at' => Carbon::now()->addWeeks(2)->subDays(7)->toDateString(),
+                'notifiable_type' => 'App\Models\Tenants\Intervention',
+                'notifiable_id' => 1,
+            ]
+        );
+    }
+);
+
+it('deletes notification when intervention is deleted', function () {
+
+    Intervention::factory()->forLocation($this->asset)->create();
+    assertDatabaseCount('scheduled_notifications', 1);
+
+    $intervention = Intervention::first();
+
+    $response = $this->deleteFromTenant('api.interventions.destroy', $intervention->id);
+    $response->assertStatus(200);
+    assertDatabaseCount('scheduled_notifications', 0);
+});
 
 it('deletes notifcation when user_preference planned_at is disabled', function () {
     Intervention::factory()->forLocation($this->asset)->create();
@@ -240,7 +267,7 @@ it('deletes notifcation when user_preference planned_at is disabled', function (
     );
 });
 
-it('creates notification when user_prefrence planned_at is enabled', function () {
+it('creates notification when user_preference planned_at is enabled', function () {
 
     Intervention::factory()->forLocation($this->asset)->create();
 
@@ -346,3 +373,11 @@ it('updates notification when user_preference notification_delay_days for planne
         ]
     );
 });
+
+// it('adds notification when maintenance_manager is added to an ASSET', function() {
+
+// });
+
+// it('removes notification when maintenance_manager is removed from an ASSET', function() {
+
+// });
