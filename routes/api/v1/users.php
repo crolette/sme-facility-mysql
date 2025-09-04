@@ -28,7 +28,6 @@ Route::middleware([
             });
         }
 
-
         if ($request->query('interns') === '1')
             $query->whereDoesntHave('provider');
 
@@ -36,6 +35,20 @@ Route::middleware([
 
         return ApiResponse::success($query->get());
     })->name('api.users.search');
+
+    Route::get('/maintenance', function (Request $request) {
+        $query  = User::role(['Admin', 'Maintenance Manager'])->select('id', 'first_name', 'last_name');
+
+        $query->whereDoesntHave('provider');
+
+        if ($request->query('q')) {
+            $query->where(function ($subquery) use ($request) {
+                $subquery->where('first_name', 'like', '%' . $request->query('q') . '%');
+            });
+        }
+
+        return ApiResponse::success($query->get());
+    })->name('api.users.maintenance');
 
     Route::get('/notifications', function () {
 

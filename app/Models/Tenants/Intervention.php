@@ -7,15 +7,20 @@ use App\Models\Tenants\Ticket;
 use App\Enums\InterventionStatus;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
+use App\Observers\InterventionObserver;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use App\Models\Tenants\ScheduledNotification;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
+#[ObservedBy([InterventionObserver::class])]
 class Intervention extends Model
 {
     use HasFactory;
@@ -55,6 +60,10 @@ class Intervention extends Model
         static::created(function ($intervention) {
             $intervention->ticket?->changeStatusToOngoing();
         });
+
+        static::deleted(function ($intervention) {
+            $intervention->notifications()->delete();
+        });
     }
 
     public function actions(): HasMany
@@ -71,6 +80,12 @@ class Intervention extends Model
     {
         return $this->belongsTo(Maintainable::class);
     }
+
+    public function notifications(): MorphMany
+    {
+        return $this->morphMany(ScheduledNotification::class, 'notifiable');
+    }
+
 
     // Asset, Site, Building, Floor, Room
     public function interventionable(): MorphTo

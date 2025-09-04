@@ -61,7 +61,7 @@ class APIFloorController extends Controller
             $floor->building()->associate($building);
             $floor->save();
 
-            $floor = $this->maintainableService->createMaintainable($floor, $maintainableRequest);
+            $this->maintainableService->create($floor, $maintainableRequest);
 
             if ($contractRequest->validated('contracts'))
                 $this->contractService->createWithModel($floor, $contractRequest->validated('contracts'));
@@ -120,7 +120,7 @@ class APIFloorController extends Controller
                 'wall_material_other'  => $floorRequest->validated('wall_material_other'),
             ]);
 
-            $floor = $this->maintainableService->createMaintainable($floor, $maintainableRequest);
+            $this->maintainableService->update($floor->maintainable, $maintainableRequest);
 
             DB::commit();
             return ApiResponse::success('', 'Site updated');

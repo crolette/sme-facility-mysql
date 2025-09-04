@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { XIcon } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { Input } from './ui/input';
 
@@ -18,6 +19,7 @@ interface BaseSearchableSelectProps<T> {
 interface SingleSelectProps<T> extends BaseSearchableSelectProps<T> {
     multiple?: false;
     onSelect: (item: T) => void;
+    onDelete: () => void;
     displayValue?: string;
 }
 
@@ -56,6 +58,7 @@ function SearchableSelect<T>(props: SearchableSelectProps<T>) {
         searchUrl,
         searchParams,
         onSelect,
+        onDelete,
         getDisplayText,
         getKey,
         placeholder = 'Rechercher...',
@@ -181,6 +184,8 @@ function SearchableSelect<T>(props: SearchableSelectProps<T>) {
                 className="w-full rounded border border-gray-300 p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 autoComplete="off"
             />
+
+            {!multiple && displayValue && <XIcon onClick={onDelete} className="absolute top-1.5 right-2" />}
 
             {/* Affichage des chips en mode multiple */}
             {multiple && selectedItems.length > 0 && (

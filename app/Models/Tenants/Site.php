@@ -70,6 +70,8 @@ class Site extends Model
                 $building->delete();
             }
             $site->maintainable()->delete();
+
+            $site->notifications()->delete();
         });
     }
 
@@ -118,6 +120,11 @@ class Site extends Model
         return $this->morphMany(Picture::class, 'imageable');
     }
 
+    public function notifications(): MorphMany
+    {
+        return $this->morphMany(ScheduledNotification::class, 'notifiable');
+    }
+
     public function interventions(): MorphMany
     {
         return $this->morphMany(Intervention::class, 'interventionable');
@@ -155,9 +162,6 @@ class Site extends Model
         );
     }
 
-
-
-
     public function name(): Attribute
     {
         return Attribute::make(
@@ -169,6 +173,13 @@ class Site extends Model
     {
         return Attribute::make(
             get: fn() => $this->maintainable->description
+        );
+    }
+
+    public function manager(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->maintainable->manager
         );
     }
 }

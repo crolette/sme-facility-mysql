@@ -99,6 +99,13 @@ class MaintainableNotificationSchedulingService
             // dump($maintainable->getOriginal('maintenance_manager_id'));
             // dump($maintainable->getChanges());
             $this->createScheduleForUser($maintainable, $maintainable->manager);
+
+            // add notifications to the manager for the interventions linked to the maintainable
+            $interventions = $maintainable->maintainable->interventions;
+            if (count($interventions) > 0)
+                foreach ($interventions as $intervention) {
+                    app(InterventionNotificationSchedulingService::class)->scheduleForIntervention($intervention, $maintainable->manager);
+                }
         }
     }
 
@@ -238,13 +245,23 @@ class MaintainableNotificationSchedulingService
 
     public function removeNotificationsForOldMaintenanceManager(Maintainable $maintainable, User $user)
     {
-        // dump('--- removeNotificationsForOldMaintenanceManager ---');
+        // only remove notification if the user has the maintenance manager role
+        if ($user->hasAnyRole('Admin'))
+            return;
+
+
         $notifications = $maintainable->maintainable->notifications()->where('user_id', $user->id)->get();
         // dump($notifications);
 
         if (count($notifications) > 0)
             foreach ($notifications as $notification) {
                 $notification->delete();
+            }
+
+        $interventions = $maintainable->maintainable->interventions;
+        if (count($interventions) > 0)
+            foreach ($interventions as $intervention) {
+                app(InterventionNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($intervention, $user);
             }
     }
 }

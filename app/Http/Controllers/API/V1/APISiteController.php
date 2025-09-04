@@ -55,7 +55,7 @@ class APISiteController extends Controller
                 'address' => $siteRequest->validated('address')
             ]);
 
-            $site = $this->maintainableService->createMaintainable($site, $maintainableRequest);
+            $this->maintainableService->create($site, $maintainableRequest);
 
             $files = $documentUploadRequest->validated('files');
             if ($files) {
@@ -108,7 +108,7 @@ class APISiteController extends Controller
                 'address' => $siteRequest->validated('address')
             ]);
 
-            $site = $this->maintainableService->createMaintainable($site, $maintainableRequest);
+            $this->maintainableService->update($site->maintainable, $maintainableRequest);
 
             DB::commit();
             return ApiResponse::success('', 'Site updated');

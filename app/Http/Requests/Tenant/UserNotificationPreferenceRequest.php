@@ -43,7 +43,7 @@ class UserNotificationPreferenceRequest extends FormRequest
                 'required',
                 Rule::in(config("notifications.notification_types.{$this->asset_type}", []))
             ],
-            'notification_delay_days' => [],
+            'notification_delay_days' => 'nullable|integer|min:1',
             'enabled' => 'required|boolean'
         ];
     }

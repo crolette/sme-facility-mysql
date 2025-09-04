@@ -21,6 +21,8 @@ use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
 
 beforeEach(function () {
+    $this->user = User::factory()->withRole('Admin')->create();
+    $this->actingAs($this->user, 'tenant');
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
@@ -38,13 +40,13 @@ beforeEach(function () {
         ->create();
 
     $this->asset =  Asset::factory()->forLocation($this->room)->create();
-    $this->user = User::factory()->create();
-    $this->actingAs($this->user, 'tenant');
+
     $this->ticket = Ticket::factory()->forLocation($this->asset)->create();
     $this->intervention = Intervention::factory()->create();
 });
 
 it('can, has an anonymous, create a new action to an intervention', function () {
+    // TODO  check the it is as anonymous user
 
     $formData = [
         'action_type_id' => $this->interventionActionType->id,

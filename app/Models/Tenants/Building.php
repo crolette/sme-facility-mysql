@@ -78,6 +78,7 @@ class Building extends Model
                 }
             }
             $building->maintainable()->delete();
+            $building->notifications()->delete();
         });
     }
 
@@ -106,6 +107,7 @@ class Building extends Model
     {
         return $this->morphOne(Maintainable::class, 'maintainable');
     }
+
 
     public function contracts(): MorphToMany
     {
@@ -141,6 +143,12 @@ class Building extends Model
     {
         return $this->morphMany(Ticket::class, 'ticketable');
     }
+
+    public function notifications(): MorphMany
+    {
+        return $this->morphMany(ScheduledNotification::class, 'notifiable');
+    }
+
 
     public function interventions(): MorphMany
     {
@@ -194,6 +202,14 @@ class Building extends Model
     {
         return Attribute::make(
             get: fn() => $this->maintainable->description
+        );
+    }
+
+
+    public function manager(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->maintainable->manager
         );
     }
 }
