@@ -13,6 +13,7 @@ use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use App\Http\Controllers\Controller;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Tenant\DocumentUpdateRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 
@@ -25,6 +26,10 @@ class DestroyDocumentController extends Controller
             return ApiResponse::error('Document not found', [], 404);
 
         try {
+
+            Storage::disk('tenants')->delete($document->path);
+            if (count(Storage::disk('tenants')->files($document->directory)) === 0)
+                Storage::disk('tenants')->deleteDirectory($document->directory);
 
             $document->delete();
 

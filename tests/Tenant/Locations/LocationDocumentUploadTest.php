@@ -207,3 +207,7 @@ it('can update name and description a document from an asset ', function () {
         'category_type_id' => $categoryType->id
     ]);
 });
+
+// it('deletes the documents directory if it is empty', function() {
+
+// });

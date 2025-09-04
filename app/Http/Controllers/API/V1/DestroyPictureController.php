@@ -14,6 +14,7 @@ use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use App\Http\Controllers\Controller;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Tenant\DocumentUpdateRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 
@@ -27,7 +28,12 @@ class DestroyPictureController extends Controller
 
         try {
 
+            Storage::disk('tenants')->delete($picture->path);
+            if (count(Storage::disk('tenants')->files($picture->directory)) === 0)
+                Storage::disk('tenants')->deleteDirectory($picture->directory);
+
             $picture->delete();
+
 
             return ApiResponse::success(null, 'Picture deleted');
         } catch (Exception $e) {
