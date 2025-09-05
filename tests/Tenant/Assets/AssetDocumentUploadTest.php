@@ -44,170 +44,170 @@ beforeEach(function () {
     // $this->asset = Asset::factory()->forLocation($this->room)->create();
 });
 
-// it('can upload several files to asset', function () {
+it('can upload several files to asset', function () {
 
-//     $file1 = UploadedFile::fake()->image('avatar.png');
-//     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
-//     $categoryType = CategoryType::where('category', 'document')->first();
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
+    $categoryType = CategoryType::where('category', 'document')->first();
 
-//     $formData = [
-//         'name' => 'New asset',
-//         'description' => 'Description new asset',
-//         'locationId' => $this->room->id,
-//         'locationReference' => $this->room->reference_code,
-//         'locationType' => 'room',
-//         'categoryId' => $this->categoryType->id,
-//         'files' => [
-//             [
-//                 'file' => $file1,
-//                 'name' => 'FILE 1 - Long name of more than 10 chars',
-//                 'description' => 'descriptionIMG',
-//                 'typeId' => $categoryType->id,
-//                 'typeSlug' => $categoryType->slug
-//             ],
-//             [
-//                 'file' => $file2,
-//                 'name' => 'FILE 2 - Long name of more than 10 chars',
-//                 'description' => 'descriptionPDF',
-//                 'typeId' => $categoryType->id,
-//                 'typeSlug' => $categoryType->slug
-//             ]
-//         ]
-//     ];
+    $formData = [
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+        'locationId' => $this->room->id,
+        'locationReference' => $this->room->reference_code,
+        'locationType' => 'room',
+        'categoryId' => $this->categoryType->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ]
+        ]
+    ];
 
-//     $response = $this->postToTenant('api.assets.store', $formData);
-//     $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertSessionHasNoErrors();
 
-//     assertDatabaseCount('documents', 2);
-//     assertDatabaseHas('documentables', [
-//         'document_id' => 1,
-//         'documentable_type' => 'App\Models\Tenants\Asset',
-//         'documentable_id' => 1
-//     ]);
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => 'App\Models\Tenants\Asset',
+        'documentable_id' => 1
+    ]);
 
-//     Storage::disk('tenants')->assertExists(Document::first()->path);
-// });
+    Storage::disk('tenants')->assertExists(Document::first()->path);
+});
 
 
-// it('fails when upload wrong image mime (ie. webp)', function () {
+it('fails when upload wrong image mime (ie. webp)', function () {
 
-//     $file1 = UploadedFile::fake()->image('avatar.webp');
-//     $file2 = UploadedFile::fake()->create('report.docx', 100, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-//     $categoryType = CategoryType::where('category', 'document')->first();
+    $file1 = UploadedFile::fake()->image('avatar.webp');
+    $file2 = UploadedFile::fake()->create('report.docx', 100, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    $categoryType = CategoryType::where('category', 'document')->first();
 
-//     $formData = [
-//         'name' => 'New asset',
-//         'description' => 'Description new asset',
-//         'locationId' => $this->room->id,
-//         'locationReference' => $this->room->reference_code,
-//         'locationType' => 'room',
-//         'categoryId' => $this->categoryType->id,
-//         'files' => [
-//             [
-//                 'file' => $file1,
-//                 'name' => 'Long description of more than 10 chars',
-//                 'description' => 'descriptionIMG',
-//                 'typeId' => $categoryType->id,
-//                 'typeName' => $categoryType->slug
-//             ],
-//             [
-//                 'file' => $file2,
-//                 'name' => 'Long description of more than 10 chars',
-//                 'description' => 'descriptionPDF',
-//                 'typeId' => $categoryType->id,
-//                 'typeName' => $categoryType->slug
-//             ]
-//         ]
-//     ];
+    $formData = [
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+        'locationId' => $this->room->id,
+        'locationReference' => $this->room->reference_code,
+        'locationType' => 'room',
+        'categoryId' => $this->categoryType->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'Long description of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $categoryType->id,
+                'typeName' => $categoryType->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'Long description of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $categoryType->id,
+                'typeName' => $categoryType->slug
+            ]
+        ]
+    ];
 
-//     $response = $this->postToTenant('api.assets.store', $formData);
-//     $response->assertSessionHasErrors([
-//         'files.0.file' => "The files.0.file field must be a file of type: jpg, jpeg, png, pdf.",
-//         'files.1.file' => "The files.1.file field must be a file of type: jpg, jpeg, png, pdf."
-//     ]);
-// });
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertSessionHasErrors([
+        'files.0.file' => "The files.0.file field must be a file of type: jpg, jpeg, png, pdf.",
+        'files.1.file' => "The files.1.file field must be a file of type: jpg, jpeg, png, pdf."
+    ]);
+});
 
-// it('fails when upload exceeding document size : ' . Document::maxUploadSizeKB() . "kb", function () {
+it('fails when upload exceeding document size : ' . Document::maxUploadSizeKB() . "kb", function () {
 
-//     $file1 = UploadedFile::fake()->create('nomdufichier.pdf', Document::maxUploadSizeKB() * 2, 'application/pdf');
-//     $categoryType = CategoryType::where('category', 'document')->first();
+    $file1 = UploadedFile::fake()->create('nomdufichier.pdf', Document::maxUploadSizeKB() * 2, 'application/pdf');
+    $categoryType = CategoryType::where('category', 'document')->first();
 
-//     $formData = [
-//         'name' => 'New asset',
-//         'description' => 'Description new asset',
-//         'locationId' => $this->room->id,
-//         'locationReference' => $this->room->reference_code,
-//         'locationType' => 'room',
-//         'categoryId' => $this->categoryType->id,
-//         'files' => [
-//             [
-//                 'file' => $file1,
-//                 'name' => 'Long description of more than 10 chars',
-//                 'description' => 'descriptionIMG',
-//                 'typeId' => $categoryType->id,
-//                 'typeName' => $categoryType->slug
-//             ],
-//         ]
-//     ];
+    $formData = [
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+        'locationId' => $this->room->id,
+        'locationReference' => $this->room->reference_code,
+        'locationType' => 'room',
+        'categoryId' => $this->categoryType->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'Long description of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $categoryType->id,
+                'typeName' => $categoryType->slug
+            ],
+        ]
+    ];
 
-//     $response = $this->postToTenant('api.assets.store', $formData);
-//     $response->assertSessionHasErrors([
-//         'files.0.file' => "The files.0.file field must not be greater than " . Document::maxUploadSizeKB() . " kilobytes.",
-//     ]);
-// });
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertSessionHasErrors([
+        'files.0.file' => "The files.0.file field must not be greater than " . Document::maxUploadSizeKB() . " kilobytes.",
+    ]);
+});
 
-// it('can delete a document from an asset', function () {
+it('can delete a document from an asset', function () {
 
-//     $asset = Asset::factory()->forLocation($this->room)->create();
-//     $document = Document::factory()->withCustomAttributes([
-//         'user' => $this->user,
-//         'directoryName' => 'assets',
-//         'model' => $asset,
-//     ])->create();
-//     $asset->documents()->attach($document);
+    $asset = Asset::factory()->forLocation($this->room)->create();
+    $document = Document::factory()->withCustomAttributes([
+        'user' => $this->user,
+        'directoryName' => 'assets',
+        'model' => $asset,
+    ])->create();
+    $asset->documents()->attach($document);
 
-//     $response = $this->deleteFromTenant('api.documents.delete', $document->id);
-//     $response->assertOk();
+    $response = $this->deleteFromTenant('api.documents.delete', $document->id);
+    $response->assertOk();
 
-//     $this->assertDatabaseMissing('documents', [
-//         'id' => $document->id,
-//         'filename' => $document->filename
-//     ]);
+    $this->assertDatabaseMissing('documents', [
+        'id' => $document->id,
+        'filename' => $document->filename
+    ]);
 
-//     $this->assertDatabaseMissing('documentables', [
-//         'documentable_id' => $asset->id,
-//         'documentable_type' => Asset::class
-//     ]);
-// });
+    $this->assertDatabaseMissing('documentables', [
+        'documentable_id' => $asset->id,
+        'documentable_type' => Asset::class
+    ]);
+});
 
-// it('can update name and description a document from an asset ', function () {
+it('can update name and description a document from an asset ', function () {
 
-//     $asset = Asset::factory()->forLocation($this->room)->create();
-//     $document = Document::factory()->withCustomAttributes([
-//         'user' => $this->user,
-//         'directoryName' => 'assets',
-//         'model' => $asset,
-//     ])->create();
-//     $asset->documents()->attach($document);
+    $asset = Asset::factory()->forLocation($this->room)->create();
+    $document = Document::factory()->withCustomAttributes([
+        'user' => $this->user,
+        'directoryName' => 'assets',
+        'model' => $asset,
+    ])->create();
+    $asset->documents()->attach($document);
 
-//     $categoryType = CategoryType::where('category', 'document')->get()->last();
+    $categoryType = CategoryType::where('category', 'document')->get()->last();
 
-//     $formData =  [
-//         'name' => 'New document name',
-//         'description' =>  'New description of the new document',
-//         'typeId' => $categoryType->id,
-//         'typeSlug' => $categoryType->slug
-//     ];
+    $formData =  [
+        'name' => 'New document name',
+        'description' =>  'New description of the new document',
+        'typeId' => $categoryType->id,
+        'typeSlug' => $categoryType->slug
+    ];
 
-//     $response = $this->patchToTenant('api.documents.update', $formData, $document->id);
-//     $response->assertOk();
-//     $this->assertDatabaseHas('documents', [
-//         'id' => $document->id,
-//         'name' => 'New document name',
-//         'description' => 'New description of the new document',
-//         'category_type_id' => $categoryType->id
-//     ]);
-// });
+    $response = $this->patchToTenant('api.documents.update', $formData, $document->id);
+    $response->assertOk();
+    $this->assertDatabaseHas('documents', [
+        'id' => $document->id,
+        'name' => 'New document name',
+        'description' => 'New description of the new document',
+        'category_type_id' => $categoryType->id
+    ]);
+});
 
 it('can upload a document to an asset', function () {
     $file1 = UploadedFile::fake()->image('avatar.png');
