@@ -4,8 +4,22 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
+import axios from 'axios';
 import { BrickWall, Building, Building2, Cuboid, Handshake, LayoutDashboard, LayoutGrid, ScrollText, Ticket, Users } from 'lucide-react';
+import { useState } from 'react';
 import AppLogo from './app-logo';
+
+const fetchTicketCount = async () => {
+    try {
+        const response = await axios.get(route('api.tickets.index', { status: 'open' }));
+        return response.data.data.length;
+    } catch (error) {
+        console.log(error);
+        return 0;
+    }
+};
+
+fetchTicketCount();
 
 const mainNavItems: NavItem[] = [
     {
@@ -42,6 +56,7 @@ const mainNavItems: NavItem[] = [
         title: 'Tickets',
         href: '/tickets',
         icon: Ticket,
+        count: 5,
     },
     {
         title: 'Providers',
@@ -69,6 +84,8 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const [openTicketsCount, setOpenTicketsCount] = useState();
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>

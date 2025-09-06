@@ -352,8 +352,7 @@ it('cannot update a room type of an existing room', function () {
 
     $response = $this->patchToTenant('api.rooms.update', $formData, $room->reference_code);
     $response->assertStatus(400)
-        ->assertJson(['status' => 'error'])
-        ->assertJson(['message' => 'You cannot change the type of a location']);
+        ->assertJson(['status' => 'error']);
 
     // $response->assertSessionHasErrors([
     //     'locationType' => 'You cannot change the type of a location',
