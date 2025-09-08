@@ -171,8 +171,8 @@ export const DocumentManager = ({
 
     return (
         <>
-            <details>
-                <summary className="bg-red-5 border-2 p-2">
+            <details className="">
+                <summary className="border-sidebar-border rounded-md border-2 p-2">
                     <h3 className="inline">Documents ({documents?.length ?? 0})</h3>
                     {canAdd && <Button onClick={() => addNewFile()}>Add new file</Button>}
                 </summary>

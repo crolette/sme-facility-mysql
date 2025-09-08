@@ -189,7 +189,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
     return (
         <div>
             <details>
-                <summary className="bg-red-5 border-2 p-2">
+                <summary className="border-sidebar-border rounded-md border-2 p-2">
                     <h3 className="inline">Interventions ({interventions?.length ?? 0})</h3>
                     {!closed && <Button onClick={openModale}>add intervention</Button>}
                 </summary>

@@ -63,7 +63,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                     <RealocateRoomManager room={location} itemCode={location.reference_code} onClose={() => setShowModaleRelocateRoom(false)} />
                 )}
                 <div className="flex h-full flex-1 flex-col gap-4">
-                    <div className="flex w-full shrink-0 justify-between rounded-md border p-4">
+                    <div className="border-sidebar-border flex w-full shrink-0 justify-between rounded-md border p-4">
                         <div>
                             <h2>Code</h2>
                             <div>
@@ -78,13 +78,14 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                                         key={location.qr_code}
                                         src={route('api.image.show', { path: location.qr_code })}
                                         alt=""
-                                        className="h-32 w-32"
+                                        className="aspect-square h-32 w-auto"
                                     />
                                 </a>
                             )}
                         </div>
                     </div>
-                    <div className="rounded-md border p-4">
+
+                    <div className="border-sidebar-border rounded-md border p-4">
                         <h2>Maintenance</h2>
                         <div>
                             <p>
@@ -98,12 +99,16 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                                     'No manager'
                                 )}
                             </p>
-                            <p>Maintenance frequency : {location.maintainable.maintenance_frequency}</p>
-                            <p>Next maintenance date : {location.maintainable.next_maintenance_date}</p>
-                            <p>Last maintenance date : {location.maintainable.last_maintenance_date}</p>
+                            {location.maintainable.need_maintenance && (
+                                <>
+                                    <p>Maintenance frequency : {location.maintainable.maintenance_frequency}</p>
+                                    <p>Next maintenance date : {location.maintainable.next_maintenance_date}</p>
+                                    <p>Last maintenance date : {location.maintainable.last_maintenance_date}</p>
+                                </>
+                            )}
                         </div>
                     </div>
-                    <div className="rounded-md border p-4">
+                    <div className="border-sidebar-border rounded-md border p-4">
                         <h2>Location information</h2>
                         <div>
                             <p>Category : {location.category}</p>
@@ -129,7 +134,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                         </div>
                     </div>
                     {location.maintainable.providers && location.maintainable.providers.length > 0 && (
-                        <div className="rounded-md border p-4">
+                        <div className="border-sidebar-border rounded-md border p-4">
                             <h2>Providers</h2>
                             <ul>
                                 {location.maintainable.providers.map((provider, index) => (

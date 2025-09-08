@@ -62,7 +62,7 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
     return (
         <>
             <details>
-                <summary className="bg-red-5 border-2 p-2">
+                <summary className="border-sidebar-border rounded-md border-2 p-2">
                     <h3 className="inline">Pictures ({pictures?.length})</h3>
                     {canAdd && (
                         <Button onClick={() => setAddPictures(!addPictures)} type="button">
