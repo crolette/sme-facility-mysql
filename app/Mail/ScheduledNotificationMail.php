@@ -55,12 +55,12 @@ class ScheduledNotificationMail extends Mailable
         return match ($this->notification->notification_type) {
 
             // types : maintenance, warranty, depreciation, contract, intervention
-            'next_maintenance_date' => 'Maintenance programmée - ' . ($this->data['asset_name'] ?? 'Maintenance'),
-            'end_warranty_date' => 'Fin de garantie prochaine - ' . ($this->data['asset_name'] ?? 'Asset'),
-            'depreciation_end_date' => 'Fin de l\'amortissement - ' . ($this->data['asset_name'] ?? 'Asset'),
-            'end_date' => 'Expiration de contrat à venir - ' . ($this->data['contract_name'] ?? 'Contrat'),
-            'notice_date' => 'Contrat délai de préavis - ' . ($this->data['contract_name'] ?? 'Contrat'),
-            'planned_at' => 'Intervention à prévoir - ' . ($this->data['contract_name'] ?? 'Contrat'),
+            'next_maintenance_date' => 'Maintenance programmée - ' . ($this->data['subject'] ?? 'Maintenance'),
+            'end_warranty_date' => 'Fin de garantie prochaine - ' . ($this->data['subject'] ?? 'Asset'),
+            'depreciation_end_date' => 'Fin de l\'amortissement - ' . ($this->data['subject'] ?? 'Asset'),
+            'end_date' => 'Expiration de contrat à venir - ' . ($this->data['subject'] ?? 'Contrat'),
+            'notice_date' => 'Contrat délai de préavis - ' . ($this->data['subject'] ?? 'Contrat'),
+            'planned_at' => 'Intervention à prévoir - ' . ($this->data['subject'] ?? 'Contrat') . ' - ' . ($this->data['priority'] ?? ''),
             default => 'Notification - ' . $this->notification->notification_type
         };
     }

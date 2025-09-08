@@ -78,8 +78,11 @@
                     </div>
                     <p>Une intervention est à prévoir prochainement :</p>
                     <div class="details">
-                        <strong>Intervention :</strong> {{ $data['subject'] ?? 'N/A' }}<br>
-                        <strong>Date d'intervention :</strong> {{ isset($data['expiry_date']) ? \Carbon\Carbon::parse($data['expiry_date'])->format('d/m/Y') : 'N/A' }}<br>
+                        <strong>Type :</strong> {{ $data['type'] ?? 'N/A' }}<br>
+                        <strong>Priorité :</strong> {{ $data['priority'] ?? 'N/A' }}<br>
+                        <strong>Intervention pour </strong> {{ $data['subject'] ?? 'N/A' }}<br>
+                        <strong>Description : </strong> {{ $data['description'] ?? 'N/A' }}<br>
+                        <strong>Date d'intervention :</strong> {{ isset($data['planned_at']) ? \Carbon\Carbon::parse($data['planned_at'])->format('d/m/Y') : 'N/A' }}<br>
                        
                         <strong>Lien :</strong> <a href="{{ $data['link'] ?? '' }}">{{ $data['link'] ?? 'N/A' }}</a><br>
                     </div>

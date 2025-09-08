@@ -137,25 +137,8 @@ class NotificationSchedulingService
         $user = $preference->user;
 
         foreach ($interventions as $intervention) {
-            $notification = [
-                'status' => ScheduledNotificationStatusEnum::PENDING->value,
-                'data' => [
-                    'subject' => 'test',
-                    'notice_date' => $intervention->planned_at,
-                    'link' => route('tenant.interventions.show', $intervention->id)
-                ]
-            ];
 
-            $createdNotification = $intervention->notifications()->create([
-                ...$notification,
-                'scheduled_at' => $intervention->planned_at->subDays($delayDays),
-                'notification_type' => 'planned_at',
-                'recipient_name' => $user->fullName,
-                'recipient_email' => $user->email,
-            ]);
-
-            $createdNotification->user()->associate($user);
-            $createdNotification->save();
+            app(InterventionNotificationSchedulingService::class)->createScheduleForPlannedAtDate($intervention, $user);
         }
     }
 
