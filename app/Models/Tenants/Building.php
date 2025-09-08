@@ -205,6 +205,13 @@ class Building extends Model
         );
     }
 
+    public function level(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->site
+        );
+    }
+
 
     public function manager(): Attribute
     {

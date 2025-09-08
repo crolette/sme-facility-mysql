@@ -128,6 +128,8 @@ it('creates depreciation notification when depreciables passes from false to tru
     $response->assertSessionHasNoErrors();
     $response->assertStatus(200);
 
+    $asset->refresh();
+
     assertDatabaseCount('scheduled_notifications', 2);
 
     assertDatabaseHas(

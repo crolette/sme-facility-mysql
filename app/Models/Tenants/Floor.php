@@ -188,4 +188,11 @@ class Floor extends Model
             get: fn() => $this->maintainable->manager
         );
     }
+
+    public function level(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->building
+        );
+    }
 }
