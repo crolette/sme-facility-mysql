@@ -29,11 +29,12 @@
                     </div>
                     <p>L'amortissement d'un asset arrive à expiration :</p>
                     <div class="details">
-                        <strong>Asset :</strong> {{ $data['subject'] ?? 'N/A' }}<br>
-                        <strong>Fin d'amortissement :</strong> {{ isset($data['warranty_end_date']) ? \Carbon\Carbon::parse($data['warranty_end_date'])->format('d/m/Y') : 'N/A' }}<br>
+                        <strong>Asset :</strong> {{ $data['subject'] ?? 'N/A' }} - {{ $data['reference'] ?? '' }}<br>
+                        <strong>Emplacement :</strong> {{ $data['location'] ?? 'N/A' }}<br>
+                        <strong>Fin d'amortissement :</strong> {{ isset($data['depreciation_end_date']) ? \Carbon\Carbon::parse($data['depreciation_end_date'])->format('d/m/Y') : 'N/A' }}<br>
                         <strong>Lien :</strong> {{ $data['link'] ?? 'N/A' }}<br>
                     </div>
-                    <p>Après cette date, l'asset ne sera plus couvert par la garantie constructeur.</p>
+                    <p>Après cette date, l'asset sera totalement amorti.</p>
                 @break
 
                  @case('notice_date')
@@ -42,13 +43,12 @@
                     </div>
                     <p>Un contrat arrive à expiration prochainement :</p>
                     <div class="details">
-                        <strong>Contrat :</strong> {{ $data['contract_name'] ?? 'N/A' }}<br>
-                        <strong>Date d'expiration :</strong> {{ isset($data['expiry_date']) ? \Carbon\Carbon::parse($data['expiry_date'])->format('d/m/Y') : 'N/A' }}<br>
-                        @if(isset($data['contract_reference']))
-                            <strong>Référence :</strong> {{ $data['contract_reference'] ?? 'N/A' }}<br>
-                        @endif
-                        @if(isset($data['supplier_name']))
-                            <strong>Fournisseur :</strong> {{ $data['supplier_name'] ?? 'N/A' }}<br>
+                        <strong>Contrat :</strong> {{ $data['subject'] ?? 'N/A' }}<br>
+                        <strong>Renouvellement :</strong> {{ $data['renewal_type'] ?? 'N/A' }}<br>
+                        <strong>Date de préavis :</strong> {{ isset($data['notice_date']) ? \Carbon\Carbon::parse($data['notice_date'])->format('d/m/Y') : 'N/A' }}<br>
+                        <strong>Date d'expiration :</strong> {{ isset($data['end_date']) ? \Carbon\Carbon::parse($data['end_date'])->format('d/m/Y') : 'N/A' }}<br>
+                        @if(isset($data['provider']))
+                            <strong>Fournisseur :</strong> {{ $data['provider'] ?? 'N/A' }}<br>
                         @endif
                         <strong>Lien :</strong> <a href="{{ $data['link'] ?? '' }}">{{ $data['link'] ?? 'N/A' }}</a><br>
                     </div>
@@ -62,14 +62,10 @@
                     <p>Un contrat arrive à expiration prochainement :</p>
                     <div class="details">
                         <strong>Contrat :</strong> {{ $data['contract_name'] ?? 'N/A' }}<br>
-                        
-
-                        <strong>Date d'expiration :</strong> {{ isset($data['expiry_date']) ? \Carbon\Carbon::parse($data['expiry_date'])->format('d/m/Y') : 'N/A' }}<br>
-                        @if(isset($data['contract_reference']))
-                            <strong>Référence :</strong> {{ $data['contract_reference'] ?? 'N/A' }}<br>
-                        @endif
-                        @if(isset($data['supplier_name']))
-                            <strong>Fournisseur :</strong> {{ $data['supplier_name'] ?? 'N/A' }}<br>
+                        <strong>Renouvellement :</strong> {{ $data['renewal_type'] ?? 'N/A' }}<br>
+                        <strong>Date d'expiration :</strong> {{ isset($data['end_date']) ? \Carbon\Carbon::parse($data['end_date'])->format('d/m/Y') : 'N/A' }}<br>
+                        @if(isset($data['provider']))
+                            <strong>Fournisseur :</strong> {{ $data['provider'] ?? 'N/A' }}<br>
                         @endif
                         <strong>Lien :</strong> <a href="{{ $data['link'] ?? '' }}">{{ $data['link'] ?? 'N/A' }}</a><br>
                     </div>

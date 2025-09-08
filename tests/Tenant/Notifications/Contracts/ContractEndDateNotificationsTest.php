@@ -12,12 +12,9 @@ use App\Enums\NoticePeriodEnum;
 use App\Models\Tenants\Building;
 
 use App\Models\Tenants\Contract;
-use App\Models\Tenants\Document;
 use App\Models\Tenants\Provider;
 use App\Enums\ContractStatusEnum;
-use Illuminate\Http\UploadedFile;
 use App\Enums\ContractDurationEnum;
-use App\Enums\MaintenanceFrequency;
 use App\Models\Central\CategoryType;
 use App\Enums\ContractRenewalTypesEnum;
 use function PHPUnit\Framework\assertCount;
@@ -79,6 +76,19 @@ it('creates the end_date notification for a new created contract', function () {
 
     // 2 notifications because of the notice_date
     assertDatabaseCount('scheduled_notifications', 2);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->user->id,
+            'recipient_name' => $this->user->fullName,
+            'recipient_email' => $this->user->email,
+            'notification_type' => 'notice_date',
+            'scheduled_at' => Carbon::now()->addMonth(1)->subDays(21)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Contract',
+            'notifiable_id' => 1,
+        ]
+    );
 
     assertDatabaseHas(
         'scheduled_notifications',

@@ -167,25 +167,7 @@ class NotificationSchedulingService
         $user = $preference->user;
 
         foreach ($contracts as $contract) {
-            $notification = [
-                'status' => ScheduledNotificationStatusEnum::PENDING->value,
-                'data' => [
-                    'subject' => 'test',
-                    'notice_date' => $contract->notice_date,
-                    'link' => route('tenant.contracts.show', $contract->id)
-                ]
-            ];
-
-            $createdNotification = $contract->notifications()->create([
-                ...$notification,
-                'scheduled_at' => $contract->notice_date->subDays($delayDays),
-                'notification_type' => 'notice_date',
-                'recipient_name' => $user->fullName,
-                'recipient_email' => $user->email,
-            ]);
-
-            $createdNotification->user()->associate($user);
-            $createdNotification->save();
+            app(ContractNotificationSchedulingService::class)->createScheduleForContractNoticeDate($contract, $user);
         }
     }
 
@@ -198,25 +180,8 @@ class NotificationSchedulingService
         $user = $preference->user;
 
         foreach ($contracts as $contract) {
-            $notification = [
-                'status' => ScheduledNotificationStatusEnum::PENDING->value,
-                'data' => [
-                    'subject' => 'test',
-                    'notice_date' => $contract->end_date,
-                    'link' => route('tenant.contracts.show', $contract->id)
-                ]
-            ];
 
-            $createdNotification = $contract->notifications()->create([
-                ...$notification,
-                'scheduled_at' => $contract->end_date->subDays($delayDays),
-                'notification_type' => 'end_date',
-                'recipient_name' => $user->fullName,
-                'recipient_email' => $user->email,
-            ]);
-
-            $createdNotification->user()->associate($user);
-            $createdNotification->save();
+            app(ContractNotificationSchedulingService::class)->createScheduleForContractEndDate($contract, $user);
         }
     }
 
@@ -266,25 +231,27 @@ class NotificationSchedulingService
     {
         $delayDays = $preference->notification_delay_days;
         $assets = Asset::where('depreciation_end_date', '>', Carbon::now()->addDays($delayDays))->get();
-        $user = $preference->user;
 
         foreach ($assets as $asset) {
-            $notification = [
-                'status' => ScheduledNotificationStatusEnum::PENDING->value,
-                'data' => [
-                    'subject' => 'test',
-                    'notice_date' => $asset->end_date,
-                    'link' => route('tenant.assets.show', $asset->reference_code)
-                ]
-            ];
 
-            $asset->notifications()->create([
-                ...$notification,
-                'scheduled_at' => $asset->depreciation_end_date->subDays($delayDays),
-                'notification_type' => 'depreciation_end_date',
-                'recipient_name' => $user->fullName,
-                'recipient_email' => $user->email,
-            ]);
+            app(AssetNotificationSchedulingService::class)->createScheduleForDepreciable($asset, $preference->user);
+
+            // $notification = [
+            //     'status' => ScheduledNotificationStatusEnum::PENDING->value,
+            //     'data' => [
+            //         'subject' => 'test',
+            //         'notice_date' => $asset->end_date,
+            //         'link' => route('tenant.assets.show', $asset->reference_code)
+            //     ]
+            // ];
+
+            // $asset->notifications()->create([
+            //     ...$notification,
+            //     'scheduled_at' => $asset->depreciation_end_date->subDays($delayDays),
+            //     'notification_type' => 'depreciation_end_date',
+            //     'recipient_name' => $user->fullName,
+            //     'recipient_email' => $user->email,
+            // ]);
         }
     }
 

@@ -77,17 +77,20 @@ class AssetNotificationSchedulingService
         $preference = $user->notification_preferences()->where('notification_type', 'depreciation_end_date')->first();
         $delay = $preference->notification_delay_days;
 
-
-
         if ($preference && $preference->enabled && $asset->depreciation_end_date?->subDays($delay) > now()) {
             // if ($preference && $preference->enabled && $asset->depreciation_end_date->subDays($delay) < now()) {
 
             $notification = [
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
                 'notification_type' => 'depreciation_end_date',
+                'recipient_name' => $user->fullName,
+                'recipient_email' => $user->email,
+                'scheduled_at' => $asset->depreciation_end_date->subDays($delay),
 
                 'data' => [
                     'subject' => $asset->name,
+                    'reference' => $asset->reference_code,
+                    'location' => $asset->location->name,
                     'depreciation_end_date' => $asset->depreciation_end_date,
                     'link' => route('tenant.assets.show', $asset->reference_code)
                 ]
@@ -100,9 +103,6 @@ class AssetNotificationSchedulingService
                 ],
                 [
                     ...$notification,
-                    'recipient_name' => $user->fullName,
-                    'recipient_email' => $user->email,
-                    'scheduled_at' => $asset->depreciation_end_date->subDays($delay),
                 ]
             );
 
