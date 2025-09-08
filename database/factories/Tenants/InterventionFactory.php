@@ -23,18 +23,27 @@ class InterventionFactory extends Factory
     public function definition(): array
     {
         $category = CategoryType::where('category', 'intervention')->first();
-        $ticket = Ticket::first();
 
         return [
             'intervention_type_id' => $category->id,
             'priority' => 'medium',
-            'status' => 'draft',
-            'planned_at' => Carbon::now()->add('day', 7),
+            'status' => 'planned',
+            'planned_at' => Carbon::now()->addMonth(),
             'description' => fake()->paragraph(),
-            'repair_delay' => Carbon::now()->add('month', 1),
-            'ticket_id' => $ticket->id,
-            'maintainable_id' => $ticket->ticketable->maintainable->id,
+            'repair_delay' => Carbon::now()->addMonth(),
         ];
+    }
+
+    public function forTicket($ticket)
+    {
+        return $this->for($ticket, 'interventionable')->state(function () use ($ticket) {
+            return [
+                'ticket_id' => $ticket->id,
+                'maintainable_id' => $ticket->ticketable->maintainable->id,
+                'interventionable_type' => get_class($ticket->ticketable),
+                'interventionable_id' => $ticket->ticketable->id,
+            ];
+        });
     }
 
 
@@ -42,6 +51,7 @@ class InterventionFactory extends Factory
     public function forLocation($location)
     {
         return $this->for($location, 'interventionable')->state(function () use ($location) {
+            $location->refresh();
 
             return [
                 'maintainable_id' => $location->maintainable->id,
@@ -50,6 +60,8 @@ class InterventionFactory extends Factory
             ];
         });
     }
+
+
 
     public function configure()
     {

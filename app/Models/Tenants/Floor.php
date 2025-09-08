@@ -70,6 +70,7 @@ class Floor extends Model
                 }
             }
             $floor->maintainable()->delete();
+            $floor->notifications()->delete();
         });
     }
 
@@ -129,6 +130,12 @@ class Floor extends Model
         return $this->morphMany(Ticket::class, 'ticketable');
     }
 
+    public function notifications(): MorphMany
+    {
+        return $this->morphMany(ScheduledNotification::class, 'notifiable');
+    }
+
+
     public function interventions(): MorphMany
     {
         return $this->morphMany(Intervention::class, 'interventionable');
@@ -172,6 +179,20 @@ class Floor extends Model
     {
         return Attribute::make(
             get: fn() => $this->maintainable->description
+        );
+    }
+
+    public function manager(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->maintainable->manager
+        );
+    }
+
+    public function level(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->building
         );
     }
 }

@@ -23,6 +23,7 @@ use function Pest\Laravel\assertDatabaseMissing;
 beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
+    $this->manager = User::factory()->withRole('Maintenance Manager')->create();
 
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
@@ -92,7 +93,8 @@ it('can create a new asset to site', function () {
         'locationReference' => $this->site->reference_code,
         'surface' => 12,
         'categoryId' => $this->categoryType->id,
-        'need_maintenance' => false
+        'need_maintenance' => false,
+        'maintenance_manager_id' => $this->manager->id,
     ];
 
     $response = $this->postToTenant('api.assets.store', $formData);
@@ -118,6 +120,7 @@ it('can create a new asset to site', function () {
     ]);
 
     assertDatabaseHas('maintainables', [
+        'maintenance_manager_id' => $this->manager->id,
         'maintainable_type' => get_class($asset),
         'maintainable_id' => $asset->id,
         'name' => 'New asset',

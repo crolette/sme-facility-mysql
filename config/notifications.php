@@ -8,5 +8,4 @@ return [
         'intervention' => ['planned_at'],
         'maintenance' => ['next_maintenance_date', 'end_warranty_date'],
     ]
-
 ];

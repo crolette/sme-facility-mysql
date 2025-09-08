@@ -67,6 +67,8 @@ class TenantAssetController extends Controller
         if (Auth::user()->cannot('view', $asset))
             abort(403);
 
+
+
         return Inertia::render('tenants/assets/show', ['item' => $asset->load('maintainable.manager:id,first_name,last_name', 'maintainable.providers:id,name')]);
     }
 

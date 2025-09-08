@@ -60,7 +60,7 @@ beforeEach(function () {
 
 // NEED MAINTENANCE
 
-it('creates next maintenance date notification for a new created asset', function () {
+it('creates next maintenance date notification for a new created asset with maintenance manager', function () {
 
     $formData = [
         ...$this->basicAssetData,

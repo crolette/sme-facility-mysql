@@ -39,6 +39,12 @@ class APIUserController extends Controller
         try {
             [$user, $password] = $this->userService->create($request->validated());
 
+            if ($user->hasAnyRole('Admin', 'Maintenance Manager')) {
+                Password::sendResetLink(
+                    $request->only('email')
+                );
+            }
+
             Debugbar::info($user, $password);
 
             return ApiResponse::success(['password' => $password ?? null], 'User created');

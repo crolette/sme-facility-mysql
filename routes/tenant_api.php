@@ -52,12 +52,10 @@ Route::prefix('/v1/')->group(
 
                     $path = $request->path;
 
-                    if (! Storage::disk('tenants')->exists($path)) {
-                        abort(404);
+                    if (!$path || !Storage::disk('tenants')->exists($path)) {
+                        return null;
                     }
-                    Debugbar::info(
-                        Storage::disk('tenants')->path($path)
-                    );
+
                     return Storage::disk('tenants')->download($path);
                 })->name('api.file.download');
 
@@ -66,12 +64,10 @@ Route::prefix('/v1/')->group(
 
                     $path = $request->path;
 
-                    if (! Storage::disk('tenants')->exists($path)) {
-                        abort(404);
+                    if (!$path || !Storage::disk('tenants')->exists($path)) {
+                        return null;
                     }
-                    Debugbar::info(
-                        Storage::disk('tenants')->path($path)
-                    );
+
                     return response()->file(Storage::disk('tenants')->path($path));
                 })->name('api.image.show');
 
@@ -104,8 +100,8 @@ Route::prefix('/v1/')->group(
 
                     $path = $document->path;
 
-                    if (! Storage::disk('tenants')->exists($path)) {
-                        abort(404);
+                    if (!$path || !Storage::disk('tenants')->exists($path)) {
+                        return null;
                     }
 
                     return response()->file(Storage::disk('tenants')->path($path));
@@ -115,9 +111,8 @@ Route::prefix('/v1/')->group(
                 Route::get('/pictures/{picture}', function (Picture $picture) {
 
                     $path = $picture->path;
-
-                    if (! Storage::disk('tenants')->exists($path)) {
-                        abort(404);
+                    if (!$path || !Storage::disk('tenants')->exists($path)) {
+                        return null;
                     }
 
                     return response()->file(Storage::disk('tenants')->path($path));

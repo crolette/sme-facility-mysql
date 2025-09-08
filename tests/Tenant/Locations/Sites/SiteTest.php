@@ -23,8 +23,7 @@ use function PHPUnit\Framework\assertCount;
 
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->user->assignRole('Admin');
+    $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
 });
@@ -39,7 +38,7 @@ it('can render the index sites page', function () {
     $response->assertInertia(
         fn($page) =>
         $page->component('tenants/locations/index')
-            ->has('locations', 3)
+            ->has('items', 3)
     );
 });
 
@@ -138,48 +137,6 @@ it('can create a new site with other matherials', function () {
     ]);
 });
 
-it('can upload several files to site', function () {
-
-    $file1 = UploadedFile::fake()->image('avatar.png');
-    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
-    CategoryType::factory()->count(2)->create(['category' => 'document']);
-    $categoryType = CategoryType::where('category', 'document')->first();
-
-    $formData = [
-        'name' => 'New site',
-        'description' => 'Description new site',
-        'locationType' => $this->siteType->id,
-        'files' => [
-            [
-                'file' => $file1,
-                'name' => 'FILE 1 - Long name of more than 10 chars',
-                'description' => 'descriptionIMG',
-                'typeId' => $categoryType->id,
-                'typeSlug' => $categoryType->slug
-            ],
-            [
-                'file' => $file2,
-                'name' => 'FILE 2 - Long name of more than 10 chars',
-                'description' => 'descriptionPDF',
-                'typeId' => $categoryType->id,
-                'typeSlug' => $categoryType->slug
-            ]
-        ]
-    ];
-
-    $response = $this->postToTenant('api.sites.store', $formData);
-    $response->assertStatus(200)
-        ->assertJson(['status' => 'success']);
-
-    assertDatabaseCount('documents', 2);
-    assertDatabaseHas('documentables', [
-        'document_id' => 1,
-        'documentable_type' => 'App\Models\Tenants\Site',
-        'documentable_id' => 1
-    ]);
-
-    Storage::disk('tenants')->assertExists(Document::first()->path);
-});
 
 it('can render the show site page', function () {
     $site = Site::factory()->create();
@@ -313,105 +270,6 @@ it('cannot delete a site which has related buildings and related floors', functi
 
     $response = $this->deleteFromTenant('api.sites.destroy', $site->reference_code);
     $response->assertStatus(409);
-});
-
-it('can update name and description of a document from a site ', function () {
-    CategoryType::factory()->count(2)->create(['category' => 'document']);
-    $site = Site::factory()->create();
-    $document = Document::factory()->withCustomAttributes([
-        'user' => $this->user,
-        'directoryName' => 'site',
-        'model' => $site,
-    ])->create();
-    $site->documents()->attach($document);
-
-    $categoryType = CategoryType::where('category', 'document')->get()->last();
-
-    $formData =  [
-        'name' => 'New document name',
-        'description' =>  'New description of the new document',
-        'typeId' => $categoryType->id,
-        'typeSlug' => $categoryType->slug
-    ];
-
-    $response = $this->patchToTenant('api.documents.update', $formData, $document->id);
-    $response->assertOk();
-    $this->assertDatabaseHas('documents', [
-        'id' => $document->id,
-        'name' => 'New document name',
-        'description' => 'New description of the new document',
-        'category_type_id' => $categoryType->id
-    ]);
-});
-
-it('can upload a document to an existing site', function () {
-    $file1 = UploadedFile::fake()->image('avatar.png');
-    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
-    CategoryType::factory()->count(2)->create(['category' => 'document']);
-    $site = Site::factory()->create();
-    $categoryType = CategoryType::where('category', 'document')->first();
-
-    $formData = [
-        'files' => [
-            [
-                'file' => $file1,
-                'name' => 'FILE 1 - Long name of more than 10 chars',
-                'description' => 'descriptionIMG',
-                'typeId' => $categoryType->id,
-                'typeSlug' => $categoryType->slug
-            ],
-            [
-                'file' => $file2,
-                'name' => 'FILE 2 - Long name of more than 10 chars',
-                'description' => 'descriptionPDF',
-                'typeId' => $categoryType->id,
-                'typeSlug' => $categoryType->slug
-            ]
-        ]
-    ];
-
-    $response = $this->postToTenant('api.sites.documents.post', $formData, $site);
-    $response->assertSessionHasNoErrors();
-
-    assertDatabaseCount('documents', 2);
-    assertDatabaseHas('documentables', [
-        'document_id' => 1,
-        'documentable_type' => 'App\Models\Tenants\Site',
-        'documentable_id' => 1
-    ]);
-});
-
-it('can add pictures to a site', function () {
-    $site = Site::factory()->create();
-    $file1 = UploadedFile::fake()->image('avatar.png');
-    $file2 = UploadedFile::fake()->image('test.jpg');
-
-    $formData = [
-        'pictures' => [
-            $file1,
-            $file2
-        ]
-    ];
-
-    $response = $this->postToTenant('api.sites.pictures.post', $formData, $site);
-    $response->assertSessionHasNoErrors();
-    assertDatabaseCount('pictures', 2);
-    assertDatabaseHas('pictures', [
-        'imageable_type' => 'App\Models\Tenants\Site',
-        'imageable_id' => 1
-    ]);
-});
-
-it('can retrieve all pictures from a site', function () {
-    $site = Site::factory()->create();
-
-    Picture::factory()->forModelAndUser($site, $this->user, 'sites')->create();
-    Picture::factory()->forModelAndUser($site, $this->user, 'sites')->create();
-
-    $response = $this->getFromTenant('api.sites.pictures', $site);
-    $response->assertStatus(200);
-    $data = $response->json('data');
-    $this->assertCount(2, $data);
 });
 
 it('can retrieve all assets from a site', function () {

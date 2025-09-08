@@ -31,8 +31,8 @@ class InterventionAction extends Model
     {
         return [
             'intervention_date' => 'date:d-m-Y',
-            'created_at' => 'date:d-m-Y H:m',
-            'updated_at' => 'date:d-m-Y H:m',
+            'created_at' => 'date:d-m-Y H:i',
+            'updated_at' => 'date:d-m-Y H:i',
         ];
     }
 

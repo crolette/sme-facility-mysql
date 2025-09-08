@@ -15,8 +15,6 @@ export default function ShowTicket({ ticket }: { ticket: Ticket }) {
         },
     ];
 
-    console.log(ticket);
-
     const [ticketItem, setTicketItem] = useState(ticket);
 
     const fetchTicket = async () => {
@@ -49,7 +47,7 @@ export default function ShowTicket({ ticket }: { ticket: Ticket }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Ticket" />
             <div>
-                <a href={route(formatUrlAsset(ticket.ticketable_type), ticketItem.ticketable.code)}>
+                <a href={route(formatUrlAsset(ticket.ticketable_type), ticketItem.ticketable.reference_code)}>
                     <Button type="button">Show asset</Button>
                 </a>
                 {ticketItem.status !== 'closed' && (

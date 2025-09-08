@@ -3,7 +3,7 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { BrickWall, Building, Building2, Cuboid, Handshake, LayoutDashboard, LayoutGrid, ScrollText, Ticket, Users } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -42,6 +42,7 @@ const mainNavItems: NavItem[] = [
         title: 'Tickets',
         href: '/tickets',
         icon: Ticket,
+        count: 5,
     },
     {
         title: 'Providers',
@@ -69,6 +70,12 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+    const { props } = usePage();
+
+    const openTicketsCount = props.openTicketsCount as number;
+
+    const navItems = mainNavItems.map((item) => (item.title === 'Tickets' ? { ...item, count: openTicketsCount } : item));
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -84,7 +91,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={navItems} />
             </SidebarContent>
 
             <SidebarFooter>

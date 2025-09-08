@@ -14,44 +14,13 @@ class ContractNotificationSchedulingService
 {
     public function scheduleForContract(Contract $contract)
     {
-        $notificationTypes = collect(config('notifications.notification_types.contract'));
-
-        $notification = [
-            'status' => ScheduledNotificationStatusEnum::PENDING->value,
-            'data' => [
-                'subject' => 'test',
-                'notice_date' => $contract->notice_date
-            ]
-        ];
 
         $users = User::role('Admin')->get();
 
-        foreach ($notificationTypes as $notificationType) {
+        foreach ($users as $user) {
 
-            foreach ($users as $user) {
-                $delay = $user->notification_preferences()->where('notification_type', $notificationType)->where('enabled', true)->value('notification_delay_days') ?? 7;
-                // get the date of the notification type : i.e. notice_date or end_date
-                $date = $contract->$notificationType;
-
-                $createdNotification = $contract->notifications()->updateOrCreate(
-                    [
-                        'recipient_email' => $user->email,
-                        'notification_type' => $notificationType,
-                    ],
-                    [
-                        ...$notification,
-                        'scheduled_at' => $date->subDays($delay),
-                        'notification_type' => $notificationType,
-                        'recipient_name' => $user->fullName,
-                        'recipient_email' => $user->email,
-                    ]
-                );
-
-                // dump($createdNotification);
-
-                $createdNotification->user()->associate($user);
-                $createdNotification->save();
-            }
+            $this->createScheduleForContractEndDate($contract, $user);
+            $this->createScheduleForContractNoticeDate($contract, $user);
         }
     }
 
@@ -95,45 +64,36 @@ class ContractNotificationSchedulingService
             $notification->update(['scheduled_at' => $newDate]);
     }
 
-
-    public function deleteScheduledNotificationForNotificationType(UserNotificationPreference $preference)
+    public function createScheduleForContractNoticeDate(Contract $contract, User $user)
     {
-        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
-
-        foreach ($scheduledNotifications as $notification) {
-            $notification->delete();
-        }
-    }
-
-    public function createScheduleForContractNoticeDate(UserNotificationPreference $preference)
-    {
+        $preference = $user->notification_preferences()->where('notification_type', 'notice_date')->first();
         $delayDays = $preference->notification_delay_days;
-        $contracts = Contract::where('notice_date', '>', Carbon::now()->addDays($delayDays))->get();
 
-        $user = $preference->user;
+        if ($preference && $preference->enabled && $contract->notice_date?->subDays($delayDays) > now()) {
 
-        foreach ($contracts as $contract) {
             $notification = [
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
+                'scheduled_at' => $contract->notice_date->subDays($delayDays),
+                'notification_type' => 'notice_date',
+                'recipient_name' => $user->fullName,
+                'recipient_email' => $user->email,
                 'data' => [
-                    'subject' => 'test',
-                    'notice_date' => $contract->notice_date
+                    'subject' => $contract->name,
+                    'renewal_type' => $contract->renewal_type,
+                    'provider' => $contract->provider->name,
+                    'end_date' => $contract->end_date,
+                    'notice_date' => $contract->notice_date,
+                    'link' => route('tenant.contracts.show', $contract->id)
                 ]
             ];
 
-            $createdNotification = $contract->notifications()->updateOrCreate(
-                [
-                    'recipient_email' => $user->email,
-                    'notification_type' => 'notice_date',
-                ],
-                [
-                    ...$notification,
-                    'scheduled_at' => $contract->notice_date->subDays($delayDays),
-                    'notification_type' => 'notice_date',
-                    'recipient_name' => $user->fullName,
-                    'recipient_email' => $user->email,
-                ]
-            );
+            $createdNotification = $contract->notifications()->updateOrCreate([
+                'recipient_email' => $user->email,
+                'notification_type' => 'notice_date',
+            ], [
+                ...$notification,
+
+            ]);
 
             $createdNotification->user()->associate($user);
             $createdNotification->save();
@@ -141,28 +101,34 @@ class ContractNotificationSchedulingService
     }
 
 
-    public function createScheduleForContractEndDate(UserNotificationPreference $preference)
+    public function createScheduleForContractEndDate(Contract $contract, User $user)
     {
+        $preference = $user->notification_preferences()->where('notification_type', 'end_date')->first();
         $delayDays = $preference->notification_delay_days;
-        $contracts = Contract::where('end_date', '>', Carbon::now()->addDays($delayDays))->get();
 
-        $user = $preference->user;
+        if ($preference && $preference->enabled && $contract->end_date?->subDays($delayDays) > now()) {
 
-        foreach ($contracts as $contract) {
             $notification = [
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
-                'data' => [
-                    'subject' => 'test',
-                    'notice_date' => $contract->end_date
-                ]
-            ];
-
-            $createdNotification = $contract->notifications()->create([
-                ...$notification,
                 'scheduled_at' => $contract->end_date->subDays($delayDays),
                 'notification_type' => 'end_date',
                 'recipient_name' => $user->fullName,
                 'recipient_email' => $user->email,
+                'data' => [
+                    'subject' => $contract->name,
+                    'renewal_type' => $contract->renewal_type,
+                    'provider' => $contract->provider->name,
+                    'end_date' => $contract->end_date,
+                    'link' => route('tenant.contracts.show', $contract->id)
+                ]
+            ];
+
+            $createdNotification = $contract->notifications()->updateOrCreate([
+                'recipient_email' => $user->email,
+                'notification_type' => 'end_date',
+            ], [
+                ...$notification,
+
             ]);
 
             $createdNotification->user()->associate($user);

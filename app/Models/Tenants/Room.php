@@ -11,6 +11,7 @@ use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Tenants\ScheduledNotification;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -68,6 +69,7 @@ class Room extends Model
 
         static::deleting(function ($room) {
             $room->maintainable()->delete();
+            $room->notifications()->delete();
         });
     }
 
@@ -126,6 +128,11 @@ class Room extends Model
         return $this->morphMany(Intervention::class, 'interventionable');
     }
 
+    public function notifications(): MorphMany
+    {
+        return $this->morphMany(ScheduledNotification::class, 'notifiable');
+    }
+
     public function category($locale = null): Attribute
     {
         $locale = $locale ?? app()->getLocale();
@@ -164,6 +171,20 @@ class Room extends Model
     {
         return Attribute::make(
             get: fn() => $this->maintainable->description
+        );
+    }
+
+    public function manager(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->maintainable->manager
+        );
+    }
+
+    public function level(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->floor
         );
     }
 

@@ -4,8 +4,6 @@ namespace App\Observers;
 
 use App\Services\NotificationSchedulingService;
 use App\Models\Tenants\UserNotificationPreference;
-use App\Services\AssetNotificationSchedulingService;
-use App\Services\MaintainableNotificationSchedulingService;
 use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 
 

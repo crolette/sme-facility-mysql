@@ -24,7 +24,9 @@ beforeEach(function () {
     LocationType::factory()->create(['level' => 'floor']);
     LocationType::factory()->create(['level' => 'room']);
     CategoryType::factory()->create(['category' => 'asset']);
-    User::factory()->create();
+
+    $this->user = User::factory()->withRole('Admin')->create();
+    $this->actingAs($this->user, 'tenant');
     $this->interventionType = CategoryType::factory()->create(['category' => 'intervention']);
     $this->interventionActionType = CategoryType::factory()->create(['category' => 'action']);
     $this->site = Site::factory()->create();
@@ -37,21 +39,19 @@ beforeEach(function () {
         ->create();
 
     $this->asset =  Asset::factory()->forLocation($this->room)->create();
-    $this->user = User::factory()->create();
-    $this->actingAs($this->user, 'tenant');
+    $this->asset->refresh();
     $this->ticket = Ticket::factory()->forLocation($this->asset)->create();
 });
 
 it('can factory intervention', function () {
     Intervention::factory()->forLocation($this->asset)->create();
-    Intervention::factory()->create();
+    Intervention::factory()->forTicket($this->ticket)->create();
     assertDatabaseCount('interventions', 2);
     assertDatabaseCount('intervention_actions', 2);
 });
 
 it('can render interventions in the ticket page', function () {
-    Intervention::factory()->forLocation($this->asset)->count(2)->create();
-    // Intervention::factory()->forLocation($this->asset)->create();
+    Intervention::factory()->forTicket($this->ticket)->count(2)->create();
     assertDatabaseCount('interventions', 2);
 
     $response = $this->getFromTenant('tenant.tickets.show', $this->ticket);
@@ -166,6 +166,7 @@ it('can create a new intervention for an ASSET', function () {
 it('can get all interventions for an ASSET', function () {
     Intervention::factory()->forLocation($this->asset)->count(2)->create();
     $response = $this->getFromTenant('api.assets.interventions', $this->asset->reference_code);
+    // dump($response);
 
     $response->assertStatus(200)
         ->assertJson([
@@ -337,7 +338,7 @@ it('can get all interventions for a ROOM', function () {
 
 it('can update an existing intervention', function () {
 
-    $intervention = Intervention::factory()->create(['status' => 'draft']);
+    $intervention = Intervention::factory()->forLocation($this->room)->create(['status' => 'draft']);
 
     $formData = [
         'intervention_type_id' => $this->interventionType->id,
@@ -368,7 +369,7 @@ it('can update an existing intervention', function () {
 
 it('can delete an intervention', function () {
 
-    $intervention = Intervention::factory()->create();
+    $intervention = Intervention::factory()->forLocation($this->site)->create();
 
     $response = $this->deleteFromTenant('api.interventions.destroy', $intervention);
     $response->assertStatus(200)

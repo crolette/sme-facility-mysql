@@ -1,4 +1,4 @@
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
@@ -9,7 +9,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
-import { SharedData } from '@/types';
 
 type LoginForm = {
     email: string;
@@ -20,16 +19,15 @@ type LoginForm = {
 interface LoginProps {
     status?: string;
     canResetPassword: boolean;
+    company: string;
 }
 
-export default function TenantLogin({ status, canResetPassword }: LoginProps) {
+export default function TenantLogin({ status, canResetPassword, company }: LoginProps) {
     const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>({
         email: '',
         password: '',
         remember: false,
     });
-
-    const tenant = usePage<SharedData>().props.tenant;
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -38,10 +36,12 @@ export default function TenantLogin({ status, canResetPassword }: LoginProps) {
         });
     };
 
-    return (
-        <AuthLayout title={`Log in to your account ${tenant}`} description="Enter your email and password below to log in">
-            <Head title="Log in" />
+    // console.log(tenant);
 
+    return (
+        <AuthLayout title={`SME-Facility - Log in`} description="Enter your email and password below to log in">
+            <Head title="SME-Facility - Log in" />
+            <p className="text-center">{company}</p>
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
                     <div className="grid gap-2">
@@ -99,7 +99,6 @@ export default function TenantLogin({ status, canResetPassword }: LoginProps) {
                     </Button>
                 </div>
             </form>
-
             {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
         </AuthLayout>
     );

@@ -22,8 +22,7 @@ use function Pest\Laravel\assertDatabaseMissing;
 
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->user->assignRole('Admin');
+    $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
     $this->buildingType = LocationType::factory()->create(['level' => 'building']);
@@ -41,8 +40,8 @@ it('can render the index floors page', function () {
     $response->assertInertia(
         fn($page) =>
         $page->component('tenants/locations/index')
-            ->has('locations', 3)
-            ->has('locations.0.maintainable')
+            ->has('items', 3)
+            ->has('items.0.maintainable')
     );
 });
 
@@ -176,50 +175,6 @@ it('can attach a provider to a floor\'s maintainable', function () {
     assertCount(1, $floor->maintainable->providers);
 });
 
-it('can upload several files to building', function () {
-
-    $file1 = UploadedFile::fake()->image('avatar.png');
-    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
-    CategoryType::factory()->count(2)->create(['category' => 'document']);
-    $categoryType = CategoryType::where('category', 'document')->first();
-
-    $formData = [
-        'name' => 'New room',
-        'description' => 'Description new room',
-        'levelType' => $this->building->id,
-        'locationType' => $this->floorType->id,
-        'files' => [
-            [
-                'file' => $file1,
-                'name' => 'FILE 1 - Long name of more than 10 chars',
-                'description' => 'descriptionIMG',
-                'typeId' => $categoryType->id,
-                'typeSlug' => $categoryType->slug
-            ],
-            [
-                'file' => $file2,
-                'name' => 'FILE 2 - Long name of more than 10 chars',
-                'description' => 'descriptionPDF',
-                'typeId' => $categoryType->id,
-                'typeSlug' => $categoryType->slug
-            ]
-        ]
-    ];
-
-    $response = $this->postToTenant('api.floors.store', $formData);
-    $response->assertStatus(200)
-        ->assertJson(['status' => 'success']);
-
-    assertDatabaseCount('documents', 2);
-    assertDatabaseHas('documentables', [
-        'document_id' => 1,
-        'documentable_type' => 'App\Models\Tenants\Floor',
-        'documentable_id' => 1
-    ]);
-
-    Storage::disk('tenants')->assertExists(Document::first()->path);
-});
-
 it('can render the show floor page', function () {
     $floor = Floor::factory()->create();
 
@@ -333,6 +288,10 @@ it('cannot update a floor type of an existing floor', function () {
     $response = $this->patchToTenant('api.floors.update', $formData, $floor);
     $response->assertStatus(400)
         ->assertJson(['status' => 'error']);
+
+    // $response->assertSessionHasErrors([
+    //     'locationType' => 'You cannot change the type of a location',
+    // ]);
 });
 
 it('can delete a floor and his maintainable', function () {
@@ -361,38 +320,6 @@ it('can delete a floor and his maintainable', function () {
     assertDatabaseCount('maintainables', 2);
 });
 
-it('can add pictures to a floor', function () {
-    $floor = Floor::factory()->create();
-    $file1 = UploadedFile::fake()->image('avatar.png');
-    $file2 = UploadedFile::fake()->image('test.jpg');
-
-    $formData = [
-        'pictures' => [
-            $file1,
-            $file2
-        ]
-    ];
-
-    $response = $this->postToTenant('api.floors.pictures.post', $formData, $floor);
-    $response->assertSessionHasNoErrors();
-    assertDatabaseCount('pictures', 2);
-    assertDatabaseHas('pictures', [
-        'imageable_type' => 'App\Models\Tenants\Floor',
-        'imageable_id' => 1
-    ]);
-});
-
-it('can retrieve all pictures from a floor', function () {
-    $floor = Floor::factory()->create();
-
-    Picture::factory()->forModelAndUser($floor, $this->user, 'floors')->create();
-    Picture::factory()->forModelAndUser($floor, $this->user, 'floors')->create();
-
-    $response = $this->getFromTenant('api.floors.pictures', $floor);
-    $response->assertStatus(200);
-    $data = $response->json('data');
-    $this->assertCount(2, $data);
-});
 
 it('can retrieve all assets from a floor', function () {
     $floor = Floor::factory()->create();

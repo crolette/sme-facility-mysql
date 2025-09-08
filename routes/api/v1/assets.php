@@ -100,7 +100,6 @@ Route::middleware([
 
             // Get all interventions from an asset
             Route::get('/interventions/', function (Asset $asset) {
-
                 return ApiResponse::success($asset->interventions()->where('ticket_id', null)->get());
             })->name('api.assets.interventions');
         });

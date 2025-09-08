@@ -64,7 +64,7 @@ class APIBuildingController extends Controller
             $building->site()->associate($site);
             $building->save();
 
-            $building = $this->maintainableService->createMaintainable($building, $maintainableRequest);
+            $this->maintainableService->create($building, $maintainableRequest);
 
             if ($contractRequest->validated('contracts'))
                 $this->contractService->createWithModel($building, $contractRequest->validated('contracts'));
@@ -101,7 +101,7 @@ class APIBuildingController extends Controller
             $errors = new MessageBag([
                 'locationType' => ['You cannot change the building type of a location'],
             ]);
-            return ApiResponse::error('Error while updating the site', $errors);
+            return ApiResponse::error('Error while updating the building', $errors);
         }
 
         try {
@@ -119,16 +119,16 @@ class APIBuildingController extends Controller
                 'outdoor_material_other'  => $buildingRequest->validated('outdoor_material_other'),
             ]);
 
-            $building = $this->maintainableService->createMaintainable($building, $maintainableRequest);
+            $this->maintainableService->update($building->maintainable, $maintainableRequest);
 
             DB::commit();
-            return ApiResponse::success('', 'Site updated');
+            return ApiResponse::success('', 'Building updated');
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
             return ApiResponse::error('ERROR : ' . $e->getMessage());
         }
-        return ApiResponse::error('Error while updating the site');
+        return ApiResponse::error('Error while updating the building');
     }
 
     /**
@@ -144,6 +144,6 @@ class APIBuildingController extends Controller
         }
 
         $building->delete();
-        return ApiResponse::success('', 'site deleted');
+        return ApiResponse::success('', 'Building deleted');
     }
 }
