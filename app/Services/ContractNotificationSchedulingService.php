@@ -20,7 +20,8 @@ class ContractNotificationSchedulingService
             'status' => ScheduledNotificationStatusEnum::PENDING->value,
             'data' => [
                 'subject' => 'test',
-                'notice_date' => $contract->notice_date
+                'notice_date' => $contract->notice_date,
+                'link' => route('tenant.contracts.show', $contract->id)
             ]
         ];
 
@@ -107,7 +108,8 @@ class ContractNotificationSchedulingService
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
                 'data' => [
                     'subject' => 'test',
-                    'notice_date' => $contract->notice_date
+                    'notice_date' => $contract->notice_date,
+                    'link' => route('tenant.contracts.show', $contract->id)
                 ]
             ];
 
@@ -143,7 +145,8 @@ class ContractNotificationSchedulingService
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
                 'data' => [
                     'subject' => 'test',
-                    'notice_date' => $contract->end_date
+                    'notice_date' => $contract->end_date,
+                    'link' => route('tenant.contracts.show', $contract->id)
                 ]
             ];
 

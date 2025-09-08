@@ -2,12 +2,12 @@
 
 namespace App\Mail;
 
-use App\Models\ScheduledNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\Mailables\Envelope;
+use App\Models\Tenants\ScheduledNotification;
 
 class ScheduledNotificationMail extends Mailable
 {
@@ -19,7 +19,7 @@ class ScheduledNotificationMail extends Mailable
     public function __construct(ScheduledNotification $notification)
     {
         $this->notification = $notification;
-        $this->data = json_decode($notification->data, true) ?? [];
+        $this->data = $notification->data ?? [];
     }
 
     public function envelope(): Envelope
@@ -55,11 +55,12 @@ class ScheduledNotificationMail extends Mailable
         return match ($this->notification->notification_type) {
 
             // types : maintenance, warranty, depreciation, contract, intervention
-            'maintenance' => 'Maintenance programmée - ' . ($this->data['asset_name'] ?? 'Asset'),
-            'warranty' => 'Fin de garantie prochaine - ' . ($this->data['asset_name'] ?? 'Asset'),
-            'depreciation' => 'Fin de l\'amortissement - ' . ($this->data['asset_name'] ?? 'Asset'),
-            'contract' => 'Expiration de contrat à venir - ' . ($this->data['contract_name'] ?? 'Contrat'),
-            'intervention' => 'Intervention à prévoir - ' . ($this->data['contract_name'] ?? 'Contrat'),
+            'next_maintenance_date' => 'Maintenance programmée - ' . ($this->data['asset_name'] ?? 'Maintenance'),
+            'end_warranty_date' => 'Fin de garantie prochaine - ' . ($this->data['asset_name'] ?? 'Asset'),
+            'depreciation_end_date' => 'Fin de l\'amortissement - ' . ($this->data['asset_name'] ?? 'Asset'),
+            'end_date' => 'Expiration de contrat à venir - ' . ($this->data['contract_name'] ?? 'Contrat'),
+            'notice_date' => 'Contrat délai de préavis - ' . ($this->data['contract_name'] ?? 'Contrat'),
+            'planned_at' => 'Intervention à prévoir - ' . ($this->data['contract_name'] ?? 'Contrat'),
             default => 'Notification - ' . $this->notification->notification_type
         };
     }

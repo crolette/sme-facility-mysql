@@ -62,9 +62,12 @@ class InterventionNotificationSchedulingService
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
                 'data' => [
                     'subject' => 'test',
-                    'notice_date' => $intervention->planned_at
+                    'intervention_date' => $intervention->planned_at,
+                    'link' => route('tenant.interventions.show', $intervention->id)
                 ]
             ];
+
+            Debugbar::info('createScheduleForPlannedAtDate', $notification);
 
             $createdNotification = $intervention->notifications()->updateOrCreate(
                 [

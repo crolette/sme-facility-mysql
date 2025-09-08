@@ -36,10 +36,9 @@ class ProcessTenantNotifications implements ShouldQueue
         // Se connecter à la DB du tenant
         $this->tenant->run(function () use ($tenantId) {
 
-            // Récupérer les notifications à envoyer (aujourd'hui + tolérance de 1 jour)
+            // Récupérer les notifications à envoyer (aujourd'hui)
             $notifications = ScheduledNotification::where('status', 'pending')
-                ->where('scheduled_at', '<=', now()->addDay())
-                ->where('scheduled_at', '>=', now()->subDay())
+                ->where('scheduled_at', '<=', now())
                 ->get();
 
             Log::info("Found {$notifications->count()} notifications to process for tenant: {$tenantId}");
@@ -63,10 +62,17 @@ class ProcessTenantNotifications implements ShouldQueue
 
     protected function processNotification(ScheduledNotification $notification, $tenantId)
     {
-        // Envoyer l'email (tu remplaceras par ta logique d'envoi)
-        // Mail::to($notification->recipient_email)->send(
-        //     // new \App\Mail\ScheduledNotificationMail($notification)
-        // );
+        Log::info("Try send mail to : {$notification->recipient_email} for type : {$notification->notification_type}");
+        try {
+            Mail::to($notification->recipient_email)->send(
+                new \App\Mail\ScheduledNotificationMail($notification)
+            );
+            Log::info("Mail sent to : {$notification->recipient_email}");
+        } catch (\Exception $e) {
+            Log::error("Email failed: " . $e->getMessage());
+            throw $e;
+        }
+
 
         // Marquer comme envoyée
         $notification->update([

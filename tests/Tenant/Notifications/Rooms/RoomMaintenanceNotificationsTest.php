@@ -345,7 +345,6 @@ it('deletes notifications when notification preference next_maintenance_date of 
 
 
 it('creates notifications when notification preference next_maintenance_date of user is enabled', function () {
-    dump($this->admin->email, $this->manager->email);
     $formData = [
         ...$this->basicRoomData,
         'maintenance_manager_id' => $this->manager->id,

@@ -13,6 +13,8 @@ class ScheduledNotification extends Model
         'scheduled_at',
         'recipient_email',
         'recipient_name',
+        'retry_count',
+        'error_message',
         'status',
         'sent_at',
         'data',
