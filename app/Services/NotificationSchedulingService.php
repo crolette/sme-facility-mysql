@@ -182,35 +182,11 @@ class NotificationSchedulingService
             ->merge($this->searchEntity(Floor::class, 'end_warranty_date', $delayDays))
             ->merge($this->searchEntity(Room::class, 'end_warranty_date', $delayDays));
 
-        // $assets = Asset::whereHas('maintainable', fn($query) => $query->where('end_warranty_date', '>', Carbon::now()->addDays($delayDays)))->get();
         $user = $preference->user;
 
         foreach ($assetsOrLocations as $assetOrLocation) {
 
             app(MaintainableNotificationSchedulingService::class)->createScheduleForEndWarrantyDate($assetOrLocation->maintainable, $user);
-
-            // $notification = [
-            //     'status' => ScheduledNotificationStatusEnum::PENDING->value,
-            //     'data' => [
-            //         'subject' => 'test',
-            //         'notice_date' => $assetOrLocation->maintainable->end_warranty_date,
-            //         'link' => match ($assetOrLocation->maintainable->maintainable_type) {
-            //             'App\Models\Tenants\Site' => route('tenant.sites.show', $assetOrLocation->reference_code),
-            //             'App\Models\Tenants\Building' => route('tenant.buildings.show', $assetOrLocation->reference_code),
-            //             'App\Models\Tenants\Floor' => route('tenant.floors.show', $assetOrLocation->reference_code),
-            //             'App\Models\Tenants\Room' => route('tenant.rooms.show', $assetOrLocation->reference_code),
-            //             'App\Models\Tenants\Asset' => route('tenant.assets.show', $assetOrLocation->reference_code),
-            //         }
-            //     ]
-            // ];
-
-            // $assetOrLocation->notifications()->create([
-            //     ...$notification,
-            //     'scheduled_at' => $assetOrLocation->maintainable->end_warranty_date->subDays($delayDays),
-            //     'notification_type' => 'end_warranty_date',
-            //     'recipient_name' => $user->fullName,
-            //     'recipient_email' => $user->email,
-            // ]);
         }
     }
 
@@ -223,30 +199,11 @@ class NotificationSchedulingService
         foreach ($assets as $asset) {
 
             app(AssetNotificationSchedulingService::class)->createScheduleForDepreciable($asset, $preference->user);
-
-            // $notification = [
-            //     'status' => ScheduledNotificationStatusEnum::PENDING->value,
-            //     'data' => [
-            //         'subject' => 'test',
-            //         'notice_date' => $asset->end_date,
-            //         'link' => route('tenant.assets.show', $asset->reference_code)
-            //     ]
-            // ];
-
-            // $asset->notifications()->create([
-            //     ...$notification,
-            //     'scheduled_at' => $asset->depreciation_end_date->subDays($delayDays),
-            //     'notification_type' => 'depreciation_end_date',
-            //     'recipient_name' => $user->fullName,
-            //     'recipient_email' => $user->email,
-            // ]);
         }
     }
 
     public function createScheduleForNextMaintenanceDate(UserNotificationPreference $preference)
     {
-        // dump('-- createScheduleForNextMaintenanceDate');
-        // dump($preference->user);
         $delayDays = $preference->notification_delay_days;
         $assetsOrLocations = collect([]);
 
@@ -262,29 +219,6 @@ class NotificationSchedulingService
         foreach ($assetsOrLocations as $assetOrLocation) {
 
             app(MaintainableNotificationSchedulingService::class)->createScheduleForNextMaintenanceDate($assetOrLocation->maintainable, $user);
-
-            // $notification = [
-            //     'status' => ScheduledNotificationStatusEnum::PENDING->value,
-            //     'data' => [
-            //         'subject' => 'test',
-            //         'notice_date' => $assetOrLocation->maintainable->next_maintenance_date,
-            //         'link' => match ($assetOrLocation->maintainable->maintainable_type) {
-            //             'App\Models\Tenants\Site' => route('tenant.sites.show', $assetOrLocation->reference_code),
-            //             'App\Models\Tenants\Building' => route('tenant.buildings.show', $assetOrLocation->reference_code),
-            //             'App\Models\Tenants\Floor' => route('tenant.floors.show', $assetOrLocation->reference_code),
-            //             'App\Models\Tenants\Room' => route('tenant.rooms.show', $assetOrLocation->reference_code),
-            //             'App\Models\Tenants\Asset' => route('tenant.assets.show', $assetOrLocation->reference_code),
-            //         }
-            //     ]
-            // ];
-
-            // $assetOrLocation->notifications()->create([
-            //     ...$notification,
-            //     'scheduled_at' => $assetOrLocation->maintainable->next_maintenance_date->subDays($delayDays),
-            //     'notification_type' => 'next_maintenance_date',
-            //     'recipient_name' => $user->fullName,
-            //     'recipient_email' => $user->email,
-            // ]);
         }
     }
 
