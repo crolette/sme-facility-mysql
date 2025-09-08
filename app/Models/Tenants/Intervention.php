@@ -44,8 +44,8 @@ class Intervention extends Model
         return [
             'planned_at' => 'date:d-m-Y',
             'repair_delay' => 'date:d-m-Y',
-            'created_at' => 'date:d-m-Y H:m',
-            'updated_at' => 'date:d-m-Y H:m',
+            'created_at' => 'date:d-m-Y H:i',
+            'updated_at' => 'date:d-m-Y H:i',
             'status' => InterventionStatus::class,
             'priority' => PriorityLevel::class
         ];

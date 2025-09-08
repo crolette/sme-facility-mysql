@@ -21,7 +21,7 @@ class NewPasswordController extends Controller
      */
     public function create(Request $request): Response
     {
-        return Inertia::render('auth/reset-password', [
+        return Inertia::render('tenants/auth/reset-password', [
             'email' => $request->email,
             'token' => $request->route('token'),
         ]);
@@ -59,7 +59,7 @@ class NewPasswordController extends Controller
         // the application's home authenticated view. If there is an error we can
         // redirect them back to where they came from with their error message.
         if ($status == Password::PasswordReset) {
-            return to_route('central.login')->with('status', __($status));
+            return to_route('tenant.login')->with('status', __($status));
         }
 
         throw ValidationException::withMessages([

@@ -12,7 +12,6 @@ use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
-use Illuminate\Support\Facades\Storage;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
@@ -20,112 +19,138 @@ use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
 
 beforeEach(function () {
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    LocationType::factory()->create(['level' => 'room']);
-    CategoryType::factory()->count(2)->create(['category' => 'document']);
-    $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
-    CategoryType::factory()->count(2)->create(['category' => 'asset']);
+    $this->siteType = LocationType::factory()->create(['level' => 'site']);
+    $this->documentCategory = CategoryType::factory()->create(['category' => 'document']);
 
     $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
 
     // on créée les différentes "locations" possibles pour attacher un asset
     $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
-    $this->room = Room::factory()
-        ->for(LocationType::where('level', 'room')->first())
-        ->for(Floor::first())
-        ->create();
 
     // on créé un asset qu'on attache à une room
     // $this->asset = Asset::factory()->forLocation($this->room)->create();
 });
 
-it('can upload several files to asset', function () {
+it('can upload several files when site is created', function () {
 
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
-    $categoryType = CategoryType::where('category', 'document')->first();
 
     $formData = [
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'locationId' => $this->room->id,
-        'locationReference' => $this->room->reference_code,
-        'locationType' => 'room',
-        'categoryId' => $this->categoryType->id,
+        'name' => 'New site',
+        'description' => 'Description new site',
+        'locationType' => $this->siteType->id,
         'files' => [
             [
                 'file' => $file1,
                 'name' => 'FILE 1 - Long name of more than 10 chars',
                 'description' => 'descriptionIMG',
-                'typeId' => $categoryType->id,
-                'typeSlug' => $categoryType->slug
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
             ],
             [
                 'file' => $file2,
                 'name' => 'FILE 2 - Long name of more than 10 chars',
                 'description' => 'descriptionPDF',
-                'typeId' => $categoryType->id,
-                'typeSlug' => $categoryType->slug
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
             ]
         ]
     ];
 
-    $response = $this->postToTenant('api.assets.store', $formData);
+    $response = $this->postToTenant('api.sites.store', $formData);
     $response->assertSessionHasNoErrors();
 
     assertDatabaseCount('documents', 2);
     assertDatabaseHas('documentables', [
         'document_id' => 1,
-        'documentable_type' => 'App\Models\Tenants\Asset',
-        'documentable_id' => 1
+        'documentable_type' => 'App\Models\Tenants\Site',
+        'documentable_id' => 2
     ]);
     assertDatabaseHas('documentables', [
         'document_id' => 2,
-        'documentable_type' => 'App\Models\Tenants\Asset',
-        'documentable_id' => 1
+        'documentable_type' => 'App\Models\Tenants\Site',
+        'documentable_id' => 2
     ]);
 
     Storage::disk('tenants')->assertExists(Document::first()->path);
 });
+
+it('can upload a document to an existing site', function () {
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
+
+    $formData = [
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ]
+        ]
+    ];
+
+    $response = $this->postToTenant('api.sites.documents.post', $formData, $this->site->reference_code);
+    $response->assertSessionHasNoErrors();
+
+    $document = Document::first();
+    expect(Storage::disk('tenants')->exists($document->directory))->toBeTrue();
+    expect(Storage::disk('tenants')->exists($document->path))->toBeTrue();
+
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => 'App\Models\Tenants\Site',
+        'documentable_id' => 1
+    ]);
+
+    assertDatabaseHas('documentables', [
+        'document_id' => 2,
+        'documentable_type' => 'App\Models\Tenants\Site',
+        'documentable_id' => 1
+    ]);
+});
+
 
 
 it('fails when upload wrong image mime (ie. webp)', function () {
 
     $file1 = UploadedFile::fake()->image('avatar.webp');
     $file2 = UploadedFile::fake()->create('report.docx', 100, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-    $categoryType = CategoryType::where('category', 'document')->first();
 
     $formData = [
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'locationId' => $this->room->id,
-        'locationReference' => $this->room->reference_code,
-        'locationType' => 'room',
-        'categoryId' => $this->categoryType->id,
+        'name' => 'New site',
+        'description' => 'Description new site',
+        'locationType' => $this->siteType->id,
         'files' => [
             [
                 'file' => $file1,
                 'name' => 'Long description of more than 10 chars',
                 'description' => 'descriptionIMG',
-                'typeId' => $categoryType->id,
-                'typeName' => $categoryType->slug
+                'typeId' => $this->documentCategory->id,
+                'typeName' => $this->documentCategory->slug
             ],
             [
                 'file' => $file2,
                 'name' => 'Long description of more than 10 chars',
                 'description' => 'descriptionPDF',
-                'typeId' => $categoryType->id,
-                'typeName' => $categoryType->slug
+                'typeId' => $this->documentCategory->id,
+                'typeName' => $this->documentCategory->slug
             ]
         ]
     ];
 
-    $response = $this->postToTenant('api.assets.store', $formData);
+    $response = $this->postToTenant('api.sites.store', $formData);
     $response->assertSessionHasErrors([
         'files.0.file' => "The files.0.file field must be a file of type: jpg, jpeg, png, pdf.",
         'files.1.file' => "The files.1.file field must be a file of type: jpg, jpeg, png, pdf."
@@ -135,41 +160,51 @@ it('fails when upload wrong image mime (ie. webp)', function () {
 it('fails when upload exceeding document size : ' . Document::maxUploadSizeKB() . "kb", function () {
 
     $file1 = UploadedFile::fake()->create('nomdufichier.pdf', Document::maxUploadSizeKB() * 2, 'application/pdf');
-    $categoryType = CategoryType::where('category', 'document')->first();
 
     $formData = [
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'locationId' => $this->room->id,
-        'locationReference' => $this->room->reference_code,
-        'locationType' => 'room',
-        'categoryId' => $this->categoryType->id,
+        'name' => 'New site',
+        'description' => 'Description new site',
+        'locationType' => $this->siteType->id,
         'files' => [
             [
                 'file' => $file1,
                 'name' => 'Long description of more than 10 chars',
                 'description' => 'descriptionIMG',
-                'typeId' => $categoryType->id,
-                'typeName' => $categoryType->slug
+                'typeId' => $this->documentCategory->id,
+                'typeName' => $this->documentCategory->slug
             ],
         ]
     ];
 
-    $response = $this->postToTenant('api.assets.store', $formData);
+    $response = $this->postToTenant('api.sites.store', $formData);
     $response->assertSessionHasErrors([
         'files.0.file' => "The files.0.file field must not be greater than " . Document::maxUploadSizeKB() . " kilobytes.",
     ]);
 });
 
-it('can delete a document from an asset', function () {
+it('can delete a document from a site', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
-    $document = Document::factory()->withCustomAttributes([
-        'user' => $this->user,
-        'directoryName' => 'assets',
-        'model' => $asset,
-    ])->create();
-    $asset->documents()->attach($document);
+
+    $file1 = UploadedFile::fake()->image('avatar.png');
+
+    $formData = [
+
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ],
+
+        ]
+    ];
+
+    $response = $this->postToTenant('api.sites.documents.post', $formData, $this->site->reference_code);
+    $response->assertSessionHasNoErrors();
+
+    $document = $this->site->documents()->first();
 
     $response = $this->deleteFromTenant('api.documents.delete', $document->id);
     $response->assertOk();
@@ -180,28 +215,27 @@ it('can delete a document from an asset', function () {
     ]);
 
     $this->assertDatabaseMissing('documentables', [
-        'documentable_id' => $asset->id,
-        'documentable_type' => Asset::class
+        'documentable_id' =>  $this->site->id,
+        'documentable_type' => Site::class
     ]);
+    expect(Storage::disk('tenants')->exists($document->path))->toBeFalse();
 });
 
-it('can update name and description a document from an asset ', function () {
+it('can update name and description a document from a site ', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+
     $document = Document::factory()->withCustomAttributes([
         'user' => $this->user,
-        'directoryName' => 'assets',
-        'model' => $asset,
+        'directoryName' => 'sites',
+        'model' =>  $this->site,
     ])->create();
-    $asset->documents()->attach($document);
-
-    $categoryType = CategoryType::where('category', 'document')->get()->last();
+    $this->site->documents()->attach($document);
 
     $formData =  [
         'name' => 'New document name',
         'description' =>  'New description of the new document',
-        'typeId' => $categoryType->id,
-        'typeSlug' => $categoryType->slug
+        'typeId' => $this->documentCategory->id,
+        'typeSlug' => $this->documentCategory->slug
     ];
 
     $response = $this->patchToTenant('api.documents.update', $formData, $document->id);
@@ -210,45 +244,15 @@ it('can update name and description a document from an asset ', function () {
         'id' => $document->id,
         'name' => 'New document name',
         'description' => 'New description of the new document',
-        'category_type_id' => $categoryType->id
+        'category_type_id' => $this->documentCategory->id
     ]);
 });
-
-it('can upload a document to an asset', function () {
-    $file1 = UploadedFile::fake()->image('avatar.png');
-    $categoryType = CategoryType::where('category', 'document')->first();
-
-    $asset = Asset::factory()->forLocation($this->room)->create();
-
-    $formData = [
-
-        'files' => [
-            [
-                'file' => $file1,
-                'name' => 'FILE 1 - Long name of more than 10 chars',
-                'description' => 'descriptionIMG',
-                'typeId' => $categoryType->id,
-                'typeSlug' => $categoryType->slug
-            ],
-
-        ]
-    ];
-
-    $response = $this->postToTenant('api.assets.documents.post', $formData, $asset->reference_code);
-    $response->assertSessionHasNoErrors();
-
-    $document = $asset->documents()->first();
-
-    expect(Storage::disk('tenants')->exists($document->directory))->toBeTrue();
-});
-
 
 it('deletes the documents directory if it is empty', function () {
 
     $file1 = UploadedFile::fake()->image('avatar.png');
-    $categoryType = CategoryType::where('category', 'document')->first();
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $site = Site::factory()->create();
 
     $formData = [
 
@@ -257,17 +261,17 @@ it('deletes the documents directory if it is empty', function () {
                 'file' => $file1,
                 'name' => 'FILE 1 - Long name of more than 10 chars',
                 'description' => 'descriptionIMG',
-                'typeId' => $categoryType->id,
-                'typeSlug' => $categoryType->slug
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
             ],
 
         ]
     ];
 
-    $response = $this->postToTenant('api.assets.documents.post', $formData, $asset->reference_code);
+    $response = $this->postToTenant('api.sites.documents.post', $formData, $site->reference_code);
     $response->assertSessionHasNoErrors();
 
-    $document = $asset->documents()->first();
+    $document = $site->documents()->first();
 
     expect(Storage::disk('tenants')->exists($document->directory))->toBeTrue();
 
@@ -280,8 +284,8 @@ it('deletes the documents directory if it is empty', function () {
     ]);
 
     $this->assertDatabaseMissing('documentables', [
-        'documentable_id' => $asset->id,
-        'documentable_type' => Asset::class
+        'documentable_id' => $site->id,
+        'documentable_type' => Site::class
     ]);
 
     expect(Storage::disk('tenants')->exists($document->directory))->toBeFalse();
@@ -289,9 +293,8 @@ it('deletes the documents directory if it is empty', function () {
 
 it('do not delete the documents directory if it is not empty', function () {
     $file1 = UploadedFile::fake()->image('avatar.png');
-    $categoryType = CategoryType::where('category', 'document')->first();
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $site = Site::factory()->create();
 
     $formData = [
 
@@ -300,14 +303,14 @@ it('do not delete the documents directory if it is not empty', function () {
                 'file' => $file1,
                 'name' => 'FILE 1 - First file',
                 'description' => 'descriptionIMG',
-                'typeId' => $categoryType->id,
-                'typeSlug' => $categoryType->slug
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
             ],
 
         ]
     ];
 
-    $response = $this->postToTenant('api.assets.documents.post', $formData, $asset->reference_code);
+    $response = $this->postToTenant('api.sites.documents.post', $formData, $site->reference_code);
     $response->assertSessionHasNoErrors();
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
     $formData = [
@@ -317,17 +320,17 @@ it('do not delete the documents directory if it is not empty', function () {
                 'file' => $file2,
                 'name' => 'FILE 2 - Second file',
                 'description' => 'descriptionIMG',
-                'typeId' => $categoryType->id,
-                'typeSlug' => $categoryType->slug
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
             ],
 
         ]
     ];
 
-    $response = $this->postToTenant('api.assets.documents.post', $formData, $asset->reference_code);
+    $response = $this->postToTenant('api.sites.documents.post', $formData, $site->reference_code);
     $response->assertSessionHasNoErrors();
 
-    $document = $asset->documents()->first();
+    $document = $site->documents()->first();
 
 
     $response = $this->deleteFromTenant('api.documents.delete', $document->id);
@@ -340,8 +343,8 @@ it('do not delete the documents directory if it is not empty', function () {
 
     $this->assertDatabaseMissing('documentables', [
         'document_id' => $document->id,
-        'documentable_id' => $asset->id,
-        'documentable_type' => Asset::class
+        'documentable_id' => $site->id,
+        'documentable_type' => Site::class
     ]);
 
     expect(Storage::disk('tenants')->exists($document->directory))->toBeTrue();

@@ -10,6 +10,7 @@ use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Contract;
+use App\Enums\MaintenanceFrequency;
 use App\Models\Tenants\Intervention;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Models\Tenants\ScheduledNotification;
@@ -62,6 +63,10 @@ class NotificationSchedulingService
         $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
 
         foreach ($scheduledNotifications as $notification) {
+
+            if ($notification->notifiable->maintainable->maintenance_frequency == MaintenanceFrequency::ONDEMAND->value || $notification->notifiable->maintainable->next_maintenance_date->subDays($preference->notification_delay_days) < now())
+                continue;
+
             $newDate = $notification->notifiable->maintainable->next_maintenance_date->subDays($preference->notification_delay_days);
             $notification->update(['scheduled_at' => $newDate]);
         }
@@ -217,7 +222,6 @@ class NotificationSchedulingService
         $user = $preference->user;
 
         foreach ($assetsOrLocations as $assetOrLocation) {
-
             app(MaintainableNotificationSchedulingService::class)->createScheduleForNextMaintenanceDate($assetOrLocation->maintainable, $user);
         }
     }

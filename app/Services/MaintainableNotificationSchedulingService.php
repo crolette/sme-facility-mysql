@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\MaintenanceFrequency;
 use Carbon\Carbon;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
@@ -118,13 +119,12 @@ class MaintainableNotificationSchedulingService
 
     public function updateScheduleForNextMaintenanceDate(Maintainable $maintainable, Collection $notifications)
     {
-
         foreach ($notifications as $notification) {
             // changer scheduled_at en fonction de la nouvelle date de maintenance et en fonction des préférences utilisateurs
-            Debugbar::info($notification->user);
+
             $notificationPreference = $notification->user->notification_preferences()->where('notification_type', 'next_maintenance_date')->first();
 
-            if ($maintainable->next_maintenance_date->subDays($notificationPreference->notification_delay_days) < now())
+            if ($maintainable->maintenance_frequency == MaintenanceFrequency::ONDEMAND->value || $maintainable->next_maintenance_date->subDays($notificationPreference->notification_delay_days) < now())
                 continue;
 
             $notification->update(['scheduled_at' => $maintainable->next_maintenance_date->subDays($notificationPreference->notification_delay_days)]);
@@ -135,9 +135,7 @@ class MaintainableNotificationSchedulingService
     {
         $preference = $user->notification_preferences()->where('notification_type', 'next_maintenance_date')->first();
 
-        if ($preference && $preference->enabled && $maintainable->next_maintenance_date->subDays($preference->notification_delay_days) > now()) {
-            $delay = $preference->notification_delay_days;
-
+        if ($preference && $preference->enabled && $maintainable->maintenance_frequency != MaintenanceFrequency::ONDEMAND->value &&   $maintainable->next_maintenance_date->subDays($preference->notification_delay_days) > now()) {
             $notification = [
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
                 'notification_type' => 'next_maintenance_date',

@@ -99,7 +99,7 @@ export default function IndexTickets() {
             </div>
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <h3 className="inline">Tickets {!fetchingData && `(${tickets?.length ?? 0})`}</h3>
-                {fetchingData && [<p>Loading tickets...</p>]}
+                {fetchingData && <p>Loading tickets...</p>}
                 {!fetchingData && tickets && tickets?.length > 0 && (
                     <Table>
                         <TableHead>
@@ -115,44 +115,42 @@ export default function IndexTickets() {
                             </TableHeadRow>
                         </TableHead>
                         <TableBody>
-                            {tickets?.map((ticket, index) => {
-                                return (
-                                    <TableBodyRow key={index}>
-                                        <TableBodyData>
-                                            <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
-                                        </TableBodyData>
-                                        <TableBodyData>{ticket.asset_code}</TableBodyData>
-                                        <TableBodyData>{ticket.status}</TableBodyData>
-                                        <TableBodyData>{ticket.reporter?.full_name ?? ticket.reporter_email}</TableBodyData>
-                                        <TableBodyData>{ticket.description}</TableBodyData>
-                                        <TableBodyData>{ticket.created_at}</TableBodyData>
-                                        <TableBodyData>{ticket.updated_at}</TableBodyData>
+                            {tickets?.map((ticket, index) => (
+                                <TableBodyRow key={index}>
+                                    <TableBodyData>
+                                        <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
+                                    </TableBodyData>
+                                    <TableBodyData>{ticket.asset_code}</TableBodyData>
+                                    <TableBodyData>{ticket.status}</TableBodyData>
+                                    <TableBodyData>{ticket.reporter?.full_name ?? ticket.reporter_email}</TableBodyData>
+                                    <TableBodyData>{ticket.description}</TableBodyData>
+                                    <TableBodyData>{ticket.created_at}</TableBodyData>
+                                    <TableBodyData>{ticket.updated_at}</TableBodyData>
 
-                                        <TableBodyData>
-                                            {ticket.status == 'open' && (
-                                                <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'ongoing')}>
-                                                    Ongoing
+                                    <TableBodyData>
+                                        {ticket.status == 'open' && (
+                                            <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'ongoing')}>
+                                                Ongoing
+                                            </Button>
+                                        )}
+                                        {ticket.status !== 'closed' && (
+                                            <>
+                                                <Button variant={'destructive'} onClick={() => changeStatusTicket(ticket.id, 'closed')}>
+                                                    Close
                                                 </Button>
-                                            )}
-                                            {ticket.status !== 'closed' && (
-                                                <>
-                                                    <Button variant={'destructive'} onClick={() => changeStatusTicket(ticket.id, 'closed')}>
-                                                        Close
-                                                    </Button>
-                                                    <a href={route('tenant.tickets.show', ticket.id)}>
-                                                        <Button type="button">Show</Button>
-                                                    </a>
-                                                </>
-                                            )}
-                                            {ticket.status === 'closed' && (
-                                                <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'open')}>
-                                                    Re-open
-                                                </Button>
-                                            )}
-                                        </TableBodyData>
-                                    </TableBodyRow>
-                                );
-                            })}
+                                                <a href={route('tenant.tickets.show', ticket.id)}>
+                                                    <Button type="button">Show</Button>
+                                                </a>
+                                            </>
+                                        )}
+                                        {ticket.status === 'closed' && (
+                                            <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'open')}>
+                                                Re-open
+                                            </Button>
+                                        )}
+                                    </TableBodyData>
+                                </TableBodyRow>
+                            ))}
                         </TableBody>
                     </Table>
                 )}

@@ -12,9 +12,14 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
                 {items.map((item) => (
                     <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton asChild isActive={item.href === page.url} tooltip={{ children: item.title }}>
-                            <Link href={item.href} prefetch>
+                            <Link href={item.href} prefetch className="flex">
                                 {item.icon && <item.icon />}
                                 <span>{item.title}</span>
+                                {item.count && (
+                                    <div className="bg-accent-foreground text-accent flex h-4 w-4 items-center justify-center rounded-full p-3 text-xs">
+                                        <span>{item.count}</span>
+                                    </div>
+                                )}
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

@@ -6,6 +6,7 @@ import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { Label } from '../ui/label';
 
 interface DocumentManagerProps {
     itemCodeId: number | string;
@@ -234,6 +235,7 @@ export const DocumentManager = ({
                             <div className="flex flex-col gap-2">
                                 <form onSubmit={submitType === 'edit' ? submitEditFile : submitNewFile} className="space-y-2">
                                     <p className="text-center">{submitType === 'edit' ? 'Edit document' : 'Add document'}</p>
+                                    <Label>Document category</Label>
                                     <select
                                         name="documentType"
                                         required
@@ -282,7 +284,7 @@ export const DocumentManager = ({
                                             <p className="text-xs">Accepted files: png, jpg, pdf. - Maximum file size: 4MB</p>
                                         </>
                                     )}
-
+                                    <Label>Document name</Label>
                                     <Input
                                         type="text"
                                         name="name"
@@ -296,7 +298,7 @@ export const DocumentManager = ({
                                             }))
                                         }
                                     />
-
+                                    <Label>Document description</Label>
                                     <Input
                                         type="text"
                                         name="description"
