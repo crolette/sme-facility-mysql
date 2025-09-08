@@ -23,59 +23,112 @@
 
         <div class="content">
             @switch($notificationType)
-                @case('contract_expiry')
+                @case('depreciation_end_date')
                     <div class="alert">
-                        <strong>⚠️ Expiration de contrat</strong>
+                        <strong>🛡️ Fin d'amortissement</strong>
+                    </div>
+                    <p>L'amortissement d'un asset arrive à expiration :</p>
+                    <div class="details">
+                        <strong>Asset :</strong> {{ $data['subject'] ?? 'N/A' }}<br>
+                        <strong>Fin d'amortissement :</strong> {{ isset($data['warranty_end_date']) ? \Carbon\Carbon::parse($data['warranty_end_date'])->format('d/m/Y') : 'N/A' }}<br>
+                        <strong>Lien :</strong> {{ $data['link'] ?? 'N/A' }}<br>
+                    </div>
+                    <p>Après cette date, l'asset ne sera plus couvert par la garantie constructeur.</p>
+                @break
+
+                 @case('notice_date')
+                    <div class="alert">
+                        <strong>⚠️ Préavis contrat </strong>
                     </div>
                     <p>Un contrat arrive à expiration prochainement :</p>
                     <div class="details">
                         <strong>Contrat :</strong> {{ $data['contract_name'] ?? 'N/A' }}<br>
                         <strong>Date d'expiration :</strong> {{ isset($data['expiry_date']) ? \Carbon\Carbon::parse($data['expiry_date'])->format('d/m/Y') : 'N/A' }}<br>
                         @if(isset($data['contract_reference']))
-                            <strong>Référence :</strong> {{ $data['contract_reference'] }}<br>
+                            <strong>Référence :</strong> {{ $data['contract_reference'] ?? 'N/A' }}<br>
                         @endif
                         @if(isset($data['supplier_name']))
-                            <strong>Fournisseur :</strong> {{ $data['supplier_name'] }}<br>
+                            <strong>Fournisseur :</strong> {{ $data['supplier_name'] ?? 'N/A' }}<br>
                         @endif
+                        <strong>Lien :</strong> <a href="{{ $data['link'] ?? '' }}">{{ $data['link'] ?? 'N/A' }}</a><br>
                     </div>
                     <p>Nous vous recommandons de prendre les dispositions nécessaires pour le renouvellement ou la résiliation de ce contrat.</p>
+                @break
+
+                @case('end_date')
+                    <div class="alert">
+                        <strong>⚠️ Expiration de contrat</strong>
+                    </div>
+                    <p>Un contrat arrive à expiration prochainement :</p>
+                    <div class="details">
+                        <strong>Contrat :</strong> {{ $data['contract_name'] ?? 'N/A' }}<br>
+                        
+
+                        <strong>Date d'expiration :</strong> {{ isset($data['expiry_date']) ? \Carbon\Carbon::parse($data['expiry_date'])->format('d/m/Y') : 'N/A' }}<br>
+                        @if(isset($data['contract_reference']))
+                            <strong>Référence :</strong> {{ $data['contract_reference'] ?? 'N/A' }}<br>
+                        @endif
+                        @if(isset($data['supplier_name']))
+                            <strong>Fournisseur :</strong> {{ $data['supplier_name'] ?? 'N/A' }}<br>
+                        @endif
+                        <strong>Lien :</strong> <a href="{{ $data['link'] ?? '' }}">{{ $data['link'] ?? 'N/A' }}</a><br>
+                    </div>
+                    <p>Nous vous recommandons de prendre les dispositions nécessaires pour le renouvellement ou la résiliation de ce contrat.</p>
+                @break           
+
+                @case('planned_at')
+                    <div class="alert">
+                        <strong>⚠️ Intervention à prévoir</strong>
+                    </div>
+                    <p>Une intervention est à prévoir prochainement :</p>
+                    <div class="details">
+                        <strong>Intervention :</strong> {{ $data['subject'] ?? 'N/A' }}<br>
+                        <strong>Date d'intervention :</strong> {{ isset($data['expiry_date']) ? \Carbon\Carbon::parse($data['expiry_date'])->format('d/m/Y') : 'N/A' }}<br>
+                       
+                        <strong>Lien :</strong> <a href="{{ $data['link'] ?? '' }}">{{ $data['link'] ?? 'N/A' }}</a><br>
+                    </div>
+                    <p>Nous vous recommandons de prendre les dispositions nécessaires pour l'intervention.</p>
                     @break
 
-                @case('maintenance_due')
+                @case('next_maintenance_date')
                     <div class="alert">
                         <strong>🔧 Maintenance programmée</strong>
                     </div>
                     <p>Une maintenance est programmée prochainement :</p>
                     <div class="details">
-                        <strong>Asset :</strong> {{ $data['asset_name'] ?? 'N/A' }}<br>
+                        <strong>Asset :</strong> {{ $data['subject'] ?? 'N/A' }}<br>
                         <strong>Date de maintenance :</strong> {{ isset($data['maintenance_date']) ? \Carbon\Carbon::parse($data['maintenance_date'])->format('d/m/Y') : 'N/A' }}<br>
                         @if(isset($data['maintenance_type']))
-                            <strong>Type :</strong> {{ $data['maintenance_type'] }}<br>
+                            <strong>Type :</strong> {{ $data['maintenance_type'] ?? 'N/A' }}<br>
                         @endif
                         @if(isset($data['location']))
-                            <strong>Localisation :</strong> {{ $data['location'] }}<br>
+                            <strong>Localisation :</strong> {{ $data['location'] ?? 'N/A' }}<br>
                         @endif
+                        <strong>Lien :</strong> <a href="{{ $data['link'] ?? '' }}">{{ $data['link'] ?? 'N/A' }}</a><br>
                     </div>
                     <p>Veillez à organiser cette maintenance dans les délais prévus.</p>
                     @break
 
-                @case('warranty_end')
+                @case('end_warranty_date')
                     <div class="alert">
                         <strong>🛡️ Fin de garantie</strong>
                     </div>
                     <p>La garantie d'un asset arrive à expiration :</p>
                     <div class="details">
-                        <strong>Asset :</strong> {{ $data['asset_name'] ?? 'N/A' }}<br>
+                        <strong>Asset :</strong> {{ $data['subject'] ?? 'N/A' }}<br>
                         <strong>Fin de garantie :</strong> {{ isset($data['warranty_end_date']) ? \Carbon\Carbon::parse($data['warranty_end_date'])->format('d/m/Y') : 'N/A' }}<br>
                         @if(isset($data['warranty_type']))
-                            <strong>Type de garantie :</strong> {{ $data['warranty_type'] }}<br>
+                            <strong>Type de garantie :</strong> {{ $data['warranty_type'] ?? 'N/A' }}<br>
                         @endif
                         @if(isset($data['supplier_name']))
-                            <strong>Fournisseur :</strong> {{ $data['supplier_name'] }}<br>
+                            <strong>Fournisseur :</strong> {{ $data['supplier_name'] ?? 'N/A' }}<br>
                         @endif
+                       <strong>Lien :</strong> <a href="{{ $data['link'] ?? '' }}">{{ $data['link'] ?? 'N/A' }}</a><br>
                     </div>
                     <p>Après cette date, l'asset ne sera plus couvert par la garantie constructeur.</p>
                     @break
+
+                
 
                 @default
                     <div class="alert">

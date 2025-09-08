@@ -151,7 +151,14 @@ class MaintainableNotificationSchedulingService
 
                 'data' => [
                     'subject' => $maintainable->name,
-                    'next_maintenance_date' => $maintainable->next_maintenance_date
+                    'next_maintenance_date' => $maintainable->next_maintenance_date,
+                    'link' => match ($maintainable->maintainable_type) {
+                        'App\Models\Tenants\Site' => route('tenant.sites.show', $maintainable->maintainable->reference_code),
+                        'App\Models\Tenants\Building' => route('tenant.buildings.show', $maintainable->maintainable->reference_code),
+                        'App\Models\Tenants\Floor' => route('tenant.floors.show', $maintainable->maintainable->reference_code),
+                        'App\Models\Tenants\Room' => route('tenant.rooms.show', $maintainable->maintainable->reference_code),
+                        'App\Models\Tenants\Asset' => route('tenant.assets.show', $maintainable->maintainable->reference_code),
+                    }
                 ]
             ];
 
@@ -191,7 +198,14 @@ class MaintainableNotificationSchedulingService
 
                 'data' => [
                     'subject' => $maintainable->name,
-                    'end_warranty_date' => $maintainable->end_warranty_date
+                    'end_warranty_date' => $maintainable->end_warranty_date,
+                    'link' => match ($maintainable->maintainable_type) {
+                        'App\Models\Tenants\Site' => route('tenant.sites.show', $maintainable->maintainable->reference_code),
+                        'App\Models\Tenants\Building' => route('tenant.buildings.show', $maintainable->maintainable->reference_code),
+                        'App\Models\Tenants\Floor' => route('tenant.floors.show', $maintainable->maintainable->reference_code),
+                        'App\Models\Tenants\Room' => route('tenant.rooms.show', $maintainable->maintainable->reference_code),
+                        'App\Models\Tenants\Asset' => route('tenant.assets.show', $maintainable->maintainable->reference_code),
+                    }
                 ]
             ];
 

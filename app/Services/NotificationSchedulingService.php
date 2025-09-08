@@ -141,7 +141,8 @@ class NotificationSchedulingService
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
                 'data' => [
                     'subject' => 'test',
-                    'notice_date' => $intervention->planned_at
+                    'notice_date' => $intervention->planned_at,
+                    'link' => route('tenant.interventions.show', $intervention->id)
                 ]
             ];
 
@@ -170,7 +171,8 @@ class NotificationSchedulingService
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
                 'data' => [
                     'subject' => 'test',
-                    'notice_date' => $contract->notice_date
+                    'notice_date' => $contract->notice_date,
+                    'link' => route('tenant.contracts.show', $contract->id)
                 ]
             ];
 
@@ -200,7 +202,8 @@ class NotificationSchedulingService
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
                 'data' => [
                     'subject' => 'test',
-                    'notice_date' => $contract->end_date
+                    'notice_date' => $contract->end_date,
+                    'link' => route('tenant.contracts.show', $contract->id)
                 ]
             ];
 
@@ -237,7 +240,14 @@ class NotificationSchedulingService
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
                 'data' => [
                     'subject' => 'test',
-                    'notice_date' => $assetOrLocation->maintainable->end_warranty_date
+                    'notice_date' => $assetOrLocation->maintainable->end_warranty_date,
+                    'link' => match ($assetOrLocation->maintainable->maintainable_type) {
+                        'App\Models\Tenants\Site' => route('tenant.sites.show', $assetOrLocation->reference_code),
+                        'App\Models\Tenants\Building' => route('tenant.buildings.show', $assetOrLocation->reference_code),
+                        'App\Models\Tenants\Floor' => route('tenant.floors.show', $assetOrLocation->reference_code),
+                        'App\Models\Tenants\Room' => route('tenant.rooms.show', $assetOrLocation->reference_code),
+                        'App\Models\Tenants\Asset' => route('tenant.assets.show', $assetOrLocation->reference_code),
+                    }
                 ]
             ];
 
@@ -263,7 +273,8 @@ class NotificationSchedulingService
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
                 'data' => [
                     'subject' => 'test',
-                    'notice_date' => $asset->end_date
+                    'notice_date' => $asset->end_date,
+                    'link' => route('tenant.assets.show', $asset->reference_code)
                 ]
             ];
 
@@ -298,7 +309,14 @@ class NotificationSchedulingService
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
                 'data' => [
                     'subject' => 'test',
-                    'notice_date' => $assetOrLocation->maintainable->next_maintenance_date
+                    'notice_date' => $assetOrLocation->maintainable->next_maintenance_date,
+                    'link' => match ($assetOrLocation->maintainable->maintainable_type) {
+                        'App\Models\Tenants\Site' => route('tenant.sites.show', $assetOrLocation->reference_code),
+                        'App\Models\Tenants\Building' => route('tenant.buildings.show', $assetOrLocation->reference_code),
+                        'App\Models\Tenants\Floor' => route('tenant.floors.show', $assetOrLocation->reference_code),
+                        'App\Models\Tenants\Room' => route('tenant.rooms.show', $assetOrLocation->reference_code),
+                        'App\Models\Tenants\Asset' => route('tenant.assets.show', $assetOrLocation->reference_code),
+                    }
                 ]
             ];
 

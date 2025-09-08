@@ -88,7 +88,8 @@ class AssetNotificationSchedulingService
 
                 'data' => [
                     'subject' => $asset->name,
-                    'depreciation_end_date' => $asset->depreciation_end_date
+                    'depreciation_end_date' => $asset->depreciation_end_date,
+                    'link' => route('tenant.assets.show', $asset->reference_code)
                 ]
             ];
 
