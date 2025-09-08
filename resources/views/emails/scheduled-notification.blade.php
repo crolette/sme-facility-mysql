@@ -95,11 +95,9 @@
                     </div>
                     <p>Une maintenance est programmée prochainement :</p>
                     <div class="details">
-                        <strong>Asset :</strong> {{ $data['subject'] ?? 'N/A' }}<br>
+                        <strong>Asset/Lieu :</strong> {{ $data['subject'] ?? 'N/A' }}<br>
+                        <strong>Reference :</strong> {{ $data['reference'] ?? 'N/A' }}<br>
                         <strong>Date de maintenance :</strong> {{ isset($data['maintenance_date']) ? \Carbon\Carbon::parse($data['maintenance_date'])->format('d/m/Y') : 'N/A' }}<br>
-                        @if(isset($data['maintenance_type']))
-                            <strong>Type :</strong> {{ $data['maintenance_type'] ?? 'N/A' }}<br>
-                        @endif
                         @if(isset($data['location']))
                             <strong>Localisation :</strong> {{ $data['location'] ?? 'N/A' }}<br>
                         @endif
@@ -112,19 +110,17 @@
                     <div class="alert">
                         <strong>🛡️ Fin de garantie</strong>
                     </div>
-                    <p>La garantie d'un asset arrive à expiration :</p>
+                    <p>La garantie d'un asset/lieu arrive à expiration :</p>
                     <div class="details">
-                        <strong>Asset :</strong> {{ $data['subject'] ?? 'N/A' }}<br>
-                        <strong>Fin de garantie :</strong> {{ isset($data['warranty_end_date']) ? \Carbon\Carbon::parse($data['warranty_end_date'])->format('d/m/Y') : 'N/A' }}<br>
-                        @if(isset($data['warranty_type']))
-                            <strong>Type de garantie :</strong> {{ $data['warranty_type'] ?? 'N/A' }}<br>
-                        @endif
-                        @if(isset($data['supplier_name']))
-                            <strong>Fournisseur :</strong> {{ $data['supplier_name'] ?? 'N/A' }}<br>
+                        <strong>Asset/Lieu :</strong> {{ $data['subject'] ?? 'N/A' }}<br>
+                        <strong>Reference :</strong> {{ $data['reference'] ?? 'N/A' }}<br>
+                        <strong>Fin de garantie :</strong> {{ isset($data['end_warranty_date']) ? \Carbon\Carbon::parse($data['end_warranty_date'])->format('d/m/Y') : 'N/A' }}<br>
+                           @if(isset($data['location']))
+                            <strong>Localisation :</strong> {{ $data['location'] ?? 'N/A' }}<br>
                         @endif
                        <strong>Lien :</strong> <a href="{{ $data['link'] ?? '' }}">{{ $data['link'] ?? 'N/A' }}</a><br>
                     </div>
-                    <p>Après cette date, l'asset ne sera plus couvert par la garantie constructeur.</p>
+                    <p>Après cette date, l'asset/lieu ne sera plus couvert par la garantie.</p>
                     @break
 
                 

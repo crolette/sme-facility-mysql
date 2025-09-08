@@ -15,6 +15,8 @@ use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Models\Tenants\ScheduledNotification;
 use App\Enums\ScheduledNotificationStatusEnum;
 use App\Models\Tenants\UserNotificationPreference;
+use App\Services\AssetNotificationSchedulingService;
+use App\Services\MaintainableNotificationSchedulingService;
 
 class NotificationSchedulingService
 {
@@ -184,28 +186,31 @@ class NotificationSchedulingService
         $user = $preference->user;
 
         foreach ($assetsOrLocations as $assetOrLocation) {
-            $notification = [
-                'status' => ScheduledNotificationStatusEnum::PENDING->value,
-                'data' => [
-                    'subject' => 'test',
-                    'notice_date' => $assetOrLocation->maintainable->end_warranty_date,
-                    'link' => match ($assetOrLocation->maintainable->maintainable_type) {
-                        'App\Models\Tenants\Site' => route('tenant.sites.show', $assetOrLocation->reference_code),
-                        'App\Models\Tenants\Building' => route('tenant.buildings.show', $assetOrLocation->reference_code),
-                        'App\Models\Tenants\Floor' => route('tenant.floors.show', $assetOrLocation->reference_code),
-                        'App\Models\Tenants\Room' => route('tenant.rooms.show', $assetOrLocation->reference_code),
-                        'App\Models\Tenants\Asset' => route('tenant.assets.show', $assetOrLocation->reference_code),
-                    }
-                ]
-            ];
 
-            $assetOrLocation->notifications()->create([
-                ...$notification,
-                'scheduled_at' => $assetOrLocation->maintainable->end_warranty_date->subDays($delayDays),
-                'notification_type' => 'end_warranty_date',
-                'recipient_name' => $user->fullName,
-                'recipient_email' => $user->email,
-            ]);
+            app(MaintainableNotificationSchedulingService::class)->createScheduleForEndWarrantyDate($assetOrLocation->maintainable, $user);
+
+            // $notification = [
+            //     'status' => ScheduledNotificationStatusEnum::PENDING->value,
+            //     'data' => [
+            //         'subject' => 'test',
+            //         'notice_date' => $assetOrLocation->maintainable->end_warranty_date,
+            //         'link' => match ($assetOrLocation->maintainable->maintainable_type) {
+            //             'App\Models\Tenants\Site' => route('tenant.sites.show', $assetOrLocation->reference_code),
+            //             'App\Models\Tenants\Building' => route('tenant.buildings.show', $assetOrLocation->reference_code),
+            //             'App\Models\Tenants\Floor' => route('tenant.floors.show', $assetOrLocation->reference_code),
+            //             'App\Models\Tenants\Room' => route('tenant.rooms.show', $assetOrLocation->reference_code),
+            //             'App\Models\Tenants\Asset' => route('tenant.assets.show', $assetOrLocation->reference_code),
+            //         }
+            //     ]
+            // ];
+
+            // $assetOrLocation->notifications()->create([
+            //     ...$notification,
+            //     'scheduled_at' => $assetOrLocation->maintainable->end_warranty_date->subDays($delayDays),
+            //     'notification_type' => 'end_warranty_date',
+            //     'recipient_name' => $user->fullName,
+            //     'recipient_email' => $user->email,
+            // ]);
         }
     }
 
@@ -255,28 +260,31 @@ class NotificationSchedulingService
         $user = $preference->user;
 
         foreach ($assetsOrLocations as $assetOrLocation) {
-            $notification = [
-                'status' => ScheduledNotificationStatusEnum::PENDING->value,
-                'data' => [
-                    'subject' => 'test',
-                    'notice_date' => $assetOrLocation->maintainable->next_maintenance_date,
-                    'link' => match ($assetOrLocation->maintainable->maintainable_type) {
-                        'App\Models\Tenants\Site' => route('tenant.sites.show', $assetOrLocation->reference_code),
-                        'App\Models\Tenants\Building' => route('tenant.buildings.show', $assetOrLocation->reference_code),
-                        'App\Models\Tenants\Floor' => route('tenant.floors.show', $assetOrLocation->reference_code),
-                        'App\Models\Tenants\Room' => route('tenant.rooms.show', $assetOrLocation->reference_code),
-                        'App\Models\Tenants\Asset' => route('tenant.assets.show', $assetOrLocation->reference_code),
-                    }
-                ]
-            ];
 
-            $assetOrLocation->notifications()->create([
-                ...$notification,
-                'scheduled_at' => $assetOrLocation->maintainable->next_maintenance_date->subDays($delayDays),
-                'notification_type' => 'next_maintenance_date',
-                'recipient_name' => $user->fullName,
-                'recipient_email' => $user->email,
-            ]);
+            app(MaintainableNotificationSchedulingService::class)->createScheduleForNextMaintenanceDate($assetOrLocation->maintainable, $user);
+
+            // $notification = [
+            //     'status' => ScheduledNotificationStatusEnum::PENDING->value,
+            //     'data' => [
+            //         'subject' => 'test',
+            //         'notice_date' => $assetOrLocation->maintainable->next_maintenance_date,
+            //         'link' => match ($assetOrLocation->maintainable->maintainable_type) {
+            //             'App\Models\Tenants\Site' => route('tenant.sites.show', $assetOrLocation->reference_code),
+            //             'App\Models\Tenants\Building' => route('tenant.buildings.show', $assetOrLocation->reference_code),
+            //             'App\Models\Tenants\Floor' => route('tenant.floors.show', $assetOrLocation->reference_code),
+            //             'App\Models\Tenants\Room' => route('tenant.rooms.show', $assetOrLocation->reference_code),
+            //             'App\Models\Tenants\Asset' => route('tenant.assets.show', $assetOrLocation->reference_code),
+            //         }
+            //     ]
+            // ];
+
+            // $assetOrLocation->notifications()->create([
+            //     ...$notification,
+            //     'scheduled_at' => $assetOrLocation->maintainable->next_maintenance_date->subDays($delayDays),
+            //     'notification_type' => 'next_maintenance_date',
+            //     'recipient_name' => $user->fullName,
+            //     'recipient_email' => $user->email,
+            // ]);
         }
     }
 

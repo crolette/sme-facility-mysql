@@ -10,6 +10,7 @@ class MaintainableObserver implements ShouldHandleEventsAfterCommit
 {
     public function created(Maintainable $maintainable)
     {
+        // dump('--- MAINTAINABLE OBERSERVER CREATED ---');
         app(MaintainableNotificationSchedulingService::class)->createScheduleForMaintainable($maintainable);
     }
 

@@ -56,11 +56,11 @@ class ScheduledNotificationMail extends Mailable
 
             // types : maintenance, warranty, depreciation, contract, intervention
             'next_maintenance_date' => 'Maintenance programmée - ' . ($this->data['subject'] ?? 'Maintenance'),
-            'end_warranty_date' => 'Fin de garantie prochaine - ' . ($this->data['subject'] ?? 'Asset'),
+            'end_warranty_date' => 'Fin de garantie prochaine - ' . ($this->data['subject'] ?? 'Maintenance'),
             'depreciation_end_date' => 'Fin de l\'amortissement - ' . ($this->data['subject'] ?? 'Asset'),
             'end_date' => 'Expiration de contrat à venir - ' . ($this->data['subject'] ?? 'Contrat'),
             'notice_date' => 'Contrat délai de préavis - ' . ($this->data['subject'] ?? 'Contrat'),
-            'planned_at' => 'Intervention à prévoir - ' . ($this->data['subject'] ?? 'Contrat') . ' - ' . ($this->data['priority'] ?? ''),
+            'planned_at' => 'Intervention à prévoir - ' . ($this->data['subject'] ?? 'Intervention') . ' - ' . ($this->data['priority'] ?? ''),
             default => 'Notification - ' . $this->notification->notification_type
         };
     }
