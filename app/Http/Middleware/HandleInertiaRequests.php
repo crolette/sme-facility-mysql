@@ -65,7 +65,7 @@ class HandleInertiaRequests extends Middleware
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
-            'openTicketsCount' => Ticket::where('status', 'open')->orWhere('status', 'ongoing')->count(),
+            'openTicketsCount' => tenancy()->tenant ? Ticket::where('status', 'open')->orWhere('status', 'ongoing')->count() : '',
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
