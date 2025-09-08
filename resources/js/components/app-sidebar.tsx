@@ -3,23 +3,9 @@ import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import axios from 'axios';
+import { Link, usePage } from '@inertiajs/react';
 import { BrickWall, Building, Building2, Cuboid, Handshake, LayoutDashboard, LayoutGrid, ScrollText, Ticket, Users } from 'lucide-react';
-import { useState } from 'react';
 import AppLogo from './app-logo';
-
-const fetchTicketCount = async () => {
-    try {
-        const response = await axios.get(route('api.tickets.index', { status: 'open' }));
-        return response.data.data.length;
-    } catch (error) {
-        console.log(error);
-        return 0;
-    }
-};
-
-fetchTicketCount();
 
 const mainNavItems: NavItem[] = [
     {
@@ -84,7 +70,11 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
-    const [openTicketsCount, setOpenTicketsCount] = useState();
+    const { props } = usePage();
+
+    const openTicketsCount = props.openTicketsCount as number;
+
+    const navItems = mainNavItems.map((item) => (item.title === 'Tickets' ? { ...item, count: openTicketsCount } : item));
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -101,7 +91,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={navItems} />
             </SidebarContent>
 
             <SidebarFooter>

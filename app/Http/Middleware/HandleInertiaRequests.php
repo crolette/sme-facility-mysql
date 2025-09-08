@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Tenants\Ticket;
 use Closure;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -64,6 +65,7 @@ class HandleInertiaRequests extends Middleware
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
+            'openTicketsCount' => Ticket::where('status', 'open')->orWhere('status', 'ongoing')->count(),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

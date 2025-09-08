@@ -14,10 +14,10 @@ class TicketController extends Controller
 
     public function index()
     {
-        $tickets = Ticket::all()->load('interventions');
+        // $tickets = Ticket::all()->load('interventions');
 
 
-        return Inertia::render('tenants/tickets/index', ['tickets' => $tickets]);
+        return Inertia::render('tenants/tickets/index');
     }
 
     public function create()
