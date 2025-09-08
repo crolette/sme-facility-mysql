@@ -130,7 +130,7 @@ export default function TenantDashboard({
                                 ))}
                             </div>
                         ) : (
-                            <p>No maintenance planned</p>
+                            <p>No interventions planned</p>
                         )}
                         {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
                     </div>
