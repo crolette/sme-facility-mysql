@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { Asset, type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
+import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ShowAsset({ item }: { item: Asset }) {
@@ -88,6 +89,8 @@ export default function ShowAsset({ item }: { item: Asset }) {
         },
     ];
 
+    const [showMobileMenu, setShowMobileMenu] = useState(false);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Asset ${asset.maintainable.name}`} />
@@ -123,7 +126,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                     </Button>
                 </div>
 
-                <div className="grid max-w-full grid-cols-[1fr_3fr] gap-4">
+                <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_3fr]">
                     <div className="bg-sidebar border-sidebar-border flex h-fit flex-col gap-2 rounded-md shadow-xl">
                         <div className="flex flex-col gap-1 px-4 py-2 text-center">
                             <p className="font-semibold">{asset.name}</p>
@@ -140,7 +143,33 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                 )}
                             </p>
                         </div>
-                        <ul className="mb-2 flex flex-col">
+                        {/* MOBILE MENU */}
+                        <ul className="relative mb-2 lg:hidden">
+                            <li
+                                className="bg-sidebar-accent flex cursor-pointer justify-between p-2"
+                                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                            >
+                                {activeTab}
+                                <ChevronDown />
+                            </li>
+                            {showMobileMenu && (
+                                <div className="bg-sidebar absolute w-full">
+                                    {navSidebar.map((nav) => (
+                                        <li
+                                            onClick={() => {
+                                                setActiveTab(nav.tabName);
+                                                setShowMobileMenu(false);
+                                            }}
+                                            className={'hover:bg-accent cursor-pointer p-2'}
+                                        >
+                                            {nav.tabDisplay}
+                                        </li>
+                                    ))}
+                                </div>
+                            )}
+                        </ul>
+                        {/* DESKTOP MENU */}
+                        <ul className="mb-2 hidden flex-col lg:flex">
                             {navSidebar.map((nav) => (
                                 <li
                                     onClick={() => setActiveTab(nav.tabName)}
@@ -151,7 +180,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             ))}
                         </ul>
                     </div>
-                    <div>
+                    <div className="overflow-hidden">
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                 <h2>Asset information</h2>

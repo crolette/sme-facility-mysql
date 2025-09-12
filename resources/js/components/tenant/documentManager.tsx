@@ -170,64 +170,60 @@ export const DocumentManager = ({
     console.log(newFileData);
 
     return (
-        <>
-            <details className="">
-                <summary className="border-sidebar-border rounded-md border-2 p-2">
-                    <h3 className="inline">Documents ({documents?.length ?? 0})</h3>
-                    {canAdd && <Button onClick={() => addNewFile()}>Add new file</Button>}
-                </summary>
-                {documents && documents.length > 0 && (
-                    <Table>
-                        <TableHead>
-                            <TableHeadRow>
-                                <TableHeadData>File</TableHeadData>
-                                <TableHeadData>Size</TableHeadData>
-                                <TableHeadData>Filename</TableHeadData>
-                                <TableHeadData>Name</TableHeadData>
-                                <TableHeadData>Description</TableHeadData>
-                                <TableHeadData>Created at</TableHeadData>
-                                <TableHeadData>Category</TableHeadData>
-                                <TableHeadData></TableHeadData>
-                            </TableHeadRow>
-                        </TableHead>
-                        <TableBody>
-                            {documents.map((document, index) => {
-                                const isImage = document.mime_type.startsWith('image/');
-                                const isPdf = document.mime_type === 'application/pdf';
-                                return (
-                                    <TableBodyRow key={index}>
-                                        <TableBodyData>
-                                            <a href={route(showRoute, document.id)}>
-                                                {isImage && (
-                                                    <img
-                                                        src={route(showRoute, document.id)}
-                                                        alt="preview"
-                                                        className="mx-auto h-20 w-20 rounded object-cover"
-                                                    />
-                                                )}
-                                                {isPdf && <BiSolidFilePdf size={'80px'} className="mx-auto" />}
-                                            </a>
-                                        </TableBodyData>
+        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+            <h2 className="inline">Documents ({documents?.length ?? 0})</h2>
+            {canAdd && <Button onClick={() => addNewFile()}>Add new file</Button>}
+            {documents && documents.length > 0 && (
+                <Table>
+                    <TableHead>
+                        <TableHeadRow>
+                            <TableHeadData>File</TableHeadData>
+                            <TableHeadData>Size</TableHeadData>
+                            <TableHeadData>Name</TableHeadData>
+                            <TableHeadData>Description</TableHeadData>
+                            <TableHeadData>Category</TableHeadData>
+                            <TableHeadData>Filename</TableHeadData>
+                            <TableHeadData>Created at</TableHeadData>
+                            <TableHeadData></TableHeadData>
+                        </TableHeadRow>
+                    </TableHead>
+                    <TableBody>
+                        {documents.map((document, index) => {
+                            const isImage = document.mime_type.startsWith('image/');
+                            const isPdf = document.mime_type === 'application/pdf';
+                            return (
+                                <TableBodyRow key={index}>
+                                    <TableBodyData>
+                                        <a href={route(showRoute, document.id)}>
+                                            {isImage && (
+                                                <img
+                                                    src={route(showRoute, document.id)}
+                                                    alt="preview"
+                                                    className="mx-auto h-10 w-10 rounded object-cover"
+                                                />
+                                            )}
+                                            {isPdf && <BiSolidFilePdf size={'40px'} className="mx-auto" />}
+                                        </a>
+                                    </TableBodyData>
 
-                                        <TableBodyData>{document.sizeMo} Mo</TableBodyData>
-                                        <TableBodyData>{document.filename}</TableBodyData>
-                                        <TableBodyData>{document.name}</TableBodyData>
-                                        <TableBodyData>{document.description}</TableBodyData>
-                                        <TableBodyData>{document.created_at}</TableBodyData>
-                                        <TableBodyData>{document.category}</TableBodyData>
-                                        <TableBodyData>
-                                            <Button variant={'destructive'} onClick={() => deleteDocument(document.id)}>
-                                                Delete
-                                            </Button>
-                                            <Button onClick={() => editFile(document.id)}>Edit</Button>
-                                        </TableBodyData>
-                                    </TableBodyRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
-                )}
-            </details>
+                                    <TableBodyData>{document.sizeMo} Mo</TableBodyData>
+                                    <TableBodyData>{document.name}</TableBodyData>
+                                    <TableBodyData>{document.description}</TableBodyData>
+                                    <TableBodyData>{document.category}</TableBodyData>
+                                    <TableBodyData>{document.filename}</TableBodyData>
+                                    <TableBodyData>{document.created_at}</TableBodyData>
+                                    <TableBodyData>
+                                        <Button variant={'destructive'} onClick={() => deleteDocument(document.id)}>
+                                            Delete
+                                        </Button>
+                                        <Button onClick={() => editFile(document.id)}>Edit</Button>
+                                    </TableBodyData>
+                                </TableBodyRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            )}
             {showFileModal && (
                 <div className="bg-background/50 fixed inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">
@@ -327,6 +323,6 @@ export const DocumentManager = ({
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 };

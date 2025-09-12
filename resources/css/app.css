@@ -161,8 +161,12 @@
     }
 }
 
-a:hover {
+a {
     @apply underline;
+}
+
+a:hover {
+    @apply italic;
 }
 
 h1 {

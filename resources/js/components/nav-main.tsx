@@ -11,7 +11,11 @@ export function NavMain({ items = [] }: { items: NavItem[] }) {
             <SidebarMenu>
                 {items.map((item) => (
                     <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild isActive={item.href === page.url} tooltip={{ children: item.title }}>
+                        <SidebarMenuButton
+                            asChild
+                            isActive={route().current()?.includes(item.title.toLowerCase())}
+                            tooltip={{ children: item.title }}
+                        >
                             <Link href={item.href} prefetch className="flex">
                                 {item.icon && <item.icon />}
                                 <span>{item.title}</span>
