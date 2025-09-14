@@ -75,9 +75,9 @@ export default function IndexSites({ items, routeName }: { locations: TenantSite
                                         <TableBodyData>{item.description}</TableBodyData>
 
                                         <TableBodyData>
-                                            <a href={route(`tenant.${routeName}.show`, item.reference_code)}>
+                                            {/* <a href={route(`tenant.${routeName}.show`, item.reference_code)}>
                                                 <Button variant={'outline'}>See</Button>
-                                            </a>
+                                            </a> */}
 
                                             <a href={route(`tenant.${routeName}.edit`, item.reference_code)}>
                                                 <Button>Edit</Button>

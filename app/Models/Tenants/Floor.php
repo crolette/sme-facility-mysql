@@ -100,6 +100,12 @@ class Floor extends Model
         return $this->belongsTo(Building::class, 'level_id');
     }
 
+    public function level()
+    {
+        return $this->belongsTo(Building::class, 'level_id');
+    }
+
+
     public function contracts(): MorphToMany
     {
         return $this->morphToMany(Contract::class, 'contractable');
@@ -159,12 +165,21 @@ class Floor extends Model
         );
     }
 
+    
+
     public function wallMaterial($locale = null): Attribute
     {
         $locale = $locale ?? app()->getLocale();
 
         return Attribute::make(
             get: fn() => $this->wallMaterialType ? $this->wallMaterialType->translations->where('locale', $locale)->first()?->label ?? $this->wallMaterialType->translations->where('locale', config('app.fallback_locale'))?->label : $this->wall_material_other  ?? null
+        );
+    }
+
+    public function levelPath(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => route('tenant.floors.show', $this->level->reference_code)
         );
     }
 
@@ -189,10 +204,5 @@ class Floor extends Model
         );
     }
 
-    public function level(): Attribute
-    {
-        return Attribute::make(
-            get: fn() => $this->building
-        );
-    }
+
 }

@@ -8,6 +8,7 @@ import { Checkbox } from '../ui/checkbox';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
+import { Pill } from '../ui/pill';
 
 interface TicketManagerProps {
     itemCode: string;
@@ -162,7 +163,9 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                                     <TableBodyData>
                                         <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
                                     </TableBodyData>
-                                    <TableBodyData>{ticket.status}</TableBodyData>
+                                    <TableBodyData>
+                                        <Pill variant={ticket.status}>{ticket.status}</Pill>
+                                    </TableBodyData>
                                     <TableBodyData>{ticket.reporter_email ?? ticket.reporter?.email}</TableBodyData>
                                     <TableBodyData>{ticket.description}</TableBodyData>
                                     <TableBodyData>{ticket.created_at}</TableBodyData>
@@ -175,10 +178,10 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                                                     Close
                                                 </Button>
 
-                                                <Button onClick={() => editTicket(ticket.id)}>Edit</Button>
-                                                <a href={route('tenant.tickets.show', ticket.id)}>
+                                                {/* <Button onClick={() => editTicket(ticket.id)}>Edit</Button> */}
+                                                {/* <a href={route('tenant.tickets.show', ticket.id)}>
                                                     <Button type="button">Show</Button>
-                                                </a>
+                                                </a> */}
                                             </>
                                         )}
                                     </TableBodyData>

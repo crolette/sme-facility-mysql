@@ -7,6 +7,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import { InterventionActionManager } from './interventionActionManager';
+import { Pill } from '../ui/pill';
 
 interface InterventionManagerProps {
     itemCodeId: number | string;
@@ -212,7 +213,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                 <TableBodyRow>
                                     <TableBodyData>{intervention.intervention_type.label}</TableBodyData>
                                     <TableBodyData>{intervention.description}</TableBodyData>
-                                    <TableBodyData>{intervention.priority}</TableBodyData>
+                                    <TableBodyData><Pill variant={intervention.priority}>{intervention.priority}</Pill></TableBodyData>
                                     <TableBodyData>{intervention.status}</TableBodyData>
                                     <TableBodyData>{intervention.planned_at ?? 'Not planned'}</TableBodyData>
                                     <TableBodyData>{intervention.repair_delay ?? 'No repair delay'}</TableBodyData>

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import { Button } from '../ui/button';
 import Modale from '../Modale';
+import { Pill } from '../ui/pill';
 
 export const ContractsList = ({ items, editable = false }: { items: Contract[]; editable?: boolean }) => {
     const [contracts, setContracts] = useState(items);
@@ -64,7 +65,7 @@ export const ContractsList = ({ items, editable = false }: { items: Contract[]; 
                                         </TableBodyData>
                                         <TableBodyData>{contract.type}</TableBodyData>
                                         <TableBodyData>
-                                            <span className="rounded-full bg-gray-500 p-2">{contract.status}</span>
+                                            <Pill variant={contract.status}>{contract.status}</Pill>
                                         </TableBodyData>
                                         <TableBodyData>{contract.internal_reference}</TableBodyData>
                                         <TableBodyData>{contract.provider_reference}</TableBodyData>
@@ -72,14 +73,14 @@ export const ContractsList = ({ items, editable = false }: { items: Contract[]; 
                                         <TableBodyData>
                                             <a href={route(`tenant.providers.show`, contract.provider.id)}> {contract.provider.name} </a>
                                         </TableBodyData>
-                                        <TableBodyData>{contract.provider.category}</TableBodyData>
+                                        <TableBodyData className='bg-'>{contract.provider.category}</TableBodyData>
                                         <TableBodyData>{contract.end_date}</TableBodyData>
 
                                         {editable && (
                                             <TableBodyData>
-                                                <a href={route(`tenant.contracts.show`, contract.id)}>
+                                                {/* <a href={route(`tenant.contracts.show`, contract.id)}>
                                                     <Button variant={'outline'}>See</Button>
-                                                </a>
+                                                </a> */}
                                                 <a href={route(`tenant.contracts.edit`, contract.id)}>
                                                     <Button>Edit</Button>
                                                 </a>

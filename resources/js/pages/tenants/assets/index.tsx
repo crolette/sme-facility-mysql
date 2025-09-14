@@ -20,9 +20,6 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
     const [assets, setAssets] = useState<Asset[]>(items);
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    // useEffect(() => {
-    //     fetchAssets();
-    // }, []);
 
     const [activeAssetsTab, setActiveAssetsTab] = useState(true);
     const [trashedAssetsTab, setTrashedAssetsTab] = useState(false);
@@ -81,11 +78,11 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
         }
     };
 
-    const [assetToDelete, setAssetToDelete] = useState('');
+    const [assetToDelete, setAssetToDelete] = useState<Asset | null >(null);
 
     const deleteAsset = async () => {
         try {
-            const response = await axios.delete(route(`api.assets.destroy`, assetToDelete));
+            const response = await axios.delete(route(`api.assets.destroy`, assetToDelete?.reference_code));
             if (response.data.status === 'success') {
                 setSearch('');
                 fetchAssets();
@@ -130,7 +127,7 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
             <Head title="Assets" />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="b flex justify-between border-b-2">
+                <div className="b flex gap-10 border-b-2">
                     <ul className="flex pl-4">
                         <li
                             className={cn(
@@ -158,7 +155,7 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                         </li>
                     </ul>
                     <a href={route(`tenant.assets.create`)} className="w-fit">
-                        <Button>Add asset</Button>
+                        <Button>Create</Button>
                     </a>
                 </div>
                 {isLoading && (
@@ -167,20 +164,19 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                         <p className="animate-pulse">Loading...</p>
                     </div>
                 )}
-                {!isLoading && activeAssetsTab && (
-                    <>
-                        <Table>
-                            <TableHead>
-                                <TableHeadRow>
-                                    <TableHeadData>Reference code</TableHeadData>
-                                    <TableHeadData>Code</TableHeadData>
-                                    <TableHeadData>Category</TableHeadData>
-                                    <TableHeadData>Name</TableHeadData>
-                                    <TableHeadData>Description</TableHeadData>
-                                    <TableHeadData></TableHeadData>
-                                </TableHeadRow>
-                            </TableHead>
-
+                <Table>
+                    <TableHead>
+                        <TableHeadRow>
+                            <TableHeadData>Reference code</TableHeadData>
+                            <TableHeadData>Code</TableHeadData>
+                            <TableHeadData>Category</TableHeadData>
+                            <TableHeadData>Name</TableHeadData>
+                            <TableHeadData>Description</TableHeadData>
+                            <TableHeadData></TableHeadData>
+                        </TableHeadRow>
+                    </TableHead>
+                    {!isLoading && activeAssetsTab && (
+                        <>
                             <TableBody>
                                 {assets &&
                                     assets.map((asset, index) => {
@@ -195,16 +191,16 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                                                 <TableBodyData>{asset.maintainable.description}</TableBodyData>
 
                                                 <TableBodyData>
-                                                    <a href={route(`tenant.assets.show`, asset.reference_code)}>
+                                                    {/* <a href={route(`tenant.assets.show`, asset.reference_code)}>
                                                         <Button variant={'outline'}>See</Button>
-                                                    </a>
+                                                    </a> */}
 
                                                     <a href={route(`tenant.assets.edit`, asset.reference_code)}>
                                                         <Button>Edit</Button>
                                                     </a>
                                                     <Button
                                                         onClick={() => {
-                                                            setAssetToDelete(asset.reference_code);
+                                                            setAssetToDelete(asset);
                                                             setShowDeleteModale(true);
                                                         }}
                                                         variant={'destructive'}
@@ -216,22 +212,10 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                                         );
                                     })}
                             </TableBody>
-                        </Table>
-                    </>
-                )}
+                        </>
+                    )}
 
-                {!isLoading && trashedAssetsTab && (
-                    <Table>
-                        <TableHead>
-                            <TableHeadRow>
-                                <TableHeadData>Reference code</TableHeadData>
-                                <TableHeadData>Code</TableHeadData>
-                                <TableHeadData>Category</TableHeadData>
-                                <TableHeadData>Name</TableHeadData>
-                                <TableHeadData>Description</TableHeadData>
-                                <TableHeadData></TableHeadData>
-                            </TableHeadRow>
-                        </TableHead>
+                    {!isLoading && trashedAssetsTab && (
                         <TableBody>
                             {trashedAssets &&
                                 trashedAssets.map((asset, index) => {
@@ -247,9 +231,9 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                                             <TableBodyData>{asset.maintainable.description}</TableBodyData>
 
                                             <TableBodyData>
-                                                <a href={route('tenant.assets.deleted', asset.id)}>
+                                                {/* <a href={route('tenant.assets.deleted', asset.id)}>
                                                     <Button>Show</Button>
-                                                </a>
+                                                </a> */}
                                                 <Button onClick={() => restoreAsset(asset)} variant={'green'}>
                                                     Restore
                                                 </Button>
@@ -267,16 +251,16 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                                     );
                                 })}
                         </TableBody>
-                    </Table>
-                )}
+                    )}
+                </Table>
             </div>
             <Modale
                 title={'Delete asset'}
-                message={'Are you sure you want to delete this asset ?'}
+                message={`Are you sure you want to delete the asset ${assetToDelete?.maintainable.name} ? `}
                 isOpen={showDeleteModale}
                 onConfirm={deleteAsset}
                 onCancel={() => {
-                    setAssetToDelete('');
+                    setAssetToDelete(null);
                     setShowDeleteModale(false);
                 }}
             />

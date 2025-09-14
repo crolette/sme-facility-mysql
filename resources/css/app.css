@@ -145,7 +145,7 @@
     --sidebar-foreground: oklch(0.985 0 0);
     --sidebar-primary: oklch(0.985 0 0);
     --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent: oklch(34.423% 0.01775 248.397);
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(36.025% 0.05066 263.018);
     --sidebar-ring: oklch(0.439 0 0);
@@ -161,12 +161,20 @@
     }
 }
 
-a {
+a  {
     @apply underline;
 }
 
 a:hover {
     @apply italic;
+}
+
+[data-slot='sidebar-menu-button'] {
+    text-decoration: none;
+}
+
+[data-slot='sidebar-menu-button']:hover {
+    font-style: normal;
 }
 
 h1 {
@@ -189,6 +197,8 @@ label:has(input:required) {
     /* color: oklch(38.385% 0.05163 19.666); */
     font-weight: bold;
 }
+
+
 
 div:has(+ input:required)::after {
     content: '*';

@@ -78,7 +78,11 @@ class TenantBuildingController extends Controller
         if (Auth::user()->cannot('view', $building))
             abort(403);
 
-        return Inertia::render('tenants/locations/show', ['routeName' => 'buildings', 'item' => $building->load('site', 'documents', 'maintainable.manager', 'maintainable.providers')]);
+        $building = Building::where('reference_code', $building->reference_code)->with(['site', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers'])->first();
+        $building->append('level_path');
+
+
+        return Inertia::render('tenants/locations/show', ['routeName' => 'buildings', 'item' => $building]);
     }
 
     /**

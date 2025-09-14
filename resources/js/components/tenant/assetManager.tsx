@@ -22,8 +22,9 @@ export const AssetManager = ({ itemCode, type }: AssetManagerProps) => {
     useEffect(() => {
         fetchAssets();
     }, []);
+    
     return (
-        <div className="border-sidebar-border rounded-md border p-4">
+        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
             <h2>Assets</h2>
             <ul>
                 {assets &&

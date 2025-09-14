@@ -87,6 +87,8 @@ export interface TenantSite {
 
 export interface TenantBuilding extends TenantSite {
     site: TenantSite;
+    level: TenantSite;
+    level_path: string;
     surface_outdoor: number;
     outdoor_material: string;
     outdoor_material_id: number;
@@ -95,10 +97,14 @@ export interface TenantBuilding extends TenantSite {
 
 export interface TenantFloor extends TenantSite {
     building: TenantBuilding;
+    level: TenantBuilding;
+    level_path: string;
 }
 
 export interface TenantRoom extends TenantSite {
     floor: TenantFloor;
+    level: TenantFloor;
+    level_path: string;
 }
 
 export interface Contract {

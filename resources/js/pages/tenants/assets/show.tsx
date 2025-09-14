@@ -12,6 +12,7 @@ import axios from 'axios';
 import { useState } from 'react';
 
 export default function ShowAsset({ item }: { item: Asset }) {
+    console.log(item);
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `${item.reference_code} - ${item.maintainable.name}`,
@@ -92,7 +93,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                 </div>
 
                 <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_4fr]">
-                    <SidebarMenuAssetLocation item={asset} activeTab={activeTab}  setActiveTab={setActiveTab} menu='asset' />
+                    <SidebarMenuAssetLocation item={asset} activeTab={activeTab}  setActiveTab={setActiveTab} menu='asset' isAsset />
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">

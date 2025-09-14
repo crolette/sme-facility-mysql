@@ -135,6 +135,8 @@ class Site extends Model
         return $this->morphMany(Ticket::class, 'ticketable');
     }
 
+   
+
     public function category($locale = null): Attribute
     {
         $locale = $locale ?? app()->getLocale();

@@ -4,7 +4,7 @@ import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 
-export default function SidebarMenuAssetLocation({ item, activeTab, setActiveTab, menu = 'location'}: { item: TenantSite | TenantBuilding | TenantFloor | TenantRoom | Asset; activeTab: string; setActiveTab: (tab: string) => void;  menu?: string}) {
+export default function SidebarMenuAssetLocation({ item, activeTab, setActiveTab, menu = 'location', isAsset = false }: { item: TenantSite | TenantBuilding | TenantFloor | TenantRoom | Asset; activeTab: string; setActiveTab: (tab: string) => void; menu?: string;  isAsset? : boolean}) {
    
 
     let navSidebar = [
@@ -51,6 +51,7 @@ export default function SidebarMenuAssetLocation({ item, activeTab, setActiveTab
             tabName: 'assets',
             tabDisplay: 'assets',
         }]
+    
 
     const [showMobileMenu, setShowMobileMenu] = useState(false);
 
@@ -61,13 +62,21 @@ export default function SidebarMenuAssetLocation({ item, activeTab, setActiveTab
 
                 <p className="text-sm">{item.code}</p>
                 <p className="text-xs">{item.reference_code}</p>
-                <p className="text-sm">
-                    {/* {asset.is_mobile ? (
-                        <a href={route(`tenant.users.show`, asset.location.id)}>{asset.location.full_name}</a>
-                    ) : (
-                        <a href={route(`tenant.${asset.location.location_type.level}s.show`, item.location.reference_code)}>{item.location.name}</a>
-                    )} */}
-                </p>
+                {isAsset ? (
+                    <p className="text-sm">
+                        {item.location_id &&
+                            (item.is_mobile ? (
+                                <a href={route(`tenant.users.show`, item.location.id)}>{item.location.full_name}</a>
+                            ) : (
+                                <a href={route(`tenant.${item.location.location_type.level}s.show`, item.location.reference_code)}>
+                                    {item.location.name}
+                                </a>
+                            ))}
+                    </p>
+                ) : (
+                        item.level && 
+                    <a href={item.level_path}>{item.level.name}</a>
+                )}
             </div>
             {/* MOBILE MENU */}
             <ul className="relative mb-2 lg:hidden">

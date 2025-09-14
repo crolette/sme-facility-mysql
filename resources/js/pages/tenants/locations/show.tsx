@@ -47,7 +47,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Tenants" />
-            <div className="flex h-full flex-1 flex-col justify-between gap-4 rounded-xl p-4">
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div>
                     <a href={route(`tenant.${routeName}.edit`, location.reference_code)}>
                         <Button>Edit</Button>
@@ -70,7 +70,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                     <SidebarMenuAssetLocation item={location} activeTab={activeTab} setActiveTab={setActiveTab} />
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
-                            <div className="border-sidebar-border flex w-full shrink-0 justify-between rounded-md border p-4">
+                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                 <div>
                                     <h2>Code</h2>
                                     <div>
@@ -114,7 +114,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                         )}
 
                         {activeTab === 'maintenance' && (
-                            <div className="border-sidebar-border rounded-md border p-4">
+                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                 <h2>Maintenance</h2>
                                 <div>
                                     <p>
@@ -140,7 +140,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                         )}
 
                         {activeTab === 'providers' && (
-                            <div className="border-sidebar-border rounded-md border p-4">
+                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                 <h2>Providers</h2>
                                 {location.maintainable.providers && location.maintainable.providers.length > 0 && (
                                     <ul>
@@ -152,11 +152,10 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                                     </ul>
                                 )}
                             </div>
-                            
-                            )}
+                        )}
 
                         {activeTab === 'contracts' && (
-                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
+                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                 <h2>Contracts</h2>
                                 <ContractsList items={location.contracts} />
                             </div>

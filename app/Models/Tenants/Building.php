@@ -119,6 +119,12 @@ class Building extends Model
         return $this->belongsTo(Site::class, 'level_id');
     }
 
+    public function level()
+    {
+        return $this->belongsTo(Site::class, 'level_id');
+    }
+
+
     public function floors(): HasMany
     {
         return $this->hasMany(Floor::class, 'level_id');
@@ -198,17 +204,17 @@ class Building extends Model
         );
     }
 
+    public function levelPath(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => route('tenant.floors.show', $this->level->reference_code)
+        );
+    }
+
     public function description(): Attribute
     {
         return Attribute::make(
             get: fn() => $this->maintainable->description
-        );
-    }
-
-    public function level(): Attribute
-    {
-        return Attribute::make(
-            get: fn() => $this->site
         );
     }
 

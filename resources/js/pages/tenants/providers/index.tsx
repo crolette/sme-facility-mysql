@@ -48,9 +48,9 @@ export default function ProviderIndex({ providers }: { providers: Provider[] }) 
                                             <a href={route(`tenant.providers.edit`, item.id)}>
                                                 <Button>Edit</Button>
                                             </a>
-                                            <a href={route(`tenant.providers.show`, item.id)}>
+                                            {/* <a href={route(`tenant.providers.show`, item.id)}>
                                                 <Button variant={'outline'}>See</Button>
-                                            </a>
+                                            </a> */}
                                         </TableBodyData>
                                     </TableBodyRow>
                                 );
