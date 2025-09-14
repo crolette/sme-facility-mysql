@@ -1,14 +1,14 @@
+import { ContractsList } from '@/components/tenant/contractsList';
 import { DocumentManager } from '@/components/tenant/documentManager';
 import { InterventionManager } from '@/components/tenant/interventionManager';
 import { PictureManager } from '@/components/tenant/pictureManager';
+import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
 import { TicketManager } from '@/components/tenant/ticketManager';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { cn } from '@/lib/utils';
 import { Asset, type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
-import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ShowAsset({ item }: { item: Asset }) {
@@ -52,44 +52,9 @@ export default function ShowAsset({ item }: { item: Asset }) {
         if (response.data.status === 'success') fetchAsset();
     };
 
+ 
     const [activeTab, setActiveTab] = useState('information');
-
-    const navSidebar = [
-        {
-            tabName: 'information',
-            tabDisplay: 'Infos',
-        },
-        {
-            tabName: 'maintenance',
-            tabDisplay: 'Maintenance',
-        },
-        {
-            tabName: 'providers',
-            tabDisplay: 'providers',
-        },
-        {
-            tabName: 'warranty',
-            tabDisplay: 'warranty',
-        },
-        {
-            tabName: 'pictures',
-            tabDisplay: 'pictures',
-        },
-        {
-            tabName: 'documents',
-            tabDisplay: 'documents',
-        },
-        {
-            tabName: 'tickets',
-            tabDisplay: 'tickets',
-        },
-        {
-            tabName: 'interventions',
-            tabDisplay: 'interventions',
-        },
-    ];
-
-    const [showMobileMenu, setShowMobileMenu] = useState(false);
+   
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -126,60 +91,8 @@ export default function ShowAsset({ item }: { item: Asset }) {
                     </Button>
                 </div>
 
-                <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_3fr]">
-                    <div className="bg-sidebar border-sidebar-border flex h-fit flex-col gap-2 rounded-md shadow-xl">
-                        <div className="flex flex-col gap-1 px-4 py-2 text-center">
-                            <p className="font-semibold">{asset.name}</p>
-
-                            <p className="text-sm">{asset.code}</p>
-                            <p className="text-xs">{asset.reference_code}</p>
-                            <p className="text-sm">
-                                {asset.is_mobile ? (
-                                    <a href={route(`tenant.users.show`, asset.location.id)}>{asset.location.full_name}</a>
-                                ) : (
-                                    <a href={route(`tenant.${asset.location.location_type.level}s.show`, asset.location.reference_code)}>
-                                        {asset.location.name}
-                                    </a>
-                                )}
-                            </p>
-                        </div>
-                        {/* MOBILE MENU */}
-                        <ul className="relative mb-2 lg:hidden">
-                            <li
-                                className="bg-sidebar-accent flex cursor-pointer justify-between p-2"
-                                onClick={() => setShowMobileMenu(!showMobileMenu)}
-                            >
-                                {activeTab}
-                                <ChevronDown />
-                            </li>
-                            {showMobileMenu && (
-                                <div className="bg-sidebar absolute w-full">
-                                    {navSidebar.map((nav) => (
-                                        <li
-                                            onClick={() => {
-                                                setActiveTab(nav.tabName);
-                                                setShowMobileMenu(false);
-                                            }}
-                                            className={'hover:bg-accent cursor-pointer p-2'}
-                                        >
-                                            {nav.tabDisplay}
-                                        </li>
-                                    ))}
-                                </div>
-                            )}
-                        </ul>
-                        {/* DESKTOP MENU */}
-                        <ul className="mb-2 hidden flex-col lg:flex">
-                            {navSidebar.map((nav) => (
-                                <li
-                                    onClick={() => setActiveTab(nav.tabName)}
-                                    className={cn(activeTab === nav.tabName ? 'bg-accent' : '', 'cursor-pointer p-2')}
-                                >
-                                    {nav.tabDisplay}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_4fr]">
+                    <SidebarMenuAssetLocation item={asset} activeTab={activeTab}  setActiveTab={setActiveTab} menu='asset' />
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
@@ -259,12 +172,20 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             </div>
                         )}
 
-                        {activeTab === 'providers' && asset.maintainable.providers && asset.maintainable.providers?.length > 0 && (
+                        {activeTab === 'contracts' && (
+                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
+                                <h2>Contracts</h2>
+                                <ContractsList items={asset.contracts} />
+                            </div>
+                        )}
+
+                        {activeTab === 'providers' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
                                 <h2>Providers</h2>
+
                                 <p>End contract date : {asset.contract_end_date}</p>
                                 <ul>
-                                    {asset.maintainable.providers.map((provider, index) => (
+                                    {asset.maintainable.providers?.map((provider, index) => (
                                         <li key={index}>
                                             <a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>
                                         </li>

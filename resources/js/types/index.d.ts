@@ -80,6 +80,7 @@ export interface TenantSite {
     level_id: number;
     location_type: LocationType;
     maintainable: Maintainable;
+    contracts: Contract[];
     tickets: Ticket[];
     documents: Documents[];
 }
@@ -147,6 +148,7 @@ export interface Asset {
     deleted_at?: string;
     created_at: string;
     updated_at?: string;
+    contracts: Contract[];
     asset_category: AssetCategory;
     maintainable: Maintainable;
     location: Partial<TenantSite | TenantBuilding | TenantFloor | TenantRoom | User>;

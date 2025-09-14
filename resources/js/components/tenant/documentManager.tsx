@@ -167,8 +167,6 @@ export const DocumentManager = ({
         }
     };
 
-    console.log(newFileData);
-
     return (
         <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
             <h2 className="inline">Documents ({documents?.length ?? 0})</h2>
