@@ -20,8 +20,8 @@ Route::middleware([
     })->name('api.contracts.index');
 
     Route::get('/search', function(Request $request) {
-        $contracts = Contract::all();
-
+        $contracts = Contract::where('name', 'like', '%'.$request->query('q').'%')->get();
+        
         return ApiResponse::success($contracts);
     })->name('api.contracts.search');
 

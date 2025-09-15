@@ -167,6 +167,8 @@ function SearchableSelect<T>(props: SearchableSelectProps<T>) {
         }, 200);
     };
 
+    console.log(selectedItems);
+
     return (
         <div className={`relative ${className}`}>
             <Input

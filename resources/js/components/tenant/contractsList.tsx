@@ -6,7 +6,7 @@ import { Button } from '../ui/button';
 import Modale from '../Modale';
 import { Pill } from '../ui/pill';
 
-export const ContractsList = ({ items, editable = false }: { items: Contract[]; editable?: boolean }) => {
+export const ContractsList = ({ items, editable = false, removable = false, contractableReference = null, routeName = null }: { items: Contract[]; editable ?: boolean; removable ?: boolean; contractableReference ?: string;  routeName?: string}) => {
     const [contracts, setContracts] = useState(items);
     const fetchContracts = async () => {
         try {
@@ -37,6 +37,8 @@ export const ContractsList = ({ items, editable = false }: { items: Contract[]; 
         }
     };
 
+    console.log(contractableReference);
+
     return (
         <>
             {contracts && contracts.length > 0 && (
@@ -52,7 +54,7 @@ export const ContractsList = ({ items, editable = false }: { items: Contract[]; 
                             <TableHeadData>Provider</TableHeadData>
                             <TableHeadData>Category</TableHeadData>
                             <TableHeadData>End date</TableHeadData>
-                            {editable && <TableHeadData></TableHeadData>}
+                            {(editable || removable) && <TableHeadData></TableHeadData>}
                         </TableHeadRow>
                     </TableHead>
                     <TableBody>
@@ -73,28 +75,52 @@ export const ContractsList = ({ items, editable = false }: { items: Contract[]; 
                                         <TableBodyData>
                                             <a href={route(`tenant.providers.show`, contract.provider.id)}> {contract.provider.name} </a>
                                         </TableBodyData>
-                                        <TableBodyData className='bg-'>{contract.provider.category}</TableBodyData>
+                                        <TableBodyData className="bg-">{contract.provider.category}</TableBodyData>
                                         <TableBodyData>{contract.end_date}</TableBodyData>
 
-                                        {editable && (
-                                            <TableBodyData>
-                                                {/* <a href={route(`tenant.contracts.show`, contract.id)}>
-                                                    <Button variant={'outline'}>See</Button>
-                                                </a> */}
-                                                <a href={route(`tenant.contracts.edit`, contract.id)}>
-                                                    <Button>Edit</Button>
-                                                </a>
-                                                <Button
-                                                    onClick={() => {
-                                                        setContractToDelete(contract);
-                                                        setShowDeleteModale(true);
-                                                    }}
-                                                    variant={'destructive'}
-                                                >
-                                                    Delete
-                                                </Button>
-                                            </TableBodyData>
-                                        )}
+                                        {(editable || removable) && (
+                                                <TableBodyData>
+                                                    
+                                                    {editable && (
+                                                        <>
+                                                            <a href={route(`tenant.contracts.edit`, contract.id)}>
+                                                                <Button>Edit</Button>
+                                                            </a>
+                                                            <Button
+                                                                onClick={() => {
+                                                                    setContractToDelete(contract);
+                                                                    setShowDeleteModale(true);
+                                                                }}
+                                                                variant={'destructive'}
+                                                            >
+                                                                Delete
+                                                            </Button>
+                                                        </>
+                                                )}
+                                                    {removable && (
+                                                        <>
+                                                            <Button
+                                                            onClick={async () => {
+                                                                try {
+                                                                    const response = await axios.delete(
+                                                                        route(`api.${routeName}.contracts.delete`, contractableReference),
+                                                                        { data: { contract_id: contract.id } },
+                                                                    );
+                                                                    console.log(response.data)
+                                                                } catch {
+                                                                    console.log(error)
+                                                                }
+                                                              
+                                                                }}
+                                                                variant={'destructive'}
+                                                            >
+                                                                Remove
+                                                            </Button>
+                                                        </>
+                                                    )}
+
+                                                </TableBodyData>
+                                            )}
                                     </TableBodyRow>
                                 );
                             })}

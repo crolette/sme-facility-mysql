@@ -43,13 +43,15 @@ class ContractService
         foreach($request as $contractId)
         {
             $contract = Contract::find($contractId);
-            $model->contracts()->attach($contract);
+            if(!$model->contracts()->find($contractId))
+                $model->contracts()->attach($contract);
         }
     }
 
     public function detachExistingContractFromModel(Model $model, $contractId)
     {
         $contract = Contract::find($contractId);
+
         $model->contracts()->detach($contract);
     }
 

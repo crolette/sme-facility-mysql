@@ -1,3 +1,4 @@
+import SearchableInput from '@/components/SearchableInput';
 import { ContractsList } from '@/components/tenant/contractsList';
 import { DocumentManager } from '@/components/tenant/documentManager';
 import { InterventionManager } from '@/components/tenant/interventionManager';
@@ -6,7 +7,8 @@ import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocati
 import { TicketManager } from '@/components/tenant/ticketManager';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { Asset, type BreadcrumbItem } from '@/types';
+import { Asset, Contract, type BreadcrumbItem } from '@/types';
+import { router } from '@inertiajs/core';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { useState } from 'react';
@@ -23,6 +25,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
     const { post, delete: destroy } = useForm();
 
     const [asset, setAsset] = useState(item);
+    const [existingContracts, setExistingContracts] = useState(asset.contracts);
 
     const fetchAsset = async () => {
         const response = await axios.get(route('api.assets.show', asset.reference_code));
@@ -56,6 +59,24 @@ export default function ShowAsset({ item }: { item: Asset }) {
  
     const [activeTab, setActiveTab] = useState('information');
    
+    const [addExistingContractModale, setAddExistingContractModale] = useState<boolean>(false);
+    console.log(asset);
+
+    const addExistingContractToAsset = async() => {
+        const contracts = {
+            existing_contracts: existingContracts.map(elem => elem.id)
+        };
+
+        try {
+            const response = await axios.post(route('api.assets.contracts.post', asset.reference_code), contracts);
+            console.log(response.data);
+            setAddExistingContractModale(false);
+            setExistingContracts(asset.contracts);
+
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -93,7 +114,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                 </div>
 
                 <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_4fr]">
-                    <SidebarMenuAssetLocation item={asset} activeTab={activeTab}  setActiveTab={setActiveTab} menu='asset' isAsset />
+                    <SidebarMenuAssetLocation item={asset} activeTab={activeTab} setActiveTab={setActiveTab} menu="asset" isAsset />
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
@@ -176,7 +197,9 @@ export default function ShowAsset({ item }: { item: Asset }) {
                         {activeTab === 'contracts' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
                                 <h2>Contracts</h2>
-                                <ContractsList items={asset.contracts} />
+                                <Button onClick={() => setAddExistingContractModale(true)}>add existing contract</Button>
+                                <Button onClick={() => router.get(route('tenant.contracts.create'))}>Add new contract</Button>
+                                <ContractsList items={asset.contracts} contractableReference={asset.reference_code} routeName="assets" removable/>
                             </div>
                         )}
 
@@ -236,6 +259,38 @@ export default function ShowAsset({ item }: { item: Asset }) {
                     </div>
                 </div>
             </div>
+            {addExistingContractModale && (
+                <div className="bg-background/50 fixed inset-0 z-50">
+                    <div className="bg-background/20 flex h-dvh items-center justify-center">
+                        <div className="bg-background flex flex-col items-center justify-center p-4 text-center md:max-w-1/3">
+                            <p>Add Existing contract</p>
+                            <SearchableInput<Contract>
+                                multiple={true}
+                                searchUrl={route('api.contracts.search')}
+                                selectedItems={existingContracts}
+                                getDisplayText={(contract) => contract.name}
+                                getKey={(contract) => contract.id}
+                                onSelect={(contracts) => {
+                                    console.log(contracts);
+                                    // const prev = existingContracts;
+                                    // prev.push(contracts);
+                                    setExistingContracts(contracts);
+                                }}
+                                placeholder="Search contracts..."
+                            />
+                            <Button variant="secondary" onClick={() => {
+                                setAddExistingContractModale(false);
+                                setExistingContracts(asset.contracts);
+                            }}>
+                                Cancel
+                            </Button>
+                            <Button onClick={addExistingContractToAsset}>
+                                Add contract
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AppLayout>
     );
 }
