@@ -231,6 +231,9 @@ export interface Intervention {
     ticket_id?: number;
     interventionable_id?: number;
     actions?: InterventionAction[];
+    maintainable: Maintainable;
+    interventionable_type: string;
+    interventionable: TenantSite | TenantBuilding | TenantFloor | TenantRoom | Asset;
 }
 
 export interface InterventionAction {

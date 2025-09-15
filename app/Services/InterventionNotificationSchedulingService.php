@@ -60,14 +60,20 @@ class InterventionNotificationSchedulingService
 
             $notification = [
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
+                'scheduled_at' => $intervention->planned_at->subDays($preference->notification_delay_days),
+                'notification_type' => 'planned_at',
+                'recipient_name' => $user->fullName,
+                'recipient_email' => $user->email,
                 'data' => [
-                    'subject' => 'test',
-                    'intervention_date' => $intervention->planned_at,
+                    'type' => $intervention->type,
+                    'subject' => $intervention->interventionable->name,
+                    'priority' => $intervention->priority,
+                    'planned_at' => $intervention->planned_at,
+                    'description' => $intervention->description,
                     'link' => route('tenant.interventions.show', $intervention->id)
                 ]
             ];
 
-            Debugbar::info('createScheduleForPlannedAtDate', $notification);
 
             $createdNotification = $intervention->notifications()->updateOrCreate(
                 [
@@ -76,14 +82,8 @@ class InterventionNotificationSchedulingService
                 ],
                 [
                     ...$notification,
-                    'scheduled_at' => $intervention->planned_at->subDays($preference->notification_delay_days),
-                    'notification_type' => 'planned_at',
-                    'recipient_name' => $user->fullName,
-                    'recipient_email' => $user->email,
                 ]
             );
-
-            // dump($createdNotification);
 
             $createdNotification->user()->associate($user);
             $createdNotification->save();

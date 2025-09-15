@@ -13,6 +13,7 @@ use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Building;
 use App\Enums\MaintenanceFrequency;
 use App\Http\Controllers\Controller;
+use App\Models\Tenants\Intervention;
 use App\Models\Tenants\Maintainable;
 
 class DashboardController extends Controller
@@ -51,6 +52,9 @@ class DashboardController extends Controller
             ->with('maintainable') // on eager-load correctement
             ->get();
 
-        return Inertia::render('tenants/dashboard', ['assets' => $assets, 'tickets' => $tickets, 'maintainables' => $maintainables]);
+        $interventions = Intervention::select('id', 'intervention_type_id', 'priority', 'status', 'maintainable_id', 'interventionable_type', 'interventionable_id', 'ticket_id',)->where('planned_at', '>=', today())->orderBy('planned_at')->limit(10)->with('maintainable:id,name,maintainable_type', 'ticket:id,description', 'interventionable')->get();
+        // dd($interventions);
+
+        return Inertia::render('tenants/dashboard', ['assets' => $assets, 'tickets' => $tickets, 'maintainables' => $maintainables, 'interventions' => $interventions]);
     }
 }

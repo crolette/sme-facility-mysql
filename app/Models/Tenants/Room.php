@@ -181,6 +181,13 @@ class Room extends Model
         );
     }
 
+    public function level(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->floor
+        );
+    }
+
     public function qrCodePath(): Attribute
     {
         return Attribute::make(
