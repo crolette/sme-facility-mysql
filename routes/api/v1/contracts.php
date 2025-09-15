@@ -1,10 +1,12 @@
 <?php
 
 use App\Helpers\ApiResponse;
-use App\Http\Controllers\API\V1\APIContractController;
-use App\Models\Tenants\Contract;
 use Illuminate\Http\Request;
+use App\Models\Tenants\Contract;
+use App\Services\DocumentService;
 use Illuminate\Support\Facades\Route;
+use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Http\Controllers\API\V1\APIContractController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 
 Route::middleware([
@@ -25,10 +27,26 @@ Route::middleware([
         return ApiResponse::success($contracts);
     })->name('api.contracts.search');
 
+
+
     Route::post('/', [APIContractController::class, 'store'])->name('api.contracts.store');
 
     Route::prefix('/{contract}')->group(function () {
         Route::patch('/', [APIContractController::class, 'update'])->name('api.contracts.update');
         Route::delete('/', [APIContractController::class, 'destroy'])->name('api.contracts.destroy');
+
+        Route::get('/documents', function (Contract $contract) {
+            Debugbar::info('api document contract', $contract);
+            // $asset = Asset::withTrashed()->with('documents')->where('reference_code', $asset)->first();
+            return ApiResponse::success($contract->load('documents')->documents);
+        })->name('api.contracts.documents');
+
+        Route::post('/documents', function (Contract $contract, DocumentUploadRequest $request) {
+            Debugbar::info('api document contract POST', $contract->id, $request);
+
+            app(DocumentService::class)->uploadAndAttachDocumentsForContract($contract, $request['files']);
+            // $asset = Asset::withTrashed()->with('documents')->where('reference_code', $asset)->first();
+            return ApiResponse::success([], 'Document added');
+        })->name('api.contracts.documents.post');
     });
 });

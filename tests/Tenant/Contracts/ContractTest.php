@@ -203,6 +203,39 @@ it('can create a contract with documents', function() {
     Storage::disk('tenants')->assertExists(Document::find(2)->path);
 });
 
+it('can attach a document to an existing contract', function() {
+
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $categoryType = CategoryType::where('category', 'document')->first();
+    $contract = Contract::factory()->create();
+
+    $formData = ['files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ],
+        ]];
+
+        $response = $this->postToTenant('api.contracts.documents.post', $formData, $contract->id);
+        $response->assertSessionHasNoErrors();
+        $response->assertStatus(200)->assertJson(['status' => 'success']);
+
+        $contract->refresh();
+        assertEquals(1, $contract->documents->count());
+    assertDatabaseCount('documents', 1);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => 'App\Models\Tenants\Contract',
+        'documentable_id' => 1
+    ]);
+
+
+    Storage::disk('tenants')->assertExists(Document::find(1)->path);
+
+});
 
 
 it('can store a site with contracts', function () {

@@ -124,6 +124,7 @@ export interface Contract {
     notice_period: string;
     notice_date: string;
     provider: Provider;
+    documents?: Documents[];
 }
 
 export interface Asset {

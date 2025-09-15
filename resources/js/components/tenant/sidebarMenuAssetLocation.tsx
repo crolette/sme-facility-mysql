@@ -1,10 +1,10 @@
 import { cn } from "@/lib/utils";
-import { Asset, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from "@/types";
+import { Asset, Contract, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from "@/types";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 
-export default function SidebarMenuAssetLocation({ item, activeTab, setActiveTab, menu = 'location', isAsset = false }: { item: TenantSite | TenantBuilding | TenantFloor | TenantRoom | Asset; activeTab: string; setActiveTab: (tab: string) => void; menu?: string;  isAsset? : boolean}) {
+export default function SidebarMenuAssetLocation({ item, activeTab, setActiveTab, menu = 'location', isAsset = false }: { item: TenantSite | TenantBuilding | TenantFloor | TenantRoom | Asset |Contract; activeTab: string; setActiveTab: (tab: string) => void; menu?: string;  isAsset? : boolean}) {
    
 
     let navSidebar = [
@@ -52,26 +52,41 @@ export default function SidebarMenuAssetLocation({ item, activeTab, setActiveTab
             tabDisplay: 'assets',
         }]
     
+    if (menu === 'contract')
+        navSidebar = [
+            {
+                tabName: 'information',
+                tabDisplay: 'Infos',
+            },
+            {
+                tabName: 'assets',
+                tabDisplay: 'assets',
+            },
+            {
+                tabName: 'documents',
+                tabDisplay: 'documents',
+            },
+        ];
 
     const [showMobileMenu, setShowMobileMenu] = useState(false);
-
+    console.log(item);
     return (
         <div className="bg-sidebar border-sidebar-border flex h-fit flex-col gap-2 rounded-md shadow-xl">
             <div className="flex flex-col gap-1 px-4 py-2 text-center">
                 <p className="font-semibold">{item.name}</p>
 
-                <p className="text-sm">{item.code}</p>
-                <p className="text-xs">{item.reference_code}</p>
+                <p className="text-sm">{item.code ?? item.internal_reference }</p>
+                <p className="text-xs">{item.reference_code ?? item.type}</p>
                 {isAsset ? (
                     <p className="text-sm">
-                        {item.location_id &&
-                            (item.is_mobile ? (
+                        {(item.location_id &&
+                            item.is_mobile) ? (
                                 <a href={route(`tenant.users.show`, item.location.id)}>{item.location.full_name}</a>
                             ) : (
                                 <a href={route(`tenant.${item.location.location_type.level}s.show`, item.location.reference_code)}>
                                     {item.location.name}
                                 </a>
-                            ))}
+                            )}
                     </p>
                 ) : (
                         item.level && 
