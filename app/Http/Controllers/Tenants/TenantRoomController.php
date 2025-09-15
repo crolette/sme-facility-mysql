@@ -70,7 +70,7 @@ class TenantRoomController extends Controller
         if (Auth::user()->cannot('view', $room))
             abort(403);
 
-        $room = Room::where('reference_code', $room->reference_code)->with(['floor', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers'])->first();
+        $room = Room::where('reference_code', $room->reference_code)->with(['floor', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers', 'contracts', 'contracts.provider'])->first();
         $room->append('level_path');
 
         return Inertia::render('tenants/locations/show', ['routeName' => 'rooms', 'item' => $room]);

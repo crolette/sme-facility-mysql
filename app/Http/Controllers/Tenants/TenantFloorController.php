@@ -76,7 +76,7 @@ class TenantFloorController extends Controller
         if (Auth::user()->cannot('view', $floor))
             abort(403);
 
-        $floor = Floor::where('reference_code', $floor->reference_code)->with(['building', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers'])->first();
+        $floor = Floor::where('reference_code', $floor->reference_code)->with(['building', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers', 'contracts', 'contracts.provider'])->first();
         $floor->append('level_path');
 
         return Inertia::render('tenants/locations/show', ['routeName' => 'floors', 'item' => $floor]);

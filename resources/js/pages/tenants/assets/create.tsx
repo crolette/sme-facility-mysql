@@ -211,7 +211,6 @@ export default function CreateAsset({
                         'Content-Type': 'multipart/form-data',
                     },
                 });
-                console.log(response.data);
                 if (response.data.status === 'success') {
                     router.visit(route(`tenant.assets.index`), {
                         preserveScroll: false,

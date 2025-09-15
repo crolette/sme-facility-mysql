@@ -109,7 +109,6 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
         }
     };
 
-    console.log(newTicketData);
 
     const submitNewTicket: FormEventHandler = async (e) => {
         e.preventDefault();

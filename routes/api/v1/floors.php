@@ -1,14 +1,17 @@
 <?php
 
 use App\Helpers\ApiResponse;
+use Illuminate\Http\Request;
 use App\Models\Tenants\Floor;
 use App\Services\QRCodeService;
 use App\Services\PictureService;
+use App\Services\ContractService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\Route;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Controllers\API\V1\APIFloorController;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 
 Route::middleware([
@@ -59,6 +62,32 @@ Route::middleware([
             return ApiResponse::success(null, 'Document added');
         })->name('api.floors.documents.post');
 
+        Route::prefix('contracts')->group(function () {
+
+            Route::get('', function (Floor $floor) {
+
+                $contracts = Floor::where('reference_code', $floor->reference_code)->with(['contracts', 'contracts.provider'])->first()->contracts;
+
+                return ApiResponse::success($contracts ?? [], 'Contract');
+            })->name('api.floors.contracts');
+
+            Route::post('', function (Floor $floor, ContractWithModelStoreRequest $contractWithModelRequest) {
+
+                if ($contractWithModelRequest->validated('existing_contracts'))
+                    app(ContractService::class)->attachExistingContractsToModel($floor, $contractWithModelRequest->validated('existing_contracts'));
+
+                return ApiResponse::success([], 'Contract(s) added');
+            })->name('api.floors.contracts.post');
+
+            // Remove/Detach a contract 
+            Route::delete('', function (Floor $floor, Request $request) {
+                $validated = $request->validateWithBag('errors', [
+                    'contract_id' => 'required|exists:contracts,id'
+                ]);
+                app(ContractService::class)->detachExistingContractFromModel($floor, $validated['contract_id']);
+                return ApiResponse::success([], 'Contract removed');
+            })->name('api.floors.contracts.delete');
+        });
 
         // Get all tickets from a floor
         Route::get('/tickets/', function (Floor $floor) {

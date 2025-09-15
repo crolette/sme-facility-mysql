@@ -52,7 +52,6 @@ export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUpload
     const [error, setError] = useState<string | null>(null);
     const fileInputRef = useRef(null);
 
-    console.log(selectedFile);
     const handleFileSelect = (files: FileList | null) => {
         const file = files?.[0];
         if (file) {

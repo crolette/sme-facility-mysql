@@ -1,5 +1,6 @@
 import InputError from '@/components/input-error';
 import SearchableInput from '@/components/SearchableInput';
+import FileManager from '@/components/tenant/FileManager';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +12,7 @@ import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { XIcon } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
+import { BiSolidFilePdf } from 'react-icons/bi';
 
 interface Contractable {
     locationId: number;
@@ -34,6 +36,13 @@ type TypeFormData = {
     contract_duration: string;
     notice_period: string;
     contractables?: Contractable[];
+    files: {
+        file: File;
+        name: string;
+        description: string;
+        typeId: null | number;
+        typeSlug: string;
+    }[];
 };
 
 export default function CreateContract({
@@ -76,7 +85,8 @@ export default function CreateContract({
         }
     }, [objects]);
 
-    const { data, setData } = useForm<TypeFormData>({
+    const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
+    const { data, setData, setError } = useForm<TypeFormData>({
         provider_id: contract?.provider_id ?? null,
         provider_name: contract?.provider.name ?? null,
         name: contract?.name ?? '',
@@ -91,7 +101,11 @@ export default function CreateContract({
         contract_duration: contract?.contract_duration ?? '',
         notice_period: contract?.notice_period ?? '',
         contractables: [],
+        files: selectedDocuments,
+        
     });
+
+    console.log(contract);
 
     const [errors, setErrors] = useState<TypeFormData>();
 
@@ -107,23 +121,27 @@ export default function CreateContract({
                 }
             } catch (error) {
                 console.log(error);
-                setErrors(error.response.data.errors);
+                setError(error.response.data.errors);
             }
         } else {
             try {
-                const response = await axios.post(route('api.contracts.store'), data);
-                console.log(response);
+                const response = await axios.post(route('api.contracts.store'), data, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
                 if (response.data.status === 'success') {
                     router.visit(route('tenant.contracts.show', response.data.data.id));
                 }
             } catch (error) {
                 console.log(error.response.data.errors);
-                setErrors(error.response.data.errors);
+                setError(error.response.data.errors);
             }
         }
     };
 
-    console.log(data);
+    console.log(errors);
+
 
     const handleAddAssetOrLocation = (location) => {
         const updatedContractables = [...data.contractables];
@@ -148,6 +166,18 @@ export default function CreateContract({
             updatedContractables.filter((contractable) => contractable.locationId !== location.locationId),
         );
     };
+
+    const removeDocument = (index: number) => {
+        const files = data.files.filter((file, indexFile) => {
+            return index !== indexFile ? file : null;
+        });
+        setSelectedDocuments(() => {
+            setData('files', files);
+            return files;
+        });
+    };
+
+    const [showFileModal, setShowFileModal] = useState(false);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -183,9 +213,14 @@ export default function CreateContract({
                     <Label className="font-medium">Provider</Label>
                     <SearchableInput<Provider>
                         required
+                        multiple={false}
                         searchUrl={route('api.providers.search')}
                         getKey={(provider) => provider.id}
                         displayValue={data.provider_name}
+                        onDelete={() => {
+                            setData('provider_id', '');
+                            setData('provider_name', '');
+                        }}
                         getDisplayText={(provider) => provider.name}
                         onSelect={(provider) => {
                             setData('provider_id', provider.id);
@@ -196,6 +231,7 @@ export default function CreateContract({
                     />
                     <Label htmlFor="end_date">Linked to</Label>
                     <SearchableInput
+                        multiple={false}
                         searchUrl={route('api.search.all')}
                         selectedItems={data.contractables ?? []}
                         getDisplayText={(location) => location.name}
@@ -309,7 +345,7 @@ export default function CreateContract({
                             name="notice_period"
                             onChange={(e) => setData('notice_period', e.target.value)}
                             id=""
-                            // required
+                            defaultValue={''}
                             value={data.notice_period}
                             className={cn(
                                 'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
@@ -335,6 +371,44 @@ export default function CreateContract({
                         <Input id="end_date" type="date" value={data.end_date} onChange={(e) => setData('end_date', e.target.value)} disabled />
                         <p className="text-sm">The end date is automatically calculated based on the contract duration.</p>
                         <InputError className="mt-2" message={errors?.end_date ?? ''} />
+                        {!contract && (
+                            <div id="files">
+                                <Label>Documents</Label>
+                                <Button onClick={() => setShowFileModal(!showFileModal)} type="button" className="block">
+                                    Add file
+                                </Button>
+                                {selectedDocuments.length > 0 && (
+                                    <ul className="flex gap-4">
+                                        {selectedDocuments.map((document, index) => {
+                                            const isImage = document.file.type.startsWith('image/');
+                                            const isPdf = document.file.type === 'application/pdf';
+                                            const fileURL = URL.createObjectURL(document.file);
+                                            return (
+                                                <li key={index} className="bg-foreground/10 flex w-50 flex-col gap-2 p-6">
+                                                    {/* <p>
+                                                                            {
+                                                                                documentTypes.find((type) => {
+                                                                                    return type.id === document.type;
+                                                                                })?.label
+                                                                            }
+                                                                        </p> */}
+                                                    {isImage && (
+                                                        <img src={fileURL} alt="preview" className="mx-auto h-40 w-40 rounded object-cover" />
+                                                    )}
+                                                    {isPdf && <BiSolidFilePdf size={'160px'} />}
+                                                    <p>{document.name}</p>
+
+                                                    <p>{document.description}</p>
+                                                    <Button type="button" variant="destructive" className="" onClick={() => removeDocument(index)}>
+                                                        Remove
+                                                    </Button>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                )}
+                            </div>
+                        )}
                         <Button type="submit">{contract ? 'Update' : 'Submit'}</Button>
                         <Button
                             variant={'secondary'}
@@ -346,6 +420,15 @@ export default function CreateContract({
                         </Button>
                     </div>
                 </form>
+                <FileManager
+                    documents={selectedDocuments}
+                    showModal={showFileModal}
+                    onDocumentsChange={(docs) => {
+                        setSelectedDocuments(docs);
+                        setData('files', docs);
+                    }}
+                    onToggleModal={() => setShowFileModal(!showFileModal)}
+                />
             </div>
         </AppLayout>
     );

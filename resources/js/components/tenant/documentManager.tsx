@@ -61,6 +61,7 @@ export const DocumentManager = ({
         }
     };
 
+
     const [showFileModal, setShowFileModal] = useState(false);
     const [documentTypes, setDocumentTypes] = useState<CentralType[]>([]);
 
