@@ -1,9 +1,12 @@
 <?php
 
 use App\Helpers\ApiResponse;
+use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Services\QRCodeService;
+use App\Models\Tenants\Contract;
 use App\Services\PictureService;
+use App\Services\ContractService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Debugbar\Facades\Debugbar;
@@ -16,7 +19,6 @@ use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\Tenants\ForceDeleteAssetController;
 use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
 use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
-use App\Services\ContractService;
 
 Route::middleware([
     'web',
@@ -77,7 +79,7 @@ Route::middleware([
                 return ApiResponse::success([], 'Document added');
             })->name('api.assets.documents.post');
 
-
+            
             Route::prefix('/contracts')->group(function () {
                 Route::post('', function (Asset $asset, ContractWithModelStoreRequest $contractWithModelRequest) {
 
@@ -86,6 +88,15 @@ Route::middleware([
 
                     return ApiResponse::success([], 'Contract(s) added');
                 })->name('api.assets.contracts.post');
+
+                // Remove/Detach a contract from an asset
+                Route::delete('', function (Asset $asset, Request $request) {
+                    $validated = $request->validateWithBag('errors',[
+                        'contract_id' => 'required|exists:contracts,id'
+                    ]);
+                        app(ContractService::class)->detachExistingContractFromModel($asset, $validated['contract_id']);
+                        return ApiResponse::success([], 'Contract removed');
+                })->name('api.assets.contracts.delete');
             });
 
                

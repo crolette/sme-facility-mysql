@@ -17,16 +17,12 @@ class ContractService
 {
     public function createWithModel(Model $model, $request): void
     {
-        dump('createWithModel');
         foreach ($request as $key => $contractRequest) {
             $contract = new Contract([...$contractRequest]);
             
             if (isset($contractRequest['contract_duration']))
                 $contract = $this->updateContractEndDate($contract,  $contract->contract_duration);
             
-            dump('createWithModel');
-           
-
             $contract->notice_period = isset($contractRequest['notice_period']) ? $contractRequest['notice_period'] : 'default';
 
             $contract = $this->updateNoticeDate($contract, $contract->notice_period);
@@ -49,6 +45,12 @@ class ContractService
             $contract = Contract::find($contractId);
             $model->contracts()->attach($contract);
         }
+    }
+
+    public function detachExistingContractFromModel(Model $model, $contractId)
+    {
+        $contract = Contract::find($contractId);
+        $model->contracts()->detach($contract);
     }
 
     public function create($request): Contract | string

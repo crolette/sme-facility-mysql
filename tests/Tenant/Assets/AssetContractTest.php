@@ -304,6 +304,7 @@ it('can add existing contracts to an existing asset', function () {
     $response = $this->postToTenant('api.assets.contracts.post', $formData, $this->asset);
     $response->assertStatus(200)->assertJson(['status' => 'success']);
 
+    assertDatabaseCount('contractables', 2);
     assertDatabaseHas(
         'contractables',
         [
@@ -324,3 +325,48 @@ it('can add existing contracts to an existing asset', function () {
 
 });
 
+it('can remove a contract from an asset', function() {
+
+    $contractOne =  Contract::factory()->create();
+    $contractTwo =  Contract::factory()->create();
+
+    $formData = [
+        'existing_contracts' => [
+            $contractOne->id,
+            $contractTwo->id
+        ]
+    ];
+
+    $response = $this->postToTenant('api.assets.contracts.post', $formData, $this->asset);
+    $response->assertStatus(200)->assertJson(['status' => 'success']);
+
+    assertDatabaseCount('contractables', 2);
+
+    $formData = [
+        'contract_id' => $contractOne->id
+    ];
+
+    $response = $this->deleteFromTenant('api.assets.contracts.delete',  $this->asset, $formData);
+    $response->assertStatus(200)->assertJson(['status' => 'success']);
+
+    assertDatabaseCount('contractables', 1);
+
+    assertDatabaseMissing(
+        'contractables',
+        [
+            'contract_id' => $contractOne->id,
+            'contractable_type' => get_class($this->asset),
+            'contractable_id' => $this->asset->id
+        ]
+    );
+
+    assertDatabaseHas(
+        'contractables',
+        [
+            'contract_id' => $contractTwo->id,
+            'contractable_type' => get_class($this->asset),
+            'contractable_id' => $this->asset->id
+        ]
+    );
+
+});
