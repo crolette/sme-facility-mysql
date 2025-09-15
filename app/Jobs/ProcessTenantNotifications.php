@@ -64,10 +64,18 @@ class ProcessTenantNotifications implements ShouldQueue
     {
         Log::info("Try send mail to : {$notification->recipient_email} for type : {$notification->notification_type}");
         try {
-            Mail::to($notification->recipient_email)->send(
-                new \App\Mail\ScheduledNotificationMail($notification)
-            );
-            Log::info("Mail sent to : {$notification->recipient_email}");
+            if(env('APP_ENV') === 'local')  {
+                Mail::to('crolweb@gmail.com')->send(
+                    new \App\Mail\ScheduledNotificationMail($notification)
+                );
+                Log::info("Mail sent to : crolweb@gmail.com");
+            } else {
+                Mail::to($notification->recipient_email)->send(
+                    new \App\Mail\ScheduledNotificationMail($notification)
+                );
+                Log::info("Mail sent to : {$notification->recipient_email}");
+
+            }
         } catch (\Exception $e) {
             Log::error("Email failed: " . $e->getMessage());
             throw $e;
