@@ -296,9 +296,6 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                 getDisplayText={(contract) => contract.name}
                                 getKey={(contract) => contract.id}
                                 onSelect={(contracts) => {
-                                    console.log(contracts);
-                                    // const prev = existingContracts;
-                                    // prev.push(contracts);
                                     setExistingContracts(contracts);
                                 }}
                                 placeholder="Search contracts..."

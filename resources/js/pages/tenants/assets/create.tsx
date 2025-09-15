@@ -67,6 +67,7 @@ type TypeFormData = {
     next_maintenance_date: string | null;
     last_maintenance_date: string | null;
     contracts: Contract[];
+    existing_contracts: [];
     files: {
         file: File;
         name: string;
@@ -148,6 +149,7 @@ export default function CreateAsset({
         pictures: [],
         contracts: [],
         providers: asset?.maintainable.providers ?? [],
+        existing_contracts: []
     });
 
     const [listIsOpen, setListIsOpen] = useState(false);
@@ -291,7 +293,7 @@ export default function CreateAsset({
 
     const addFileModalForm = () => {
         return (
-            <div className="bg-background/50 absolute inset-0 z-50">
+            <div className="bg-background/50 fixed inset-0 z-50">
                 <div className="bg-background/20 flex h-dvh items-center justify-center">
                     <div className="bg-background flex items-center justify-center p-4">
                         <div className="flex flex-col gap-2">
@@ -304,7 +306,7 @@ export default function CreateAsset({
                                     onChange={(e) => setNewDocumentType(parseInt(e.target.value))}
                                     id=""
                                     className={cn(
-                                        'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                        'border-input placeholder:text-muted-foreground flex w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
                                         'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
                                         'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
                                     )}
@@ -338,12 +340,11 @@ export default function CreateAsset({
                                     placeholder="Document name"
                                     onChange={(e) => setNewFileName(e.target.value)}
                                 />
-                                <p className="text-border text-xs">Servira à la sauvegarde du nom du fichier</p>
+                                <p className="text-border text-foreground text-xs">Le nom servira également à la sauvegarde du nom du fichier</p>
                                 <Input
                                     type="text"
                                     name="description"
                                     id="description"
-                                    required
                                     minLength={10}
                                     maxLength={250}
                                     placeholder="Document description"
@@ -351,7 +352,7 @@ export default function CreateAsset({
                                 />
                                 <div className="flex justify-between">
                                     <Button>Submit</Button>
-                                    <Button type="button" onClick={closeFileModal} variant={'outline'}>
+                                    <Button type="button" onClick={closeFileModal} variant="secondary">
                                         Cancel
                                     </Button>
                                 </div>
@@ -398,6 +399,10 @@ export default function CreateAsset({
 
     console.log(data);
 
+    const [existingContracts, setExistingContracts] = useState([]);
+    console.log(existingContracts);
+    console.log(data.existing_contracts);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Create asset`} />
@@ -415,423 +420,446 @@ export default function CreateAsset({
                         )}
                     </div>
                 )}
-                <form onSubmit={submit}>
-                    <div>
-                        <Label htmlFor="is_mobile">Mobile asset ?</Label>
-                        <Checkbox
-                            id="is_mobile"
-                            name="is_mobile"
-                            checked={data.is_mobile ?? true}
-                            onClick={() =>
-                                setData((prev) => ({
-                                    ...prev,
-                                    is_mobile: !data.is_mobile,
-                                    locationId: '',
-                                    locationName: '',
-                                    locationReference: '',
-                                    locationType: '',
-                                }))
-                            }
-                        />
-                        <InputError className="mt-2" message={errors?.is_mobile ?? ''} />
-                    </div>
-                    {data.is_mobile ? (
-                        <>
-                            <div>
-                                <label className="mb-2 block text-sm font-medium">User of the mobile asset</label>
-                                <SearchableInput<User>
-                                    searchUrl={route('api.users.search')}
-                                    searchParams={{ interns: 1 }}
-                                    displayValue={data.locationName}
-                                    getDisplayText={(user) => user.full_name}
-                                    getKey={(user) => user.id}
-                                    onSelect={(user) => {
-                                        setData('locationId', user.id);
-                                        setData('locationName', user.full_name);
-                                        setData('locationType', 'user');
-                                    }}
-                                    placeholder="Search user..."
-                                    className="mb-4"
-                                />
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <Label htmlFor="search">Search</Label>
-                            <div className="relative">
-                                <Input
-                                    type="search"
-                                    value={data.q}
-                                    onChange={(e) => setData('q', e.target.value)}
-                                    placeholder="Search by code or name"
-                                />
-                                <ul className="bg-background absolute z-10 flex w-full flex-col border" aria-autocomplete="list" role="listbox">
-                                    {isSearching && (
-                                        <li value="0" key="" className="">
-                                            Searching...
-                                        </li>
-                                    )}
-                                    {listIsOpen &&
-                                        locations &&
-                                        locations.length > 0 &&
-                                        locations?.map((location) => (
-                                            <li
-                                                role="option"
-                                                value={location.reference_code}
-                                                key={location.reference_code}
-                                                onClick={() => setSelectedLocation(location)}
-                                                className="hover:bg-foreground hover:text-background cursor-pointer p-2 text-sm"
-                                            >
-                                                {location.name + ' (' + location.reference_code + ')'}
-                                            </li>
-                                        ))}
-                                    {listIsOpen && locations && locations.length == 0 && (
-                                        <>
-                                            <li value="0" key="">
-                                                No results
-                                            </li>
-                                        </>
-                                    )}
-                                </ul>
-                            </div>
-                            {/* {data.locationName && ( */}
-                            <>
-                                <Label htmlFor="locationType">Level</Label>
-                                <Input
-                                    required
-                                    type="text"
-                                    disabled
-                                    value={data.locationName ? data.locationName + ' - ' + data.locationReference : 'No location selected'}
-                                />
-                                <InputError className="mt-2" message={errors?.locationType ?? ''} />
-                            </>
-                            {/* )} */}
-                        </>
-                    )}
-
-                    <Label htmlFor="name">Name</Label>
-                    <Input
-                        id="name"
-                        type="text"
-                        required
-                        autoFocus
-                        maxLength={100}
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
-                        placeholder="Asset name"
-                    />
-                    <InputError className="mt-2" message={errors?.name ?? ''} />
-
-                    {!asset && (
-                        <div>
-                            <Label htmlFor="need_qr_code">Need QR Code ?</Label>
+                <form onSubmit={submit} className="flex flex-col gap-4">
+                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                        <h5>Location</h5>
+                        <div className="flex items-center gap-2">
+                            <Label htmlFor="is_mobile">Mobile asset ?</Label>
                             <Checkbox
-                                id="need_qr_code"
-                                name="need_qr_code"
-                                checked={data.need_qr_code ?? true}
-                                onClick={() => setData('need_qr_code', !data.need_qr_code)}
+                                id="is_mobile"
+                                name="is_mobile"
+                                checked={data.is_mobile ?? true}
+                                onClick={() =>
+                                    setData((prev) => ({
+                                        ...prev,
+                                        is_mobile: !data.is_mobile,
+                                        locationId: '',
+                                        locationName: '',
+                                        locationReference: '',
+                                        locationType: '',
+                                    }))
+                                }
                             />
-                            <InputError className="mt-2" message={errors?.need_qr_code ?? ''} />
                         </div>
-                    )}
-
-                    <Label htmlFor="category">Category</Label>
-                    <select
-                        name="category"
-                        required
-                        value={data.categoryId === '' ? 0 : data.categoryId}
-                        onChange={(e) => setData('categoryId', e.target.value)}
-                        id="category"
-                        className={cn(
-                            'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                            'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                        )}
-                    >
-                        {categories && categories.length > 0 && (
+                        <InputError className="mt-2" message={errors?.is_mobile ?? ''} />
+                        {data.is_mobile ? (
                             <>
-                                <option value="0" disabled className="bg-background text-foreground">
-                                    Select an option
-                                </option>
-                                {categories?.map((category) => (
-                                    <option value={category.id} key={category.id} className="bg-background text-foreground">
-                                        {category.label}
-                                    </option>
-                                ))}
+                                <div>
+                                    <label className="mb-2 block text-sm font-medium">User of the mobile asset</label>
+                                    <SearchableInput<User>
+                                        searchUrl={route('api.users.search')}
+                                        searchParams={{ interns: 1 }}
+                                        displayValue={data.locationName}
+                                        getDisplayText={(user) => user.full_name}
+                                        getKey={(user) => user.id}
+                                        onSelect={(user) => {
+                                            setData('locationId', user.id);
+                                            setData('locationName', user.full_name);
+                                            setData('locationType', 'user');
+                                        }}
+                                        placeholder="Search user..."
+                                        className="mb-4"
+                                    />
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                <Label htmlFor="search">Search</Label>
+                                <div className="relative">
+                                    <Input
+                                        type="search"
+                                        value={data.q}
+                                        onChange={(e) => setData('q', e.target.value)}
+                                        placeholder="Search by code or name to add a level"
+                                    />
+                                    <ul className="bg-background absolute z-10 flex w-full flex-col border" aria-autocomplete="list" role="listbox">
+                                        {isSearching && (
+                                            <li value="0" key="" className="">
+                                                Searching...
+                                            </li>
+                                        )}
+                                        {listIsOpen &&
+                                            locations &&
+                                            locations.length > 0 &&
+                                            locations?.map((location) => (
+                                                <li
+                                                    role="option"
+                                                    value={location.reference_code}
+                                                    key={location.reference_code}
+                                                    onClick={() => setSelectedLocation(location)}
+                                                    className="hover:bg-foreground hover:text-background cursor-pointer p-2 text-sm"
+                                                >
+                                                    {location.name + ' (' + location.reference_code + ')'}
+                                                </li>
+                                            ))}
+                                        {listIsOpen && locations && locations.length == 0 && (
+                                            <>
+                                                <li value="0" key="">
+                                                    No results
+                                                </li>
+                                            </>
+                                        )}
+                                    </ul>
+                                </div>
+                                {/* {data.locationName && ( */}
+                                <>
+                                    <Label htmlFor="locationType">Level</Label>
+                                    <Input
+                                        required
+                                        type="text"
+                                        disabled
+                                        value={data.locationName ? data.locationName + ' - ' + data.locationReference : 'No location selected'}
+                                    />
+                                    <InputError className="mt-2" message={errors?.locationType ?? ''} />
+                                </>
+                                {/* )} */}
                             </>
                         )}
-                    </select>
-                    <InputError className="mt-2" message={errors?.categoryId ?? ''} />
-
-                    <Label htmlFor="description">Description</Label>
-                    <Input
-                        id="description"
-                        type="text"
-                        maxLength={255}
-                        required
-                        value={data.description}
-                        onChange={(e) => setData('description', e.target.value)}
-                        placeholder="Asset description"
-                    />
-                    <InputError className="mt-2" message={errors?.description ?? ''} />
-
-                    <Label htmlFor="surface">Surface</Label>
-                    <Input
-                        id="surface"
-                        type="number"
-                        min={0}
-                        step="0.01"
-                        value={data.surface ?? ''}
-                        placeholder="Asset surface"
-                        onChange={(e) => setData('surface', parseFloat(e.target.value))}
-                    />
-                    <InputError className="mt-2" message={errors?.surface ?? ''} />
-                    <div className="flex flex-col gap-4 md:flex-row">
-                        <div className="w-full">
-                            <Label htmlFor="brand">Brand</Label>
-                            <Input
-                                id="brand"
-                                type="text"
-                                maxLength={100}
-                                value={data.brand}
-                                onChange={(e) => setData('brand', e.target.value)}
-                                placeholder="Asset brand"
-                            />
-                            <InputError className="mt-2" message={errors?.brand ?? ''} />
-                        </div>
-                        <div className="w-full">
-                            <Label htmlFor="model">Model</Label>
-                            <Input
-                                id="model"
-                                type="text"
-                                maxLength={100}
-                                value={data.model}
-                                onChange={(e) => setData('model', e.target.value)}
-                                placeholder="Asset model"
-                            />
-                            <InputError className="mt-2" message={errors?.model ?? ''} />
-                        </div>
-                        <div className="w-full">
-                            <Label htmlFor="serial_number">Serial number</Label>
-                            <Input
-                                id="serial_number"
-                                type="text"
-                                maxLength={50}
-                                value={data.serial_number}
-                                onChange={(e) => setData('serial_number', e.target.value)}
-                                placeholder="Asset serial number"
-                            />
-                            <InputError className="mt-2" message={errors?.serial_number ?? ''} />
-                        </div>
                     </div>
+                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                        <h5>Information</h5>
+                        <div>
+                            <Label htmlFor="name">Name</Label>
+                            <Input
+                                id="name"
+                                type="text"
+                                required
+                                autoFocus
+                                maxLength={100}
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                placeholder="Asset name"
+                            />
+                            <InputError className="mt-2" message={errors?.name ?? ''} />
+                        </div>
 
-                    <div>
-                        <Label htmlFor="purchase_date">Date of purchase</Label>
+                        {!asset && (
+                            <div className="flex items-center gap-2">
+                                <Label htmlFor="need_qr_code">Need QR Code ?</Label>
+                                <Checkbox
+                                    id="need_qr_code"
+                                    name="need_qr_code"
+                                    checked={data.need_qr_code ?? true}
+                                    onClick={() => setData('need_qr_code', !data.need_qr_code)}
+                                />
+                                <InputError className="mt-2" message={errors?.need_qr_code ?? ''} />
+                            </div>
+                        )}
+
+                        <Label htmlFor="category">Category</Label>
+                        <select
+                            name="category"
+                            required
+                            value={data.categoryId === '' ? 0 : data.categoryId}
+                            onChange={(e) => setData('categoryId', e.target.value)}
+                            id="category"
+                            className={cn(
+                                'border-input placeholder:text-muted-foreground flex w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                            )}
+                        >
+                            {categories && categories.length > 0 && (
+                                <>
+                                    <option value="0" disabled className="bg-background text-foreground">
+                                        Select an option
+                                    </option>
+                                    {categories?.map((category) => (
+                                        <option value={category.id} key={category.id} className="bg-background text-foreground3">
+                                            {category.label}
+                                        </option>
+                                    ))}
+                                </>
+                            )}
+                        </select>
+                        <InputError className="mt-2" message={errors?.categoryId ?? ''} />
+
+                        <Label htmlFor="description">Description</Label>
                         <Input
-                            id="purchase_date"
-                            type="date"
-                            value={data.purchase_date}
-                            max={minEndDateWarranty}
-                            onChange={(e) => setData('purchase_date', e.target.value)}
-                            placeholder="Date of purchase"
+                            id="description"
+                            type="text"
+                            maxLength={255}
+                            required
+                            value={data.description}
+                            onChange={(e) => setData('description', e.target.value)}
+                            placeholder="Asset description"
                         />
-                        <InputError className="mt-2" message={errors?.purchase_date ?? ''} />
-                    </div>
-                    <Label htmlFor="purchase_cost">Purchase cost</Label>
-                    <Input
-                        id="purchase_cost"
-                        type="number"
-                        min={0}
-                        step="0.01"
-                        value={data.purchase_cost ?? ''}
-                        onChange={(e) => setData('purchase_cost', parseFloat(e.target.value))}
-                        placeholder="Purchase cost (max. 2 decimals) : 4236.36"
-                    />
-                    <InputError className="mt-2" message={errors?.purchase_cost ?? ''} />
+                        <InputError className="mt-2" message={errors?.description ?? ''} />
 
-                    {/* Depreciation */}
-                    <div>
-                        <Label htmlFor="depreciable">depreciable ?</Label>
-                        <Checkbox
-                            id="depreciable"
-                            name="depreciable"
-                            checked={data.depreciable}
-                            onClick={() => setData('depreciable', !data.depreciable)}
+                        <Label htmlFor="surface">Surface</Label>
+                        <Input
+                            id="surface"
+                            type="number"
+                            min={0}
+                            step="0.01"
+                            value={data.surface ?? ''}
+                            placeholder="Asset surface"
+                            onChange={(e) => setData('surface', parseFloat(e.target.value))}
                         />
-                    </div>
-                    <InputError className="mt-2" message={errors?.depreciable ?? ''} />
-                    {data.depreciable && (
+                        <InputError className="mt-2" message={errors?.surface ?? ''} />
                         <div className="flex flex-col gap-4 md:flex-row">
                             <div className="w-full">
-                                <Label htmlFor="depreciation_start_date">Depreciation start date</Label>
+                                <Label htmlFor="brand">Brand</Label>
                                 <Input
-                                    id="depreciation_start_date"
+                                    id="brand"
+                                    type="text"
+                                    maxLength={100}
+                                    value={data.brand}
+                                    onChange={(e) => setData('brand', e.target.value)}
+                                    placeholder="Asset brand"
+                                />
+                                <InputError className="mt-2" message={errors?.brand ?? ''} />
+                            </div>
+                            <div className="w-full">
+                                <Label htmlFor="model">Model</Label>
+                                <Input
+                                    id="model"
+                                    type="text"
+                                    maxLength={100}
+                                    value={data.model}
+                                    onChange={(e) => setData('model', e.target.value)}
+                                    placeholder="Asset model"
+                                />
+                                <InputError className="mt-2" message={errors?.model ?? ''} />
+                            </div>
+                            <div className="w-full">
+                                <Label htmlFor="serial_number">Serial number</Label>
+                                <Input
+                                    id="serial_number"
+                                    type="text"
+                                    maxLength={50}
+                                    value={data.serial_number}
+                                    onChange={(e) => setData('serial_number', e.target.value)}
+                                    placeholder="Asset serial number"
+                                />
+                                <InputError className="mt-2" message={errors?.serial_number ?? ''} />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                        <h5>Purchase/Warranty</h5>
+                        <div className="flex flex-col gap-4 md:flex-row">
+                            <div className="w-full">
+                                <Label htmlFor="purchase_date">Date of purchase</Label>
+                                <Input
+                                    id="purchase_date"
                                     type="date"
-                                    value={data.depreciation_start_date ?? ''}
-                                    onChange={(e) => setData('depreciation_start_date', e.target.value)}
-                                    placeholder="Depreciation start date"
+                                    value={data.purchase_date}
+                                    max={minEndDateWarranty}
+                                    onChange={(e) => setData('purchase_date', e.target.value)}
+                                    placeholder="Date of purchase"
                                 />
-                                <InputError className="mt-2" message={errors?.depreciation_start_date ?? ''} />
+                                <InputError className="mt-2" message={errors?.purchase_date ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label htmlFor="depreciation_duration">Depreciation duration (in years)</Label>
+                                <Label htmlFor="purchase_cost">Purchase cost</Label>
                                 <Input
-                                    id="depreciation_duration"
-                                    type="number"
-                                    min={1}
-                                    step="1"
-                                    value={data.depreciation_duration ?? ''}
-                                    placeholder="Asset depreciation_duration"
-                                    onChange={(e) => setData('depreciation_duration', parseFloat(e.target.value))}
-                                />
-                                <InputError className="mt-2" message={errors?.depreciation_start_date ?? ''} />
-                            </div>
-                            <div className="w-full">
-                                <Label htmlFor="depreciation_end_date">Depreciation end date</Label>
-                                <Input
-                                    id="depreciation_end_date"
-                                    type="date"
-                                    value={data.depreciation_end_date ?? ''}
-                                    onChange={(e) => setData('depreciation_end_date', e.target.value)}
-                                    placeholder="Depreciation end date"
-                                />
-                                <InputError className="mt-2" message={errors?.depreciation_end_date ?? ''} />
-                            </div>
-                            <div className="w-full">
-                                <Label htmlFor="residual_value">Residual value</Label>
-                                <Input
-                                    id="residual_value"
+                                    id="purchase_cost"
                                     type="number"
                                     min={0}
                                     step="0.01"
-                                    value={data.residual_value ?? ''}
-                                    onChange={(e) => setData('residual_value', parseFloat(e.target.value))}
+                                    value={data.purchase_cost ?? ''}
+                                    onChange={(e) => setData('purchase_cost', parseFloat(e.target.value))}
                                     placeholder="Purchase cost (max. 2 decimals) : 4236.36"
                                 />
-                                <InputError className="mt-2" message={errors?.residual_value ?? ''} />
+                                <InputError className="mt-2" message={errors?.purchase_cost ?? ''} />
                             </div>
                         </div>
-                    )}
-
-                    {/* Warranty */}
-                    <Label htmlFor="under_warranty">Still under warranty ?</Label>
-                    <Checkbox
-                        id="under_warranty"
-                        name="under_warranty"
-                        checked={data.under_warranty}
-                        onClick={() => setData('under_warranty', !data.under_warranty)}
-                    />
-                    <InputError className="mt-2" message={errors?.under_warranty ?? ''} />
-
-                    {data.under_warranty && (
-                        <div>
-                            <Label htmlFor="end_warranty_date">Date end of warranty</Label>
-                            <Input
-                                id="end_warranty_date"
-                                type="date"
-                                value={data.end_warranty_date}
-                                min={minEndDateWarranty}
-                                onChange={(e) => setData('end_warranty_date', e.target.value)}
-                                placeholder="Date end of warranty"
+                        {/* Warranty */}
+                        <div className="flex items-center gap-2">
+                            <Label htmlFor="under_warranty">Still under warranty ?</Label>
+                            <Checkbox
+                                id="under_warranty"
+                                name="under_warranty"
+                                checked={data.under_warranty}
+                                onClick={() => setData('under_warranty', !data.under_warranty)}
                             />
-                            <InputError className="mt-2" message={errors?.end_warranty_date ?? ''} />
                         </div>
-                    )}
-                    <div>
-                        <Label htmlFor="need_maintenance">Need maintenance ?</Label>
-                        <Checkbox
-                            id="need_maintenance"
-                            name="need_maintenance"
-                            checked={data.need_maintenance}
-                            onClick={() => setData('need_maintenance', !data.need_maintenance)}
-                        />
-                        <InputError className="mt-2" message={errors?.need_maintenance ?? ''} />
+                        <InputError className="mt-2" message={errors?.under_warranty ?? ''} />
+
+                        {data.under_warranty && (
+                            <div>
+                                <Label htmlFor="end_warranty_date">Date end of warranty</Label>
+                                <Input
+                                    id="end_warranty_date"
+                                    type="date"
+                                    value={data.end_warranty_date}
+                                    min={minEndDateWarranty}
+                                    onChange={(e) => setData('end_warranty_date', e.target.value)}
+                                    placeholder="Date end of warranty"
+                                />
+                                <InputError className="mt-2" message={errors?.end_warranty_date ?? ''} />
+                            </div>
+                        )}
                     </div>
 
-                    {data.need_maintenance && (
-                        <>
+                    {/* Depreciation */}
+                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                        <h5>Depreciation</h5>
+
+                        <div className="flex items-center gap-2">
+                            <Label htmlFor="depreciable">depreciable ?</Label>
+                            <Checkbox
+                                id="depreciable"
+                                name="depreciable"
+                                checked={data.depreciable}
+                                onClick={() => setData('depreciable', !data.depreciable)}
+                            />
+                        </div>
+                        <InputError className="mt-2" message={errors?.depreciable ?? ''} />
+                        {data.depreciable && (
                             <div className="flex flex-col gap-4 md:flex-row">
                                 <div className="w-full">
-                                    <Label htmlFor="maintenance_frequency">Maintenance frequency</Label>
-                                    <select
-                                        name="maintenance_frequency"
-                                        value={data.maintenance_frequency ?? ''}
-                                        onChange={(e) => setData('maintenance_frequency', e.target.value)}
-                                        id=""
-                                        required={data.need_maintenance}
-                                        className={cn(
-                                            'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                            'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                                        )}
-                                    >
-                                        {frequencies && frequencies.length > 0 && (
-                                            <>
-                                                <option value="" disabled className="bg-background text-foreground">
-                                                    Select an option
-                                                </option>
-                                                {frequencies?.map((frequency, index) => (
-                                                    <option value={frequency} key={index} className="bg-background text-foreground">
-                                                        {frequency}
-                                                    </option>
-                                                ))}
-                                            </>
-                                        )}
-                                    </select>
-
-                                    <InputError className="mt-2" message={errors?.maintenance_frequency ?? ''} />
-                                </div>
-
-                                <div className="w-full">
-                                    <Label htmlFor="last_maintenance_date">Date last maintenance</Label>
+                                    <Label htmlFor="depreciation_start_date">Depreciation start date</Label>
                                     <Input
-                                        id="last_maintenance_date"
+                                        id="depreciation_start_date"
                                         type="date"
-                                        value={data.last_maintenance_date ?? ''}
-                                        max={minEndDateWarranty}
-                                        onChange={(e) => setData('last_maintenance_date', e.target.value)}
-                                        placeholder="Date last maintenance"
+                                        value={data.depreciation_start_date ?? ''}
+                                        onChange={(e) => setData('depreciation_start_date', e.target.value)}
+                                        placeholder="Depreciation start date"
                                     />
-                                    <InputError className="mt-2" message={errors?.last_maintenance_date ?? ''} />
+                                    <InputError className="mt-2" message={errors?.depreciation_start_date ?? ''} />
                                 </div>
                                 <div className="w-full">
-                                    <Label htmlFor="next_maintenance_date">Date next maintenance</Label>
+                                    <Label htmlFor="depreciation_duration">Depreciation duration (in years)</Label>
                                     <Input
-                                        id="next_maintenance_date"
-                                        type="date"
-                                        value={data.next_maintenance_date ?? ''}
-                                        min={minEndDateWarranty}
-                                        onChange={(e) => setData('next_maintenance_date', e.target.value)}
-                                        placeholder="Date last maintenance"
+                                        id="depreciation_duration"
+                                        type="number"
+                                        min={1}
+                                        step="1"
+                                        value={data.depreciation_duration ?? ''}
+                                        placeholder="Asset depreciation_duration"
+                                        onChange={(e) => setData('depreciation_duration', parseFloat(e.target.value))}
                                     />
-                                    <InputError className="mt-2" message={errors?.next_maintenance_date ?? ''} />
+                                    <InputError className="mt-2" message={errors?.depreciation_start_date ?? ''} />
+                                </div>
+                                <div className="w-full">
+                                    <Label htmlFor="depreciation_end_date">Depreciation end date</Label>
+                                    <Input
+                                        id="depreciation_end_date"
+                                        type="date"
+                                        value={data.depreciation_end_date ?? ''}
+                                        onChange={(e) => setData('depreciation_end_date', e.target.value)}
+                                        placeholder="Depreciation end date"
+                                    />
+                                    <InputError className="mt-2" message={errors?.depreciation_end_date ?? ''} />
+                                </div>
+                                <div className="w-full">
+                                    <Label htmlFor="residual_value">Residual value</Label>
+                                    <Input
+                                        id="residual_value"
+                                        type="number"
+                                        min={0}
+                                        step="0.01"
+                                        value={data.residual_value ?? ''}
+                                        onChange={(e) => setData('residual_value', parseFloat(e.target.value))}
+                                        placeholder="Purchase cost (max. 2 decimals) : 4236.36"
+                                    />
+                                    <InputError className="mt-2" message={errors?.residual_value ?? ''} />
                                 </div>
                             </div>
-                        </>
-                    )}
-                    <div>
-                        <label className="mb-2 block text-sm font-medium">Maintenance manager</label>
-                        <SearchableInput<User>
-                            searchUrl={route('api.users.maintenance')}
-                            // searchParams={{ interns: 1 }}
-                            displayValue={data.maintenance_manager_name}
-                            getDisplayText={(user) => user.full_name}
-                            getKey={(user) => user.id}
-                            onSelect={(user) => {
-                                setData('maintenance_manager_id', user.id);
-                                setData('maintenance_manager_name', user.full_name);
-                            }}
-                            onDelete={() => {
-                                setData('maintenance_manager_id', null);
-                                setData('maintenance_manager_name', null);
-                            }}
-                            placeholder="Search maintenance manager..."
-                            className="mb-4"
-                        />
+                        )}
+                    </div>
+                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                        <h5>Maintenance</h5>
+
+                        <div className="flex items-center gap-2">
+                            <Label htmlFor="need_maintenance">Need maintenance ?</Label>
+                            <Checkbox
+                                id="need_maintenance"
+                                name="need_maintenance"
+                                checked={data.need_maintenance}
+                                onClick={() => setData('need_maintenance', !data.need_maintenance)}
+                            />
+                            <InputError className="mt-2" message={errors?.need_maintenance ?? ''} />
+                        </div>
+
+                        {data.need_maintenance && (
+                            <>
+                                <div className="flex flex-col gap-4 md:flex-row">
+                                    <div className="w-full">
+                                        <Label htmlFor="maintenance_frequency">Maintenance frequency</Label>
+                                        <select
+                                            name="maintenance_frequency"
+                                            value={data.maintenance_frequency ?? ''}
+                                            onChange={(e) => setData('maintenance_frequency', e.target.value)}
+                                            id=""
+                                            required={data.need_maintenance}
+                                            className={cn(
+                                                'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                            )}
+                                        >
+                                            {frequencies && frequencies.length > 0 && (
+                                                <>
+                                                    <option value="" disabled className="bg-background text-foreground">
+                                                        Select an option
+                                                    </option>
+                                                    {frequencies?.map((frequency, index) => (
+                                                        <option value={frequency} key={index} className="bg-background text-foreground">
+                                                            {frequency}
+                                                        </option>
+                                                    ))}
+                                                </>
+                                            )}
+                                        </select>
+
+                                        <InputError className="mt-2" message={errors?.maintenance_frequency ?? ''} />
+                                    </div>
+
+                                    <div className="w-full">
+                                        <Label htmlFor="last_maintenance_date">Date last maintenance</Label>
+                                        <Input
+                                            id="last_maintenance_date"
+                                            type="date"
+                                            value={data.last_maintenance_date ?? ''}
+                                            max={minEndDateWarranty}
+                                            onChange={(e) => setData('last_maintenance_date', e.target.value)}
+                                            placeholder="Date last maintenance"
+                                        />
+                                        <InputError className="mt-2" message={errors?.last_maintenance_date ?? ''} />
+                                    </div>
+                                    <div className="w-full">
+                                        <Label htmlFor="next_maintenance_date">Date next maintenance</Label>
+                                        <Input
+                                            id="next_maintenance_date"
+                                            type="date"
+                                            value={data.next_maintenance_date ?? ''}
+                                            min={minEndDateWarranty}
+                                            onChange={(e) => setData('next_maintenance_date', e.target.value)}
+                                            placeholder="Date last maintenance"
+                                        />
+                                        <InputError className="mt-2" message={errors?.next_maintenance_date ?? ''} />
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">Maintenance manager</label>
+                            <SearchableInput<User>
+                                searchUrl={route('api.users.maintenance')}
+                                // searchParams={{ interns: 1 }}
+                                displayValue={data.maintenance_manager_name}
+                                getDisplayText={(user) => user.full_name}
+                                getKey={(user) => user.id}
+                                onSelect={(user) => {
+                                    setData('maintenance_manager_id', user.id);
+                                    setData('maintenance_manager_name', user.full_name);
+                                }}
+                                onDelete={() => {
+                                    setData('maintenance_manager_id', null);
+                                    setData('maintenance_manager_name', null);
+                                }}
+                                placeholder="Search maintenance manager..."
+                                className="mb-4"
+                            />
+                        </div>
                     </div>
 
-                    <div>
-                        <label className="mb-2 block text-sm font-medium">Providers</label>
+                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                        <h5>Providers</h5>
                         <SearchableInput<Provider>
                             multiple={true}
                             searchUrl={route('api.providers.search')}
@@ -846,12 +874,29 @@ export default function CreateAsset({
                     </div>
 
                     {!asset && (
-                        <>
+                        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                             {/* Contracts */}
                             <div className="flex items-center gap-2">
                                 <h5>Contract</h5>
-                                <PlusCircleIcon onClick={() => setCountContracts((prev) => prev + 1)} />
+                                <p className="">
+                                    Add new contract <PlusCircleIcon className="inline-block" onClick={() => setCountContracts((prev) => prev + 1)} />
+                                </p>
                             </div>
+                            <SearchableInput<Contract>
+                                multiple={true}
+                                searchUrl={route('api.contracts.search')}
+                                selectedItems={existingContracts}
+                                getDisplayText={(contract) => contract.name}
+                                getKey={(contract) => contract.id}
+                                onSelect={(contracts) => {
+                                    setExistingContracts(contracts);
+                                    setData(
+                                        'existing_contracts',
+                                        contracts.map((elem) => elem.id),
+                                    );
+                                }}
+                                placeholder="Add existing contracts..."
+                            />
 
                             {countContracts > 0 &&
                                 [...Array(countContracts)].map((_, index) => (
@@ -866,7 +911,6 @@ export default function CreateAsset({
                                                 type="text"
                                                 value={data.contracts[index]?.name ?? ''}
                                                 placeholder={`Contract name ${index + 1}`}
-                                                className="rounded border px-2 py-1"
                                                 minLength={4}
                                                 maxLength={100}
                                                 required
@@ -878,7 +922,6 @@ export default function CreateAsset({
                                                 type="text"
                                                 // value={data.contracts[index].name ?? ''}
                                                 placeholder={`Type ${index + 1}`}
-                                                className="rounded border px-2 py-1"
                                                 minLength={4}
                                                 maxLength={100}
                                                 required
@@ -917,7 +960,7 @@ export default function CreateAsset({
                                                 required
                                                 value={data.contracts[index]?.contract_duration ?? ''}
                                                 className={cn(
-                                                    'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                    'border-input placeholder:text-muted-foreground flex w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
                                                     'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
                                                     'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
                                                 )}
@@ -971,7 +1014,7 @@ export default function CreateAsset({
                                                 // required
                                                 value={data.contracts[index]?.notice_period ?? ''}
                                                 className={cn(
-                                                    'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                    'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
                                                     'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
                                                     'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
                                                 )}
@@ -999,7 +1042,7 @@ export default function CreateAsset({
                                                 id=""
                                                 defaultValue={''}
                                                 className={cn(
-                                                    'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                    'border-input placeholder:text-muted-foreground flex w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
                                                     'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
                                                     'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
                                                 )}
@@ -1028,7 +1071,7 @@ export default function CreateAsset({
                                                     id=""
                                                     // required={data.need_maintenance}
                                                     className={cn(
-                                                        'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                        'border-input placeholder:text-muted-foreground flex w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
                                                         'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
                                                         'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
                                                     )}
@@ -1050,12 +1093,12 @@ export default function CreateAsset({
                                         </div>
                                     </div>
                                 ))}
-                        </>
+                        </div>
                     )}
 
                     {!asset && (
-                        <div>
-                            <Label>Pictures</Label>
+                        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                            <h5>Pictures</h5>
                             <Input
                                 type="file"
                                 multiple
@@ -1065,8 +1108,8 @@ export default function CreateAsset({
                         </div>
                     )}
                     {!asset && (
-                        <div id="files">
-                            <Label>Documents</Label>
+                        <div id="files" className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                            <h5>Documents</h5>
                             <Button onClick={() => setShowFileModal(!showFileModal)} type="button" className="block">
                                 Add file
                             </Button>
@@ -1101,13 +1144,14 @@ export default function CreateAsset({
                         </div>
                     )}
 
-                    <br />
-                    <Button type="submit">{asset ? 'Update' : 'Submit'}</Button>
-                    <a href={asset ? route('tenant.assets.show', asset.reference_code) : route('tenant.assets.index')}>
-                        <Button type="button" tabIndex={6} variant={'secondary'}>
-                            Cancel
-                        </Button>
-                    </a>
+                    <div className="flex justify-between">
+                        <Button type="submit">{asset ? 'Update' : 'Submit'}</Button>
+                        <a href={asset ? route('tenant.assets.show', asset.reference_code) : route('tenant.assets.index')}>
+                            <Button type="button" tabIndex={6} variant={'secondary'}>
+                                Cancel
+                            </Button>
+                        </a>
+                    </div>
                 </form>
                 {showFileModal && addFileModalForm()}
             </div>
