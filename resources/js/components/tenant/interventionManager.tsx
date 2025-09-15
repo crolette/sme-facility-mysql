@@ -7,6 +7,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import { InterventionActionManager } from './interventionActionManager';
+import { Pill } from '../ui/pill';
 
 interface InterventionManagerProps {
     itemCodeId: number | string;
@@ -187,34 +188,32 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
     }, [actionsChanged === true]);
 
     return (
-        <div>
-            <details>
-                <summary className="bg-red-5 border-2 p-2">
-                    <h3 className="inline">Interventions ({interventions?.length ?? 0})</h3>
-                    {!closed && <Button onClick={openModale}>add intervention</Button>}
-                </summary>
-                {interventions &&
-                    interventions.length > 0 &&
-                    interventions.map((intervention, index) => (
-                        <Table key={index}>
-                            <TableHead>
-                                <TableHeadRow>
-                                    <TableHeadData>Type</TableHeadData>
-                                    <TableHeadData>Description</TableHeadData>
-                                    <TableHeadData>Priority</TableHeadData>
-                                    <TableHeadData>Status</TableHeadData>
-                                    <TableHeadData>Planned at</TableHeadData>
-                                    <TableHeadData>Repair delay</TableHeadData>
-                                    <TableHeadData>Total costs</TableHeadData>
-                                    <TableHeadData></TableHeadData>
-                                </TableHeadRow>
-                            </TableHead>
+        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+            <h2 className="inline">Interventions ({interventions?.length ?? 0})</h2>
+            {!closed && <Button onClick={openModale}>add intervention</Button>}
+            <Table>
+                <TableHead>
+                    <TableHeadRow>
+                        <TableHeadData>Type</TableHeadData>
+                        <TableHeadData>Description</TableHeadData>
+                        <TableHeadData>Priority</TableHeadData>
+                        <TableHeadData>Status</TableHeadData>
+                        <TableHeadData>Planned at</TableHeadData>
+                        <TableHeadData>Repair delay</TableHeadData>
+                        <TableHeadData>Total costs</TableHeadData>
+                        <TableHeadData></TableHeadData>
+                    </TableHeadRow>
+                </TableHead>
 
-                            <TableBody>
+                <TableBody>
+                    {interventions &&
+                        interventions.length > 0 &&
+                        interventions.map((intervention, index) => (
+                            <>
                                 <TableBodyRow>
                                     <TableBodyData>{intervention.intervention_type.label}</TableBodyData>
                                     <TableBodyData>{intervention.description}</TableBodyData>
-                                    <TableBodyData>{intervention.priority}</TableBodyData>
+                                    <TableBodyData><Pill variant={intervention.priority}>{intervention.priority}</Pill></TableBodyData>
                                     <TableBodyData>{intervention.status}</TableBodyData>
                                     <TableBodyData>{intervention.planned_at ?? 'Not planned'}</TableBodyData>
                                     <TableBodyData>{intervention.repair_delay ?? 'No repair delay'}</TableBodyData>
@@ -245,10 +244,10 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                         />
                                     </TableBodyData>
                                 </TableBodyRow>
-                            </TableBody>
-                        </Table>
-                    ))}
-            </details>
+                            </>
+                        ))}
+                </TableBody>
+            </Table>
             {addIntervention && (
                 <div className="bg-background/50 fixed inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">

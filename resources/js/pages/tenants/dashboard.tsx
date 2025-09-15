@@ -96,8 +96,8 @@ export default function TenantDashboard({
                         <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
                     </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative h-fit flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
                         <h2>Next maintenances</h2>
                         {maintainables && maintainables.length > 0 ? (
                             <div>
@@ -115,7 +115,7 @@ export default function TenantDashboard({
                         )}
                         {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
                     </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative min-h-[100vh] flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative h-fit flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
                         <h2>Next interventions</h2>
                         {interventions && interventions.length > 0 ? (
                             <div>

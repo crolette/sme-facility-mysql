@@ -52,6 +52,7 @@ class Asset extends Model
     protected $with = [
         'location',
         'maintainable',
+        'assetCategory'
     ];
 
     protected $appends = [

@@ -98,6 +98,11 @@ class Room extends Model
         return $this->belongsTo(Floor::class, 'level_id');
     }
 
+    public function level()
+    {
+        return $this->belongsTo(Floor::class, 'level_id');
+    }
+
     public function contracts(): MorphToMany
     {
         return $this->morphToMany(Contract::class, 'contractable');
@@ -167,6 +172,13 @@ class Room extends Model
         );
     }
 
+    public function levelPath(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => route('tenant.floors.show', $this->level->reference_code)
+        );
+    }
+
     public function description(): Attribute
     {
         return Attribute::make(
@@ -181,12 +193,7 @@ class Room extends Model
         );
     }
 
-    public function level(): Attribute
-    {
-        return Attribute::make(
-            get: fn() => $this->floor
-        );
-    }
+   
 
     public function qrCodePath(): Attribute
     {

@@ -8,6 +8,7 @@ import { Checkbox } from '../ui/checkbox';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
+import { Pill } from '../ui/pill';
 
 interface TicketManagerProps {
     itemCode: string;
@@ -128,69 +129,68 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
     };
 
     return (
-        <>
-            <details>
-                <summary className="bg-red-5 border-2 p-2">
-                    <h3 className="inline">Tickets ({tickets?.length ?? 0})</h3>
-                    {canAdd && (
-                        <Button
-                            className=""
-                            onClick={() => {
-                                setSubmitTypeTicket('new');
-                                setAddTicketModal(!addTicketModal);
-                            }}
-                        >
-                            Add new ticket
-                        </Button>
-                    )}
-                </summary>
-                {tickets && tickets?.length > 0 && (
-                    <Table>
-                        <TableHead>
-                            <TableHeadRow>
-                                <TableHeadData>Code</TableHeadData>
-                                <TableHeadData>Status</TableHeadData>
-                                <TableHeadData>Reporter</TableHeadData>
-                                <TableHeadData>Description</TableHeadData>
-                                <TableHeadData>Created at</TableHeadData>
-                                <TableHeadData>Updated at</TableHeadData>
-                                <TableHeadData></TableHeadData>
-                            </TableHeadRow>
-                        </TableHead>
-                        <TableBody>
-                            {tickets?.map((ticket, index) => {
-                                return (
-                                    <TableBodyRow key={index}>
-                                        <TableBodyData>
-                                            <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
-                                        </TableBodyData>
-                                        <TableBodyData>{ticket.status}</TableBodyData>
-                                        <TableBodyData>{ticket.reporter_email ?? ticket.reporter?.email}</TableBodyData>
-                                        <TableBodyData>{ticket.description}</TableBodyData>
-                                        <TableBodyData>{ticket.created_at}</TableBodyData>
-                                        <TableBodyData>{ticket.updated_at !== ticket.created_at ? ticket.updated_at : '-'}</TableBodyData>
+        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+            <h2 className="inline">Tickets ({tickets?.length ?? 0})</h2>
+            {canAdd && (
+                <Button
+                    className=""
+                    onClick={() => {
+                        setSubmitTypeTicket('new');
+                        setAddTicketModal(!addTicketModal);
+                    }}
+                >
+                    Add new ticket
+                </Button>
+            )}
 
-                                        <TableBodyData>
-                                            {ticket.status !== 'closed' && (
-                                                <>
-                                                    <Button variant={'destructive'} onClick={() => closeTicket(ticket.id)}>
-                                                        Close
-                                                    </Button>
+            {tickets && tickets?.length > 0 && (
+                <Table>
+                    <TableHead>
+                        <TableHeadRow>
+                            <TableHeadData>Code</TableHeadData>
+                            <TableHeadData>Status</TableHeadData>
+                            <TableHeadData>Reporter</TableHeadData>
+                            <TableHeadData>Description</TableHeadData>
+                            <TableHeadData>Created at</TableHeadData>
+                            <TableHeadData>Updated at</TableHeadData>
+                            <TableHeadData></TableHeadData>
+                        </TableHeadRow>
+                    </TableHead>
+                    <TableBody>
+                        {tickets?.map((ticket, index) => {
+                            return (
+                                <TableBodyRow key={index}>
+                                    <TableBodyData>
+                                        <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
+                                    </TableBodyData>
+                                    <TableBodyData>
+                                        <Pill variant={ticket.status}>{ticket.status}</Pill>
+                                    </TableBodyData>
+                                    <TableBodyData>{ticket.reporter_email ?? ticket.reporter?.email}</TableBodyData>
+                                    <TableBodyData>{ticket.description}</TableBodyData>
+                                    <TableBodyData>{ticket.created_at}</TableBodyData>
+                                    <TableBodyData>{ticket.updated_at !== ticket.created_at ? ticket.updated_at : '-'}</TableBodyData>
 
-                                                    <Button onClick={() => editTicket(ticket.id)}>Edit</Button>
-                                                    <a href={route('tenant.tickets.show', ticket.id)}>
-                                                        <Button type="button">Show</Button>
-                                                    </a>
-                                                </>
-                                            )}
-                                        </TableBodyData>
-                                    </TableBodyRow>
-                                );
-                            })}
-                        </TableBody>
-                    </Table>
-                )}
-            </details>
+                                    <TableBodyData>
+                                        {ticket.status !== 'closed' && (
+                                            <>
+                                                <Button variant={'destructive'} onClick={() => closeTicket(ticket.id)}>
+                                                    Close
+                                                </Button>
+
+                                                {/* <Button onClick={() => editTicket(ticket.id)}>Edit</Button> */}
+                                                {/* <a href={route('tenant.tickets.show', ticket.id)}>
+                                                    <Button type="button">Show</Button>
+                                                </a> */}
+                                            </>
+                                        )}
+                                    </TableBodyData>
+                                </TableBodyRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            )}
 
             {addTicketModal && (
                 <div className="bg-background/50 fixed inset-0 z-50">
@@ -253,6 +253,6 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 };

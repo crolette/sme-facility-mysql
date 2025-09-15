@@ -60,33 +60,29 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
     };
 
     return (
-        <>
-            <details>
-                <summary className="bg-red-5 border-2 p-2">
-                    <h3 className="inline">Pictures ({pictures?.length})</h3>
-                    {canAdd && (
-                        <Button onClick={() => setAddPictures(!addPictures)} type="button">
-                            Add pictures
-                        </Button>
-                    )}
-                </summary>
-                <div className="flex flex-wrap gap-4">
-                    {pictures &&
-                        pictures.length > 0 &&
-                        pictures.map((picture, index) => {
-                            return (
-                                <div key={index} className="w-32">
-                                    <a href={route(showRoute, picture.id)} download className="w cursor-pointer">
-                                        <img src={route(showRoute, picture.id)} className="aspect-square object-cover" alt={picture.filename} />
-                                    </a>
-                                    <Button variant={'destructive'} onClick={() => deletePicture(picture.id)}>
-                                        Delete
-                                    </Button>
-                                </div>
-                            );
-                        })}
-                </div>
-            </details>
+        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+            <h2 className="inline">Pictures ({pictures?.length})</h2>
+            {canAdd && (
+                <Button onClick={() => setAddPictures(!addPictures)} type="button">
+                    Add pictures
+                </Button>
+            )}
+            <div className="flex flex-wrap gap-4">
+                {pictures &&
+                    pictures.length > 0 &&
+                    pictures.map((picture, index) => {
+                        return (
+                            <div key={index} className="w-32">
+                                <a href={route(showRoute, picture.id)} download className="w cursor-pointer">
+                                    <img src={route(showRoute, picture.id)} className="aspect-square object-cover" alt={picture.filename} />
+                                </a>
+                                <Button variant={'destructive'} onClick={() => deletePicture(picture.id)}>
+                                    Delete
+                                </Button>
+                            </div>
+                        );
+                    })}
+            </div>
 
             {addPictures && (
                 <div className="bg-background/50 absolute inset-0 z-50">
@@ -120,6 +116,6 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
                     </div>
                 </div>
             )}
-        </>
+        </div>
     );
 };

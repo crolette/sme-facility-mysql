@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Pill } from '@/components/ui/pill';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
@@ -52,8 +53,8 @@ export default function IndexTickets() {
                 <ul className="flex border-b-2 pl-4">
                     <li
                         className={cn(
-                            'cursor-pointer border-x-2 border-t-2 px-4 py-1',
-                            fetchTicketStatus === null ? 'bg-secondary' : 'bg-transparent',
+                            'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-4 py-1',
+                            fetchTicketStatus === null ? 'bg-primary text-background' : 'bg-secondary',
                         )}
                         onClick={() => {
                             setFetchTicketStatus(null);
@@ -64,8 +65,8 @@ export default function IndexTickets() {
 
                     <li
                         className={cn(
-                            'cursor-pointer border-x-2 border-t-2 px-4 py-1',
-                            fetchTicketStatus === 'open' ? 'bg-secondary' : 'bg-transparent',
+                            'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-4 py-1',
+                            fetchTicketStatus === 'open' ? 'bg-primary text-background' : 'bg-secondary',
                         )}
                         onClick={() => {
                             setFetchTicketStatus('open');
@@ -75,8 +76,8 @@ export default function IndexTickets() {
                     </li>
                     <li
                         className={cn(
-                            'cursor-pointer border-x-2 border-t-2 px-4 py-1',
-                            fetchTicketStatus === 'ongoing' ? 'bg-secondary' : 'bg-transparent',
+                            'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-4 py-1',
+                            fetchTicketStatus === 'ongoing' ? 'bg-primary text-background' : 'bg-secondary',
                         )}
                         onClick={() => {
                             setFetchTicketStatus('ongoing');
@@ -86,8 +87,8 @@ export default function IndexTickets() {
                     </li>
                     <li
                         className={cn(
-                            'cursor-pointer border-x-2 border-t-2 px-4 py-1',
-                            fetchTicketStatus === 'closed' ? 'bg-secondary' : 'bg-transparent',
+                            'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-4 py-1',
+                            fetchTicketStatus === 'closed' ? 'bg-primary text-background' : 'bg-secondary',
                         )}
                         onClick={() => {
                             setFetchTicketStatus('closed');
@@ -121,7 +122,10 @@ export default function IndexTickets() {
                                         <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
                                     </TableBodyData>
                                     <TableBodyData>{ticket.asset_code}</TableBodyData>
-                                    <TableBodyData>{ticket.status}</TableBodyData>
+                                    <TableBodyData>
+                                        <Pill variant={ticket.status} >
+                                        {ticket.status}</Pill>
+                                    </TableBodyData>
                                     <TableBodyData>{ticket.reporter?.full_name ?? ticket.reporter_email}</TableBodyData>
                                     <TableBodyData>{ticket.description}</TableBodyData>
                                     <TableBodyData>{ticket.created_at}</TableBodyData>
@@ -130,7 +134,7 @@ export default function IndexTickets() {
                                     <TableBodyData>
                                         {ticket.status == 'open' && (
                                             <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'ongoing')}>
-                                                Ongoing
+                                                Mark as Ongoing
                                             </Button>
                                         )}
                                         {ticket.status !== 'closed' && (
@@ -138,9 +142,9 @@ export default function IndexTickets() {
                                                 <Button variant={'destructive'} onClick={() => changeStatusTicket(ticket.id, 'closed')}>
                                                     Close
                                                 </Button>
-                                                <a href={route('tenant.tickets.show', ticket.id)}>
+                                                {/* <a href={route('tenant.tickets.show', ticket.id)}>
                                                     <Button type="button">Show</Button>
-                                                </a>
+                                                </a> */}
                                             </>
                                         )}
                                         {ticket.status === 'closed' && (

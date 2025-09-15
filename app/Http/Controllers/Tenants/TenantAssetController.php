@@ -67,15 +67,16 @@ class TenantAssetController extends Controller
         if (Auth::user()->cannot('view', $asset))
             abort(403);
 
+        // dd();
 
-
-        return Inertia::render('tenants/assets/show', ['item' => $asset->load('maintainable.manager:id,first_name,last_name', 'maintainable.providers:id,name')]);
+        return Inertia::render('tenants/assets/show', ['item' => $asset->load('maintainable.manager:id,first_name,last_name', 'contracts:id,name,type,provider_id,status,renewal_type,end_date,internal_reference,provider_reference', 'contracts.provider:id,name,logo', 'maintainable.providers:id,name')]);
     }
 
     public function showDeleted($id)
     {
-        $asset = Asset::withTrashed()->findOrFail($id);
-        return Inertia::render('tenants/assets/show', ['asset' => $asset->load('documents', 'pictures', 'tickets.pictures')]);
+        $asset = Asset::withTrashed()->with(['documents','pictures','tickets.pictures'])->findOrFail($id);
+        
+        return Inertia::render('tenants/assets/show', ['asset' => $asset]);
     }
 
     /**

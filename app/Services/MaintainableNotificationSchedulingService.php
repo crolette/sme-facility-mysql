@@ -141,7 +141,7 @@ class MaintainableNotificationSchedulingService
                 'notification_type' => 'next_maintenance_date',
                 'recipient_name' => $user->fullName,
                 'recipient_email' => $user->email,
-                'scheduled_at' => $maintainable->next_maintenance_date->subDays($delay),
+                'scheduled_at' => $maintainable->next_maintenance_date->subDays($preference->notification_delay_days),
                 'data' => [
                     'subject' => $maintainable->name,
                     'reference' => $maintainable->maintainable->reference_code,
