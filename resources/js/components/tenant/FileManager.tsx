@@ -24,7 +24,7 @@ interface FileManagerProps {
 }
 
 export default function FileManager({ documents, showModal, onDocumentsChange, onToggleModal }: FileManagerProps) {
-    const [showFileModal, setShowFileModal] = useState(false);
+    
     const [newFileName, setNewFileName] = useState('');
     const [newFileDescription, setNewFileDescription] = useState('');
     const [newFile, setNewFile] = useState<File | null>(null);

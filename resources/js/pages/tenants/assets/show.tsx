@@ -25,12 +25,30 @@ export default function ShowAsset({ item }: { item: Asset }) {
     const { post, delete: destroy } = useForm();
 
     const [asset, setAsset] = useState(item);
-    const [existingContracts, setExistingContracts] = useState(asset.contracts);
+    const [existingContracts, setExistingContracts] = useState(asset.contracts ?? []);
 
     const fetchAsset = async () => {
         const response = await axios.get(route('api.assets.show', asset.reference_code));
         if (response.data.status === 'success') setAsset(response.data.data);
     };
+
+    const updateContracts = (newContracts: Contract[]) => {
+        setAsset((prev) => ({ ...prev, contracts: newContracts }));
+        setExistingContracts(newContracts);
+    }
+
+    const fetchContracts = async () => {
+        try {
+            const response = await axios.get(route('api.assets.contracts', asset.reference_code));
+            if (response.data.status === 'success') {
+                updateContracts(response.data.data)
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    
 
     const deleteAsset = (asset: Asset) => {
         destroy(route(`api.assets.destroy`, asset.reference_code));
@@ -60,7 +78,6 @@ export default function ShowAsset({ item }: { item: Asset }) {
     const [activeTab, setActiveTab] = useState('information');
    
     const [addExistingContractModale, setAddExistingContractModale] = useState<boolean>(false);
-    console.log(asset);
 
     const addExistingContractToAsset = async() => {
         const contracts = {
@@ -69,10 +86,11 @@ export default function ShowAsset({ item }: { item: Asset }) {
 
         try {
             const response = await axios.post(route('api.assets.contracts.post', asset.reference_code), contracts);
-            console.log(response.data);
-            setAddExistingContractModale(false);
-            setExistingContracts(asset.contracts);
-
+            if (response.data.status === "success") {
+                setAddExistingContractModale(false);
+                fetchContracts();
+            }
+            
         } catch (error) {
             console.log(error);
         }
@@ -199,7 +217,14 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                 <h2>Contracts</h2>
                                 <Button onClick={() => setAddExistingContractModale(true)}>add existing contract</Button>
                                 <Button onClick={() => router.get(route('tenant.contracts.create'))}>Add new contract</Button>
-                                <ContractsList items={asset.contracts} contractableReference={asset.reference_code} routeName="assets" removable/>
+                                <ContractsList
+                                    items={asset.contracts}
+                                    contractableReference={asset.reference_code}
+                                    getUrl="api.assets.contracts"
+                                    routeName="assets"
+                                    removable
+                                    onContractsChange={updateContracts}
+                                />
                             </div>
                         )}
 
@@ -278,15 +303,16 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                 }}
                                 placeholder="Search contracts..."
                             />
-                            <Button variant="secondary" onClick={() => {
-                                setAddExistingContractModale(false);
-                                setExistingContracts(asset.contracts);
-                            }}>
+                            <Button
+                                variant="secondary"
+                                onClick={() => {
+                                    setAddExistingContractModale(false);
+                                    setExistingContracts(asset.contracts);
+                                }}
+                            >
                                 Cancel
                             </Button>
-                            <Button onClick={addExistingContractToAsset}>
-                                Add contract
-                            </Button>
+                            <Button onClick={addExistingContractToAsset}>Add contract</Button>
                         </div>
                     </div>
                 </div>

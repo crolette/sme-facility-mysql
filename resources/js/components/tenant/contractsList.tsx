@@ -6,25 +6,45 @@ import { Button } from '../ui/button';
 import Modale from '../Modale';
 import { Pill } from '../ui/pill';
 
-export const ContractsList = ({ items, editable = false, removable = false, contractableReference = null, routeName = null }: { items: Contract[]; editable ?: boolean; removable ?: boolean; contractableReference ?: string;  routeName?: string}) => {
-    const [contracts, setContracts] = useState(items);
+interface ContractsList {
+    getUrl: string;
+    items: Contract[];
+    editable?: boolean;
+    removable?: boolean;
+    contractableReference?: string | null;
+    routeName?: string | null;
+    onContractsChange?: (contracts: Contract[]) => void;
+}
+
+export const ContractsList = ({
+    getUrl,
+    items,
+    editable = false,
+    removable = false,
+    contractableReference = null,
+    routeName = null,
+    onContractsChange,
+}: ContractsList) => {
+
     const fetchContracts = async () => {
+        if (!contractableReference) return;
+
         try {
-            const response = await axios.get(route('api.contracts.index'));
+            const response = await axios.get(route(getUrl, contractableReference));
             if (response.data.status === 'success') {
-                setContracts(response.data.data);
+                onContractsChange?.(response.data.data);
             }
         } catch (error) {
             console.log(error);
         }
     };
 
+
     const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
     const [contractToDelete, setContractToDelete] = useState<Contract | null>(null);
 
     const deleteContract = async () => {
-        if (!contractToDelete)
-            return;
+        if (!contractToDelete) return;
 
         try {
             const response = await axios.delete(route('api.contracts.destroy', contractToDelete.id));
@@ -37,11 +57,26 @@ export const ContractsList = ({ items, editable = false, removable = false, cont
         }
     };
 
-    console.log(contractableReference);
+    const removeContract = async (contract_id: number) => {
+        if (!contractableReference) return;
+
+        try {
+            const response = await axios.delete(route(`api.${routeName}.contracts.delete`, contractableReference), {
+                data: { contract_id: contract_id },
+            });
+            if (response.data.status === 'success') {
+                fetchContracts();
+            }
+        } catch {
+            // console.log(error);
+        }
+    };
+
+    // console.log(contractableReference);
 
     return (
         <>
-            {contracts && contracts.length > 0 && (
+            {items && items.length > 0 && (
                 <Table>
                     <TableHead>
                         <TableHeadRow>
@@ -58,8 +93,8 @@ export const ContractsList = ({ items, editable = false, removable = false, cont
                         </TableHeadRow>
                     </TableHead>
                     <TableBody>
-                        {contracts &&
-                            contracts.map((contract) => {
+                        {items &&
+                            items.map((contract) => {
                                 return (
                                     <TableBodyRow key={contract.id}>
                                         <TableBodyData>
@@ -73,70 +108,54 @@ export const ContractsList = ({ items, editable = false, removable = false, cont
                                         <TableBodyData>{contract.provider_reference}</TableBodyData>
                                         <TableBodyData>{contract.renewal_type}</TableBodyData>
                                         <TableBodyData>
-                                            <a href={route(`tenant.providers.show`, contract.provider.id)}> {contract.provider.name} </a>
+                                            <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>
                                         </TableBodyData>
                                         <TableBodyData className="bg-">{contract.provider.category}</TableBodyData>
                                         <TableBodyData>{contract.end_date}</TableBodyData>
 
                                         {(editable || removable) && (
-                                                <TableBodyData>
-                                                    
-                                                    {editable && (
-                                                        <>
-                                                            <a href={route(`tenant.contracts.edit`, contract.id)}>
-                                                                <Button>Edit</Button>
-                                                            </a>
-                                                            <Button
-                                                                onClick={() => {
-                                                                    setContractToDelete(contract);
-                                                                    setShowDeleteModale(true);
-                                                                }}
-                                                                variant={'destructive'}
-                                                            >
-                                                                Delete
-                                                            </Button>
-                                                        </>
+                                            <TableBodyData>
+                                                {editable && (
+                                                    <>
+                                                        <a href={route(`tenant.contracts.edit`, contract.id)}>
+                                                            <Button>Edit</Button>
+                                                        </a>
+                                                        <Button
+                                                            onClick={() => {
+                                                                setContractToDelete(contract);
+                                                                setShowDeleteModale(true);
+                                                            }}
+                                                            variant={'destructive'}
+                                                        >
+                                                            Delete
+                                                        </Button>
+                                                    </>
                                                 )}
-                                                    {removable && (
-                                                        <>
-                                                            <Button
-                                                            onClick={async () => {
-                                                                try {
-                                                                    const response = await axios.delete(
-                                                                        route(`api.${routeName}.contracts.delete`, contractableReference),
-                                                                        { data: { contract_id: contract.id } },
-                                                                    );
-                                                                    console.log(response.data)
-                                                                } catch {
-                                                                    console.log(error)
-                                                                }
-                                                              
-                                                                }}
-                                                                variant={'destructive'}
-                                                            >
-                                                                Remove
-                                                            </Button>
-                                                        </>
-                                                    )}
-
-                                                </TableBodyData>
-                                            )}
+                                                {removable && (
+                                                    <>
+                                                        <Button onClick={() => removeContract(contract.id)} variant={'destructive'}>
+                                                            Remove
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            </TableBodyData>
+                                        )}
                                     </TableBodyRow>
                                 );
                             })}
                     </TableBody>
                 </Table>
             )}
-             <Modale
-                            title={'Delete contract'}
-                            message={`Are you sure you want to delete this contract ${contractToDelete?.name} ?`}
-                            isOpen={showDeleteModale}
-                            onConfirm={deleteContract}
-                            onCancel={() => {
-                                setShowDeleteModale(false);
-                                setContractToDelete(null);
-                            }}
-                        />
+            <Modale
+                title={'Delete contract'}
+                message={`Are you sure you want to delete this contract ${contractToDelete?.name} ?`}
+                isOpen={showDeleteModale}
+                onConfirm={deleteContract}
+                onCancel={() => {
+                    setShowDeleteModale(false);
+                    setContractToDelete(null);
+                }}
+            />
         </>
     );
 };

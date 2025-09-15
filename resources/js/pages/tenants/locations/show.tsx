@@ -1,3 +1,4 @@
+import SearchableInput from '@/components/SearchableInput';
 import { AssetManager } from '@/components/tenant/assetManager';
 import { ContractsList } from '@/components/tenant/contractsList';
 import { DocumentManager } from '@/components/tenant/documentManager';
@@ -9,7 +10,8 @@ import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocati
 import { TicketManager } from '@/components/tenant/ticketManager';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { TenantBuilding, TenantFloor, TenantRoom, TenantSite, type BreadcrumbItem } from '@/types';
+import { Contract, TenantBuilding, TenantFloor, TenantRoom, TenantSite, type BreadcrumbItem } from '@/types';
+import { router } from '@inertiajs/core';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
 import { useState } from 'react';
@@ -41,6 +43,43 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
         const response = await axios.post(route('api.maintenance.done', location.maintainable.id));
         fetchLocation();
     };
+
+        const [existingContracts, setExistingContracts] = useState(location.contracts ?? []);
+
+        const updateContracts = (newContracts: Contract[]) => {
+            setLocation((prev) => ({ ...prev, contracts: newContracts }));
+            // setExistingContracts(newContracts);
+        };
+
+        const fetchContracts = async () => {
+            try {
+                const response = await axios.get(route(`api.${routeName}.contracts`, location.reference_code));
+                console.log(response.data);
+                if (response.data.status === 'success') {
+                    updateContracts(response.data.data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
+    
+     const [addExistingContractModale, setAddExistingContractModale] = useState<boolean>(false);
+
+     const addExistingContractToAsset = async () => {
+         const contracts = {
+             existing_contracts: existingContracts.map((elem) => elem.id),
+         };
+
+         try {
+             const response = await axios.post(route(`api.${routeName}.contracts.post`, location.reference_code), contracts);
+             if (response.data.status === 'success') {
+                 setAddExistingContractModale(false);
+                 fetchContracts();
+             }
+         } catch (error) {
+             console.log(error);
+         }
+     };
 
      const [activeTab, setActiveTab] = useState('information');
 
@@ -155,9 +194,18 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                         )}
 
                         {activeTab === 'contracts' && (
-                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h2>Contracts</h2>
-                                <ContractsList items={location.contracts} />
+                           <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
+                                                           <h2>Contracts</h2>
+                                                           <Button onClick={() => setAddExistingContractModale(true)}>add existing contract</Button>
+                                                           <Button onClick={() => router.get(route('tenant.contracts.create'))}>Add new contract</Button>
+                                <ContractsList
+                                    items={location.contracts}
+                                    contractableReference={location.reference_code}
+                                    getUrl={`api.${routeName}.contracts`}
+                                    routeName={routeName}
+                                    removable
+                                    onContractsChange={updateContracts}
+                                />
                             </div>
                         )}
 
@@ -194,6 +242,39 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                     </div>
                 </div>
             </div>
+            {addExistingContractModale && (
+                <div className="bg-background/50 fixed inset-0 z-50">
+                    <div className="bg-background/20 flex h-dvh items-center justify-center">
+                        <div className="bg-background flex flex-col items-center justify-center p-4 text-center md:max-w-1/3">
+                            <p>Add Existing contract</p>
+                            <SearchableInput<Contract>
+                                multiple={true}
+                                searchUrl={route('api.contracts.search')}
+                                selectedItems={existingContracts}
+                                getDisplayText={(contract) => contract.name}
+                                getKey={(contract) => contract.id}
+                                onSelect={(contracts) => {
+                                    console.log(contracts);
+                                    // const prev = existingContracts;
+                                    // prev.push(contracts);
+                                    setExistingContracts(contracts);
+                                }}
+                                placeholder="Search contracts..."
+                            />
+                            <Button
+                                variant="secondary"
+                                onClick={() => {
+                                    setAddExistingContractModale(false);
+                                    setExistingContracts(location.contracts);
+                                }}
+                            >
+                                Cancel
+                            </Button>
+                            <Button onClick={addExistingContractToAsset}>Add contract</Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AppLayout>
     );
 }

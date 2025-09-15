@@ -2,13 +2,16 @@
 
 use App\Helpers\ApiResponse;
 use App\Models\Tenants\Site;
+use Illuminate\Http\Request;
 use App\Services\QRCodeService;
 use App\Services\PictureService;
+use App\Services\ContractService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\V1\APISiteController;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 
 Route::middleware([
@@ -68,6 +71,35 @@ Route::middleware([
 
                 return ApiResponse::success(null, 'Document added');
             })->name('api.sites.documents.post');
+
+            Route::prefix('contracts')->group(function () {
+
+                Route::get('', function (Site $site) {
+
+                    $contracts = Building::where('reference_code', $site->reference_code)->with(['contracts', 'contracts.provider'])->first()->contracts;
+
+                    return ApiResponse::success($contracts ?? [], 'Contract');
+                })->name('api.sites.contracts');
+
+                Route::post('', function (Site $site, ContractWithModelStoreRequest $contractWithModelRequest) {
+
+                    if ($contractWithModelRequest->validated('existing_contracts'))
+                        app(ContractService::class)->attachExistingContractsToModel($site, $contractWithModelRequest->validated('existing_contracts'));
+
+                    return ApiResponse::success([], 'Contract(s) added');
+                })->name('api.sites.contracts.post');
+
+                // Remove/Detach a contract 
+                Route::delete('', function (Site $site, Request $request) {
+                    Debugbar::info($request);
+                    $validated = $request->validateWithBag('errors', [
+                        'contract_id' => 'required|exists:contracts,id'
+                    ]);
+                    app(ContractService::class)->detachExistingContractFromModel($site, $validated['contract_id']);
+                    return ApiResponse::success([], 'Contract removed');
+                })->name('api.sites.contracts.delete');
+            });
+
 
             // Get all tickets from a site
             Route::get('/tickets/', function (Site $site) {

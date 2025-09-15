@@ -3,14 +3,17 @@
 use App\Helpers\ApiResponse;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
+use Illuminate\Http\Request;
 use App\Services\QRCodeService;
 use App\Services\PictureService;
+use App\Services\ContractService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\V1\APIRoomController;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Controllers\API\V1\RelocateRoomController;
+use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 
 Route::middleware([
@@ -63,6 +66,34 @@ Route::middleware([
                     return ApiResponse::error('Error posting new documents');
                 }
             })->name('api.rooms.documents.post');
+
+            Route::prefix('contracts')->group(function() {
+
+                Route::get('', function (Room $room) {
+
+                    $contracts = Room::where('reference_code', $room->reference_code)->with(['contracts', 'contracts.provider'])->first()->contracts;
+
+                    return ApiResponse::success($contracts ?? [], 'Contract');
+                })->name('api.rooms.contracts');
+
+                Route::post('', function (Room $room, ContractWithModelStoreRequest $contractWithModelRequest) {
+
+                    if ($contractWithModelRequest->validated('existing_contracts'))
+                        app(ContractService::class)->attachExistingContractsToModel($room, $contractWithModelRequest->validated('existing_contracts'));
+
+                    return ApiResponse::success([], 'Contract(s) added');
+                })->name('api.rooms.contracts.post');
+
+                // Remove/Detach a contract 
+                Route::delete('', function (Room $room, Request $request) {
+                    $validated = $request->validateWithBag('errors', [
+                        'contract_id' => 'required|exists:contracts,id'
+                    ]);
+                    app(ContractService::class)->detachExistingContractFromModel($room, $validated['contract_id']);
+                    return ApiResponse::success([], 'Contract removed');
+                })->name('api.rooms.contracts.delete');
+
+            });
 
             // Get all tickets from a room
             Route::get('/tickets/', function (Room $room) {

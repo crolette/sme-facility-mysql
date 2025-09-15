@@ -237,6 +237,10 @@ it('can attach a document to an existing contract', function() {
 
 });
 
+it('can delete a document from an existing contract', function() {
+
+});
+
 
 it('can store a site with contracts', function () {
 

@@ -97,7 +97,6 @@ function SearchableSelect<T>(props: SearchableSelectProps<T>) {
             const response = await axios.get(searchUrl, {
                 params: { q: query, ...searchParams },
             });
-            console.log(response.data.data);
             setItems(response.data.data || response.data);
             setIsSearching(false);
             setListIsOpen(true);
@@ -166,8 +165,6 @@ function SearchableSelect<T>(props: SearchableSelectProps<T>) {
             setListIsOpen(false);
         }, 200);
     };
-
-    console.log(selectedItems);
 
     return (
         <div className={`relative ${className}`}>

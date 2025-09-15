@@ -81,6 +81,14 @@ Route::middleware([
 
             
             Route::prefix('/contracts')->group(function () {
+
+                Route::get('', function (Asset $asset) {
+
+                    $assetContracts = Asset::where('reference_code', $asset->reference_code)->with(['contracts', 'contracts.provider'])->first()->contracts;
+
+                    return ApiResponse::success($assetContracts ?? [], 'Contract');
+                })->name('api.assets.contracts');
+
                 Route::post('', function (Asset $asset, ContractWithModelStoreRequest $contractWithModelRequest) {
 
                     if ($contractWithModelRequest->validated('existing_contracts'))

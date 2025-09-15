@@ -105,6 +105,8 @@ export default function CreateContract({
         
     });
 
+    console.log(contract);
+
     const [errors, setErrors] = useState<TypeFormData>();
 
     const submit: FormEventHandler = async (e) => {
@@ -343,7 +345,7 @@ export default function CreateContract({
                             name="notice_period"
                             onChange={(e) => setData('notice_period', e.target.value)}
                             id=""
-                            defaultValue={""}
+                            defaultValue={''}
                             value={data.notice_period}
                             className={cn(
                                 'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
@@ -369,40 +371,44 @@ export default function CreateContract({
                         <Input id="end_date" type="date" value={data.end_date} onChange={(e) => setData('end_date', e.target.value)} disabled />
                         <p className="text-sm">The end date is automatically calculated based on the contract duration.</p>
                         <InputError className="mt-2" message={errors?.end_date ?? ''} />
-                        <div id="files">
-                            <Label>Documents</Label>
-                            <Button onClick={() => setShowFileModal(!showFileModal)} type="button" className="block">
-                                Add file
-                            </Button>
-                            {selectedDocuments.length > 0 && (
-                                <ul className="flex gap-4">
-                                    {selectedDocuments.map((document, index) => {
-                                        const isImage = document.file.type.startsWith('image/');
-                                        const isPdf = document.file.type === 'application/pdf';
-                                        const fileURL = URL.createObjectURL(document.file);
-                                        return (
-                                            <li key={index} className="bg-foreground/10 flex w-50 flex-col gap-2 p-6">
-                                                {/* <p>
+                        {!contract && (
+                            <div id="files">
+                                <Label>Documents</Label>
+                                <Button onClick={() => setShowFileModal(!showFileModal)} type="button" className="block">
+                                    Add file
+                                </Button>
+                                {selectedDocuments.length > 0 && (
+                                    <ul className="flex gap-4">
+                                        {selectedDocuments.map((document, index) => {
+                                            const isImage = document.file.type.startsWith('image/');
+                                            const isPdf = document.file.type === 'application/pdf';
+                                            const fileURL = URL.createObjectURL(document.file);
+                                            return (
+                                                <li key={index} className="bg-foreground/10 flex w-50 flex-col gap-2 p-6">
+                                                    {/* <p>
                                                                             {
                                                                                 documentTypes.find((type) => {
                                                                                     return type.id === document.type;
                                                                                 })?.label
                                                                             }
                                                                         </p> */}
-                                                {isImage && <img src={fileURL} alt="preview" className="mx-auto h-40 w-40 rounded object-cover" />}
-                                                {isPdf && <BiSolidFilePdf size={'160px'} />}
-                                                <p>{document.name}</p>
+                                                    {isImage && (
+                                                        <img src={fileURL} alt="preview" className="mx-auto h-40 w-40 rounded object-cover" />
+                                                    )}
+                                                    {isPdf && <BiSolidFilePdf size={'160px'} />}
+                                                    <p>{document.name}</p>
 
-                                                <p>{document.description}</p>
-                                                <Button type="button" variant="destructive" className="" onClick={() => removeDocument(index)}>
-                                                    Remove
-                                                </Button>
-                                            </li>
-                                        );
-                                    })}
-                                </ul>
-                            )}
-                        </div>
+                                                    <p>{document.description}</p>
+                                                    <Button type="button" variant="destructive" className="" onClick={() => removeDocument(index)}>
+                                                        Remove
+                                                    </Button>
+                                                </li>
+                                            );
+                                        })}
+                                    </ul>
+                                )}
+                            </div>
+                        )}
                         <Button type="submit">{contract ? 'Update' : 'Submit'}</Button>
                         <Button
                             variant={'secondary'}

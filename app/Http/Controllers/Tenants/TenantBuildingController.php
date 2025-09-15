@@ -78,7 +78,7 @@ class TenantBuildingController extends Controller
         if (Auth::user()->cannot('view', $building))
             abort(403);
 
-        $building = Building::where('reference_code', $building->reference_code)->with(['site', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers'])->first();
+        $building = Building::where('reference_code', $building->reference_code)->with(['site', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers', 'contracts', 'contracts.provider'])->first();
         $building->append('level_path');
 
 
