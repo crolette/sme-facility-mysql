@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\ContractDurationEnum;
 use Carbon\Carbon;
 use App\Models\LocationType;
 use App\Models\Tenants\Room;
@@ -8,17 +7,19 @@ use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Enums\NoticePeriodEnum;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Contract;
 
+use App\Models\Tenants\Document;
 use App\Models\Tenants\Provider;
 use App\Enums\ContractStatusEnum;
 use Illuminate\Http\UploadedFile;
+
+use App\Enums\ContractDurationEnum;
 use App\Models\Central\CategoryType;
 
 use App\Enums\ContractRenewalTypesEnum;
-use App\Enums\NoticePeriodEnum;
-
 use function PHPUnit\Framework\assertCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -80,21 +81,13 @@ beforeEach(function () {
 
 it('can factory a contract', function () {
 
-    // Contract::factory()
-    //     ->hasAttached(
-    //         Asset::factory()->count(2), // Attache 2 assets au contrat
-    //         [],
-    //         'contractables' // Nom de la relation pivot
-    //     )
-    //     ->create();
-
     Contract::factory()->forLocation($this->asset)->create();
     assertDatabaseCount('contracts', 1);
     assertDatabaseCount('contractables', 1);
     assertEquals(1, $this->asset->contracts()->count());
 });
 
-it('can store a contract with asset and locations', function () {
+it('can create a contract and attach asset and locations', function () {
 
     $formData = [
         'provider_id' => $this->provider->id,
@@ -138,6 +131,7 @@ it('can store a contract with asset and locations', function () {
         'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
         'status' => ContractStatusEnum::ACTIVE->value,
     ]);
+    
     assertDatabaseCount('contractables', 5);
 
     assertDatabaseHas(
@@ -151,40 +145,65 @@ it('can store a contract with asset and locations', function () {
     );
 });
 
-it('can store an asset with contracts', function () {
+it('can create a contract with documents', function() {
+
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
+    $categoryType = CategoryType::where('category', 'document')->first();
 
     $formData = [
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'locationId' => $this->site->id,
-        'locationType' => 'site',
-        'locationReference' => $this->site->reference_code,
-        'categoryId' => $this->categoryType->id,
-
-        'contracts' => [
-            $this->contractOneData,
-            $this->contractTwoData
+        'provider_id' => $this->provider->id,
+        'name' => 'Contrat de bail',
+        'type' => 'Bail',
+        'notes' => 'Nouveau contrat de bail 2025',
+        'internal_reference' => 'Bail Site 2025',
+        'provider_reference' => 'Provider reference 2025',
+        'start_date' => Carbon::now()->toDateString(),
+        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
+        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
+        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
+        'status' => ContractStatusEnum::ACTIVE->value,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ]
         ]
-
     ];
 
-    $response = $this->postToTenant('api.assets.store', $formData);
+    $response = $this->postToTenant('api.contracts.store', $formData);
+    $response->assertSessionHasNoErrors();
+
     $response->assertStatus(200)
         ->assertJson(['status' => 'success']);
 
-    assertDatabaseCount('contracts', 2);
-    assertDatabaseHas(
-        'contracts',
-        $this->contractOneData,
-    );
-    assertDatabaseHas(
-        'contracts',
-        $this->contractTwoData
-    );
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => 'App\Models\Tenants\Contract',
+        'documentable_id' => 1
+    ]);
+    assertDatabaseHas('documentables', [
+        'document_id' => 2,
+        'documentable_type' => 'App\Models\Tenants\Contract',
+        'documentable_id' => 1
+    ]);
 
-    $asset = Asset::find(2);
-    assertEquals(2, $asset->contracts()->count());
+    Storage::disk('tenants')->assertExists(Document::find(1)->path);
+    Storage::disk('tenants')->assertExists(Document::find(2)->path);
 });
+
+
 
 it('can store a site with contracts', function () {
 

@@ -6,6 +6,7 @@ use App\Models\Tenants\Site;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Enums\NoticePeriodEnum;
+use App\Models\Tenants\Document;
 use App\Enums\ContractStatusEnum;
 use App\Enums\ContractDurationEnum;
 use App\Observers\ContractObserver;
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 #[ObservedBy([ContractObserver::class])]
 class Contract extends Model
@@ -95,11 +97,11 @@ class Contract extends Model
         return $this->morphedByMany(Room::class, 'contractable');
     }
 
-    /**
-     * contractable
-     *
-     * @return MorphTo
-     */
+    public function documents(): MorphToMany
+    {
+        return $this->morphToMany(Document::class, 'documentable');
+    }
+
     public function contractables(): MorphTo
     {
         return $this->morphTo()->withTrashed();

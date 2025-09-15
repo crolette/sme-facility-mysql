@@ -17,11 +17,15 @@ class ContractService
 {
     public function createWithModel(Model $model, $request): void
     {
+        dump('createWithModel');
         foreach ($request as $key => $contractRequest) {
             $contract = new Contract([...$contractRequest]);
-
+            
             if (isset($contractRequest['contract_duration']))
                 $contract = $this->updateContractEndDate($contract,  $contract->contract_duration);
+            
+            dump('createWithModel');
+           
 
             $contract->notice_period = isset($contractRequest['notice_period']) ? $contractRequest['notice_period'] : 'default';
 
@@ -29,8 +33,21 @@ class ContractService
 
             $contract->provider()->associate($contractRequest['provider_id']);
             $contract->save();
+
+            if (isset($contractRequest['files']))
+                app(DocumentService::class)->uploadAndAttachDocumentsForContract($contract, $contractRequest['files']);
+            
             $model->contracts()->attach($contract);
             $model->save();
+        }
+    }
+
+    public function attachExistingContractsToModel(Model $model, $request): void
+    {
+        foreach($request as $contractId)
+        {
+            $contract = Contract::find($contractId);
+            $model->contracts()->attach($contract);
         }
     }
 
@@ -48,10 +65,11 @@ class ContractService
         $contract->provider()->associate($request['provider_id']);
         $contract->save();
 
-        Debugbar::info('contractables', $request['contractables'], isset($request['contractables']));
-
         if (isset($request['contractables']))
             $contract = $this->syncContractables($contract, $request['contractables']);
+
+        if (isset($request['files']))
+            app(DocumentService::class)->uploadAndAttachDocumentsForContract($contract, $request['files']);
 
         return $contract;
     }

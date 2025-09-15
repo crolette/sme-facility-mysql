@@ -304,7 +304,6 @@ export const DocumentManager = ({
                                         name="description"
                                         id="description"
                                         value={newFileData.description}
-                                        required
                                         minLength={10}
                                         maxLength={250}
                                         placeholder="Document description"
