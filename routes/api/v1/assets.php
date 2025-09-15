@@ -1,15 +1,20 @@
 <?php
 
 use App\Helpers\ApiResponse;
+use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Services\QRCodeService;
+use App\Models\Tenants\Contract;
 use App\Services\PictureService;
+use App\Services\ContractService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use App\Http\Requests\Tenant\ContractStoreRequest;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Controllers\API\V1\APIAssetController;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\Tenants\ForceDeleteAssetController;
 use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
@@ -66,7 +71,6 @@ Route::middleware([
             // Post a new document to the assets
             Route::post('/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Asset $asset) {
 
-                Debugbar::info($documentUploadRequest, $documentUploadRequest->validated());
                 $files = $documentUploadRequest->validated('files');
                 if ($files) {
                     $documentService->uploadAndAttachDocuments($asset, $files);
@@ -74,6 +78,28 @@ Route::middleware([
 
                 return ApiResponse::success([], 'Document added');
             })->name('api.assets.documents.post');
+
+            
+            Route::prefix('/contracts')->group(function () {
+                Route::post('', function (Asset $asset, ContractWithModelStoreRequest $contractWithModelRequest) {
+
+                    if ($contractWithModelRequest->validated('existing_contracts'))
+                        app(ContractService::class)->attachExistingContractsToModel($asset, $contractWithModelRequest->validated('existing_contracts'));
+
+                    return ApiResponse::success([], 'Contract(s) added');
+                })->name('api.assets.contracts.post');
+
+                // Remove/Detach a contract from an asset
+                Route::delete('', function (Asset $asset, Request $request) {
+                    $validated = $request->validateWithBag('errors',[
+                        'contract_id' => 'required|exists:contracts,id'
+                    ]);
+                        app(ContractService::class)->detachExistingContractFromModel($asset, $validated['contract_id']);
+                        return ApiResponse::success([], 'Contract removed');
+                })->name('api.assets.contracts.delete');
+            });
+
+               
 
             // Get all pictures from an asset
             Route::get('/pictures/', function ($asset) {
@@ -94,7 +120,6 @@ Route::middleware([
 
             // Get all tickets from an asset
             Route::get('/tickets/', function (Asset $asset) {
-                // $asset = Asset::withTrashed()->with('tickets')->where('reference_code', $asset)->first();
                 return ApiResponse::success($asset->tickets);
             })->name('api.assets.tickets');
 

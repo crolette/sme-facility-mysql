@@ -55,6 +55,9 @@ class APIAssetController extends Controller
             if ($contractRequest->validated('contracts'))
                 $this->contractService->createWithModel($asset, $contractRequest->validated('contracts'));
 
+            if ($contractRequest->validated('existing_contracts'))
+                $this->contractService->attachExistingContractsToModel($asset, $contractRequest->validated('existing_contracts'));
+
             $files = $documentUploadRequest->validated('files');
             if ($files) {
                 $documentService->uploadAndAttachDocuments($asset, $files);
@@ -84,8 +87,7 @@ class APIAssetController extends Controller
      */
     public function update(AssetUpdateRequest $request, MaintainableRequest $maintainableRequest, Asset $asset)
     {
-        Debugbar::info('--- ASSET UPDATE ---');
-        Debugbar::info($maintainableRequest->validated());
+
         if (Auth::user()->cannot('update', $asset))
             abort(403);
 

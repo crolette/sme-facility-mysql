@@ -32,7 +32,6 @@ class APIContractController extends Controller
             DB::beginTransaction();
 
             $contract = $this->contractService->create($request->validated());
-            Debugbar::info('after contractService store');
 
             DB::commit();
 

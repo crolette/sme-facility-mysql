@@ -49,7 +49,7 @@ class AssetFactory extends Factory
     public function forLocation($location): static
     {
         return $this->for($location, 'location')->state(function () use ($location) {
-            $count = Company::incrementAndGetTicketNumber();
+            $count = Company::incrementAndGetAssetNumber();
 
             $codeNumber = generateCodeNumber($count, 'A', 4);
 

@@ -67,6 +67,13 @@ class ContractStoreRequest extends FormRequest
             'contractables.*.locationId' => ['required', 'integer'],
             'contractables.*.locationCode' => ['required', 'string'],
 
+            'files' => 'nullable|array',
+            'files.*.file' => 'required_with:files.*.name|file|mimes:jpg,jpeg,png,pdf|max:' . Document::maxUploadSizeKB(),
+            'files.*.name' => 'required_with:files.*.file|string|min:10|max:100',
+            'files.*.description' => 'nullable|string|min:10|max:250',
+            'files.*.typeId' => ['required_with:files.*.name', Rule::in(CategoryType::where('category', 'document')->pluck('id')->toArray())],
+            'files.*.typeSlug' => ['required_with:files.*.name', Rule::in(CategoryType::where('category', 'document')->pluck('slug')->toArray())],
+
         ];
     }
 }

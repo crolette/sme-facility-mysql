@@ -48,6 +48,16 @@ class ContractWithModelStoreRequest extends FormRequest
             'contracts.*.renewal_type' => ['required', Rule::in(array_column(ContractRenewalTypesEnum::cases(), 'value'))],
             'contracts.*.status' => ['required', Rule::in(array_column(ContractStatusEnum::cases(), 'value'))],
 
+            'existing_contracts' => 'nullable|array',
+            'existing_contracts.*' => 'required|exists:contracts,id',
+
+            'contracts.*.files' => 'nullable|array',
+            'contracts.*.files.*.file' => 'required_with:files.*.name|file|mimes:jpg,jpeg,png,pdf|max:' . Document::maxUploadSizeKB(),
+            'contracts.*.files.*.name' => 'required_with:files.*.file|string|min:10|max:100',
+            'contracts.*.files.*.description' => 'nullable|string|min:10|max:250',
+            'contracts.*.files.*.typeId' => ['required_with:files.*.name', Rule::in(CategoryType::where('category', 'document')->pluck('id')->toArray())],
+            'contracts.*.files.*.typeSlug' => ['required_with:files.*.name', Rule::in(CategoryType::where('category', 'document')->pluck('slug')->toArray())],
+
         ];
     }
 }

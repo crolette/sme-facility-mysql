@@ -73,7 +73,6 @@ class AssetCreateRequest extends FormRequest
             ]);
         }
 
-
         return [
             'locationType' => ['required', 'in:user,site,building,floor,room'],
             'locationId' => ['required', Rule::in($model::pluck('id')->toArray())],

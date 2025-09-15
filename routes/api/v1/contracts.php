@@ -3,6 +3,7 @@
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\API\V1\APIContractController;
 use App\Models\Tenants\Contract;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 
@@ -17,6 +18,12 @@ Route::middleware([
         $contracts = Contract::select('id', 'name', 'type', 'provider_id', 'status', 'renewal_type', 'end_date')->with('provider:id,name,category_type_id')->get();
         return ApiResponse::success($contracts);
     })->name('api.contracts.index');
+
+    Route::get('/search', function(Request $request) {
+        $contracts = Contract::all();
+
+        return ApiResponse::success($contracts);
+    })->name('api.contracts.search');
 
     Route::post('/', [APIContractController::class, 'store'])->name('api.contracts.store');
 
