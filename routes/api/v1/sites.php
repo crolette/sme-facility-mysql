@@ -76,7 +76,7 @@ Route::middleware([
 
                 Route::get('', function (Site $site) {
 
-                    $contracts = Building::where('reference_code', $site->reference_code)->with(['contracts', 'contracts.provider'])->first()->contracts;
+                    $contracts = Site::where('reference_code', $site->reference_code)->with(['contracts', 'contracts.provider'])->first()->contracts;
 
                     return ApiResponse::success($contracts ?? [], 'Contract');
                 })->name('api.sites.contracts');
@@ -91,7 +91,6 @@ Route::middleware([
 
                 // Remove/Detach a contract 
                 Route::delete('', function (Site $site, Request $request) {
-                    Debugbar::info($request);
                     $validated = $request->validateWithBag('errors', [
                         'contract_id' => 'required|exists:contracts,id'
                     ]);
