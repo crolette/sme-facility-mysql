@@ -150,6 +150,13 @@ class Asset extends Model
         );
     }
 
+    public function levelPath(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->location->locationRoute ?? ''
+        );
+    }
+
     public function name(): Attribute
     {
         return Attribute::make(

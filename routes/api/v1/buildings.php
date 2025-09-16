@@ -46,21 +46,36 @@ Route::middleware([
             return ApiResponse::success($building->load('assets')->assets);
         })->name('api.buildings.assets');
 
-        // Get all documents from a building
-        Route::get('/documents/', function (Building $building) {
-            return ApiResponse::success($building->load('documents')->documents);
-        })->name('api.buildings.documents');
+        Route::prefix('/documents')->group(function() {
 
-        // Post a new document to a building
-        Route::post('/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Building $building) {
+            // Get all documents from a building
+            Route::get('', function (Building $building) {
+                return ApiResponse::success($building->load('documents')->documents);
+            })->name('api.buildings.documents');
 
-            $files = $documentUploadRequest->validated('files');
-            if ($files) {
-                $documentService->uploadAndAttachDocuments($building, $files);
-            }
+            // Post a new document to a building
+            Route::post('', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Building $building) {
 
-            return ApiResponse::success(null, 'Document added');
-        })->name('api.buildings.documents.post');
+                $files = $documentUploadRequest->validated('files');
+                if ($files) {
+                    $documentService->uploadAndAttachDocuments($building, $files);
+                }
+
+                return ApiResponse::success(null, 'Document added');
+            })->name('api.buildings.documents.post');
+
+            // Detach a document from a location
+            Route::patch('', function (Building $building, Request $request) {
+                $validated = $request->validateWithBag('errors', [
+                    'document_id' => 'required|exists:documents,id'
+                ]);
+
+                app(DocumentService::class)->detachDocumentFromModel($building, $validated['document_id']);
+                return ApiResponse::success([], 'Document removed');
+            })->name('api.buildings.documents.detach');
+        });
+        
+
 
 
         Route::prefix('contracts')->group(function () {

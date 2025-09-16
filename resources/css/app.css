@@ -163,6 +163,8 @@
 
 a  {
     @apply underline;
+    cursor: pointer;
+
 }
 
 a:hover {

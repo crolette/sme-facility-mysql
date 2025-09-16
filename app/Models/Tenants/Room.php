@@ -172,6 +172,13 @@ class Room extends Model
         );
     }
 
+    public function locationRoute(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => route('tenant.rooms.show', $this->reference_code)
+        );
+    }
+
     public function levelPath(): Attribute
     {
         return Attribute::make(

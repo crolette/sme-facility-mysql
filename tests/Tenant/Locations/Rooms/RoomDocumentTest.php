@@ -34,7 +34,7 @@ beforeEach(function () {
     $this->location = Room::factory()->create();
 });
 
-it('can upload several files to room', function () {
+it('can upload several files when creating room', function () {
 
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
@@ -81,6 +81,134 @@ it('can upload several files to room', function () {
     Storage::disk('tenants')->assertExists(Document::first()->directory);
 });
 
+it('can upload documents to an existing room', function () {
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
+
+    $formData = [
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ]
+        ]
+    ];
+
+    $response = $this->postToTenant('api.rooms.documents.post', $formData, $this->location->reference_code);
+    $response->assertSessionHasNoErrors();
+
+    $document = Document::first();
+    expect(Storage::disk('tenants')->exists($document->directory))->toBeTrue();
+    expect(Storage::disk('tenants')->exists($document->path))->toBeTrue();
+
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => get_class($this->location),
+        'documentable_id' => $this->location->id
+    ]);
+
+    assertDatabaseHas('documentables', [
+        'document_id' => 2,
+        'documentable_type' => get_class($this->location),
+        'documentable_id' => $this->location->id
+    ]);
+});
+
+it('can remove/detach a document from a room', function () {
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
+
+    $formData = [
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ]
+        ]
+    ];
+
+    $this->postToTenant('api.rooms.documents.post', $formData, $this->location->reference_code);
+
+    $document = Document::first();
+
+    $formData = [
+        'document_id' => $document->id
+    ];
+
+    $response = $this->patchToTenant('api.rooms.documents.detach', $formData, $this->location->reference_code);
+    $response->assertOk();
+
+    $this->assertDatabaseHas('documents', [
+        'id' => $document->id,
+        'filename' => $document->filename
+    ]);
+
+    $this->assertDatabaseMissing('documentables', [
+        'document_id' => $document->id,
+        'documentable_id' => $this->location->id,
+        'documentable_type' => get_class($this->location)
+    ]);
+
+    expect(Storage::disk('tenants')->exists($document->path))->toBeTrue();
+});
+
+it('can delete a document from a room', function () {
+
+    $file1 = UploadedFile::fake()->image('avatar.png');
+
+    $formData = [
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ],
+        ]
+    ];
+
+    $response = $this->postToTenant('api.rooms.documents.post', $formData, $this->location->reference_code);
+    $response->assertSessionHasNoErrors();
+
+    $document = $this->location->documents()->first();
+
+    $response = $this->deleteFromTenant('api.documents.delete', $document->id);
+    $response->assertOk();
+
+    $this->assertDatabaseMissing('documents', [
+        'id' => $document->id,
+        'filename' => $document->filename
+    ]);
+
+    $this->assertDatabaseMissing('documentables', [
+        'documentable_id' =>  $this->location->id,
+        'documentable_type' => get_class($this->location)
+    ]);
+
+    expect(Storage::disk('tenants')->exists($document->path))->toBeFalse();
+});
 
 it('fails when upload wrong image mime (ie. webp)', function () {
 
@@ -143,44 +271,7 @@ it('fails when upload exceeding document size : ' . Document::maxUploadSizeKB() 
     ]);
 });
 
-it('can delete a document from a room', function () {
 
-    $file1 = UploadedFile::fake()->image('avatar.png');
-
-    $formData = [
-
-        'files' => [
-            [
-                'file' => $file1,
-                'name' => 'FILE 1 - Long name of more than 10 chars',
-                'description' => 'descriptionIMG',
-                'typeId' => $this->documentCategory->id,
-                'typeSlug' => $this->documentCategory->slug
-            ],
-
-        ]
-    ];
-
-    $response = $this->postToTenant('api.rooms.documents.post', $formData, $this->location->reference_code);
-    $response->assertSessionHasNoErrors();
-
-    $document = $this->location->documents()->first();
-
-    $response = $this->deleteFromTenant('api.documents.delete', $document->id);
-    $response->assertOk();
-
-    $this->assertDatabaseMissing('documents', [
-        'id' => $document->id,
-        'filename' => $document->filename
-    ]);
-
-    $this->assertDatabaseMissing('documentables', [
-        'documentable_id' =>  $this->location->id,
-        'documentable_type' => get_class($this->location)
-    ]);
-
-    expect(Storage::disk('tenants')->exists($document->path))->toBeFalse();
-});
 
 it('can update name and description a document from a room ', function () {
 

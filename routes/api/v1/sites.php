@@ -51,26 +51,39 @@ Route::middleware([
                 return ApiResponse::success($site->load('assets')->assets);
             })->name('api.sites.assets');
 
-            // Get all documents from a site
-            Route::get('/documents/', function (Site $site) {
-                if (Auth::user()->cannot('view', $site))
-                    return ApiResponse::notAuthorized();
+            Route::prefix('/documents')->group(function() {
 
-                return ApiResponse::success($site->load('documents')->documents);
-            })->name('api.sites.documents');
+                // Get all documents from a site
+                Route::get('', function (Site $site) {
+                    if (Auth::user()->cannot('view', $site))
+                        return ApiResponse::notAuthorized();
 
-            // Post a new document to a site
-            Route::post('/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Site $site) {
-                if (Auth::user()->cannot('view', $site))
-                    return ApiResponse::notAuthorized();
+                    return ApiResponse::success($site->load('documents')->documents);
+                })->name('api.sites.documents');
 
-                $files = $documentUploadRequest->validated('files');
-                if ($files) {
-                    $documentService->uploadAndAttachDocuments($site, $files);
-                }
+                // Post a new document to a site
+                Route::post('', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Site $site) {
+                    if (Auth::user()->cannot('view', $site))
+                        return ApiResponse::notAuthorized();
 
-                return ApiResponse::success(null, 'Document added');
-            })->name('api.sites.documents.post');
+                    $files = $documentUploadRequest->validated('files');
+                    if ($files) {
+                        $documentService->uploadAndAttachDocuments($site, $files);
+                    }
+
+                    return ApiResponse::success(null, 'Document added');
+                })->name('api.sites.documents.post');
+
+                // Detach a document from a location
+                Route::patch('', function (Site $site, Request $request) {
+                    $validated = $request->validateWithBag('errors', [
+                        'document_id' => 'required|exists:documents,id'
+                    ]);
+
+                    app(DocumentService::class)->detachDocumentFromModel($site, $validated['document_id']);
+                    return ApiResponse::success([], 'Document removed');
+                })->name('api.sites.documents.detach');
+            });
 
             Route::prefix('contracts')->group(function () {
 

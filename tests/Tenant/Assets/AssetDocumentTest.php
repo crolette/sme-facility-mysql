@@ -163,13 +163,39 @@ it('fails when upload exceeding document size : ' . Document::maxUploadSizeKB() 
 
 it('can delete a document from an asset', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
-    $document = Document::factory()->withCustomAttributes([
-        'user' => $this->user,
-        'directoryName' => 'assets',
-        'model' => $asset,
-    ])->create();
-    $asset->documents()->attach($document);
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
+    $categoryType = CategoryType::where('category', 'document')->first();
+
+    $formData = [
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+        'locationId' => $this->room->id,
+        'locationReference' => $this->room->reference_code,
+        'locationType' => 'room',
+        'categoryId' => $this->categoryType->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ]
+        ]
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+
+    $asset = Asset::first();
+    $document = Document::first();
 
     $response = $this->deleteFromTenant('api.documents.delete', $document->id);
     $response->assertOk();
@@ -180,20 +206,49 @@ it('can delete a document from an asset', function () {
     ]);
 
     $this->assertDatabaseMissing('documentables', [
+        'document_id' => $document->id,
         'documentable_id' => $asset->id,
         'documentable_type' => Asset::class
     ]);
+
+    expect(Storage::disk('tenants')->exists($document->path))->toBeFalse();
 });
 
 it('can remove/detach a document from an asset', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
-    $document = Document::factory()->withCustomAttributes([
-        'user' => $this->user,
-        'directoryName' => 'assets',
-        'model' => $asset,
-    ])->create();
-    $asset->documents()->attach($document);
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
+    $categoryType = CategoryType::where('category', 'document')->first();
+
+    $formData = [
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+        'locationId' => $this->room->id,
+        'locationReference' => $this->room->reference_code,
+        'locationType' => 'room',
+        'categoryId' => $this->categoryType->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ]
+        ]
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+
+    $asset = Asset::first();
+    $document = Document::first();
 
     $formData = [
         'document_id' => $document->id
@@ -212,6 +267,9 @@ it('can remove/detach a document from an asset', function () {
         'documentable_id' => $asset->id,
         'documentable_type' => Asset::class
     ]);
+
+    expect(Storage::disk('tenants')->exists($document->path))->toBeTrue();
+
 });
 
 it('can update name and description a document from an asset ', function () {

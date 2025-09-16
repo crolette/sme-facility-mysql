@@ -45,7 +45,18 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                     </Button>
                 </div>
                 <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_4fr]">
-                    <SidebarMenuAssetLocation item={contract} activeTab={activeTab} setActiveTab={setActiveTab} menu="contract" />
+                    <SidebarMenuAssetLocation
+                        activeTab={activeTab}
+                        setActiveTab={setActiveTab}
+                        menu="contract"
+                        infos={{
+                            name: contract.name,
+                            code: contract.internal_reference,
+                            reference: contract.type ?? contract.provider?.category,
+                            levelPath: route('tenant.providers.show', contract.provider_id),
+                            levelName: contract.provider.name,
+                        }}
+                    />
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
@@ -103,7 +114,6 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                                     ))}
                                 </ul>
                             </div>
-                            
                         )}
                     </div>
                 </div>

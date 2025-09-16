@@ -176,10 +176,17 @@ class Floor extends Model
         );
     }
 
+    public function locationRoute(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => route('tenant.floors.show', $this->reference_code)
+        );
+    }
+
     public function levelPath(): Attribute
     {
         return Attribute::make(
-            get: fn() => route('tenant.floors.show', $this->level->reference_code)
+            get: fn() => route('tenant.buildings.show', $this->level->reference_code)
         );
     }
 

@@ -46,21 +46,34 @@ Route::middleware([
             return ApiResponse::success($floor->load('assets')->assets);
         })->name('api.floors.assets');
 
-        // Get all documents from a floor
-        Route::get('/documents/', function (Floor $floor) {
-            return ApiResponse::success($floor->load('documents')->documents);
-        })->name('api.floors.documents');
+        Route::prefix('/documents')->group(function () {
+            // Get all documents from a floor
+            Route::get('', function (Floor $floor) {
+                return ApiResponse::success($floor->load('documents')->documents);
+            })->name('api.floors.documents');
 
-        // Post a new document to a floor
-        Route::post('/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Floor $floor) {
+            // Post a new document to a floor
+            Route::post('', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Floor $floor) {
 
-            $files = $documentUploadRequest->validated('files');
-            if ($files) {
-                $documentService->uploadAndAttachDocuments($floor, $files);
-            }
+                $files = $documentUploadRequest->validated('files');
+                if ($files) {
+                    $documentService->uploadAndAttachDocuments($floor, $files);
+                }
 
-            return ApiResponse::success(null, 'Document added');
-        })->name('api.floors.documents.post');
+                return ApiResponse::success(null, 'Document added');
+            })->name('api.floors.documents.post');
+
+            // Detach a document from a location
+            Route::patch('', function (Floor $floor, Request $request) {
+                $validated = $request->validateWithBag('errors', [
+                    'document_id' => 'required|exists:documents,id'
+                ]);
+
+                app(DocumentService::class)->detachDocumentFromModel($floor, $validated['document_id']);
+                return ApiResponse::success([], 'Document removed');
+            })->name('api.floors.documents.detach');
+        });
+       
 
         Route::prefix('contracts')->group(function () {
 
