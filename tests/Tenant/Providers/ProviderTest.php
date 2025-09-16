@@ -11,7 +11,7 @@ use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
+    $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
     $this->categoryType = CategoryType::factory()->create(['category' => 'provider']);
 });

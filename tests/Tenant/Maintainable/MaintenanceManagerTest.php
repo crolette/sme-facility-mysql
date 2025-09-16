@@ -57,7 +57,7 @@ it('can add a maintenance manager when creating asset', function () {
         'maintenance_manager_id' => $this->manager->id
     ];
 
-    $response = $this->postToTenant('tenant.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertSessionHasNoErrors();
 
     $asset = Asset::latest('id')->first();
@@ -79,7 +79,7 @@ it('can update a maintenance manager on existing asset', function () {
         'maintenance_manager_id' => $this->manager->id
     ];
 
-    $response = $this->patchToTenant('tenant.assets.update', $formData, $asset->reference_code);
+    $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
     $response->assertSessionHasNoErrors();
 
     $asset = Asset::find($asset->id);
@@ -100,7 +100,7 @@ it('can add a maintenance manager when creating site', function () {
         'maintenance_manager_id' => $this->manager->id
     ];
 
-    $response = $this->postToTenant('tenant.sites.store', $formData);
+    $response = $this->postToTenant('api.sites.store', $formData);
     $response->assertSessionHasNoErrors();
 
     $location = Site::latest('id')->first();
@@ -120,7 +120,7 @@ it('can update a maintenance manager of an existing site', function () {
         'maintenance_manager_id' => $this->manager->id
     ];
 
-    $response = $this->patchToTenant('tenant.sites.update', $formData,  $this->site->reference_code);
+    $response = $this->patchToTenant('api.sites.update', $formData,  $this->site->reference_code);
     $response->assertSessionHasNoErrors();
 
     $location = Site::latest('id')->first();
@@ -145,7 +145,7 @@ it('can add a maintenance manager when creating building', function () {
         'maintenance_manager_id' => $this->manager->id
     ];
 
-    $response = $this->postToTenant('tenant.buildings.store', $formData);
+    $response = $this->postToTenant('api.buildings.store', $formData);
     $response->assertSessionHasNoErrors();
 
     $location = Building::latest('id')->first();
@@ -167,7 +167,7 @@ it('can update a maintenance manager of existing building', function () {
         'maintenance_manager_id' => $this->manager->id
     ];
 
-    $response = $this->patchToTenant('tenant.buildings.update', $formData, $this->building->reference_code);
+    $response = $this->patchToTenant('api.buildings.update', $formData, $this->building->reference_code);
     $response->assertSessionHasNoErrors();
 
     $location = Building::latest('id')->first();
@@ -189,7 +189,7 @@ it('can add a maintenance manager when creating floor', function () {
         'maintenance_manager_id' => $this->manager->id
     ];
 
-    $response = $this->postToTenant('tenant.floors.store', $formData);
+    $response = $this->postToTenant('api.floors.store', $formData);
 
     $response->assertSessionHasNoErrors();
 
@@ -212,7 +212,7 @@ it('can update a maintenance manager of existing floor', function () {
         'maintenance_manager_id' => $this->manager->id
     ];
 
-    $response = $this->patchToTenant('tenant.floors.update', $formData, $this->floor->reference_code);
+    $response = $this->patchToTenant('api.floors.update', $formData, $this->floor->reference_code);
     $response->assertSessionHasNoErrors();
 
     $location = Floor::latest('id')->first();
@@ -234,7 +234,7 @@ it('can add a maintenance manager when creating room', function () {
         'maintenance_manager_id' => $this->manager->id
     ];
 
-    $response = $this->postToTenant('tenant.rooms.store', $formData);
+    $response = $this->postToTenant('api.rooms.store', $formData);
 
     $response->assertSessionHasNoErrors();
 
@@ -257,7 +257,7 @@ it('can update a maintenance manager of existing room', function () {
         'maintenance_manager_id' => $this->manager->id
     ];
 
-    $response = $this->patchToTenant('tenant.rooms.update', $formData, $this->room->reference_code);
+    $response = $this->patchToTenant('api.rooms.update', $formData, $this->room->reference_code);
     $response->assertSessionHasNoErrors();
 
     $location = Room::latest('id')->first();

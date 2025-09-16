@@ -66,7 +66,7 @@ it('can add maintenance frequency to asset without next_maintenance_date', funct
         'last_maintenance_date' => '2025-05-05'
     ];
 
-    $this->postToTenant('tenant.assets.store', $formData);
+    $this->postToTenant('api.assets.store', $formData);
 
     assertDatabaseHas('maintainables', [
         'maintenance_frequency' => 'monthly',
@@ -86,7 +86,7 @@ it('can add maintenance frequency to asset with next_maintenance_date', function
         'last_maintenance_date' => '2025-05-05',
     ];
 
-    $this->postToTenant('tenant.assets.store', $formData);
+    $this->postToTenant('api.assets.store', $formData);
 
     assertDatabaseHas('maintainables', [
         'maintenance_frequency' => 'monthly',
@@ -108,7 +108,7 @@ it('can update maintenance frequency/date from asset', function () {
         'last_maintenance_date' => '2025-05-05',
     ];
 
-    $this->patchToTenant('tenant.assets.update', $formData, $asset->reference_code);
+    $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
 
     assertDatabaseHas('maintainables', [
         'maintenance_frequency' => 'monthly',

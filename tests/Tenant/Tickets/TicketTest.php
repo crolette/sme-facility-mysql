@@ -19,6 +19,8 @@ use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
 
 beforeEach(function () {
+    $this->user = User::factory()->withRole('Admin')->create();
+    $this->actingAs($this->user, 'tenant');
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
@@ -36,8 +38,7 @@ beforeEach(function () {
         ->create();
 
     $this->asset =  Asset::factory()->forLocation($this->room)->create();
-    $this->user = User::factory()->create();
-    $this->actingAs($this->user, 'tenant');
+    
 });
 
 it('can render the index tickets page', function () {
