@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import InputError from '@/components/input-error';
 import SearchableInput from '@/components/SearchableInput';
+import FileManager from '@/components/tenant/FileManager';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -18,6 +19,14 @@ import { BiSolidFilePdf } from 'react-icons/bi';
 interface ProviderForm {
     id: number;
     name: string;
+}
+
+interface ContractFile {
+    file: File;
+    name: string;
+    description: string;
+    typeId: null | number;
+    typeSlug: string;
 }
 
 interface Contract {
@@ -66,7 +75,7 @@ type TypeFormData = {
     maintenance_frequency: string | null;
     next_maintenance_date: string | null;
     last_maintenance_date: string | null;
-    contracts: Contract[];
+    contracts: { Contract, files }[];
     existing_contracts: [];
     files: {
         file: File;
@@ -291,6 +300,26 @@ export default function CreateAsset({
         });
     };
 
+    const removeContractDocument = (contractIndex: number, fileIndex: number) => {
+        const files = data.contracts[contractIndex].files.filter((file: ContractFile, indexFile: number) => {
+            return fileIndex !== indexFile ? file : null;
+        });
+        console.log(files)
+
+        setData((prev) => {
+            const updatedContracts = [...prev.contracts];
+            updatedContracts[contractIndex] = {
+                ...updatedContracts[contractIndex],
+                files: files,
+            };
+            return { ...prev, contracts: updatedContracts };
+        });
+        console.log('removeContractDocument');
+        console.log(contractIndex, fileIndex);
+    };
+
+    console.log(data.contracts);
+
     const addFileModalForm = () => {
         return (
             <div className="bg-background/50 fixed inset-0 z-50">
@@ -388,8 +417,6 @@ export default function CreateAsset({
     };
 
     useEffect(() => {
-        console.log(data.depreciation_duration, data.depreciation_end_date);
-        console.log(new Date().toLocaleString());
         if (data.depreciation_duration && data.depreciation_duration > 0 && data.depreciation_start_date !== null) {
             const date = new Date(data.depreciation_start_date); // Convertit la chaîne en objet Date
             date.setFullYear(date.getFullYear() + data.depreciation_duration); // Ajoute les années
@@ -397,11 +424,10 @@ export default function CreateAsset({
         }
     }, [data.depreciation_duration]);
 
-    console.log(data);
+    const [existingContracts, setExistingContracts] = useState<Contract[]>([]);
 
-    const [existingContracts, setExistingContracts] = useState([]);
-    console.log(existingContracts);
-    console.log(data.existing_contracts);
+    const [showContractFileModal, setShowContractFileModal] = useState(false);
+    const [indexContractForFiles, setIndexContractForFiles] = useState<number | null>(null);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -900,11 +926,15 @@ export default function CreateAsset({
 
                             {countContracts > 0 &&
                                 [...Array(countContracts)].map((_, index) => (
-                                    <div key={index} className="flex flex-col gap-2 rounded-md border-2 border-slate-400 p-4">
-                                        <div className="flex w-fit gap-2">
-                                            <p>Contract {index + 1}</p>
-                                            <MinusCircleIcon onClick={() => handleRemoveContract(index)} />
-                                        </div>
+                                    <details key={index} className="flex flex-col rounded-md border-2 border-slate-400 p-4" open>
+                                        <summary>
+                                            <div className="flex w-fit gap-2">
+                                                <p>
+                                                    Contract {index + 1} {data.contracts[index]?.name ? `- ${data.contracts[index]?.name}` : ''}
+                                                </p>
+                                                <MinusCircleIcon onClick={() => handleRemoveContract(index)} />
+                                            </div>
+                                        </summary>
                                         <div>
                                             <Label className="font-medium">Name</Label>
                                             <Input
@@ -941,14 +971,13 @@ export default function CreateAsset({
                                                     handleChangeContracts(index, 'provider_name', provider.name);
                                                 }}
                                                 placeholder="Search provider..."
-                                                // className="mb-4"
                                             />
 
                                             <Label htmlFor="start_date">Start date</Label>
                                             <Input
                                                 id="start_date"
                                                 type="date"
-                                                value={data.contracts[index]?.start_date ?? ''}
+                                                value={data.contracts[index]?.start_date ?? new Date().toISOString().split('T')[0]}
                                                 onChange={(e) => handleChangeContracts(index, 'start_date', e.target.value)}
                                             />
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.start_date : ''} />
@@ -958,6 +987,7 @@ export default function CreateAsset({
                                                 onChange={(e) => handleChangeContracts(index, 'contract_duration', e.target.value)}
                                                 id=""
                                                 required
+                                                defaultValue={Date.now().toLocaleString()}
                                                 value={data.contracts[index]?.contract_duration ?? ''}
                                                 className={cn(
                                                     'border-input placeholder:text-muted-foreground flex w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
@@ -1011,7 +1041,8 @@ export default function CreateAsset({
                                                 name="notice_period"
                                                 onChange={(e) => handleChangeContracts(index, 'notice_period', e.target.value)}
                                                 id=""
-                                                // required
+                                                required
+                                                defaultValue={''}
                                                 value={data.contracts[index]?.notice_period ?? ''}
                                                 className={cn(
                                                     'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
@@ -1021,9 +1052,9 @@ export default function CreateAsset({
                                             >
                                                 {noticePeriods && noticePeriods.length > 0 && (
                                                     <>
-                                                        {/* <option value="" disabled className="bg-background text-foreground">
-                                                                            Select a duration
-                                                                        </option> */}
+                                                        <option value="" disabled className="bg-background text-foreground">
+                                                            Select a duration
+                                                        </option>
                                                         {noticePeriods?.map((type, index) => (
                                                             <option value={type} key={index} className="bg-background text-foreground">
                                                                 {type}
@@ -1089,9 +1120,63 @@ export default function CreateAsset({
                                                         </>
                                                     )}
                                                 </select>
+                                                <h5>Documents</h5>
+                                                <Button
+                                                    onClick={() => {
+                                                        setIndexContractForFiles(index);
+                                                        setShowContractFileModal(!showContractFileModal);
+                                                    }}
+                                                    type="button"
+                                                    className="block"
+                                                >
+                                                    Add file
+                                                </Button>
+
+                                                {data.contracts[index]?.files?.length > 0 && (
+                                                    <ul className="flex gap-4">
+                                                        {data.contracts[index]?.files.map((document: ContractFile, indexFile: number) => {
+                                                            const isImage = document.file.type.startsWith('image/');
+                                                            const isPdf = document.file.type === 'application/pdf';
+                                                            const fileURL = URL.createObjectURL(document.file);
+                                                            return (
+                                                                <li
+                                                                    key={`${index}-${indexFile}`}
+                                                                    className="bg-foreground/10 flex w-50 flex-col gap-2 p-6"
+                                                                >
+                                                                    <p>
+                                                                        {
+                                                                            documentTypes.find((type) => {
+                                                                                return type.id === document.typeId;
+                                                                            })?.label
+                                                                        }
+                                                                    </p>
+                                                                    {isImage && (
+                                                                        <img
+                                                                            src={fileURL}
+                                                                            alt="preview"
+                                                                            className="mx-auto h-40 w-40 rounded object-cover"
+                                                                        />
+                                                                    )}
+                                                                    {isPdf && <BiSolidFilePdf size={'160px'} />}
+                                                                    <p>{document.name}</p>
+
+                                                                    <p>{document.description}</p>
+                                                                    <Button
+                                                                        type="button"
+                                                                        variant="destructive"
+                                                                        className=""
+                                                                        onClick={() => removeContractDocument(index, indexFile)}
+                                                                    >
+                                                                        Remove
+                                                                    </Button>
+                                                                </li>
+                                                            );
+                                                        })}
+                                                    </ul>
+                                                )}
                                             </div>
                                         </div>
-                                    </div>
+                                    </details>
                                 ))}
                         </div>
                     )}
@@ -1154,6 +1239,25 @@ export default function CreateAsset({
                     </div>
                 </form>
                 {showFileModal && addFileModalForm()}
+                <FileManager
+                    documents={data.contracts[indexContractForFiles]?.files ?? []}
+                    showModal={showContractFileModal}
+                    onDocumentsChange={(docs) => {
+                        if (indexContractForFiles)
+                            setData((prev) => {
+                                const updatedContracts = [...prev.contracts];
+                                updatedContracts[indexContractForFiles] = {
+                                    ...updatedContracts[indexContractForFiles],
+                                    files: docs,
+                                };
+                                return { ...prev, contracts: updatedContracts };
+                            });
+                    }}
+                    onToggleModal={() => {
+                        setShowContractFileModal(!showContractFileModal);
+                        setIndexContractForFiles(null);
+                    }}
+                />
             </div>
         </AppLayout>
     );

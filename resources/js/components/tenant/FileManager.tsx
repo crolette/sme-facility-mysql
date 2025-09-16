@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { FormEventHandler, useState } from "react";
+import { FormEventHandler, useEffect, useState } from "react";
 import { CentralType } from "@/types";
 import axios from "axios";
 
@@ -33,7 +33,7 @@ export default function FileManager({ documents, showModal, onDocumentsChange, o
     const fetchDocumentTypes = async () => {
         try {
             const response = await axios.get(route('api.category-types', { type: 'document' }));
-            return await response.data.data;
+            setDocumentTypes(response.data.data);
         } catch (error) {
             console.error('Erreur lors de la recherche :', error);
             const errors = error.response.data.errors;
@@ -42,16 +42,18 @@ export default function FileManager({ documents, showModal, onDocumentsChange, o
         }
     };
 
-    
-    
-    const [documentTypes, setDocumentTypes] = useState<CentralType[]>(fetchDocumentTypes);
+    useEffect(() => {
+        fetchDocumentTypes();
+    }, [])
+
+    const [documentTypes, setDocumentTypes] = useState<CentralType[]>();
 
     const addFile: FormEventHandler = (e) => {
         e.preventDefault();
 
         if (!newFile) return;
 
-        const typeSlug = documentTypes.find((type) => {
+        const typeSlug = documentTypes?.find((type) => {
             return type.id === newDocumentType;
         })?.slug;
 
@@ -131,7 +133,6 @@ export default function FileManager({ documents, showModal, onDocumentsChange, o
                                     type="text"
                                     name="description"
                                     id="description"
-                                    required
                                     minLength={10}
                                     maxLength={250}
                                     placeholder="Document description"

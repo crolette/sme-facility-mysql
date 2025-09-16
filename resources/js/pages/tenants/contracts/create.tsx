@@ -94,7 +94,7 @@ export default function CreateContract({
         notes: contract?.notes ?? '',
         internal_reference: contract?.internal_reference ?? '',
         provider_reference: contract?.provider_reference ?? '',
-        start_date: contract?.start_date ?? '',
+        start_date: contract?.start_date ?? new Date().toISOString().split('T')[0],
         end_date: contract?.end_date ?? '',
         renewal_type: contract?.renewal_type ?? '',
         status: contract?.status ?? '',
@@ -104,8 +104,6 @@ export default function CreateContract({
         files: selectedDocuments,
         
     });
-
-    console.log(contract);
 
     const [errors, setErrors] = useState<TypeFormData>();
 
@@ -355,9 +353,9 @@ export default function CreateContract({
                         >
                             {noticePeriods && noticePeriods.length > 0 && (
                                 <>
-                                    {/* <option value="" disabled className="bg-background text-foreground">
+                                    <option value="" disabled className="bg-background text-foreground">
                                         Select a duration
-                                    </option> */}
+                                    </option>
                                     {noticePeriods?.map((type, index) => (
                                         <option value={type} key={index} className="bg-background text-foreground">
                                             {type}
