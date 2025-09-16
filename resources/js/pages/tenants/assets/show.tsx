@@ -14,7 +14,6 @@ import axios from 'axios';
 import { useState } from 'react';
 
 export default function ShowAsset({ item }: { item: Asset }) {
-    console.log(item);
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `${item.reference_code} - ${item.maintainable.name}`,
@@ -132,7 +131,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                 </div>
 
                 <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_4fr]">
-                    <SidebarMenuAssetLocation item={asset} activeTab={activeTab} setActiveTab={setActiveTab} menu="asset" isAsset />
+                    <SidebarMenuAssetLocation activeTab={activeTab} setActiveTab={setActiveTab} menu="asset" isAsset infos={{name: 'test', code: asset.code, reference: asset.reference_code, levelPath: asset.level_path, levelName: asset.is_mobile ? asset.location.full_name : asset.location.name}} />
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
@@ -263,6 +262,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             <DocumentManager
                                 itemCodeId={asset.reference_code}
                                 getDocumentsUrl={`api.assets.documents`}
+                                removableRoute={`api.assets.documents.detach`}
                                 editRoute={`api.documents.update`}
                                 uploadRoute={`api.assets.documents.post`}
                                 deleteRoute={`api.documents.delete`}
@@ -296,9 +296,6 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                 getDisplayText={(contract) => contract.name}
                                 getKey={(contract) => contract.id}
                                 onSelect={(contracts) => {
-                                    console.log(contracts);
-                                    // const prev = existingContracts;
-                                    // prev.push(contracts);
                                     setExistingContracts(contracts);
                                 }}
                                 placeholder="Search contracts..."

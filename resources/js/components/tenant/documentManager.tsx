@@ -7,6 +7,7 @@ import { BiSolidFilePdf } from 'react-icons/bi';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import { Loader2 } from 'lucide-react';
 
 interface DocumentManagerProps {
     itemCodeId: number | string;
@@ -15,6 +16,7 @@ interface DocumentManagerProps {
     editRoute: string;
     deleteRoute: string;
     showRoute: string;
+    removableRoute?: string;
     canAdd?: boolean;
 }
 
@@ -33,22 +35,41 @@ export const DocumentManager = ({
     uploadRoute,
     deleteRoute,
     showRoute,
+    removableRoute,
     canAdd = true,
 }: DocumentManagerProps) => {
     const [documents, setDocuments] = useState<Documents[]>();
+    const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
     useEffect(() => {
         fetchDocuments();
     }, []);
 
+    const removeDocument = async (id: number) => {
+          setIsUpdating(true);
+          try {
+              const response = await axios.patch(route(removableRoute, itemCodeId), { document_id: id });
+              console.log(response);
+              if (response.data.status === 'success') {
+                  fetchDocuments();
+              }
+          } catch (error) {
+              console.error('Erreur lors de la suppression', error);
+              setIsUpdating(false);
+          }
+      };
+
     const deleteDocument = async (id: number) => {
+        setIsUpdating(true);
         try {
             const response = await axios.delete(route(deleteRoute, id));
             if (response.data.status === 'success') {
                 fetchDocuments();
+                
             }
         } catch (error) {
             console.error('Erreur lors de la suppression', error);
+            setIsUpdating(false);
         }
     };
 
@@ -56,6 +77,7 @@ export const DocumentManager = ({
         try {
             const response = await axios.get(route(getDocumentsUrl, itemCodeId));
             setDocuments(response.data.data);
+            setIsUpdating(false);
         } catch (error) {
             console.error('Erreur lors de la recherche :', error);
         }
@@ -139,6 +161,7 @@ export const DocumentManager = ({
 
     const submitEditFile: FormEventHandler = async (e) => {
         e.preventDefault();
+        setIsUpdating(true);
 
         try {
             const response = await axios.patch(route(editRoute, newFileData.documentId), newFileData);
@@ -152,6 +175,7 @@ export const DocumentManager = ({
 
     const submitNewFile: FormEventHandler = async (e) => {
         e.preventDefault();
+        setIsUpdating(true);
 
         const newFile = {
             files: [newFileData],
@@ -212,6 +236,9 @@ export const DocumentManager = ({
                                     <TableBodyData>{document.filename}</TableBodyData>
                                     <TableBodyData>{document.created_at}</TableBodyData>
                                     <TableBodyData>
+                                        <Button variant={'destructive'} onClick={() => removeDocument(document.id)}>
+                                            Remove
+                                        </Button>
                                         <Button variant={'destructive'} onClick={() => deleteDocument(document.id)}>
                                             Delete
                                         </Button>
@@ -223,8 +250,18 @@ export const DocumentManager = ({
                     </TableBody>
                 </Table>
             )}
-            {showFileModal && (
+            {isUpdating && (
                 <div className="bg-background/50 fixed inset-0 z-50">
+                    <div className="bg-background/20 flex h-dvh items-center justify-center">
+                        <div className="bg-background flex items-center justify-center p-4 flex-col">
+                            <Loader2 size={36} className='animate-spin'/>
+                            <p className='animate-pulse'>Updating...</p>
+                        </div>
+                        </div>
+                        </div>
+            )}
+            {showFileModal && (
+                <div className="bg-background/50 fixed inset-0 z-40">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">
                         <div className="bg-background flex items-center justify-center p-4">
                             <div className="flex flex-col gap-2">

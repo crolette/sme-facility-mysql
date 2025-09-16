@@ -50,22 +50,34 @@ Route::middleware([
                 return ApiResponse::success($room->load('assets')->assets);
             })->name('api.rooms.assets');
 
+            Route::prefix('/documents')->group(function() {
+                // Get all documents from a room
+                Route::get('', function (Room $room) {
+                    return ApiResponse::success($room->load('documents')->documents);
+                })->name('api.rooms.documents');
 
-            // Get all documents from a room
-            Route::get('/documents/', function (Room $room) {
-                return ApiResponse::success($room->load('documents')->documents);
-            })->name('api.rooms.documents');
+                // Post a new document to a floor
+                Route::post('', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Room $room) {
+                    $files = $documentUploadRequest->validated('files');
+                    if ($files) {
+                        $documentService->uploadAndAttachDocuments($room, $files);
+                        return ApiResponse::success(null, 'Document added');
+                    } else {
+                        return ApiResponse::error('Error posting new documents');
+                    }
+                })->name('api.rooms.documents.post');
 
-            // Post a new document to a floor
-            Route::post('/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Room $room) {
-                $files = $documentUploadRequest->validated('files');
-                if ($files) {
-                    $documentService->uploadAndAttachDocuments($room, $files);
-                    return ApiResponse::success(null, 'Document added');
-                } else {
-                    return ApiResponse::error('Error posting new documents');
-                }
-            })->name('api.rooms.documents.post');
+                // Detach a document from a location
+                Route::patch('', function (Room $room, Request $request) {
+                    $validated = $request->validateWithBag('errors', [
+                        'document_id' => 'required|exists:documents,id'
+                    ]);
+
+                    app(DocumentService::class)->detachDocumentFromModel($room, $validated['document_id']);
+                    return ApiResponse::success([], 'Document removed');
+                })->name('api.rooms.documents.detach');
+            });
+           
 
             Route::prefix('contracts')->group(function() {
 

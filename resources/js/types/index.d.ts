@@ -155,6 +155,7 @@ export interface Asset {
     deleted_at?: string;
     created_at: string;
     updated_at?: string;
+    level_path?: string;
     contracts: Contract[];
     asset_category: AssetCategory;
     maintainable: Maintainable;

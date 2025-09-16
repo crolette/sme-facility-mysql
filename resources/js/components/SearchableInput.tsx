@@ -40,12 +40,12 @@ interface ChipProps<T> {
 
 function Chip<T>({ item, getDisplayText, onRemove }: ChipProps<T>) {
     return (
-        <span className="mr-2 mb-2 inline-flex items-center rounded-full bg-gray-400 px-2 py-1 text-sm text-blue-800 dark:bg-gray-700 dark:text-gray-200">
+        <span className="bg-sidebar-border text-background dark:text-foreground mr-2 mb-2 inline-flex items-center rounded-full px-3 py-2 text-sm">
             {getDisplayText(item)}
             <button
                 type="button"
                 onClick={() => onRemove(item)}
-                className="ml-1 cursor-pointer text-blue-600 hover:text-blue-800 focus:outline-none dark:text-gray-200 dark:hover:text-gray-100"
+                className="text-background dark:text-foreground hover:text-foreground dark:hover:text-background ml-1 cursor-pointer focus:outline-none"
             >
                 ×
             </button>
@@ -180,7 +180,7 @@ function SearchableSelect<T>(props: SearchableSelectProps<T>) {
                     }
                 }}
                 placeholder={placeholder}
-                className="w-full rounded border border-gray-300 p-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                className="w-full rounded border border-gray-300 px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 autoComplete="off"
             />
 

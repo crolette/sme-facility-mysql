@@ -71,4 +71,10 @@ class DocumentService
             $contract->documents()->attach($document);
         }
     }
+
+    public function detachDocumentFromModel(Model $model, int $documentId) 
+    {
+        $document = Document::find($documentId);
+        $model->documents()->detach($document);
+    }
 };

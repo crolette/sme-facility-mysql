@@ -103,12 +103,12 @@ class Asset extends Model
 
     public function documents(): MorphToMany
     {
-        return $this->morphToMany(Document::class, 'documentable');
+        return $this->morphToMany(Document::class, 'documentable')->withTimestamps();
     }
 
     public function contracts(): MorphToMany
     {
-        return $this->morphToMany(Contract::class, 'contractable');
+        return $this->morphToMany(Contract::class, 'contractable')->withTimestamps();
     }
 
     public function interventions(): MorphMany
@@ -147,6 +147,13 @@ class Asset extends Model
 
         return Attribute::make(
             get: fn() => $this->assetCategory->translations->where('locale', $locale)->first()?->label ?? $this->assetCategory->translations->where('locale', config('app.fallback_locale'))?->label
+        );
+    }
+
+    public function levelPath(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->location->locationRoute ?? ''
         );
     }
 

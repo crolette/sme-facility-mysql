@@ -105,7 +105,7 @@ class Room extends Model
 
     public function contracts(): MorphToMany
     {
-        return $this->morphToMany(Contract::class, 'contractable');
+        return $this->morphToMany(Contract::class, 'contractable')->withTimestamps();
     }
 
     public function assets(): MorphMany
@@ -115,7 +115,7 @@ class Room extends Model
 
     public function documents(): MorphToMany
     {
-        return $this->morphToMany(Document::class, 'documentable');
+        return $this->morphToMany(Document::class, 'documentable')->withTimestamps();
     }
 
     public function pictures(): MorphMany
@@ -169,6 +169,13 @@ class Room extends Model
     {
         return Attribute::make(
             get: fn() => $this->maintainable->name
+        );
+    }
+
+    public function locationRoute(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => route('tenant.rooms.show', $this->reference_code)
         );
     }
 

@@ -111,7 +111,7 @@ class Building extends Model
 
     public function contracts(): MorphToMany
     {
-        return $this->morphToMany(Contract::class, 'contractable');
+        return $this->morphToMany(Contract::class, 'contractable')->withTimestamps();
     }
 
     public function site(): BelongsTo
@@ -137,7 +137,7 @@ class Building extends Model
 
     public function documents(): MorphToMany
     {
-        return $this->morphToMany(Document::class, 'documentable');
+        return $this->morphToMany(Document::class, 'documentable')->withTimestamps();
     }
 
     public function pictures(): MorphMany
@@ -204,10 +204,17 @@ class Building extends Model
         );
     }
 
+    public function locationRoute(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => route('tenant.buildings.show', $this->reference_code)
+        );
+    }
+
     public function levelPath(): Attribute
     {
         return Attribute::make(
-            get: fn() => route('tenant.floors.show', $this->level->reference_code)
+            get: fn() => route('tenant.sites.show', $this->level->reference_code)
         );
     }
 

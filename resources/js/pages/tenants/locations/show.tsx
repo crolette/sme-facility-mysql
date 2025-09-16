@@ -106,7 +106,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                     <RealocateRoomManager room={location} itemCode={location.reference_code} onClose={() => setShowModaleRelocateRoom(false)} />
                 )}
                 <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_4fr]">
-                    <SidebarMenuAssetLocation item={location} activeTab={activeTab} setActiveTab={setActiveTab} />
+                    <SidebarMenuAssetLocation activeTab={activeTab} setActiveTab={setActiveTab} infos={{ name: location.name, code: location.code, reference: location.reference_code, levelPath: location.level_path, levelName: location.level.name }} />
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">

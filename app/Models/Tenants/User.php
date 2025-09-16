@@ -5,18 +5,19 @@ namespace App\Models\Tenants;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Models\Tenants\Asset;
-use App\Models\Tenants\Provider;
 use App\Observers\UserObserver;
+use App\Models\Tenants\Provider;
 use Spatie\Permission\Traits\HasRoles;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -125,6 +126,13 @@ class User extends Authenticatable
     public function notifications(): HasMany
     {
         return $this->hasMany(ScheduledNotification::class);
+    }
+
+    public function locationRoute(): Attribute
+    {   
+        return Attribute::make(
+            get: fn() => route('tenant.users.show', $this->id)
+        );
     }
 
     public function fullName(): Attribute

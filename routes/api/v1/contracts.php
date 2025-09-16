@@ -35,18 +35,29 @@ Route::middleware([
         Route::patch('/', [APIContractController::class, 'update'])->name('api.contracts.update');
         Route::delete('/', [APIContractController::class, 'destroy'])->name('api.contracts.destroy');
 
-        Route::get('/documents', function (Contract $contract) {
-            Debugbar::info('api document contract', $contract);
-            // $asset = Asset::withTrashed()->with('documents')->where('reference_code', $asset)->first();
-            return ApiResponse::success($contract->load('documents')->documents);
-        })->name('api.contracts.documents');
+        Route::prefix('/documents')->group(function() {
 
-        Route::post('/documents', function (Contract $contract, DocumentUploadRequest $request) {
-            Debugbar::info('api document contract POST', $contract->id, $request);
+            Route::get('', function (Contract $contract) {
+                Debugbar::info('api document contract', $contract);
+                // $asset = Asset::withTrashed()->with('documents')->where('reference_code', $asset)->first();
+                return ApiResponse::success($contract->load('documents')->documents);
+            })->name('api.contracts.documents');
+            
+            Route::post('', function (Contract $contract, DocumentUploadRequest $request) {
+                Debugbar::info('api document contract POST', $contract->id, $request);
+                
+                app(DocumentService::class)->uploadAndAttachDocumentsForContract($contract, $request['files']);
+                // $asset = Asset::withTrashed()->with('documents')->where('reference_code', $asset)->first();
+                return ApiResponse::success([], 'Document added');
+            })->name('api.contracts.documents.post');
 
-            app(DocumentService::class)->uploadAndAttachDocumentsForContract($contract, $request['files']);
-            // $asset = Asset::withTrashed()->with('documents')->where('reference_code', $asset)->first();
-            return ApiResponse::success([], 'Document added');
-        })->name('api.contracts.documents.post');
+            Route::patch('', function (Contract $contract, Request $request) {
+                $validated = $request->validateWithBag('errors', [
+                    'document_id' => 'required|exists:documents,id'
+                ]);
+
+                app(DocumentService::class)->detachDocumentFromModel($contract, $validated['document_id']);
+            })->name('api.contracts.documents.detach');
+        });
     });
 });
