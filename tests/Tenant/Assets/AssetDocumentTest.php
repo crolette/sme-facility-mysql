@@ -185,6 +185,35 @@ it('can delete a document from an asset', function () {
     ]);
 });
 
+it('can remove/detach a document from an asset', function () {
+
+    $asset = Asset::factory()->forLocation($this->room)->create();
+    $document = Document::factory()->withCustomAttributes([
+        'user' => $this->user,
+        'directoryName' => 'assets',
+        'model' => $asset,
+    ])->create();
+    $asset->documents()->attach($document);
+
+    $formData = [
+        'document_id' => $document->id
+    ];
+
+    $response = $this->patchToTenant('api.assets.documents.detach', $formData, $asset->reference_code);
+    $response->assertOk();
+
+    $this->assertDatabaseHas('documents', [
+        'id' => $document->id,
+        'filename' => $document->filename
+    ]);
+
+    $this->assertDatabaseMissing('documentables', [
+        'document_id' => $document->id,
+        'documentable_id' => $asset->id,
+        'documentable_type' => Asset::class
+    ]);
+});
+
 it('can update name and description a document from an asset ', function () {
 
     $asset = Asset::factory()->forLocation($this->room)->create();

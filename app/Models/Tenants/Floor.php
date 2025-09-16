@@ -108,7 +108,7 @@ class Floor extends Model
 
     public function contracts(): MorphToMany
     {
-        return $this->morphToMany(Contract::class, 'contractable');
+        return $this->morphToMany(Contract::class, 'contractable')->withTimestamps();
     }
 
     public function rooms(): HasMany
@@ -123,7 +123,7 @@ class Floor extends Model
 
     public function documents(): MorphToMany
     {
-        return $this->morphToMany(Document::class, 'documentable');
+        return $this->morphToMany(Document::class, 'documentable')->withTimestamps();
     }
 
     public function pictures(): MorphMany

@@ -69,6 +69,7 @@ export default function SidebarMenuAssetLocation({ item, activeTab, setActiveTab
         ];
 
     const [showMobileMenu, setShowMobileMenu] = useState(false);
+    // FIXME Do not pass item as props as it is the complete model Asset/Location
     console.log(item);
     return (
         <div className="bg-sidebar border-sidebar-border flex h-fit flex-col gap-2 rounded-md shadow-xl">

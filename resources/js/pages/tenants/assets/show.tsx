@@ -263,6 +263,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             <DocumentManager
                                 itemCodeId={asset.reference_code}
                                 getDocumentsUrl={`api.assets.documents`}
+                                removableRoute={`api.assets.documents.detach`}
                                 editRoute={`api.documents.update`}
                                 uploadRoute={`api.assets.documents.post`}
                                 deleteRoute={`api.documents.delete`}

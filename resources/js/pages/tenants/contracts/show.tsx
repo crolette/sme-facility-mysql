@@ -74,6 +74,7 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                                 itemCodeId={contract.id}
                                 getDocumentsUrl={`api.contracts.documents`}
                                 editRoute={`api.documents.update`}
+                                removableRoute={`api.contracts.documents.detach`}
                                 uploadRoute={`api.contracts.documents.post`}
                                 deleteRoute={`api.documents.delete`}
                                 showRoute={'api.documents.show'}

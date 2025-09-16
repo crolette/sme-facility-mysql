@@ -103,12 +103,12 @@ class Asset extends Model
 
     public function documents(): MorphToMany
     {
-        return $this->morphToMany(Document::class, 'documentable');
+        return $this->morphToMany(Document::class, 'documentable')->withTimestamps();
     }
 
     public function contracts(): MorphToMany
     {
-        return $this->morphToMany(Contract::class, 'contractable');
+        return $this->morphToMany(Contract::class, 'contractable')->withTimestamps();
     }
 
     public function interventions(): MorphMany

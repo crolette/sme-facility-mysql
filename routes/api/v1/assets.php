@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Services\QRCodeService;
 use App\Models\Tenants\Contract;
+use App\Models\Tenants\Document;
 use App\Services\PictureService;
 use App\Services\ContractService;
 use App\Services\DocumentService;
@@ -62,22 +63,35 @@ Route::middleware([
                 return ApiResponse::success();
             })->name('api.assets.qr.regen');
 
-            // Get all the documents from an asset
-            Route::get('/documents/', function ($asset) {
-                $asset = Asset::withTrashed()->with('documents')->where('reference_code', $asset)->first();
-                return ApiResponse::success($asset->documents);
-            })->name('api.assets.documents');
+            Route::prefix('/documents')->group(function() {
+                // Get all the documents from an asset
+                Route::get('', function ($asset) {
+                    $asset = Asset::withTrashed()->with('documents')->where('reference_code', $asset)->first();
+                    return ApiResponse::success($asset->documents);
+                })->name('api.assets.documents');
 
-            // Post a new document to the assets
-            Route::post('/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Asset $asset) {
+                // Post a new document to the assets
+                Route::post('', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Asset $asset) {
 
-                $files = $documentUploadRequest->validated('files');
-                if ($files) {
-                    $documentService->uploadAndAttachDocuments($asset, $files);
-                }
+                    $files = $documentUploadRequest->validated('files');
+                    if ($files) {
+                        $documentService->uploadAndAttachDocuments($asset, $files);
+                    }
 
-                return ApiResponse::success([], 'Document added');
-            })->name('api.assets.documents.post');
+                    return ApiResponse::success([], 'Document added');
+                })->name('api.assets.documents.post');
+
+                Route::patch('', function(Asset $asset, Request $request) {
+                    $validated = $request->validateWithBag('errors', [
+                        'document_id' => 'required|exists:documents,id'
+                    ]);
+
+                    app(DocumentService::class)->detachDocumentFromModel($asset, $validated['document_id']);
+                    return ApiResponse::success([], 'Document removed');
+                })->name('api.assets.documents.detach');
+            });
+
+         
 
             
             Route::prefix('/contracts')->group(function () {
@@ -99,7 +113,8 @@ Route::middleware([
 
                 // Remove/Detach a contract from an asset
                 Route::delete('', function (Asset $asset, Request $request) {
-                    Debugbar::info($request);                    $validated = $request->validateWithBag('errors',[
+                    Debugbar::info($request);                    
+                    $validated = $request->validateWithBag('errors',[
                         'contract_id' => 'required|exists:contracts,id'
                     ]);
                         app(ContractService::class)->detachExistingContractFromModel($asset, $validated['contract_id']);

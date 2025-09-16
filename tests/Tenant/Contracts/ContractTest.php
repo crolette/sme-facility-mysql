@@ -233,12 +233,36 @@ it('can attach a document to an existing contract', function() {
     ]);
 
 
-    Storage::disk('tenants')->assertExists(Document::find(1)->path);
-
 });
 
-it('can delete a document from an existing contract', function() {
+it('can detach a document from an existing contract', function() {
+    $contract = Contract::factory()->create();
+    $document = Document::factory()->withCustomAttributes([
+        'user' => $this->user,
+        'directoryName' => 'contracts',
+        'model' => $contract,
+    ])->create();
+    $contract->documents()->attach($document);
 
+    $formData = [
+        'document_id' => $document->id
+    ];
+
+    $response = $this->patchToTenant('api.contracts.documents.detach', $formData, $contract->id);
+    $response->assertOk();
+
+    $this->assertDatabaseHas('documents', [
+        'id' => $document->id,
+        'filename' => $document->filename
+    ]);
+
+    $this->assertDatabaseMissing('documentables', [
+        'document_id' => $document->id,
+        'documentable_id' => $contract->id,
+        'documentable_type' => Contract::class
+    ]);
+
+    Storage::disk('tenants')->assertExists(Document::find($document->id)->path);
 });
 
 
