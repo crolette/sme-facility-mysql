@@ -25,7 +25,7 @@ class APIContractController extends Controller
     public function store(ContractStoreRequest $request)
     {
 
-        if (Auth::user()->cannot('create', Asset::class))
+        if (Auth::user()->cannot('create', Contract::class))
             abort(403);
 
         try {
@@ -49,8 +49,9 @@ class APIContractController extends Controller
      */
     public function update(ContractUpdateRequest $request, Contract $contract)
     {
-        if (Auth::user()->cannot('create', Asset::class))
+        if (Auth::user()->cannot('update', $contract))
             abort(403);
+
 
         try {
             DB::beginTransaction();
@@ -73,7 +74,7 @@ class APIContractController extends Controller
      */
     public function destroy(Contract $contract)
     {
-        if (Auth::user()->cannot('create', Asset::class))
+        if (Auth::user()->cannot('delete', $contract))
             abort(403);
 
         $contract->delete();

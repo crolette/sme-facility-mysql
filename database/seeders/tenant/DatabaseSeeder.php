@@ -7,6 +7,7 @@ use App\Models\Tenants\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Database\Seeders\tenant\PermissionsSeeder;
+use Database\Seeders\tenant\ContractsPermissionsSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,10 +16,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
         $this->call([
             PermissionsSeeder::class,
+            ContractsPermissionsSeeder::class
         ]);
 
         if (!User::where('email', 'super@sme-facility.com')->first()) {
