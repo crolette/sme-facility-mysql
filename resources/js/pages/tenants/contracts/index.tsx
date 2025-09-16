@@ -19,7 +19,7 @@ export default function IndexContracts({ items }: { items: Contract[] }) {
                 <a href={route('tenant.contracts.create')}>
                     <Button>Create</Button>
                 </a>
-                <ContractsList items={items} editable />
+                <ContractsList getUrl={'api.contracts.index'}  items={items} editable />
             </div>
         </AppLayout>
     );

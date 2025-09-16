@@ -106,48 +106,64 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                     <RealocateRoomManager room={location} itemCode={location.reference_code} onClose={() => setShowModaleRelocateRoom(false)} />
                 )}
                 <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_4fr]">
-                    <SidebarMenuAssetLocation activeTab={activeTab} setActiveTab={setActiveTab} infos={{ name: location.name, code: location.code, reference: location.reference_code, levelPath: location.level_path, levelName: location.level.name }} />
+                    <SidebarMenuAssetLocation
+                        activeTab={activeTab}
+                        setActiveTab={setActiveTab}
+                        infos={{
+                            name: location.name,
+                            code: location.code,
+                            reference: location.reference_code,
+                            levelPath: location.level_path,
+                            levelName: location.level.name,
+                        }}
+                    />
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <div>
-                                    <h2>Code</h2>
+                                        <h2>Code</h2>
+                                <div className="grid grid-cols-[1fr_160px] gap-4">
                                     <div>
-                                        <p>Code : {location.code}</p>
-                                        <p>Reference code : {location.reference_code}</p>
-                                        <p>Category : {location.category}</p>
-                                        <p>Name : {location.name}</p>
-                                        <p>Address : {location.address}</p>
-                                        <p>Description : {location.description}</p>
-                                        {location.location_type.slug === 'outdoor' ? (
-                                            <>
-                                                <p>
-                                                    Outdoor: {location.surface_outdoor} ({location.outdoor_material})
-                                                </p>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <p>
-                                                    Floor: {location.surface_floor} ({location.floor_material})
-                                                </p>
-                                                <p>
-                                                    Walls: {location.surface_walls} ({location.wall_material})
-                                                </p>
-                                            </>
+                                        <div>
+                                            <p>Code : {location.code}</p>
+                                            <p>Reference code : {location.reference_code}</p>
+                                            <p>Category : {location.category}</p>
+                                            <p>Name : {location.name}</p>
+                                            <p>Address : {location.address}</p>
+                                            <p>Description : {location.description}</p>
+                                            {location.location_type.slug === 'outdoor' ? (
+                                                <>
+                                                    <p>
+                                                        Outdoor: {location.surface_outdoor} ({location.outdoor_material})
+                                                    </p>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <p>
+                                                        Floor: {location.surface_floor} ({location.floor_material})
+                                                    </p>
+                                                    <p>
+                                                        Walls: {location.surface_walls} ({location.wall_material})
+                                                    </p>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="shrink-1">
+                                        {location.qr_code && (
+                                            <a
+                                                href={route('api.file.download', { path: location.qr_code })}
+                                                download
+                                                className="w-fit cursor-pointer"
+                                            >
+                                                <img
+                                                    key={location.qr_code}
+                                                    src={route('api.image.show', { path: location.qr_code })}
+                                                    alt=""
+                                                    className="h-40 w-40 object-cover"
+                                                />
+                                            </a>
                                         )}
                                     </div>
-                                </div>
-                                <div className="shrink-1">
-                                    {location.qr_code && (
-                                        <a href={route('api.file.download', { path: location.qr_code })} download className="w-fit cursor-pointer">
-                                            <img
-                                                key={location.qr_code}
-                                                src={route('api.image.show', { path: location.qr_code })}
-                                                alt=""
-                                                className="aspect-square h-32 w-auto"
-                                            />
-                                        </a>
-                                    )}
                                 </div>
                             </div>
                         )}
@@ -194,10 +210,10 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                         )}
 
                         {activeTab === 'contracts' && (
-                           <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
-                                                           <h2>Contracts</h2>
-                                                           <Button onClick={() => setAddExistingContractModale(true)}>add existing contract</Button>
-                                                           <Button onClick={() => router.get(route('tenant.contracts.create'))}>Add new contract</Button>
+                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
+                                <h2>Contracts</h2>
+                                <Button onClick={() => setAddExistingContractModale(true)}>add existing contract</Button>
+                                <Button onClick={() => router.get(route('tenant.contracts.create'))}>Add new contract</Button>
                                 <ContractsList
                                     items={location.contracts}
                                     contractableReference={location.reference_code}

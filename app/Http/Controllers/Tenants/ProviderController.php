@@ -55,6 +55,6 @@ class ProviderController extends Controller
         if (Auth::user()->cannot('view', $provider))
             abort(403);
 
-        return Inertia::render('tenants/providers/show', ['item' => $provider->load('users', 'contracts')]);
+        return Inertia::render('tenants/providers/show', ['item' => $provider->load('users', 'contracts', 'contracts.provider')]);
     }
 }

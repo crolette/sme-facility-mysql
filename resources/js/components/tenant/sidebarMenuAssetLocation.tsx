@@ -1,12 +1,11 @@
 import { cn } from "@/lib/utils";
-import { Asset, Contract, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from "@/types";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 interface InfosProps {
     name: string;
     code: string;
-    reference: string;
+    reference?: string;
     levelPath: string;
     levelName: string;
 }
@@ -14,10 +13,9 @@ interface SideBarMenuProps {
     activeTab: string;
     setActiveTab: (tab: string) => void;
     menu?: string;
-    isAsset?: boolean;
     infos: InfosProps
 }
-export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu = 'location', isAsset = false, infos }: SideBarMenuProps) {
+export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu = 'location', infos }: SideBarMenuProps) {
     
     let navSidebar = [
         {
@@ -58,6 +56,34 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
         },
     ];
 
+    if (menu === 'provider')
+        navSidebar = [
+            {
+                tabName: 'information',
+                tabDisplay: 'Infos',
+            },
+            {
+                tabName: 'contracts',
+                tabDisplay: 'contracts',
+            },
+            {
+                tabName: 'users',
+                tabDisplay: 'users',
+            },
+        ];
+    
+    if (menu === 'user')
+        navSidebar = [
+            {
+                tabName: 'information',
+                tabDisplay: 'Infos',
+            },
+            {
+                tabName: 'assets',
+                tabDisplay: 'assets',
+            },
+        ];
+
     if (menu === 'location')
         navSidebar = [...navSidebar, {
             tabName: 'assets',
@@ -81,8 +107,6 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
         ];
 
     const [showMobileMenu, setShowMobileMenu] = useState(false);
-    // FIXME Do not pass item as props as it is the complete model Asset/Location
-    console.log(infos);
     return (
         <div className="bg-sidebar border-sidebar-border flex h-fit flex-col gap-2 rounded-md shadow-xl">
             <div className="flex flex-col gap-1 px-4 py-2 text-center">

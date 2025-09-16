@@ -73,7 +73,7 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
                     pictures.map((picture, index) => {
                         return (
                             <div key={index} className="w-32">
-                                <a href={route(showRoute, picture.id)} download className="w cursor-pointer">
+                                <a href={route('api.file.download', { path: picture.path })} download className="w-fit cursor-pointer">
                                     <img src={route(showRoute, picture.id)} className="aspect-square object-cover" alt={picture.filename} />
                                 </a>
                                 <Button variant={'destructive'} onClick={() => deletePicture(picture.id)}>

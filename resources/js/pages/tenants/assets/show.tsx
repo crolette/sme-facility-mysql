@@ -131,31 +131,44 @@ export default function ShowAsset({ item }: { item: Asset }) {
                 </div>
 
                 <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_4fr]">
-                    <SidebarMenuAssetLocation activeTab={activeTab} setActiveTab={setActiveTab} menu="asset" isAsset infos={{name: 'test', code: asset.code, reference: asset.reference_code, levelPath: asset.level_path, levelName: asset.is_mobile ? asset.location.full_name : asset.location.name}} />
+                    <SidebarMenuAssetLocation
+                        activeTab={activeTab}
+                        setActiveTab={setActiveTab}
+                        menu="asset"
+                        infos={{
+                            name: asset.name,
+                            code: asset.code,
+                            reference: asset.reference_code,
+                            levelPath: asset.level_path,
+                            levelName: asset.is_mobile ? asset.location.full_name : asset.location.name,
+                        }}
+                    />
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                 <h2>Asset information</h2>
-                                <div className="shrink-1">
-                                    {asset.qr_code && (
-                                        <a href={route('api.file.download', { path: asset.qr_code })} download className="w-fit cursor-pointer">
-                                            <img
-                                                key={asset.qr_code}
-                                                src={route('api.image.show', { path: asset.qr_code })}
-                                                alt=""
-                                                className="aspect-square h-32 w-auto"
-                                            />
-                                        </a>
-                                    )}
-                                </div>
-                                <div>
-                                    <p>Category : {asset.category}</p>
-                                    <p>Name : {asset.name}</p>
-                                    <p>Description : {asset.description}</p>
-                                    <p>Brand : {asset.brand}</p>
-                                    <p>Model : {asset.model}</p>
-                                    <p>Serial number : {asset.serial_number}</p>
-                                    <p>Surface : {asset.surface}</p>
+                                <div className="grid grid-cols-[1fr_160px] gap-4">
+                                    <div>
+                                        <p>Category : {asset.category}</p>
+                                        <p>Name : {asset.name}</p>
+                                        <p>Description : {asset.description}</p>
+                                        <p>Brand : {asset.brand}</p>
+                                        <p>Model : {asset.model}</p>
+                                        <p>Serial number : {asset.serial_number}</p>
+                                        <p>Surface : {asset.surface}</p>
+                                    </div>
+                                    <div className="shrink-1">
+                                        {asset.qr_code && (
+                                            <a href={route('api.file.download', { path: asset.qr_code })} download className="w-fit cursor-pointer">
+                                                <img
+                                                    key={asset.qr_code}
+                                                    src={route('api.image.show', { path: asset.qr_code })}
+                                                    alt=""
+                                                    className="aspect-square h-32 w-auto"
+                                                />
+                                            </a>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         )}

@@ -168,6 +168,7 @@ export interface Picture {
     filename: string;
     size: number;
     sizeMo: number;
+    path: string;
     fullPath: string;
     created_at: string;
     uploaded_by?: User;
@@ -182,6 +183,7 @@ export interface Documents {
     filename: string;
     description: string;
     sizeMo: number;
+    path: string;
     category_type_id: number;
     created_at: string;
 }

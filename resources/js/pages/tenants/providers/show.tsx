@@ -1,4 +1,8 @@
 import ImageUploadModale from '@/components/ImageUploadModale';
+import Modale from '@/components/Modale';
+import { ContractsList } from '@/components/tenant/contractsList';
+import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
+import { UsersList } from '@/components/tenant/usersList';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Provider } from '@/types';
@@ -65,6 +69,9 @@ export default function ProviderShow({ item }: { item: Provider }) {
         fetchProvider();
     };
 
+    const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
+     const [activeTab, setActiveTab] = useState('information');
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sites" />
@@ -73,7 +80,7 @@ export default function ProviderShow({ item }: { item: Provider }) {
                     <a href={route(`tenant.providers.edit`, provider.id)}>
                         <Button>Edit</Button>
                     </a>
-                    <Button onClick={() => deleteProvider(provider)} variant={'destructive'}>
+                    <Button onClick={() => setShowDeleteModale(!showDeleteModale)} variant={'destructive'}>
                         Delete
                     </Button>
                     <Button onClick={() => setIsModalOpen(true)} variant={'secondary'}>
@@ -81,66 +88,83 @@ export default function ProviderShow({ item }: { item: Provider }) {
                         Uploader un logo
                     </Button>
                 </div>
-
-                <div className="flex items-center gap-2">
-                    <div className="flex w-full shrink-0 justify-between rounded-md border p-4">
-                        <div>
-                            <h2>Provider information</h2>
-                            <div>
-                                <p>Category : {provider.category}</p>
-                                <p>Name : {provider.name}</p>
-                                <p>Address : {provider.address}</p>
-                                <p>Phone number : {provider.phone_number}</p>
-                                <p>VAT Number : {provider.vat_number}</p>
-                                <p>Email : {provider.email}</p>
-                            </div>
-                        </div>
-                        <div className="shrink-1">
-                            {provider.logo && (
-                                <div className="relative">
-                                    <img src={route('api.image.show', { path: provider.logo })} alt="" className="h-auto w-40 object-cover" />
-                                    <Button type="button" onClick={deleteLogo} variant={'destructive'} className="absolute top-2 right-2">
-                                        <Trash></Trash>
-                                    </Button>
+                <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_4fr]">
+                    <SidebarMenuAssetLocation
+                        activeTab={activeTab}
+                        setActiveTab={setActiveTab}
+                        menu="provider"
+                        infos={{
+                            name: provider.name,
+                            code: provider.category,
+                            levelPath: provider.website,
+                            levelName: provider.website,
+                        }}
+                    />
+                    <div className="overflow-hidden">
+                        {activeTab === 'information' && (
+                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                                <h2>Provider information</h2>
+                                <div className="grid grid-cols-[1fr_160px] gap-4">
+                                    <div>
+                                        <p>Category : {provider.category}</p>
+                                        <p>Name : {provider.name}</p>
+                                        <p>Address : {provider.address}</p>
+                                        <p>Phone number : {provider.phone_number}</p>
+                                        <p>VAT Number : {provider.vat_number}</p>
+                                        <p>
+                                            Email :<a href={`mailto:${provider.email}`}>{provider.email}</a>
+                                        </p>
+                                    </div>
+                                    <div className="shrink-1">
+                                        {provider.logo && (
+                                            <div className="relative w-fit">
+                                                <img
+                                                    src={route('api.image.show', { path: provider.logo })}
+                                                    alt=""
+                                                    className="h-40 w-40 rounded-full object-cover"
+                                                />
+                                                <Button type="button" onClick={deleteLogo} variant={'destructive'} className="absolute top-2 right-2">
+                                                    <Trash></Trash>
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                            )}
-                        </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'contracts' && (
+                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
+                                <h2>Contracts</h2>
+                                <ContractsList items={provider.contracts ?? []} getUrl="api.providers.contracts" routeName="providers" />
+                            </div>
+                        )}
+
+                        {activeTab === 'users' && (
+                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                                <h2>Users</h2>
+
+                                <UsersList items={provider.users} />
+                            </div>
+                        )}
                     </div>
-                </div>
-
-                <ImageUploadModale
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    uploadUrl={route('api.providers.logo.store', provider.id)}
-                    onUploadSuccess={handleUploadSuccess}
-                />
-                <div className="rounded-md border p-4">
-                    <h2>Users</h2>
-
-                    <ul>
-                        {provider.users &&
-                            provider.users.map((user, index) => (
-                                <li key={index}>
-                                    {user.full_name} - {user.email}
-                                </li>
-                            ))}
-                    </ul>
-                </div>
-                <div className="rounded-md border p-4">
-                    <h2>Contracts</h2>
-
-                    <ul>
-                        {provider.contracts &&
-                            provider.contracts.map((contract, index) => (
-                                <li key={index}>
-                                    <a href={route('tenant.contracts.show', contract.id)}>
-                                        {contract.name} - {contract.internal_reference} - {contract.provider_reference}
-                                    </a>
-                                </li>
-                            ))}
-                    </ul>
+                    <ImageUploadModale
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        uploadUrl={route('api.providers.logo.store', provider.id)}
+                        onUploadSuccess={handleUploadSuccess}
+                    />
                 </div>
             </div>
+            <Modale
+                title={'Delete provider'}
+                message={`Are you sure you want to delete this provider ${provider.name} ?`}
+                isOpen={showDeleteModale}
+                onConfirm={deleteProvider}
+                onCancel={() => {
+                    setShowDeleteModale(false);
+                }}
+            />
         </AppLayout>
     );
 }

@@ -58,7 +58,6 @@ class UserService
             $this->deleteExistingFiles($files);
         }
 
-
         $fileName = Carbon::now()->isoFormat('YYYYMMDDHHMM') . '_avatar_' . Str::slug($name, '-') . '.' . $file->extension();
         $path = Storage::disk('tenants')->putFileAs($directory, $file, $fileName);
 

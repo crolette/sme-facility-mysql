@@ -24,11 +24,11 @@ export default function Modale({
                                     <p className="text-destructive mx-auto text-3xl font-bold">{title}</p>
                                     <p className="mx-auto w-2/3">{message}</p>
                                     <div className="mx-auto flex gap-4">
-                                        <Button variant={'destructive'} onClick={onConfirm}>
-                                            Delete
-                                        </Button>
                                         <Button variant={'secondary'} onClick={onCancel}>
                                             Cancel
+                                        </Button>
+                                        <Button variant={'destructive'} onClick={onConfirm}>
+                                            Delete
                                         </Button>
                                     </div>
                                 </div>

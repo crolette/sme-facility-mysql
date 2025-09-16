@@ -72,7 +72,7 @@ export const ContractsList = ({
         }
     };
 
-    // console.log(contractableReference);
+    console.log(items);
 
     return (
         <>

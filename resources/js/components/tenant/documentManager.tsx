@@ -8,6 +8,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Loader2 } from 'lucide-react';
+import Modale from '../Modale';
 
 interface DocumentManagerProps {
     itemCodeId: number | string;
@@ -59,12 +60,17 @@ export const DocumentManager = ({
           }
       };
 
-    const deleteDocument = async (id: number) => {
-        setIsUpdating(true);
+     const [documentToDelete, setDocumentToDelete] = useState(null);
+    const deleteDocument = async () => {
+        if (!documentToDelete)
+            return;
+            
+            setIsUpdating(true);
         try {
-            const response = await axios.delete(route(deleteRoute, id));
+            const response = await axios.delete(route(deleteRoute, documentToDelete));
             if (response.data.status === 'success') {
                 fetchDocuments();
+                setShowDeleteModale(false);
                 
             }
         } catch (error) {
@@ -191,6 +197,8 @@ export const DocumentManager = ({
             console.log(error);
         }
     };
+    const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
+   
 
     return (
         <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
@@ -205,7 +213,6 @@ export const DocumentManager = ({
                             <TableHeadData>Name</TableHeadData>
                             <TableHeadData>Description</TableHeadData>
                             <TableHeadData>Category</TableHeadData>
-                            <TableHeadData>Filename</TableHeadData>
                             <TableHeadData>Created at</TableHeadData>
                             <TableHeadData></TableHeadData>
                         </TableHeadRow>
@@ -217,7 +224,7 @@ export const DocumentManager = ({
                             return (
                                 <TableBodyRow key={index}>
                                     <TableBodyData>
-                                        <a href={route(showRoute, document.id)}>
+                                        <a href={route('api.file.download', { path: document.path })} download className="w-fit cursor-pointer">
                                             {isImage && (
                                                 <img
                                                     src={route(showRoute, document.id)}
@@ -233,13 +240,18 @@ export const DocumentManager = ({
                                     <TableBodyData>{document.name}</TableBodyData>
                                     <TableBodyData>{document.description}</TableBodyData>
                                     <TableBodyData>{document.category}</TableBodyData>
-                                    <TableBodyData>{document.filename}</TableBodyData>
                                     <TableBodyData>{document.created_at}</TableBodyData>
                                     <TableBodyData>
                                         <Button variant={'destructive'} onClick={() => removeDocument(document.id)}>
                                             Remove
                                         </Button>
-                                        <Button variant={'destructive'} onClick={() => deleteDocument(document.id)}>
+                                        <Button
+                                            variant={'destructive'}
+                                            onClick={() => {
+                                                setDocumentToDelete(document.id);
+                                                setShowDeleteModale(!showDeleteModale);
+                                            }}
+                                        >
                                             Delete
                                         </Button>
                                         <Button onClick={() => editFile(document.id)}>Edit</Button>
@@ -253,12 +265,12 @@ export const DocumentManager = ({
             {isUpdating && (
                 <div className="bg-background/50 fixed inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">
-                        <div className="bg-background flex items-center justify-center p-4 flex-col">
-                            <Loader2 size={36} className='animate-spin'/>
-                            <p className='animate-pulse'>Updating...</p>
+                        <div className="bg-background flex flex-col items-center justify-center p-4">
+                            <Loader2 size={36} className="animate-spin" />
+                            <p className="animate-pulse">Updating...</p>
                         </div>
-                        </div>
-                        </div>
+                    </div>
+                </div>
             )}
             {showFileModal && (
                 <div className="bg-background/50 fixed inset-0 z-40">
@@ -358,6 +370,17 @@ export const DocumentManager = ({
                     </div>
                 </div>
             )}
+            <Modale
+                title={'Delete document'}
+                message={`Are you sure you want to delete this document ?`}
+                isOpen={showDeleteModale}
+                onConfirm={deleteDocument}
+                onCancel={() => {
+                    setShowDeleteModale(false);
+                }}
+            />
+
+            
         </div>
     );
 };

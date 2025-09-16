@@ -1,3 +1,4 @@
+import Modale from '@/components/Modale';
 import { DocumentManager } from '@/components/tenant/documentManager';
 import { DocumentsList } from '@/components/tenant/documentsList';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
@@ -17,7 +18,7 @@ export default function ShowContract({ item, objects }: { item: Contract; object
         },
     ];
 
-    const deleteContract = async (contract: Contract) => {
+    const deleteContract = async () => {
         try {
             const response = await axios.delete(route('api.contracts.destroy', contract.id));
             if (response.data.status === 'success') {
@@ -28,8 +29,7 @@ export default function ShowContract({ item, objects }: { item: Contract; object
         }
     };
 
-    console.log(objects);
-    console.log(contract);
+     const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
      const [activeTab, setActiveTab] = useState('information');
 
     return (
@@ -40,7 +40,7 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                     <a href={route(`tenant.contracts.edit`, contract.id)}>
                         <Button>Edit</Button>
                     </a>
-                    <Button onClick={() => deleteContract(contract)} variant={'destructive'}>
+                    <Button onClick={() => setShowDeleteModale(!showDeleteModale)} variant={'destructive'}>
                         Delete
                     </Button>
                 </div>
@@ -118,6 +118,15 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                     </div>
                 </div>
             </div>
+            <Modale
+                            title={'Delete contract'}
+                            message={`Are you sure you want to delete this contract ${contract.name} ?`}
+                            isOpen={showDeleteModale}
+                            onConfirm={deleteContract}
+                            onCancel={() => {
+                                setShowDeleteModale(false);
+                            }}
+                        />
         </AppLayout>
     );
 }
