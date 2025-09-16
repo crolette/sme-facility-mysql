@@ -9,6 +9,7 @@ use App\Services\LogoService;
 use App\Models\Tenants\Provider;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Tenant\ProviderRequest;
@@ -27,6 +28,9 @@ class APIProviderController extends Controller
 
     public function store(ProviderRequest $request)
     {
+        if (Auth::user()->cannot('create', Provider::class))
+            return ApiResponse::notAuthorized();
+
         try {
 
             DB::beginTransaction();
@@ -54,6 +58,9 @@ class APIProviderController extends Controller
 
     public function update(ProviderRequest $request, Provider $provider)
     {
+        if (Auth::user()->cannot('update', $provider))
+            return ApiResponse::notAuthorized();
+
         try {
 
             DB::beginTransaction();
@@ -84,6 +91,9 @@ class APIProviderController extends Controller
 
     public function destroy(Provider $provider)
     {
+        if (Auth::user()->cannot('delete', $provider))
+            return ApiResponse::notAuthorized();
+        
         $provider->delete();
         return ApiResponse::success('', 'Provider deleted');
     }

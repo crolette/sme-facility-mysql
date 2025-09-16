@@ -37,7 +37,7 @@ beforeEach(function () {
     LocationType::factory()->create(['level' => 'room']);
     CategoryType::factory()->create(['category' => 'document']);
     CategoryType::factory()->create(['category' => 'asset']);
-    CategoryType::factory()->create(['category' => 'provider']);
+    $this->categoryType = CategoryType::factory()->create(['category' => 'provider']);
     Site::factory()->create();
     Building::factory()->create();
     Floor::factory()->create();
@@ -50,27 +50,27 @@ beforeEach(function () {
     $this->asset = Asset::factory()->forLocation($this->room)->create();
     $this->provider = Provider::factory()->create();
     $this->contract = Contract::factory()->create();
-    
+
+    $file1 = UploadedFile::fake()->image('logo.png');
+
+
     $this->formData = [
-        'provider_id' => $this->provider->id,
-        'name' => 'Contrat de bail',
-        'type' => 'Bail',
-        'notes' => 'Nouveau contrat de bail 2025',
-        'internal_reference' => 'Bail Site 2025',
-        'provider_reference' => 'Provider reference 2025',
-        'start_date' => Carbon::now()->toDateString(),
-        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
-        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
-        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
-        'status' => ContractStatusEnum::ACTIVE->value
+        'name' => 'Facility Web Experience SPRL',
+        'email' => 'info@facilitywebxp.be',
+        'vat_number' => 'BE0123456789',
+        'address' => 'Rue sur le Hour 16A, 4910 La Reid, Belgique',
+        'phone_number' => '+32450987654',
+        'categoryId' => $this->categoryType->id,
+        'website' => 'www.website.com',
+        'logo' => $file1
     ];
 });
 
-test('test access roles to contracts index page', function (string $role, int $expectedStatus) {
+test('test access roles to providers index page', function (string $role, int $expectedStatus) {
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
-    $response = $this->getFromTenant('tenant.contracts.index');
+    $response = $this->getFromTenant('tenant.providers.index');
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -78,11 +78,11 @@ test('test access roles to contracts index page', function (string $role, int $e
     ['Provider', 403]
 ]);
 
-test('test access roles to create contract page', function (string $role, int $expectedStatus) {
+test('test access roles to create provider page', function (string $role, int $expectedStatus) {
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
-    $response = $this->getFromTenant('tenant.contracts.create');
+    $response = $this->getFromTenant('tenant.providers.create');
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -90,11 +90,11 @@ test('test access roles to create contract page', function (string $role, int $e
     ['Provider', 403]
 ]);
 
-test('test access roles to view any contract page', function (string $role, int $expectedStatus) {
+test('test access roles to view any provider page', function (string $role, int $expectedStatus) {
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
-    $response = $this->getFromTenant('tenant.contracts.show', $this->contract);
+    $response = $this->getFromTenant('tenant.providers.show', $this->provider);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -102,11 +102,11 @@ test('test access roles to view any contract page', function (string $role, int 
     ['Provider', 403]
 ]);
 
-test('test access roles to store a contract', function (string $role, int $expectedStatus) {
+test('test access roles to store a provider', function (string $role, int $expectedStatus) {
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
-    $response = $this->postToTenant('api.contracts.store', $this->formData);
+    $response = $this->postToTenant('api.providers.store', $this->formData);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -114,11 +114,11 @@ test('test access roles to store a contract', function (string $role, int $expec
     ['Provider', 403]
 ]);
 
-test('test access roles to update any contract page', function (string $role, int $expectedStatus) {
+test('test access roles to update any provider page', function (string $role, int $expectedStatus) {
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
-    $response = $this->getFromTenant('tenant.contracts.edit', $this->contract);
+    $response = $this->getFromTenant('tenant.providers.edit', $this->provider);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -126,11 +126,11 @@ test('test access roles to update any contract page', function (string $role, in
     ['Provider', 403]
 ]);
 
-test('test access roles to update a contract', function (string $role, int $expectedStatus) {
+test('test access roles to update a provider', function (string $role, int $expectedStatus) {
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
-    $response = $this->patchToTenant('api.contracts.update', $this->formData, $this->contract);
+    $response = $this->patchToTenant('api.providers.update', $this->formData, $this->provider);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -139,12 +139,12 @@ test('test access roles to update a contract', function (string $role, int $expe
 ]);
 
 
-test('test access roles to contract page', function (string $role, int $expectedStatus) {
+test('test access roles to provider page', function (string $role, int $expectedStatus) {
     $user = User::factory()->create();
     $user->assignRole($role);
     $this->actingAs($user, 'tenant');
 
-    $response = $this->getFromTenant('tenant.contracts.show', $this->contract);
+    $response = $this->getFromTenant('tenant.providers.show', $this->provider);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -153,14 +153,14 @@ test('test access roles to contract page', function (string $role, int $expected
 ]);
 
 
-test('test access roles to delete any contract', function (string $role, int $expectedStatus) {
+test('test access roles to delete any provider', function (string $role, int $expectedStatus) {
 
     $user = User::factory()->create();
     $user->assignRole($role);
     $this->actingAs($user, 'tenant');
 
 
-    $response = $this->deleteFromTenant('api.contracts.destroy', $this->contract);
+    $response = $this->deleteFromTenant('api.providers.destroy', $this->provider);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -168,24 +168,15 @@ test('test access roles to delete any contract', function (string $role, int $ex
     ['Provider', 403]
 ]);
 
-test('test access roles to post a new document to a contract', function (string $role, int $expectedStatus) {
+test('test access roles to post a new logo to a provider', function (string $role, int $expectedStatus) {
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
     $file1 = UploadedFile::fake()->image('avatar.png');
-    $categoryType = CategoryType::where('category', 'document')->first();
+    
+    $formData = ['image' => $file1];
 
-    $formData = ['files' => [
-        [
-            'file' => $file1,
-            'name' => 'FILE 1 - Long name of more than 10 chars',
-            'description' => 'descriptionIMG',
-            'typeId' => $categoryType->id,
-            'typeSlug' => $categoryType->slug
-        ],
-    ]];
-
-    $response = $this->postToTenant('api.contracts.documents.post', $formData, $this->contract);
+    $response = $this->postToTenant('api.providers.logo.store', $formData, $this->provider);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -193,23 +184,17 @@ test('test access roles to post a new document to a contract', function (string 
     ['Provider', 403]
 ]);
 
-test('test access roles to detach a document from a contract', function (string $role, int $expectedStatus) {
+test('test access roles to delete a logo of a provider', function (string $role, int $expectedStatus) {
+    $user = User::factory()->withRole($role)->create();
+    $this->actingAs($user, 'tenant');
 
-        $user = User::factory()->withRole($role)->create();
-        $this->actingAs($user, 'tenant');
+    $file1 = UploadedFile::fake()->image('avatar.png');
 
-    $document = Document::factory()->withCustomAttributes([
-        'user' => $this->user,
-        'directoryName' => 'contracts',
-        'model' => $this->contract,
-    ])->create();
-    $this->contract->documents()->attach($document);
+    $formData = ['image' => $file1];
 
-    $formData = [
-        'document_id' => $document->id
-    ];
+    $this->postToTenant('api.providers.logo.store', $formData, $this->provider);
 
-    $response = $this->patchToTenant('api.contracts.documents.detach', $formData, $this->contract);
+    $response = $this->deleteFromTenant('api.providers.logo.destroy', $this->provider);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],

@@ -10,10 +10,11 @@ use App\Services\LogoService;
 use App\Models\Tenants\Provider;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Tenant\ImageUploadRequest;
+use Illuminate\Support\Facades\Auth;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Tenant\ProviderRequest;
+use App\Http\Requests\Tenant\ImageUploadRequest;
 
 class APIUploadProviderLogoController extends Controller
 {
@@ -23,6 +24,9 @@ class APIUploadProviderLogoController extends Controller
 
     public function store(ImageUploadRequest $request, Provider $provider)
     {
+        if (Auth::user()->cannot('update', $provider))
+            return ApiResponse::notAuthorized();
+
         $provider = $this->logoService->uploadAndAttachLogo($provider, $request->validated('image'));
         $provider->save();
         return ApiResponse::success('', 'Logo uploaded');

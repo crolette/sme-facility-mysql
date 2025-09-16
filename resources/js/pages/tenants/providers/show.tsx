@@ -2,6 +2,7 @@ import ImageUploadModale from '@/components/ImageUploadModale';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Provider } from '@/types';
+import { router } from '@inertiajs/core';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
 import { Trash, Upload } from 'lucide-react';
@@ -18,26 +19,39 @@ export default function ProviderShow({ item }: { item: Provider }) {
         },
     ];
 
-    const deleteProvider = (provider: Provider) => {
-        console.log('delete provider : ' + provider.name);
+    const deleteProvider = async () => {
+        try {
+            const response = await axios.delete(route('api.providers.destroy', provider.id));
+            console.log(response);
+            if (response.data.status === 'success')
+            {
+                router.get(route('tenant.providers.index'));
+            }
+        } catch (error) {
+            console.log(error.response.data.message);
+        }
     };
 
     const fetchProvider = async () => {
         try {
             const response = await axios.get(route('api.providers.show', provider.id));
-            setProvider(response.data.data);
+            if (response.data.status === 'success') {
+                setProvider(response.data.data);
+            }
         } catch (error) {
-            console.log(error);
+            console.log(error.response.data.message);
         }
     };
 
     const deleteLogo = async () => {
         try {
             const response = await axios.delete(route('api.providers.logo.destroy', provider.id));
-            console.log(response);
-            fetchProvider();
+            if (response.data.status === 'success') {
+                setProvider(response.data.data);
+                fetchProvider();
+            }
         } catch (error) {
-            console.log(error);
+            console.log(error.response.data.message);
         }
     };
 

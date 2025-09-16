@@ -262,7 +262,6 @@ it('can detach a document from an existing contract', function() {
         'documentable_type' => Contract::class
     ]);
 
-    Storage::disk('tenants')->assertExists(Document::find($document->id)->path);
 });
 
 

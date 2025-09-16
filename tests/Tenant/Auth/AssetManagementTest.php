@@ -204,7 +204,6 @@ test('test access roles to delete asset with maintenance manager', function (str
 test('test access roles to restore any asset', function (string $role, int $expectedStatus) {
 
     $user = User::factory()->withRole($role)->create();
-    dump($user->email);
     $this->actingAs($user, 'tenant');
 
     $response = $this->postToTenant('api.assets.restore', [], $this->asset->reference_code);

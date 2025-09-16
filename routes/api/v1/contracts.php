@@ -4,6 +4,7 @@ use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Contract;
 use App\Services\DocumentService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Controllers\API\V1\APIContractController;
@@ -38,25 +39,29 @@ Route::middleware([
         Route::prefix('/documents')->group(function() {
 
             Route::get('', function (Contract $contract) {
-                Debugbar::info('api document contract', $contract);
-                // $asset = Asset::withTrashed()->with('documents')->where('reference_code', $asset)->first();
+
                 return ApiResponse::success($contract->load('documents')->documents);
             })->name('api.contracts.documents');
             
             Route::post('', function (Contract $contract, DocumentUploadRequest $request) {
-                Debugbar::info('api document contract POST', $contract->id, $request);
-                
+                if (Auth::user()->cannot('update', $contract))
+                    return ApiResponse::notAuthorized();
+
                 app(DocumentService::class)->uploadAndAttachDocumentsForContract($contract, $request['files']);
-                // $asset = Asset::withTrashed()->with('documents')->where('reference_code', $asset)->first();
+                
                 return ApiResponse::success([], 'Document added');
             })->name('api.contracts.documents.post');
 
             Route::patch('', function (Contract $contract, Request $request) {
+                if (Auth::user()->cannot('update', $contract))
+                    return ApiResponse::notAuthorized();
+
                 $validated = $request->validateWithBag('errors', [
                     'document_id' => 'required|exists:documents,id'
                 ]);
 
                 app(DocumentService::class)->detachDocumentFromModel($contract, $validated['document_id']);
+                return ApiResponse::success([], 'Document removed');
             })->name('api.contracts.documents.detach');
         });
     });

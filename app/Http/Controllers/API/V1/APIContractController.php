@@ -26,7 +26,7 @@ class APIContractController extends Controller
     {
 
         if (Auth::user()->cannot('create', Contract::class))
-            abort(403);
+            return ApiResponse::notAuthorized();
 
         try {
             DB::beginTransaction();
@@ -50,7 +50,7 @@ class APIContractController extends Controller
     public function update(ContractUpdateRequest $request, Contract $contract)
     {
         if (Auth::user()->cannot('update', $contract))
-            abort(403);
+            return ApiResponse::notAuthorized();
 
 
         try {
@@ -75,7 +75,7 @@ class APIContractController extends Controller
     public function destroy(Contract $contract)
     {
         if (Auth::user()->cannot('delete', $contract))
-            abort(403);
+            return ApiResponse::notAuthorized();
 
         $contract->delete();
         return ApiResponse::success('', 'Contract deleted');
