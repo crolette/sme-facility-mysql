@@ -14,9 +14,13 @@ use function PHPUnit\Framework\assertNotNull;
 use function PHPUnit\Framework\assertNull;
 use function PHPUnit\Framework\assertTrue;
 
+beforeEach(function() {
+    $this->user = User::factory()->withRole('Admin')->create();
+    $this->actingAs($this->user, 'tenant');
+});
+
 test('test access roles to users index', function (string $role, int $expectedStatus) {
-    $user = User::factory()->create();
-    $user->assignRole($role);
+    $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
     $response = $this->getFromTenant('tenant.users.index');
@@ -28,10 +32,8 @@ test('test access roles to users index', function (string $role, int $expectedSt
 ]);
 
 test('test access roles to view own user', function (string $role, int $expectedStatus) {
-    $user = User::factory()->create();
-    $user->assignRole($role);
+    $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
-
     $response = $this->getFromTenant('tenant.users.show', $user);
     $response->assertStatus($expectedStatus);
 })->with([
@@ -41,10 +43,10 @@ test('test access roles to view own user', function (string $role, int $expected
 ]);
 
 test('test access roles to view another user', function (string $role, int $expectedStatus) {
-    $user = User::factory()->create();
-    $user->assignRole($role);
+    $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
-    $newUser = User::factory()->create();
+
+      $newUser = User::factory()->create();
 
     $response = $this->getFromTenant('tenant.users.show', $newUser);
     $response->assertStatus($expectedStatus);
@@ -55,10 +57,9 @@ test('test access roles to view another user', function (string $role, int $expe
 ]);
 
 test('test access roles to users create', function (string $role, int $expectedStatus) {
-    $user = User::factory()->create();
-    $user->assignRole($role);
+    $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
-
+  
     $response = $this->getFromTenant('tenant.users.create');
     $response->assertStatus($expectedStatus);
 })->with([
@@ -69,8 +70,7 @@ test('test access roles to users create', function (string $role, int $expectedS
 
 
 test('an admin can create a new user with a role', function (string $role) {
-    $user = User::factory()->create();
-    $user->assignRole('Admin');
+    $user = User::factory()->withRole('Admin')->create();
     $this->actingAs($user, 'tenant');
 
     $formData = [
@@ -92,12 +92,15 @@ test('an admin can create a new user with a role', function (string $role) {
     $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
 
     assertTrue($createdUser->hasRole($role));
-})->with('roles');
+})->with([
+    ['Admin'],
+    ['Maintenance Manager'],
+    ['Provider']
+]);
 
 test('an admin can update the role of a user', function (string $role) {
 
-    $user = User::factory()->create();
-    $user->assignRole('Admin');
+    $user = User::factory()->withRole('Admin')->create();
     $this->actingAs($user, 'tenant');
 
     $user = User::factory()->create();
@@ -120,14 +123,16 @@ test('an admin can update the role of a user', function (string $role) {
 
     $user->refresh();
     assertTrue($user->hasRole($role));
-})->with('roles');
+})->with([
+    ['Admin'],
+    ['Maintenance Manager'],
+    ['Provider']
+]);
 
 test('another user as an admin cannot create a user', function (string $role) {
-
-    $user = User::factory()->create();
-    $user->assignRole($role);
+    $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
-
+    
     $formData = [
         'first_name' => 'Jane',
         'last_name' => 'Doe',
@@ -138,4 +143,7 @@ test('another user as an admin cannot create a user', function (string $role) {
 
     $response = $this->postToTenant('api.users.store', $formData);
     $response->assertStatus(403);
-})->with('rolesWithoutAccess');
+})->with([
+    ['Maintenance Manager'],
+    ['Provider']
+]);

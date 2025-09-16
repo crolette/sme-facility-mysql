@@ -23,8 +23,7 @@ use function Pest\Laravel\assertDatabaseMissing;
 
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->user->assignRole('Admin');
+    $this->user = User::factory()->withRole('Admin')->create();
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
     $this->buildingType = LocationType::factory()->create(['level' => 'building']);
     $this->site = Site::factory()->create();
@@ -161,7 +160,7 @@ test('test access roles to delete any building', function (string $role, int $ex
     $this->actingAs($user, 'tenant');
 
 
-    $response = $this->deleteFromTenant('api.buildings.destroy', $this->builflong->reference_code);
+    $response = $this->deleteFromTenant('api.buildings.destroy', $this->building->reference_code);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],

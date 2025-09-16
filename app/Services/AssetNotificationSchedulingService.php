@@ -77,6 +77,7 @@ class AssetNotificationSchedulingService
         $preference = $user->notification_preferences()->where('notification_type', 'depreciation_end_date')->first();
         $delay = $preference->notification_delay_days;
 
+
         if ($preference && $preference->enabled && $asset->depreciation_end_date?->subDays($delay) > now()) {
             // if ($preference && $preference->enabled && $asset->depreciation_end_date->subDays($delay) < now()) {
 

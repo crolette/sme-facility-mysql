@@ -29,10 +29,13 @@ class UserNotificationPreferenceService
             $preferences = config('notifications.notification_types');
 
             foreach ($preferences as $assetType => $notificationType) {
-
+                
                 foreach ($notificationType as $type) {
-
-                    $user->notification_preferences()->create([
+                    $user->notification_preferences()->updateOrCreate([
+                        'user_id' => $user->id,
+                        'asset_type' => $assetType,
+                        'notification_type' => $type,
+                    ],[
                         'asset_type' => $assetType,
                         'notification_type' => $type,
                         'notification_delay_days' => 7,

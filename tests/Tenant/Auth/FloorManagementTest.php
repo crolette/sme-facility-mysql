@@ -23,8 +23,7 @@ use function Pest\Laravel\assertDatabaseMissing;
 
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->user->assignRole('Admin');
+    $this->user = User::factory()->withRole('Admin')->create();
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
     $this->buildingType = LocationType::factory()->create(['level' => 'building']);
     $this->floorType = LocationType::factory()->create(['level' => 'floor']);

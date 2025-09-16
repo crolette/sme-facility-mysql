@@ -7,6 +7,7 @@ use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
@@ -20,8 +21,6 @@ class RestoreSoftDeletedAssetController extends Controller
 
         try {
             DB::beginTransaction();
-
-            // $asset = Asset::onlyTrashed()->findOrFail($assetId);
 
             $referenceCode = $asset->location->reference_code . '-' . $asset->code;
             $asset->update([

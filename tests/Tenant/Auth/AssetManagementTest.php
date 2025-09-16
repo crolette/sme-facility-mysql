@@ -23,8 +23,7 @@ use function Pest\Laravel\assertDatabaseMissing;
 
 
 beforeEach(function () {
-    $this->user = User::factory()->create();
-    $this->user->assignRole('Admin');
+    $this->user = User::factory()->withRole('Admin')->create();
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
@@ -204,8 +203,8 @@ test('test access roles to delete asset with maintenance manager', function (str
 
 test('test access roles to restore any asset', function (string $role, int $expectedStatus) {
 
-    $user = User::factory()->create();
-    $user->assignRole($role);
+    $user = User::factory()->withRole($role)->create();
+    dump($user->email);
     $this->actingAs($user, 'tenant');
 
     $response = $this->postToTenant('api.assets.restore', [], $this->asset->reference_code);
@@ -218,7 +217,7 @@ test('test access roles to restore any asset', function (string $role, int $expe
 
 test('test access roles to force delete any asset', function (string $role, int $expectedStatus) {
 
-    $user = User::factory()->create();
+    $user = User::factory()->withRole($role)->create();
     $user->assignRole($role);
     $this->actingAs($user, 'tenant');
 
