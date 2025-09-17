@@ -26,9 +26,10 @@ export interface NavItem {
 type FlashType = 'success' | 'error' | 'warning' | 'info';
 
 export interface Flash {
-    status?: string;
+    status: string;
     message: string;
     type: FlashType;
+    errors?: string[];
 }
 
 export type LocationLevel = 'site' | 'building' | 'floor' | 'room';

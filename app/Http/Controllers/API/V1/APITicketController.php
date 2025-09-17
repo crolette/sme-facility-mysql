@@ -38,22 +38,18 @@ class APITicketController extends Controller
 
     public function store(TicketRequest $request, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService)
     {
-        
         try {
             DB::beginTransaction();
 
             $count = Company::incrementAndGetTicketNumber();
             $codeNumber = generateCodeNumber($count, 'TK', 4);
-
             $ticket = new Ticket(
                 [
                     ...$request->validated(),
                     'code' => $codeNumber
                 ]
             );
-
-
-            if (!$request->validated('reporter_email')) {
+            if ($request->validated('reporter_email')) {
                 $ticket->reporter()->associate($request->validated('reported_by'));
             } else {
                 $ticket->reporter()->associate(Auth::guard('tenant')->user()->id);
@@ -70,11 +66,12 @@ class APITicketController extends Controller
             $location = $models[$request->validated('location_type')]::where('reference_code', $request->validated('location_code'))->first();
 
             $ticket->ticketable()->associate($location);
-
             $ticket->save();
 
-            $files = $pictureUploadRequest->validated('pictures');
+            // TODO Send email to admin / maintenance manager if not the one who created the ticket
 
+            $files = $pictureUploadRequest->validated('pictures');
+            
             if ($files) {
                 $pictureService->uploadAndAttachPictures($ticket, $files, $request->validated('reporter_email') ?? null);
             }
@@ -86,7 +83,6 @@ class APITicketController extends Controller
             DB::rollback();
             return ApiResponse::error('Error during Ticket creation', [$e->getMessage()]);
         }
-
         return ApiResponse::error('Error during Ticket creation');
     }
 

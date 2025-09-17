@@ -20,12 +20,7 @@ class TicketController extends Controller
         return Inertia::render('tenants/tickets/index');
     }
 
-    public function create()
-    {
-        $statuses = array_column(TicketStatus::cases(), 'value');
-        return Inertia::render('tenants/tickets/create', ['statuses' => $statuses]);
-    }
-
+    
     public function show(Ticket $ticket)
     {
         // dump('-- ticket controller show -- ');

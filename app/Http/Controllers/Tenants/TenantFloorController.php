@@ -77,7 +77,7 @@ class TenantFloorController extends Controller
             abort(403);
 
         $floor = Floor::where('reference_code', $floor->reference_code)->with(['building', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers', 'contracts', 'contracts.provider'])->first();
-        $floor->append('level_path');
+        $floor->append('level_path', 'floor_material', 'wall_material');
 
         return Inertia::render('tenants/locations/show', ['routeName' => 'floors', 'item' => $floor]);
     }

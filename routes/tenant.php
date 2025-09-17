@@ -9,11 +9,16 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AuthenticateTenant;
 use Stancl\Tenancy\Middleware\ScopeSessions;
+use App\Http\Controllers\Tenants\UserController;
 use App\Http\Controllers\Tenants\QRCodeController;
 use App\Http\Controllers\Tenants\TicketController;
+use App\Http\Controllers\API\V1\APITicketController;
+use App\Http\Controllers\Tenants\ContractController;
+use App\Http\Controllers\Tenants\ProviderController;
 use App\Http\Controllers\Tenants\DashboardController;
 use App\Http\Controllers\Tenants\TenantRoomController;
 use App\Http\Controllers\Tenants\TenantSiteController;
+use App\Http\Controllers\Tenants\AssetTicketController;
 use App\Http\Controllers\Tenants\TenantAssetController;
 use App\Http\Controllers\Tenants\TenantFloorController;
 use App\Http\Controllers\Tenants\InterventionController;
@@ -22,15 +27,12 @@ use App\Http\Controllers\Tenants\TenantBuildingController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\Tenants\ForceDeleteAssetController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Tenants\AssetTicketController;
 use App\Http\Controllers\Tenants\InterventionActionController;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+use App\Http\Controllers\Tenants\CreateTicketFromQRCodeController;
 use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
-use App\Http\Controllers\Tenants\Auth\TenantAuthenticatedSessionController;
-use App\Http\Controllers\Tenants\ContractController;
-use App\Http\Controllers\Tenants\ProviderController;
-use App\Http\Controllers\Tenants\UserController;
 use App\Http\Controllers\Tenants\UserNotificationPreferenceController;
+use App\Http\Controllers\Tenants\Auth\TenantAuthenticatedSessionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -96,22 +98,25 @@ Route::middleware([
 });
 
 
-Route::middleware([
+Route::middleware(array_merge([
     'web',
     InitializeTenancyBySubdomain::class,
     ScopeSessions::class,
     PreventAccessFromCentralDomains::class,
-])->group(function () {
+], app()->environment('local') ? [] : ['throttle:6,60']))->group(function () {
 
-    Route::get('/assets/{assetCode}/tickets/create', [AssetTicketController::class, 'createFromAsset'])->name('tenant.assets.tickets.create')->middleware('throttle:6,60');
+    Route::get('/assets/{asset}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromAsset'])->name('tenant.assets.tickets.create');
 
-    Route::get('/sites/{site}/tickets/create', [AssetTicketController::class, 'createFromSite'])->name('tenant.sites.tickets.create')->middleware('throttle:6,60');
+    Route::get('/sites/{site}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromSite'])->name('tenant.sites.tickets.create');
 
-    Route::get('/buildings/{building}/tickets/create', [AssetTicketController::class, 'createFromBuilding'])->name('tenant.buildings.tickets.create')->middleware('throttle:6,60');
+    Route::get('/buildings/{building}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromBuilding'])->name('tenant.buildings.tickets.create');
 
-    Route::get('/floors/{floor}/tickets/create', [AssetTicketController::class, 'createFromFloor'])->name('tenant.floors.tickets.create')->middleware('throttle:6,60');
+    Route::get('/floors/{floor}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromFloor'])->name('tenant.floors.tickets.create');
 
-    Route::get('/rooms/{Room}/tickets/create', [AssetTicketController::class, 'createFromRoom'])->name('tenant.rooms.tickets.create')->middleware('throttle:6,60');
+    Route::get('/rooms/{room}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromRoom'])->name('tenant.rooms.tickets.create');
+
+    // Post a new ticket
+    Route::post('/', [APITicketController::class, 'store'])->name('api.tickets.store');
 });
 
 require __DIR__ . '/settings.php';

@@ -79,7 +79,7 @@ class TenantBuildingController extends Controller
             abort(403);
 
         $building = Building::where('reference_code', $building->reference_code)->with(['site', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers', 'contracts', 'contracts.provider'])->first();
-        $building->append('level_path');
+        $building->append('level_path' ,'floor_material', 'wall_material', 'outdoor_material');
 
 
         return Inertia::render('tenants/locations/show', ['routeName' => 'buildings', 'item' => $building]);

@@ -90,6 +90,7 @@ export default function ShowTicket({ ticket }: { ticket: Ticket }) {
                     uploadRoute={`api.tickets.pictures.post`}
                     deleteRoute={`api.pictures.delete`}
                     showRoute={'api.pictures.show'}
+                    canAdd={ticketItem.status === 'closed' ? false : true}
                 />
 
                 <InterventionManager

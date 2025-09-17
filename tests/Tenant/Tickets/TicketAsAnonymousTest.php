@@ -19,6 +19,7 @@ use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
 
 beforeEach(function () {
+    User::factory()->create();
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
@@ -39,21 +40,64 @@ beforeEach(function () {
     
 });
 
+it('can render a new ticket page for a guest', function (string $modelType, string $routeName) {
+    $model = match ($modelType) {
+        'asset' => $this->asset,
+        'site' => $this->site,
+        'building' => $this->building,
+        'floor' => $this->floor,
+        'room' => $this->room,
+        default => throw new Exception('Unknown model type')
+    };
 
-it('can create a new ticket to an ASSET with "anonymous" user', function () {
+    $model->refresh();
+
+
+    $response = $this->getFromTenant('tenant.'.$routeName. '.tickets.create', $model->reference_code);
+    $response->assertOk();
+
+    $response->assertInertia(
+        fn($page) =>
+        $page->component('tenants/tickets/CreateTicketFromQRCode')->has('item')->where('item.name', $model->name)->where('item.reference_code', $model->reference_code)
+    );
+})->with([
+    ['asset', 'assets'],
+    ['site', 'sites'],
+    ['building', 'buildings'],
+    ['floor', 'floors'],
+    ['room', 'rooms'],
+]);
+
+it('can create a new ticket with pictures has "anonymous" user', function (string $modelType, string $locationType) {
+
+    $model = match ($modelType) {
+        'asset' => $this->asset,
+        'site' => $this->site,
+        'building' => $this->building,
+        'floor' => $this->floor,
+        'room' => $this->room,
+        default => throw new Exception('Unknown model type')
+    };
+
+    $model->refresh();
+
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->image('test.jpg');
 
     $formData = [
-        'location_type' => 'assets',
-        'location_code' => $this->asset->reference_code,
-        'status' => TicketStatus::OPEN->value,
+        'location_type' => $locationType,
+        'location_code' => $model->reference_code,
         'description' => 'A nice description for this new ticket',
         'being_notified' => true,
-        'reporter_email' => 'test@test.com'
+        'reporter_email' => 'test@test.com',
+        'pictures' => [
+            $file1,
+            $file2
+        ]
     ];
 
     $response = $this->postToTenant('api.tickets.store', $formData);
-    $response->assertOk(302);
-    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200);
 
     assertDatabaseCount('tickets', 1);
 
@@ -62,8 +106,19 @@ it('can create a new ticket to an ASSET with "anonymous" user', function () {
         'reporter_email' => 'test@test.com',
         'being_notified' => 1,
         'description' => 'A nice description for this new ticket',
-        'ticketable_type' => get_class($this->asset),
+        'ticketable_type' => get_class($model),
         'ticketable_id' => 1,
     ]);
-});
 
+    assertDatabaseCount('pictures', 2);
+    assertDatabaseHas('pictures', [
+        'imageable_type' => 'App\Models\Tenants\Ticket',
+        'imageable_id' => 1
+    ]);
+})->with([
+    ['asset', 'assets'],
+    ['site', 'sites'],
+    ['building', 'buildings'],
+    ['floor', 'floors'],
+    ['room', 'rooms'],
+]);
