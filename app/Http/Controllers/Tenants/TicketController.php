@@ -24,11 +24,11 @@ class TicketController extends Controller
     
     public function show(Ticket $ticket)
     {
-
+        
         if (Auth::user()->cannot('view', $ticket))
             abort(403);
         
 
-        return Inertia::render('tenants/tickets/show', ['ticket' => $ticket->load('pictures', 'interventions')]);
+        return Inertia::render('tenants/tickets/show', ['item' => $ticket->load('pictures', 'interventions')]);
     }
 };

@@ -224,6 +224,7 @@ export interface Ticket {
     being_notified: boolean;
     code: string;
     closed_at?: string;
+    ticketable_route: string;
     created_at: string;
     updated_at: string;
     pictures?: Picture[];

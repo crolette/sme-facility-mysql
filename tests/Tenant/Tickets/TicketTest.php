@@ -66,7 +66,7 @@ it('can render the show ticket page', function () {
 
     $response->assertInertia(
         fn($page) => $page->component('tenants/tickets/show')
-            ->has('ticket')
+            ->has('item')->where('item.code', $ticket->code)
     );
     $response->assertOk();
 });

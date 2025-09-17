@@ -31,11 +31,12 @@ class Ticket extends Model
 
     protected $appends = [
         'asset_code',
+        'ticketable_route',
     ];
 
     protected $with = [
         'reporter:id,first_name,last_name',
-        'reporter:id,first_name,last_name',
+        
         'interventions',
     ];
 
@@ -105,6 +106,13 @@ class Ticket extends Model
         $this->closed_at = now();
 
         return $this->save();
+    }
+
+    public function ticketableRoute(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->ticketable->locationRoute ?? ''
+        );
     }
 
     public function assetCode(): Attribute

@@ -30,7 +30,9 @@ export default function ShowContract({ item, objects }: { item: Contract; object
     };
 
      const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
-     const [activeTab, setActiveTab] = useState('information');
+    const [activeTab, setActiveTab] = useState('information');
+    
+    console.log(objects);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -52,6 +54,7 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                         infos={{
                             name: contract.name,
                             code: contract.internal_reference,
+                            status: contract.status,
                             reference: contract.type ?? contract.provider?.category,
                             levelPath: route('tenant.providers.show', contract.provider_id),
                             levelName: contract.provider.name,
@@ -119,14 +122,14 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                 </div>
             </div>
             <Modale
-                            title={'Delete contract'}
-                            message={`Are you sure you want to delete this contract ${contract.name} ?`}
-                            isOpen={showDeleteModale}
-                            onConfirm={deleteContract}
-                            onCancel={() => {
-                                setShowDeleteModale(false);
-                            }}
-                        />
+                title={'Delete contract'}
+                message={`Are you sure you want to delete this contract ${contract.name} ?`}
+                isOpen={showDeleteModale}
+                onConfirm={deleteContract}
+                onCancel={() => {
+                    setShowDeleteModale(false);
+                }}
+            />
         </AppLayout>
     );
 }
