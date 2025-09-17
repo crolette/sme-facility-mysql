@@ -14,7 +14,8 @@ class TicketController extends Controller
 
     public function index()
     {
-        // $tickets = Ticket::all()->load('interventions');
+        if(Auth::user()->cannot('viewAny', Ticket::class))
+            abort(403);
 
 
         return Inertia::render('tenants/tickets/index');
@@ -23,9 +24,10 @@ class TicketController extends Controller
     
     public function show(Ticket $ticket)
     {
-        // dump('-- ticket controller show -- ');
-        // dump($ticket->load('pictures', 'interventions'));
-        // dd($ticket, $ticket->interventions()->first()->actions()->sum('intervention_costs'));
+
+        if (Auth::user()->cannot('view', $ticket))
+            abort(403);
+        
 
         return Inertia::render('tenants/tickets/show', ['ticket' => $ticket->load('pictures', 'interventions')]);
     }

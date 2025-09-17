@@ -8,6 +8,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Database\Seeders\tenant\PermissionsSeeder;
 use Database\Seeders\tenant\ContractsPermissionsSeeder;
+use Database\Seeders\tenant\ProvidersPermissionsSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,7 +19,8 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             PermissionsSeeder::class,
-            ContractsPermissionsSeeder::class
+            ContractsPermissionsSeeder::class,
+            ProvidersPermissionsSeeder::class
         ]);
 
         if (!User::where('email', 'super@sme-facility.com')->first()) {

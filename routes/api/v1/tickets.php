@@ -28,53 +28,67 @@ Route::middleware([
     // Get all tickets
     Route::get('/', [APITicketController::class, 'index'])->name('api.tickets.index');
 
-    // Get a specific ticket
-    Route::get('{ticket}', [APITicketController::class, 'show'])->name('api.tickets.get');
+    Route::prefix('{ticket}')->group(function() {
+        // Get a specific ticket
+        Route::get('/', [APITicketController::class, 'show'])->name('api.tickets.get');
+        Route::delete('/', [APITicketController::class, 'destroy'])->name('api.tickets.destroy');
 
-    // Get all pictures from a ticket
-    Route::get('/{ticket}/pictures/', function (Ticket $ticket) {
-        return ApiResponse::success($ticket->load('pictures')->pictures);
-    })->name('api.tickets.pictures');
+        // Get all pictures from a ticket
+        Route::get('/pictures/', function (Ticket $ticket) {
+            return ApiResponse::success($ticket->load('pictures')->pictures);
+        })->name('api.tickets.pictures');
 
-    // Post a new picture to a ticket
-    Route::post('/{ticket}/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Ticket $ticket) {
+        // Post a new picture to a ticket
+        Route::post('/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Ticket $ticket) {
 
-        $files = $pictureUploadRequest->validated('pictures');
-        if ($files) {
-            $pictureService->uploadAndAttachPictures($ticket, $files);
-        }
+            $files = $pictureUploadRequest->validated('pictures');
+            if ($files) {
+                $pictureService->uploadAndAttachPictures($ticket, $files);
+            }
 
-        return ApiResponse::success(null, 'Pictures added');
-    })->name('api.tickets.pictures.post');
+            return ApiResponse::success(null, 'Pictures added');
+        })->name('api.tickets.pictures.post');
 
+        // Update a specific ticket
+        Route::patch('/', [APITicketController::class, 'update'])->name('api.tickets.update');
+
+        // Change the status of a specific ticket
+        Route::patch('/status', [APITicketController::class, 'changeStatus'])->name('api.tickets.status');
+
+
+        // Get all ticket related interventions
+        Route::get('/interventions', function (Ticket $ticket) {
+            return ApiResponse::success($ticket->load('interventions')->interventions);
+        })->name('api.tickets.interventions');
+
+    });
+    
+
+    
 
     // TODO are documents needed for a ticket ?
     // Get all the documents from a ticket
-    Route::get('/{ticket}/documents/', function (Ticket $ticket) {
-        return ApiResponse::success($ticket->load('documents')->documents);
-    })->name('api.tickets.documents');
+    // Route::get('/{ticket}/documents/', function (Ticket $ticket) {
+    //     if (Auth::user()->cannot('update', $ticket))
+    //         return ApiResponse::notAuthorized();
 
-    // Post a new document to the ticket
-    Route::post('/{ticket}/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Ticket $ticket) {
+    //     return ApiResponse::success($ticket->load('documents')->documents);
+    // })->name('api.tickets.documents');
 
-        $files = $documentUploadRequest->validated('files');
-        if ($files) {
-            $documentService->uploadAndAttachDocuments($ticket, $files);
-        }
+    // // Post a new document to the ticket
+    // Route::post('/{ticket}/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Ticket $ticket) {
 
-        return ApiResponse::success([], 'Document added');
-    })->name('api.tickets.documents.post');
+    //     if (Auth::user()->cannot('update', $ticket))
+    //         return ApiResponse::notAuthorized();
 
-    // Update a specific ticket
-    Route::patch('{ticket}', [APITicketController::class, 'update'])->name('api.tickets.update');
+    //     $files = $documentUploadRequest->validated('files');
+    //     if ($files) {
+    //         $documentService->uploadAndAttachDocuments($ticket, $files);
+    //     }
 
-    // Change the status of a specific ticket
-    Route::patch('{ticket}/status', [APITicketController::class, 'changeStatus'])->name('api.tickets.status');
+    //     return ApiResponse::success([], 'Document added');
+    // })->name('api.tickets.documents.post');
 
-
-    // Get all ticket related interventions
-    Route::get('{ticket}/interventions', function (Ticket $ticket) {
-        return ApiResponse::success($ticket->load('interventions')->interventions);
-    })->name('api.tickets.interventions');
+   
 
 });

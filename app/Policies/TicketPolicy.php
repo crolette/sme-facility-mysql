@@ -2,9 +2,8 @@
 
 namespace App\Policies;
 
-use App\Models\Ticket;
 use App\Models\Tenants\User;
-use App\Models\Central\CentralUser;
+use App\Models\Tenants\Ticket;
 use Illuminate\Auth\Access\Response;
 
 class TicketPolicy
@@ -14,7 +13,7 @@ class TicketPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->can('view any tickets');
     }
 
     /**
@@ -22,7 +21,11 @@ class TicketPolicy
      */
     public function view(User $user, Ticket $ticket): bool
     {
-        return false;
+        if($user->hasRole('Maintenance Manager')) {
+            return $user->can('view tickets') && $user->id === $ticket->ticketable->manager->id ? true : false;
+        }
+
+        return $user->can('view tickets');
     }
 
     /**
@@ -30,7 +33,8 @@ class TicketPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        // return $user->can('create tickets');
+        return true;
     }
 
     /**
@@ -38,7 +42,12 @@ class TicketPolicy
      */
     public function update(User $user, Ticket $ticket): bool
     {
-        return false;
+        if ($user->hasRole('Maintenance Manager')) {
+            return $user->can('update tickets') && $user->id === $ticket->ticketable->manager->id ? true : false;
+        }
+    
+        // dump('--- after Maintenacne Manager --- ');
+        return $user->can('update tickets');
     }
 
     /**
@@ -46,7 +55,7 @@ class TicketPolicy
      */
     public function delete(User $user, Ticket $ticket): bool
     {
-        return false;
+        return $user->can('delete tickets');
     }
 
     /**

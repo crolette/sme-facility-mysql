@@ -321,3 +321,14 @@ it('can close an existing ticket', function () {
     ]);
     $this->assertNotNull($ticket->fresh()->closed_at);
 });
+
+it('can delete an existing ticket', function () {
+
+    $ticket = Ticket::factory()->forLocation($this->asset)->create(['reported_by' => $this->user->id]);
+
+    $response = $this->deleteFromTenant('api.tickets.destroy', $ticket);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseEmpty('tickets');
+
+});

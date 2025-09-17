@@ -88,6 +88,9 @@ class APITicketController extends Controller
 
     public function update(TicketRequest $request, Ticket $ticket)
     {
+        if (Auth::user()->cannot('update', $ticket))
+            return ApiResponse::notAuthorized();
+
         try {
             DB::beginTransaction();
 
@@ -123,7 +126,10 @@ class APITicketController extends Controller
 
     public function changeStatus(Request $request, Ticket $ticket)
     {
-        Debugbar::info($request);
+        if (Auth::user()->cannot('update', $ticket))
+            return ApiResponse::notAuthorized();
+
+
         if (in_array($request->status, ['open', 'closed', 'ongoing'])) {
             if ($request->status === 'closed') {
                 $ticket->closeTicket();
@@ -135,6 +141,22 @@ class APITicketController extends Controller
 
         return ApiResponse::error('Error during Ticket update');
     }
+
+    public function destroy(Ticket $ticket)
+    {
+        if (Auth::user()->cannot('delete', $ticket))
+            return ApiResponse::notAuthorized();
+
+        try {
+                     $ticket->delete();
+                    return ApiResponse::success(null, 'Ticket deleted');
+                } catch (Exception $e) {
+                    return ApiResponse::error('Error during Ticket deletion', [$e->getMessage()]);
+                }
+
+        return ApiResponse::error('Error during Ticket deletion');
+    }
+
 
 
     // public function close(Ticket $ticket)

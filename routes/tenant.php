@@ -87,6 +87,7 @@ Route::middleware([
     Route::prefix('tickets')->group(function () {
         Route::get('/', [TicketController::class, 'index'])->name('tenant.tickets.index');
         Route::get('/{ticket}', [TicketController::class, 'show'])->name('tenant.tickets.show');
+        // Route::get('/{ticket}/edit', [TicketController::class, 'update'])->name('tenant.tickets.update');
     });
 
     // INTERVENTIONS

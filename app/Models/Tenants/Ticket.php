@@ -51,8 +51,23 @@ class Ticket extends Model
             'closed_at' => 'date:d-m-Y h:i',
             'created_at' => 'date:d-m-Y H:i',
             'updated_at' => 'date:d-m-Y H:i',
-            'being_notified' => 'boolean'
+            'being_notified' => 'boolean',
+            'status' => TicketStatus::class
         ];
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($ticket) {
+            $ticket->interventions()->delete();
+
+            // TODO service to delete pictures from the disk
+            $ticket->pictures()->delete();
+        });
+
+        
     }
 
 
