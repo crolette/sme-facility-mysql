@@ -38,7 +38,7 @@ class APITicketController extends Controller
 
     public function store(TicketRequest $request, PictureUploadRequest $pictureUploadRequest, PictureService $pictureService)
     {
-        Debugbar::info($request->validated());
+        
         try {
             DB::beginTransaction();
 
