@@ -7,7 +7,7 @@ import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocati
 import { TicketManager } from '@/components/tenant/ticketManager';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { Asset, Contract, type BreadcrumbItem } from '@/types';
+import { Asset, Contract, type BreadcrumbItem, Documents} from '@/types';
 import { router } from '@inertiajs/core';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
@@ -25,6 +25,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
 
     const [asset, setAsset] = useState(item);
     const [existingContracts, setExistingContracts] = useState(asset.contracts ?? []);
+    
 
     const fetchAsset = async () => {
         const response = await axios.get(route('api.assets.show', asset.reference_code));
@@ -47,7 +48,59 @@ export default function ShowAsset({ item }: { item: Asset }) {
         }
     };
 
+    const [addExistingContractModale, setAddExistingContractModale] = useState<boolean>(false);
+
+    const addExistingContractToAsset = async () => {
+        const contracts = {
+            existing_contracts: existingContracts.map((elem) => elem.id),
+        };
+
+        try {
+            const response = await axios.post(route('api.assets.contracts.post', asset.reference_code), contracts);
+            if (response.data.status === 'success') {
+                setAddExistingContractModale(false);
+                fetchContracts();
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    // const [existingDocuments, setExistingDocuments] = useState(asset.documents ?? []);
+    // const [addExistingDocumentsModale, setAddExistingDocumentsModale] = useState<boolean>(false);
+
+    //     const updateDocuments = (newDocuments: Documents[]) => {
+    //         setAsset((prev) => ({ ...prev, documents: newDocuments }));
+    //         setExistingDocuments(newDocuments);
+    //     };
+
+    //     const fetchDocuments = async () => {
+    //         try {
+    //             const response = await axios.get(route('api.assets.documents', asset.reference_code));
+    //             if (response.data.status === 'success') {
+    //                 updateDocuments(response.data.data);
+    //             }
+    //         } catch (error) {
+    //             console.log(error);
+    //         }
+    //     };
+    // console.log(existingDocuments);
     
+    // const addExistingDocumentsToAsset = async () => {
+    //     const documents = {
+    //         existing_documents: existingDocuments.map((elem) => elem.id),
+    //     };
+
+    //     try {
+    //         const response = await axios.post(route('api.assets.documents.post', asset.reference_code), documents);
+    //         if (response.data.status === 'success') {
+    //             setAddExistingDocumentsModale(false);
+    //             fetchDocuments();
+    //         }
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // };
 
     const deleteAsset = (asset: Asset) => {
         destroy(route(`api.assets.destroy`, asset.reference_code));
@@ -76,24 +129,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
  
     const [activeTab, setActiveTab] = useState('information');
    
-    const [addExistingContractModale, setAddExistingContractModale] = useState<boolean>(false);
-
-    const addExistingContractToAsset = async() => {
-        const contracts = {
-            existing_contracts: existingContracts.map(elem => elem.id)
-        };
-
-        try {
-            const response = await axios.post(route('api.assets.contracts.post', asset.reference_code), contracts);
-            if (response.data.status === "success") {
-                setAddExistingContractModale(false);
-                fetchContracts();
-            }
-            
-        } catch (error) {
-            console.log(error);
-        }
-    }
+    
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -272,16 +308,19 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             />
                         )}
                         {activeTab === 'documents' && (
-                            <DocumentManager
-                                itemCodeId={asset.reference_code}
-                                getDocumentsUrl={`api.assets.documents`}
-                                removableRoute={`api.assets.documents.detach`}
-                                editRoute={`api.documents.update`}
-                                uploadRoute={`api.assets.documents.post`}
-                                deleteRoute={`api.documents.delete`}
-                                showRoute={'api.documents.show'}
-                                canAdd={asset.deleted_at == null ? true : false}
-                            />
+                            <>
+                                
+                                <DocumentManager
+                                    itemCodeId={asset.reference_code}
+                                    getDocumentsUrl={`api.assets.documents`}
+                                    removableRoute={`api.assets.documents.detach`}
+                                    editRoute={`api.documents.update`}
+                                    uploadRoute={`api.assets.documents.post`}
+                                    deleteRoute={`api.documents.delete`}
+                                    showRoute={'api.documents.show'}
+                                    canAdd={asset.deleted_at == null ? true : false}
+                                />
+                            </>
                         )}
 
                         {activeTab === 'pictures' && (
@@ -297,6 +336,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                     </div>
                 </div>
             </div>
+            
             {addExistingContractModale && (
                 <div className="bg-background/50 fixed inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">

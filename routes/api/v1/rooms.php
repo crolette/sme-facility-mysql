@@ -62,13 +62,18 @@ Route::middleware([
 
                 // Post a new document to a floor
                 Route::post('', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Room $room) {
-                    $files = $documentUploadRequest->validated('files');
-                    if ($files) {
-                        $documentService->uploadAndAttachDocuments($room, $files);
-                        return ApiResponse::success(null, 'Document added');
-                    } else {
-                        return ApiResponse::error('Error posting new documents');
+
+                    if (Auth::user()->cannot('update', $room))
+                        return ApiResponse::notAuthorized();
+
+                    if ($documentUploadRequest->validated('files')) {
+                        $documentService->uploadAndAttachDocuments($room, $documentUploadRequest->validated('files'));
                     }
+
+                    if ($documentUploadRequest->validated('existing_documents'))
+                        $documentService->attachExistingDocumentsToModel($room, $documentUploadRequest->validated('existing_documents'));
+
+                    return ApiResponse::success(null, 'Document removed');
                 })->name('api.rooms.documents.post');
 
                 // Detach a document from a location

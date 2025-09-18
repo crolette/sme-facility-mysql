@@ -78,10 +78,15 @@ Route::middleware([
                 // Post a new document to the assets
                 Route::post('', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Asset $asset) {
 
-                    $files = $documentUploadRequest->validated('files');
-                    if ($files) {
-                        $documentService->uploadAndAttachDocuments($asset, $files);
+                    if (Auth::user()->cannot('update', $asset))
+                        return ApiResponse::notAuthorized();
+
+                    if ($documentUploadRequest->validated('files')) {
+                        $documentService->uploadAndAttachDocuments($asset, $documentUploadRequest->validated('files'));
                     }
+
+                    if ($documentUploadRequest->validated('existing_documents'))
+                        $documentService->attachExistingDocumentsToModel($asset, $documentUploadRequest->validated('existing_documents'));
 
                     return ApiResponse::success([], 'Document added');
                 })->name('api.assets.documents.post');

@@ -74,6 +74,7 @@ class DocumentService
 
     public function detachDocumentFromModel(Model $model, int $documentId) 
     {
+        Debugbar::info('detach detachDocumentFromModel', $documentId);
         $document = Document::find($documentId);
         $model->documents()->detach($document);
     }
