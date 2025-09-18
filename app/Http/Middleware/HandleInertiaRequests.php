@@ -2,11 +2,12 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Tenants\Ticket;
 use Closure;
-use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
+use Illuminate\Http\Request;
+use App\Models\Tenants\Ticket;
+use App\Models\Tenants\Company;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -51,12 +52,20 @@ class HandleInertiaRequests extends Middleware
      * @return array<string, mixed>
      */
     public function share(Request $request): array
-    {
+    {   
+        // dd(Company::first()->logo_path);
+        
+        if(session()->missing('tenantName') || session()->missing('tenantLogo')){
+            $company = Company::first();
+            session(['tenantName' => $company->name ?? config('app.name')]);
+            session(['tenantLogo' => $company->logo]);
+        }
+
 
         return [
             ...parent::share($request),
             'name' => config('app.name'),
-            'tenantName' => tenancy()?->tenant?->company_name,
+            'tenant' => ['name' => session('tenantName'), 'logo' => session('tenantLogo')],
             'auth' => [
                 'user' => $request->user(),
             ],

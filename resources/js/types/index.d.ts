@@ -86,6 +86,14 @@ export interface TenantSite {
     documents: Documents[];
 }
 
+export interface Company {
+    logo: string;
+    address: string;
+    vat_number: string;
+    phone_number: string;
+    name: string;
+}
+
 export interface TenantBuilding extends TenantSite {
     site: TenantSite;
     level: TenantSite;
@@ -354,7 +362,7 @@ export interface Address {
 
 export interface SharedData {
     name: string;
-    tenantName: string;
+    tenant: { name: string; logo: string };
     auth: Auth;
     flash: Flash;
     ziggy: Config & { location: string };

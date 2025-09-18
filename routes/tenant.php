@@ -23,6 +23,7 @@ use App\Http\Controllers\Tenants\TenantAssetController;
 use App\Http\Controllers\Tenants\TenantFloorController;
 use App\Http\Controllers\Tenants\InterventionController;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use App\Http\Controllers\API\V1\APICompanyLogoController;
 use App\Http\Controllers\Tenants\TenantBuildingController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\Tenants\ForceDeleteAssetController;
@@ -71,6 +72,11 @@ Route::middleware([
         Route::get('/create', [ProviderController::class, 'create'])->name('tenant.providers.create');
         Route::get('/{provider}', [ProviderController::class, 'show'])->name('tenant.providers.show');
         Route::get('/{provider}/edit', [ProviderController::class, 'edit'])->name('tenant.providers.edit');
+    });
+
+    Route::prefix('company')->group(function() {
+        Route::post('/logo', [APICompanyLogoController::class, 'store'])->name('api.company.logo.store');
+        Route::delete('/logo', [APICompanyLogoController::class, 'destroy'])->name('api.company.logo.destroy');
     });
 
     // USERS

@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\ScopeSessions;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\PasswordController;
+use App\Http\Controllers\Settings\CompanyProfileController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Tenants\UserNotificationPreferenceController;
@@ -24,6 +25,8 @@ Route::middleware([
 
     Route::get('settings/password', [PasswordController::class, 'edit'])->name('password.edit');
     Route::put('settings/password', [PasswordController::class, 'update'])->name('password.update');
+
+    Route::get('settings/company', [CompanyProfileController::class, 'show'])->name('tenant.company.show');
 
     Route::resource('settings/notification-preferences', UserNotificationPreferenceController::class)->parameters(['notification-preferences' => 'preference'])->only('index', 'show', 'create', 'edit')->names('tenant.notification-preferences');
 
