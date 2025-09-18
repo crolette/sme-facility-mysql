@@ -70,9 +70,12 @@ class APIRoomController extends Controller
             if ($contractRequest->validated('contracts'))
                 $this->contractService->createWithModel($room, $contractRequest->validated('contracts'));
 
-            $files = $documentUploadRequest->validated('files');
-            if ($files) {
-                $documentService->uploadAndAttachDocuments($room, $files);
+            if ($documentUploadRequest->validated('files')) {
+                $documentService->uploadAndAttachDocuments($room, $documentUploadRequest->validated('files'));
+            }
+
+            if ($documentUploadRequest->validated('existing_documents')) {
+                $documentService->attachExistingDocumentsToModel($room, $documentUploadRequest->validated('existing_documents'));
             }
 
             if ($roomRequest->validated('need_qr_code') === true)

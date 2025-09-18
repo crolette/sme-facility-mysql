@@ -30,6 +30,39 @@ beforeEach(function () {
     $this->location = Building::factory()->create();
 });
 
+it('can attach existing documents to building', function () {
+    CategoryType::where('category', 'document')->first();
+    $documents = Document::factory()->count(2)->withCustomAttributes([
+        'user' => $this->user,
+        'directoryName' => 'buildings',
+        'model' => $this->location,
+    ])->create();
+
+    $formData = [
+        'name' => 'New building',
+        'description' => 'Description new building',
+        'levelType' => $this->site->id,
+        'locationType' => $this->locationType->id,
+        'existing_documents' => [...$documents->pluck('id')]
+
+    ];
+
+    $response = $this->postToTenant('api.buildings.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => 'App\Models\Tenants\Building',
+        'documentable_id' => 2
+    ]);
+    assertDatabaseHas('documentables', [
+        'document_id' => 2,
+        'documentable_type' => 'App\Models\Tenants\Building',
+        'documentable_id' => 2
+    ]);
+});
+
 it('can upload several files when creating building', function () {
 
     $file1 = UploadedFile::fake()->image('avatar.png');

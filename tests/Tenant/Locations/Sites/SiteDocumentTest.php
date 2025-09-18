@@ -29,6 +29,38 @@ beforeEach(function () {
 
 });
 
+it('can attach existing documents to floor', function () {
+    CategoryType::where('category', 'document')->first();
+    $documents = Document::factory()->count(2)->withCustomAttributes([
+        'user' => $this->user,
+        'directoryName' => 'sites',
+        'model' => $this->location,
+    ])->create();
+
+    $formData = [
+        'name' => 'New site',
+        'description' => 'Description new site',
+        'locationType' => $this->siteType->id,
+        'existing_documents' => [...$documents->pluck('id')]
+
+    ];
+
+    $response = $this->postToTenant('api.sites.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => 'App\Models\Tenants\Site',
+        'documentable_id' => 2
+    ]);
+    assertDatabaseHas('documentables', [
+        'document_id' => 2,
+        'documentable_type' => 'App\Models\Tenants\Site',
+        'documentable_id' => 2
+    ]);
+});
+
 it('can upload several files when site is created', function () {
 
     $file1 = UploadedFile::fake()->image('avatar.png');

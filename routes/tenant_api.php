@@ -71,6 +71,11 @@ Route::prefix('/v1/')->group(
                     return response()->file(Storage::disk('tenants')->path($path));
                 })->name('api.image.show');
 
+                Route::get('/search', function (Request $request) {
+                    $documents = Document::where('name', 'like', '%' . $request->query('q') . '%')->orWhere('description', 'like', '%' . $request->query('q') . '%')->limit(5)->get();
+
+                    return ApiResponse::success($documents);
+                })->name('api.documents.search');
 
 
                 // Return the category type searched

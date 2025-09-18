@@ -58,9 +58,12 @@ class APIAssetController extends Controller
             if ($contractRequest->validated('existing_contracts'))
                 $this->contractService->attachExistingContractsToModel($asset, $contractRequest->validated('existing_contracts'));
 
-            $files = $documentUploadRequest->validated('files');
-            if ($files) {
-                $documentService->uploadAndAttachDocuments($asset, $files);
+            if ($documentUploadRequest->validated('files')) {
+                $documentService->uploadAndAttachDocuments($asset, $documentUploadRequest->validated('files'));
+            }
+
+            if ($documentUploadRequest->validated('existing_documents')) {
+                $documentService->attachExistingDocumentsToModel($asset, $documentUploadRequest->validated('existing_documents'));
             }
 
             $pictures = $pictureUploadRequest->validated('pictures');
