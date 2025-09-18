@@ -137,6 +137,7 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
                     {infos.levelName}
                 </a>
             </div>
+            
             {/* MOBILE MENU */}
             <ul className="relative mb-2 lg:hidden">
                 <li className="bg-sidebar-accent flex cursor-pointer justify-between p-2" onClick={() => setShowMobileMenu(!showMobileMenu)}>
