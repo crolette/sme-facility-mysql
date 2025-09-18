@@ -113,8 +113,8 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                             name: location.name,
                             code: location.code,
                             reference: location.reference_code,
-                            levelPath: location.level_path,
-                            levelName: location.level.name,
+                            levelPath: location.level_path ?? '',
+                            levelName: location.level?.name ?? '',
                         }}
                     />
                     <div className="overflow-hidden">

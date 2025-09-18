@@ -347,7 +347,6 @@ it('deletes the documents directory if it is empty', function () {
                 'typeId' => $categoryType->id,
                 'typeSlug' => $categoryType->slug
             ],
-
         ]
     ];
 
@@ -374,7 +373,7 @@ it('deletes the documents directory if it is empty', function () {
     expect(Storage::disk('tenants')->exists($document->directory))->toBeFalse();
 });
 
-it('do not delete the documents directory if it is not empty', function () {
+it('does not delete the documents directory if it is not empty', function () {
     $file1 = UploadedFile::fake()->image('avatar.png');
     $categoryType = CategoryType::where('category', 'document')->first();
 
