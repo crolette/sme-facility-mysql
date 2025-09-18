@@ -13,10 +13,10 @@
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
-        "simplesoftwareio/simple-qrcode": "^4.2",
         "spatie/laravel-permission": "^6.21",
         "stancl/tenancy": "^3.9",
-        "tightenco/ziggy": "^2.4"
+        "tightenco/ziggy": "^2.4",
+        "tuncaybahadir/quar": "^1.5"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15",

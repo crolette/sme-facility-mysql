@@ -9,6 +9,7 @@ use App\Models\Tenants\Document;
 use App\Services\PictureService;
 use App\Services\ContractService;
 use App\Services\DocumentService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\ContractStoreRequest;
@@ -59,6 +60,10 @@ Route::middleware([
 
 
             Route::post('/qr/regen', function (Asset $asset, QRCodeService $qRCodeService) {
+
+                if(Auth::user()->cannot('update', $asset))
+                        return ApiResponse::notAuthorized();
+
                 $qRCodeService->createAndAttachQR($asset);
                 return ApiResponse::success();
             })->name('api.assets.qr.regen');

@@ -8,6 +8,7 @@ use App\Services\QRCodeService;
 use App\Services\PictureService;
 use App\Services\ContractService;
 use App\Services\DocumentService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\V1\APIRoomController;
 use App\Http\Requests\Tenant\PictureUploadRequest;
@@ -41,6 +42,9 @@ Route::middleware([
             Route::patch('/relocate', [RelocateRoomController::class, 'relocateRoom'])->name('api.rooms.relocate');
 
             Route::post('/qr/regen', function (Room $room, QRCodeService $qRCodeService) {
+                if (Auth::user()->cannot('update', $room))
+                    return ApiResponse::notAuthorized();
+
                 $qRCodeService->createAndAttachQR($room);
                 return ApiResponse::success();
             })->name('api.rooms.qr.regen');

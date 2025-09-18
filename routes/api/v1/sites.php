@@ -7,6 +7,7 @@ use App\Services\QRCodeService;
 use App\Services\PictureService;
 use App\Services\ContractService;
 use App\Services\DocumentService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\V1\APISiteController;
 use App\Http\Requests\Tenant\PictureUploadRequest;
@@ -33,6 +34,9 @@ Route::middleware([
             Route::delete('/', [APISiteController::class, 'destroy'])->name('api.sites.destroy');
 
             Route::post('/qr/regen', function (Site $site, QRCodeService $qRCodeService) {
+                if (Auth::user()->cannot('update', $site))
+                    return ApiResponse::notAuthorized();
+
                 $qRCodeService->createAndAttachQR($site);
                 return ApiResponse::success();
             })->name('api.sites.qr.regen');

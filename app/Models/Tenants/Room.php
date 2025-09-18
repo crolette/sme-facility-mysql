@@ -27,6 +27,7 @@ class Room extends Model
         'reference_code',
         'code',
         'qr_code',
+        'qr_hash',
         'surface_floor',
         'floor_material_id',
         'floor_material_other',

@@ -50,10 +50,14 @@ it('can render a new ticket page for a guest', function (string $modelType, stri
         default => throw new Exception('Unknown model type')
     };
 
+$model->update([
+    'qr_hash' => generateQRCodeHash('routeName', $model)
+]);
+
     $model->refresh();
 
 
-    $response = $this->getFromTenant('tenant.'.$routeName. '.tickets.create', $model->reference_code);
+    $response = $this->getFromTenant('tenant.'.$routeName. '.tickets.create', $model->qr_hash);
     $response->assertOk();
 
     $response->assertInertia(

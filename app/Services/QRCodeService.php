@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use tbQuar\Facades\Quar;
 
 class QRCodeService
 {
@@ -18,34 +18,33 @@ class QRCodeService
         $tenantId = tenancy()->tenant->id;
         $modelType = Str::plural(Str::lower(class_basename($model))); // e.g., "assets", "sites", "buildings"
         $modelId = $model->id;
-
+        
         $directory = "$tenantId/$modelType/$modelId/qrcode/";
-        if ($modelType === 'assets') {
-            $fileName = 'qr_'  . $model->code . '_' . Carbon::now()->isoFormat('YYYYMMDDHHMM')  . '.png';
-        } else {
-            $fileName = 'qr_'  . $model->reference_code . '_' . Carbon::now()->isoFormat('YYYYMMDDHHMM')  . '.png';
-        }
+
+        $qr_hash = generateQRCodeHash($modelType, $model);
+
+        $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDHHMM')  . '.png';
+        
+        $route = route('tenant.' . $modelType . '.tickets.create', $qr_hash);
 
         $files = Storage::disk('tenants')->files($directory);
 
         if (count($files) > 0) {
             $this->deleteExistingQR($files);
         }
-
-        if ($modelType === 'assets') {
-            $route = route('tenant.assets.tickets.create', $model->code);
-        } else {
-            $route = route('tenant.' . $modelType . '.tickets.create', $model->reference_code);
-        }
-
-        $qr = QrCode::format('png')
+        
+        $qr = Quar::format('png')
             ->size(300)
             ->margin(2)
+            ->gradient(34, 78, 143, 37, 39, 41,  'vertical')
             ->generate($route);
 
         Storage::disk('tenants')->put($directory . $fileName, $qr);
 
-        $model->update(['qr_code' => $directory . $fileName]);
+        $model->update([
+            'qr_code' => $directory . $fileName,
+            'qr_hash' => $qr_hash
+        ]);
     }
 
     public function deleteExistingQR($files)
