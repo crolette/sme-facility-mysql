@@ -34,6 +34,39 @@ beforeEach(function () {
     $this->location = Room::factory()->create();
 });
 
+it('can attach existing documents to room', function () {
+    CategoryType::where('category', 'document')->first();
+    $documents = Document::factory()->count(2)->withCustomAttributes([
+        'user' => $this->user,
+        'directoryName' => 'rooms',
+        'model' => $this->location,
+    ])->create();
+
+    $formData = [
+        'name' => 'New room',
+        'description' => 'Description new room',
+        'levelType' => $this->floor->id,
+        'locationType' => $this->locationType->id,
+        'existing_documents' => [...$documents->pluck('id')]
+
+    ];
+
+    $response = $this->postToTenant('api.rooms.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => 'App\Models\Tenants\Room',
+        'documentable_id' => 2
+    ]);
+    assertDatabaseHas('documentables', [
+        'document_id' => 2,
+        'documentable_type' => 'App\Models\Tenants\Room',
+        'documentable_id' => 2
+    ]);
+});
+
 it('can upload several files when creating room', function () {
 
     $file1 = UploadedFile::fake()->image('avatar.png');

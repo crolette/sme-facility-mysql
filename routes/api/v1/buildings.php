@@ -60,10 +60,16 @@ Route::middleware([
             // Post a new document to a building
             Route::post('', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Building $building) {
 
-                $files = $documentUploadRequest->validated('files');
-                if ($files) {
-                    $documentService->uploadAndAttachDocuments($building, $files);
+                if (Auth::user()->cannot('update', $building))
+                    return ApiResponse::notAuthorized();
+
+
+                if ($documentUploadRequest->validated('files')) {
+                    $documentService->uploadAndAttachDocuments($building, $documentUploadRequest->validated('files'));
                 }
+
+                if ($documentUploadRequest->validated('existing_documents'))
+                    $documentService->attachExistingDocumentsToModel($building, $documentUploadRequest->validated('existing_documents'));
 
                 return ApiResponse::success(null, 'Document added');
             })->name('api.buildings.documents.post');

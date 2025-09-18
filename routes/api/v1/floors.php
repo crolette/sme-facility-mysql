@@ -59,10 +59,15 @@ Route::middleware([
             // Post a new document to a floor
             Route::post('', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Floor $floor) {
 
-                $files = $documentUploadRequest->validated('files');
-                if ($files) {
-                    $documentService->uploadAndAttachDocuments($floor, $files);
+                if (Auth::user()->cannot('update', $floor))
+                    return ApiResponse::notAuthorized();
+
+                if ($documentUploadRequest->validated('files')) {
+                    $documentService->uploadAndAttachDocuments($floor, $documentUploadRequest->validated('files'));
                 }
+
+                if ($documentUploadRequest->validated('existing_documents'))
+                    $documentService->attachExistingDocumentsToModel($floor, $documentUploadRequest->validated('existing_documents'));
 
                 return ApiResponse::success(null, 'Document added');
             })->name('api.floors.documents.post');

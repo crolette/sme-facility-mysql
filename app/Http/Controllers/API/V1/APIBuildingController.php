@@ -69,10 +69,14 @@ class APIBuildingController extends Controller
             if ($contractRequest->validated('contracts'))
                 $this->contractService->createWithModel($building, $contractRequest->validated('contracts'));
 
-            $files = $documentUploadRequest->validated('files');
-            if ($files) {
-                $documentService->uploadAndAttachDocuments($building, $files);
+            if ($documentUploadRequest->validated('files')) {
+                $documentService->uploadAndAttachDocuments($building, $documentUploadRequest->validated('files'));
             }
+
+            if ($documentUploadRequest->validated('existing_documents')) {
+                $documentService->attachExistingDocumentsToModel($building, $documentUploadRequest->validated('existing_documents'));
+            }
+
             if ($buildingRequest->validated('need_qr_code') === true)
                 $this->qrCodeService->createAndAttachQR($building);
 

@@ -31,6 +31,9 @@ class DocumentUploadRequest extends FormRequest
             'files.*.file' => 'required_with:files.*.name|file|mimes:jpg,jpeg,png,pdf|max:' . Document::maxUploadSizeKB(),
             'files.*.typeId' => ['required_with:files.*.name', Rule::in(CategoryType::where('category', 'document')->pluck('id')->toArray())],
             'files.*.typeSlug' => ['required_with:files.*.name', Rule::in(CategoryType::where('category', 'document')->pluck('slug')->toArray())],
+
+            'existing_documents' => 'nullable|array',
+            'existing_documents.*' => 'required|exists:documents,id',
         ];
     }
 }

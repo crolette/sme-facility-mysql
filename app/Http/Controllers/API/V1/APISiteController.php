@@ -57,9 +57,12 @@ class APISiteController extends Controller
 
             $this->maintainableService->create($site, $maintainableRequest);
 
-            $files = $documentUploadRequest->validated('files');
-            if ($files) {
-                $documentService->uploadAndAttachDocuments($site, $files);
+            if ($documentUploadRequest->validated('files')) {
+                $documentService->uploadAndAttachDocuments($site, $documentUploadRequest->validated('files'));
+            }
+
+            if ($documentUploadRequest->validated('existing_documents')) {
+                $documentService->attachExistingDocumentsToModel($site, $documentUploadRequest->validated('existing_documents'));
             }
 
             if ($contractRequest->validated('contracts'))

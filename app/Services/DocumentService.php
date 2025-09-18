@@ -74,7 +74,19 @@ class DocumentService
 
     public function detachDocumentFromModel(Model $model, int $documentId) 
     {
+        Debugbar::info('detach detachDocumentFromModel', $documentId);
         $document = Document::find($documentId);
         $model->documents()->detach($document);
+    }
+
+    public function attachExistingDocumentsToModel(Model $model, $request): void
+    {
+        foreach ($request as $documentId) {
+            if (!$model->documents()->find($documentId)) {
+                $document = Document::find($documentId);
+                $model->documents()->attach($document);
+
+            }
+        }
     }
 };

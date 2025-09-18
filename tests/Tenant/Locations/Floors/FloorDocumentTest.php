@@ -32,6 +32,39 @@ beforeEach(function () {
     $this->location = Floor::factory()->create();
 });
 
+it('can attach existing documents to room', function () {
+    CategoryType::where('category', 'document')->first();
+    $documents = Document::factory()->count(2)->withCustomAttributes([
+        'user' => $this->user,
+        'directoryName' => 'floors',
+        'model' => $this->location,
+    ])->create();
+
+    $formData = [
+        'name' => 'New floor',
+        'description' => 'Description new floor',
+        'levelType' => $this->building->id,
+        'locationType' => $this->locationType->id,
+        'existing_documents' => [...$documents->pluck('id')]
+
+    ];
+
+    $response = $this->postToTenant('api.floors.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => 'App\Models\Tenants\Floor',
+        'documentable_id' => 2
+    ]);
+    assertDatabaseHas('documentables', [
+        'document_id' => 2,
+        'documentable_type' => 'App\Models\Tenants\Floor',
+        'documentable_id' => 2
+    ]);
+});
+
 it('can upload several files to floor', function () {
 
     $file1 = UploadedFile::fake()->image('avatar.png');

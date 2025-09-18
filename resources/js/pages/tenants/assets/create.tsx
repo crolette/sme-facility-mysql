@@ -77,6 +77,7 @@ type TypeFormData = {
     last_maintenance_date: string | null;
     contracts: { Contract, files }[];
     existing_contracts: [];
+    existing_documents: [];
     files: {
         file: File;
         name: string;
@@ -158,7 +159,8 @@ export default function CreateAsset({
         pictures: [],
         contracts: [],
         providers: asset?.maintainable.providers ?? [],
-        existing_contracts: []
+        existing_contracts: [],
+        existing_documents: [],
     });
 
     const [listIsOpen, setListIsOpen] = useState(false);
@@ -425,6 +427,7 @@ export default function CreateAsset({
     }, [data.depreciation_duration]);
 
     const [existingContracts, setExistingContracts] = useState<Contract[]>([]);
+    const [existingDocuments, setExistingDocuments] = useState<Document[]>([]);
 
     const [showContractFileModal, setShowContractFileModal] = useState(false);
     const [indexContractForFiles, setIndexContractForFiles] = useState<number | null>(null);
@@ -1195,6 +1198,21 @@ export default function CreateAsset({
                     {!asset && (
                         <div id="files" className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                             <h5>Documents</h5>
+                            <SearchableInput<Document>
+                                multiple={true}
+                                searchUrl={route('api.documents.search')}
+                                selectedItems={existingDocuments}
+                                getDisplayText={(document) => document.name +  '-' + document.mime_type}
+                                getKey={(document) => document.id}
+                                onSelect={(documents) => {
+                                    setExistingDocuments(documents);
+                                    setData(
+                                        'existing_documents',
+                                        documents.map((elem) => elem.id),
+                                    );
+                                }}
+                                placeholder="Add existing contracts..."
+                            />
                             <Button onClick={() => setShowFileModal(!showFileModal)} type="button" className="block">
                                 Add file
                             </Button>

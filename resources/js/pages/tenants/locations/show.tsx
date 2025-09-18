@@ -113,14 +113,14 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                             name: location.name,
                             code: location.code,
                             reference: location.reference_code,
-                            levelPath: location.level_path,
-                            levelName: location.level.name,
+                            levelPath: location.level_path ?? '',
+                            levelName: location.level?.name ?? '',
                         }}
                     />
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                        <h2>Code</h2>
+                                <h2>Code</h2>
                                 <div className="grid grid-cols-[1fr_160px] gap-4">
                                     <div>
                                         <div>
@@ -234,6 +234,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                                 itemCodeId={location.reference_code}
                                 getDocumentsUrl={`api.${routeName}.documents`}
                                 editRoute={`api.documents.update`}
+                                removableRoute={`api.${routeName}.documents.detach`}
                                 uploadRoute={`api.${routeName}.documents.post`}
                                 deleteRoute={`api.documents.delete`}
                                 showRoute={'api.documents.show'}

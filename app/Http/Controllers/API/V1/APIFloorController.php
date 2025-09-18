@@ -66,10 +66,14 @@ class APIFloorController extends Controller
             if ($contractRequest->validated('contracts'))
                 $this->contractService->createWithModel($floor, $contractRequest->validated('contracts'));
 
-            $files = $documentUploadRequest->validated('files');
-            if ($files) {
-                $documentService->uploadAndAttachDocuments($floor, $files);
+            if ($documentUploadRequest->validated('files')) {
+                $documentService->uploadAndAttachDocuments($floor, $documentUploadRequest->validated('files'));
             }
+
+            if ($documentUploadRequest->validated('existing_documents')) {
+                $documentService->attachExistingDocumentsToModel($floor, $documentUploadRequest->validated('existing_documents'));
+            }
+
             if ($floorRequest->validated('need_qr_code') === true)
                 $this->qrCodeService->createAndAttachQR($floor);
 

@@ -20,6 +20,9 @@ use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
 
 beforeEach(function () {
+    $this->user = User::factory()->withRole('Admin')->create();
+    $this->actingAs($this->user, 'tenant');
+
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
@@ -28,8 +31,7 @@ beforeEach(function () {
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
     CategoryType::factory()->count(2)->create(['category' => 'asset']);
 
-    $this->user = User::factory()->withRole('Admin')->create();
-    $this->actingAs($this->user, 'tenant');
+  
 
     // on créée les différentes "locations" possibles pour attacher un asset
     $this->site = Site::factory()->create();
@@ -42,6 +44,44 @@ beforeEach(function () {
 
     // on créé un asset qu'on attache à une room
     // $this->asset = Asset::factory()->forLocation($this->room)->create();
+});
+
+it('can attach existing documents to asset', function () {
+    $asset = Asset::factory()->forLocation($this->room)->create();
+
+    CategoryType::where('category', 'document')->first();
+    $documents = Document::factory()->count(2)->withCustomAttributes([
+                'user' => $this->user,
+                'directoryName' => 'assets',
+                'model' => $asset,
+            ])->create();
+
+    $formData = [
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+        'locationId' => $this->room->id,
+        'locationReference' => $this->room->reference_code,
+        'locationType' => 'room',
+        'categoryId' => $this->categoryType->id,
+        'existing_documents' => [...$documents->pluck('id')]
+        
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => 'App\Models\Tenants\Asset',
+        'documentable_id' => 2
+    ]);
+    assertDatabaseHas('documentables', [
+        'document_id' => 2,
+        'documentable_type' => 'App\Models\Tenants\Asset',
+        'documentable_id' => 2
+    ]);
+
 });
 
 it('can upload several files to asset', function () {
@@ -347,7 +387,6 @@ it('deletes the documents directory if it is empty', function () {
                 'typeId' => $categoryType->id,
                 'typeSlug' => $categoryType->slug
             ],
-
         ]
     ];
 
@@ -374,7 +413,7 @@ it('deletes the documents directory if it is empty', function () {
     expect(Storage::disk('tenants')->exists($document->directory))->toBeFalse();
 });
 
-it('do not delete the documents directory if it is not empty', function () {
+it('does not delete the documents directory if it is not empty', function () {
     $file1 = UploadedFile::fake()->image('avatar.png');
     $categoryType = CategoryType::where('category', 'document')->first();
 

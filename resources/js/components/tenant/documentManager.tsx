@@ -9,6 +9,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Loader2 } from 'lucide-react';
 import Modale from '../Modale';
+import SearchableInput from '../SearchableInput';
 
 interface DocumentManagerProps {
     itemCodeId: number | string;
@@ -47,7 +48,13 @@ export const DocumentManager = ({
     }, []);
 
     const removeDocument = async (id: number) => {
-          setIsUpdating(true);
+        console.log(id, { document_id: id });
+        console.log(removableRoute);
+        if (!removableRoute || !id)
+            return;
+        
+        setIsUpdating(true);
+
           try {
               const response = await axios.patch(route(removableRoute, itemCodeId), { document_id: id });
               console.log(response);
@@ -56,8 +63,9 @@ export const DocumentManager = ({
               }
           } catch (error) {
               console.error('Erreur lors de la suppression', error);
-              setIsUpdating(false);
           }
+        
+            setIsUpdating(false);
       };
 
      const [documentToDelete, setDocumentToDelete] = useState(null);
@@ -92,6 +100,8 @@ export const DocumentManager = ({
 
     const [showFileModal, setShowFileModal] = useState(false);
     const [documentTypes, setDocumentTypes] = useState<CentralType[]>([]);
+        const [existingDocuments, setExistingDocuments] = useState<Documents[] | [] >([]);
+        const [addExistingDocumentsModale, setAddExistingDocumentsModale] = useState<boolean>(false);
 
     const updateDocumentData = {
         documentId: 0,
@@ -110,6 +120,23 @@ export const DocumentManager = ({
         fetchDocuments();
         setSubmitType('edit');
     };
+
+        const addExistingDocumentsToAsset = async () => {
+            const documents = {
+                existing_documents: existingDocuments.map((elem) => elem.id),
+            };
+
+            try {
+                const response = await axios.post(route(uploadRoute, itemCodeId), documents);
+                if (response.data.status === 'success') {
+                    setAddExistingDocumentsModale(false);
+                    fetchDocuments();
+                    setExistingDocuments([])
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        };
 
     const fetchDocumentTypes = async () => {
         try {
@@ -203,7 +230,12 @@ export const DocumentManager = ({
     return (
         <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
             <h2 className="inline">Documents ({documents?.length ?? 0})</h2>
-            {canAdd && <Button onClick={() => addNewFile()}>Add new file</Button>}
+            {canAdd && (
+                <>
+                    <Button onClick={() => setAddExistingDocumentsModale(true)}>Add existing document</Button>
+                    <Button onClick={() => addNewFile()}>Add new file</Button>
+                </>
+            )}
             {documents && documents.length > 0 && (
                 <Table>
                     <TableHead>
@@ -379,8 +411,36 @@ export const DocumentManager = ({
                     setShowDeleteModale(false);
                 }}
             />
-
-            
+            {addExistingDocumentsModale && (
+                <div className="bg-background/50 fixed inset-0 z-50">
+                    <div className="bg-background/20 flex h-dvh items-center justify-center">
+                        <div className="bg-background flex flex-col items-center justify-center p-4 text-center md:max-w-1/3">
+                            <p>Add Existing document</p>
+                            <SearchableInput<Documents>
+                                multiple={true}
+                                searchUrl={route('api.documents.search')}
+                                selectedItems={existingDocuments}
+                                getDisplayText={(document) => document.name}
+                                getKey={(document) => document.id}
+                                onSelect={(documents) => {
+                                    setExistingDocuments(documents);
+                                }}
+                                placeholder="Search documents..."
+                            />
+                            <Button
+                                variant="secondary"
+                                onClick={() => {
+                                    setAddExistingDocumentsModale(false);
+                                    setExistingDocuments([]);
+                                }}
+                            >
+                                Cancel
+                            </Button>
+                            <Button onClick={addExistingDocumentsToAsset}>Add document</Button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

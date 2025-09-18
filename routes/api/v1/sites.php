@@ -67,23 +67,28 @@ Route::middleware([
 
                 // Post a new document to a site
                 Route::post('', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Site $site) {
-                    if (Auth::user()->cannot('view', $site))
+                    if (Auth::user()->cannot('update', $site))
                         return ApiResponse::notAuthorized();
 
-                    $files = $documentUploadRequest->validated('files');
-                    if ($files) {
-                        $documentService->uploadAndAttachDocuments($site, $files);
+                    if ($documentUploadRequest->validated('files')) {
+                        $documentService->uploadAndAttachDocuments($site, $documentUploadRequest->validated('files'));
                     }
+
+                    if ($documentUploadRequest->validated('existing_documents'))
+                        $documentService->attachExistingDocumentsToModel($site, $documentUploadRequest->validated('existing_documents'));
 
                     return ApiResponse::success(null, 'Document added');
                 })->name('api.sites.documents.post');
 
                 // Detach a document from a location
                 Route::patch('', function (Site $site, Request $request) {
+                    Debugbar::info('detach document', $request->all());
+                    
                     $validated = $request->validateWithBag('errors', [
                         'document_id' => 'required|exists:documents,id'
                     ]);
-
+                    
+                    
                     app(DocumentService::class)->detachDocumentFromModel($site, $validated['document_id']);
                     return ApiResponse::success([], 'Document removed');
                 })->name('api.sites.documents.detach');
