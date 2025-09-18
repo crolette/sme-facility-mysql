@@ -18,11 +18,13 @@ type FormDataTicket = {
     reporter_email: string;
     being_notified: boolean;
     pictures: File[];
+    website: string;
 };
 
 export default function CreateTicketFromQRCode({ item, location_type }: { item: Asset | TenantSite | TenantBuilding | TenantFloor | TenantRoom; location_type: string }) {
 
     const updateTicketData = {
+        website: '',
         ticket_id: null,
         location_type: location_type,
         location_code: item.reference_code,
@@ -68,6 +70,19 @@ export default function CreateTicketFromQRCode({ item, location_type }: { item: 
                         <p>{item.category}</p>
                     </div>
                     <form onSubmit={submitTicket} className="flex flex-col gap-4">
+                        <Input
+                            name="website"
+                            value={newTicketData.website}
+                            tabIndex={-1}
+                            autoComplete="off"
+                            style={{ display: 'none' }}
+                            onChange={(e) =>
+                                setNewTicketData((prev) => ({
+                                    ...prev,
+                                    website: e.target.value,
+                                }))
+                            }
+                        />
                         <Label htmlFor="reporter_email">E-mail address</Label>
                         <Input
                             id="reporter_email"
@@ -122,19 +137,19 @@ export default function CreateTicketFromQRCode({ item, location_type }: { item: 
                         <InputError message={errors ? Object.getOwnPropertyDescriptor(errors, 'pictures.1')?.value : ''} />
                         <InputError message={errors ? Object.getOwnPropertyDescriptor(errors, 'pictures.2')?.value : ''} />
 
-                            <div className="flex items-center gap-4">
-                                <Label htmlFor="notified">Do you want to be notified when the ticket is closed ? </Label>
-                                <Checkbox
-                                    id="notified"
-                                    checked={newTicketData.being_notified}
-                                    onClick={() => {
-                                        setNewTicketData((prev) => ({
-                                            ...prev,
-                                            being_notified: !newTicketData.being_notified,
-                                        }));
-                                    }}
-                                />
-                            </div>
+                        <div className="flex items-center gap-4">
+                            <Label htmlFor="notified">Do you want to be notified when the ticket is closed ? </Label>
+                            <Checkbox
+                                id="notified"
+                                checked={newTicketData.being_notified}
+                                onClick={() => {
+                                    setNewTicketData((prev) => ({
+                                        ...prev,
+                                        being_notified: !newTicketData.being_notified,
+                                    }));
+                                }}
+                            />
+                        </div>
                         <Button>Add new ticket</Button>
                     </form>
                 </div>

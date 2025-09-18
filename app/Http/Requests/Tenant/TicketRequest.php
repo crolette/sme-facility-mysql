@@ -54,6 +54,7 @@ class TicketRequest extends FormRequest
         $data = $this->all();
 
         return [
+            'website' => 'prohibited',
             'ticket_id' => ['nullable', 'integer', Rule::exists('tickets', 'id')],
             'location_type' => ['required', 'string', Rule::in(['sites', 'buildings', 'floors', 'rooms', 'assets'])],
             'location_code' => ['required', 'string'],
