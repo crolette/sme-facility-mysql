@@ -7,6 +7,7 @@ use App\Services\QRCodeService;
 use App\Services\PictureService;
 use App\Services\ContractService;
 use App\Services\DocumentService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Controllers\API\V1\APIFloorController;
@@ -37,6 +38,9 @@ Route::middleware([
         Route::delete('/', [APIFloorController::class, 'destroy'])->name('api.floors.destroy');
 
         Route::post('/qr/regen', function (Floor $floor, QRCodeService $qRCodeService) {
+            if (Auth::user()->cannot('update', $floor))
+                return ApiResponse::notAuthorized();
+
             $qRCodeService->createAndAttachQR($floor);
             return ApiResponse::success();
         })->name('api.floors.qr.regen');

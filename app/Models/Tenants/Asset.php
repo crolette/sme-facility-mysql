@@ -41,7 +41,8 @@ class Asset extends Model
         'brand',
         'model',
         'qr_code',
-        'is_mobile'
+        'is_mobile',
+        'qr_hash'
     ];
 
     protected $hidden = [

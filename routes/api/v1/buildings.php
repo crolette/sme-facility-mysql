@@ -7,6 +7,7 @@ use App\Models\Tenants\Building;
 use App\Services\PictureService;
 use App\Services\ContractService;
 use App\Services\DocumentService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
@@ -33,6 +34,9 @@ Route::middleware([
         Route::delete('/', [APIBuildingController::class, 'destroy'])->name('api.buildings.destroy');
 
         Route::post('/qr/regen', function (Building $building, QRCodeService $qRCodeService) {
+            if (Auth::user()->cannot('update', $building))
+                return ApiResponse::notAuthorized();
+            
             $qRCodeService->createAndAttachQR($building);
             return ApiResponse::success();
         })->name('api.buildings.qr.regen');

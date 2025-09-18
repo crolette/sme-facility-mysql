@@ -227,3 +227,33 @@ test('test access roles to force delete any asset', function (string $role, int 
     ['Maintenance Manager', 403],
     ['Provider', 403]
 ]);
+
+test('cannot regenerate a QR Code if user is not maintenance manager from the asset', function (string $role, int $expectedStatus) {
+
+    $user = User::factory()->withRole($role)->create();
+    $user->assignRole($role);
+    $this->actingAs($user, 'tenant');
+
+    $response = $this->postToTenant('api.assets.qr.regen', [], $this->asset->reference_code);
+    $response->assertStatus($expectedStatus);
+})->with([
+    ['Admin', 200],
+    ['Maintenance Manager', 403],
+    ['Provider', 403]
+]);
+
+test('can regenerate a QR Code if user is not maintenance manager from the asset', function (string $role, int $expectedStatus) {
+
+    $user = User::factory()->withRole($role)->create();
+    $user->assignRole($role);
+    $this->actingAs($user, 'tenant');
+    $this->asset->maintainable()->update(['maintenance_manager_id' => $user->id]);
+
+    $response = $this->postToTenant('api.assets.qr.regen', [], $this->asset->reference_code);
+    $response->assertStatus($expectedStatus);
+})->with([
+    ['Admin', 200],
+    ['Maintenance Manager', 200],
+    ['Provider', 403]
+]);
+

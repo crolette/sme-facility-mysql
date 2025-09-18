@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 use Inertia\Inertia;
 use App\Models\Tenant;
+use tbQuar\Facades\Quar;
 use App\Jobs\DeleteDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AuthenticateTenant;
 use Stancl\Tenancy\Middleware\ScopeSessions;
 use App\Http\Controllers\Tenants\UserController;
-use App\Http\Controllers\Tenants\QRCodeController;
 use App\Http\Controllers\Tenants\TicketController;
 use App\Http\Controllers\API\V1\APITicketController;
 use App\Http\Controllers\Tenants\ContractController;
@@ -65,8 +65,6 @@ Route::middleware([
 
     Route::resource('contracts', ContractController::class)->parameters(['contracts' => 'contract'])->only('index', 'show', 'create', 'edit')->names('tenant.contracts');
 
-
-
     // PROVIDERS
     Route::prefix('providers')->group(function () {
         Route::get('/', [ProviderController::class, 'index'])->name('tenant.providers.index');
@@ -106,15 +104,15 @@ Route::middleware(array_merge([
     PreventAccessFromCentralDomains::class,
 ], app()->environment('local') ? [] : ['throttle:6,60']))->group(function () {
 
-    Route::get('/assets/{asset}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromAsset'])->name('tenant.assets.tickets.create');
+    Route::get('/assets/{qr_hash}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromAsset'])->name('tenant.assets.tickets.create');
 
-    Route::get('/sites/{site}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromSite'])->name('tenant.sites.tickets.create');
+    Route::get('/sites/{qr_hash}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromSite'])->name('tenant.sites.tickets.create');
 
-    Route::get('/buildings/{building}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromBuilding'])->name('tenant.buildings.tickets.create');
+    Route::get('/buildings/{qr_hash}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromBuilding'])->name('tenant.buildings.tickets.create');
 
-    Route::get('/floors/{floor}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromFloor'])->name('tenant.floors.tickets.create');
+    Route::get('/floors/{qr_hash}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromFloor'])->name('tenant.floors.tickets.create');
 
-    Route::get('/rooms/{room}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromRoom'])->name('tenant.rooms.tickets.create');
+    Route::get('/rooms/{qr_hash}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromRoom'])->name('tenant.rooms.tickets.create');
 
     // Post a new ticket
     Route::post('/', [APITicketController::class, 'store'])->name('api.tickets.store');

@@ -15,34 +15,33 @@ use Illuminate\Database\Eloquent\Model;
 
 class CreateTicketFromQRCodeController extends Controller
 {
-    public function createFromAsset(Asset $asset)
+    public function createFromAsset(string $qr_hash)
     {
-        
-        $asset = Asset::select('id', 'code', 'reference_code', 'location_type', 'location_id', 'category_type_id')->where('reference_code', $asset->reference_code)->with('maintainable:id,maintainable_type,maintainable_id,name,description')->first();
+        $asset = Asset::select('id', 'code', 'reference_code', 'location_type', 'location_id', 'category_type_id')->where('qr_hash', $qr_hash)->with('maintainable:id,maintainable_type,maintainable_id,name,description')->first();
         return $this->create($asset, 'assets');
     }
 
-    public function createFromSite(Site $site)
+    public function createFromSite(string $qr_hash)
     {
-        $site = Site::select('id', 'code', 'reference_code', 'location_type_id')->where('reference_code', $site->reference_code)->with('maintainable:id,maintainable_type,maintainable_id,name,description')->first();
+        $site = Site::select('id', 'code', 'reference_code', 'location_type_id')->where('qr_hash', $qr_hash)->with('maintainable:id,maintainable_type,maintainable_id,name,description')->first();
         return $this->create($site, 'sites');
     }
 
-    public function createFromBuilding(Building $building)
+    public function createFromBuilding(string $qr_hash)
     {
-        $building = Building::select('id', 'code', 'reference_code', 'location_type_id')->where('reference_code', $building->reference_code)->with('maintainable:id,maintainable_type,maintainable_id,name,description')->first();
+        $building = Building::select('id', 'code', 'reference_code', 'location_type_id')->where('qr_hash', $qr_hash)->with('maintainable:id,maintainable_type,maintainable_id,name,description')->first();
         return $this->create($building, 'buildings');
     }
 
-    public function createFromFloor(Floor $floor)
+    public function createFromFloor(string $qr_hash)
     {
-        $floor = Floor::select('id', 'code', 'reference_code', 'location_type_id')->where('reference_code', $floor->reference_code)->with('maintainable:id,maintainable_type,maintainable_id,name,description')->first();
+        $floor = Floor::select('id', 'code', 'reference_code', 'location_type_id')->where('qr_hash', $qr_hash)->with('maintainable:id,maintainable_type,maintainable_id,name,description')->first();
         return $this->create($floor, 'floors');
     }
 
-    public function createFromRoom(Room $room)
+    public function createFromRoom(string $qr_hash)
     {
-        $room = Room::select('id', 'code', 'reference_code', 'location_type_id')->where('reference_code', $room->reference_code)->with('maintainable:id,maintainable_type,maintainable_id,name,description')->first();
+        $room = Room::select('id', 'code', 'reference_code', 'location_type_id')->where('qr_hash', $qr_hash)->with('maintainable:id,maintainable_type,maintainable_id,name,description')->first();
         return $this->create($room, 'rooms');
     }
 

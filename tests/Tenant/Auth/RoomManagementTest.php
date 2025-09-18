@@ -189,3 +189,32 @@ test('test access roles to delete room with maintenance manager', function (stri
     ['Maintenance Manager', 403],
     ['Provider', 403]
 ]);
+
+test('cannot regenerate a QR Code if user is not maintenance manager from the room', function (string $role, int $expectedStatus) {
+
+    $user = User::factory()->withRole($role)->create();
+    $user->assignRole($role);
+    $this->actingAs($user, 'tenant');
+
+    $response = $this->postToTenant('api.rooms.qr.regen', [], $this->room->reference_code);
+    $response->assertStatus($expectedStatus);
+})->with([
+    ['Admin', 200],
+    ['Maintenance Manager', 403],
+    ['Provider', 403]
+]);
+
+test('can regenerate a QR Code if user is not maintenance manager from the room', function (string $role, int $expectedStatus) {
+
+    $user = User::factory()->withRole($role)->create();
+    $user->assignRole($role);
+    $this->actingAs($user, 'tenant');
+    $this->room->maintainable()->update(['maintenance_manager_id' => $user->id]);
+
+    $response = $this->postToTenant('api.rooms.qr.regen', [], $this->room->reference_code);
+    $response->assertStatus($expectedStatus);
+})->with([
+    ['Admin', 200],
+    ['Maintenance Manager', 200],
+    ['Provider', 403]
+]);
