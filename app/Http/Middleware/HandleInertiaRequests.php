@@ -52,20 +52,24 @@ class HandleInertiaRequests extends Middleware
      * @return array<string, mixed>
      */
     public function share(Request $request): array
-    {   
+    {
         // dd(Company::first()->logo_path);
+
         
         if(session()->missing('tenantName') || session()->missing('tenantLogo')){
-            $company = Company::first();
-            session(['tenantName' => $company->name ?? config('app.name')]);
-            session(['tenantLogo' => $company->logo]);
+            if(tenancy()->tenant) {
+                $company = Company::first();
+                session(['tenantName' => $company->name ?? config('app.name')]);
+                session(['tenantLogo' => $company->logo]);
+            }
         }
 
+        // dd(session('tenantName'));
 
         return [
             ...parent::share($request),
             'name' => config('app.name'),
-            'tenant' => ['name' => session('tenantName'), 'logo' => session('tenantLogo')],
+            'tenant' => ['name' => session('tenantName') ?? config('app.name'), 'logo' => session('tenantLogo')],
             'auth' => [
                 'user' => $request->user(),
             ],
