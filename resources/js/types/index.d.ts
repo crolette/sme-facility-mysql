@@ -26,9 +26,10 @@ export interface NavItem {
 type FlashType = 'success' | 'error' | 'warning' | 'info';
 
 export interface Flash {
-    status?: string;
+    status: string;
     message: string;
     type: FlashType;
+    errors?: string[];
 }
 
 export type LocationLevel = 'site' | 'building' | 'floor' | 'room';
@@ -223,6 +224,7 @@ export interface Ticket {
     being_notified: boolean;
     code: string;
     closed_at?: string;
+    ticketable_route: string;
     created_at: string;
     updated_at: string;
     pictures?: Picture[];

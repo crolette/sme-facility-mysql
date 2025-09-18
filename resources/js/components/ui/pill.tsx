@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const pillVariants = cva(
-  "rounded-full bg-sidebar-accent py-1 px-2 text-background dark:text-foreground",
+  "rounded-full bg-sidebar-accent py-1 px-2 text-background dark:text-foreground w-fit",
   {
     variants: {
       variant: {

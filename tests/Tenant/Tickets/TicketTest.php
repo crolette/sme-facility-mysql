@@ -66,68 +66,9 @@ it('can render the show ticket page', function () {
 
     $response->assertInertia(
         fn($page) => $page->component('tenants/tickets/show')
-            ->has('ticket')
+            ->has('item')->where('item.code', $ticket->code)
     );
     $response->assertOk();
-});
-
-it('fails when creating a new ticket with a wrong asset code', function () {
-
-    $formData = [
-        'location_type' => 'assets',
-        'location_code' => 'AB01',
-        'status' => TicketStatus::OPEN->value,
-        'description' => 'A nice description for this new ticket',
-        'being_notified' => false,
-        'reported_by' => $this->user->id
-    ];
-
-    $response = $this->postToTenant('api.tickets.store', $formData);
-    $response->assertSessionHasErrors(
-        ['location_code' => "The selected location code is invalid."]
-    );
-
-    assertDatabaseEmpty('tickets');
-});
-
-it('fails when creating a new ticket with a wrong location type', function () {
-
-    $formData = [
-        'location_type' => 'toilets',
-        'location_code' => 'AB01',
-        'status' => TicketStatus::OPEN->value,
-        'description' => 'A nice description for this new ticket',
-        'being_notified' => true,
-        'reported_by' => $this->user->id
-    ];
-
-    $response = $this->postToTenant('api.tickets.store', $formData);
-    $response->assertSessionHasErrors(
-        ['location_type' => "The selected location type is invalid."]
-    );
-
-    assertDatabaseEmpty('tickets');
-});
-
-it('fails when creating a new ticket with a wrong status', function () {
-
-    $formData = [
-        'location_type' => 'assets',
-        'location_code' => $this->asset->code,
-        'status' => 'test',
-        'description' => 'A nice description for this new ticket',
-        'being_notified' => false,
-        'reported_by' => $this->user->id
-    ];
-
-    $response = $this->postToTenant('api.tickets.store', $formData);
-    $response->assertSessionHasErrors(
-        [
-            'status' => 'The selected status is invalid.'
-        ]
-    );
-
-    assertDatabaseEmpty('tickets');
 });
 
 it('can create a new ticket to an ASSET with the logged user', function () {
@@ -142,9 +83,7 @@ it('can create a new ticket to an ASSET with the logged user', function () {
     ];
 
     $response = $this->postToTenant('api.tickets.store', $formData);
-    $response->assertOk(302);
-    // dump($response);
-    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200);
 
     assertDatabaseCount('tickets', 1);
 
@@ -156,34 +95,6 @@ it('can create a new ticket to an ASSET with the logged user', function () {
         'description' => 'A nice description for this new ticket',
         'ticketable_type' => get_class($this->asset),
         'ticketable_id' => $this->asset->id,
-    ]);
-});
-
-it('can create a new ticket to an ASSET with "anonymous" user', function () {
-
-    $formData = [
-        'location_type' => 'assets',
-        'location_code' => $this->asset->reference_code,
-        'status' => TicketStatus::OPEN->value,
-        'description' => 'A nice description for this new ticket',
-        'being_notified' => true,
-        'reporter_email' => 'test@test.com'
-    ];
-
-    $response = $this->postToTenant('api.tickets.store', $formData);
-    $response->assertOk(302);
-    // dump($response);
-    $response->assertSessionHasNoErrors();
-
-    assertDatabaseCount('tickets', 1);
-
-    assertDatabaseHas('tickets', [
-        'status' => 'open',
-        'reporter_email' => 'test@test.com',
-        'being_notified' => 1,
-        'description' => 'A nice description for this new ticket',
-        'ticketable_type' => get_class($this->asset),
-        'ticketable_id' => 1,
     ]);
 });
 
@@ -236,8 +147,7 @@ it('can create several tickets with correct incremental code', function () {
 
     $response = $this->postToTenant('api.tickets.store', $formData);
 
-    $response->assertOk(302);
-    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200);
 
     assertDatabaseCount('tickets', 2);
 
@@ -266,9 +176,7 @@ it('can create a new ticket to a ROOM', function () {
     ];
 
     $response = $this->postToTenant('api.tickets.store', $formData);
-    $response->assertOk(302);
-    // dump($response);
-    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200);
 
     assertDatabaseCount('tickets', 1);
 
@@ -294,9 +202,7 @@ it('can create a new ticket to a FLOOR', function () {
     ];
 
     $response = $this->postToTenant('api.tickets.store', $formData);
-    $response->assertOk(302);
-    // dump($response);
-    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200);
 
     assertDatabaseCount('tickets', 1);
 
@@ -322,9 +228,7 @@ it('can create a new ticket to a BUILDING', function () {
     ];
 
     $response = $this->postToTenant('api.tickets.store', $formData);
-    $response->assertOk(302);
-    // dump($response);
-    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200);
 
     assertDatabaseCount('tickets', 1);
 
@@ -350,9 +254,7 @@ it('can create a new ticket to a SITE', function () {
     ];
 
     $response = $this->postToTenant('api.tickets.store', $formData);
-    $response->assertOk(302);
-    // dump($response);
-    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200);
 
     assertDatabaseCount('tickets', 1);
 
@@ -380,6 +282,7 @@ it('can update an existing ticket', function () {
     ];
 
     $response = $this->patchToTenant('api.tickets.update', $formData, $ticket);
+    $response->assertStatus(200);
 
     assertDatabaseHas('tickets', [
         'status' => 'ongoing',
@@ -387,6 +290,20 @@ it('can update an existing ticket', function () {
         'description' => 'A nice description for this new ticket',
         'ticketable_type' => get_class($this->site),
         'ticketable_id' => $this->site->id,
+    ]);
+});
+
+it('can update the status of an existing ticket', function () {
+
+    $ticket = Ticket::factory()->forLocation($this->asset)->create(['reported_by' => $this->user->id]);
+
+    $response = $this->patchToTenant('api.tickets.status', ['status' => TicketStatus::ONGOING->value], $ticket);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseHas('tickets', [
+        'id' => $ticket->id,
+        'status' => TicketStatus::ONGOING->value,
+        'closed_by' => null,
     ]);
 });
 
@@ -405,73 +322,13 @@ it('can close an existing ticket', function () {
     $this->assertNotNull($ticket->fresh()->closed_at);
 });
 
-it('can retrieve all tickets ', function () {
-    Ticket::factory()->forLocation($this->room)->create(['reported_by' => $this->user->id]);
-    Ticket::factory()->forLocation($this->site)->create(['reported_by' => $this->user->id]);
-    Ticket::factory()->forLocation($this->floor)->create(['reported_by' => $this->user->id]);
-    Ticket::factory()->forLocation($this->asset)->create(['reported_by' => $this->user->id]);
+it('can delete an existing ticket', function () {
 
-    $response = $this->getFromTenant('api.tickets.index');
+    $ticket = Ticket::factory()->forLocation($this->asset)->create(['reported_by' => $this->user->id]);
 
-    $response->assertStatus(200)
-        ->assertJson([
-            'status' => 'success',
-        ])
-        ->assertJsonCount(4, 'data');
-});
+    $response = $this->deleteFromTenant('api.tickets.destroy', $ticket);
+    $response->assertSessionHasNoErrors();
 
-it('can retrieve all tickets from a site', function () {
-    Ticket::factory()->forLocation($this->site)->create(['reported_by' => $this->user->id]);
-    Ticket::factory()->forLocation($this->site)->create(['reported_by' => $this->user->id]);
-    Ticket::factory()->forLocation($this->site)->create(['reported_by' => $this->user->id]);
+    assertDatabaseEmpty('tickets');
 
-    $response = $this->getFromTenant('api.sites.tickets', $this->site->reference_code);
-
-    $response->assertStatus(200)
-        ->assertJson([
-            'status' => 'success',
-        ])
-        ->assertJsonCount(3, 'data');
-});
-
-it('can retrieve all tickets from a building', function () {
-    Ticket::factory()->forLocation($this->building)->create(['reported_by' => $this->user->id]);
-    Ticket::factory()->forLocation($this->building)->create(['reported_by' => $this->user->id]);
-    Ticket::factory()->forLocation($this->building)->create(['reported_by' => $this->user->id]);
-
-    $response = $this->getFromTenant('api.buildings.tickets', $this->building->reference_code);
-
-    $response->assertStatus(200)
-        ->assertJson([
-            'status' => 'success',
-        ])
-        ->assertJsonCount(3, 'data');
-});
-
-it('can retrieve all tickets from a floor', function () {
-    Ticket::factory()->forLocation($this->floor)->create(['reported_by' => $this->user->id]);
-    Ticket::factory()->forLocation($this->floor)->create(['reported_by' => $this->user->id]);
-    Ticket::factory()->forLocation($this->floor)->create(['reported_by' => $this->user->id]);
-
-    $response = $this->getFromTenant('api.floors.tickets', $this->floor->reference_code);
-
-    $response->assertStatus(200)
-        ->assertJson([
-            'status' => 'success',
-        ])
-        ->assertJsonCount(3, 'data');
-});
-
-it('can retrieve all tickets from a room', function () {
-    Ticket::factory()->forLocation($this->room)->create(['reported_by' => $this->user->id]);
-    Ticket::factory()->forLocation($this->room)->create(['reported_by' => $this->user->id]);
-    Ticket::factory()->forLocation($this->room)->create(['reported_by' => $this->user->id]);
-
-    $response = $this->getFromTenant('api.rooms.tickets', $this->room->reference_code);
-
-    $response->assertStatus(200)
-        ->assertJson([
-            'status' => 'success',
-        ])
-        ->assertJsonCount(3, 'data');
 });

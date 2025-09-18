@@ -1,10 +1,12 @@
 import { cn } from "@/lib/utils";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
+import { Pill } from "../ui/pill";
 
 interface InfosProps {
     name: string;
     code: string;
+    status?: string;
     reference?: string;
     levelPath: string;
     levelName: string;
@@ -90,6 +92,22 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
             tabDisplay: 'assets',
         }]
     
+    if (menu === 'ticket')
+        navSidebar = [
+            {
+                tabName: 'information',
+                tabDisplay: 'Infos',
+            },
+            {
+                tabName: 'pictures',
+                tabDisplay: 'pictures',
+            },
+            {
+                tabName: 'interventions',
+                tabDisplay: 'interventions',
+            },
+        ];
+    
     if (menu === 'contract')
         navSidebar = [
             {
@@ -109,15 +127,17 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     return (
         <div className="bg-sidebar border-sidebar-border flex h-fit flex-col gap-2 rounded-md shadow-xl">
-            <div className="flex flex-col gap-1 px-4 py-2 text-center">
+            <div className="flex flex-col gap-1 px-4 py-2 items-center text-center">
                 <p className="font-semibold">{infos.name}</p>
 
                 <p className="text-sm">{infos.code ?? ''}</p>
+                {infos.status && <Pill variant={infos.status}>{infos.status}</Pill>}
                 <p className="text-xs">{infos.reference ?? ''}</p>
-                    <a href={infos.levelPath} className="text-sm">
-                        {infos.levelName}
-                    </a>
+                <a href={infos.levelPath} className="text-sm">
+                    {infos.levelName}
+                </a>
             </div>
+            
             {/* MOBILE MENU */}
             <ul className="relative mb-2 lg:hidden">
                 <li className="bg-sidebar-accent flex cursor-pointer justify-between p-2" onClick={() => setShowMobileMenu(!showMobileMenu)}>

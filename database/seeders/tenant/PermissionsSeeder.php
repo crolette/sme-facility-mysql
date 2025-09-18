@@ -67,7 +67,6 @@ class PermissionsSeeder extends Seeder
                 'view tickets',
                 'create tickets',
                 'update tickets',
-                'delete tickets',
 
                 'view interventions',
                 'create interventions',

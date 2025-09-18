@@ -72,8 +72,6 @@ export const ContractsList = ({
         }
     };
 
-    console.log(items);
-
     return (
         <>
             {items && items.length > 0 && (

@@ -157,6 +157,13 @@ class Asset extends Model
         );
     }
 
+    public function locationRoute(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => route('tenant.assets.show', $this->reference_code)
+        );
+    }
+
     public function name(): Attribute
     {
         return Attribute::make(

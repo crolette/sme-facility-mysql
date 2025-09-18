@@ -55,9 +55,6 @@ class Building extends Model
         'name',
         'description',
         'category',
-        'floor_material',
-        'wall_material',
-        'outdoor_material'
     ];
 
     // Ensure route model binding use the slug instead of ID

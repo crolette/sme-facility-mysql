@@ -77,7 +77,11 @@ class TenantSiteController extends Controller
         if (Auth::user()->cannot('view', $site))
             abort(403);
 
-        return Inertia::render('tenants/locations/show', ['routeName' => 'sites', 'item' => $site->load(['locationType', 'documents', 'maintainable.manager', 'maintainable.providers', 'contracts', 'contracts.provider'])]);
+        $site = Site::where('reference_code', $site->reference_code)->with(['floor', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers', 'contracts', 'contracts.provider'])->first();
+        $site->append('level_path', 'floor_material', 'wall_material');
+
+
+        return Inertia::render('tenants/locations/show', ['routeName' => 'sites', 'item' => $site]);
     }
 
     /**

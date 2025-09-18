@@ -27,7 +27,7 @@ class Picture extends Model
         'sizeMo'
     ];
 
-    public const MAX_UPLOAD_SIZE_MB = 4;
+    public const MAX_UPLOAD_SIZE_MB = 6;
 
     public static function maxUploadSizeKB(): int
     {

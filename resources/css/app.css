@@ -209,13 +209,8 @@ div:has(+ input:required)::after {
     font-weight: bold;
 }
 
-label:has(+ select:required)::after {
-    content: '*';
-    color: var(--color-destructive);
-    font-size: large;
-    font-weight: bold;
-}
-
+label:has(+ select:required)::after,
+label:has(+ textarea:required)::after,
 label:has(+ input:required)::after {
     content: '*';
     color: var(--color-destructive);

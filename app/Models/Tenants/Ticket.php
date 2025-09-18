@@ -31,11 +31,12 @@ class Ticket extends Model
 
     protected $appends = [
         'asset_code',
+        'ticketable_route',
     ];
 
     protected $with = [
         'reporter:id,first_name,last_name',
-        'reporter:id,first_name,last_name',
+        
         'interventions',
     ];
 
@@ -51,8 +52,23 @@ class Ticket extends Model
             'closed_at' => 'date:d-m-Y h:i',
             'created_at' => 'date:d-m-Y H:i',
             'updated_at' => 'date:d-m-Y H:i',
-            'being_notified' => 'boolean'
+            'being_notified' => 'boolean',
+            'status' => TicketStatus::class
         ];
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($ticket) {
+            $ticket->interventions()->delete();
+
+            // TODO service to delete pictures from the disk
+            $ticket->pictures()->delete();
+        });
+
+        
     }
 
 
@@ -90,6 +106,13 @@ class Ticket extends Model
         $this->closed_at = now();
 
         return $this->save();
+    }
+
+    public function ticketableRoute(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->ticketable->locationRoute ?? ''
+        );
     }
 
     public function assetCode(): Attribute

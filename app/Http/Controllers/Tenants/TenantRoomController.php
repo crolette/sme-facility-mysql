@@ -71,7 +71,7 @@ class TenantRoomController extends Controller
             abort(403);
 
         $room = Room::where('reference_code', $room->reference_code)->with(['floor', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers', 'contracts', 'contracts.provider'])->first();
-        $room->append('level_path');
+        $room->append('level_path', 'floor_material', 'wall_material');
 
         return Inertia::render('tenants/locations/show', ['routeName' => 'rooms', 'item' => $room]);
     }

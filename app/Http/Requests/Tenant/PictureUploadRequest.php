@@ -26,7 +26,7 @@ class PictureUploadRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'pictures' => 'nullable|array',
+            'pictures' => 'nullable|array|max:3',
             'pictures.*' => 'image|mimes:jpg,jpeg,png|max:' . Picture::maxUploadSizeKB(),
         ];
     }

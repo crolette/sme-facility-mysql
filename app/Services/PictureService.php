@@ -18,13 +18,14 @@ class PictureService
     public function uploadAndAttachPictures(Model $model, array $files, ?string $email = null): void
     {
         $tenantId = tenancy()->tenant->id;
-        $modelType = Str::plural(Str::lower(class_basename($model))); // e.g., "assets", "sites", "buildings"
+        $modelType = Str::plural(Str::lower(class_basename($model))); // e.g., "assets", "sites", "buildings", "tickets",...
         $modelId = $model->id;
 
         foreach ($files as $file) {
             try {
                 Debugbar::info('pictureservice', $file);
-                $directory = "$tenantId/$modelType/$modelId/pictures";
+                
+                $directory = "$tenantId/$modelType/$modelId/pictures"; // e.g., "webxp/tickets/1/pictures"
 
                 $newfileName = Str::chopEnd($file->getClientOriginalName(), ['.png', '.jpg', '.jpeg']);
 
