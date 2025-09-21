@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Events\TicketCreated;
 use Exception;
 use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
@@ -67,6 +68,8 @@ class APITicketController extends Controller
 
             $ticket->ticketable()->associate($location);
             $ticket->save();
+
+            event(new TicketCreated($ticket, $location));
 
             // TODO Send email to admin / maintenance manager if not the one who created the ticket
 

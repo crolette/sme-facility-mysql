@@ -6,6 +6,8 @@ use Inertia\Inertia;
 use App\Models\Tenant;
 use tbQuar\Facades\Quar;
 use App\Jobs\DeleteDatabase;
+use App\Models\Tenants\Ticket;
+use App\Mail\TicketCreatedMail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AuthenticateTenant;
@@ -54,6 +56,14 @@ Route::middleware([
     PreventAccessFromCentralDomains::class,
     'auth:tenant'
 ])->group(function () {
+
+//     Route::get('/mail', function () {
+
+//     // Claimed Location
+//     $param1 = Ticket::first();
+//     return (new TicketCreatedMail($param1, $param1->ticketable))->render();
+// });
+
     Route::get('dashboard', [DashboardController::class, 'show'])->name('tenant.dashboard');
 
     Route::resource('sites', TenantSiteController::class)->parameters(['sites' => 'site'])->only('index', 'show', 'create', 'edit')->names('tenant.sites');

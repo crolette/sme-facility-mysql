@@ -86,7 +86,7 @@ export default function CreateTicketFromQRCode({ item, location_type }: { item: 
                         <Label htmlFor="reporter_email">E-mail address</Label>
                         <Input
                             id="reporter_email"
-                            type="text"
+                            type="email"
                             name="reporter_email"
                             value={newTicketData.reporter_email}
                             required
