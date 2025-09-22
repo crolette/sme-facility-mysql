@@ -27,21 +27,27 @@ class TicketCreatedListener
     public function handle(TicketCreated $event): void
     {
         Debugbar::info('TICKET CREATED LISTENER');
-        if (env('APP_ENV') !== "production") {
+        if (env('APP_ENV') === "local") {
 
             $user = Auth::user();
 
                 Mail::to('crolweb@gmail.com')
                     ->locale($user->preferred_locale ?? config('app.locale'))
-                    ->send(new TicketCreatedMail($event->ticket, $event->model, $user));
+                    ->send(new TicketCreatedMail($event->ticket, $event->model));
         } else {
 
-            $users = User::role(['Super Admin', 'Moderator', 'Admin'])->get();
+            $users = User::role(['Admin'])->get();
 
             foreach ($users as $user) {
                 Mail::to($user->email)
                     ->locale($user->preferred_locale ?? config('app.locale'))
-                    ->send(new TicketCreatedMail($event->ticket, $event->model, $user));
+                    ->send(new TicketCreatedMail($event->ticket, $event->model));
+            }
+
+            if($event->ticket->ticketable->manager) {
+                Mail::to($event->ticket->ticketable->manager->email)
+                    ->locale(config('app.locale'))
+                    ->send(new TicketCreatedMail($event->ticket, $event->model));
             }
         }
     }

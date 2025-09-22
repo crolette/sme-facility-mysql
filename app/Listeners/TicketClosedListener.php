@@ -29,7 +29,7 @@ class TicketClosedListener
     public function handle(TicketClosed $event): void
     {
         Debugbar::info('TICKET CLOSED LISTENER');
-        if (env('APP_ENV') !== "production") {
+        if (env('APP_ENV') === "local") {
 
             if($event->ticket->being_notified) {
                 $user = Auth::user();
