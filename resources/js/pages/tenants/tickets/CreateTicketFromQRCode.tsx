@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Asset, TenantBuilding, TenantFloor, TenantRoom, TenantSite, Ticket } from '@/types';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
-import { BadgeAlert, BadgeCheck } from 'lucide-react';
+import { BadgeAlert, BadgeCheck, Loader } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
 type FormDataTicket = {
@@ -37,6 +37,7 @@ export default function CreateTicketFromQRCode({ item, location_type }: { item: 
     const [newTicketData, setNewTicketData] = useState<FormDataTicket>(updateTicketData);
 
     const submitTicket: FormEventHandler = async (e) => {
+         setIsProcessing(true);
         e.preventDefault();
         try {
             const response = await axios.post(route('api.tickets.store'), newTicketData, {
@@ -47,14 +48,17 @@ export default function CreateTicketFromQRCode({ item, location_type }: { item: 
             if (response.data.status === 'success') {
                 setShowSuccessModale(true);
                 setNewTicketData(updateTicketData);
+                setIsProcessing(false);
             }
         } catch (error) {
             console.log(error.response.data);
             setErrors(error?.response.data.errors);
             setShowErrorModale(true);
+            setIsProcessing(false);
         }
     };
     const [errors, setErrors] = useState<{ [key: string]: string }>();
+    const [isProcessing, setIsProcessing] = useState(false);
     const [showSuccessModale, setShowSuccessModale] = useState<boolean>(false);
     const [showErrorModale, setShowErrorModale] = useState<boolean>(false);
 
@@ -185,6 +189,27 @@ export default function CreateTicketFromQRCode({ item, location_type }: { item: 
                                             Close
                                         </Button>
                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {isProcessing && (
+                    <div className="bg-background/50 fixed inset-0 z-50">
+                        <div className="bg-background/20 flex h-dvh items-center justify-center">
+                            <div className="bg-background flex items-center justify-center p-4 text-center md:w-1/3">
+                                <div className="flex flex-col items-center gap-4">
+                                    <Loader size={48} className="animate-pulse" />
+                                    <p className="mx-auto animate-pulse text-3xl font-bold">
+                                        Processing<span>...</span>
+                                    </p>
+                                    <p className="mx-auto">Ticket is being submitted...</p>
+                                    {/* <div className="mx-auto flex gap-4">
+                                        <Button variant={'secondary'} onClick={() => setShowErrorModale(false)}>
+                                            Close
+                                        </Button>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>

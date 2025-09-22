@@ -12,10 +12,9 @@ use Illuminate\Queue\SerializesModels;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class TicketCreatedMail extends Mailable
+class TicketClosedMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -24,13 +23,12 @@ class TicketCreatedMail extends Mailable
      */
     public function __construct(
         public Ticket $ticket,
-        public Model $model
     ) {
 
         $locale = App::getLocale();
         App::setLocale($locale);
 
-        Debugbar::info('TICKET CREATED MAIL', $ticket, $model);
+        Debugbar::info('TICKET CLOSED MAIL', $ticket);
 
     }
 
@@ -41,7 +39,7 @@ class TicketCreatedMail extends Mailable
     {
         return new Envelope(
             from: new Address('notifications@sme-facility.com', 'SME-Facility - Notification'),
-            subject: 'New ticket : ' . $this->ticket->code . ' - ' . $this->model->name,
+            subject: 'Ticket closed : ' . $this->ticket->code . ' - ' . $this->ticket->ticketable->name,
             
         );
     }
@@ -52,7 +50,7 @@ class TicketCreatedMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.ticket-created',
+            view: 'emails.ticket-closed',
         );
     }
 
@@ -63,17 +61,6 @@ class TicketCreatedMail extends Mailable
      */
     public function attachments(): array
     {
-        Debugbar::info('PICTURES TICKETS', $this->ticket->pictures);
-
-        return array_filter([
-            Attachment::fromStorageDisk('tenants', $this->ticket->pictures[0]->path),
-            $this->ticket->pictures[1]
-                ? Attachment::fromStorageDisk('tenants',  $this->ticket->pictures[1]->path)
-                : null,
-            $this->ticket->pictures[2]
-                ? Attachment::fromStorageDisk('tenants',  $this->ticket->pictures[2]->path)
-                : null,
-        ]);
-
+        return [];
     }
 }
