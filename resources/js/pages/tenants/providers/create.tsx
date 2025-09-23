@@ -1,10 +1,11 @@
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Provider } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { FormEventHandler } from 'react';
 
@@ -27,7 +28,7 @@ export default function ProviderCreateUpdate({ provider, providerCategories }: {
         },
     ];
 
-    console.log(provider);
+    const { showToast } = useToast();
     const { data, setData } = useForm<TypeFormData>({
         name: provider?.name ?? '',
         phone_number: provider?.phone_number ?? '',
@@ -45,10 +46,12 @@ export default function ProviderCreateUpdate({ provider, providerCategories }: {
             try {
                 const response = await axios.patch(route('api.providers.update', provider.id), data);
                 if (response.data.status === 'success') {
-                    window.location.href = route('tenant.providers.show', provider.id);
+                    router.visit(route('tenant.providers.show', provider.id), {
+                        preserveScroll: false,
+                    });
                 }
             } catch (error) {
-                console.log(error);
+                 showToast(error.response.data.message, error.response.data.status);
             }
         } else {
             try {
@@ -58,10 +61,13 @@ export default function ProviderCreateUpdate({ provider, providerCategories }: {
                     },
                 });
                 if (response.data.status === 'success') {
-                    window.location.href = provider ? route('tenant.providers.show', provider.id) : route('tenant.providers.index');
+                     router.visit(route('tenant.providers.show', provider.id), {
+                         preserveScroll: false,
+                     });
+             
                 }
             } catch (error) {
-                console.log(error);
+                showToast(error.response.data.message, error.response.data.status);
             }
         }
     };

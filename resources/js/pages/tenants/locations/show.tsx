@@ -8,6 +8,7 @@ import { PictureManager } from '@/components/tenant/pictureManager';
 import RealocateRoomManager from '@/components/tenant/relocateRoomManager';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
 import { TicketManager } from '@/components/tenant/ticketManager';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { Contract, TenantBuilding, TenantFloor, TenantRoom, TenantSite, type BreadcrumbItem } from '@/types';
@@ -17,6 +18,7 @@ import axios from 'axios';
 import { useState } from 'react';
 
 export default function ShowLocation({ item, routeName }: { item: TenantSite | TenantBuilding | TenantFloor | TenantRoom; routeName: string }) {
+    const { showToast } = useToast();
     const [location, setLocation] = useState(item);
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -33,16 +35,31 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
     };
 
     const generateQR = async () => {
-        const response = await axios.post(route(`api.${routeName}.qr.regen`, location.reference_code));
-        if (response.data.status === 'success') {
-            fetchLocation();
+        try {
+            const response = await axios.post(route(`api.${routeName}.qr.regen`, location.reference_code));
+            if (response.data.status === 'success') {
+                fetchLocation();
+                showToast(response.data.message, response.data.status);
+            }
+
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
     const markMaintenanceDone = async () => {
-        const response = await axios.post(route('api.maintenance.done', location.maintainable.id));
-        fetchLocation();
+        try {
+            const response = await axios.post(route('api.maintenance.done', location.maintainable.id));
+            if (response.data.status === 'success') {
+                fetchLocation();
+                showToast(response.data.message, response.data.status);
+            }
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
+        }
     };
+
+ 
 
         const [existingContracts, setExistingContracts] = useState(location.contracts ?? []);
 
@@ -75,9 +92,10 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
              if (response.data.status === 'success') {
                  setAddExistingContractModale(false);
                  fetchContracts();
+                  showToast(response.data.message, response.data.status);
              }
          } catch (error) {
-             console.log(error);
+                showToast(error.response.data.message, error.response.data.status);
          }
      };
 

@@ -10,6 +10,7 @@ import { InterventionActionManager } from './interventionActionManager';
 import { Pill } from '../ui/pill';
 import SearchableInput from '../SearchableInput';
 import { Loader, X } from 'lucide-react';
+import { useToast } from '../ToastrContext';
 
 interface InterventionManagerProps {
     itemCodeId: number | string;
@@ -38,6 +39,7 @@ type InterventionFormData = {
 
 export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, closed = false }: InterventionManagerProps) => {
     const [interventions, setInterventions] = useState<Intervention[]>([]);
+    const { showToast } = useToast();
 
     const [addIntervention, setAddIntervention] = useState<boolean>(false);
     const [submitType, setSubmitType] = useState<'edit' | 'new'>('edit');
@@ -58,9 +60,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
             const response = await axios.get(route('api.category-types', { type: 'intervention' }));
             setInterventionTypes(response.data.data);
         } catch (error) {
-            console.error('Erreur lors de la recherche :', error);
-            const errors = error.response.data.errors;
-            console.error('Erreur de validation :', errors);
+            console.log(error)
         }
     };
 
@@ -119,9 +119,11 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
             const response = await axios.post(route('api.interventions.store'), interventionDataForm);
             if (response.data.status === 'success') {
                 closeModale();
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
             console.error(error);
+             showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -161,9 +163,11 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                 setSubmitType('new');
                 setIsProcessing(false);
                 setInterventionDataForm(interventionData);
+                showToast(response.data.message, response.data.status);
+
             }
         } catch (error) {
-            console.error('Erreur lors de la recherche : ', error);
+             showToast(error.response.data.message, error.response.data.status);
             setIsProcessing(false);
         }
     };
@@ -178,9 +182,11 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
             const response = await axios.delete(route('api.interventions.destroy', id));
             if (response.data.status === 'success') {
                 fetchInterventions();
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
             console.error(error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -201,8 +207,6 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         fetchProviders(id);
         setInterventionToSend(id);
         setSendInterventionToProviderModale(true);
-
-
     };
 
 
@@ -210,11 +214,10 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         try {
             const response = await axios.get(route('api.interventions.providers', id));
             if (response.data.status === 'success') {
-                console.log(response.data)
                 setProviders(response.data.data);
             }
         } catch (error) {
-            console.log(error)
+            showToast(error.response.data.message, error.response.data.status);
         }
     }
 
@@ -228,9 +231,10 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
             const response = await axios.post(route('api.interventions.send-provider', interventionToSend), providerEmail);
             if (response.data.status === 'success') {
                 closeSendInterventionToProviderModale();
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.log(error);
+            showToast(error.response.data.message, error.response.data.status);
             setIsProcessing(false);
          }
     }

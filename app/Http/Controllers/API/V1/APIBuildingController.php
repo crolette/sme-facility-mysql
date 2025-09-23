@@ -82,7 +82,7 @@ class APIBuildingController extends Controller
                 $this->qrCodeService->createAndAttachQR($building);
 
             DB::commit();
-            return ApiResponse::success('', 'Building created');
+            return ApiResponse::successFlash('', 'Building created');
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
@@ -145,7 +145,7 @@ class APIBuildingController extends Controller
             abort(403);
 
         if (count($building->assets) > 0 || count($building->floors) > 0) {
-            abort(409)->with(['message' => 'Building cannot be deleted ! Assets and/or floors are linked to this building', 'type' => 'warning']);
+            return ApiResponse::error('Building cannot be deleted ! Assets and/or floors are linked to this building');
         }
 
         $building->delete();

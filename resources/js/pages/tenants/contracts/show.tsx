@@ -2,6 +2,7 @@ import Modale from '@/components/Modale';
 import { DocumentManager } from '@/components/tenant/documentManager';
 import { DocumentsList } from '@/components/tenant/documentsList';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { Asset, BreadcrumbItem, Contract, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from '@/types';
@@ -10,6 +11,7 @@ import axios from 'axios';
 import { useState } from 'react';
 
 export default function ShowContract({ item, objects }: { item: Contract; objects: [] }) {
+    const { showToast } = useToast();
     const [contract, setContract] = useState<Contract>(item);
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -25,15 +27,13 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                 router.visit(route('tenant.contracts.index'));
             }
         } catch (error) {
-            console.log(error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
      const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
     const [activeTab, setActiveTab] = useState('information');
     
-    console.log(objects);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Contract" />

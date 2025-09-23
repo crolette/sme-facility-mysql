@@ -2,6 +2,7 @@ import { Picture } from '@/types';
 import axios from 'axios';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { Button } from '../ui/button';
+import { useToast } from '../ToastrContext';
 
 interface PictureManagerProps {
     itemCodeId: number | string;
@@ -13,6 +14,7 @@ interface PictureManagerProps {
 }
 
 export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, deleteRoute, showRoute, canAdd = true }: PictureManagerProps) => {
+    const { showToast } = useToast();
     const [pictures, setPictures] = useState<Picture[]>([]);
     const [newPictures, setNewPictures] = useState<{ pictures: File[] } | null>(null);
     const [addPictures, setAddPictures] = useState(false);
@@ -26,7 +28,7 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
             const response = await axios.get(route(getPicturesUrl, itemCodeId));
             setPictures(response.data.data);
         } catch (error) {
-            console.error('Erreur lors de la recherche :', error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -35,9 +37,10 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
             const response = await axios.delete(route(deleteRoute, id));
             if (response.data.status === 'success') {
                 fetchPictures();
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.error('Erreur lors de la suppression', error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -53,9 +56,10 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
                 fetchPictures();
                 setNewPictures(null);
                 setAddPictures(!addPictures);
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.log(error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 

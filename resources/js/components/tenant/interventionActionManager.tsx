@@ -7,6 +7,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
+import { useToast } from '../ToastrContext';
 
 interface InterventionActionManagerProps {
     interventionId: number;
@@ -35,6 +36,7 @@ type InterventionFormData = {
 
 export const InterventionActionManager = ({ interventionId, closed, actionsChanged }: InterventionActionManagerProps) => {
     const auth = usePage().props.auth;
+    const { showToast } = useToast();
     const [interventionActions, setInterventionActions] = useState<InterventionAction[]>([]);
 
     const [addInterventionAction, setAddInterventionAction] = useState<boolean>(false);
@@ -109,9 +111,10 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
             const response = await axios.post(route('api.interventions.actions.store', interventionId), interventionActionDataForm);
             if (response.data.status === 'success') {
                 closeModale();
+               showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.error(error);
+           showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -138,6 +141,10 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
 
     const submitEditInterventionAction: FormEventHandler = async (e) => {
         e.preventDefault();
+        if (!interventionActionDataForm.action_id)
+            return;
+
+
         try {
             const response = await axios.patch(
                 route('api.interventions.actions.update', interventionActionDataForm.action_id),
@@ -145,9 +152,11 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
             );
             if (response.data.status === 'success') {
                 closeModale();
+                showToast(response.data.message, response.data.status);
+
             }
         } catch (error) {
-            console.error('Erreur lors de la recherche : ', error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -166,9 +175,10 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
             const response = await axios.delete(route('api.interventions.actions.destroy', id));
             if (response.data.status === 'success') {
                 fetchInterventionActions();
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.error(error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 

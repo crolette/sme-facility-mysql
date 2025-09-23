@@ -47,7 +47,7 @@ class APIProviderController extends Controller
 
             DB::commit();
 
-            return ApiResponse::success('', 'Provider created');
+            return ApiResponse::successFlash('', 'Provider created');
         } catch (Exception $e) {
             DB::rollback();
             return ApiResponse::error($e->getMessage());
@@ -80,7 +80,7 @@ class APIProviderController extends Controller
 
             DB::commit();
 
-            return ApiResponse::success('', 'Provider updated');
+            return ApiResponse::successFlash('', 'Provider updated');
         } catch (Exception $e) {
             DB::rollback();
             return ApiResponse::error($e->getMessage());

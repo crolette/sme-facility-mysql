@@ -1,3 +1,4 @@
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Pill } from '@/components/ui/pill';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
@@ -17,6 +18,7 @@ export default function IndexTickets() {
     ];
     const [fetchTicketStatus, setFetchTicketStatus] = useState<null | 'open' | 'ongoing' | 'closed'>('open');
     const [fetchingData, setFetchingData] = useState<boolean>(true);
+    const { showToast } = useToast();
 
     const fetchTickets = async () => {
         try {
@@ -24,7 +26,7 @@ export default function IndexTickets() {
             setTickets(response.data.data);
             setFetchingData(false);
         } catch (error) {
-            console.error('Erreur lors de la recherche :', error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -40,9 +42,10 @@ export default function IndexTickets() {
             const response = await axios.patch(route('api.tickets.status', id), { status: status });
             if (response.data.status === 'success') {
                 fetchTickets();
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.error('Erreur lors de la suppression', error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 

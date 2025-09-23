@@ -3,6 +3,7 @@ import Modale from '@/components/Modale';
 import { ContractsList } from '@/components/tenant/contractsList';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
 import { UsersList } from '@/components/tenant/usersList';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Provider } from '@/types';
@@ -13,8 +14,8 @@ import { Trash, Upload } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ProviderShow({ item }: { item: Provider }) {
+    const { showToast } = useToast();
     const [provider, setProvider] = useState(item);
-    console.log(item);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -32,7 +33,7 @@ export default function ProviderShow({ item }: { item: Provider }) {
                 router.get(route('tenant.providers.index'));
             }
         } catch (error) {
-            console.log(error.response.data.message);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -41,9 +42,10 @@ export default function ProviderShow({ item }: { item: Provider }) {
             const response = await axios.get(route('api.providers.show', provider.id));
             if (response.data.status === 'success') {
                 setProvider(response.data.data);
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.log(error.response.data.message);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -53,9 +55,10 @@ export default function ProviderShow({ item }: { item: Provider }) {
             if (response.data.status === 'success') {
                 setProvider(response.data.data);
                 fetchProvider();
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.log(error.response.data.message);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -70,8 +73,8 @@ export default function ProviderShow({ item }: { item: Provider }) {
     };
 
     const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
-     const [activeTab, setActiveTab] = useState('information');
-
+    const [activeTab, setActiveTab] = useState('information');
+    
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sites" />

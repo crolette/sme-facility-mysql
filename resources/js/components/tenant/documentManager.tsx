@@ -10,6 +10,7 @@ import { Label } from '../ui/label';
 import { Loader2 } from 'lucide-react';
 import Modale from '../Modale';
 import SearchableInput from '../SearchableInput';
+import { useToast } from '../ToastrContext';
 
 interface DocumentManagerProps {
     itemCodeId: number | string;
@@ -40,6 +41,7 @@ export const DocumentManager = ({
     removableRoute,
     canAdd = true,
 }: DocumentManagerProps) => {
+    const { showToast } = useToast();
     const [documents, setDocuments] = useState<Documents[]>();
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
 
@@ -62,7 +64,7 @@ export const DocumentManager = ({
                   fetchDocuments();
               }
           } catch (error) {
-              console.error('Erreur lors de la suppression', error);
+              showToast(error.response.data.message, error.response.data.status);
           }
         
             setIsUpdating(false);
@@ -79,10 +81,12 @@ export const DocumentManager = ({
             if (response.data.status === 'success') {
                 fetchDocuments();
                 setShowDeleteModale(false);
+                 setIsUpdating(false);
+                showToast(response.data.message, response.data.status);
                 
             }
         } catch (error) {
-            console.error('Erreur lors de la suppression', error);
+            showToast(error.response.data.message, error.response.data.status);
             setIsUpdating(false);
         }
     };
@@ -126,16 +130,21 @@ export const DocumentManager = ({
                 existing_documents: existingDocuments.map((elem) => elem.id),
             };
 
+            setIsUpdating(true);
+
             try {
                 const response = await axios.post(route(uploadRoute, itemCodeId), documents);
                 if (response.data.status === 'success') {
                     setAddExistingDocumentsModale(false);
                     fetchDocuments();
                     setExistingDocuments([])
+                    showToast(response.data.message, response.data.status);
                 }
             } catch (error) {
-                console.log(error);
+                showToast(error.response.data.message, error.response.data.status);
             }
+
+             setIsUpdating(false);
         };
 
     const fetchDocumentTypes = async () => {
@@ -200,10 +209,12 @@ export const DocumentManager = ({
             const response = await axios.patch(route(editRoute, newFileData.documentId), newFileData);
             if (response.data.status === 'success') {
                 closeFileModal();
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.error('Erreur lors de la recherche :', error);
+            showToast(error.response.data.message, error.response.data.status);
         }
+        setIsUpdating(false);
     };
 
     const submitNewFile: FormEventHandler = async (e) => {
@@ -214,14 +225,17 @@ export const DocumentManager = ({
             files: [newFileData],
         };
         try {
-            await axios.post(route(uploadRoute, itemCodeId), newFile, {
+            const response = await axios.post(route(uploadRoute, itemCodeId), newFile, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-            closeFileModal();
-        } catch (error) {
-            console.log(error);
+            if (response.data.status === 'success') {
+                closeFileModal();
+                 showToast(response.data.message, response.data.status);
+                }
+            } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
     const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);

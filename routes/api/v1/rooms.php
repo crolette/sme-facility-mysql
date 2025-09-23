@@ -46,7 +46,7 @@ Route::middleware([
                     return ApiResponse::notAuthorized();
 
                 $qRCodeService->createAndAttachQR($room);
-                return ApiResponse::success();
+                return ApiResponse::success([], 'QR Code created');
             })->name('api.rooms.qr.regen');
 
             // Get all documents from a room

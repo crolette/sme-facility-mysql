@@ -1,6 +1,7 @@
 import { InterventionManager } from '@/components/tenant/interventionManager';
 import { PictureManager } from '@/components/tenant/pictureManager';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Ticket } from '@/types';
@@ -10,6 +11,7 @@ import { useState } from 'react';
 
 export default function ShowTicket({ item }: { item: Ticket }) {
     const [ticket, setTicket] = useState(item);
+    const { showToast } = useToast();
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Show tickets`,
@@ -22,7 +24,7 @@ export default function ShowTicket({ item }: { item: Ticket }) {
             const response = await axios.get(route(`api.tickets.get`, ticket.id));
             setTicket(response.data.data);
         } catch (error) {
-            console.error('Erreur lors de la recherche :', error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -31,9 +33,10 @@ export default function ShowTicket({ item }: { item: Ticket }) {
             const response = await axios.patch(route('api.tickets.status', id), { status: status });
             if (response.data.status === 'success') {
                 fetchTicket();
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.error('Erreur lors de la suppression', error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 

@@ -30,7 +30,7 @@ class RestoreSoftDeletedAssetController extends Controller
             $asset->restore();
 
             DB::commit();
-            return ApiResponse::success('Asset restored');
+            return ApiResponse::success([],'Asset restored');
         } catch (Exception $e) {
             DB::rollBack();
             Log::info($e->getMessage());

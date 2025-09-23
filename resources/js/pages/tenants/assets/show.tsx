@@ -5,9 +5,10 @@ import { InterventionManager } from '@/components/tenant/interventionManager';
 import { PictureManager } from '@/components/tenant/pictureManager';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
 import { TicketManager } from '@/components/tenant/ticketManager';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { Asset, Contract, type BreadcrumbItem, Documents} from '@/types';
+import { Asset, Contract, type BreadcrumbItem} from '@/types';
 import { router } from '@inertiajs/core';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
@@ -21,7 +22,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
         },
     ];
 
-    const { post, delete: destroy } = useForm();
+    const { showToast } = useToast();
 
     const [asset, setAsset] = useState(item);
     const [existingContracts, setExistingContracts] = useState(asset.contracts ?? []);
@@ -60,70 +61,71 @@ export default function ShowAsset({ item }: { item: Asset }) {
             if (response.data.status === 'success') {
                 setAddExistingContractModale(false);
                 fetchContracts();
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.log(error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
-    // const [existingDocuments, setExistingDocuments] = useState(asset.documents ?? []);
-    // const [addExistingDocumentsModale, setAddExistingDocumentsModale] = useState<boolean>(false);
-
-    //     const updateDocuments = (newDocuments: Documents[]) => {
-    //         setAsset((prev) => ({ ...prev, documents: newDocuments }));
-    //         setExistingDocuments(newDocuments);
-    //     };
-
-    //     const fetchDocuments = async () => {
-    //         try {
-    //             const response = await axios.get(route('api.assets.documents', asset.reference_code));
-    //             if (response.data.status === 'success') {
-    //                 updateDocuments(response.data.data);
-    //             }
-    //         } catch (error) {
-    //             console.log(error);
-    //         }
-    //     };
-    // console.log(existingDocuments);
-    
-    // const addExistingDocumentsToAsset = async () => {
-    //     const documents = {
-    //         existing_documents: existingDocuments.map((elem) => elem.id),
-    //     };
-
-    //     try {
-    //         const response = await axios.post(route('api.assets.documents.post', asset.reference_code), documents);
-    //         if (response.data.status === 'success') {
-    //             setAddExistingDocumentsModale(false);
-    //             fetchDocuments();
-    //         }
-    //     } catch (error) {
-    //         console.log(error);
-    //     }
-    // };
-
-    const deleteAsset = (asset: Asset) => {
-        destroy(route(`api.assets.destroy`, asset.reference_code));
+    const deleteAsset = async (asset: Asset) => {
+        try {
+            const response = await axios.delete(route(`api.assets.destroy`, asset.reference_code));
+            router.visit(route(`tenant.assets.index`), {
+                preserveScroll: false,
+            });
+            showToast(response.data.message, response.data.status);
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
+        }
     };
 
-    const restoreAsset = (asset: Asset) => {
-        post(route('api.tenant.assets.restore', asset.id));
+    const restoreAsset = async (asset: Asset) => {
+          try {
+              const response = await axios.delete(route(`api.tenant.assets.restore`, asset.reference_code));
+
+              showToast(response.data.message, response.data.status);
+          } catch (error) {
+              showToast(error.response.data.message, error.response.data.status);
+          }
+        
     };
 
-    const deleteDefinitelyAsset = (asset: Asset) => {
-        destroy(route(`api.tenant.assets.force`, asset.id));
+    const deleteDefinitelyAsset = async (asset: Asset) => {
+          try {
+              const response = await axios.delete(route(`api.tenant.assets.force`, asset.reference_code));
+
+              showToast(response.data.message, response.data.status);
+          } catch (error) {
+              showToast(error.response.data.message, error.response.data.status);
+          }
+        
+        
     };
 
     const generateQR = async () => {
-        const response = await axios.post(route('api.assets.qr.regen', asset.reference_code));
-        if (response.data.status === 'success') {
-            fetchAsset();
+        try {
+            const response = await axios.post(route('api.assets.qr.regen', asset.reference_code));
+            if (response.data.status === 'success') {
+                fetchAsset();
+                showToast(response.data.message, response.data.status);
+            }
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
         }
+        
     };
 
     const markMaintenanceDone = async () => {
-        const response = await axios.post(route('api.maintenance.done', asset.maintainable.id));
-        if (response.data.status === 'success') fetchAsset();
+        try {
+            const response = await axios.post(route('api.maintenance.done', asset.maintainable.id));
+            if (response.data.status === 'success') {
+                fetchAsset();
+                showToast(response.data.message, response.data.status);
+            }
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
+        }
     };
 
  

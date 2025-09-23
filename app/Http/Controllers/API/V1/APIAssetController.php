@@ -77,7 +77,7 @@ class APIAssetController extends Controller
                 $this->qrCodeService->createAndAttachQR($asset);
 
             DB::commit();
-            return ApiResponse::success('', 'Asset created');
+            return ApiResponse::successFlash('', 'Asset created');
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());

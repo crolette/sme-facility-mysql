@@ -12,8 +12,6 @@ export default function UserIndex({ users }: { users: User[] }) {
         },
     ];
 
-    console.log(users);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sites" />

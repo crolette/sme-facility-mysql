@@ -1,4 +1,5 @@
 import Modale from '@/components/Modale';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
@@ -16,6 +17,7 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
             href: `/assets`,
         },
     ];
+    const { showToast } = useToast();
 
     const [assets, setAssets] = useState<Asset[]>(items);
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -35,9 +37,10 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                 setActiveAssetsTab(false);
                 fetchTrashedAssets();
                 setShowDeleteDefinitelyModale(false);
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.log(error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -51,9 +54,12 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                 setActiveAssetsTab(!activeAssetsTab);
                 setSearch('');
                 fetchAssets();
+                console.log(response.data.message, response.data.status);
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
             console.log(error);
+             showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -63,7 +69,7 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
             setAssets(response.data.data);
             setIsLoading(false);
         } catch (error) {
-            console.error('Erreur lors de la recherche :', error);
+             showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -74,7 +80,7 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
             setTrashedAssets(response.data.data);
             setIsLoading(false);
         } catch (error) {
-            console.error('Erreur lors de la recherche :', error);
+             showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -87,9 +93,10 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                 setSearch('');
                 fetchAssets();
                 setShowDeleteModale(!showDeleteModale);
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.log(error);
+             showToast(error.response.data.message, error.response.data.status);
         }
     };
 

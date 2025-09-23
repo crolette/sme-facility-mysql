@@ -1,6 +1,7 @@
 import InputError from '@/components/input-error';
 import SearchableInput from '@/components/SearchableInput';
 import FileManager from '@/components/tenant/FileManager';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -66,9 +67,10 @@ export default function CreateContract({
             href: `/contract/${contract?.id ?? 'create'}`,
         },
     ];
+      const { showToast } = useToast();
+    
 
     // const [contractables, setContractables] = useState<Contractable[]>([]);
-    console.log(objects);
     useEffect(() => {
         const updatedContractables: Contractable[] = [];
         if (objects?.length > 0) {
@@ -118,7 +120,7 @@ export default function CreateContract({
                     router.visit(route('tenant.contracts.show', contract.id));
                 }
             } catch (error) {
-                console.log(error);
+                showToast(error.response.data.message, error.response.data.status);
                 setError(error.response.data.errors);
             }
         } else {
@@ -132,14 +134,11 @@ export default function CreateContract({
                     router.visit(route('tenant.contracts.show', response.data.data.id));
                 }
             } catch (error) {
-                console.log(error.response.data.errors);
+                showToast(error.response.data.message, error.response.data.status);
                 setError(error.response.data.errors);
             }
         }
     };
-
-    console.log(errors);
-
 
     const handleAddAssetOrLocation = (location) => {
         const updatedContractables = [...data.contractables];

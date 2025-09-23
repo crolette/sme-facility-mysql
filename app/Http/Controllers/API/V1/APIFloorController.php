@@ -79,14 +79,14 @@ class APIFloorController extends Controller
                 $this->qrCodeService->createAndAttachQR($floor);
 
             DB::commit();
-            return ApiResponse::success('', 'Building created');
+            return ApiResponse::successFlash('', 'Floor created');
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
             return ApiResponse::error('ERROR : ' . $e->getMessage());
             return redirect()->back()->with(['message' => 'ERROR : ' . $e->getMessage(), 'type' => 'error']);
         }
-        return ApiResponse::error('Error while creating the building');
+        return ApiResponse::error('Error while creating the floor');
     }
 
     /**
@@ -128,7 +128,7 @@ class APIFloorController extends Controller
             $this->maintainableService->update($floor->maintainable, $maintainableRequest);
 
             DB::commit();
-            return ApiResponse::success('', 'Site updated');
+            return ApiResponse::success('', 'Floor updated');
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
@@ -147,10 +147,10 @@ class APIFloorController extends Controller
             abort(403);
 
         if (count($floor->assets) > 0 || count($floor->rooms) > 0) {
-            abort(409)->with(['message' => 'Floor cannot be deleted ! Assets and/or rooms are linked to this floor', 'type' => 'warning']);
+            return ApiResponse::error('Floor cannot be deleted ! Assets and/or rooms are linked to this floor');
         }
 
         $floor->delete();
-        return ApiResponse::success('', 'site deleted');
+        return ApiResponse::success('', 'Floor deleted');
     }
 }

@@ -2,6 +2,7 @@ import axios from 'axios';
 import { ImageIcon, Upload, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Button } from './ui/button';
+import { useToast } from './ToastrContext';
 
 // Props pour ImageUploadModal
 interface ImageUploadModalProps {
@@ -50,6 +51,7 @@ export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUpload
     const [preview, setPreview] = useState(null);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { showToast } = useToast();
     const fileInputRef = useRef(null);
 
     const handleFileSelect = (files: FileList | null) => {
@@ -93,8 +95,10 @@ export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUpload
                     'Content-Type': 'multipart/form-data',
                 },
             });
+            showToast(response.data.message, response.data.status);
 
             if (response.data.status == 'error') {
+                 showToast(response.data.message, response.data.status);
                 throw new Error(`Erreur d'upload: ${response.status}`);
             }
 

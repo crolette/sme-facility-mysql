@@ -65,7 +65,7 @@ Route::middleware([
                         return ApiResponse::notAuthorized();
 
                 $qRCodeService->createAndAttachQR($asset);
-                return ApiResponse::success();
+                return ApiResponse::success([], 'QR Code created');
             })->name('api.assets.qr.regen');
 
             Route::prefix('/documents')->group(function() {

@@ -35,7 +35,7 @@ class APIContractController extends Controller
 
             DB::commit();
 
-            return ApiResponse::success(['id' => $contract->id], 'Contract created');
+            return ApiResponse::successFlash(['id' => $contract->id], 'Contract created');
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
@@ -60,7 +60,7 @@ class APIContractController extends Controller
 
             DB::commit();
 
-            return ApiResponse::success('', 'Contract updated');
+            return ApiResponse::successFlash('', 'Contract updated');
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
@@ -78,6 +78,6 @@ class APIContractController extends Controller
             return ApiResponse::notAuthorized();
 
         $contract->delete();
-        return ApiResponse::success('', 'Contract deleted');
+        return ApiResponse::successFlash('', 'Contract deleted');
     }
 }

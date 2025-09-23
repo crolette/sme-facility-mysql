@@ -84,7 +84,7 @@ class APIRoomController extends Controller
                 $this->qrCodeService->createAndAttachQR($room);
 
             DB::commit();
-            return ApiResponse::success('', 'Room created');
+            return ApiResponse::successFlash('', 'Room created');
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());

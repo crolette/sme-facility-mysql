@@ -18,7 +18,7 @@ use App\Models\Tenants\UserNotificationPreference;
 
 class UserService
 {
-    public function create($request): array | Exception
+    public function create($request): User | Exception
     {
         try {
             DB::beginTransaction();
@@ -30,17 +30,12 @@ class UserService
             if (isset($request['provider_id']))
                 $user = $this->attachProvider($user, $request['provider_id']);
 
-            if ($request['can_login'] === true) {
-                $password = Str::password(12);
-                $user->password = Hash::make($password);
-                $user->assignRole($request['role']);
-                //TODO check how to send password reset link instead of creating password
-            }
+          
 
             $user->save();
 
             DB::commit();
-            return [$user, $password ?? ''];
+            return $user;
         } catch (Exception $e) {
             DB::rollBack();
             return $e;

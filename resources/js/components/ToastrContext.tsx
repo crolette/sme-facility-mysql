@@ -1,6 +1,5 @@
 // ToastContext.tsx
 import { createContext, ReactNode, useContext, useState } from 'react';
-import Toastr from './Toastr';
 
 interface ToastData {
     message: string;
@@ -33,5 +32,9 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
         setToastData({ message, type });
     };
 
-    return <ToastContext.Provider value={{ showToast, toastData }}>{children}<Toastr toastData={toastData} /></ToastContext.Provider>;
+    return (
+        <ToastContext.Provider value={{ showToast, toastData }}>
+            {children}
+        </ToastContext.Provider>
+    );
 };

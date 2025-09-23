@@ -42,7 +42,7 @@ Route::middleware([
                 return ApiResponse::notAuthorized();
 
             $qRCodeService->createAndAttachQR($floor);
-            return ApiResponse::success();
+            return ApiResponse::success([], 'QR Code created');
         })->name('api.floors.qr.regen');
 
         // Get all assets from a floor

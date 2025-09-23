@@ -1,4 +1,6 @@
+import InputError from '@/components/input-error';
 import SearchableInput from '@/components/SearchableInput';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -28,6 +30,8 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
             href: `/providers`,
         },
     ];
+    const { showToast } = useToast();
+    const [errors, setErrors] = useState();
 
     const { data, setData, reset } = useForm<FormDataUser>({
         first_name: user?.first_name ?? '',
@@ -41,8 +45,6 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
         role: user?.roles?.length > 0 ? user?.roles[0].name : '',
     });
 
-    const [password, setPassword] = useState();
-
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
         if (user) {
@@ -54,7 +56,8 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
                     });
                 }
             } catch (error) {
-                console.log(error);
+                setErrors(error.response.data.errors);
+                showToast(error.response.data.message, error.response.data.status);
             }
         } else {
             try {
@@ -64,12 +67,13 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
                     },
                 });
                 console.log(response);
-                if (response.data.status === 'success' && response.data.data.password) {
-                    setPassword(response.data.data.password);
+                if (response.data.status === 'success') {
+                    showToast(response.data.message, response.data.status);
                 }
                 reset();
             } catch (error) {
-                console.log(error);
+                setErrors(error.response.data.errors);
+                showToast(error.response.data.message, error.response.data.status);
             }
         }
     };
@@ -78,21 +82,19 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sites" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                {password && (
-                    <div className="bg-red-100">
-                        <p>USER CREATED:</p>
-                        <p>PASSWORD: {password}</p>
-                    </div>
-                )}
                 <form onSubmit={submit}>
                     <Label>First name</Label>
                     <Input type="text" onChange={(e) => setData('first_name', e.target.value)} value={data.first_name} required />
+                    <InputError message={errors?.first_name ?? ''} />
                     <Label>Last name</Label>
                     <Input type="text" onChange={(e) => setData('last_name', e.target.value)} value={data.last_name} required />
+                    <InputError message={errors?.last_name ?? ''} />
                     <Label>Job position</Label>
                     <Input type="text" onChange={(e) => setData('job_position', e.target.value)} value={data.job_position} />
+                    <InputError message={errors?.job_position ?? ''} />
                     <Label>Email</Label>
                     <Input type="email" onChange={(e) => setData('email', e.target.value)} value={data.email} required />
+                    <InputError message={errors?.email ?? ''} />
                     <Label>Can login</Label>
                     <Checkbox onClick={() => setData('can_login', !data.can_login)} checked={data.can_login ?? false} />
                     {data.can_login && (
@@ -108,6 +110,7 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
                             </select>
                         </div>
                     )}
+                    <InputError message={errors?.can_login ?? ''} />
                     {!user && (
                         <div>
                             <Label>Avatar</Label>
@@ -119,6 +122,7 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
                                 accept="image/png, image/jpeg, image/jpg"
                             />
                             <p className="text-xs">Accepted files: png, jpg - Maximum file size: 4MB</p>
+                            <InputError message={errors?.avatar ?? ''} />
                         </div>
                     )}
 

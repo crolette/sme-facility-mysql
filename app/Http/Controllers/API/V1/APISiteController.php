@@ -73,7 +73,7 @@ class APISiteController extends Controller
                 $this->qrCodeService->createAndAttachQR($site);
 
             DB::commit();
-            return ApiResponse::success('', 'Site created');
+            return ApiResponse::successFlash('', 'Site created');
         } catch (Exception $e) {
             DB::rollback();
             Log::error($e->getMessage());
@@ -133,10 +133,10 @@ class APISiteController extends Controller
             abort(403);
 
         if (count($site->assets) > 0 || count($site->buildings) > 0) {
-            abort(409)->with(['message' => 'Site cannot be deleted ! Assets and/or buildings are linked to this site', 'type' => 'warning']);
+            return ApiResponse::error('Site cannot be deleted ! Assets and/or buildings are linked to this site');
         }
 
         $site->delete();
-        return ApiResponse::success('', 'site deleted');
+        return ApiResponse::success('', 'Site deleted');
     }
 }

@@ -37,7 +37,7 @@ class APIUserController extends Controller
         }
 
         try {
-            [$user, $password] = $this->userService->create($request->validated());
+            $user = $this->userService->create($request->validated());
 
             if ($user->hasAnyRole('Admin', 'Maintenance Manager')) {
                 Password::sendResetLink(
@@ -45,9 +45,7 @@ class APIUserController extends Controller
                 );
             }
 
-            Debugbar::info($user, $password);
-
-            return ApiResponse::success(['password' => $password ?? null], 'User created');
+            return ApiResponse::successFlash([], 'User created');
         } catch (Exception $e) {
             Debugbar::info($e->getMessage());
             return ApiResponse::error($e->getMessage());

@@ -58,8 +58,8 @@ class UserRequest extends FormRequest
 
         return [
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', new NotDisposableEmail, Rule::unique(User::class)->ignore($this->route('user'))],
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'min:3', 'max:255'],
+            'last_name' => ['required', 'string',  'min:3', 'max:255'],
             'avatar' => 'nullable|file|mimes:png,jpg,jpeg|max:' . User::maxUploadSizeKB(),
             'job_position' => 'nullable|string|max:100',
             'can_login' => 'nullable|boolean',

@@ -38,7 +38,7 @@ Route::middleware([
                     return ApiResponse::notAuthorized();
 
                 $qRCodeService->createAndAttachQR($site);
-                return ApiResponse::success();
+                return ApiResponse::success([], 'QR Code created');
             })->name('api.sites.qr.regen');
 
             Route::get('/', function (Site $site) {

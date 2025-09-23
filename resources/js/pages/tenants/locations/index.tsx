@@ -28,11 +28,12 @@ export default function IndexSites({ items, routeName }: { locations: TenantSite
                 setShowDeleteModale(false);
                 setLocationToDelete(null);
                 fetchLocations();
-                showToast(response.data.message, response.data.status)
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
             console.log(error);
             setShowDeleteModale(false);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 

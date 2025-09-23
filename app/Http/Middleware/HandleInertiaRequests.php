@@ -64,8 +64,6 @@ class HandleInertiaRequests extends Middleware
             }
         }
 
-        // dd(session('tenantName'));
-
         return [
             ...parent::share($request),
             'name' => config('app.name'),

@@ -9,6 +9,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import { Pill } from '../ui/pill';
+import { useToast } from '../ToastrContext';
 
 interface TicketManagerProps {
     itemCode: string;
@@ -30,6 +31,7 @@ type FormDataTicket = {
 
 export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = true }: TicketManagerProps) => {
     const auth = usePage().props.auth.user;
+     const { showToast } = useToast();
 
     const [tickets, setTickets] = useState<Ticket[]>();
     const [addTicketModal, setAddTicketModal] = useState<boolean>(false);
@@ -55,9 +57,11 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
     const fetchTickets = async () => {
         try {
             const response = await axios.get(route(getTicketsUrl, itemCode));
-            setTickets(await response.data.data);
+            if (response.data.status === 'success') {
+                setTickets(await response.data.data);
+            }
         } catch (error) {
-            console.error('Erreur lors de la recherche :', error);
+             showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -66,9 +70,10 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
             const response = await axios.patch(route('api.tickets.status', id), { status: 'closed' });
             if (response.data.status === 'success') {
                 fetchTickets();
+                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.error('Erreur lors de la suppression', error);
+             showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -101,11 +106,15 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
         e.preventDefault();
         try {
             const response = await axios.patch(route('api.tickets.update', newTicketData.ticket_id), newTicketData);
-            fetchTickets();
-            closeModalTicket();
+            if (response.data.status === 'success') {
+                fetchTickets();
+                closeModalTicket();
+                 showToast(response.data.message, response.data.status);
+
+            }
             // }
         } catch (error) {
-            console.log(error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -121,9 +130,10 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
             if (response.data.status === 'success') {
                 fetchTickets();
                 closeModalTicket();
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.log(error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
