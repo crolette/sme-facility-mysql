@@ -2,14 +2,11 @@
 
 declare(strict_types=1);
 
-use Inertia\Inertia;
-use App\Models\Tenant;
-use tbQuar\Facades\Quar;
-use App\Jobs\DeleteDatabase;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
+use App\Models\Tenants\Intervention;
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\AuthenticateTenant;
 use Stancl\Tenancy\Middleware\ScopeSessions;
+use App\Mail\SendInterventionToProviderEmail;
 use App\Http\Controllers\Tenants\UserController;
 use App\Http\Controllers\Tenants\TicketController;
 use App\Http\Controllers\API\V1\APITicketController;
@@ -18,22 +15,16 @@ use App\Http\Controllers\Tenants\ProviderController;
 use App\Http\Controllers\Tenants\DashboardController;
 use App\Http\Controllers\Tenants\TenantRoomController;
 use App\Http\Controllers\Tenants\TenantSiteController;
-use App\Http\Controllers\Tenants\AssetTicketController;
 use App\Http\Controllers\Tenants\TenantAssetController;
 use App\Http\Controllers\Tenants\TenantFloorController;
 use App\Http\Controllers\Tenants\InterventionController;
-use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use App\Http\Controllers\API\V1\APICompanyLogoController;
 use App\Http\Controllers\Tenants\TenantBuildingController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
-use App\Http\Controllers\Tenants\ForceDeleteAssetController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Tenants\InterventionActionController;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+use App\Http\Controllers\Tenants\InterventionProviderController;
 use App\Http\Controllers\Tenants\CreateTicketFromQRCodeController;
-use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
-use App\Http\Controllers\Tenants\UserNotificationPreferenceController;
-use App\Http\Controllers\Tenants\Auth\TenantAuthenticatedSessionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -54,7 +45,20 @@ Route::middleware([
     PreventAccessFromCentralDomains::class,
     'auth:tenant'
 ])->group(function () {
+
+
     Route::get('dashboard', [DashboardController::class, 'show'])->name('tenant.dashboard');
+    Route::get('/mail', function () {
+        $param1 = Intervention::first();
+
+        $url = URL::temporarySignedRoute(
+            'tenant.intervention.provider',
+            now()->addDays(7),
+            ['intervention' => $param1->id, 'email' => 'crolweb@gmail.com']
+        );
+
+        return (new SendInterventionToProviderEmail($param1, $url))->render();
+    });
 
     Route::resource('sites', TenantSiteController::class)->parameters(['sites' => 'site'])->only('index', 'show', 'create', 'edit')->names('tenant.sites');
     Route::resource('buildings', TenantBuildingController::class)->parameters(['buildings' => 'building'])->only('index', 'show', 'create', 'edit')->names('tenant.buildings');
@@ -93,13 +97,18 @@ Route::middleware([
         Route::get('/{ticket}', [TicketController::class, 'show'])->name('tenant.tickets.show');
         // Route::get('/{ticket}/edit', [TicketController::class, 'update'])->name('tenant.tickets.update');
     });
-
+    
     // INTERVENTIONS
-    Route::get('interventions/', [InterventionController::class, 'index'])->name('tenant.interventions.index');
-    Route::get('interventions/create/{ticket}', [InterventionController::class, 'create'])->name('tenant.interventions.create');
-    Route::get('interventions/{intervention}', [InterventionController::class, 'show'])->name('tenant.interventions.show');
-    Route::get('interventions/{intervention}/actions/create', [InterventionActionController::class, 'create'])->name('tenant.interventions.actions.create');
-    Route::get('actions/{action}/edit', [InterventionActionController::class, 'edit'])->name('tenant.interventions.actions.edit');
+
+    Route::prefix('interventions')->group(function() {
+        Route::get('', [InterventionController::class, 'index'])->name('tenant.interventions.index');
+        Route::get('/create/{ticket}', [InterventionController::class, 'create'])->name('tenant.interventions.create');
+        Route::get('/{intervention}', [InterventionController::class, 'show'])->name('tenant.interventions.show');
+        Route::get('/{intervention}/actions/create', [InterventionActionController::class, 'create'])->name('tenant.interventions.actions.create');
+        Route::get('/{intervention}/actions/{action}/edit', [InterventionActionController::class, 'edit'])->name('tenant.interventions.actions.edit');
+
+
+    });
 });
 
 
@@ -122,6 +131,12 @@ Route::middleware(array_merge([
 
     // Post a new ticket
     Route::post('/', [APITicketController::class, 'store'])->name('api.tickets.store');
+
+
+    // Route::get('/{intervention}/external', [InterventionProviderController::class, 'create'])->name('tenant.intervention.provider');
+    Route::get('/interventions/{intervention}/external', [InterventionProviderController::class, 'create'])->name('tenant.intervention.provider')->middleware('signed');
+    // Route::post('/{intervention}/external', [InterventionProviderController::class, 'store'])->name('tenant.intervention.provider.store');
+    Route::post('/interventions/{intervention}/external', [InterventionProviderController::class, 'store'])->name('tenant.intervention.provider.store')->middleware('signed');
 });
 
 require __DIR__ . '/settings.php';

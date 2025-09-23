@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use App\Events\TicketClosed;
+use App\Events\TicketCreated;
 use Exception;
 use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
@@ -68,6 +70,8 @@ class APITicketController extends Controller
             $ticket->ticketable()->associate($location);
             $ticket->save();
 
+           
+
             // TODO Send email to admin / maintenance manager if not the one who created the ticket
 
             $files = $pictureUploadRequest->validated('pictures');
@@ -76,7 +80,10 @@ class APITicketController extends Controller
                 $pictureService->uploadAndAttachPictures($ticket, $files, $request->validated('reporter_email') ?? null);
             }
 
+            
             DB::commit();
+            
+            event(new TicketCreated($ticket, $location));
 
             return ApiResponse::success(null, 'Ticket created');
         } catch (Exception $e) {
@@ -133,6 +140,10 @@ class APITicketController extends Controller
         if (in_array($request->status, ['open', 'closed', 'ongoing'])) {
             if ($request->status === 'closed') {
                 $ticket->closeTicket();
+
+                event(new TicketClosed($ticket));
+
+
                 return ApiResponse::success(null, 'Ticket closed');
             }
             $ticket->update(['status' => $request->status]);

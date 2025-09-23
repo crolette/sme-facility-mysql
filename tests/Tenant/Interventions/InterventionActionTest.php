@@ -42,44 +42,10 @@ beforeEach(function () {
     $this->asset =  Asset::factory()->forLocation($this->room)->create();
 
     $this->ticket = Ticket::factory()->forLocation($this->asset)->create();
-    $this->intervention = Intervention::factory()->create();
+    $this->intervention = Intervention::factory()->forLocation($this->asset)->create();
 });
 
-it('can, has an anonymous, create a new action to an intervention', function () {
-    // TODO  check the it is as anonymous user
-
-    $formData = [
-        'action_type_id' => $this->interventionActionType->id,
-        'description' => 'New action for intervention',
-        'intervention_date' => Carbon::now()->add('day', 7),
-        'started_at' => '13:25',
-        'finished_at' => '17:30',
-        'intervention_costs' => '9999999.25',
-        'creator_email' => 'test@test.com'
-    ];
-
-    $response = $this->postToTenant('api.interventions.actions.store', $formData, $this->intervention);
-
-    $response->assertStatus(200)
-        ->assertJson([
-            'status' => 'success',
-        ]);
-
-    assertDatabaseCount('intervention_actions', 2);
-    assertDatabaseHas('intervention_actions', [
-        'id' => 2,
-        'action_type_id' => $this->interventionActionType->id,
-        'description' => 'New action for intervention',
-        'intervention_date' => Carbon::now()->add('day', 7)->toDateString(),
-        'started_at' => '13:25:00',
-        'finished_at' => '17:30:00',
-        'intervention_costs' => '9999999.25',
-        'creator_email' => 'test@test.com'
-
-    ]);
-});
-
-it('can, has an authenticated user, create a new action to an intervention', function () {
+it('can create a new action to an intervention', function () {
 
     $formData = [
         'action_type_id' => $this->interventionActionType->id,
@@ -164,5 +130,73 @@ it('can delete an intervention action', function () {
     assertDatabaseCount('intervention_actions', 1);
     assertDatabaseMissing('intervention_actions', [
         'id' => $interventionAction->id
+    ]);
+});
+
+it('sums intervention costs of intervention when action with intervention_costs is added', function () {
+
+    $formData = [
+        'action_type_id' => $this->interventionActionType->id,
+        'description' => 'New action for intervention',
+        'intervention_date' => Carbon::now()->add('day', 7),
+        'started_at' => '13:25',
+        'finished_at' => '17:30',
+        'intervention_costs' => '9999999.25',
+        'created_by' => $this->user->id
+    ];
+
+    $response = $this->postToTenant('api.interventions.actions.store', $formData, $this->intervention);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    // Intervention factory has 500.25
+    assertDatabaseHas('interventions', [
+        'id' => $this->intervention->id,
+        'total_costs' => '10000499.50',
+    ]);
+});
+
+it('updates intervention costs of intervention when action with intervention_costs is updated', function() {
+    
+    $interventionAction = $this->intervention->actions->first();
+
+    $formData = [
+        'action_type_id' => $this->interventionActionType->id,
+        'description' => 'Updated action for intervention',
+        'intervention_date' => Carbon::now()->add('day', 2),
+        'started_at' => '14:25',
+        'finished_at' => '18:30',
+        'intervention_costs' => '0',
+        'updated_by' => $this->user->id,
+    ];
+
+    $response = $this->patchToTenant('api.interventions.actions.update', $formData, $interventionAction);
+    $response->assertOk();
+
+    assertDatabaseHas('interventions', [
+        'id' => $this->intervention->id,
+        'total_costs' => '0',
+    ]);
+
+});
+
+it('updates intervention costs of intervention when action with intervention_costs is deleted', function () {
+    InterventionAction::factory()->forIntervention($this->intervention)->create();
+    $interventionAction = $this->intervention->actions->first();
+
+    assertDatabaseHas('interventions', [
+        'id' => $this->intervention->id,
+        'total_costs' => '1000.50',
+    ]);
+
+    $response = $this->deleteFromTenant('api.interventions.actions.destroy', $interventionAction);
+    $response->assertOk();
+
+    assertDatabaseHas('interventions', [
+        'id' => $this->intervention->id,
+        'total_costs' => '500.25',
     ]);
 });

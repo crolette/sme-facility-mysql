@@ -12,6 +12,7 @@ use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Building;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
+use App\Models\Tenants\Intervention;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
@@ -69,6 +70,21 @@ it('can render the show ticket page', function () {
             ->has('item')->where('item.code', $ticket->code)
     );
     $response->assertOk();
+});
+
+it('can render interventions in the ticket page', function () {
+    Intervention::factory()->forTicket($this->ticket)->count(2)->create();
+
+    $response = $this->getFromTenant('tenant.tickets.show', $this->ticket);
+    $response->assertOk();
+
+    $response->assertInertia(
+        fn($page) =>
+        $page->component('tenants/tickets/show')
+            ->has('item')
+            ->has('item.interventions', 2)
+            ->has('item.interventions.0.actions', 1)
+    );
 });
 
 it('can create a new ticket to an ASSET with the logged user', function () {

@@ -50,22 +50,6 @@ it('can factory intervention', function () {
     assertDatabaseCount('intervention_actions', 2);
 });
 
-it('can render interventions in the ticket page', function () {
-    Intervention::factory()->forTicket($this->ticket)->count(2)->create();
-    assertDatabaseCount('interventions', 2);
-
-    $response = $this->getFromTenant('tenant.tickets.show', $this->ticket);
-    $response->assertOk();
-
-    $response->assertInertia(
-        fn($page) =>
-        $page->component('tenants/tickets/show')
-            ->has('ticket')
-            ->has('ticket.interventions', 2)
-            ->has('ticket.interventions.0.actions', 1)
-    );
-});
-
 it('shows the create intervention page for a ticket', function () {
 
     $response = $this->getFromTenant('tenant.interventions.create', $this->ticket);
@@ -162,19 +146,6 @@ it('can create a new intervention for an ASSET', function () {
     ]);
 });
 
-
-it('can get all interventions for an ASSET', function () {
-    Intervention::factory()->forLocation($this->asset)->count(2)->create();
-    $response = $this->getFromTenant('api.assets.interventions', $this->asset->reference_code);
-    // dump($response);
-
-    $response->assertStatus(200)
-        ->assertJson([
-            'status' => 'success',
-        ])
-        ->assertJsonCount(2, 'data');
-});
-
 it('can create a new intervention for a SITE', function () {
 
     $formData = [
@@ -202,17 +173,6 @@ it('can create a new intervention for a SITE', function () {
         'interventionable_type' => get_class($this->site),
         'interventionable_id' => $this->site->id
     ]);
-});
-
-it('can get all interventions for a SITE', function () {
-    Intervention::factory()->forLocation($this->site)->count(2)->create();
-    $response = $this->getFromTenant('api.sites.interventions', $this->site);
-
-    $response->assertStatus(200)
-        ->assertJson([
-            'status' => 'success',
-        ])
-        ->assertJsonCount(2, 'data');
 });
 
 it('can create a new intervention for a BUILDING', function () {
@@ -244,18 +204,6 @@ it('can create a new intervention for a BUILDING', function () {
     ]);
 });
 
-it('can get all interventions for a BUILDING', function () {
-    Intervention::factory()->forLocation($this->building)->count(2)->create();
-    $response = $this->getFromTenant('api.buildings.interventions', $this->building);
-
-    $response->assertStatus(200)
-        ->assertJson([
-            'status' => 'success',
-        ])
-        ->assertJsonCount(2, 'data');
-});
-
-
 it('can create a new intervention for a FLOOR', function () {
 
     $formData = [
@@ -285,17 +233,6 @@ it('can create a new intervention for a FLOOR', function () {
     ]);
 });
 
-it('can get all interventions for a FLOOR', function () {
-    Intervention::factory()->forLocation($this->floor)->count(2)->create();
-    $response = $this->getFromTenant('api.floors.interventions', $this->floor);
-
-    $response->assertStatus(200)
-        ->assertJson([
-            'status' => 'success',
-        ])
-        ->assertJsonCount(2, 'data');
-});
-
 it('can create a new intervention for a ROOM', function () {
 
     $formData = [
@@ -323,17 +260,6 @@ it('can create a new intervention for a ROOM', function () {
         'interventionable_type' => get_class($this->room),
         'interventionable_id' => $this->room->id
     ]);
-});
-
-it('can get all interventions for a ROOM', function () {
-    Intervention::factory()->forLocation($this->room)->count(2)->create();
-    $response = $this->getFromTenant('api.rooms.interventions', $this->room->reference_code);
-
-    $response->assertStatus(200)
-        ->assertJson([
-            'status' => 'success',
-        ])
-        ->assertJsonCount(2, 'data');
 });
 
 it('can update an existing intervention', function () {
@@ -380,4 +306,3 @@ it('can delete an intervention', function () {
     assertDatabaseEmpty('interventions');
 });
 
-// it('sum intervention costs automatically based on actions', function () {});

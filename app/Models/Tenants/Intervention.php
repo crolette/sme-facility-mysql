@@ -34,14 +34,19 @@ class Intervention extends Model
     ];
 
     protected $with = [
-        'interventionType:id',
+        // 'interventionType:id',
         'actions'
+    ];
+
+    protected $appends = [
+        'type'
     ];
 
 
     protected function casts(): array
     {
         return [
+            'total_costs' => 'decimal:2',
             'planned_at' => 'date:d-m-Y',
             'repair_delay' => 'date:d-m-Y',
             'created_at' => 'date:d-m-Y H:i',
@@ -54,7 +59,7 @@ class Intervention extends Model
     public static function booted(): void
     {
         static::addGlobalScope('ancient', function (Builder $builder) {
-            $builder->orderBy('created_at', 'desc');
+            $builder->orderBy('updated_at', 'desc');
         });
 
         static::created(function ($intervention) {
@@ -102,5 +107,15 @@ class Intervention extends Model
     {
         $this->total_costs = $this->actions()->sum('intervention_costs');
         $this->save();
+    }
+
+
+    public function type($locale = null): Attribute
+    {
+        $locale = $locale ?? app()->getLocale();
+
+        return Attribute::make(
+            get: fn() => $this->interventionType->translations->where('locale', $locale)->first()?->label ?? $this->interventionType->translations->where('locale', config('app.fallback_locale'))?->label
+        );
     }
 }

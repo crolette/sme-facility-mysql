@@ -128,18 +128,18 @@ Route::prefix('/v1/')->group(
                 Route::delete('/pictures/{picture}', [DestroyPictureController::class, 'destroy'])->name('api.pictures.delete');
 
             
-                Route::prefix('interventions')->group(function () {
-                    Route::post('/create', [APIInterventionController::class, 'store'])->name('api.interventions.store');
-                    Route::patch('/{intervention}', [APIInterventionController::class, 'update'])
-                        ->name('api.interventions.update');
-                    Route::delete('/{intervention}', [APIInterventionController::class, 'destroy'])
-                        ->name('api.interventions.destroy');
+                // Route::prefix('interventions')->group(function () {
+                //     Route::post('/create', [APIInterventionController::class, 'store'])->name('api.interventions.store');
+                //     Route::patch('/{intervention}', [APIInterventionController::class, 'update'])
+                //         ->name('api.interventions.update');
+                //     Route::delete('/{intervention}', [APIInterventionController::class, 'destroy'])
+                //         ->name('api.interventions.destroy');
 
-                    Route::get('/{intervention}/actions', [APIInterventionActionController::class, 'index'])->name('api.interventions.actions.index');
-                    Route::post('/{intervention}/actions', [APIInterventionActionController::class, 'store'])->name('api.interventions.actions.store');
-                    Route::patch('/actions/{action}', [APIInterventionActionController::class, 'update'])->name('api.interventions.actions.update');
-                    Route::delete('/actions/{action}', [APIInterventionActionController::class, 'destroy'])->name('api.interventions.actions.destroy');
-                });
+                //     Route::get('/{intervention}/actions', [APIInterventionActionController::class, 'index'])->name('api.interventions.actions.index');
+                //     Route::post('/{intervention}/actions', [APIInterventionActionController::class, 'store'])->name('api.interventions.actions.store');
+                //     Route::patch('/actions/{action}', [APIInterventionActionController::class, 'update'])->name('api.interventions.actions.update');
+                //     Route::delete('/actions/{action}', [APIInterventionActionController::class, 'destroy'])->name('api.interventions.actions.destroy');
+                // });
             });
         });
     }

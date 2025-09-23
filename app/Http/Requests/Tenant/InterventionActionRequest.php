@@ -32,7 +32,7 @@ class InterventionActionRequest extends FormRequest
             'action_type_id' => ['required', Rule::in(CategoryType::where('category', 'action')->pluck('id')->toArray())],
 
             'description' => ['nullable', 'string'],
-            'intervention_date' => ['nullable', 'date'],
+            'intervention_date' => ['nullable', 'date', Rule::date()->beforeOrEqual(today())],
             'started_at' => ['nullable', 'date_format:H:i'],
             'finished_at' => ['nullable', 'date_format:H:i', 'after:start_time'],
             'intervention_costs' => ['nullable', 'numeric', 'decimal:0,2'],
