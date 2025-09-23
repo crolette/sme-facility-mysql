@@ -29,9 +29,6 @@ class TicketCreatedMail extends Mailable
 
         $locale = App::getLocale();
         App::setLocale($locale);
-
-        Debugbar::info('TICKET CREATED MAIL', $ticket, $model);
-
     }
 
     /**

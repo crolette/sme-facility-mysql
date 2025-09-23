@@ -57,6 +57,7 @@ export default function CreateTicketFromQRCode({ item, location_type }: { item: 
             setIsProcessing(false);
         }
     };
+
     const [errors, setErrors] = useState<{ [key: string]: string }>();
     const [isProcessing, setIsProcessing] = useState(false);
     const [showSuccessModale, setShowSuccessModale] = useState<boolean>(false);
@@ -205,11 +206,6 @@ export default function CreateTicketFromQRCode({ item, location_type }: { item: 
                                         Processing<span>...</span>
                                     </p>
                                     <p className="mx-auto">Ticket is being submitted...</p>
-                                    {/* <div className="mx-auto flex gap-4">
-                                        <Button variant={'secondary'} onClick={() => setShowErrorModale(false)}>
-                                            Close
-                                        </Button>
-                                    </div> */}
                                 </div>
                             </div>
                         </div>

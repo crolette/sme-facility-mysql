@@ -104,22 +104,6 @@ it('a provider can access to the intervention page', function () {
 });
 
 
-it('can retrieve providers linked to an intervention (asset) to select to which one to send', function() {
-
-    $providers = Provider::factory()->count(2)->create();
-    $this->asset->maintainable->providers()->sync($providers->pluck('id'));
-
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
-
-    $response = $this->getFromTenant('api.interventions.providers', $intervention->id);
-    $response->assertOk();
-
-    $response->assertJson(['status' => 'success']);
-    $response->assertJsonCount(2, 'data');
-
-});
-
-
 it('can post an action as external provider', function() {
 
     $intervention = Intervention::factory()->forLocation($this->asset)->create();
@@ -151,4 +135,31 @@ it('can post an action as external provider', function() {
             'creator_email' => $provider->email
     ]);
 
+});
+
+it('sends an email to the admin when a provider encoded a new action', function() {
+
+    Mail::fake();
+
+    $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $provider = User::factory()->create();
+
+    $formData = [
+        'action_type_id' => $this->interventionActionType->id,
+        'description' => 'New action for intervention',
+        'intervention_date' => Carbon::now()->add('day', 7),
+        'started_at' => '13:25',
+        'finished_at' => '17:30',
+        'intervention_costs' => '9999999.25',
+        'creator_email' => $provider->email
+    ];
+
+
+    // route tested with signed middleware removed from routes
+    $response = $this->postToTenant('tenant.intervention.provider.store', $formData, $intervention->id);
+    $response->assertOk();
+
+    Mail::assertSent(InterventionAddedByProviderMail::class, function ($mail) use ($intervention) {
+        return $mail->hasTo('test@test.com');
+    });
 });

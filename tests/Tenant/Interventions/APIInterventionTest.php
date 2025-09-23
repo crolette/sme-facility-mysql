@@ -54,6 +54,21 @@ it('can get an intervention', function() {
 
 });
 
+
+it('can retrieve providers linked to an intervention (asset) to select to which one to send', function () {
+
+    $providers = Provider::factory()->count(2)->create();
+    $this->asset->maintainable->providers()->sync($providers->pluck('id'));
+
+    $intervention = Intervention::factory()->forLocation($this->asset)->create();
+
+    $response = $this->getFromTenant('api.interventions.providers', $intervention->id);
+    $response->assertOk();
+
+    $response->assertJson(['status' => 'success']);
+    $response->assertJsonCount(2, 'data');
+});
+
 it('can get an intervention with ticket', function () {
     $intervention = Intervention::factory()->forTicket($this->ticket)->create();
     $response = $this->getFromTenant('api.interventions.show', $intervention->id);

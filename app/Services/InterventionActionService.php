@@ -15,7 +15,7 @@ use App\Models\Tenants\InterventionAction;
 
 class InterventionActionService
 {
-    public function create(Intervention $intervention, array $request): void
+    public function create(Intervention $intervention, array $request): InterventionAction
     {
         $action = new InterventionAction($request);
 
@@ -25,6 +25,8 @@ class InterventionActionService
         }
 
         $intervention->actions()->save($action);
+
+        return $action;
     }
 
     

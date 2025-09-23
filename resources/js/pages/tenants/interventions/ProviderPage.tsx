@@ -7,6 +7,7 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, CentralType, Intervention, InterventionAction, Ticket } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
+import { BadgeAlert, BadgeCheck, Loader } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
 type InterventionFormData = {
@@ -23,14 +24,11 @@ type InterventionFormData = {
 
 export default function ProviderPage({ intervention, email, actionTypes, query, pastInterventions }: { intervention: Intervention; email: string; actionTypes: CentralType[]; query: string; pastInterventions: Intervention[] }) {
 
-    const submitIntervention: FormEventHandler = (e) => {
-        e.preventDefault();
+     const [errors, setErrors] = useState<{ [key: string]: string }>();
+     const [isProcessing, setIsProcessing] = useState(false);
+     const [showSuccessModale, setShowSuccessModale] = useState<boolean>(false);
+     const [showErrorModale, setShowErrorModale] = useState<boolean>(false);
 
-    }
-
-    console.log(pastInterventions);
-
-    const [errors, setErrors] = useState<InterventionFormData>();
     const { data, setData } = useForm<InterventionFormData>(
         {
          action_id: null,
@@ -46,6 +44,7 @@ export default function ProviderPage({ intervention, email, actionTypes, query, 
 
        const submitInterventionAction: FormEventHandler = async (e) => {
            e.preventDefault();
+           setIsProcessing(true);
            const url = route('tenant.intervention.provider.store', intervention.id) + '?' + query
 
            try {
@@ -53,14 +52,16 @@ export default function ProviderPage({ intervention, email, actionTypes, query, 
                if (response.data.status === 'success') {
                    //    closeModale();
                    console.log(response);
+                   setIsProcessing(false);
+                   setShowSuccessModale(true);
                }
            } catch (error) {
                console.error(error);
                setErrors(error.response.data.errors);
+               setIsProcessing(false);
+               setShowErrorModale(true);
            }
        };
-    
-    console.log(intervention);
     
     return (
         <>
@@ -181,6 +182,55 @@ export default function ProviderPage({ intervention, email, actionTypes, query, 
                     </div>
                 </div>
             </div>
+            {showSuccessModale && (
+                <div className="bg-background/50 fixed inset-0 z-50">
+                    <div className="bg-background/20 flex h-dvh items-center justify-center">
+                        <div className="bg-background flex items-center justify-center p-4 text-center md:w-1/3">
+                            <div className="flex flex-col items-center gap-4">
+                                <BadgeCheck size={48} className="text-chart-2" />
+                                <p className="text-chart-2 mx-auto text-3xl font-bold">Thank you</p>
+                                <p className="mx-auto">Intervention submitted</p>
+                                <p className="mx-auto">You can now close this window.</p>
+                                <div className="mx-auto flex gap-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showErrorModale && (
+                <div className="bg-background/50 fixed inset-0 z-50">
+                    <div className="bg-background/20 flex h-dvh items-center justify-center">
+                        <div className="bg-background flex items-center justify-center p-4 text-center md:w-1/3">
+                            <div className="flex flex-col items-center gap-4">
+                                <BadgeAlert size={48} className="text-destructive" />
+                                <p className="text-destructive mx-auto text-3xl font-bold">Error</p>
+                                <p className="mx-auto">Error while submitting. Try again</p>
+                                <div className="mx-auto flex gap-4">
+                                    <Button variant={'secondary'} onClick={() => setShowErrorModale(false)}>
+                                        Close
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {isProcessing && (
+                <div className="bg-background/50 fixed inset-0 z-50">
+                    <div className="bg-background/20 flex h-dvh items-center justify-center">
+                        <div className="bg-background flex items-center justify-center p-4 text-center md:w-1/3">
+                            <div className="flex flex-col items-center gap-4">
+                                <Loader size={48} className="animate-pulse" />
+                                <p className="mx-auto animate-pulse text-3xl font-bold">
+                                    Processing<span>...</span>
+                                </p>
+                                <p className="mx-auto">Intervention is being submitted...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }

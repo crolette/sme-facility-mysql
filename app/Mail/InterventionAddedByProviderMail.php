@@ -5,13 +5,13 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use App\Models\Tenants\Intervention;
-use Illuminate\Mail\Mailables\Address;
+use App\Models\Tenants\InterventionAction;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class SendInterventionToProviderEmail extends Mailable
+class InterventionAddedByProviderMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -20,8 +20,7 @@ class SendInterventionToProviderEmail extends Mailable
      */
     public function __construct(
         public Intervention $intervention,
-        public string $url
-        )
+        public InterventionAction $interventionAction)
     {
         //
     }
@@ -32,8 +31,7 @@ class SendInterventionToProviderEmail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('notifications@sme-facility.com', 'SME-Facility - Notification'),
-            subject: 'An intervention requires your attention from ' . tenancy()->tenant->company_name . ' for ' . $this->intervention->interventionable->name,
+            subject: 'Intervention Added By Provider ' . 'for ' . $this->intervention->interventionable->name
         );
     }
 
@@ -43,7 +41,7 @@ class SendInterventionToProviderEmail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.send-intervention-provider',
+            view: 'emails.intervention-added-by-provider',
         );
     }
 

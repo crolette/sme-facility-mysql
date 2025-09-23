@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Tenants;
 
+use App\Events\InterventionAddedByProviderEvent;
 use Exception;
 use Inertia\Inertia;
 use App\Helpers\ApiResponse;
@@ -37,8 +38,9 @@ class InterventionProviderController extends Controller
         try {
             DB::beginTransaction();
 
-            $this->interventionActionService->create($intervention, $request->validated());
+            $interventionAction = $this->interventionActionService->create($intervention, $request->validated());
 
+            event(new InterventionAddedByProviderEvent($intervention, $interventionAction));
 
             DB::commit();
 

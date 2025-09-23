@@ -28,8 +28,6 @@ Route::middleware([
     PreventAccessFromCentralDomains::class,
     'auth:tenant'
 ])->prefix('/v1/interventions')->group(function () {
-    // Get all tickets
-
 
     Route::post('/create', [APIInterventionController::class, 'store'])->name('api.interventions.store');
 
@@ -47,7 +45,7 @@ Route::middleware([
 
         Route::get('providers', function(Intervention $intervention) {
 
-            $providers = $intervention->interventionable->maintainable->providers;
+            $providers = $intervention->interventionable->maintainable->providers->load('users');
 
             return ApiResponse::success($providers, 'Providers');
         })->name('api.interventions.providers');

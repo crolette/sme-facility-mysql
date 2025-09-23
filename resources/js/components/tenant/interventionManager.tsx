@@ -1,5 +1,5 @@
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
-import { CentralType, Intervention } from '@/types';
+import { CentralType, Intervention, Provider, User } from '@/types';
 import axios from 'axios';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { Button } from '../ui/button';
@@ -8,6 +8,8 @@ import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import { InterventionActionManager } from './interventionActionManager';
 import { Pill } from '../ui/pill';
+import SearchableInput from '../SearchableInput';
+import { Loader, X } from 'lucide-react';
 
 interface InterventionManagerProps {
     itemCodeId: number | string;
@@ -101,20 +103,17 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         setAddIntervention(true);
     };
 
-    const cancelModale = () => {
-        setInterventionDataForm(interventionData);
-        setAddIntervention(false);
-        setSubmitType('edit');
-    };
     const closeModale = () => {
         setInterventionDataForm(interventionData);
         setAddIntervention(false);
         fetchInterventions();
         setSubmitType('edit');
+        setIsProcessing(false);
     };
 
     const submitIntervention: FormEventHandler = async (e) => {
         e.preventDefault();
+         setIsProcessing(true);
 
         try {
             const response = await axios.post(route('api.interventions.store'), interventionDataForm);
@@ -152,16 +151,20 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
 
     const submitEditIntervention: FormEventHandler = async (e) => {
         e.preventDefault();
+        setIsProcessing(true);
+
         try {
             const response = await axios.patch(route('api.interventions.update', interventionDataForm.intervention_id), interventionDataForm);
             if (response.data.status === 'success') {
                 fetchInterventions();
                 setAddIntervention(false);
                 setSubmitType('new');
+                setIsProcessing(false);
                 setInterventionDataForm(interventionData);
             }
         } catch (error) {
             console.error('Erreur lors de la recherche : ', error);
+            setIsProcessing(false);
         }
     };
 
@@ -187,6 +190,60 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         setActionsChanged(false);
     }, [actionsChanged === true]);
 
+    const [sendInterventionToProviderModale, setSendInterventionToProviderModale] = useState<boolean>(false);
+    const [interventionToSend, setInterventionToSend] = useState<number | null>(null);
+    const [isProcessing, setIsProcessing] = useState<boolean>(false);
+
+    const [providers, setProviders] = useState<Provider[] | null>(null)
+    const [providerEmail, setProviderEmail] = useState<User | null>()
+
+    const sendIntervention = (id: number) => {
+        fetchProviders(id);
+        setInterventionToSend(id);
+        setSendInterventionToProviderModale(true);
+
+
+    };
+
+
+    const fetchProviders = async (id: number) => {
+        try {
+            const response = await axios.get(route('api.interventions.providers', id));
+            if (response.data.status === 'success') {
+                console.log(response.data)
+                setProviders(response.data.data);
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const sendInterventionMail = async () => {
+        if (!interventionToSend || !providerEmail)
+            return;
+
+        setIsProcessing(true);
+        
+        try {
+            const response = await axios.post(route('api.interventions.send-provider', interventionToSend), providerEmail);
+            if (response.data.status === 'success') {
+                closeSendInterventionToProviderModale();
+            }
+        } catch (error) {
+            console.log(error);
+            setIsProcessing(false);
+         }
+    }
+
+
+    const closeSendInterventionToProviderModale = () => {
+        setSendInterventionToProviderModale(false);
+        setProviderEmail(null);
+        setProviders(null);
+        setInterventionToSend(null);
+        setIsProcessing(false);
+    }
+
     return (
         <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
             <h2 className="inline">Interventions ({interventions?.length ?? 0})</h2>
@@ -210,10 +267,12 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                         interventions.length > 0 &&
                         interventions.map((intervention, index) => (
                             <>
-                                <TableBodyRow>
+                                <TableBodyRow className="even:bg-red-400">
                                     <TableBodyData>{intervention.intervention_type.label}</TableBodyData>
                                     <TableBodyData>{intervention.description}</TableBodyData>
-                                    <TableBodyData><Pill variant={intervention.priority}>{intervention.priority}</Pill></TableBodyData>
+                                    <TableBodyData>
+                                        <Pill variant={intervention.priority}>{intervention.priority}</Pill>
+                                    </TableBodyData>
                                     <TableBodyData>{intervention.status}</TableBodyData>
                                     <TableBodyData>{intervention.planned_at ?? 'Not planned'}</TableBodyData>
                                     <TableBodyData>{intervention.repair_delay ?? 'No repair delay'}</TableBodyData>
@@ -225,6 +284,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                                 <Button type="button" variant="destructive" onClick={() => deleteIntervention(intervention.id)}>
                                                     Delete
                                                 </Button>
+                                                <Button onClick={() => sendIntervention(intervention.id)}>Send to provider</Button>
                                             </>
                                         )}
                                     </TableBodyData>
@@ -248,140 +308,241 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                         ))}
                 </TableBody>
             </Table>
+            {sendInterventionToProviderModale && (
+                <div className="bg-background/50 fixed inset-0 z-50">
+                    <div className="bg-background/20 flex h-dvh items-center justify-center">
+                        <div className="bg-background flex flex-col items-center justify-center p-10">
+                            {isProcessing && (
+                                <div className="flex flex-col items-center gap-4">
+                                    <Loader size={48} className="animate-pulse" />
+                                    <p className="mx-auto animate-pulse text-3xl font-bold">
+                                        Processing...
+                                    </p>
+                                    <p className="mx-auto">Intervention is being sent...</p>
+                                </div>
+                            )}
+                            {!isProcessing && (
+                                <div>
+                                    <h5>Send intervention to provider</h5>
+                                    <p>Select user provider or internal user to send this intervention to</p>
+
+                                    <div className="flex w-full flex-col">
+                                        <p className="font-semibold">Providers</p>
+                                        {providers ? (
+                                            providers.length > 0 ? (
+                                                <>
+                                                    <ul>
+                                                        {providers.map((provider) => (
+                                                            <>
+                                                                <li key={provider.id} className="font-bold">
+                                                                    {provider.name}
+                                                                </li>
+                                                                <ul>
+                                                                    {provider.users &&
+                                                                        provider.users.map((user: User) => (
+                                                                            <li className="cursor-pointer" onClick={() => setProviderEmail(user)}>
+                                                                                {user.full_name} -{user.email}
+                                                                            </li>
+                                                                        ))}
+                                                                </ul>
+                                                            </>
+                                                        ))}
+                                                    </ul>
+                                                </>
+                                            ) : (
+                                                <p>No providers</p>
+                                            )
+                                        ) : (
+                                            <p className="animate-pulse">Loading providers...</p>
+                                        )}
+                                    </div>
+                                    <div className="flex w-full flex-col">
+                                        <p className="font-semibold">Internal users</p>
+                                        <SearchableInput<User>
+                                            searchUrl={route('api.users.search')}
+                                            searchParams={{ interns: 1 }}
+                                            displayValue={''}
+                                            getDisplayText={(user) => user.full_name}
+                                            getKey={(user) => user.id}
+                                            onDelete={() => setProviderEmail(null)}
+                                            onSelect={(user) => {
+                                                setProviderEmail(user);
+                                            }}
+                                            placeholder="Search internal user..."
+                                            className="mb-4"
+                                        />
+                                    </div>
+
+                                    {providerEmail && (
+                                        <div>
+                                            <p className="text-center">Send email to :</p>
+                                            <div className="flex">
+                                                <p>
+                                                    {providerEmail.full_name} - {providerEmail.email}
+                                                </p>
+                                                <X onClick={() => setProviderEmail(null)} />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <div className="flex w-full justify-between">
+                                        <Button onClick={sendInterventionMail}>Send</Button>
+
+                                        <Button onClick={closeSendInterventionToProviderModale} variant="secondary">
+                                            Cancel
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
             {addIntervention && (
                 <div className="bg-background/50 fixed inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">
                         <div className="bg-background flex items-center justify-center p-10">
-                            <form
-                                onSubmit={submitType === 'new' ? submitIntervention : submitEditIntervention}
-                                className="flex w-full flex-col space-y-4"
-                            >
-                                <Label>Intervention Type</Label>
-                                <select
-                                    name="intervention_type"
-                                    id="intervention_type"
-                                    required
-                                    value={interventionDataForm.intervention_type_id ?? ''}
-                                    onChange={(e) =>
-                                        setInterventionDataForm((prev) => ({
-                                            ...prev,
-                                            intervention_type_id: parseInt(e.target.value),
-                                        }))
-                                    }
+                            {isProcessing && (
+                                <div className="flex flex-col items-center gap-4">
+                                    <Loader size={48} className="animate-pulse" />
+                                    <p className="mx-auto animate-pulse text-3xl font-bold">
+                                        Processing...
+                                    </p>
+                                    <p className="mx-auto">Intervention is being added...</p>
+                                </div>
+                            )}
+                            {!isProcessing && (
+                                <form
+                                    onSubmit={submitType === 'new' ? submitIntervention : submitEditIntervention}
+                                    className="flex w-full flex-col space-y-4"
                                 >
-                                    <option value="">Select intervention type</option>
-                                    {interventionTypes?.map((interventionType) => (
-                                        <option key={interventionType.id} value={interventionType.id}>
-                                            {interventionType.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                <Label>Status</Label>
-                                <select
-                                    name=""
-                                    id=""
-                                    required
-                                    value={interventionDataForm.status ?? ''}
-                                    onChange={(e) =>
-                                        setInterventionDataForm((prev) => ({
-                                            ...prev,
-                                            status: e.target.value,
-                                        }))
-                                    }
-                                >
-                                    <option value="">Select status</option>
-                                    <option value="draft">draft</option>
-                                    <option value="planned">planned</option>
-                                    <option value="in progress">in progress</option>
-                                    <option value="waiting for parts">waiting for parts</option>
-                                    <option value="completed">completed</option>
-                                    <option value="cancelled">cancelled</option>
-                                </select>
-                                <Label>Priority</Label>
-                                <select
-                                    name=""
-                                    id=""
-                                    required
-                                    value={interventionDataForm.priority ?? ''}
-                                    onChange={(e) =>
-                                        setInterventionDataForm((prev) => ({
-                                            ...prev,
-                                            priority: e.target.value,
-                                        }))
-                                    }
-                                >
-                                    <option value="">Select priority</option>
-                                    <option value="low">Low</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">High</option>
-                                    <option value="urgent">Urgent</option>
-                                </select>
-                                <Label>Description</Label>
-                                <Textarea
-                                    placeholder="description"
-                                    value={interventionDataForm.description ?? ''}
-                                    onChange={(e) =>
-                                        setInterventionDataForm((prev) => ({
-                                            ...prev,
-                                            description: e.target.value,
-                                        }))
-                                    }
-                                ></Textarea>
-                                <Label>Planned at</Label>
-                                <div className="flex gap-2">
-                                    <Input
-                                        type="date"
-                                        value={interventionDataForm.planned_at ?? ''}
+                                    <Label>Intervention Type</Label>
+                                    <select
+                                        name="intervention_type"
+                                        id="intervention_type"
+                                        required
+                                        value={interventionDataForm.intervention_type_id ?? ''}
                                         onChange={(e) =>
                                             setInterventionDataForm((prev) => ({
                                                 ...prev,
-                                                planned_at: e.target.value,
-                                            }))
-                                        }
-                                    />
-                                    <Button
-                                        variant={'outline'}
-                                        type="button"
-                                        onClick={() =>
-                                            setInterventionDataForm((prev) => ({
-                                                ...prev,
-                                                planned_at: null,
+                                                intervention_type_id: parseInt(e.target.value),
                                             }))
                                         }
                                     >
-                                        Clear planned at
-                                    </Button>
-                                </div>
-                                <Label>Repair delay</Label>
-                                <div className="flex gap-2">
-                                    <Input
-                                        type="date"
-                                        value={interventionDataForm.repair_delay ?? ''}
+                                        <option value="">Select intervention type</option>
+                                        {interventionTypes?.map((interventionType) => (
+                                            <option key={interventionType.id} value={interventionType.id}>
+                                                {interventionType.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <Label>Status</Label>
+                                    <select
+                                        name=""
+                                        id=""
+                                        required
+                                        value={interventionDataForm.status ?? ''}
                                         onChange={(e) =>
                                             setInterventionDataForm((prev) => ({
                                                 ...prev,
-                                                repair_delay: e.target.value,
-                                            }))
-                                        }
-                                    />
-                                    <Button
-                                        variant={'outline'}
-                                        type="button"
-                                        onClick={() =>
-                                            setInterventionDataForm((prev) => ({
-                                                ...prev,
-                                                repair_delay: null,
+                                                status: e.target.value,
                                             }))
                                         }
                                     >
-                                        Clear Repair delay
+                                        <option value="">Select status</option>
+                                        <option value="draft">draft</option>
+                                        <option value="planned">planned</option>
+                                        <option value="in progress">in progress</option>
+                                        <option value="waiting for parts">waiting for parts</option>
+                                        <option value="completed">completed</option>
+                                        <option value="cancelled">cancelled</option>
+                                    </select>
+                                    <Label>Priority</Label>
+                                    <select
+                                        name=""
+                                        id=""
+                                        required
+                                        value={interventionDataForm.priority ?? ''}
+                                        onChange={(e) =>
+                                            setInterventionDataForm((prev) => ({
+                                                ...prev,
+                                                priority: e.target.value,
+                                            }))
+                                        }
+                                    >
+                                        <option value="">Select priority</option>
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                        <option value="urgent">Urgent</option>
+                                    </select>
+                                    <Label>Description</Label>
+                                    <Textarea
+                                        placeholder="description"
+                                        value={interventionDataForm.description ?? ''}
+                                        onChange={(e) =>
+                                            setInterventionDataForm((prev) => ({
+                                                ...prev,
+                                                description: e.target.value,
+                                            }))
+                                        }
+                                    ></Textarea>
+                                    <Label>Planned at</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="date"
+                                            value={interventionDataForm.planned_at ?? ''}
+                                            onChange={(e) =>
+                                                setInterventionDataForm((prev) => ({
+                                                    ...prev,
+                                                    planned_at: e.target.value,
+                                                }))
+                                            }
+                                        />
+                                        <Button
+                                            variant={'outline'}
+                                            type="button"
+                                            onClick={() =>
+                                                setInterventionDataForm((prev) => ({
+                                                    ...prev,
+                                                    planned_at: null,
+                                                }))
+                                            }
+                                        >
+                                            Clear planned at
+                                        </Button>
+                                    </div>
+                                    <Label>Repair delay</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="date"
+                                            value={interventionDataForm.repair_delay ?? ''}
+                                            onChange={(e) =>
+                                                setInterventionDataForm((prev) => ({
+                                                    ...prev,
+                                                    repair_delay: e.target.value,
+                                                }))
+                                            }
+                                        />
+                                        <Button
+                                            variant={'outline'}
+                                            type="button"
+                                            onClick={() =>
+                                                setInterventionDataForm((prev) => ({
+                                                    ...prev,
+                                                    repair_delay: null,
+                                                }))
+                                            }
+                                        >
+                                            Clear Repair delay
+                                        </Button>
+                                    </div>
+                                    <Button type="submit">Submit</Button>
+                                    <Button onClick={closeModale} type="button" variant={'secondary'}>
+                                        Cancel
                                     </Button>
-                                </div>
-                                <Button type="submit">Submit</Button>
-                                <Button onClick={cancelModale} type="button" variant={'secondary'}>
-                                    Cancel
-                                </Button>
-                            </form>
+                                </form>
+                            )}
                         </div>
                     </div>
                 </div>

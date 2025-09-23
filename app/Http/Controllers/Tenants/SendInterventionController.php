@@ -8,18 +8,18 @@ use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
 use App\Models\Tenants\Intervention;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Events\SendInterventionToProviderEvent;
 
 class SendInterventionController extends Controller
 {
     public function store(Intervention $intervention, Request $request)
     {
-        // if(Auth::cannot('update', $intervention))
-        //     return ApiResponse::notAuthorized();
-        
         $validated = $request->validate([
             'email' => 'required|email',
         ]);
+
+        Debugbar::info('SendInterventionController', $validated, $request->all());
 
         $url = URL::temporarySignedRoute(
             'tenant.intervention.provider',

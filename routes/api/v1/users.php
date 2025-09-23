@@ -20,7 +20,7 @@ Route::middleware([
 ])->prefix('/v1/users')->group(function () {
 
     Route::get('/search', function (Request $request) {
-        $query  = User::select('id', 'first_name', 'last_name');
+        $query  = User::select('id', 'first_name', 'last_name', 'email');
 
         if ($request->query('q')) {
             $query->where(function ($subquery) use ($request) {
@@ -30,8 +30,6 @@ Route::middleware([
 
         if ($request->query('interns') === '1')
             $query->whereDoesntHave('provider');
-
-        Debugbar::info($request->query('interns') === '1');
 
         return ApiResponse::success($query->get());
     })->name('api.users.search');
