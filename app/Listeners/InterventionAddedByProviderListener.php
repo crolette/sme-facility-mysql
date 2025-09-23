@@ -29,8 +29,21 @@ class InterventionAddedByProviderListener
             Mail::to('crolweb@gmail.com')
                 ->send(new InterventionAddedByProviderMail($event->intervention, $event->interventionAction));
         } else {
-            Mail::to($event->email)
-                ->send(new InterventionAddedByProviderMail($event->intervention, $event->interventionAction));
+
+            $users = User::role(['Admin'])->get();
+
+            foreach ($users as $user) {
+                Mail::to($user->email)
+                    ->locale($user->preferred_locale ?? config('app.locale'))
+                    ->send(new InterventionAddedByProviderMail($event->intervention, $event->interventionAction));
+            }
+
+            if ($event->intervention->interventionable->manager) {
+                Mail::to($event->ticket->ticketable->manager->email)
+                    ->locale($user->preferred_locale ?? config('app.locale'))
+                    ->send(new InterventionAddedByProviderMail($event->intervention, $event->interventionAction));
+            }
+
         }
     }
 }
