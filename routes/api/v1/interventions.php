@@ -34,7 +34,7 @@ Route::middleware([
     Route::post('/create', [APIInterventionController::class, 'store'])->name('api.interventions.store');
 
     Route::prefix('/{intervention}')->group(function() {
-
+        Route::get('/', [APIInterventionController::class, 'show'])->name('api.interventions.show');
         Route::patch('/', [APIInterventionController::class, 'update'])
         ->name('api.interventions.update');
         Route::delete('/', [APIInterventionController::class, 'destroy'])

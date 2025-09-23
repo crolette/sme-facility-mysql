@@ -254,6 +254,9 @@ export interface Intervention {
     interventionable_id?: number;
     actions?: InterventionAction[];
     maintainable: Maintainable;
+    type: string;
+    created_at: string;
+    updated_at: string;
     interventionable_type: string;
     interventionable: TenantSite | TenantBuilding | TenantFloor | TenantRoom | Asset;
 }
@@ -271,6 +274,7 @@ export interface InterventionAction {
     creator?: User;
     updater?: User;
     creator_email?: string;
+    type: string;
 }
 
 export interface AssetCategory {

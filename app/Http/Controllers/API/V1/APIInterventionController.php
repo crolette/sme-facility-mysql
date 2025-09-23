@@ -39,6 +39,14 @@ class APIInterventionController extends Controller
     //     return ApiResponse::success($ticket->load('pictures'), 'Ticket');
     // }
 
+    public function show(Intervention $intervention)
+    {
+        $intervention->load('ticket', 'interventionable');
+        return ApiResponse::success($intervention, 'Intervention');
+
+    }
+
+
     public function store(InterventionRequest $request)
     {
         Debugbar::info('store intervention', $request->validated());

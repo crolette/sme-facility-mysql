@@ -12,17 +12,24 @@ use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
 use App\Models\Tenants\InterventionAction;
 use App\Http\Requests\Tenant\InterventionActionRequest;
+use App\Services\InterventionActionService;
 
 class InterventionProviderController extends Controller
 {
+    public function __construct(
+        protected InterventionActionService $interventionActionService
+    ) {}
+
     public function create(Intervention $intervention, Request $request) {
 
-        $intervention->load('interventionable','ticket','actions');
-        // dd($request->getQueryString(), $request->normalizeQueryString($request->getQueryString()));
-        $types = CategoryType::where('category', 'action')->get();
-        // dd($types);
+        $intervention->select('id', 'intervention_type_id', 'description', 'updated_at')->with('interventionable','ticket', 'actions:id,action_type_id,intervention_id,description')->get();
+        
+        $asset = $intervention->interventionable;
+        $pastInterventions = $asset->interventions()->select('id', 'intervention_type_id', 'description', 'updated_at')->with('actions:id,action_type_id,intervention_id,description,updated_at')->whereNot('id', $intervention->id)->get();
 
-        return Inertia::render('tenants/interventions/ProviderPage', ['intervention' => $intervention, 'email' => $request->email, 'actionTypes' => $types, 'query' => $request->getQueryString()]);
+        $types = CategoryType::where('category', 'action')->get();
+
+        return Inertia::render('tenants/interventions/ProviderPage', ['intervention' => $intervention, 'email' => $request->email, 'actionTypes' => $types, 'query' => $request->getQueryString(), 'pastInterventions' => $pastInterventions]);
     }
 
     public function store(Intervention $intervention, InterventionActionRequest $request) 
@@ -30,14 +37,7 @@ class InterventionProviderController extends Controller
         try {
             DB::beginTransaction();
 
-            $action = new InterventionAction($request->validated());
-
-            $action->actionType()->associate($request->validated('action_type_id'));
-            if (!$request->validated('creator_email')) {
-                $action->creator()->associate($request->validated('created_by'));
-            }
-
-            $intervention->actions()->save($action);
+            $this->interventionActionService->create($intervention, $request->validated());
 
 
             DB::commit();

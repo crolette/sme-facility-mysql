@@ -73,43 +73,38 @@ it('can send an intervention to a provider', function() {
 
 });
 
-it('a provider can access to an intervention', function () {
+it('a provider can access to the intervention page', function () {
 
+    Intervention::factory()->forLocation($this->asset)->create();
+    $interventionOne = Intervention::factory()->forLocation($this->asset)->create();
+    InterventionAction::factory()->forIntervention($interventionOne)->create();
+    InterventionAction::factory()->forIntervention($interventionOne)->create();
+    $interventionOne->update([
+        'status' => InterventionStatus::COMPLETED->value
+    ]);
 
-    // $interventionOne = Intervention::factory()->forLocation($this->asset)->create();
-    // InterventionAction::factory()->forIntervention($interventionOne)->create();
-    // InterventionAction::factory()->forIntervention($interventionOne)->create();
-    // $interventionOne->update([
-    //     'status' => InterventionStatus::COMPLETED->value
-    // ]);
+    $interventionTwo = Intervention::factory()->forLocation($this->asset)->create();
 
-    // $interventionTwo = Intervention::factory()->forLocation($this->asset)->create();
+    $actionTypesCount = CategoryType::where('category', 'action')->count();
 
-    // $url = URL::temporarySignedRoute(
-    //     'tenant.intervention.provider',
-    //     now()->addDays(7),
-    //     ['intervention' => $interventionTwo->id, 'id' => $interventionTwo->id, 'email' => 'test@test.com']
-    // );
-
-    // $route = $this->tenantRoute('tenant.intervention.provider', $interventionTwo->id);
-    // dump($route);
-    // dump($url);
-    // $tenantUrl = preg_replace('/^https?:\/\/[^\/]+/', "http://{$this->tenant->id}.localhost:8000", $url);
-
-    // dump($tenantUrl);
-
-    // $response = $this->withoutMiddleware('signed')->get($tenantUrl);
-    // $response->assertSessionHasNoErrors();
-    // $response->assertOk();
-    // $response->assertInertia(
-    //     fn($page) => $page->component('tenants/interventions/ProviderPage')->has('intervention')->where('intervention.id', $interventionTwo->id)
-    // );
+    // route tested with signed middleware removed from routes
+    $response = $this->getFromTenant('tenant.intervention.provider', $interventionTwo->id);
+    $response->assertSessionHasNoErrors();
+    $response->assertOk();
+    $response->assertInertia(
+        fn($page) => 
+            $page->component('tenants/interventions/ProviderPage')
+                ->has('intervention')
+                ->has('actionTypes', $actionTypesCount)
+                ->has('pastInterventions', 2)
+                ->where('intervention.id', $interventionTwo->id)
+    );
 
 
 });
 
 
-it('can retrieve providers linked to an intervention (asset)', function() {
+it('can retrieve providers linked to an intervention (asset) to select to which one to send', function() {
 
     $providers = Provider::factory()->count(2)->create();
     $this->asset->maintainable->providers()->sync($providers->pluck('id'));
@@ -124,9 +119,11 @@ it('can retrieve providers linked to an intervention (asset)', function() {
 
 });
 
+
 it('can post an action as external provider', function() {
 
     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $provider = User::factory()->create();
 
     $formData = [
         'action_type_id' => $this->interventionActionType->id,
@@ -135,29 +132,23 @@ it('can post an action as external provider', function() {
         'started_at' => '13:25',
         'finished_at' => '17:30',
         'intervention_costs' => '9999999.25',
-        'created_by' => $this->user->id
+        'creator_email' => $provider->email
     ];
 
-    $url = URL::temporarySignedRoute(
-        'tenant.intervention.provider',
-        now()->addDays(7),
-        ['intervention' => $intervention->id,  'email' => 'test@test.com']
-    );
 
-    $response = $this->withoutMiddleware('signed')->post($url, $formData);
+    // route tested with signed middleware removed from routes
+    $response = $this->postToTenant('tenant.intervention.provider.store', $formData, $intervention->id);
     $response->assertOk();
 
+    assertDatabaseHas('intervention_actions', 
+    [
+        'intervention_id' => $intervention->id,
+            'description' => 'New action for intervention',
+            'intervention_date' => Carbon::now()->add('day', 7)->toDateString(),
+            'started_at' => '13:25',
+            'finished_at' => '17:30',
+            'intervention_costs' => '9999999.25',
+            'creator_email' => $provider->email
+    ]);
+
 });
-
-
-// it('rejects unsigned route access', function () {
-//     $intervention = Intervention::factory()->create();
-
-//     $response = $this->get(route('tenant.intervention.provider', [
-//         'intervention' => $intervention->id,
-//         'id' => $intervention->id,
-//         'email' => 'test@test.com'
-//     ]));
-
-//     $response->assertStatus(403); // ou 401
-// });

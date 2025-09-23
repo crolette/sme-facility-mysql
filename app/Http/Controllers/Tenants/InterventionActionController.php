@@ -24,7 +24,7 @@ class InterventionActionController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function edit(InterventionAction $action)
+    public function edit(Intervention $intervention, InterventionAction $action)
     {
         return Inertia::render('tenants/tickets/interventions/actions/create', ['action' => $action]);
     }

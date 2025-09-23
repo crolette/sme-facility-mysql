@@ -2,11 +2,13 @@
 
 namespace App\Models\Tenants;
 
+use Carbon\Carbon;
 use App\Models\Tenants\User;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -27,10 +29,17 @@ class InterventionAction extends Model
         'actionType:id',
     ];
 
+    protected $appends = [
+        'type'
+    ];
+
     protected function casts(): array
     {
         return [
+            'intervention_costs' => 'decimal:2',
             'intervention_date' => 'date:d-m-Y',
+            'started_at' => 'date:H:i',
+            'finished_at' => 'date:H:i',
             'created_at' => 'date:d-m-Y H:i',
             'updated_at' => 'date:d-m-Y H:i',
         ];
@@ -39,15 +48,17 @@ class InterventionAction extends Model
     public static function booted()
     {
         static::addGlobalScope('ancient', function (Builder $builder) {
-            $builder->orderBy('created_at', 'desc');
+            $builder->orderBy('updated_at', 'desc');
         });
 
         static::created(function ($action) {
             $action->intervention->updateTotalCosts();
+            $action->intervention->setUpdatedAt(Carbon::now());
         });
-
+        
         static::updated(function ($action) {
             $action->intervention->updateTotalCosts();
+            $action->intervention->setUpdatedAt(Carbon::now());
         });
 
         static::deleted(function ($action) {
@@ -75,5 +86,14 @@ class InterventionAction extends Model
     public function updater(): BelongsTo
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function type($locale = null): Attribute
+    {
+        $locale = $locale ?? app()->getLocale();
+
+        return Attribute::make(
+            get: fn() => $this->actionType->translations->where('locale', $locale)->first()?->label ?? $this->actionType->translations->where('locale', config('app.fallback_locale'))?->label
+        );
     }
 }

@@ -220,7 +220,7 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                 )}
             </ul>
             {addInterventionAction && (
-                <div className="bg-background/50 absolute inset-0 z-50">
+                <div className="bg-background/50 fixed inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">
                         <div className="bg-background flex items-center justify-center p-4">
                             <form

@@ -116,13 +116,19 @@ Route::middleware([
     });
     
     // INTERVENTIONS
-    Route::get('interventions/', [InterventionController::class, 'index'])->name('tenant.interventions.index');
-    Route::get('interventions/create/{ticket}', [InterventionController::class, 'create'])->name('tenant.interventions.create');
-    Route::get('interventions/{intervention}', [InterventionController::class, 'show'])->name('tenant.interventions.show');
-    Route::get('interventions/{intervention}/actions/create', [InterventionActionController::class, 'create'])->name('tenant.interventions.actions.create');
-    Route::get('actions/{action}/edit', [InterventionActionController::class, 'edit'])->name('tenant.interventions.actions.edit');
-    Route::get('interventions/{intervention}/external', [InterventionProviderController::class, 'create'])->name('tenant.intervention.provider')->middleware('signed');
-    Route::post('interventions/{intervention}/external', [InterventionProviderController::class, 'store'])->name('tenant.intervention.provider.store')->middleware('signed');
+
+    Route::prefix('interventions')->group(function() {
+        Route::get('', [InterventionController::class, 'index'])->name('tenant.interventions.index');
+        Route::get('/create/{ticket}', [InterventionController::class, 'create'])->name('tenant.interventions.create');
+        Route::get('/{intervention}', [InterventionController::class, 'show'])->name('tenant.interventions.show');
+        Route::get('/{intervention}/actions/create', [InterventionActionController::class, 'create'])->name('tenant.interventions.actions.create');
+        Route::get('/{intervention}/actions/{action}/edit', [InterventionActionController::class, 'edit'])->name('tenant.interventions.actions.edit');
+
+        Route::get('/{intervention}/external', [InterventionProviderController::class, 'create'])->name('tenant.intervention.provider');
+        // Route::get('/{intervention}/external', [InterventionProviderController::class, 'create'])->name('tenant.intervention.provider')->middleware('signed');
+        Route::post('/{intervention}/external', [InterventionProviderController::class, 'store'])->name('tenant.intervention.provider.store');
+        // Route::post('/{intervention}/external', [InterventionProviderController::class, 'store'])->name('tenant.intervention.provider.store')->middleware('signed');
+    });
 });
 
 
