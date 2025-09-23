@@ -220,8 +220,7 @@ export default function CreateLocation({
             return files;
         });
     };
-
-    const todayDate = new Date().toISOString().split('T')[0];
+    const todayDate = location ? '': new Date().toISOString().split('T')[0];
 
     const addFileModalForm = () => {
         return (
@@ -348,7 +347,6 @@ export default function CreateLocation({
         setCountContracts((prev) => prev - 1);
     };
 
-    // console.log(errors.contracts[1].status);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -435,6 +433,19 @@ export default function CreateLocation({
                         placeholder="Name"
                     />
                     <InputError className="mt-2" message={errors.name ?? ''} />
+
+                     <Label htmlFor="name">Description</Label>
+                    <Input
+                        id="description"
+                        type="text"
+                        required
+                        // disabled={type?.prefix ? true : false}
+                        maxLength={255}
+                        value={data.description}
+                        onChange={(e) => setData('description', e.target.value)}
+                        placeholder="Description"
+                    />
+                    <InputError className="mt-2" message={errors.description ?? ''} />
 
                     {!location && (
                         <div>
@@ -648,18 +659,7 @@ export default function CreateLocation({
                         </>
                     )}
 
-                    <Label htmlFor="name">Description</Label>
-                    <Input
-                        id="description"
-                        type="text"
-                        required
-                        // disabled={type?.prefix ? true : false}
-                        maxLength={255}
-                        value={data.description}
-                        onChange={(e) => setData('description', e.target.value)}
-                        placeholder="Description"
-                    />
-                    <InputError className="mt-2" message={errors.description ?? ''} />
+                   
                     <div>
                         <Label htmlFor="need_maintenance">Need maintenance ?</Label>
                         <Checkbox
@@ -723,7 +723,7 @@ export default function CreateLocation({
                                         id="next_maintenance_date"
                                         type="date"
                                         value={data.next_maintenance_date ?? ''}
-                                        min={todayDate}
+                                        min = {todayDate}
                                         onChange={(e) => setData('next_maintenance_date', e.target.value)}
                                         placeholder="Date last maintenance"
                                     />
@@ -771,8 +771,7 @@ export default function CreateLocation({
                                 <PlusCircleIcon onClick={() => setCountContracts((prev) => prev + 1)} />
                             </div>
 
-                            {countContracts &&
-                                countContracts > 0 &&
+                            {countContracts > 0 &&
                                 [...Array(countContracts)].map((_, index) => (
                                     <div key={index} className="flex flex-col gap-2 rounded-md border-2 border-slate-400 p-4">
                                         <div className="flex w-fit gap-2">

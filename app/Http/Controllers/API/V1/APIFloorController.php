@@ -19,6 +19,7 @@ use App\Services\MaintainableService;
 use App\Http\Requests\Tenant\TenantFloorRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Http\Requests\Tenant\MaintainableUpdateRequest;
 use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
 
 class APIFloorController extends Controller
@@ -91,7 +92,7 @@ class APIFloorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(TenantFloorRequest $floorRequest, MaintainableRequest $maintainableRequest, Floor $floor)
+    public function update(TenantFloorRequest $floorRequest, MaintainableUpdateRequest $maintainableRequest, Floor $floor)
     {
         if (Auth::user()->cannot('update', $floor))
             abort(403);

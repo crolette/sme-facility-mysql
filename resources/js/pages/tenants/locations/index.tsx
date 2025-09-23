@@ -1,4 +1,5 @@
 import Modale from '@/components/Modale';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
@@ -18,6 +19,7 @@ export default function IndexSites({ items, routeName }: { locations: TenantSite
     const [locations, setLocations] = useState(items);
     const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
     const [locationToDelete, setLocationToDelete] = useState<TenantSite | TenantBuilding | TenantFloor | TenantRoom | null>(null);
+    const { showToast } = useToast();
 
     const deleteLocation = async () => {
         try {
@@ -26,9 +28,11 @@ export default function IndexSites({ items, routeName }: { locations: TenantSite
                 setShowDeleteModale(false);
                 setLocationToDelete(null);
                 fetchLocations();
+                showToast(response.data.message, response.data.status)
             }
         } catch (error) {
             console.log(error);
+            setShowDeleteModale(false);
         }
     };
 

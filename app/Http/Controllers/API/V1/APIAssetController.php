@@ -22,6 +22,7 @@ use App\Http\Requests\Tenant\AssetUpdateRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Http\Requests\Tenant\MaintainableUpdateRequest;
 use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
 
 class APIAssetController extends Controller
@@ -88,7 +89,7 @@ class APIAssetController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(AssetUpdateRequest $request, MaintainableRequest $maintainableRequest, Asset $asset)
+    public function update(AssetUpdateRequest $request, MaintainableUpdateRequest $maintainableRequest, Asset $asset)
     {
 
         if (Auth::user()->cannot('update', $asset))

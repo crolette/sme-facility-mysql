@@ -18,6 +18,7 @@ use App\Services\MaintainableService;
 use App\Http\Requests\Tenant\TenantSiteRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Http\Requests\Tenant\MaintainableUpdateRequest;
 use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
 
 class APISiteController extends Controller
@@ -85,7 +86,7 @@ class APISiteController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(TenantSiteRequest $siteRequest, MaintainableRequest $maintainableRequest,  Site $site)
+    public function update(TenantSiteRequest $siteRequest, MaintainableUpdateRequest $maintainableRequest,  Site $site)
     {
         if (Auth::user()->cannot('update', $site))
             abort(403);

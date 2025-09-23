@@ -19,6 +19,7 @@ use App\Services\MaintainableService;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Requests\Tenant\TenantBuildingRequest;
+use App\Http\Requests\Tenant\MaintainableUpdateRequest;
 use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
 
 class APIBuildingController extends Controller
@@ -94,7 +95,7 @@ class APIBuildingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(TenantBuildingRequest $buildingRequest, MaintainableRequest $maintainableRequest, Building $building)
+    public function update(TenantBuildingRequest $buildingRequest, MaintainableUpdateRequest $maintainableRequest, Building $building)
     {
         if (Auth::user()->cannot('update', $building))
             abort(403);

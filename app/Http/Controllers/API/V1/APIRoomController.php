@@ -17,11 +17,13 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\TenantRoomRequest;
 use App\Http\Requests\Tenant\TenantFloorRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
+use App\Http\Requests\Tenant\MaintainableUpdateRequest;
 
 class APIRoomController extends Controller
 {
@@ -95,7 +97,7 @@ class APIRoomController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(TenantRoomRequest $roomRequest, MaintainableRequest $maintainableRequest, Room $room)
+    public function update(TenantRoomRequest $roomRequest, MaintainableUpdateRequest $maintainableRequest, Room $room)
     {
         if (Auth::user()->cannot('update', $room))
             abort(403);
@@ -146,9 +148,11 @@ class APIRoomController extends Controller
         if (Auth::user()->cannot('delete', $room))
             abort(403);
 
-
+        Debugbar::info('DESTROY');
         if (count($room->assets) > 0) {
-            abort(409)->with(['message' => 'Room cannot be deleted ! Assets are linked to this room', 'type' => 'warning']);
+            Debugbar::info('Cannot delete');
+            // return ApiResponse::success('', 'Room deleted');
+            return ApiResponse::error('Room cannot be deleted ! Assets are linked to this room');
         }
 
 
