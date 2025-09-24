@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Tenants;
 
-use App\Events\InterventionAddedByProviderEvent;
 use Exception;
 use Inertia\Inertia;
 use App\Helpers\ApiResponse;
@@ -11,9 +10,11 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Models\Tenants\InterventionAction;
-use App\Http\Requests\Tenant\InterventionActionRequest;
 use App\Services\InterventionActionService;
+use App\Events\InterventionAddedByProviderEvent;
+use App\Http\Requests\Tenant\InterventionActionRequest;
 
 class InterventionProviderController extends Controller
 {
@@ -22,7 +23,7 @@ class InterventionProviderController extends Controller
     ) {}
 
     public function create(Intervention $intervention, Request $request) {
-
+        
         $intervention->select('id', 'intervention_type_id', 'description', 'updated_at')->with('interventionable','ticket', 'actions:id,action_type_id,intervention_id,description')->get();
         
         $asset = $intervention->interventionable;
