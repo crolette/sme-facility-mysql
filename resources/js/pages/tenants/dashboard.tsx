@@ -17,12 +17,10 @@ export default function TenantDashboard({
     maintainables,
     interventions,
 }: {
-        counts: { ticketsCount: number, assetsCount: number, interventionsCount: number };
+    counts: { ticketsCount: number, assetsCount: number, interventionsCount: number };
     maintainables: Maintainable[];
     interventions: Intervention[];
 }) {
-    console.log(counts);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
@@ -39,22 +37,22 @@ export default function TenantDashboard({
                         {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
                     </div>
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex items-center justify-center overflow-hidden rounded-xl border p-4">
-                        <a href={route('tenant.assets.index')} className="text-center  !no-underline">
+                        <a href={route('tenant.assets.index')} className="text-center !no-underline">
                             <div className="flex flex-col items-center justify-center">
                                 <p className="font-semibold uppercase">Assets</p>
                                 <Cuboid strokeWidth={1} className="m-auto h-12 w-12" />
-                                <p  className="text-lg">{counts.assetsCount}</p>
+                                <p className="text-lg">{counts.assetsCount}</p>
                             </div>
                         </a>
                         {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
                     </div>
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-4">
                         {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
-                        <a href={route('tenant.assets.index')} className="text-center  !no-underline">
+                        <a href={route('tenant.assets.index')} className="text-center !no-underline">
                             <div className="flex flex-col items-center justify-center">
                                 <p className="font-semibold uppercase">Interventions</p>
                                 <Wrench strokeWidth={1} className="m-auto h-12 w-12" />
-                                <p  className="text-lg">{counts.interventionsCount}</p>
+                                <p className="text-lg">{counts.interventionsCount}</p>
                             </div>
                         </a>
                     </div>
@@ -68,7 +66,7 @@ export default function TenantDashboard({
                                     <li key={maintainable.id} className="even:bg-sidebar odd:bg-secondary p-2">
                                         <a href={maintainable.maintainable.location_route} className="!no-underline">
                                             <p>
-                                                {maintainable.next_maintenance_date} - {maintainable.name}
+                                                        {maintainable.next_maintenance_date}- {maintainable.name}
                                             </p>
                                             <p className="text-sm">
                                                 ({maintainable.maintainable.reference_code}) - {maintainable.maintenance_frequency}
