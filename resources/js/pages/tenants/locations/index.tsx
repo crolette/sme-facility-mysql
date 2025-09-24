@@ -7,6 +7,7 @@ import { BreadcrumbItem, TenantBuilding, TenantFloor, TenantRoom, TenantSite } f
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
 import { useState } from 'react';
+import { BiSolidFilePdf } from 'react-icons/bi';
 
 export default function IndexSites({ items, routeName }: { locations: TenantSite[] | TenantBuilding[] | TenantFloor[]; routeName: string }) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -52,9 +53,17 @@ export default function IndexSites({ items, routeName }: { locations: TenantSite
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sites" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <a href={route(`tenant.${routeName}.create`)}>
-                    <Button>Create</Button>
-                </a>
+                <div className='flex space-x-2'>
+                    <a href={route(`tenant.${routeName}.create`)}>
+                        <Button>Create</Button>
+                    </a>
+                    <a href={route('tenant.pdf.qr-codes', { type: routeName })} target="__blank">
+                        <Button variant={'secondary'}>
+                            <BiSolidFilePdf size={20} />
+                            Download QR Codes
+                        </Button>
+                    </a>
+                </div>
                 <Table>
                     <TableHead>
                         <TableHeadRow>

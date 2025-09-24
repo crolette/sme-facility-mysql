@@ -9,6 +9,7 @@ import { Head } from '@inertiajs/react';
 import axios from 'axios';
 import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { BiSolidFilePdf } from 'react-icons/bi';
 
 export default function IndexAssets({ items }: { items: Asset[] }) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -134,7 +135,7 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
             <Head title="Assets" />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="b flex gap-10 border-b-2">
+                <div className="flex gap-10 border-b-2">
                     <ul className="flex pl-4">
                         <li
                             className={cn(
@@ -164,6 +165,12 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                     <a href={route(`tenant.assets.create`)} className="w-fit">
                         <Button>Create</Button>
                     </a>
+                    <a href={route('tenant.pdf.qr-codes', {type: 'assets'})} target='__blank'>
+                                            <Button variant={'secondary'}>
+                                                <BiSolidFilePdf size={20} />
+                                                Download QR Codes
+                                            </Button>
+                                        </a>
                 </div>
                 {isLoading && (
                     <div className="my-4 flex gap-4">

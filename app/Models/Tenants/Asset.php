@@ -192,14 +192,15 @@ class Asset extends Model
         return $this->interventions()->where('ticket_id', null);
     }
 
-    // public function manager(): Attribute
-    // {
-    //     return Attribute::make(
-    //         get: fn() => $this->maintainable->manager ?? $this->location->maintainable->manager
-    //     );
-    // }
-
-
+    public function getQRCodeForPdf(): Attribute
+    {
+        
+        $imageData = Storage::disk('tenants')->get($this->qr_code);
+        $mimeType = Storage::disk('tenants')->mimeType($this->qr_code);
+        return Attribute::make(
+            get: fn() => 'data:' . $mimeType . ';base64,' . base64_encode($imageData)
+        );
+    }
 
     public function qrCodePath(): Attribute
     {

@@ -209,4 +209,14 @@ class Room extends Model
             get: fn() => Storage::disk('tenants')->url($this->qr_code) ?? null
         );
     }
+
+    public function getQRCodeForPdf(): Attribute
+    {
+
+        $imageData = Storage::disk('tenants')->get($this->qr_code);
+        $mimeType = Storage::disk('tenants')->mimeType($this->qr_code);
+        return Attribute::make(
+            get: fn() => 'data:' . $mimeType . ';base64,' . base64_encode($imageData)
+        );
+    }
 }
