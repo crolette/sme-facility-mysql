@@ -84,4 +84,5 @@ class Maintainable extends Model
     {
         return $this->hasMany(Intervention::class);
     }
+    
 }

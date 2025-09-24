@@ -60,6 +60,7 @@ class Asset extends Model
         'name',
         'description',
         'category',
+        'location_route'
     ];
 
     protected $casts = [

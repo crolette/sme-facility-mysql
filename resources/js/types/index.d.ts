@@ -80,6 +80,7 @@ export interface TenantSite {
     category: string;
     level_id: number;
     location_type: LocationType;
+    location_route: string;
     maintainable: Maintainable;
     contracts: Contract[];
     tickets: Ticket[];
@@ -165,6 +166,7 @@ export interface Asset {
     created_at: string;
     updated_at?: string;
     level_path?: string;
+    location_route: string;
     contracts: Contract[];
     asset_category: AssetCategory;
     maintainable: Maintainable;

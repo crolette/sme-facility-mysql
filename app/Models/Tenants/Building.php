@@ -56,6 +56,7 @@ class Building extends Model
         'name',
         'description',
         'category',
+        'location_route'
     ];
 
     // Ensure route model binding use the slug instead of ID

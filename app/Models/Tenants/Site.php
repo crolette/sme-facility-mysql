@@ -51,6 +51,7 @@ class Site extends Model
         'name',
         'description',
         'category',
+        'location_route'
     ];
 
     // Ensure route model binding use the slug instead of ID
@@ -181,6 +182,13 @@ class Site extends Model
     {
         return Attribute::make(
             get: fn() => $this->maintainable->manager
+        );
+    }
+
+    public function locationRoute(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => route('tenant.sites.show', $this->reference_code)
         );
     }
 }

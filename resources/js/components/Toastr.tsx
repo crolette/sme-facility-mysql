@@ -6,12 +6,9 @@ import { useToast } from './ToastrContext';
 
 
 export default function Toastr() {
-    const { toastData, showToast } = useToast();
+    const { toastData } = useToast();
     const [visible, setVisible] = useState(true);
     const { flash } = usePage<SharedData>().props;
-
-    console.log(toastData)
-    console.log(flash);
 
     useEffect(() => {
         if (flash?.message) {

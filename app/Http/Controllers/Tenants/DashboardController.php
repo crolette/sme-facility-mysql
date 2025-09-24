@@ -20,8 +20,16 @@ class DashboardController extends Controller
 {
     public function show()
     {
-        $assets = Asset::count();
-        $tickets = Ticket::where('status', '!=', 'closed')->count();
+        $assetsCount = Asset::count();
+        $ticketsCount = Ticket::where('status', '!=', 'closed')->count();
+        $interventionsCount = Intervention::where('status', '!=', 'completed')->where('status', '!=', 'cancelled')->count();
+
+        $counts = [
+            'assetsCount' => $assetsCount,
+            'ticketsCount' => $ticketsCount,
+            'interventionsCount' => $interventionsCount,
+        ];
+
         $maintainables = Maintainable::select(
             'id',
             'name',
@@ -49,12 +57,15 @@ class DashboardController extends Controller
             )
             ->orderBy('next_maintenance_date')
             ->limit(10)
-            ->with('maintainable') // on eager-load correctement
+            ->with('maintainable')
             ->get();
 
-        $interventions = Intervention::select('id', 'intervention_type_id', 'priority', 'status', 'maintainable_id', 'interventionable_type', 'interventionable_id', 'ticket_id',)->where('planned_at', '>=', today())->orderBy('planned_at')->limit(10)->with('maintainable:id,name,maintainable_type', 'ticket:id,description', 'interventionable')->get();
+
+            // dd($maintainables);
+
+        $interventions = Intervention::select('id', 'intervention_type_id', 'priority', 'status', 'maintainable_id', 'interventionable_type', 'interventionable_id', 'ticket_id','planned_at')->where('planned_at', '>=', today())->orderBy('planned_at')->limit(10)->with('maintainable:id,name,maintainable_type', 'ticket:id,description', 'interventionable')->get();
         // dd($interventions);
 
-        return Inertia::render('tenants/dashboard', ['assets' => $assets, 'tickets' => $tickets, 'maintainables' => $maintainables, 'interventions' => $interventions]);
+        return Inertia::render('tenants/dashboard', ['counts' => $counts, 'maintainables' => $maintainables, 'interventions' => $interventions]);
     }
 }
