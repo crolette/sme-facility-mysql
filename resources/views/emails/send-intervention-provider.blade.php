@@ -24,7 +24,7 @@
 
         <div class="content">
                 <div class="alert">
-                        <strong>🛡️ Ticket</strong>
+                        <strong>⚠️ Intervention</strong>
                     </div>
                     <div class="details">
                         <strong>Intervention :</strong> {{ $intervention->priority }}  {{ $intervention->status }}<br>
@@ -32,7 +32,6 @@
                         <strong>Name :</strong> {{ $intervention->interventionable->name }}<br>
                         <strong>Description :</strong> {{ $intervention->interventionable->description }}<br>
                         <strong>Planned at :</strong> {{ $intervention->planned_at }}<br>
-                        <strong>URL :</strong> {{ $url }}<br>
                          <a href={{ $url }} class="button">View problem</a>
                     </div>
         </div>
