@@ -11,6 +11,7 @@ use App\Models\Tenants\Document;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -229,6 +230,16 @@ class Building extends Model
     {
         return Attribute::make(
             get: fn() => $this->maintainable->manager
+        );
+    }
+
+    public function getQRCodeForPdf(): Attribute
+    {
+
+        $imageData = Storage::disk('tenants')->get($this->qr_code);
+        $mimeType = Storage::disk('tenants')->mimeType($this->qr_code);
+        return Attribute::make(
+            get: fn() => 'data:' . $mimeType . ';base64,' . base64_encode($imageData)
         );
     }
 }

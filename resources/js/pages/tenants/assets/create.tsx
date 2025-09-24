@@ -2,6 +2,7 @@
 import InputError from '@/components/input-error';
 import SearchableInput from '@/components/SearchableInput';
 import FileManager from '@/components/tenant/FileManager';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -123,6 +124,7 @@ export default function CreateAsset({
         },
     ];
     const [errors, setErrors] = useState<TypeFormData>();
+    const { showToast } = useToast();
     const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
     const { data, setData } = useForm<TypeFormData>({
         q: '',
@@ -214,7 +216,7 @@ export default function CreateAsset({
                     });
                 }
             } catch (error) {
-                console.log(error);
+                 showToast(error.response.data.message, error.response.data.status);
                 setErrors(error.response.data.errors);
             }
         } else {
@@ -230,7 +232,7 @@ export default function CreateAsset({
                     });
                 }
             } catch (error) {
-                console.log(error);
+                showToast(error.response.data.message, error.response.data.status);
                 setErrors(error.response.data.errors);
             }
         }
