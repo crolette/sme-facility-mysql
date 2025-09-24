@@ -30,9 +30,10 @@ class UserService
             if (isset($request['provider_id']))
                 $user = $this->attachProvider($user, $request['provider_id']);
 
-          
-
             $user->save();
+
+            if(isset($request['role']))
+                $user->assignRole($request['role']);
 
             DB::commit();
             return $user;

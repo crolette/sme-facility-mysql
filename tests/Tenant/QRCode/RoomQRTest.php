@@ -54,7 +54,7 @@ it('creates a QR Code when need_qr_code is true at room\'s creation', function (
 
     $location = Room::first();
 
-    $qr_hash = generateQRCodeHash('rooms', $location);
+    $qr_hash = generateQRCodeHash($location);
 
     $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDHHMM')  . '.png';
     $qrPath = tenancy()->tenant->id . "/rooms/" . $location->id . "/qrcode/" . $fileName;
@@ -78,7 +78,7 @@ it('can regenerate a QR Code for a room', function () {
     $response = $this->postToTenant('api.rooms.qr.regen', [], $location->reference_code);
     $response->assertSessionHasNoErrors();
 
-    $qr_hash = generateQRCodeHash('rooms', $location);
+    $qr_hash = generateQRCodeHash($location);
 
     $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDHHMM')  . '.png';
     $qrPath = tenancy()->tenant->id . "/rooms/" . $location->id . "/qrcode/" . $fileName;

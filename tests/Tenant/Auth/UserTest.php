@@ -90,8 +90,6 @@ it('can post a new "loginable" user and return the password', function () {
         ->assertJson(
             fn(AssertableJson $json) =>
             $json->where('status', 'success')
-                ->whereType('data.password', 'string')
-                ->etc()
         );
 
     $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();

@@ -20,7 +20,7 @@ afterEach(function () {
 
 
 it('can access tenant dashboard', function () {
-    $this->actingAs($user = User::factory()->create());
+    $this->actingAs($user = User::factory()->withRole('Admin')->create());
 
     // $url = 'http://test.localhost:8000/dashboard';
 

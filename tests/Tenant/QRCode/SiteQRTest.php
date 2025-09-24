@@ -45,7 +45,7 @@ it('creates a QR Code when need_qr_code is true at site\'s creation', function()
 
     $location = Site::first();
 
-    $qr_hash = generateQRCodeHash('sites', $location);
+    $qr_hash = generateQRCodeHash($location);
 
     $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDHHMM')  . '.png';
     $qrPath = tenancy()->tenant->id . "/sites/" . $location->id . "/qrcode/" . $fileName;
@@ -70,7 +70,7 @@ it('can regenerate a QR Code for a site', function() {
     $response = $this->postToTenant('api.sites.qr.regen', [], $location->reference_code);
     $response->assertSessionHasNoErrors();
 
-    $qr_hash = generateQRCodeHash('sites', $location);
+    $qr_hash = generateQRCodeHash($location);
 
     $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDHHMM')  . '.png';
     $qrPath = tenancy()->tenant->id . "/sites/" . $location->id . "/qrcode/" . $fileName;

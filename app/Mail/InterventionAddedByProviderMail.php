@@ -30,7 +30,6 @@ class InterventionAddedByProviderMail extends Mailable
      */
     public function envelope(): Envelope
     {
-        dump('ENVELOPE');
         return new Envelope(
             subject: 'Intervention Added By Provider for ' . $this->intervention->interventionable->name
         );

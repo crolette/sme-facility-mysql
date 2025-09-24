@@ -146,7 +146,7 @@ it('can delete an existing provider', function () {
     assertDatabaseEmpty('providers');
 });
 
-it('can post a new logo for a provider', function() {
+// it('can post a new logo for a provider', function() {
 
     
-});
+// });

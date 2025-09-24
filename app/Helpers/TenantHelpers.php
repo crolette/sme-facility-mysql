@@ -22,13 +22,15 @@ if (!function_exists('qrCodeHash')) {
      * @param  Model $model
      * @return string
      */
-    function generateQRCodeHash(string $modelType, Model $model): string
+    function generateQRCodeHash(Model $model): string
     {
-        $data = $modelType === 'assets'
+        
+        $data = get_class($model) === 'App\Models\Tenants\Assets'
             ?
             implode('::', [$model->code, tenant()->domain->domain])
             :
             implode('::', [$model->reference_code, tenant()->domain->domain]);
+
 
         return substr(hash('sha256', $data . config('app.key')), 0, 12);
     }

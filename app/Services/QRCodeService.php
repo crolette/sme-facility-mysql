@@ -21,7 +21,7 @@ class QRCodeService
         
         $directory = "$tenantId/$modelType/$modelId/qrcode/";
 
-        $qr_hash = generateQRCodeHash($modelType, $model);
+        $qr_hash = generateQRCodeHash($model);
 
         $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDHHMM')  . '.png';
         

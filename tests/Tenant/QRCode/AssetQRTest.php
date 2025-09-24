@@ -63,7 +63,7 @@ it('creates a QR Code when need_qr_code is true', function() {
 
     $asset = Asset::first();
 
-    $qr_hash = generateQRCodeHash('assets', $asset);
+    $qr_hash = generateQRCodeHash($asset);
 
     $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDHHMM')  . '.png';
      $qrPath = tenancy()->tenant->id . "/assets/" . $asset->id . "/qrcode/" . $fileName;
@@ -87,7 +87,7 @@ it('can regenerate a QR Code', function() {
     $response->assertSessionHasNoErrors();
 
 
-    $qr_hash = generateQRCodeHash('assets', $asset);
+    $qr_hash = generateQRCodeHash($asset);
 
     $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDHHMM')  . '.png';
     $qrPath = tenancy()->tenant->id . "/assets/" . $asset->id . "/qrcode/" . $fileName;

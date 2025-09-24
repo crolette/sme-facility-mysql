@@ -51,7 +51,7 @@ it('can render a new ticket page for a guest', function (string $modelType, stri
     };
 
     $model->update([
-        'qr_hash' => generateQRCodeHash($routeName, $model)
+        'qr_hash' => generateQRCodeHash($model)
     ]);
 
     $model->refresh();

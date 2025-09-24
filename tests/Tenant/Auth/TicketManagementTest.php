@@ -114,7 +114,14 @@ test('test access roles to create tickets page for asset', function (string $rol
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
-    $response = $this->getFromTenant('tenant.assets.tickets.create', $this->asset->reference_code);
+    $this->asset->update([
+        'qr_hash' => generateQRCodeHash($this->asset)
+    ]);
+
+    $this->asset->refresh();
+
+    $response = $this->getFromTenant('tenant.assets.tickets.create', $this->asset->qr_hash);
+
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -127,7 +134,14 @@ test('test access roles to create tickets page for site', function (string $role
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
-    $response = $this->getFromTenant('tenant.sites.tickets.create', $this->site->reference_code);
+    $this->site->update([
+        'qr_hash' => generateQRCodeHash($this->site)
+    ]);
+
+    $this->site->refresh();
+
+    $response = $this->getFromTenant('tenant.sites.tickets.create', $this->site->qr_hash);
+
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -140,8 +154,15 @@ test('test access roles to create tickets page for building', function (string $
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
-    $response = $this->getFromTenant('tenant.buildings.tickets.create', $this->building->reference_code);
+    $this->building->update([
+        'qr_hash' => generateQRCodeHash($this->building)
+    ]);
+
+    $this->building->refresh();
+
+    $response = $this->getFromTenant('tenant.buildings.tickets.create', $this->building->qr_hash);
     $response->assertStatus($expectedStatus);
+
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 200],
@@ -153,7 +174,13 @@ test('test access roles to create tickets page for floor', function (string $rol
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
-    $response = $this->getFromTenant('tenant.floors.tickets.create', $this->floor->reference_code);
+    $this->floor->update([
+        'qr_hash' => generateQRCodeHash($this->floor)
+    ]);
+
+    $this->floor->refresh();
+
+    $response = $this->getFromTenant('tenant.floors.tickets.create', $this->floor->qr_hash);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
@@ -166,7 +193,13 @@ test('test access roles to create tickets page for room', function (string $role
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
-    $response = $this->getFromTenant('tenant.rooms.tickets.create', $this->room->reference_code);
+    $this->room->update([
+        'qr_hash' => generateQRCodeHash($this->room)
+    ]);
+
+    $this->room->refresh();
+
+    $response = $this->getFromTenant('tenant.rooms.tickets.create', $this->room->qr_hash);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],

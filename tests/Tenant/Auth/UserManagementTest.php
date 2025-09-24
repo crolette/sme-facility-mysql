@@ -92,6 +92,7 @@ test('an admin can create a new user with a role', function (string $role) {
     $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
 
     assertTrue($createdUser->hasRole($role));
+
 })->with([
     ['Admin'],
     ['Maintenance Manager'],

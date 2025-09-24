@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Models\Tenants\InterventionAction;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
+use App\Mail\InterventionAddedByProviderMail;
 use App\Mail\SendInterventionToProviderEmail;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
@@ -49,16 +50,12 @@ beforeEach(function () {
     $this->ticket = Ticket::factory()->forLocation($this->asset)->create();
 });
 
-// it('can factory intervention', function () {
-//     Intervention::factory()->forLocation($this->asset)->create();
-//     Intervention::factory()->forTicket($this->ticket)->create();
-// });
 
 it('can send an intervention to a provider', function() {
 
     Mail::fake();
 
-        $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $intervention = Intervention::factory()->forLocation($this->asset)->create();
 
     $formData = [
         'email' => 'test@test.com'
@@ -87,7 +84,7 @@ it('a provider can access to the intervention page', function () {
 
     $actionTypesCount = CategoryType::where('category', 'action')->count();
 
-    // route tested with signed middleware removed from routes
+    // signed middleware has to be remove from the route to test
     $response = $this->getFromTenant('tenant.intervention.provider', $interventionTwo->id);
     $response->assertSessionHasNoErrors();
     $response->assertOk();
@@ -120,7 +117,7 @@ it('can post an action as external provider', function() {
     ];
 
 
-    // route tested with signed middleware removed from routes
+    // signed middleware has to be remove from the route to test
     $response = $this->postToTenant('tenant.intervention.provider.store', $formData, $intervention->id);
     $response->assertOk();
 
@@ -159,5 +156,37 @@ it('sends an email to the admin when a provider encoded a new action', function(
     $response = $this->postToTenant('tenant.intervention.provider.store', $formData, $intervention->id);
     $response->assertOk();
 
-    Mail::assertSent(InterventionAddedByProviderMail::class);
+    Mail::assertSent(InterventionAddedByProviderMail::class, function($mail) {
+        return $mail->hasTo($this->user->email);
+    });
+});
+
+it('sends an email to the maintenance manager when a provider encoded a new action', function () {
+
+    Mail::fake();
+
+    $user = User::factory()->withRole('Maintenance Manager')->create();
+    $this->asset->maintainable()->update(['maintenance_manager_id' => $user->id]);
+
+    $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $provider = User::factory()->create();
+
+    $formData = [
+        'action_type_id' => $this->interventionActionType->id,
+        'description' => 'New action for intervention',
+        'intervention_date' => Carbon::now()->subDays(2),
+        'started_at' => '13:25',
+        'finished_at' => '17:30',
+        'intervention_costs' => '9999999.25',
+        'creator_email' => $provider->email
+    ];
+
+
+    // route tested with signed middleware removed from routes
+    $response = $this->postToTenant('tenant.intervention.provider.store', $formData, $intervention->id);
+    $response->assertOk();
+
+    Mail::assertSent(InterventionAddedByProviderMail::class, function ($mail) use ($user) {
+        return $mail->hasTo($user->email);
+    });
 });
