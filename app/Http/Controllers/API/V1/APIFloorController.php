@@ -147,7 +147,7 @@ class APIFloorController extends Controller
             abort(403);
 
         if (count($floor->assets) > 0 || count($floor->rooms) > 0) {
-            return ApiResponse::error('Floor cannot be deleted ! Assets and/or rooms are linked to this floor');
+            return ApiResponse::error('Floor cannot be deleted ! Assets and/or rooms are linked to this floor', [], 409);
         }
 
         $floor->delete();

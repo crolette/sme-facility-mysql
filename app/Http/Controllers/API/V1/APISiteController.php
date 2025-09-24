@@ -133,7 +133,7 @@ class APISiteController extends Controller
             abort(403);
 
         if (count($site->assets) > 0 || count($site->buildings) > 0) {
-            return ApiResponse::error('Site cannot be deleted ! Assets and/or buildings are linked to this site');
+            return ApiResponse::error('Site cannot be deleted ! Assets and/or buildings are linked to this site', [], 409);
         }
 
         $site->delete();

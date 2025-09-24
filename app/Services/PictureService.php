@@ -23,8 +23,6 @@ class PictureService
 
         foreach ($files as $file) {
             try {
-                Debugbar::info('pictureservice', $file);
-                
                 $directory = "$tenantId/$modelType/$modelId/pictures"; // e.g., "webxp/tickets/1/pictures"
 
                 $newfileName = Str::chopEnd($file->getClientOriginalName(), ['.png', '.jpg', '.jpeg']);

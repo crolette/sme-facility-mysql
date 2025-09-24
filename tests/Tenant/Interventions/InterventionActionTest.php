@@ -50,7 +50,7 @@ it('can create a new action to an intervention', function () {
     $formData = [
         'action_type_id' => $this->interventionActionType->id,
         'description' => 'New action for intervention',
-        'intervention_date' => Carbon::now()->add('day', 7),
+        'intervention_date' => Carbon::now()->subDays(7),
         'started_at' => '13:25',
         'finished_at' => '17:30',
         'intervention_costs' => '9999999.25',
@@ -69,7 +69,7 @@ it('can create a new action to an intervention', function () {
         'id' => 2,
         'action_type_id' => $this->interventionActionType->id,
         'description' => 'New action for intervention',
-        'intervention_date' => Carbon::now()->add('day', 7)->toDateString(),
+        'intervention_date' => Carbon::now()->subDays(7)->toDateString(),
         'started_at' => '13:25:00',
         'finished_at' => '17:30:00',
         'intervention_costs' => '9999999.25',
@@ -85,7 +85,7 @@ it('can update an intervention action', function () {
     $formData = [
         'action_type_id' => $this->interventionActionType->id,
         'description' => 'Updated action for intervention',
-        'intervention_date' => Carbon::now()->add('day', 2),
+        'intervention_date' => Carbon::now()->subDays(2),
         'started_at' => '14:25',
         'finished_at' => '18:30',
         'intervention_costs' => '0',
@@ -107,7 +107,7 @@ it('can update an intervention action', function () {
         'id' => 2,
         'action_type_id' => $this->interventionActionType->id,
         'description' => 'Updated action for intervention',
-        'intervention_date' => Carbon::now()->add('day', 2)->toDateString(),
+        'intervention_date' => Carbon::now()->subDays(2)->toDateString(),
         'started_at' => '14:25:00',
         'finished_at' => '18:30:00',
         'intervention_costs' => '0',
@@ -138,7 +138,7 @@ it('sums intervention costs of intervention when action with intervention_costs 
     $formData = [
         'action_type_id' => $this->interventionActionType->id,
         'description' => 'New action for intervention',
-        'intervention_date' => Carbon::now()->add('day', 7),
+        'intervention_date' => Carbon::now()->subDays(7),
         'started_at' => '13:25',
         'finished_at' => '17:30',
         'intervention_costs' => '9999999.25',
@@ -166,7 +166,7 @@ it('updates intervention costs of intervention when action with intervention_cos
     $formData = [
         'action_type_id' => $this->interventionActionType->id,
         'description' => 'Updated action for intervention',
-        'intervention_date' => Carbon::now()->add('day', 2),
+        'intervention_date' => Carbon::now()->subDays(2),
         'started_at' => '14:25',
         'finished_at' => '18:30',
         'intervention_costs' => '0',

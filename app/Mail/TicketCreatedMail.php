@@ -60,14 +60,16 @@ class TicketCreatedMail extends Mailable
      */
     public function attachments(): array
     {
-        Debugbar::info('PICTURES TICKETS', $this->ticket->pictures);
+    //    dump('PICTURES TICKETS', isset($this->ticket->pictures[2]) ? 'PICTURE' : 'NO PICTURE');
 
         return array_filter([
-            Attachment::fromStorageDisk('tenants', $this->ticket->pictures[0]->path),
-            $this->ticket->pictures[1]
+            isset($this->ticket->pictures[0])
+                ? Attachment::fromStorageDisk('tenants',  $this->ticket->pictures[0]->path)
+                : null,
+            isset($this->ticket->pictures[1])
                 ? Attachment::fromStorageDisk('tenants',  $this->ticket->pictures[1]->path)
                 : null,
-            $this->ticket->pictures[2]
+            isset($this->ticket->pictures[2])
                 ? Attachment::fromStorageDisk('tenants',  $this->ticket->pictures[2]->path)
                 : null,
         ]);

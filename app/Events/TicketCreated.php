@@ -33,7 +33,6 @@ class TicketCreated
      */
     public function __construct(Ticket $ticket, Model $model)
     {
-        Debugbar::info('TICKET CREATED EVENT');
         $this->ticket = $ticket;
         $this->model = $model;
     }

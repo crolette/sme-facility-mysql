@@ -26,9 +26,11 @@ beforeEach(function () {
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
     LocationType::factory()->create(['level' => 'room']);
-    CategoryType::factory()->count(2)->create(['category' => 'document']);
+    CategoryType::factory()->create(['category' => 'document']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
-    CategoryType::factory()->count(2)->create(['category' => 'asset']);
+    CategoryType::factory()->create(['category' => 'asset']);
+    CategoryType::factory()->create(['category' => 'intervention']);
+    CategoryType::factory()->create(['category' => 'action']);
     $this->site = Site::factory()->create();
     $this->building = Building::factory()->create();
     $this->floor = Floor::factory()->create();
@@ -73,9 +75,10 @@ it('can render the show ticket page', function () {
 });
 
 it('can render interventions in the ticket page', function () {
-    Intervention::factory()->forTicket($this->ticket)->count(2)->create();
+    $ticket = Ticket::factory()->forLocation($this->asset)->create();
+    Intervention::factory()->forTicket($ticket)->count(2)->create();
 
-    $response = $this->getFromTenant('tenant.tickets.show', $this->ticket);
+    $response = $this->getFromTenant('tenant.tickets.show', $ticket);
     $response->assertOk();
 
     $response->assertInertia(

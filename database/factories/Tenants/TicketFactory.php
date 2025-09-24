@@ -31,7 +31,7 @@ class TicketFactory extends Factory
         return [
             'code' => $codeNumber,
             'status' => TicketStatus::OPEN->value,
-            'description' => fake()->paragraph(),
+            'description' => fake()->paragraph(2),
             'reported_by' => User::factory()->create()->id,
             'being_notified' => fake()->boolean(50),
         ];

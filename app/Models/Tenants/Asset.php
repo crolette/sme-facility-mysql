@@ -194,7 +194,12 @@ class Asset extends Model
 
     public function getQRCodeForPdf(): Attribute
     {
-        
+        if(!$this->qr_code) {
+            return Attribute::make(
+                get: fn() => ''
+            );
+        }
+
         $imageData = Storage::disk('tenants')->get($this->qr_code);
         $mimeType = Storage::disk('tenants')->mimeType($this->qr_code);
         return Attribute::make(

@@ -50,9 +50,9 @@ it('can render a new ticket page for a guest', function (string $modelType, stri
         default => throw new Exception('Unknown model type')
     };
 
-$model->update([
-    'qr_hash' => generateQRCodeHash('routeName', $model)
-]);
+    $model->update([
+        'qr_hash' => generateQRCodeHash($routeName, $model)
+    ]);
 
     $model->refresh();
 
@@ -119,6 +119,7 @@ it('can create a new ticket with pictures has "anonymous" user', function (strin
         'imageable_type' => 'App\Models\Tenants\Ticket',
         'imageable_id' => 1
     ]);
+
 })->with([
     ['asset', 'assets'],
     ['site', 'sites'],

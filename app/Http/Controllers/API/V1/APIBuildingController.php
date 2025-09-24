@@ -145,7 +145,7 @@ class APIBuildingController extends Controller
             abort(403);
 
         if (count($building->assets) > 0 || count($building->floors) > 0) {
-            return ApiResponse::error('Building cannot be deleted ! Assets and/or floors are linked to this building');
+            return ApiResponse::error('Building cannot be deleted ! Assets and/or floors are linked to this building', [], 409);
         }
 
         $building->delete();

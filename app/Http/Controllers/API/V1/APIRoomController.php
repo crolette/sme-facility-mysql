@@ -152,7 +152,7 @@ class APIRoomController extends Controller
         if (count($room->assets) > 0) {
             Debugbar::info('Cannot delete');
             // return ApiResponse::success('', 'Room deleted');
-            return ApiResponse::error('Room cannot be deleted ! Assets are linked to this room');
+            return ApiResponse::error('Room cannot be deleted ! Assets are linked to this room', [], 409);
         }
 
 

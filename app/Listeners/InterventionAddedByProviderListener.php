@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Models\Tenants\User;
 use Illuminate\Support\Facades\Mail;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Queue\InteractsWithQueue;
@@ -33,13 +34,14 @@ class InterventionAddedByProviderListener
             $users = User::role(['Admin'])->get();
 
             foreach ($users as $user) {
+                dump($user->email);
                 Mail::to($user->email)
                     ->locale($user->preferred_locale ?? config('app.locale'))
                     ->send(new InterventionAddedByProviderMail($event->intervention, $event->interventionAction));
             }
 
             if ($event->intervention->interventionable->manager) {
-                Mail::to($event->ticket->ticketable->manager->email)
+                Mail::to($event->intervention->maintainable->manager->email)
                     ->locale($user->preferred_locale ?? config('app.locale'))
                     ->send(new InterventionAddedByProviderMail($event->intervention, $event->interventionAction));
             }

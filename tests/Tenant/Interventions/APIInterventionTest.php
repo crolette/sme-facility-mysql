@@ -10,6 +10,7 @@ use App\Models\Tenants\Floor;
 use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Building;
 
+use App\Models\Tenants\Provider;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
 use function Pest\Laravel\assertDatabaseHas;
@@ -24,6 +25,7 @@ beforeEach(function () {
     LocationType::factory()->create(['level' => 'floor']);
     LocationType::factory()->create(['level' => 'room']);
     CategoryType::factory()->create(['category' => 'asset']);
+    CategoryType::factory()->create(['category' => 'provider']);
 
     $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
