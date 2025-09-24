@@ -8,8 +8,9 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
 use App\Models\Tenants\ScheduledNotification;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
-class ScheduledNotificationMail extends Mailable
+class ScheduledNotificationMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

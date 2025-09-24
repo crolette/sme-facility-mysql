@@ -30,14 +30,17 @@ class DispatchTenantNotifications implements ShouldQueue
         // Récupère tous les tenants actifs depuis la DB centrale
         $tenants = Tenant::all();
 
-        Log::info("Found {$tenants->count()} active tenants to process");
+        // Log::info("Found {$tenants->count()} active tenants to process");
 
-        foreach ($tenants as $tenant) {
-            // Dispatche un job pour chaque tenant
-            ProcessTenantNotifications::dispatch($tenant);
+        tenancy()->runForMultiple($tenants, function($tenant) {
 
+            ProcessTenantNotifications::dispatch($tenant)->onQueue('default');
+    
             Log::info("Dispatched notification job for tenant: {$tenant->id}");
-        }
+        });
+        // foreach ($tenants as $tenant) {
+        //     // Dispatche un job pour chaque tenant
+        // }
 
         Log::info('Tenant notifications dispatch completed');
     }

@@ -144,7 +144,7 @@ return [
             'username' => env('REDIS_USERNAME'),
             'password' => env('REDIS_PASSWORD'),
             'port' => env('REDIS_PORT', '6379'),
-            'database' => env('REDIS_DB', '0'),
+            'database' => env('REDIS_DEFAULT_DB', '10'),
         ],
 
         'cache' => [
@@ -153,8 +153,28 @@ return [
             'username' => env('REDIS_USERNAME'),
             'password' => env('REDIS_PASSWORD'),
             'port' => env('REDIS_PORT', '6379'),
-            'database' => env('REDIS_CACHE_DB', '1'),
+            'database' => env('REDIS_CACHE_DB', '12'),
+            'prefix' => env('REDIS_CACHE_PREFIX', 'sme_facility_cache_'),
+            'options' => [
+                'serializer' => Redis::SERIALIZER_PHP, // Force PHP serializer pour le cache
+                'compression' => Redis::COMPRESSION_NONE,
+
+            ],
         ],
+        'session' => [
+            'url' => env('REDIS_URL'),
+            'host' => env('REDIS_HOST', '/home/wahu4243/.cpanel/redis/redis.sock'),
+            'port' => env('REDIS_PORT', 0),
+            'password' => env('REDIS_PASSWORD'),
+            'database' => env('REDIS_SESSION_DB', '11'),
+            'prefix' => env('REDIS_SESSION_PREFIX', 'sme_facility_session_'),
+            'options' => [
+                'serializer' => Redis::SERIALIZER_PHP, // Force PHP serializer pour le cache
+                'compression' => Redis::COMPRESSION_NONE,
+
+            ],
+        ],
+
 
     ],
 
