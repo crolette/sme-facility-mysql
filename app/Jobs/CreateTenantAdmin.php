@@ -2,12 +2,12 @@
 
 namespace App\Jobs;
 
-use App\Events\NewTenantCreatedEvent;
 use App\Models\Tenant;
 use Illuminate\Support\Str;
 use App\Models\Tenants\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
+use App\Events\NewTenantCreatedEvent;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Queue\InteractsWithQueue;
@@ -16,6 +16,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
+use App\Services\UserNotificationPreferenceService;
 
 class CreateTenantAdmin implements ShouldQueue
 {
@@ -48,6 +49,8 @@ class CreateTenantAdmin implements ShouldQueue
         ]);
 
         $admin->assignRole('Admin');
+
+        app(UserNotificationPreferenceService::class)->createDefaultUserNotificationPreferences($admin);
 
              tenancy()->end();
     }

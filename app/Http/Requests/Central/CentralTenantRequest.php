@@ -28,6 +28,10 @@ class CentralTenantRequest extends FormRequest
             $data['email'] = Str::lower($data['email']);
         }
 
+        if (isset($data['domain_name'])) {
+            $data['domain_name'] = Str::lower($data['domain_name']);
+        }
+
         $this->replace($data);
     }
 
@@ -46,7 +50,7 @@ class CentralTenantRequest extends FormRequest
             // 'password' => ['required', 'confirmed', Password::defaults()],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', new NotDisposableEmail, Rule::unique(Tenant::class)->ignore($this->route('tenant'))],
             'vat_number' => 'required|string|regex:/^[A-Z]{2}[0-9A-Z]{2,12}$/|max:14',
-            'domain_name' => ['required', 'string', 'min:3', 'max:12', Rule::unique(Domain::class, 'domain')->ignore(optional($this->route('tenant'))->domain)],
+            'domain_name' => ['required', 'string', 'alpha:ascii', 'lowercase', 'min:4', 'max:12', Rule::unique(Domain::class, 'domain')->ignore(optional($this->route('tenant'))->domain)],
             'phone_number' => 'required|string|regex:/^\+\d{8,15}$/|max:16',
             'company_code' => 'required|string|max:4',
         ];

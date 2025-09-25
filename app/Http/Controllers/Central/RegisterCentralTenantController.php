@@ -46,10 +46,6 @@ class RegisterCentralTenantController extends Controller
             DB::beginTransaction();
             
             $email = $tenantRequest->validated('email');
-            $first_name = $tenantRequest->validated('first_name');
-            $last_name = $tenantRequest->validated('last_name');
-            $password = $tenantRequest->validated('password');
-            session(['email' => $email, 'first_name' => $first_name, 'last_name' => $last_name, 'password' => $password]);
 
             $tenant = Tenant::create([...$tenantRequest->validated(), 'id' => $tenantRequest->validated('company_code')]);
 
@@ -60,20 +56,14 @@ class RegisterCentralTenantController extends Controller
             if (!$invoiceAddressRequest->validated('same_address_as_company'))
                 $tenant->addresses()->create([...$invoiceAddressRequest->validated('invoice'), 'address_type' => AddressTypes::INVOICE->value]);
 
-            Debugbar::info($tenant);
-
             $tenant->run(function () use ($email, $tenant) {
                 $admin = User::where('email', $email)->first();
-
 
                 event(new NewTenantCreatedEvent($admin, $tenant));
 
                 $token = Password::createToken($admin);
                 $admin->notify(new TenantAdminCreatedPasswordResetNotification($token, $tenant));
 
-                // Password::sendResetLink(
-                //     $tenantRequest->only('email')
-                // );
             });
 
             DB::commit();

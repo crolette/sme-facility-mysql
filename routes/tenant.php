@@ -61,27 +61,27 @@ Route::middleware([
 ])->group(function () {
 
 
+
+    // Route::get('/mail', function () {
+    //     // $param1 = User::first();
+
+    //     // $url = url(route('password.reset', [
+    //     //     'token' => 1111,
+    //     //     'email' => $param1->getEmailForPasswordReset(),
+    //     // ], false));
+
+    //     // $tenant = Tenant::first();
+    //     // return (new PasswordReset($param1,$url))->render();
+
+    //     $param1 = ScheduledNotification::where('notification_type', 'planned_at')->first();
+    //     // dd($param1->data);
+    //     // dd($param1->interventionable->location_route);
+    //     return (new ScheduledNotificationMail($param1))->render();
+    // });
+
     Route::get('dashboard', [DashboardController::class, 'show'])->name('tenant.dashboard');
-    Route::get('/mail', function () {
-        // $param1 = User::first();
 
-        // $url = url(route('password.reset', [
-        //     'token' => 1111,
-        //     'email' => $param1->getEmailForPasswordReset(),
-        // ], false));
-
-        // $tenant = Tenant::first();
-        // return (new PasswordReset($param1,$url))->render();
-        
-        $param1 = ScheduledNotification::where('notification_type', 'planned_at')->first();
-        // dd($param1->data);
-        // dd($param1->interventionable->location_route);
-        return (new ScheduledNotificationMail($param1))->render();
-    });
-
-    Route::get('/pdf-qr-codes', function(Request $request) {
-
-     
+    Route::get('/pdf-qr-codes', function(Request $request) {  
 
         $collection = collect([]);
 

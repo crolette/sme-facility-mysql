@@ -54,7 +54,7 @@
         <div class="card">
             {{-- Logo --}}
             <div style="text-align: center; margin-bottom: 30px;">
-                <img src={{ env('APP_LOGO') }} alt="{{ config('app.name') }}" style="max-width: 120px;">
+                <img src={{ env('APP_LOGO') }} alt="{{ config('app.name') }}" style="width: 160px;">
             </div>
 
             {{-- Content --}}

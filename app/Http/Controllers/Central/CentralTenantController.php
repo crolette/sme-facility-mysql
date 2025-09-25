@@ -104,9 +104,15 @@ class CentralTenantController extends Controller
     public function destroy(Tenant $tenant)
     {
         if ($tenant) {
-            $tenant->delete();
+            try {
+                $tenant->delete();
+                return ApiResponse::success([], 'Tenant deleted');
+            } catch(Exception $e) {
+                Log::info('Error during tenant update : ' . $e->getMessage());
+                return ApiResponse::error($e->getMessage());
+            }
         }
+        return ApiResponse::error('Error during tenant deletion.');
 
-        return redirect()->route('central.tenants.index');
     }
 }

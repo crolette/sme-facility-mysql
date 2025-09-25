@@ -104,11 +104,13 @@ export default function CreateTenant({ company }: { company?: Tenant }) {
         } else {
             try {
                 const response = await axios.post(route('central.tenants.store'), data);
+                console.log(response);
                 if (response.data.status === 'success') {
                     setIsProcessing(false);
                     router.visit(route('central.tenants.index'));
                 }
             } catch (error) {
+                console.log(error);
                 setIsProcessing(false);
                 showToast(error.response.data.message, error.response.data.type);
                 
@@ -142,6 +144,7 @@ export default function CreateTenant({ company }: { company?: Tenant }) {
                             type="text"
                             required
                             tabIndex={2}
+                            minLength={4}
                             value={data.domain_name}
                             disabled={company ? true : false}
                             onChange={(e) => setData('domain_name', e.target.value)}
@@ -157,6 +160,8 @@ export default function CreateTenant({ company }: { company?: Tenant }) {
                             type="text"
                             required
                             tabIndex={2}
+                            maxLength={4}
+                            minLength={4}
                             value={data.company_code}
                             disabled={company ? true : false}
                             onChange={(e) => setData('company_code', e.target.value)}
@@ -278,9 +283,7 @@ export default function CreateTenant({ company }: { company?: Tenant }) {
                         <div className="bg-background flex items-center justify-center p-4 text-center md:w-1/3">
                             <div className="flex flex-col items-center gap-4">
                                 <Loader size={48} className="animate-pulse" />
-                                <p className="mx-auto animate-pulse text-3xl font-bold">
-                                    Processing...
-                                </p>
+                                <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
                                 <p className="mx-auto">Tenant is being created...</p>
                             </div>
                         </div>
