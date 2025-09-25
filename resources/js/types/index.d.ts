@@ -340,6 +340,8 @@ export interface Role {
 export interface Tenant {
     id: string;
     data: Array;
+    first_name: string;
+    last_name: string;
     company_name: string;
     email: string;
     vat_number: string;

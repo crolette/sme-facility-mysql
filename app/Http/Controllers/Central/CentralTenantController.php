@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Central;
 
+use Exception;
 use Inertia\Inertia;
 use App\Models\Tenant;
 use App\Enums\AddressTypes;
+use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
@@ -53,34 +56,46 @@ class CentralTenantController extends Controller
             $errors = new MessageBag([
                 'domain_name' => ['You cannot change the name of the domain'],
             ]);
-            return back()->withErrors($errors)->withInput();
+            return ApiResponse::error($errors, $errors);
         }
-
+        
         if ($tenant->company_code !== $tenantRequest->validated('company_code')) {
             $errors = new MessageBag([
                 'company_code' => ['You cannot change the company code as it is used for your QR codes.'],
             ]);
-            return back()->withErrors($errors)->withInput();
+            return ApiResponse::error($errors, $errors);
         }
 
-        $tenant->update([...$tenantRequest->validated()]);
+        try {
 
-        $tenant->companyAddress()->update([...$companyAddressRequest->validated('company')]);
+            DB::beginTransaction();
 
-        if (!$invoiceAddressRequest->validated('same_address_as_company')) {
-            if ($tenant->invoiceAddress) {
-                $tenant->invoiceAddress()->update([...$invoiceAddressRequest->validated('invoice')]);
-            } else {
-                $tenant->addresses()->create([...$invoiceAddressRequest->validated('invoice'), 'address_type' => AddressTypes::INVOICE->value]);
+            $tenant->update([...$tenantRequest->validated()]);
+
+            $tenant->companyAddress()->update([...$companyAddressRequest->validated('company')]);
+
+            if (!$invoiceAddressRequest->validated('same_address_as_company')) {
+                if ($tenant->invoiceAddress) {
+                    $tenant->invoiceAddress()->update([...$invoiceAddressRequest->validated('invoice')]);
+                } else {
+                    $tenant->addresses()->create([...$invoiceAddressRequest->validated('invoice'), 'address_type' => AddressTypes::INVOICE->value]);
+                }
             }
+
+            if ($invoiceAddressRequest->validated('same_address_as_company') && $tenant->invoiceAddress)
+                $tenant->invoiceAddress()->delete();
+
+            DB::commit();
+
+            return ApiResponse::success([], 'Tenant updated');
+
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::info('Error during tenant update : ' . $e->getMessage());
+            return ApiResponse::error($e->getMessage());
         }
 
-        if ($invoiceAddressRequest->validated('same_address_as_company') && $tenant->invoiceAddress)
-            $tenant->invoiceAddress()->delete();
-
-
-
-        return redirect()->route('central.tenants.index');
+        return ApiResponse::error('Error during tenant update.');
     }
 
     /**

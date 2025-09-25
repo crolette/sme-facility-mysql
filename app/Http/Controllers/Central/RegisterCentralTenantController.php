@@ -62,7 +62,7 @@ class RegisterCentralTenantController extends Controller
 
             Debugbar::info($tenant);
 
-            $tenant->run(function () use ($email, $tenantRequest, $tenant) {
+            $tenant->run(function () use ($email, $tenant) {
                 $admin = User::where('email', $email)->first();
 
 
@@ -80,6 +80,7 @@ class RegisterCentralTenantController extends Controller
             return ApiResponse::successFlash([], 'Tenant created');
 
         } catch(Exception $e) {
+            DB::rollBack();
             Log::info('Error during tenant creation : ' . $e->getMessage());
             return ApiResponse::error($e->getMessage());
         }

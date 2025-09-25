@@ -38,20 +38,12 @@ class CreateTenantAdmin implements ShouldQueue
      */
     public function handle(): void
     {
-        $email = Session::get('email');
-        $pwd = Session::get('password');
-        $first_name = Session::get('first_name');
-        $last_name = Session::get('last_name');
-        $username = Str::lower(preg_replace('/\s+/', '', $first_name)) . '.' . Str::lower(preg_replace('/\s+/', '', $last_name));
-
         tenancy()->initialize($this->tenant);
 
         $admin = User::create([
-            'email' => $email,
-            'password' => Hash::make($pwd),
-            'first_name' => $first_name,
-            'last_name' => $last_name,
-            'username' => $username,
+            'email' => $this->tenant->email,
+            'first_name' => $this->tenant->first_name,
+            'last_name' => $this->tenant->last_name,
             'can_login' => true,
         ]);
 

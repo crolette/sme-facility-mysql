@@ -1,5 +1,6 @@
 import { AddressForm } from '@/components/addressForm';
 import InputError from '@/components/input-error';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
@@ -48,12 +49,12 @@ type TenantFormData = {
 
 export default function CreateTenant({ company }: { company?: Tenant }) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
-
+    const { showToast } = useToast();
 
     const { data, setData, post, errors } = useForm<TenantFormData>({
         company_name: company?.company_name ?? '',
-        first_name: '',
-        last_name: '',
+        first_name: company?.first_name ?? '',
+        last_name: company?.last_name ?? '',
         password: '',
         password_confirmation: '',
         domain_name: company?.domain?.domain ?? '',
@@ -81,44 +82,40 @@ export default function CreateTenant({ company }: { company?: Tenant }) {
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
         setIsProcessing(true);
+        
         if (company) {
             try {
-                const response = await axios.patch(route('central.tenant.update', company.id), {
+                const response = await axios.patch(route('central.tenants.update', company.id), data, {
                     headers: {
                         'Content-Type': 'application/json',
                         'X-HTTP-Method-Override': 'PATCH',
                         Accept: 'application/json',
                     },
                 });
-                console.log(response.data);
                 if (response.data.status === 'success') {  
-                    console.log(response.data);
                     setIsProcessing(false);
-                    router.visit(route('central.tenants.index'));
+                    showToast(response.data.message, response.data.type);
                 }
             } catch (error) {
-                console.log(error.response.data);
                 setIsProcessing(false);
+                showToast(error.response.data.message, error.response.data.type);
             }
             
         } else {
             try {
                 const response = await axios.post(route('central.tenants.store'), data);
-                 console.log(response.data);
-            if (response.data.status === 'success') {
-                setIsProcessing(false);
-                router.visit(route('central.tenants.index'));
-            }
+                if (response.data.status === 'success') {
+                    setIsProcessing(false);
+                    router.visit(route('central.tenants.index'));
+                }
             } catch (error) {
-                console.log(error.response.data);
                 setIsProcessing(false);
+                showToast(error.response.data.message, error.response.data.type);
                 
             }
             
         }
     };
-
-    console.log(isProcessing);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
