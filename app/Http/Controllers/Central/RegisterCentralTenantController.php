@@ -56,15 +56,16 @@ class RegisterCentralTenantController extends Controller
             if (!$invoiceAddressRequest->validated('same_address_as_company'))
                 $tenant->addresses()->create([...$invoiceAddressRequest->validated('invoice'), 'address_type' => AddressTypes::INVOICE->value]);
 
-            $tenant->run(function () use ($email, $tenant) {
-                $admin = User::where('email', $email)->first();
+            // FIXME this should be uncommented when on private server
+            // $tenant->run(function () use ($email, $tenant) {
+            //     $admin = User::where('email', $email)->first();
 
-                event(new NewTenantCreatedEvent($admin, $tenant));
+            //     event(new NewTenantCreatedEvent($admin, $tenant));
 
-                $token = Password::createToken($admin);
-                $admin->notify(new TenantAdminCreatedPasswordResetNotification($token, $tenant));
+            //     $token = Password::createToken($admin);
+            //     $admin->notify(new TenantAdminCreatedPasswordResetNotification($token, $tenant));
 
-            });
+            // });
 
             DB::commit();
             return ApiResponse::successFlash([], 'Tenant created');

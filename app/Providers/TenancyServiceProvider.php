@@ -27,16 +27,18 @@ class TenancyServiceProvider extends ServiceProvider
 
             Events\CreatingTenant::class => [],
             Events\TenantCreated::class => [
-                JobPipeline::make([
-                    Jobs\CreateDatabase::class,
-                    Jobs\MigrateDatabase::class,
-                    Jobs\SeedDatabase::class,
-                    CreateTenantAdmin::class,
+
+                // FIXME this should be uncommented when on private server
+                // JobPipeline::make([
+                //     Jobs\CreateDatabase::class,
+                //     Jobs\MigrateDatabase::class,
+                //     Jobs\SeedDatabase::class,
+                //     CreateTenantAdmin::class,
 
 
-                ])->send(function (Events\TenantCreated $event) {
-                    return $event->tenant;
-                })->shouldBeQueued(false), // `false` by default, but you probably want to make this `true` for production.
+                // ])->send(function (Events\TenantCreated $event) {
+                //     return $event->tenant;
+                // })->shouldBeQueued(false), // `false` by default, but you probably want to make this `true` for production.
             ],
             Events\SavingTenant::class => [],
             Events\TenantSaved::class => [],

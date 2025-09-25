@@ -1,21 +1,27 @@
 <?php
 
-use App\Http\Controllers\Central\AdminBuildingTypeController;
 use Inertia\Inertia;
+use App\Models\Tenant;
+use App\Helpers\ApiResponse;
+use App\Models\Tenants\User;
+use Illuminate\Http\Request;
+use App\Mail\NewTenantCreatedMail;
+use App\Events\NewTenantCreatedEvent;
 use Illuminate\Support\Facades\Route;
+use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Support\Facades\Password;
+use App\Http\Middleware\AuthenticateCentral;
+use App\Http\Controllers\Tenants\TicketController;
+use App\Http\Controllers\Central\AdminSiteTypeController;
 use App\Http\Controllers\Central\CentralTenantController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Central\AdminBuildingTypeController;
 use App\Http\Controllers\Central\AdminLocationTypeController;
-use App\Http\Controllers\Central\AdminSiteTypeController;
-use App\Http\Controllers\Central\CentralAssetCategoryController;
 use App\Http\Controllers\Central\CentralCategoryTypeController;
 use App\Http\Controllers\Central\CentralDocumentTypeController;
+use App\Http\Controllers\Central\CentralAssetCategoryController;
 use App\Http\Controllers\Central\RegisterCentralTenantController;
-use App\Http\Controllers\Tenants\TicketController;
-use App\Http\Middleware\AuthenticateCentral;
-use App\Mail\NewTenantCreatedMail;
-use App\Models\Tenant;
-use App\Models\Tenants\User;
+use App\Notifications\TenantAdminCreatedPasswordResetNotification;
 
 foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->group(function () {
@@ -58,6 +64,30 @@ foreach (config('tenancy.central_domains') as $domain) {
             Route::resource('asset-categories', CentralAssetCategoryController::class)->parameters(['asset-categories' => 'assetCategory'])->names('central.assets');
 
             Route::resource('category-types', CentralCategoryTypeController::class)->parameters(['category-types' => 'categoryType'])->names('central.types');
+
+            Route::post('/tenant-notif/', function(Request $request) {
+
+                try {
+                    $tenant = Tenant::findOrFail($request->tenant);
+                    $email = $tenant->email;
+
+                    $tenant->run(function () use ($email, $tenant) {
+                        $admin = User::where('email', $email)->first();
+
+                        event(new NewTenantCreatedEvent($admin, $tenant));
+
+                        $token = Password::createToken($admin);
+                        $admin->notify(new TenantAdminCreatedPasswordResetNotification($token, $tenant));
+                    });
+                    return ApiResponse::success([], 'Notif sent');
+                } catch (Exception $e) {
+                    Log::info($e->getMessage());
+                    return ApiResponse::error($e->getMessage());
+                }
+                
+
+                
+            })->name('send-notif-tenant-admin');
         });
     });
 }

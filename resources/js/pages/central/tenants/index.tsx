@@ -54,7 +54,21 @@ export default function IndexTenants({ tenants }: { tenants: Tenant[] }) {
         
     };
 
+// FIXME remove when on cloud server as it is only used on mutual server as DB creation is not automatic
+    const sendTenantNotif = async (id: string) => {
+        
+        if (!id)
+            return;
 
+        try {
+            const response = await axios.post(route('send-notif-tenant-admin', id), {tenant: id});
+            if (response.data.type === 'success') {
+                showToast(response.data.message, response.data.type);
+            }
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.type);
+        }
+    }
     
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -63,27 +77,35 @@ export default function IndexTenants({ tenants }: { tenants: Tenant[] }) {
                 <a href={route('central.tenants.create')}>
                     <Button>Create</Button>
                 </a>
-                <ul>
+                <ul className='space-y-4'>
                     {tenants.length > 0 &&
                         tenants.map((tenant) => (
-                            <li key={tenant.id}>
-                                {tenant.company_name} - {tenant.email} - {tenant.domain.domain}
-                                <Button
-                                    onClick={() => {
-                                        setData('tenant', tenant.id);
-                                        setTenantToDelete(tenant);
-                                        setShowDeleteModale(true);
-                                    }}
-                                    variant={'destructive'}
-                                >
-                                    Delete
-                                </Button>
-                                <a href={route('central.tenants.edit', tenant.id)}>
-                                    <Button>Edit</Button>
-                                </a>
-                                <a href={route('central.tenants.show', tenant.id)}>
-                                    <Button variant={'outline'}>See</Button>
-                                </a>
+                            <li key={tenant.id} className="flex items-center justify-between gap-4">
+                                <p>
+                                    {tenant.company_name} - {tenant.email} - {tenant.domain.domain}
+                                </p>
+                                <div className="flex gap-2">
+                                    <Button
+                                        onClick={() => {
+                                            setData('tenant', tenant.id);
+                                            setTenantToDelete(tenant);
+                                            setShowDeleteModale(true);
+                                        }}
+                                        variant={'destructive'}
+                                    >
+                                        Delete
+                                    </Button>
+                                    <a href={route('central.tenants.edit', tenant.id)}>
+                                        <Button>Edit</Button>
+                                    </a>
+                                    <a href={route('central.tenants.show', tenant.id)}>
+                                        <Button variant={'outline'}>See</Button>
+                                    </a>
+
+                                    <Button variant={'outline'} onClick={() => sendTenantNotif(tenant.id)}>
+                                        Send notification to admin
+                                    </Button>
+                                </div>
                             </li>
                         ))}
                 </ul>
