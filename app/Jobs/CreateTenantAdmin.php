@@ -51,7 +51,8 @@ class CreateTenantAdmin implements ShouldQueue
             'password' => Hash::make($pwd),
             'first_name' => $first_name,
             'last_name' => $last_name,
-            'username' => $username
+            'username' => $username,
+            'can_login' => true,
         ]);
 
         $admin->assignRole('Admin');

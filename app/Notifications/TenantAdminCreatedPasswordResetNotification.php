@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Mail\NewTenantPasswordCreation;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -35,6 +36,15 @@ class TenantAdminCreatedPasswordResetNotification extends ResetPassword
             ]);
 
         }
+    }
+
+    public function toMail($notifiable)
+    {
+        return new NewTenantPasswordCreation(
+            $notifiable,
+            $this->tenant,
+            $this->resetUrl($notifiable)
+        );
     }
     
 }

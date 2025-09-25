@@ -57,17 +57,21 @@ class PermissionsSeeder extends Seeder
                 'view users',
                 'update users',
 
+                'view any locations',
                 'view locations',
                 'update locations',
 
+                'view any assets',
                 'view assets',
                 'update assets',
                 'delete assets',
 
+                'view any tickets',
                 'view tickets',
                 'create tickets',
                 'update tickets',
 
+                'view any interventions',
                 'view interventions',
                 'create interventions',
                 'update interventions',

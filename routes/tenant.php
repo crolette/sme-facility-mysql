@@ -2,16 +2,21 @@
 
 declare(strict_types=1);
 
+use App\Models\Tenant;
+use App\Mail\PasswordReset;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
+use App\Models\Tenants\User;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Tenants\Building;
+use App\Mail\NewTenantCreatedMail;
 use Illuminate\Support\Facades\URL;
 use App\Models\Tenants\Intervention;
 use Illuminate\Support\Facades\Route;
+use App\Mail\NewTenantPasswordCreation;
 use Stancl\Tenancy\Middleware\ScopeSessions;
 use App\Mail\SendInterventionToProviderEmail;
 use App\Http\Controllers\Tenants\UserController;
@@ -32,6 +37,8 @@ use App\Http\Controllers\Tenants\InterventionActionController;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Tenants\InterventionProviderController;
 use App\Http\Controllers\Tenants\CreateTicketFromQRCodeController;
+use App\Mail\ScheduledNotificationMail;
+use App\Models\Tenants\ScheduledNotification;
 
 /*
 |--------------------------------------------------------------------------
@@ -56,15 +63,20 @@ Route::middleware([
 
     Route::get('dashboard', [DashboardController::class, 'show'])->name('tenant.dashboard');
     Route::get('/mail', function () {
-        $param1 = Intervention::first();
+        // $param1 = User::first();
 
-        $url = URL::temporarySignedRoute(
-            'tenant.intervention.provider',
-            now()->addDays(7),
-            ['intervention' => $param1->id, 'email' => 'crolweb@gmail.com']
-        );
+        // $url = url(route('password.reset', [
+        //     'token' => 1111,
+        //     'email' => $param1->getEmailForPasswordReset(),
+        // ], false));
 
-        return (new SendInterventionToProviderEmail($param1, $url))->render();
+        // $tenant = Tenant::first();
+        // return (new PasswordReset($param1,$url))->render();
+        
+        $param1 = ScheduledNotification::where('notification_type', 'planned_at')->first();
+        // dd($param1->data);
+        // dd($param1->interventionable->location_route);
+        return (new ScheduledNotificationMail($param1))->render();
     });
 
     Route::get('/pdf-qr-codes', function(Request $request) {
@@ -171,10 +183,10 @@ Route::middleware(array_merge([
     Route::post('/', [APITicketController::class, 'store'])->name('api.tickets.store');
 
 
-    Route::get('/{intervention}/external', [InterventionProviderController::class, 'create'])->name('tenant.intervention.provider');
-    // Route::get('/interventions/{intervention}/external', [InterventionProviderController::class, 'create'])->name('tenant.intervention.provider')->middleware('signed');
-    Route::post('/{intervention}/external', [InterventionProviderController::class, 'store'])->name('tenant.intervention.provider.store');
-    // Route::post('/interventions/{intervention}/external', [InterventionProviderController::class, 'store'])->name('tenant.intervention.provider.store')->middleware('signed');
+    // Route::get('/{intervention}/external', [InterventionProviderController::class, 'create'])->name('tenant.intervention.provider');
+    Route::get('/interventions/{intervention}/external', [InterventionProviderController::class, 'create'])->name('tenant.intervention.provider')->middleware('signed');
+    // Route::post('/{intervention}/external', [InterventionProviderController::class, 'store'])->name('tenant.intervention.provider.store');
+    Route::post('/interventions/{intervention}/external', [InterventionProviderController::class, 'store'])->name('tenant.intervention.provider.store')->middleware('signed');
 });
 
 require __DIR__ . '/settings.php';

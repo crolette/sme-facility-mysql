@@ -1,6 +1,5 @@
 import { SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
-import AppLogoIcon from './app-logo-icon';
 
 export default function AppLogo() {
     const tenant = usePage<SharedData>().props.tenant;
@@ -11,7 +10,7 @@ export default function AppLogo() {
                 {tenant.logo ? (
                     <img src={route('api.image.show', { path: tenant.logo })} className="object-cover h-full" />
                 ) : (
-                        <img src="https://fwexperience.be/logo.webp" alt="" />
+                        <img src={tenant.logo} alt="" />
                     // <AppLogoIcon className="size-5 fill-current text-white dark:text-black" />
                 )}
             </div>

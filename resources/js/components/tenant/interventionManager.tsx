@@ -272,7 +272,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                         interventions.map((intervention, index) => (
                             <>
                                 <TableBodyRow className="even:bg-red-400">
-                                    <TableBodyData>{intervention.intervention_type.label}</TableBodyData>
+                                    <TableBodyData>{intervention.type}</TableBodyData>
                                     <TableBodyData>{intervention.description}</TableBodyData>
                                     <TableBodyData>
                                         <Pill variant={intervention.priority}>{intervention.priority}</Pill>

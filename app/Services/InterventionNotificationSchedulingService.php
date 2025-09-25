@@ -70,7 +70,7 @@ class InterventionNotificationSchedulingService
                     'priority' => $intervention->priority,
                     'planned_at' => $intervention->planned_at,
                     'description' => $intervention->description,
-                    'link' => route('tenant.interventions.show', $intervention->id)
+                    'link' => $intervention->interventionable->location_route
                 ]
             ];
 

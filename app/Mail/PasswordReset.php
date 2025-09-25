@@ -2,8 +2,8 @@
 
 namespace App\Mail;
 
-use App\Models\User;
 use App\Models\Location;
+use App\Models\Tenants\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
@@ -21,6 +21,7 @@ class PasswordReset extends Mailable
      */
     public function __construct(
         public User $user,
+        public string $url
     ) {}
 
     public function envelope(): Envelope
