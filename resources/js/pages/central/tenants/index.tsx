@@ -41,6 +41,7 @@ export default function IndexTenants({ tenants }: { tenants: Tenant[] }) {
                 const response = await axios.delete(route('central.tenants.delete', data.tenant));
                 if (response.data.type === 'success') {
                     setTenantToDelete(null);
+                    setShowDeleteModale(false);
                     showToast(response.data.message, response.data.type)
                     setIsProcessing(false);
                 }
@@ -48,6 +49,7 @@ export default function IndexTenants({ tenants }: { tenants: Tenant[] }) {
                 setTenantToDelete(null);
                 showToast(error.response.data.message, error.response.data.type);
                 setIsProcessing(false);
+                setShowDeleteModale(false);
             }
         
     };
@@ -88,8 +90,8 @@ export default function IndexTenants({ tenants }: { tenants: Tenant[] }) {
             </div>
 
             <Modale
-                title={'Delete asset'}
-                message={`Are you sure you want to delete the asset ${tenantToDelete?.company_name} ? `}
+                title={'Delete tenant'}
+                message={`Are you sure you want to delete this tenant : ${tenantToDelete?.company_name} ? `}
                 isOpen={showDeleteModale}
                 onConfirm={deleteTenant}
                 onCancel={() => {
