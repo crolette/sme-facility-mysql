@@ -34,7 +34,7 @@ class NewTenantCreatedMail extends Mailable
     {
         return new Envelope(
             from: new Address('info@sme-facility.com', "SME-Facility"),
-            subject: 'Welcome ' . $this->tenant->domain->domain,
+            subject: 'Welcome ' . $this->tenant->company_name . ' on SME-Facility!',
         );
     }
 
