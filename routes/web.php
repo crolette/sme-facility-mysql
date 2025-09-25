@@ -13,6 +13,9 @@ use App\Http\Controllers\Central\CentralDocumentTypeController;
 use App\Http\Controllers\Central\RegisterCentralTenantController;
 use App\Http\Controllers\Tenants\TicketController;
 use App\Http\Middleware\AuthenticateCentral;
+use App\Mail\NewTenantCreatedMail;
+use App\Models\Tenant;
+use App\Models\Tenants\User;
 
 foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->group(function () {
@@ -20,6 +23,13 @@ foreach (config('tenancy.central_domains') as $domain) {
             return Inertia::render('welcome');
         })->name('home');
 
+        Route::get('/mail', function () {
+            $param1 = User::first();
+
+            $param2 = Tenant::first();
+
+            return (new NewTenantCreatedMail($param1, $param2))->render();
+        });
 
         Route::middleware(['web', AuthenticateCentral::class])->group(function () {
             Route::get('dashboard', function () {

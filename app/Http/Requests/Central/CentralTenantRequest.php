@@ -43,7 +43,7 @@ class CentralTenantRequest extends FormRequest
             'company_name' => 'required|string|max:255',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'password' => ['required', 'confirmed', Password::defaults()],
+            // 'password' => ['required', 'confirmed', Password::defaults()],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', new NotDisposableEmail, Rule::unique(Tenant::class)->ignore($this->route('tenant'))],
             'vat_number' => 'required|string|regex:/^[A-Z]{2}[0-9A-Z]{2,12}$/|max:14',
             'domain_name' => ['required', 'string', 'min:3', 'max:12', Rule::unique(Domain::class, 'domain')->ignore(optional($this->route('tenant'))->domain)],

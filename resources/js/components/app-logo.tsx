@@ -11,7 +11,8 @@ export default function AppLogo() {
                 {tenant.logo ? (
                     <img src={route('api.image.show', { path: tenant.logo })} className="object-cover h-full" />
                 ) : (
-                    <AppLogoIcon className="size-5 fill-current text-white dark:text-black" />
+                        <img src="https://fwexperience.be/logo.webp" alt="" />
+                    // <AppLogoIcon className="size-5 fill-current text-white dark:text-black" />
                 )}
             </div>
             <div className="ml-1 grid flex-1 text-left text-sm">

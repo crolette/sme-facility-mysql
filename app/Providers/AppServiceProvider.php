@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -46,6 +47,17 @@ class AppServiceProvider extends ServiceProvider
                 );
                 $url->setRootUrl("https://{$host}");
                 return $url;
+            });
+        }
+
+        if (env('APP_ENV') === "production") {
+            Password::defaults(function () {
+                return Password::min(12)
+                    ->mixedCase()
+                    ->letters()
+                    ->numbers()
+                    ->symbols()
+                    ->uncompromised();
             });
         }
     }

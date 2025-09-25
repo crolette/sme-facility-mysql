@@ -5,14 +5,22 @@ namespace App\Http\Controllers\Central;
 use Inertia\Inertia;
 use App\Models\Tenant;
 use App\Enums\AddressTypes;
+use App\Models\Tenants\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Events\NewTenantCreatedEvent;
+use App\Helpers\ApiResponse;
+use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Password;
 use App\Http\Requests\Central\CentralTenantRequest;
 use App\Http\Requests\Central\CompanyAddressRequest;
 use App\Http\Requests\Central\InvoiceAddressRequest;
-use Illuminate\Support\Facades\Session;
+use App\Notifications\TenantAdminCreatedPasswordResetNotification;
+use Exception;
+use Illuminate\Support\Facades\DB;
 
 class RegisterCentralTenantController extends Controller
 {
@@ -34,22 +42,47 @@ class RegisterCentralTenantController extends Controller
      */
     public function store(CentralTenantRequest $tenantRequest, CompanyAddressRequest $companyAddressRequest, InvoiceAddressRequest $invoiceAddressRequest)
     {
+        try {
+            DB::beginTransaction();
+            
+            $email = $tenantRequest->validated('email');
+            $first_name = $tenantRequest->validated('first_name');
+            $last_name = $tenantRequest->validated('last_name');
+            $password = $tenantRequest->validated('password');
+            session(['email' => $email, 'first_name' => $first_name, 'last_name' => $last_name, 'password' => $password]);
 
-        $email = $tenantRequest->validated('email');
-        $first_name = $tenantRequest->validated('first_name');
-        $last_name = $tenantRequest->validated('last_name');
-        $password = $tenantRequest->validated('password');
-        session(['email' => $email, 'first_name' => $first_name, 'last_name' => $last_name, 'password' => $password]);
+            $tenant = Tenant::create([...$tenantRequest->validated(), 'id' => $tenantRequest->validated('company_code')]);
 
-        $tenant = Tenant::create([...$tenantRequest->validated(), 'id' => $tenantRequest->validated('company_code')]);
+            $tenant->domain()->create(['domain' => $tenantRequest->validated('domain_name')]);
 
-        $tenant->domain()->create(['domain' => $tenantRequest->validated('domain_name')]);
+            $tenant->addresses()->create([...$companyAddressRequest->validated('company')]);
 
-        $tenant->addresses()->create([...$companyAddressRequest->validated('company')]);
+            if (!$invoiceAddressRequest->validated('same_address_as_company'))
+                $tenant->addresses()->create([...$invoiceAddressRequest->validated('invoice'), 'address_type' => AddressTypes::INVOICE->value]);
 
-        if (!$invoiceAddressRequest->validated('same_address_as_company'))
-            $tenant->addresses()->create([...$invoiceAddressRequest->validated('invoice'), 'address_type' => AddressTypes::INVOICE->value]);
+            Debugbar::info($tenant);
 
-        return redirect()->route('central.tenants.index');
+            $tenant->run(function () use ($email, $tenantRequest, $tenant) {
+                $admin = User::where('email', $email)->first();
+
+
+                event(new NewTenantCreatedEvent($admin, $tenant));
+
+                $token = Password::createToken($admin);
+                $admin->notify(new TenantAdminCreatedPasswordResetNotification($token, $tenant));
+
+                // Password::sendResetLink(
+                //     $tenantRequest->only('email')
+                // );
+            });
+
+            DB::commit();
+            return ApiResponse::successFlash([], 'Tenant created');
+
+        } catch(Exception $e) {
+            Log::info('Error during tenant creation : ' . $e->getMessage());
+            return ApiResponse::error($e->getMessage());
+        }
+
     }
 }

@@ -2,14 +2,16 @@
 
 namespace App\Jobs;
 
-use App\Models\Tenants\User;
+use App\Events\NewTenantCreatedEvent;
 use App\Models\Tenant;
 use Illuminate\Support\Str;
+use App\Models\Tenants\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -52,8 +54,8 @@ class CreateTenantAdmin implements ShouldQueue
             'username' => $username
         ]);
 
-        Log::info($admin);
+        $admin->assignRole('Admin');
 
-        tenancy()->end();
+             tenancy()->end();
     }
 }

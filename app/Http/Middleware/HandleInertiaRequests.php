@@ -60,7 +60,7 @@ class HandleInertiaRequests extends Middleware
             if(tenancy()->tenant) {
                 $company = Company::first();
                 session(['tenantName' => $company->name ?? config('app.name')]);
-                session(['tenantLogo' => $company->logo]);
+                session(['tenantLogo' => $company->logo ?? null]);
             }
         }
 

@@ -6,8 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/central/app-layout';
 import { Tenant, type BreadcrumbItem } from '@/types';
-import { Head, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { Head, router, useForm } from '@inertiajs/react';
+import axios from 'axios';
+import { Loader } from 'lucide-react';
+import { FormEventHandler, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -44,49 +46,79 @@ type TenantFormData = {
     };
 };
 
-export default function CreateTenant({ tenant }: { tenant?: Tenant }) {
+export default function CreateTenant({ company }: { company?: Tenant }) {
+    const [isProcessing, setIsProcessing] = useState<boolean>(false);
+
+
     const { data, setData, post, errors } = useForm<TenantFormData>({
-        company_name: tenant?.company_name ?? '',
+        company_name: company?.company_name ?? '',
         first_name: '',
         last_name: '',
         password: '',
         password_confirmation: '',
-        domain_name: tenant?.domain.domain ?? '',
-        company_code: tenant?.company_code ?? '',
-        email: tenant?.email ?? '',
-        vat_number: tenant?.vat_number ?? '',
-        phone_number: tenant?.phone_number ?? '',
+        domain_name: company?.domain?.domain ?? '',
+        company_code: company?.company_code ?? '',
+        email: company?.email ?? '',
+        vat_number: company?.vat_number ?? '',
+        phone_number: company?.phone_number ?? '',
         company: {
-            street: tenant?.company_address?.street ?? '',
-            house_number: tenant?.company_address?.house_number ?? '',
-            zip_code: tenant?.company_address?.zip_code ?? '',
-            city: tenant?.company_address?.city ?? '',
-            country: tenant?.company_address?.country ?? '',
+            street: company?.company_address?.street ?? '',
+            house_number: company?.company_address?.house_number ?? '',
+            zip_code: company?.company_address?.zip_code ?? '',
+            city: company?.company_address?.city ?? '',
+            country: company?.company_address?.country ?? '',
         },
-        same_address_as_company: tenant?.invoice_address === undefined || tenant?.invoice_address === null,
+        same_address_as_company: company?.invoice_address === undefined || company?.invoice_address === null,
         invoice: {
-            street: tenant?.invoice_address?.street ?? '',
-            house_number: tenant?.invoice_address?.house_number ?? '',
-            zip_code: tenant?.invoice_address?.zip_code ?? '',
-            city: tenant?.invoice_address?.city ?? '',
-            country: tenant?.invoice_address?.country ?? '',
+            street: company?.invoice_address?.street ?? '',
+            house_number: company?.invoice_address?.house_number ?? '',
+            zip_code: company?.invoice_address?.zip_code ?? '',
+            city: company?.invoice_address?.city ?? '',
+            country: company?.invoice_address?.country ?? '',
         },
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submit: FormEventHandler = async (e) => {
         e.preventDefault();
-        if (tenant) {
-            post(route('central.tenants.update', tenant.id), {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-HTTP-Method-Override': 'PATCH',
-                    Accept: 'application/json',
-                },
-            });
+        setIsProcessing(true);
+        if (company) {
+            try {
+                const response = await axios.patch(route('central.tenant.update', company.id), {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-HTTP-Method-Override': 'PATCH',
+                        Accept: 'application/json',
+                    },
+                });
+                console.log(response.data);
+                if (response.data.status === 'success') {  
+                    console.log(response.data);
+                    setIsProcessing(false);
+                    router.visit(route('central.tenants.index'));
+                }
+            } catch (error) {
+                console.log(error.response.data);
+                setIsProcessing(false);
+            }
+            
         } else {
-            post(route('central.tenants.store'));
+            try {
+                const response = await axios.post(route('central.tenants.store'), data);
+                 console.log(response.data);
+            if (response.data.status === 'success') {
+                setIsProcessing(false);
+                router.visit(route('central.tenants.index'));
+            }
+            } catch (error) {
+                console.log(error.response.data);
+                setIsProcessing(false);
+                
+            }
+            
         }
     };
+
+    console.log(isProcessing);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -114,7 +146,7 @@ export default function CreateTenant({ tenant }: { tenant?: Tenant }) {
                             required
                             tabIndex={2}
                             value={data.domain_name}
-                            disabled={tenant ? true : false}
+                            disabled={company ? true : false}
                             onChange={(e) => setData('domain_name', e.target.value)}
                             placeholder="Tenant domain"
                         />
@@ -129,7 +161,7 @@ export default function CreateTenant({ tenant }: { tenant?: Tenant }) {
                             required
                             tabIndex={2}
                             value={data.company_code}
-                            disabled={tenant ? true : false}
+                            disabled={company ? true : false}
                             onChange={(e) => setData('company_code', e.target.value)}
                             placeholder="company_code"
                         />
@@ -141,7 +173,7 @@ export default function CreateTenant({ tenant }: { tenant?: Tenant }) {
                         id="vat"
                         type="text"
                         required
-                        tabIndex={4}
+                        tabIndex={3}
                         value={data.vat_number}
                         onChange={(e) => setData('vat_number', e.target.value)}
                         placeholder="BE0123456789"
@@ -154,7 +186,7 @@ export default function CreateTenant({ tenant }: { tenant?: Tenant }) {
                         id="first_name"
                         type="text"
                         required
-                        tabIndex={3}
+                        tabIndex={4}
                         value={data.first_name}
                         onChange={(e) => setData('first_name', e.target.value)}
                         placeholder="John"
@@ -166,19 +198,31 @@ export default function CreateTenant({ tenant }: { tenant?: Tenant }) {
                         id="last_name"
                         type="text"
                         required
-                        tabIndex={3}
+                        tabIndex={5}
                         value={data.last_name}
                         onChange={(e) => setData('last_name', e.target.value)}
                         placeholder="Doe"
                     />
                     <InputError className="mt-2" message={errors.last_name} />
 
-                    <Label htmlFor="password">Tenant password</Label>
+                    <Label htmlFor="email">Tenant email</Label>
                     <Input
+                        id="email"
+                        type="email"
+                        required
+                        tabIndex={6}
+                        value={data.email}
+                        onChange={(e) => setData('email', e.target.value)}
+                        placeholder="tenant@company.com"
+                    />
+                    <InputError className="mt-2" message={errors.email} />
+
+                    {/* <Label htmlFor="password">Tenant password</Label> */}
+                    {/* <Input
                         id="password"
                         type="password"
                         required
-                        tabIndex={3}
+                        tabIndex={7}
                         value={data.password}
                         onChange={(e) => setData('password', e.target.value)}
                         placeholder="Password"
@@ -190,24 +234,12 @@ export default function CreateTenant({ tenant }: { tenant?: Tenant }) {
                         id="password_confirmation"
                         type="password"
                         required
-                        tabIndex={3}
+                        tabIndex={8}
                         value={data.password_confirmation}
                         onChange={(e) => setData('password_confirmation', e.target.value)}
                         placeholder="Password confirmation"
                     />
-                    <InputError className="mt-2" message={errors.password_confirmation} />
-
-                    <Label htmlFor="email">Tenant email</Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        required
-                        tabIndex={3}
-                        value={data.email}
-                        onChange={(e) => setData('email', e.target.value)}
-                        placeholder="tenant@company.com"
-                    />
-                    <InputError className="mt-2" message={errors.email} />
+                    <InputError className="mt-2" message={errors.password_confirmation} /> */}
 
                     <h3>Company Address</h3>
                     <AddressForm idPrefix="company" address={data.company} onChange={(updated) => setData('company', updated)} />
@@ -217,7 +249,7 @@ export default function CreateTenant({ tenant }: { tenant?: Tenant }) {
                         id="phone_number"
                         type="text"
                         required
-                        tabIndex={4}
+                        tabIndex={9}
                         value={data.phone_number}
                         onChange={(e) => setData('phone_number', e.target.value)}
                         placeholder="+32456789123"
@@ -234,15 +266,30 @@ export default function CreateTenant({ tenant }: { tenant?: Tenant }) {
                     />
                     <br />
 
-                    {/* {!data.same_address_as_company && (
+                    {!data.same_address_as_company && (
                         <AddressForm idPrefix="invoice" address={data.invoice} onChange={(updated) => setData('invoice', updated)} />
-                    )} */}
+                    )}
 
-                    <Button type="submit" tabIndex={4}>
+                    <Button type="submit" tabIndex={10}>
                         Submit
                     </Button>
                 </form>
             </div>
+            {isProcessing && (
+                <div className="bg-background/50 fixed inset-0 z-50">
+                    <div className="bg-background/20 flex h-dvh items-center justify-center">
+                        <div className="bg-background flex items-center justify-center p-4 text-center md:w-1/3">
+                            <div className="flex flex-col items-center gap-4">
+                                <Loader size={48} className="animate-pulse" />
+                                <p className="mx-auto animate-pulse text-3xl font-bold">
+                                    Processing...
+                                </p>
+                                <p className="mx-auto">Tenant is being created...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AppLayout>
     );
 }

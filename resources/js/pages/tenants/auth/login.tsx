@@ -36,12 +36,9 @@ export default function TenantLogin({ status, canResetPassword, company }: Login
         });
     };
 
-    // console.log(tenant);
-
     return (
-        <AuthLayout title={`SME-Facility - Log in`} description="Enter your email and password below to log in">
-            <Head title="SME-Facility - Log in" />
-            <p className="text-center">{company}</p>
+        <AuthLayout title={`SME-Facility - ${company} - Log in`} description="Enter your email and password below to log in">
+            <Head title={`SME-Facility - ${company} - Log in`} />
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
                     <div className="grid gap-2">

@@ -1,0 +1,40 @@
+<?php
+
+namespace App\Notifications;
+
+use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+
+class TenantAdminCreatedPasswordResetNotification extends ResetPassword
+{
+    // use Queueable;
+
+    protected $tenant;
+
+    public function __construct($token, $tenant)
+    {
+        parent::__construct($token);
+        $this->tenant = $tenant;
+    }
+
+    protected function resetUrl($notifiable)
+    {
+        
+        if(env('APP_ENV') === "production") {
+            $tenantUrl = 'https://' . $this->tenant->domain->domain;
+            return $tenantUrl . '.sme-facility.com/reset-password/' . $this->token . '?' . http_build_query([
+                'email' => $notifiable->getEmailForPasswordReset(),
+            ]);
+        } else {
+            $tenantUrl = 'http://' . $this->tenant->domain->domain;
+            return $tenantUrl . '.localhost:8000/reset-password/' . $this->token . '?' . http_build_query([
+                'email' => $notifiable->getEmailForPasswordReset(),
+            ]);
+
+        }
+    }
+    
+}

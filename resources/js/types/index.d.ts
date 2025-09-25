@@ -270,6 +270,7 @@ export interface InterventionAction {
     action_type: CentralType;
     started_at?: string;
     finished_at?: string;
+    updated_at: string;
     intervention_costs?: number;
     created_by?: User;
     updated_by?: User;

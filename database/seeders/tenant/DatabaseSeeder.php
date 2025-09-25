@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('SME_2025!fwebxp'),
                 'can_login' => true
             ]);
+            $user->assignRole('Super Admin');
         } else {
             $user = User::where('email', 'super@sme-facility.com')->first();
             $user->assignRole('Super Admin');

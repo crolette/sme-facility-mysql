@@ -40,7 +40,7 @@ class CentralTenantController extends Controller
      */
     public function edit(Tenant $tenant)
     {
-        return Inertia::render('central/tenants/create', ['tenant' => $tenant->load('domain')]);
+        return Inertia::render('central/tenants/create', ['company' => $tenant->load('domain')]);
     }
 
     /**
