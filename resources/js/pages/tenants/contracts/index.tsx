@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Contract } from '@/types';
 import { Head } from '@inertiajs/react';
+import { PlusCircle } from 'lucide-react';
 
 export default function IndexContracts({ items }: { items: Contract[] }) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -17,7 +18,9 @@ export default function IndexContracts({ items }: { items: Contract[] }) {
             <Head title="Contracts" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <a href={route('tenant.contracts.create')}>
-                    <Button>Create</Button>
+                    <Button>
+                        <PlusCircle />
+                        Create</Button>
                 </a>
                 <ContractsList getUrl={'api.contracts.index'}  items={items} editable />
             </div>

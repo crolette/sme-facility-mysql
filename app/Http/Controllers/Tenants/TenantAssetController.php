@@ -75,8 +75,9 @@ class TenantAssetController extends Controller
     public function showDeleted($id)
     {
         $asset = Asset::withTrashed()->with(['documents','pictures','tickets.pictures'])->findOrFail($id);
+
         
-        return Inertia::render('tenants/assets/show', ['asset' => $asset]);
+        return Inertia::render('tenants/assets/show', ['item' => $asset]);
     }
 
     /**

@@ -6,6 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from '@/types';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
+import { Pencil, PlusCircle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
@@ -55,7 +56,7 @@ export default function IndexSites({ items, routeName }: { locations: TenantSite
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className='flex space-x-2'>
                     <a href={route(`tenant.${routeName}.create`)}>
-                        <Button>Create</Button>
+                        <Button><PlusCircle />Create</Button>
                     </a>
                     <a href={route('tenant.pdf.qr-codes', { type: routeName })} target="__blank">
                         <Button variant={'secondary'}>
@@ -88,13 +89,11 @@ export default function IndexSites({ items, routeName }: { locations: TenantSite
                                         <TableBodyData>{item.name}</TableBodyData>
                                         <TableBodyData>{item.description}</TableBodyData>
 
-                                        <TableBodyData>
-                                            {/* <a href={route(`tenant.${routeName}.show`, item.reference_code)}>
-                                                <Button variant={'outline'}>See</Button>
-                                            </a> */}
-
+                                        <TableBodyData className="space-x-2">
                                             <a href={route(`tenant.${routeName}.edit`, item.reference_code)}>
-                                                <Button>Edit</Button>
+                                                <Button>
+                                                    <Pencil />
+                                                </Button>
                                             </a>
                                             <Button
                                                 onClick={() => {
@@ -103,7 +102,7 @@ export default function IndexSites({ items, routeName }: { locations: TenantSite
                                                 }}
                                                 variant={'destructive'}
                                             >
-                                                Delete
+                                                <Trash2 />
                                             </Button>
                                         </TableBodyData>
                                     </TableBodyRow>

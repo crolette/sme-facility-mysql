@@ -6,7 +6,7 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, User } from '@/types';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
-import { Upload } from 'lucide-react';
+import { Pencil, Trash2, Upload } from 'lucide-react';
 import { useState } from 'react';
 
 export default function UserShow({ item }: { item: User }) {
@@ -59,11 +59,14 @@ export default function UserShow({ item }: { item: User }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={user.full_name} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div>
+                <div className='flex gap-2'>
                     <a href={route(`tenant.users.edit`, user.id)}>
-                        <Button>Edit</Button>
+                        <Button>
+                            <Pencil />
+                            Edit</Button>
                     </a>
                     <Button onClick={() => setShowDeleteModale(!showDeleteModale)} variant={'destructive'}>
+                        <Trash2 />
                         Delete
                     </Button>
                     <Button onClick={() => setIsModalOpen(true)} variant={'secondary'}>

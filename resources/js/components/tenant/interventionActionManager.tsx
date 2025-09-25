@@ -8,6 +8,7 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import { useToast } from '../ToastrContext';
+import { Pencil, Plus, PlusCircle, Trash2 } from 'lucide-react';
 
 interface InterventionActionManagerProps {
     interventionId: number;
@@ -185,7 +186,15 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
     return (
         <>
             <ul>
-                Actions ({interventionActions.length}){!closed && <Button onClick={openModale}>add action</Button>}
+                <div className="flex items-center gap-4">
+                    <span>Actions ({interventionActions.length})</span>
+                    {!closed && (
+                        <Button onClick={openModale} size="xs" variant={'outline'}>
+                            <PlusCircle />
+                            <span>Add action</span>
+                        </Button>
+                    )}
+                </div>
                 {interventionActions && interventionActions.length > 0 && (
                     <Table>
                         <TableHead>
@@ -196,9 +205,6 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                                 <TableHeadData>Started at</TableHeadData>
                                 <TableHeadData>Finished at</TableHeadData>
                                 <TableHeadData>Costs</TableHeadData>
-                                {/* <TableHeadData>Description</TableHeadData> */}
-                                {/* <TableHeadData>Planned at</TableHeadData> */}
-                                {/* <TableHeadData>Repair delay</TableHeadData> */}
                                 <TableHeadData></TableHeadData>
                             </TableHeadRow>
                         </TableHead>
@@ -213,16 +219,19 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                                     <TableBodyData>{action.finished_at}</TableBodyData>
                                     <TableBodyData>{action.intervention_costs ? `${action.intervention_costs} €` : '-'} </TableBodyData>
 
-                                    <TableBodyData>
+                                    <TableBodyData className="space-x-2">
                                         {!closed && (
                                             <>
-                                                <Button onClick={() => editInterventionAction(action.id)}>Edit</Button>
+                                                <Button onClick={() => editInterventionAction(action.id)}>
+                                                    <Pencil />
+                                                </Button>
                                                 <Button type="button" variant="destructive" onClick={() => deleteInterventionAction(action.id)}>
-                                                    Delete
+                                                    <Trash2 />
                                                 </Button>
                                             </>
                                         )}
                                     </TableBodyData>
+                                    
                                 </TableBodyRow>
                             ))}
                         </TableBody>

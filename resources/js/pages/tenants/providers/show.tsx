@@ -10,7 +10,7 @@ import { BreadcrumbItem, Provider } from '@/types';
 import { router } from '@inertiajs/core';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
-import { Trash, Upload } from 'lucide-react';
+import { Pencil, Trash, Trash2, Upload } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ProviderShow({ item }: { item: Provider }) {
@@ -79,11 +79,14 @@ export default function ProviderShow({ item }: { item: Provider }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sites" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div>
+                <div className='flex gap-2'>
                     <a href={route(`tenant.providers.edit`, provider.id)}>
-                        <Button>Edit</Button>
+                        <Button>
+                            <Pencil />
+                            Edit</Button>
                     </a>
                     <Button onClick={() => setShowDeleteModale(!showDeleteModale)} variant={'destructive'}>
+                        <Trash2/>
                         Delete
                     </Button>
                     <Button onClick={() => setIsModalOpen(true)} variant={'secondary'}>

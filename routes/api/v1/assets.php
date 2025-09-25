@@ -153,12 +153,17 @@ Route::middleware([
 
             // Get all tickets from an asset
             Route::get('/tickets/', function (Asset $asset) {
-                return ApiResponse::success($asset->tickets);
+             
+                return  $asset ? ApiResponse::success($asset->tickets) : ApiResponse::error('No asset');
+                
+
             })->name('api.assets.tickets');
 
             // Get all interventions from an asset
             Route::get('/interventions/', function (Asset $asset) {
-                return ApiResponse::success($asset->interventions()->where('ticket_id', null)->get());
+
+                return  $asset ? ApiResponse::success($asset->interventions()->where('ticket_id', null)->get()) : ApiResponse::error('No asset');
+
             })->name('api.assets.interventions');
         });
 

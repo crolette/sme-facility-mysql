@@ -7,7 +7,7 @@ import { BiSolidFilePdf } from 'react-icons/bi';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Pencil, PlusCircle, Trash2, Unlink } from 'lucide-react';
 import Modale from '../Modale';
 import SearchableInput from '../SearchableInput';
 import { useToast } from '../ToastrContext';
@@ -50,8 +50,6 @@ export const DocumentManager = ({
     }, []);
 
     const removeDocument = async (id: number) => {
-        console.log(id, { document_id: id });
-        console.log(removableRoute);
         if (!removableRoute || !id)
             return;
         
@@ -59,7 +57,6 @@ export const DocumentManager = ({
 
           try {
               const response = await axios.patch(route(removableRoute, itemCodeId), { document_id: id });
-              console.log(response);
               if (response.data.status === 'success') {
                   fetchDocuments();
               }
@@ -152,9 +149,7 @@ export const DocumentManager = ({
             const response = await axios.get(route('api.category-types', { type: 'document' }));
             setDocumentTypes(await response.data.data);
         } catch (error) {
-            console.error('Erreur lors de la recherche :', error);
             const errors = error.response.data.errors;
-            console.error('Erreur de validation :', errors);
         }
     };
 
@@ -243,13 +238,17 @@ export const DocumentManager = ({
 
     return (
         <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-            <h2 className="inline">Documents ({documents?.length ?? 0})</h2>
+            <div className="flex items-center justify-between">
+                <h2 className="inline">Documents ({documents?.length ?? 0})</h2>
+                <div className='space-x-4'>
             {canAdd && (
                 <>
-                    <Button onClick={() => setAddExistingDocumentsModale(true)}>Add existing document</Button>
-                    <Button onClick={() => addNewFile()}>Add new file</Button>
+                    <Button onClick={() => setAddExistingDocumentsModale(true)}> <PlusCircle /> Add existing document</Button>
+                    <Button onClick={() => addNewFile()}> <PlusCircle />Add new file</Button>
                 </>
-            )}
+                    )}
+                    </div>
+                </div>
             {documents && documents.length > 0 && (
                 <Table>
                     <TableHead>
@@ -287,20 +286,28 @@ export const DocumentManager = ({
                                     <TableBodyData>{document.description}</TableBodyData>
                                     <TableBodyData>{document.category}</TableBodyData>
                                     <TableBodyData>{document.created_at}</TableBodyData>
-                                    <TableBodyData>
-                                        <Button variant={'destructive'} onClick={() => removeDocument(document.id)}>
-                                            Remove
-                                        </Button>
-                                        <Button
-                                            variant={'destructive'}
-                                            onClick={() => {
-                                                setDocumentToDelete(document.id);
-                                                setShowDeleteModale(!showDeleteModale);
-                                            }}
-                                        >
-                                            Delete
-                                        </Button>
-                                        <Button onClick={() => editFile(document.id)}>Edit</Button>
+                                    <TableBodyData className="flex space-x-2">
+                                        {canAdd && (
+                                            <>
+                                                <Button variant={'outline'} onClick={() => removeDocument(document.id)}>
+                                                    <Unlink />
+                                                    Remove
+                                                </Button>
+                                                <Button onClick={() => editFile(document.id)}>
+                                                    <Pencil />
+                                                </Button>
+
+                                                <Button
+                                                    variant={'destructive'}
+                                                    onClick={() => {
+                                                        setDocumentToDelete(document.id);
+                                                        setShowDeleteModale(!showDeleteModale);
+                                                    }}
+                                                >
+                                                    <Trash2 />
+                                                </Button>
+                                            </>
+                                        )}
                                     </TableBodyData>
                                 </TableBodyRow>
                             );
@@ -324,7 +331,7 @@ export const DocumentManager = ({
                         <div className="bg-background flex items-center justify-center p-4">
                             <div className="flex flex-col gap-2">
                                 <form onSubmit={submitType === 'edit' ? submitEditFile : submitNewFile} className="space-y-2">
-                                    <p className="text-center">{submitType === 'edit' ? 'Edit document' : 'Add document'}</p>
+                                    <p className="text-center font-semibold">{submitType === 'edit' ? 'Edit document' : 'Add document'}</p>
                                     <Label>Document category</Label>
                                     <select
                                         name="documentType"
@@ -428,8 +435,8 @@ export const DocumentManager = ({
             {addExistingDocumentsModale && (
                 <div className="bg-background/50 fixed inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">
-                        <div className="bg-background flex flex-col items-center justify-center p-4 text-center md:max-w-1/3">
-                            <p>Add Existing document</p>
+                        <div className="bg-background flex flex-col items-center justify-center p-4 text-center md:max-w-1/3 gap-4">
+                            <p className='font-semibold'>Add existing document</p>
                             <SearchableInput<Documents>
                                 multiple={true}
                                 searchUrl={route('api.documents.search')}
@@ -441,7 +448,9 @@ export const DocumentManager = ({
                                 }}
                                 placeholder="Search documents..."
                             />
-                            <Button
+                            <div className='space-x-4'>
+                                <Button onClick={addExistingDocumentsToAsset}>Add document</Button>
+                                <Button
                                 variant="secondary"
                                 onClick={() => {
                                     setAddExistingDocumentsModale(false);
@@ -450,7 +459,7 @@ export const DocumentManager = ({
                             >
                                 Cancel
                             </Button>
-                            <Button onClick={addExistingDocumentsToAsset}>Add document</Button>
+                                </div>
                         </div>
                     </div>
                 </div>

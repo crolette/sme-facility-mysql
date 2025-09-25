@@ -61,7 +61,7 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                 setTickets(await response.data.data);
             }
         } catch (error) {
-             showToast(error.response.data.message, error.response.data.status);
+            return;
         }
     };
 

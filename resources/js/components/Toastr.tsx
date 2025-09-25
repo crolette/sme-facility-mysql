@@ -9,11 +9,17 @@ export default function Toastr() {
     const { toastData } = useToast();
     const [visible, setVisible] = useState(true);
     const { flash } = usePage<SharedData>().props;
+ const [currentMessage, setCurrentMessage] = useState<string | null>();
 
     useEffect(() => {
         if (flash?.message) {
+            setCurrentMessage(flash?.message);
             setVisible(true);
-            const timer = setTimeout(() => setVisible(false), 3000);
+            const timer = setTimeout(() => {
+                setVisible(false);
+                setCurrentMessage(null);
+            }, 3000);
+            
             return () => clearTimeout(timer);
         }
     }, [flash?.message]);
@@ -21,15 +27,17 @@ export default function Toastr() {
     // Gérer les messages du context
     useEffect(() => {
         if (toastData?.message) {
-            
+            setCurrentMessage(toastData?.message);
             setVisible(true);
-            const timer = setTimeout(() => setVisible(false), 3000);
+            const timer = setTimeout(() => {
+                setVisible(false);
+                setCurrentMessage(null);
+            }, 3000);
             return () => clearTimeout(timer);
         }
     }, [toastData]);
 
-
-    const currentMessage = toastData?.message || flash?.message;
+   
     const currentType = toastData?.type || flash?.type;
 
     if (!visible || !currentMessage) return null; // Don't render if no message

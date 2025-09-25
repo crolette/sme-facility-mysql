@@ -9,7 +9,7 @@ import { Textarea } from '../ui/textarea';
 import { InterventionActionManager } from './interventionActionManager';
 import { Pill } from '../ui/pill';
 import SearchableInput from '../SearchableInput';
-import { Loader, X } from 'lucide-react';
+import { Loader, Pencil, Plus, PlusCircle, Trash2, X } from 'lucide-react';
 import { useToast } from '../ToastrContext';
 
 interface InterventionManagerProps {
@@ -249,69 +249,75 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
     }
 
     return (
-        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-            <h2 className="inline">Interventions ({interventions?.length ?? 0})</h2>
-            {!closed && <Button onClick={openModale}>add intervention</Button>}
-            <Table>
-                <TableHead>
-                    <TableHeadRow>
-                        <TableHeadData>Type</TableHeadData>
-                        <TableHeadData>Description</TableHeadData>
-                        <TableHeadData>Priority</TableHeadData>
-                        <TableHeadData>Status</TableHeadData>
-                        <TableHeadData>Planned at</TableHeadData>
-                        <TableHeadData>Repair delay</TableHeadData>
-                        <TableHeadData>Total costs</TableHeadData>
-                        <TableHeadData></TableHeadData>
-                    </TableHeadRow>
-                </TableHead>
+        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl font">
+            <div className="flex items-center justify-between">
+                <h2 className="inline">Interventions ({interventions?.length ?? 0})</h2>
+                {!closed && (
+                    <Button onClick={openModale}>
+                        <PlusCircle />
+                        Add intervention
+                    </Button>
+                )}
+            </div>
+            {interventions &&
+                interventions.length > 0 &&
+                interventions.map((intervention, index) => (
+                    <Table key={intervention.id} className="table-fixed">
+                        <TableHead>
+                            <TableHeadRow>
+                                <TableHeadData>Type</TableHeadData>
+                                <TableHeadData className="w-32">Description</TableHeadData>
+                                <TableHeadData>Priority</TableHeadData>
+                                <TableHeadData>Status</TableHeadData>
+                                <TableHeadData>Planned at</TableHeadData>
+                                <TableHeadData>Repair delay</TableHeadData>
+                                <TableHeadData>Total costs</TableHeadData>
+                                <TableHeadData>
+                                    <Button onClick={() => sendIntervention(intervention.id)} variant={'secondary'}>
+                                        Send to provider
+                                    </Button>
+                                </TableHeadData>
+                            </TableHeadRow>
+                        </TableHead>
 
-                <TableBody>
-                    {interventions &&
-                        interventions.length > 0 &&
-                        interventions.map((intervention, index) => (
-                            <>
-                                <TableBodyRow className="even:bg-red-400">
-                                    <TableBodyData>{intervention.type}</TableBodyData>
-                                    <TableBodyData>{intervention.description}</TableBodyData>
-                                    <TableBodyData>
-                                        <Pill variant={intervention.priority}>{intervention.priority}</Pill>
-                                    </TableBodyData>
-                                    <TableBodyData>{intervention.status}</TableBodyData>
-                                    <TableBodyData>{intervention.planned_at ?? 'Not planned'}</TableBodyData>
-                                    <TableBodyData>{intervention.repair_delay ?? 'No repair delay'}</TableBodyData>
-                                    <TableBodyData>{intervention.total_costs ? `${intervention.total_costs} €` : '-'}</TableBodyData>
-                                    <TableBodyData>
-                                        {!closed && (
-                                            <>
-                                                <Button onClick={() => editIntervention(intervention.id)}>Edit</Button>
-                                                <Button type="button" variant="destructive" onClick={() => deleteIntervention(intervention.id)}>
-                                                    Delete
-                                                </Button>
-                                                <Button onClick={() => sendIntervention(intervention.id)}>Send to provider</Button>
-                                            </>
-                                        )}
-                                    </TableBodyData>
-                                </TableBodyRow>
-                                <TableBodyRow key={`action-${index}`}>
-                                    <TableBodyData colSpan={8}>
-                                        <InterventionActionManager
-                                            interventionId={intervention.id}
-                                            actionsChanged={setActionsChanged}
-                                            closed={
-                                                closed
-                                                    ? true
-                                                    : intervention.status === 'completed' || intervention.status === 'cancelled'
-                                                      ? true
-                                                      : false
-                                            }
-                                        />
-                                    </TableBodyData>
-                                </TableBodyRow>
-                            </>
-                        ))}
-                </TableBody>
-            </Table>
+                        <TableBody>
+                            <TableBodyRow className="">
+                                <TableBodyData>{intervention.type}</TableBodyData>
+                                <TableBodyData className="overflow-ellipsis">{intervention.description}</TableBodyData>
+                                <TableBodyData>
+                                    <Pill variant={intervention.priority}>{intervention.priority}</Pill>
+                                </TableBodyData>
+                                <TableBodyData>{intervention.status}</TableBodyData>
+                                <TableBodyData>{intervention.planned_at ?? 'Not planned'}</TableBodyData>
+                                <TableBodyData>{intervention.repair_delay ?? 'No repair delay'}</TableBodyData>
+                                <TableBodyData>{intervention.total_costs ? `${intervention.total_costs} €` : '-'}</TableBodyData>
+                                <TableBodyData className="flex space-x-2 ">
+                                    {!closed && (
+                                        <>
+                                            <Button onClick={() => editIntervention(intervention.id)}>
+                                                <Pencil />
+                                            </Button>
+                                            <Button type="button" variant="destructive" onClick={() => deleteIntervention(intervention.id)}>
+                                                <Trash2 />
+                                            </Button>
+                                        </>
+                                    )}
+                                </TableBodyData>
+                            </TableBodyRow>
+                            <TableBodyRow key={`action-${index}`}>
+                                <TableBodyData colSpan={8}>
+                                    <InterventionActionManager
+                                        interventionId={intervention.id}
+                                        actionsChanged={setActionsChanged}
+                                        closed={
+                                            closed ? true : intervention.status === 'completed' || intervention.status === 'cancelled' ? true : false
+                                        }
+                                    />
+                                </TableBodyData>
+                            </TableBodyRow>
+                        </TableBody>
+                    </Table>
+                ))}
             {sendInterventionToProviderModale && (
                 <div className="bg-background/50 fixed inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">
@@ -319,9 +325,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                             {isProcessing && (
                                 <div className="flex flex-col items-center gap-4">
                                     <Loader size={48} className="animate-pulse" />
-                                    <p className="mx-auto animate-pulse text-3xl font-bold">
-                                        Processing...
-                                    </p>
+                                    <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
                                     <p className="mx-auto">Intervention is being sent...</p>
                                 </div>
                             )}
@@ -409,9 +413,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                             {isProcessing && (
                                 <div className="flex flex-col items-center gap-4">
                                     <Loader size={48} className="animate-pulse" />
-                                    <p className="mx-auto animate-pulse text-3xl font-bold">
-                                        Processing...
-                                    </p>
+                                    <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
                                     <p className="mx-auto">Intervention is being added...</p>
                                 </div>
                             )}

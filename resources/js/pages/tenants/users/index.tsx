@@ -3,6 +3,7 @@ import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, User } from '@/types';
 import { Head } from '@inertiajs/react';
+import { PlusCircle } from 'lucide-react';
 
 export default function UserIndex({ users }: { users: User[] }) {
     const breadcrumbs: BreadcrumbItem[] = [
@@ -17,7 +18,9 @@ export default function UserIndex({ users }: { users: User[] }) {
             <Head title="Sites" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <a href={route(`tenant.users.create`)}>
-                    <Button>Create user</Button>
+                    <Button>
+                        <PlusCircle />
+                        Create user</Button>
                 </a>
                 <Table>
                     <TableHead>

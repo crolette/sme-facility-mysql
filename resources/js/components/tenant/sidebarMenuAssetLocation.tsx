@@ -127,7 +127,7 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     return (
         <div className="bg-sidebar border-sidebar-border flex h-fit flex-col gap-2 rounded-md shadow-xl">
-            <div className="flex flex-col gap-1 px-4 py-2 items-center text-center">
+            <div className="flex flex-col items-center gap-1 px-4 py-2 text-center">
                 <p className="font-semibold">{infos.name}</p>
 
                 <p className="text-sm">{infos.code ?? ''}</p>
@@ -137,10 +137,13 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
                     {infos.levelName}
                 </a>
             </div>
-            
+
             {/* MOBILE MENU */}
             <ul className="relative mb-2 lg:hidden">
-                <li className="bg-sidebar-accent flex cursor-pointer justify-between p-2" onClick={() => setShowMobileMenu(!showMobileMenu)}>
+                <li
+                    className="bg-sidebar-accent flex cursor-pointer justify-between p-2 first-letter:uppercase"
+                    onClick={() => setShowMobileMenu(!showMobileMenu)}
+                >
                     {activeTab}
                     <ChevronDown />
                 </li>
@@ -153,7 +156,7 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
                                     setActiveTab(nav.tabName);
                                     setShowMobileMenu(false);
                                 }}
-                                className={'hover:bg-accent cursor-pointer p-2'}
+                                className={'hover:bg-accent cursor-pointer p-2 first-letter:uppercase'}
                             >
                                 {nav.tabDisplay}
                             </li>
@@ -167,7 +170,7 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
                     <li
                         key={index}
                         onClick={() => setActiveTab(nav.tabName)}
-                        className={cn(activeTab === nav.tabName ? 'bg-accent' : '', 'cursor-pointer p-2')}
+                        className={cn(activeTab === nav.tabName ? 'bg-accent' : '', 'cursor-pointer p-2 first-letter:uppercase')}
                     >
                         {nav.tabDisplay}
                     </li>

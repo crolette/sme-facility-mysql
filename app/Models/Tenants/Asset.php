@@ -98,6 +98,12 @@ class Asset extends Model
         });
     }
 
+    public function resolveRouteBinding($value, $field = null)
+    {
+        // Pour que Laravel cherche également les Asset supprimés
+        return $this->withTrashed()->where($field ?? $this->getRouteKeyName(), $value)->first();
+    }
+
     public function maintainable(): MorphOne
     {
         return $this->morphOne(Maintainable::class, 'maintainable');

@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { Asset, BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
-import { Loader2 } from 'lucide-react';
+import { ArchiveRestore, Loader2, Pencil, PlusCircle, QrCode, Shredder, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
@@ -55,11 +55,9 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                 setActiveAssetsTab(!activeAssetsTab);
                 setSearch('');
                 fetchAssets();
-                console.log(response.data.message, response.data.status);
                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.log(error);
              showToast(error.response.data.message, error.response.data.status);
         }
     };
@@ -135,11 +133,11 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
             <Head title="Assets" />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="flex gap-10 border-b-2">
+                <div className="flex gap-10 border-b-2 border-accent">
                     <ul className="flex pl-4">
                         <li
                             className={cn(
-                                'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-4 py-1',
+                                'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-6 py-1',
                                 activeAssetsTab ? 'bg-primary text-background' : 'bg-secondary',
                             )}
                             onClick={() => {
@@ -151,7 +149,7 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                         </li>
                         <li
                             className={cn(
-                                'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-4 py-1',
+                                'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-6 py-1',
                                 trashedAssetsTab ? 'bg-primary text-background' : 'bg-secondary',
                             )}
                             onClick={() => {
@@ -163,7 +161,7 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                         </li>
                     </ul>
                     <a href={route(`tenant.assets.create`)} className="w-fit">
-                        <Button>Create</Button>
+                        <Button><PlusCircle />Create</Button>
                     </a>
                     <a href={route('tenant.pdf.qr-codes', {type: 'assets'})} target='__blank'>
                                             <Button variant={'secondary'}>
@@ -204,13 +202,13 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                                                 <TableBodyData>{asset.maintainable.name}</TableBodyData>
                                                 <TableBodyData>{asset.maintainable.description}</TableBodyData>
 
-                                                <TableBodyData>
-                                                    {/* <a href={route(`tenant.assets.show`, asset.reference_code)}>
-                                                        <Button variant={'outline'}>See</Button>
-                                                    </a> */}
+                                                <TableBodyData className='space-x-2'>
+                                            
 
                                                     <a href={route(`tenant.assets.edit`, asset.reference_code)}>
-                                                        <Button>Edit</Button>
+                                                        <Button>
+                                                            <Pencil/>
+                                                            </Button>
                                                     </a>
                                                     <Button
                                                         onClick={() => {
@@ -219,7 +217,7 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                                                         }}
                                                         variant={'destructive'}
                                                     >
-                                                        Delete
+                                                        <Trash2 />
                                                     </Button>
                                                 </TableBodyData>
                                             </TableBodyRow>
@@ -244,12 +242,10 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                                             <TableBodyData>{asset.maintainable.name}</TableBodyData>
                                             <TableBodyData>{asset.maintainable.description}</TableBodyData>
 
-                                            <TableBodyData>
-                                                {/* <a href={route('tenant.assets.deleted', asset.id)}>
-                                                    <Button>Show</Button>
-                                                </a> */}
+                                            <TableBodyData className="space-x-2">
                                                 <Button onClick={() => restoreAsset(asset)} variant={'green'}>
-                                                    Restore
+                                                    <ArchiveRestore />
+                                                    {/* Restore */}
                                                 </Button>
                                                 <Button
                                                     onClick={() => {
@@ -258,7 +254,8 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                                                     }}
                                                     variant={'destructive'}
                                                 >
-                                                    Delete definitely
+                                                    <Shredder />
+                                                    {/* Delete definitely */}
                                                 </Button>
                                             </TableBodyData>
                                         </TableBodyRow>

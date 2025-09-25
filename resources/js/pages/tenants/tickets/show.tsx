@@ -7,6 +7,7 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Ticket } from '@/types';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
+import { EyeClosed } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ShowTicket({ item }: { item: Ticket }) {

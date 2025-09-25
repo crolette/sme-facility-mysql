@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Button } from '../ui/button';
 import Modale from '../Modale';
 import { Pill } from '../ui/pill';
+import { Pencil, Trash2, Unlink } from 'lucide-react';
 
 interface ContractsList {
     getUrl: string;
@@ -112,11 +113,20 @@ export const ContractsList = ({
                                         <TableBodyData>{contract.end_date}</TableBodyData>
 
                                         {(editable || removable) && (
-                                            <TableBodyData>
+                                            <TableBodyData className="flex space-x-2">
+                                                {removable && (
+                                                    <>
+                                                        <Button onClick={() => removeContract(contract.id)} variant={'outline'}>
+                                                            <Unlink />
+                                                        </Button>
+                                                    </>
+                                                )}
                                                 {editable && (
                                                     <>
                                                         <a href={route(`tenant.contracts.edit`, contract.id)}>
-                                                            <Button>Edit</Button>
+                                                            <Button>
+                                                                <Pencil />
+                                                            </Button>
                                                         </a>
                                                         <Button
                                                             onClick={() => {
@@ -125,14 +135,7 @@ export const ContractsList = ({
                                                             }}
                                                             variant={'destructive'}
                                                         >
-                                                            Delete
-                                                        </Button>
-                                                    </>
-                                                )}
-                                                {removable && (
-                                                    <>
-                                                        <Button onClick={() => removeContract(contract.id)} variant={'destructive'}>
-                                                            Remove
+                                                            <Trash2 />
                                                         </Button>
                                                     </>
                                                 )}

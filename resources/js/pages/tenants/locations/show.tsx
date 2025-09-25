@@ -15,6 +15,7 @@ import { Contract, TenantBuilding, TenantFloor, TenantRoom, TenantSite, type Bre
 import { router } from '@inertiajs/core';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
+import { CircleCheckBig, Move, Pencil, PlusCircle, QrCode } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ShowLocation({ item, routeName }: { item: TenantSite | TenantBuilding | TenantFloor | TenantRoom; routeName: string }) {
@@ -105,19 +106,29 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Tenants" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div>
+                <div className="flex flex-wrap gap-2">
                     <a href={route(`tenant.${routeName}.edit`, location.reference_code)}>
-                        <Button>Edit</Button>
+                        <Button>
+                            <Pencil />
+                            Edit
+                        </Button>
                     </a>
-                    {routeName === 'rooms' && <Button onClick={() => setShowModaleRelocateRoom(!showModaleRelocateRoom)}>Redefine room</Button>}
+
                     {location.maintainable.need_maintenance && (
                         <Button onClick={() => markMaintenanceDone()} variant={'green'}>
+                            <CircleCheckBig />
                             Mark maintenance as done
                         </Button>
                     )}
                     <Button onClick={generateQR} variant={'secondary'}>
-                        Generate new QR
+                        <QrCode /> Generate new QR
                     </Button>
+                    {routeName === 'rooms' && (
+                        <Button variant={'secondary'} onClick={() => setShowModaleRelocateRoom(!showModaleRelocateRoom)}>
+                            <Move />
+                            Redefine room
+                        </Button>
+                    )}
                 </div>
 
                 {routeName === 'rooms' && showModaleRelocateRoom && (
@@ -229,9 +240,19 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
 
                         {activeTab === 'contracts' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
-                                <h2>Contracts</h2>
-                                <Button onClick={() => setAddExistingContractModale(true)}>add existing contract</Button>
-                                <Button onClick={() => router.get(route('tenant.contracts.create'))}>Add new contract</Button>
+                                <div className="flex items-center justify-between gap-2">
+                                    <h2>Contracts</h2>
+                                    <div className="space-y-2 space-x-4 sm:space-y-0">
+                                        <Button onClick={() => setAddExistingContractModale(true)}>
+                                            <PlusCircle />
+                                            Add existing contract
+                                        </Button>
+                                        <Button onClick={() => router.get(route('tenant.contracts.create'))}>
+                                            <PlusCircle />
+                                            Add new contract
+                                        </Button>
+                                    </div>
+                                </div>
                                 <ContractsList
                                     items={location.contracts}
                                     contractableReference={location.reference_code}

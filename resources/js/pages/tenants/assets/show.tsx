@@ -12,6 +12,7 @@ import { Asset, Contract, type BreadcrumbItem} from '@/types';
 import { router } from '@inertiajs/core';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
+import { ArchiveRestore, CircleCheckBig, Pencil, PlusCircle, QrCode, Shredder, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ShowAsset({ item }: { item: Asset }) {
@@ -138,32 +139,40 @@ export default function ShowAsset({ item }: { item: Asset }) {
             <Head title={`Asset ${asset.maintainable.name}`} />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div>
+                <div className="flex flex-wrap items-center gap-4">
                     {asset.deleted_at ? (
                         <>
                             <Button onClick={() => restoreAsset(asset)} variant={'green'}>
+                                <ArchiveRestore />
                                 Restore
                             </Button>
                             <Button onClick={() => deleteDefinitelyAsset(asset)} variant={'destructive'}>
+                                <Shredder />
                                 Delete definitely
                             </Button>
                         </>
                     ) : (
                         <>
                             <a href={route(`tenant.assets.edit`, asset.reference_code)}>
-                                <Button>Edit</Button>
+                                <Button>
+                                    <Pencil />
+                                    Edit
+                                </Button>
                             </a>
                             <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
+                                <Trash2 />
                                 Delete
                             </Button>
                             {asset.maintainable.need_maintenance && (
                                 <Button onClick={() => markMaintenanceDone()} variant={'green'}>
+                                    <CircleCheckBig />
                                     Mark maintenance as done
                                 </Button>
                             )}
                         </>
                     )}
                     <Button onClick={generateQR} variant={'secondary'}>
+                        <QrCode />
                         Generate new QR
                     </Button>
                 </div>
@@ -264,9 +273,22 @@ export default function ShowAsset({ item }: { item: Asset }) {
 
                         {activeTab === 'contracts' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
-                                <h2>Contracts</h2>
-                                <Button onClick={() => setAddExistingContractModale(true)}>add existing contract</Button>
-                                <Button onClick={() => router.get(route('tenant.contracts.create'))}>Add new contract</Button>
+                                <div className="flex items-center justify-between gap-2">
+                                    <h2>Contracts</h2>
+                                        {!asset.deleted_at && (
+                                    <div className="space-y-2 space-x-4 sm:space-y-0">
+                                        <Button onClick={() => setAddExistingContractModale(true)}>
+                                            <PlusCircle />
+                                            Add existing contract
+                                        </Button>
+                                        <Button onClick={() => router.get(route('tenant.contracts.create'))}>
+                                            <PlusCircle />
+                                            Add new contract
+                                        </Button>
+                                        
+                                        </div>
+                                        )}
+                                </div>
                                 <ContractsList
                                     items={asset.contracts}
                                     contractableReference={asset.reference_code}
@@ -311,7 +333,6 @@ export default function ShowAsset({ item }: { item: Asset }) {
                         )}
                         {activeTab === 'documents' && (
                             <>
-                                
                                 <DocumentManager
                                     itemCodeId={asset.reference_code}
                                     getDocumentsUrl={`api.assets.documents`}
@@ -338,7 +359,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                     </div>
                 </div>
             </div>
-            
+
             {addExistingContractModale && (
                 <div className="bg-background/50 fixed inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">
