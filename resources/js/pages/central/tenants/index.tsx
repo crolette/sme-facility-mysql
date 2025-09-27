@@ -20,56 +20,63 @@ interface TypeFormData {
     [key: string]: any
 }
 
-export default function IndexTenants({ tenants }: { tenants: Tenant[] }) {
+export default function IndexTenants({ items }: { items: Tenant[] }) {
     const { showToast } = useToast();
-        const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
+    const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
     const [tenantToDelete, setTenantToDelete] = useState<Tenant | null>(null);
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
+    const [tenants, setTenants] = useState(items);
 
-    const {
-        data,
-        setData,
-    } = useForm<TypeFormData>({
+    const fetchTenants = async () => {
+        try {
+            const response = await axios.get(route('api.central.tenants.index'));
+            if (response.data.type === 'success') {
+                setTenants(response.data.data);
+                }
+        } catch (error) {
+             showToast(error.response.data.message, error.response.data.type);
+        }
+    }
+
+
+    const { data, setData } = useForm<TypeFormData>({
         tenant: null,
     });
 
     const deleteTenant = async () => {
-        if (!data.tenant)
-            return;
+        if (!data.tenant) return;
         setIsProcessing(true);
-            try {
-                const response = await axios.delete(route('central.tenants.delete', data.tenant));
-                if (response.data.type === 'success') {
-                    setTenantToDelete(null);
-                    setShowDeleteModale(false);
-                    showToast(response.data.message, response.data.type)
-                    setIsProcessing(false);
-                }
-            } catch (error) {
+        try {
+            const response = await axios.delete(route('central.tenants.delete', data.tenant));
+            if (response.data.type === 'success') {
                 setTenantToDelete(null);
-                showToast(error.response.data.message, error.response.data.type);
-                setIsProcessing(false);
                 setShowDeleteModale(false);
+                showToast(response.data.message, response.data.type);
+                fetchTenants();
+                setIsProcessing(false);
             }
-        
+        } catch (error) {
+            setTenantToDelete(null);
+            showToast(error.response.data.message, error.response.data.type);
+            setIsProcessing(false);
+            setShowDeleteModale(false);
+        }
     };
 
-// FIXME remove when on cloud server as it is only used on mutual server as DB creation is not automatic
+    // FIXME remove when on cloud server as it is only used on mutual server as DB creation is not automatic
     const sendTenantNotif = async (id: string) => {
-        
-        if (!id)
-            return;
+        if (!id) return;
 
         try {
-            const response = await axios.post(route('send-notif-tenant-admin', id), {tenant: id});
+            const response = await axios.post(route('send-notif-tenant-admin', id), { tenant: id });
             if (response.data.type === 'success') {
                 showToast(response.data.message, response.data.type);
             }
         } catch (error) {
             showToast(error.response.data.message, error.response.data.type);
         }
-    }
-    
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Tenants" />
@@ -77,12 +84,12 @@ export default function IndexTenants({ tenants }: { tenants: Tenant[] }) {
                 <a href={route('central.tenants.create')}>
                     <Button>Create</Button>
                 </a>
-                <ul className='space-y-4'>
+                <ul className="space-y-4">
                     {tenants.length > 0 &&
                         tenants.map((tenant) => (
                             <li key={tenant.id} className="flex items-center justify-between gap-4">
                                 <p>
-                                    {tenant.company_name} - {tenant.email} - {tenant.domain.domain}
+                                    {tenant.company_name}
                                 </p>
                                 <div className="flex gap-2">
                                     <Button
@@ -100,6 +107,9 @@ export default function IndexTenants({ tenants }: { tenants: Tenant[] }) {
                                     </a>
                                     <a href={route('central.tenants.show', tenant.id)}>
                                         <Button variant={'outline'}>See</Button>
+                                    </a>
+                                    <a href={tenant.domain_address} target='__blank'>
+                                        <Button variant={'outline'}>Access domain</Button>
                                     </a>
 
                                     <Button variant={'outline'} onClick={() => sendTenantNotif(tenant.id)}>

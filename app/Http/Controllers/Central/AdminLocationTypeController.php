@@ -63,7 +63,7 @@ class AdminLocationTypeController extends Controller
             }
 
             DB::commit();
-            return redirect()->route('central.locations.index')->with(['message' => 'Location type created', 'type' => 'success']);
+            return redirect()->route('central.locations.index')->with(['message' => 'Tenant created', 'type' => 'success']);
         } catch (Exception $e) {
             DB::rollBack();
             Log::info($e->getMessage());

@@ -46,6 +46,12 @@ foreach (config('tenancy.central_domains') as $domain) {
 
             Route::get('tenants', [CentralTenantController::class, 'index'])->name('central.tenants.index');
 
+            Route::get('api/tenants', function() {
+                $tenants = Tenant::with('domain')->get();
+                return ApiResponse::success($tenants);
+            })->name('api.central.tenants.index');
+
+
             Route::get('tenants/create', [RegisterCentralTenantController::class, 'create'])->name('central.tenants.create');
             Route::post('tenants/create', [RegisterCentralTenantController::class, 'store'])->name('central.tenants.store');
 

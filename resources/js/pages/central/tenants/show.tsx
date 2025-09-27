@@ -16,7 +16,8 @@ export default function ShowTenant({ tenant }: { tenant: Tenant }) {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <ul>
                     <li key={tenant.id}>
-                        {tenant.company_name} - {tenant.email} - {tenant.phone_number} - {tenant.company_code}
+                        {tenant.company_name} - {tenant.email} - {tenant.phone_number} - {tenant.company_code} -
+                        <a href={tenant.domain_address}>{tenant.domain_address}</a>
                         <ul>
                             <li key={tenant.domain.id}>Domain name: {tenant.domain.domain}</li>
                             <li key="99">Company address : {tenant.full_company_address}</li>

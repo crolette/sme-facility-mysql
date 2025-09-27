@@ -86,7 +86,6 @@ export const ContractsList = ({
                             <TableHeadData>Provider #</TableHeadData>
                             <TableHeadData>Renewal</TableHeadData>
                             <TableHeadData>Provider</TableHeadData>
-                            <TableHeadData>Category</TableHeadData>
                             <TableHeadData>End date</TableHeadData>
                             {(editable || removable) && <TableHeadData></TableHeadData>}
                         </TableHeadRow>
@@ -109,7 +108,6 @@ export const ContractsList = ({
                                         <TableBodyData>
                                             <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>
                                         </TableBodyData>
-                                        <TableBodyData className="bg-">{contract.provider.category}</TableBodyData>
                                         <TableBodyData>{contract.end_date}</TableBodyData>
 
                                         {(editable || removable) && (

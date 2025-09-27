@@ -137,10 +137,10 @@ export default function IndexTickets() {
                                         <TableBodyData>{ticket.created_at}</TableBodyData>
                                         <TableBodyData>{ticket.updated_at}</TableBodyData>
 
-                                        <TableBodyData>
+                                        <TableBodyData className='space-x-2'>
                                             {ticket.status == 'open' && (
                                                 <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'ongoing')}>
-                                                    Mark as Ongoing
+                                                    Ongoing
                                                 </Button>
                                             )}
                                             {ticket.status !== 'closed' && (

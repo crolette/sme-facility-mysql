@@ -28,8 +28,6 @@ class TicketClosedMail extends Mailable
         $locale = App::getLocale();
         App::setLocale($locale);
 
-        Debugbar::info('TICKET CLOSED MAIL', $ticket);
-
     }
 
     /**

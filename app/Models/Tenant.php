@@ -58,7 +58,8 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 
     protected $appends = [
         'full_company_address',
-        'full_invoice_address'
+        'full_invoice_address',
+        'domain_address'
     ];
 
     public function companyAddress(): HasOne
@@ -79,6 +80,21 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     public function domain(): HasOne
     {
         return $this->hasOne(Domain::class);
+    }
+
+    public function domainAddress(): Attribute
+    {
+
+        if (str_starts_with(config('app.url'), 'https://')) {
+            $suffix = substr(config('app.url'), strlen('https://'));
+            $address = preg_replace('/^https?:\/\/[^\/]+/', "https://{$this->domain->domain}" . '.' . $suffix, config('app.url'));
+        } else {
+            $suffix = substr(config('app.url'), strlen('http://'));
+            $address = preg_replace('/^http?:\/\/[^\/]+/', "http://{$this->domain->domain}" . '.' . $suffix, config('app.url'));
+        }
+        return Attribute::make(
+            get: fn() => $address
+        );
     }
 
     public function fullCompanyAddress(): Attribute

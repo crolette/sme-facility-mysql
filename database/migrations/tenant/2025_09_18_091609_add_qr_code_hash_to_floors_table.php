@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('floors', function (Blueprint $table) {
-            $table->dropColumn('qr_hash', 12);
+            $table->dropColumn('qr_hash');
         });
     }
 };

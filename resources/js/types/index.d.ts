@@ -352,6 +352,7 @@ export interface Tenant {
     full_invoice_address?: string;
     phone_number: string;
     domain: Domain;
+    domain_address: string;
 }
 
 export interface Domain {

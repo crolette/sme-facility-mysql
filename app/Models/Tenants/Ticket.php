@@ -49,9 +49,9 @@ class Ticket extends Model
     protected function casts(): array
     {
         return [
-            'closed_at' => 'date:d-m-Y h:i',
-            'created_at' => 'date:d-m-Y H:i',
-            'updated_at' => 'date:d-m-Y H:i',
+            'closed_at' => 'date:d-m-Y',
+            'created_at' => 'date:d-m-Y',
+            'updated_at' => 'date:d-m-Y',
             'being_notified' => 'boolean',
             'status' => TicketStatus::class
         ];

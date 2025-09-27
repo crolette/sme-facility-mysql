@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers\Central;
 
+use Exception;
 use Inertia\Inertia;
+use App\Models\Domain;
 use App\Models\Tenant;
 use App\Enums\AddressTypes;
+use App\Helpers\ApiResponse;
 use App\Models\Tenants\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Events\NewTenantCreatedEvent;
-use App\Helpers\ApiResponse;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Password;
@@ -19,8 +22,6 @@ use App\Http\Requests\Central\CentralTenantRequest;
 use App\Http\Requests\Central\CompanyAddressRequest;
 use App\Http\Requests\Central\InvoiceAddressRequest;
 use App\Notifications\TenantAdminCreatedPasswordResetNotification;
-use Exception;
-use Illuminate\Support\Facades\DB;
 
 class RegisterCentralTenantController extends Controller
 {
@@ -44,19 +45,18 @@ class RegisterCentralTenantController extends Controller
     {
         try {
             DB::beginTransaction();
-            
-            $email = $tenantRequest->validated('email');
 
-            $tenant = Tenant::create([...$tenantRequest->validated(), 'id' => $tenantRequest->validated('company_code')]);
+                $tenant = Tenant::create([...$tenantRequest->validated(), 'id' => $tenantRequest->validated('company_code')]);
 
-            $tenant->domain()->create(['domain' => $tenantRequest->validated('domain_name')]);
+                $tenant->domain()->create(['domain' => $tenantRequest->validated('domain_name')]);
 
-            $tenant->addresses()->create([...$companyAddressRequest->validated('company')]);
+                $tenant->addresses()->create([...$companyAddressRequest->validated('company')]);
 
-            if (!$invoiceAddressRequest->validated('same_address_as_company'))
-                $tenant->addresses()->create([...$invoiceAddressRequest->validated('invoice'), 'address_type' => AddressTypes::INVOICE->value]);
+                if (!$invoiceAddressRequest->validated('same_address_as_company'))
+                    $tenant->addresses()->create([...$invoiceAddressRequest->validated('invoice'), 'address_type' => AddressTypes::INVOICE->value]);
 
             // FIXME this should be uncommented when on private server
+            // $email = $tenantRequest->validated('email');
             // $tenant->run(function () use ($email, $tenant) {
             //     $admin = User::where('email', $email)->first();
 
@@ -70,9 +70,9 @@ class RegisterCentralTenantController extends Controller
             DB::commit();
             return ApiResponse::successFlash([], 'Tenant created');
 
-        } catch(Exception $e) {
-            DB::rollBack();
+        } catch(\Throwable $e) {
             Log::info('Error during tenant creation : ' . $e->getMessage());
+            DB::rollBack();
             return ApiResponse::error($e->getMessage());
         }
 

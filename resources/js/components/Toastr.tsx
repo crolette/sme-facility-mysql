@@ -9,8 +9,8 @@ export default function Toastr() {
     const { toastData } = useToast();
     const [visible, setVisible] = useState(true);
     const { flash } = usePage<SharedData>().props;
- const [currentMessage, setCurrentMessage] = useState<string | null>();
-
+    const [currentMessage, setCurrentMessage] = useState<string | null>(null);
+    
     useEffect(() => {
         if (flash?.message) {
             setCurrentMessage(flash?.message);
@@ -60,7 +60,7 @@ export default function Toastr() {
         <div
             id="notification"
             className={
-                'fixed top-4 right-4 mb-4 flex transform items-center rounded-lg p-4 text-sm shadow-lg transition-all duration-500 ease-in-out ' +
+                'fixed top-4 right-4 z-50 mb-4 flex transform items-center rounded-lg p-4 text-sm shadow-lg transition-all duration-500 ease-in-out ' +
                 typeClasses[flash.type ?? toastData?.type]
             }
             role="alert"

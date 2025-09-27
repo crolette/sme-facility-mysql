@@ -24,9 +24,8 @@ class CentralTenantController extends Controller
     public function index()
     {
         $tenants = Tenant::with('domain')->get();
-        // dd($tenants);
 
-        return Inertia::render('central/tenants/index', ['tenants' => $tenants]);
+        return Inertia::render('central/tenants/index', ['items' => $tenants]);
     }
 
     /**
@@ -34,7 +33,16 @@ class CentralTenantController extends Controller
      */
     public function show(Tenant $tenant)
     {
-        //
+        if (str_starts_with(config('app.url'), 'https://')) {
+            $suffix = substr(config('app.url'), strlen('https://'));
+            $address =preg_replace('/^https?:\/\/[^\/]+/', "https://{$tenant->domain->domain}" . '.' . $suffix, config('app.url'));
+        } else {
+            $suffix = substr(config('app.url'), strlen('http://'));
+            $address =preg_replace('/^http?:\/\/[^\/]+/', "http://{$tenant->domain->domain}" . '.' . $suffix, config('app.url'));
+        }
+
+        // dd($address);
+       
         return Inertia::render('central/tenants/show', ['tenant' => $tenant->load('domain')]);
     }
 
