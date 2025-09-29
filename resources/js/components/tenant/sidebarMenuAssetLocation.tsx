@@ -10,16 +10,42 @@ interface InfosProps {
     reference?: string;
     levelPath: string;
     levelName: string;
+    priority?: string;
 }
 interface SideBarMenuProps {
     activeTab: string;
     setActiveTab: (tab: string) => void;
-    menu?: string;
+    menu?: keyof typeof MENUS;
     infos: InfosProps
 }
-export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu = 'location', infos }: SideBarMenuProps) {
-    
-    let navSidebar = [
+
+const MENUS = {
+    interventions: [
+        {
+            tabName: 'information',
+            tabDisplay: 'Infos',
+        },
+        {
+            tabName: 'pictures',
+            tabDisplay: 'pictures',
+        },
+
+        {
+            tabName: 'actions',
+            tabDisplay: 'actions',
+        },
+    ],
+    user: [
+        {
+            tabName: 'information',
+            tabDisplay: 'Infos',
+        },
+        {
+            tabName: 'assets',
+            tabDisplay: 'assets',
+        },
+    ],
+    asset: [
         {
             tabName: 'information',
             tabDisplay: 'Infos',
@@ -56,73 +82,97 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
             tabName: 'interventions',
             tabDisplay: 'interventions',
         },
-    ];
-
-    if (menu === 'provider')
-        navSidebar = [
-            {
-                tabName: 'information',
-                tabDisplay: 'Infos',
-            },
-            {
-                tabName: 'contracts',
-                tabDisplay: 'contracts',
-            },
-            {
-                tabName: 'users',
-                tabDisplay: 'users',
-            },
-        ];
-    
-    if (menu === 'user')
-        navSidebar = [
-            {
-                tabName: 'information',
-                tabDisplay: 'Infos',
-            },
-            {
-                tabName: 'assets',
-                tabDisplay: 'assets',
-            },
-        ];
-
-    if (menu === 'location')
-        navSidebar = [...navSidebar, {
+    ],
+    provider: [
+        {
+            tabName: 'information',
+            tabDisplay: 'Infos',
+        },
+        {
+            tabName: 'contracts',
+            tabDisplay: 'contracts',
+        },
+        {
+            tabName: 'users',
+            tabDisplay: 'users',
+        },
+    ],
+    ticket: [
+        {
+            tabName: 'information',
+            tabDisplay: 'Infos',
+        },
+        {
+            tabName: 'pictures',
+            tabDisplay: 'pictures',
+        },
+        {
+            tabName: 'interventions',
+            tabDisplay: 'interventions',
+        },
+    ],
+    contract: [
+        {
+            tabName: 'information',
+            tabDisplay: 'Infos',
+        },
+        {
             tabName: 'assets',
             tabDisplay: 'assets',
-        }]
-    
-    if (menu === 'ticket')
-        navSidebar = [
-            {
-                tabName: 'information',
-                tabDisplay: 'Infos',
-            },
-            {
-                tabName: 'pictures',
-                tabDisplay: 'pictures',
-            },
-            {
-                tabName: 'interventions',
-                tabDisplay: 'interventions',
-            },
-        ];
-    
-    if (menu === 'contract')
-        navSidebar = [
-            {
-                tabName: 'information',
-                tabDisplay: 'Infos',
-            },
-            {
-                tabName: 'assets',
-                tabDisplay: 'assets',
-            },
-            {
-                tabName: 'documents',
-                tabDisplay: 'documents',
-            },
-        ];
+        },
+        {
+            tabName: 'documents',
+            tabDisplay: 'documents',
+        },
+    ],
+    location: [
+        {
+            tabName: 'information',
+            tabDisplay: 'Infos',
+        },
+        {
+            tabName: 'maintenance',
+            tabDisplay: 'Maintenance',
+        },
+        {
+            tabName: 'providers',
+            tabDisplay: 'providers',
+        },
+        {
+            tabName: 'warranty',
+            tabDisplay: 'warranty',
+        },
+        {
+            tabName: 'pictures',
+            tabDisplay: 'pictures',
+        },
+        {
+            tabName: 'contracts',
+            tabDisplay: 'contracts',
+        },
+        {
+            tabName: 'documents',
+            tabDisplay: 'documents',
+        },
+        {
+            tabName: 'tickets',
+            tabDisplay: 'tickets',
+        },
+        {
+            tabName: 'interventions',
+            tabDisplay: 'interventions',
+        },
+        {
+            tabName: 'assets',
+            tabDisplay: 'assets',
+        },
+    ],
+};
+
+
+export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu = "provider", infos }: SideBarMenuProps) {
+
+    const navSidebar = MENUS[menu];
 
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     return (
@@ -131,8 +181,12 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
                 <p className="font-semibold">{infos.name}</p>
 
                 <p className="text-sm">{infos.code ?? ''}</p>
+
                 {infos.status && <Pill variant={infos.status}>{infos.status}</Pill>}
+                {infos.priority && <Pill variant={infos.priority}>{infos.priority}</Pill>}
+
                 <p className="text-xs">{infos.reference ?? ''}</p>
+
                 <a href={infos.levelPath} className="text-sm">
                     {infos.levelName}
                 </a>

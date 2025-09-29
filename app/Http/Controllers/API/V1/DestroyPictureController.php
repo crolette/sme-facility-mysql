@@ -37,7 +37,7 @@ class DestroyPictureController extends Controller
 
             return ApiResponse::success(null, 'Picture deleted');
         } catch (Exception $e) {
-            return ApiResponse::error('Impossible de mettre à jour le Picture.', [
+            return ApiResponse::error('Error deleting picture.', [
                 'exception' => $e->getMessage()
             ], 500);
         }

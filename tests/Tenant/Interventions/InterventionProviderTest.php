@@ -12,9 +12,11 @@ use App\Models\Tenants\Building;
 use App\Models\Tenants\Provider;
 use App\Enums\InterventionStatus;
 
+use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use App\Models\Tenants\InterventionAction;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -189,4 +191,49 @@ it('sends an email to the maintenance manager when a provider encoded a new acti
     Mail::assertSent(InterventionAddedByProviderMail::class, function ($mail) use ($user) {
         return $mail->hasTo($user->email);
     });
+});
+
+it('can upload pictures for an intervention action', function () {
+
+    $user = User::factory()->withRole('Maintenance Manager')->create();
+    $this->asset->maintainable()->update(['maintenance_manager_id' => $user->id]);
+    $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $provider = User::factory()->create();
+
+    $file1 = UploadedFile::fake()->image('action1.jpg');
+    $file2 = UploadedFile::fake()->image('action1.png');
+
+    $formData = [
+        'action_type_id' => $this->interventionActionType->id,
+        'description' => 'New action for intervention',
+        'intervention_date' => Carbon::now()->subDays(7),
+        'started_at' => '13:25',
+        'finished_at' => '17:30',
+        'intervention_costs' => '9999999.25',
+        'creator_email' => $provider->email,
+        'pictures' => [
+            $file1,
+            $file2
+        ]
+    ];
+
+    $response = $this->postToTenant('api.interventions.actions.store', $formData, $intervention);
+
+    $interventionAction = InterventionAction::where('description', 'New action for intervention')->first();
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseCount('pictures', 2);
+    assertDatabaseHas('pictures', [
+        'imageable_type' => get_class($interventionAction),
+        'imageable_id' => $interventionAction->id
+    ]);
+
+    $pictures = $interventionAction->pictures;
+
+    foreach ($pictures as $picture)
+        expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
 });

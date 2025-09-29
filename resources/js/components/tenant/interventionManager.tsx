@@ -11,6 +11,7 @@ import { Pill } from '../ui/pill';
 import SearchableInput from '../SearchableInput';
 import { Loader, Pencil, Plus, PlusCircle, Trash2, X } from 'lucide-react';
 import { useToast } from '../ToastrContext';
+import Modale from '../Modale';
 
 interface InterventionManagerProps {
     itemCodeId: number | string;
@@ -35,6 +36,7 @@ type InterventionFormData = {
     locationType: null | string;
     locationId: null | number | string;
     ticket_id: null | number;
+    pictures: FileList | null;
 };
 
 export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, closed = false }: InterventionManagerProps) => {
@@ -52,6 +54,8 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
             console.error('Erreur lors de la recherche : ', error);
         }
     };
+
+    console.log(interventions);
 
     const [interventionTypes, setInterventionTypes] = useState<CentralType[]>([]);
 
@@ -80,9 +84,12 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         locationType: null,
         locationId: null,
         ticket_id: null,
+        pictures: [],
     };
 
+    
     const [interventionDataForm, setInterventionDataForm] = useState<InterventionFormData>(interventionData);
+    console.log(interventionDataForm);
 
     const openModale = () => {
         setSubmitType('new');
@@ -116,13 +123,18 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
          setIsProcessing(true);
 
         try {
-            const response = await axios.post(route('api.interventions.store'), interventionDataForm);
+            const response = await axios.post(route('api.interventions.store'), interventionDataForm, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                }
+            });
             if (response.data.status === 'success') {
                 closeModale();
                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {
             console.error(error);
+            setIsProcessing(false);
              showToast(error.response.data.message, error.response.data.status);
         }
     };
@@ -177,12 +189,19 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         return `${year}-${month}-${day}`;
     }
 
-    const deleteIntervention = async (id: number) => {
+    const [showDeleteInterventionModale, setShowDeleteInterventionModale] = useState(false);
+    const [interventionToDelete, setInterventionToDelete] = useState<null | Intervention>(null);
+    const deleteIntervention = async () => {
+        if (!interventionToDelete)
+            return;
+
         try {
-            const response = await axios.delete(route('api.interventions.destroy', id));
+            const response = await axios.delete(route('api.interventions.destroy', interventionToDelete.id));
             if (response.data.status === 'success') {
                 fetchInterventions();
                 showToast(response.data.message, response.data.status);
+                setShowDeleteInterventionModale(false);
+                setInterventionToDelete(null);
             }
         } catch (error) {
             console.error(error);
@@ -249,7 +268,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
     }
 
     return (
-        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl font">
+        <div className="border-sidebar-border bg-sidebar font rounded-md border p-4 shadow-xl">
             <div className="flex items-center justify-between">
                 <h2 className="inline">Interventions ({interventions?.length ?? 0})</h2>
                 {!closed && (
@@ -282,7 +301,11 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
 
                         <TableBody>
                             <TableBodyRow className="">
-                                <TableBodyData>{intervention.type}</TableBodyData>
+                                <TableBodyData>
+                                    <a href={route("tenant.interventions.show", intervention.id)}>
+                                        {intervention.type}
+                                        </a>
+                                </TableBodyData>
                                 <TableBodyData className="overflow-ellipsis">{intervention.description}</TableBodyData>
                                 <TableBodyData>
                                     <Pill variant={intervention.priority}>{intervention.priority}</Pill>
@@ -291,13 +314,16 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                 <TableBodyData>{intervention.planned_at ?? 'Not planned'}</TableBodyData>
                                 <TableBodyData>{intervention.repair_delay ?? 'No repair delay'}</TableBodyData>
                                 <TableBodyData>{intervention.total_costs ? `${intervention.total_costs} €` : '-'}</TableBodyData>
-                                <TableBodyData className="flex space-x-2 ">
+                                <TableBodyData className="flex space-x-2">
                                     {!closed && (
                                         <>
                                             <Button onClick={() => editIntervention(intervention.id)}>
                                                 <Pencil />
                                             </Button>
-                                            <Button type="button" variant="destructive" onClick={() => deleteIntervention(intervention.id)}>
+                                            <Button type="button" variant="destructive" onClick={() => {
+                                                setInterventionToDelete(intervention);
+                                                setShowDeleteInterventionModale(true);
+                                            }}>
                                                 <Trash2 />
                                             </Button>
                                         </>
@@ -318,6 +344,18 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                         </TableBody>
                     </Table>
                 ))}
+             <Modale
+                            title={'Delete intervention'}
+                            message={
+                                'Are you sure to delete this intervention ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.'
+                            }
+                            isOpen={showDeleteInterventionModale}
+                            onConfirm={deleteIntervention}
+                            onCancel={() => {
+                                setInterventionToDelete(null);
+                                setShowDeleteInterventionModale(false);
+                            }}
+                        />
             {sendInterventionToProviderModale && (
                 <div className="bg-background/50 fixed inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">
@@ -493,6 +531,20 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                             }))
                                         }
                                     ></Textarea>
+                                    {!closed && (
+                                        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                                            <h5>Pictures</h5>
+                                            <Input
+                                                type="file"
+                                                multiple
+                                                onChange={(e) =>  setInterventionDataForm((prev) => ({
+                                                ...prev,
+                                                pictures: e.target.files,
+                                            }))}
+                                                accept="image/png, image/jpeg, image/jpg"
+                                            />
+                                        </div>
+                                    )}
                                     <Label>Planned at</Label>
                                     <div className="flex gap-2">
                                         <Input

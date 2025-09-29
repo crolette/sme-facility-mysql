@@ -59,7 +59,7 @@ export default function ShowTicket({ item }: { item: Ticket }) {
                         </Button>
                     )}
                 </div>
-                <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_4fr]">
+                <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_6fr]">
                     <SidebarMenuAssetLocation
                         activeTab={activeTab}
                         setActiveTab={setActiveTab}

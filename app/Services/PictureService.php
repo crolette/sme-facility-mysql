@@ -38,7 +38,7 @@ class PictureService
                     'directory' => $directory,
                     'size' => $file->getSize(),
                     'mime_type' => $file->getMimeType(),
-                    'uploader_email' => $email ?? null
+                    'uploader_email' => $email ?? Auth::guard('tenant')->user()->email
                 ]);
 
                 if (Auth::guard('tenant')->check()) {
@@ -47,7 +47,7 @@ class PictureService
 
                 $model->pictures()->save($picture);
             } catch (Exception $e) {
-                Log::info('Erreur:', $e->getMessage());
+                Log::info('Erreur: ' . $e->getMessage());
             }
         }
     }

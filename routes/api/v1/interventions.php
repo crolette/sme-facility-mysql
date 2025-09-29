@@ -37,6 +37,21 @@ Route::middleware([
         ->name('api.interventions.update');
         Route::delete('/', [APIInterventionController::class, 'destroy'])
         ->name('api.interventions.destroy');
+
+        Route::get('/pictures/', function (Intervention $intervention) {
+            $intervention = Intervention::find($intervention->id)->with('pictures')->first();
+            return ApiResponse::success($intervention->pictures);
+        })->name('api.interventions.pictures');
+
+        Route::post('/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Intervention $intervention) {
+
+            $files = $pictureUploadRequest->validated('pictures');
+            if ($files) {
+                $pictureService->uploadAndAttachPictures($intervention, $files);
+            }
+
+            return ApiResponse::success(null, 'Pictures added');
+        })->name('api.interventions.pictures.post');
         
         Route::get('/actions', [APIInterventionActionController::class, 'index'])->name('api.interventions.actions.index');
         Route::post('/actions', [APIInterventionActionController::class, 'store'])->name('api.interventions.actions.store');

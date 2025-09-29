@@ -4,6 +4,7 @@ namespace App\Models\Tenants;
 
 use App\Enums\PriorityLevel;
 use App\Models\Tenants\Ticket;
+use App\Models\Tenants\Picture;
 use App\Enums\InterventionStatus;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
@@ -49,8 +50,8 @@ class Intervention extends Model
             'total_costs' => 'decimal:2',
             'planned_at' => 'date:d-m-Y',
             'repair_delay' => 'date:d-m-Y',
-            'created_at' => 'date:d-m-Y H:i',
-            'updated_at' => 'date:d-m-Y H:i',
+            'created_at' => 'date:d-m-Y',
+            'updated_at' => 'date:d-m-Y',
             'status' => InterventionStatus::class,
             'priority' => PriorityLevel::class
         ];
@@ -91,7 +92,6 @@ class Intervention extends Model
         return $this->morphMany(ScheduledNotification::class, 'notifiable');
     }
 
-
     // Asset, Site, Building, Floor, Room
     public function interventionable(): MorphTo
     {
@@ -102,6 +102,13 @@ class Intervention extends Model
     {
         return $this->belongsTo(Ticket::class);
     }
+
+
+    public function pictures(): MorphMany
+    {
+        return $this->morphMany(Picture::class, 'imageable');
+    }
+
 
     public function updateTotalCosts(): void
     {

@@ -134,7 +134,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                 {routeName === 'rooms' && showModaleRelocateRoom && (
                     <RealocateRoomManager room={location} itemCode={location.reference_code} onClose={() => setShowModaleRelocateRoom(false)} />
                 )}
-                <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_4fr]">
+                <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_6fr]">
                     <SidebarMenuAssetLocation
                         activeTab={activeTab}
                         setActiveTab={setActiveTab}

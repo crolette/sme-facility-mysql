@@ -59,11 +59,12 @@ export default function UserShow({ item }: { item: User }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={user.full_name} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className='flex gap-2'>
+                <div className="flex gap-2">
                     <a href={route(`tenant.users.edit`, user.id)}>
                         <Button>
                             <Pencil />
-                            Edit</Button>
+                            Edit
+                        </Button>
                     </a>
                     <Button onClick={() => setShowDeleteModale(!showDeleteModale)} variant={'destructive'}>
                         <Trash2 />
@@ -75,7 +76,7 @@ export default function UserShow({ item }: { item: User }) {
                     </Button>
                 </div>
 
-                <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_4fr]">
+                <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_6fr]">
                     <SidebarMenuAssetLocation
                         activeTab={activeTab}
                         setActiveTab={setActiveTab}

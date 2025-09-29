@@ -12,6 +12,8 @@ use App\Models\Tenants\Building;
 
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
+use Illuminate\Http\UploadedFile;
+
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
@@ -306,3 +308,47 @@ it('can delete an intervention', function () {
     assertDatabaseEmpty('interventions');
 });
 
+
+it('can upload pictures when creating an intervention', function() {
+
+    $file1 = UploadedFile::fake()->image('file1.png');
+    $file2 = UploadedFile::fake()->image('file2.jpg');
+
+    $formData = [
+        'intervention_type_id' => $this->interventionType->id,
+        'priority' => 'high',
+        'status' => 'planned',
+        'planned_at' => Carbon::now()->add('day', 7),
+        'description' => fake()->paragraph(),
+        'repair_delay' => Carbon::now()->add('month', 1),
+        'locationId' => $this->site->reference_code,
+        'locationType' => 'sites',
+        'pictures' => [
+            $file1,
+            $file2
+        ]
+    ];
+
+    $response = $this->postToTenant('api.interventions.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+        $intervention = Intervention::first();
+
+    assertDatabaseCount('pictures', 2);
+    assertDatabaseHas('pictures', [
+        'imageable_type' => get_class($intervention),
+        'imageable_id' => $intervention->id
+    ]);
+
+    $pictures = $intervention->pictures;
+
+    foreach ($pictures as $picture)
+        expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
+});
+
+// it('can upload a picture to an existing intervention', function() {
+
+// });

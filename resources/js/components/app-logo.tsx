@@ -6,17 +6,14 @@ export default function AppLogo() {
 
     return (
         <>
-            <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-md overflow-hidden shadow-xl">
                 {tenant.logo ? (
-                    <img src={route('api.image.show', { path: tenant.logo })} className="object-cover h-full" />
+                    <img src={route('api.image.show', { path: tenant.logo })} className="h-full object-cover" />
                 ) : (
-                        <img src={tenant.logo} alt="" />
+                    <img src={tenant.logo} alt="" className="h-full object-cover" />
                     // <AppLogoIcon className="size-5 fill-current text-white dark:text-black" />
                 )}
-            </div>
-            <div className="ml-1 grid flex-1 text-left text-sm">
+            {/* <div className="ml-1 grid flex-1 text-left text-sm"> */}
                 <span className="mb-0.5 truncate leading-none font-semibold">{tenant.name}</span>
-            </div>
         </>
     );
 }

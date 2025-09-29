@@ -165,6 +165,8 @@ export default function CreateAsset({
         existing_documents: [],
     });
 
+    console.log(data);
+
     const [listIsOpen, setListIsOpen] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [locations, setLocations] = useState<SearchedLocation[]>();

@@ -162,7 +162,7 @@ Route::middleware([
             // Get all interventions from an asset
             Route::get('/interventions/', function (Asset $asset) {
 
-                return  $asset ? ApiResponse::success($asset->interventions()->where('ticket_id', null)->get()) : ApiResponse::error('No asset');
+                return  $asset ? ApiResponse::success($asset->interventions()->with('pictures')->where('ticket_id', null)->get()) : ApiResponse::error('No asset');
 
             })->name('api.assets.interventions');
         });

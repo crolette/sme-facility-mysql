@@ -41,6 +41,6 @@ class InterventionController extends Controller
      */
     public function show(Intervention $intervention)
     {
-        return Inertia::render('tenants/tickets/interventions/show', ['intervention' => $intervention->load('ticket')]);
+        return Inertia::render('tenants/tickets/interventions/ShowIntervention', ['intervention' => $intervention->load(['ticket','interventionable', 'pictures', 'actions.pictures'])]);
     }
 }

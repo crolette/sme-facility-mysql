@@ -20,7 +20,7 @@ class InterventionActionService
         $action = new InterventionAction($request);
 
         $action->actionType()->associate($request['action_type_id']);
-        if (!$request['creator_email']) {
+        if (!isset($request['creator_email'])) {
             $action->creator()->associate($request['created_by']);
         }
 

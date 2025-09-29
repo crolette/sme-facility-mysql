@@ -9,6 +9,7 @@ import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
 import { useToast } from '../ToastrContext';
 import { Pencil, Plus, PlusCircle, Trash2 } from 'lucide-react';
+import Modale from '../Modale';
 
 interface InterventionActionManagerProps {
     interventionId: number;
@@ -33,6 +34,7 @@ type InterventionFormData = {
     created_by: null | number;
     creator_email: null | string;
     updated_by: null | number;
+    pictures: FileList | null
 };
 
 export const InterventionActionManager = ({ interventionId, closed, actionsChanged }: InterventionActionManagerProps) => {
@@ -81,10 +83,12 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
         created_by: auth?.user ? auth.user.id : null,
         creator_email: null,
         updated_by: null,
+        pictures: []
     };
 
     const [interventionActionDataForm, setInterventionActionDataForm] = useState<InterventionFormData>(interventionActionData);
 
+    // console.log(interventionActionData);
     const openModale = () => {
         setSubmitType('new');
 
@@ -109,12 +113,17 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
         e.preventDefault();
 
         try {
-            const response = await axios.post(route('api.interventions.actions.store', interventionId), interventionActionDataForm);
+            const response = await axios.post(route('api.interventions.actions.store', interventionId), interventionActionDataForm, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
             if (response.data.status === 'success') {
                 closeModale();
                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
+            
            showToast(error.response.data.message, error.response.data.status);
         }
     };
@@ -171,23 +180,31 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
         return `${hours}:${minutes}`;
     }
 
-    const deleteInterventionAction = async (id: number) => {
-        try {
-            const response = await axios.delete(route('api.interventions.actions.destroy', id));
-            if (response.data.status === 'success') {
-                fetchInterventionActions();
-                showToast(response.data.message, response.data.status);
+    const [showDeleteActionModale, setShowDeleteActionModale] = useState<boolean>(false);
+    const [actionToDelete, setActionToDelete] = useState<null | InterventionAction>(null);
+    const deleteInterventionAction = async () => {
+        if (!actionToDelete)
+            return;
+
+            
+            try {
+                const response = await axios.delete(route('api.interventions.actions.destroy', actionToDelete.id));
+                if (response.data.status === 'success') {
+                    fetchInterventionActions();
+                    showToast(response.data.message, response.data.status);
+                    setShowDeleteActionModale(false);
+                    setActionToDelete(null);
+                }
+            } catch (error) {
+                showToast(error.response.data.message, error.response.data.status);
             }
-        } catch (error) {
-            showToast(error.response.data.message, error.response.data.status);
-        }
     };
 
     return (
         <>
-            <ul>
+            <ul className={'bg-secondary p-2'}>
                 <div className="flex items-center gap-4">
-                    <span>Actions ({interventionActions.length})</span>
+                    <span className='font-semibold'>Actions ({interventionActions.length})</span>
                     {!closed && (
                         <Button onClick={openModale} size="xs" variant={'outline'}>
                             <PlusCircle />
@@ -225,19 +242,37 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                                                 <Button onClick={() => editInterventionAction(action.id)}>
                                                     <Pencil />
                                                 </Button>
-                                                <Button type="button" variant="destructive" onClick={() => deleteInterventionAction(action.id)}>
+                                                <Button
+                                                    type="button"
+                                                    variant="destructive"
+                                                    onClick={() => {
+                                                        setActionToDelete(action);
+                                                        setShowDeleteActionModale(true);
+                                                    }}
+                                                >
                                                     <Trash2 />
                                                 </Button>
                                             </>
                                         )}
                                     </TableBodyData>
-                                    
                                 </TableBodyRow>
                             ))}
                         </TableBody>
                     </Table>
                 )}
             </ul>
+            <Modale
+                title={'Delete definitely'}
+                message={
+                    'Are you sure to delete this action ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.'
+                }
+                isOpen={showDeleteActionModale}
+                onConfirm={deleteInterventionAction}
+                onCancel={() => {
+                    setActionToDelete(null);
+                    setShowDeleteActionModale(false);
+                }}
+            />
             {addInterventionAction && (
                 <div className="bg-background/50 fixed inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">
@@ -278,6 +313,22 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                                         }))
                                     }
                                 ></Textarea>
+                                {!closed && (
+                                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                                        <h5>Pictures</h5>
+                                        <Input
+                                            type="file"
+                                            multiple
+                                            onChange={(e) =>
+                                                setInterventionActionDataForm((prev) => ({
+                                                    ...prev,
+                                                    pictures: e.target.files,
+                                                }))
+                                            }
+                                            accept="image/png, image/jpeg, image/jpg"
+                                        />
+                                    </div>
+                                )}
                                 <Label>Intervention costs</Label>
                                 <Input
                                     type="number"

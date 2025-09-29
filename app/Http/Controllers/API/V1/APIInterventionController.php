@@ -20,9 +20,12 @@ use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\TicketRequest;
 use App\Http\Requests\Tenant\InterventionRequest;
 use App\Http\Requests\Tenant\PictureUploadRequest;
+use Illuminate\Support\Facades\Log;
 
 class APIInterventionController extends Controller
 {
+
+    public function __construct(protected PictureService $pictureService){}
     // public function index(Request $request)
     // {
     //     $status = $request->query('status');
@@ -47,7 +50,7 @@ class APIInterventionController extends Controller
     }
 
 
-    public function store(InterventionRequest $request)
+    public function store(InterventionRequest $request, PictureUploadRequest $pictureUploadRequest)
     {
         Debugbar::info('store intervention', $request->validated());
         try {
@@ -81,12 +84,17 @@ class APIInterventionController extends Controller
             $intervention->interventionType()->associate($request->validated('intervention_type_id'));
             $intervention->save();
 
+            if ($pictureUploadRequest->validated('pictures')) {
+                $this->pictureService->uploadAndAttachPictures($intervention, $pictureUploadRequest->validated('pictures'));
+            }
+
             DB::commit();
 
             return ApiResponse::success(null, 'Intervention created');
         } catch (Exception $e) {
+            Log::error($e->getMessage());
             DB::rollback();
-            return ApiResponse::error('Error during Intervention creation', [$e->getMessage()]);
+            return ApiResponse::error('Error during Intervention creation', ['errors' => $e->getMessage()]);
         }
 
         return ApiResponse::error('Error during Intervention creation');

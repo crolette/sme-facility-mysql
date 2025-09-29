@@ -46,7 +46,7 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                         Delete
                     </Button>
                 </div>
-                <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_4fr]">
+                <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_6fr]">
                     <SidebarMenuAssetLocation
                         activeTab={activeTab}
                         setActiveTab={setActiveTab}

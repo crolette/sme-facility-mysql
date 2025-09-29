@@ -10,15 +10,17 @@ return [
 
     'allowed_origins_patterns' => [],
 
-    'allowed_headers' => [
-        'Content-Type',
-        'X-Requested-With',
-        'X-Inertia',
-        'X-Inertia-Version',
-        'Accept',
-        'Authorization',
-        'X-CSRF-TOKEN',
-    ],
+    'allowed_headers' => ['*'],
+
+    // 'allowed_headers' => [
+    //     'Content-Type',
+    //     'X-Requested-With',
+    //     'X-Inertia',
+    //     'X-Inertia-Version',
+    //     'Accept',
+    //     'Authorization',
+    //     'X-CSRF-TOKEN',
+    // ],
 
     'exposed_headers' => [
         'X-Inertia',

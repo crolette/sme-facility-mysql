@@ -10,10 +10,12 @@ use App\Models\Tenants\Floor;
 use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Building;
 
+use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
-use App\Models\Tenants\InterventionAction;
+use Illuminate\Support\Facades\Storage;
 
+use App\Models\Tenants\InterventionAction;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
@@ -199,4 +201,44 @@ it('updates intervention costs of intervention when action with intervention_cos
         'id' => $this->intervention->id,
         'total_costs' => '500.25',
     ]);
+});
+
+it('can upload pictures for an intervention action', function() {
+
+    $file1 = UploadedFile::fake()->image('action1.jpg');
+    $file2 = UploadedFile::fake()->image('action1.png');
+
+    $formData = [
+        'action_type_id' => $this->interventionActionType->id,
+        'description' => 'New action for intervention',
+        'intervention_date' => Carbon::now()->subDays(7),
+        'started_at' => '13:25',
+        'finished_at' => '17:30',
+        'intervention_costs' => '9999999.25',
+        'created_by' => $this->user->id,
+        'pictures' => [
+            $file1,
+            $file2
+        ]
+    ];
+
+    $response = $this->postToTenant('api.interventions.actions.store', $formData, $this->intervention);
+
+    $interventionAction = InterventionAction::where('description', 'New action for intervention')->first();
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseCount('pictures', 2);
+    assertDatabaseHas('pictures', [
+        'imageable_type' => get_class($interventionAction),
+        'imageable_id' => $interventionAction->id
+    ]);
+
+    $pictures = $interventionAction->pictures;
+
+    foreach($pictures as $picture)
+        expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
 });
