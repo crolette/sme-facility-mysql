@@ -6,6 +6,7 @@ use App\Helpers\ApiResponse;
 use App\Models\Tenants\User;
 use Illuminate\Http\Request;
 use App\Mail\NewTenantCreatedMail;
+use Illuminate\Support\Facades\Log;
 use App\Events\NewTenantCreatedEvent;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Debugbar\Facades\Debugbar;
@@ -77,8 +78,12 @@ foreach (config('tenancy.central_domains') as $domain) {
                     $tenant = Tenant::findOrFail($request->tenant);
                     $email = $tenant->email;
 
+                    Debugbar::info($tenant, $email);
+                    
                     $tenant->run(function () use ($email, $tenant) {
                         $admin = User::where('email', $email)->first();
+                        
+                        Debugbar::info($admin);
 
                         event(new NewTenantCreatedEvent($admin, $tenant));
 

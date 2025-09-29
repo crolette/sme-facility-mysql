@@ -99,7 +99,8 @@ return [
         'users' => [
             'provider' => 'tenant_users',
             'table' => env('AUTH_PASSWORD_RESET_TOKEN_TABLE', 'password_reset_tokens'),
-            'expire' => 60,
+            // FIXME Change the expire time
+            'expire' => 2160,
             'throttle' => 60,
         ],
     ],
