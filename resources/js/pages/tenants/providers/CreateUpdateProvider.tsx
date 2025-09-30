@@ -20,7 +20,7 @@ type TypeFormData = {
     logo: File | null;
 };
 
-export default function ProviderCreateUpdate({ provider, providerCategories }: { provider?: Provider; providerCategories: CentralType[] }) {
+export default function CreateUpdateProvider({ provider, providerCategories }: { provider?: Provider; providerCategories: CentralType[] }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Create/Update providers`,
@@ -51,7 +51,7 @@ export default function ProviderCreateUpdate({ provider, providerCategories }: {
                     });
                 }
             } catch (error) {
-                 showToast(error.response.data.message, error.response.data.status);
+                showToast(error.response.data.message, error.response.data.status);
             }
         } else {
             try {
@@ -61,10 +61,9 @@ export default function ProviderCreateUpdate({ provider, providerCategories }: {
                     },
                 });
                 if (response.data.status === 'success') {
-                     router.visit(route('tenant.providers.show', provider.id), {
-                         preserveScroll: false,
-                     });
-             
+                    router.visit(route('tenant.providers.show', provider.id), {
+                        preserveScroll: false,
+                    });
                 }
             } catch (error) {
                 showToast(error.response.data.message, error.response.data.status);

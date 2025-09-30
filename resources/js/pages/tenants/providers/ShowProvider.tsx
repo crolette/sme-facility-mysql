@@ -13,11 +13,15 @@ import axios from 'axios';
 import { Pencil, Trash, Trash2, Upload } from 'lucide-react';
 import { useState } from 'react';
 
-export default function ProviderShow({ item }: { item: Provider }) {
+export default function ShowProvider({ item }: { item: Provider }) {
     const { showToast } = useToast();
     const [provider, setProvider] = useState(item);
 
     const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: `Index providers`,
+            href: `/providers`,
+        },
         {
             title: `${provider.name}`,
             href: `/providers/${provider.id}`,
@@ -28,8 +32,7 @@ export default function ProviderShow({ item }: { item: Provider }) {
         try {
             const response = await axios.delete(route('api.providers.destroy', provider.id));
             console.log(response);
-            if (response.data.status === 'success')
-            {
+            if (response.data.status === 'success') {
                 router.get(route('tenant.providers.index'));
             }
         } catch (error) {
@@ -74,19 +77,20 @@ export default function ProviderShow({ item }: { item: Provider }) {
 
     const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
     const [activeTab, setActiveTab] = useState('information');
-    
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sites" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className='flex gap-2'>
+                <div className="flex gap-2">
                     <a href={route(`tenant.providers.edit`, provider.id)}>
                         <Button>
                             <Pencil />
-                            Edit</Button>
+                            Edit
+                        </Button>
                     </a>
                     <Button onClick={() => setShowDeleteModale(!showDeleteModale)} variant={'destructive'}>
-                        <Trash2/>
+                        <Trash2 />
                         Delete
                     </Button>
                     <Button onClick={() => setIsModalOpen(true)} variant={'secondary'}>

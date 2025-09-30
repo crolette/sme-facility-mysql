@@ -15,8 +15,12 @@ export default function ShowContract({ item, objects }: { item: Contract; object
     const [contract, setContract] = useState<Contract>(item);
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Show contract`,
-            href: `/contract`,
+            title: `Index contracts`,
+            href: `/contracts`,
+        },
+        {
+            title: `${contract.name} (${contract.provider.name})`,
+            href: `/contract/${contract.id}`,
         },
     ];
 

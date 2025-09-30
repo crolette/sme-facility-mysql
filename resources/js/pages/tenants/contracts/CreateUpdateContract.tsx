@@ -46,7 +46,7 @@ type TypeFormData = {
     }[];
 };
 
-export default function CreateContract({
+export default function CreateUpdateContract({
     contract,
     statuses,
     renewalTypes,
@@ -67,8 +67,7 @@ export default function CreateContract({
             href: `/contract/${contract?.id ?? 'create'}`,
         },
     ];
-      const { showToast } = useToast();
-    
+    const { showToast } = useToast();
 
     // const [contractables, setContractables] = useState<Contractable[]>([]);
     useEffect(() => {
@@ -104,7 +103,6 @@ export default function CreateContract({
         notice_period: contract?.notice_period ?? '',
         contractables: [],
         files: selectedDocuments,
-        
     });
 
     const [errors, setErrors] = useState<TypeFormData>();

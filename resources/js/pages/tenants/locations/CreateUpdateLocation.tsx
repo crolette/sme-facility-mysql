@@ -70,7 +70,7 @@ type TypeFormData = {
     address: string;
 };
 
-export default function CreateLocation({
+export default function CreateUpdateLocation({
     location,
     levelTypes,
     locationTypes,

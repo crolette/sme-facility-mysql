@@ -27,7 +27,7 @@ it('can render the index providers page', function () {
     $response->assertOk()
         ->assertInertia(
             fn($page) =>
-            $page->component('tenants/providers/index')
+            $page->component('tenants/providers/IndexProviders')
                 ->has('providers', 3)
         );
 });
@@ -38,7 +38,7 @@ it('can render the show provider page', function () {
     $response->assertOk()
         ->assertInertia(
             fn($page) =>
-            $page->component('tenants/providers/show')
+            $page->component('tenants/providers/ShowProvider')
                 ->has('item')
                 ->where('item.id', $provider->id)
         );
@@ -49,7 +49,7 @@ it('can render the create provider page', function () {
     $response->assertOk()
         ->assertInertia(
             fn($page) =>
-            $page->component('tenants/providers/create')
+            $page->component('tenants/providers/CreateUpdateProvider')
         );
 });
 
@@ -59,7 +59,7 @@ it('can render the edit provider page', function () {
     $response->assertOk()
         ->assertInertia(
             fn($page) =>
-            $page->component('tenants/providers/create')
+            $page->component('tenants/providers/CreateUpdateProvider')
                 ->has('provider')
                 ->where('provider.id', $provider->id)
         );

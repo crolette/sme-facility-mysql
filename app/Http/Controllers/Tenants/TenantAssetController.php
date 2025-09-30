@@ -38,7 +38,7 @@ class TenantAssetController extends Controller
 
         $assets = Asset::withoutTrashed()->get();
 
-        return Inertia::render('tenants/assets/index', ['items' => $assets]);
+        return Inertia::render('tenants/assets/IndexAssets', ['items' => $assets]);
     }
 
     /**
@@ -57,7 +57,7 @@ class TenantAssetController extends Controller
         $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
         $noticePeriods = array_column(NoticePeriodEnum::cases(), 'value');
 
-        return Inertia::render('tenants/assets/create', ['categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
+        return Inertia::render('tenants/assets/CreateUpdateAsset', ['categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
     }
 
 
@@ -73,7 +73,7 @@ class TenantAssetController extends Controller
 
         $asset = Asset::where('reference_code', $asset->reference_code)->with(['maintainable.manager:id,first_name,last_name', 'contracts:id,name,type,provider_id,status,renewal_type,end_date,internal_reference,provider_reference', 'contracts.provider:id,name,logo', 'maintainable.providers:id,name'])->first();
     // dd($asset);
-        return Inertia::render('tenants/assets/show', ['item' => $asset->append('level_path')]);
+        return Inertia::render('tenants/assets/ShowAsset', ['item' => $asset->append('level_path')]);
     }
 
     public function showDeleted($id)
@@ -81,7 +81,7 @@ class TenantAssetController extends Controller
         $asset = Asset::withTrashed()->with(['documents','pictures','tickets.pictures'])->findOrFail($id);
 
         
-        return Inertia::render('tenants/assets/show', ['item' => $asset]);
+        return Inertia::render('tenants/assets/ShowAsset', ['item' => $asset]);
     }
 
     /**
@@ -98,6 +98,6 @@ class TenantAssetController extends Controller
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
-        return Inertia::render('tenants/assets/create', ['asset' => $asset->load(['assetCategory', 'documents', 'maintainable.manager', 'maintainable.providers:id,name,category_type_id', 'contracts']), 'categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
+        return Inertia::render('tenants/assets/CreateUpdateAsset', ['asset' => $asset->load(['assetCategory', 'documents', 'maintainable.manager', 'maintainable.providers:id,name,category_type_id', 'contracts']), 'categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
     }
 }

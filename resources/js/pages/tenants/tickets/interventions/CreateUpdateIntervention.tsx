@@ -2,7 +2,7 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Ticket } from '@/types';
 import { Head } from '@inertiajs/react';
 
-export default function CreateIntervention({ ticket }: { ticket: Ticket }) {
+export default function CreateUpdateIntervention({ ticket }: { ticket: Ticket }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Create ticket`,

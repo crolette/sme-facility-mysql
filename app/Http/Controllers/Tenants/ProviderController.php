@@ -19,7 +19,7 @@ class ProviderController extends Controller
             abort(403);
 
         $providers = Provider::all();
-        return Inertia::render('tenants/providers/index', ['providers' => $providers]);
+        return Inertia::render('tenants/providers/IndexProviders', ['providers' => $providers]);
     }
 
     /**
@@ -31,7 +31,7 @@ class ProviderController extends Controller
             abort(403);
 
         $categories = CategoryType::where('category', 'provider')->get();
-        return Inertia::render('tenants/providers/create', ['providerCategories' => $categories]);
+        return Inertia::render('tenants/providers/CreateUpdateProvider', ['providerCategories' => $categories]);
     }
 
     /**
@@ -43,7 +43,7 @@ class ProviderController extends Controller
             abort(403);
 
         $categories = CategoryType::where('category', 'provider')->get();
-        return Inertia::render('tenants/providers/create', ['provider' => $provider, 'providerCategories' => $categories]);
+        return Inertia::render('tenants/providers/CreateUpdateProvider', ['provider' => $provider, 'providerCategories' => $categories]);
     }
 
 
@@ -55,6 +55,6 @@ class ProviderController extends Controller
         if (Auth::user()->cannot('view', $provider))
             abort(403);
 
-        return Inertia::render('tenants/providers/show', ['item' => $provider->load('users', 'contracts', 'contracts.provider')]);
+        return Inertia::render('tenants/providers/ShowProvider', ['item' => $provider->load('users', 'contracts', 'contracts.provider')]);
     }
 }

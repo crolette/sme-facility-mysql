@@ -56,7 +56,7 @@ it('can render the index assets page', function () {
 
     $response->assertInertia(
         fn($page) =>
-        $page->component('tenants/assets/index')
+        $page->component('tenants/assets/IndexAssets')
             ->has('items', 4)
             ->where('items.0.maintainable.name', $asset->maintainable->name)
             ->where('items.0.location.id', $this->site->id)
@@ -72,7 +72,7 @@ it('can render the create asset page', function () {
     $response->assertOk();
 
     $response->assertInertia(
-        fn($page) => $page->component('tenants/assets/create')
+        fn($page) => $page->component('tenants/assets/CreateUpdateAsset')
             ->has('categories', 3)
     );
     $response->assertOk();
@@ -393,7 +393,7 @@ it('can show the asset page', function () {
     $response = $this->getFromTenant('tenant.assets.show', $asset);
 
     $response->assertInertia(
-        fn($page) => $page->component('tenants/assets/show')
+        fn($page) => $page->component('tenants/assets/ShowAsset')
             ->has('item')
             ->where('item.location.code', $this->room->code)
             ->where('item.maintainable.description', $asset->maintainable->description)
@@ -411,7 +411,7 @@ it('can render the update asset page', function () {
     $response = $this->getFromTenant('tenant.assets.edit', $asset);
 
     $response->assertInertia(
-        fn($page) => $page->component('tenants/assets/create')
+        fn($page) => $page->component('tenants/assets/CreateUpdateAsset')
             ->has('asset')
             ->where('asset.reference_code', $asset->reference_code)
             ->where('asset.location_type', get_class($this->room))

@@ -44,7 +44,7 @@ class TenantBuildingController extends Controller
             abort(403);
 
         $buildings = Building::all();
-        return Inertia::render('tenants/locations/index', ['items' => $buildings, 'routeName' => 'buildings']);
+        return Inertia::render('tenants/locations/IndexLocations', ['items' => $buildings, 'routeName' => 'buildings']);
     }
 
     /**
@@ -67,7 +67,7 @@ class TenantBuildingController extends Controller
         $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
         $noticePeriods = array_column(NoticePeriodEnum::cases(), 'value');
 
-        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'outdoorMaterials' => $outdoorMaterials, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
+        return Inertia::render('tenants/locations/CreateUpdateLocation', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'outdoorMaterials' => $outdoorMaterials, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
     }
 
     /**
@@ -82,7 +82,7 @@ class TenantBuildingController extends Controller
         $building->append('level_path' ,'floor_material', 'wall_material', 'outdoor_material');
 
 
-        return Inertia::render('tenants/locations/show', ['routeName' => 'buildings', 'item' => $building]);
+        return Inertia::render('tenants/locations/ShowLocation', ['routeName' => 'buildings', 'item' => $building]);
     }
 
     /**
@@ -100,6 +100,6 @@ class TenantBuildingController extends Controller
         $floorMaterials = CategoryType::where('category', 'floor_materials')->get();
         $wallMaterials = CategoryType::where('category', 'wall_materials')->get();
         $outdoorMaterials = CategoryType::where('category', 'outdoor_materials')->get();
-        return Inertia::render('tenants/locations/create', ['location' => $building->load('site'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'outdoorMaterials' => $outdoorMaterials,]);
+        return Inertia::render('tenants/locations/CreateUpdateLocation', ['location' => $building->load('site'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'outdoorMaterials' => $outdoorMaterials,]);
     }
 }

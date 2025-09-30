@@ -17,6 +17,7 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
             title: `Index assets`,
             href: `/assets`,
         },
+        
     ];
     const { showToast } = useToast();
 

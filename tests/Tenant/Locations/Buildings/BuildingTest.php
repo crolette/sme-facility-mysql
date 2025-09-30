@@ -35,7 +35,7 @@ it('can render the index buildings page', function () {
 
     $response->assertInertia(
         fn($page) =>
-        $page->component('tenants/locations/index')
+        $page->component('tenants/locations/IndexLocations')
             ->has('items', 3)
             ->has('items.0.maintainable')
     );
@@ -50,7 +50,7 @@ it('can render the create building page', function () {
     $response->assertOk();
 
     $response->assertInertia(
-        fn($page) => $page->component('tenants/locations/create')
+        fn($page) => $page->component('tenants/locations/CreateUpdateLocation')
             ->has('levelTypes')
             ->has('locationTypes', 2)
     );
@@ -271,7 +271,7 @@ it('can render the show building page', function () {
     $response->assertOk();
 
     $response->assertInertia(
-        fn($page) => $page->component('tenants/locations/show')
+        fn($page) => $page->component('tenants/locations/ShowLocation')
             ->has('item')
             ->where('item.location_type.level', $building->locationType->level)
             ->where('item.maintainable.description', $building->maintainable->description)
@@ -292,7 +292,7 @@ it('can render the update building page', function () {
 
 
     $response->assertInertia(
-        fn($page) => $page->component('tenants/locations/create')
+        fn($page) => $page->component('tenants/locations/CreateUpdateLocation')
             ->has('location')
             ->has('location.site')
             ->has('levelTypes', 1)

@@ -23,7 +23,7 @@ interface FormDataUser {
     role: string;
 }
 
-export default function UserCreateUpdate({ user, roles }: { user?: User; roles: [] }) {
+export default function CreateUpdateUser({ user, roles }: { user?: User; roles: [] }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `User`,
@@ -70,9 +70,11 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
                         'Content-Type': 'multipart/form-data',
                     },
                 });
-                console.log(response);
                 if (response.data.status === 'success') {
                     showToast(response.data.message, response.data.status);
+                      router.visit(route('tenant.users.index'), {
+                          preserveScroll: false,
+                      });
                 }
                 reset();
             } catch (error) {
@@ -81,7 +83,7 @@ export default function UserCreateUpdate({ user, roles }: { user?: User; roles: 
             }
         }
     };
-    console.log(data);
+    
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sites" />

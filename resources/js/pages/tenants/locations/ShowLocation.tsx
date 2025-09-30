@@ -23,6 +23,10 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
     const [location, setLocation] = useState(item);
     const breadcrumbs: BreadcrumbItem[] = [
         {
+            title: `Index ${routeName}`,
+            href: `/${routeName}`,
+        },
+        {
             title: `${location.reference_code} - ${location.maintainable.name}`,
             href: ``,
         },

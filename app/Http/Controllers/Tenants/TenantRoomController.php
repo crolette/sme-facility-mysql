@@ -34,7 +34,7 @@ class TenantRoomController extends Controller
             abort(403);
 
         $locations = Room::with('floor')->get();
-        return Inertia::render('tenants/locations/index', ['items' => $locations, 'routeName' => 'rooms']);
+        return Inertia::render('tenants/locations/IndexLocations', ['items' => $locations, 'routeName' => 'rooms']);
     }
 
     /**
@@ -57,7 +57,7 @@ class TenantRoomController extends Controller
         $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
         $noticePeriods = array_column(NoticePeriodEnum::cases(), 'value');
 
-        return Inertia::render('tenants/locations/create', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
+        return Inertia::render('tenants/locations/CreateUpdateLocation', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
     }
 
 
@@ -73,7 +73,7 @@ class TenantRoomController extends Controller
         $room = Room::where('reference_code', $room->reference_code)->with(['floor', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers', 'contracts', 'contracts.provider'])->first();
         $room->append('level_path', 'floor_material', 'wall_material');
 
-        return Inertia::render('tenants/locations/show', ['routeName' => 'rooms', 'item' => $room]);
+        return Inertia::render('tenants/locations/ShowLocation', ['routeName' => 'rooms', 'item' => $room]);
     }
 
     /**
@@ -92,6 +92,6 @@ class TenantRoomController extends Controller
         $floorMaterials = CategoryType::where('category', 'floor_materials')->get();
         $wallMaterials = CategoryType::where('category', 'wall_materials')->get();
 
-        return Inertia::render('tenants/locations/create', ['location' => $room->makeVisible(['level_id', 'location_type_id'])->load('floor'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials]);
+        return Inertia::render('tenants/locations/CreateUpdateLocation', ['location' => $room->makeVisible(['level_id', 'location_type_id'])->load('floor'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials]);
     }
 }

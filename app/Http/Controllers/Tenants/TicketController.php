@@ -18,7 +18,7 @@ class TicketController extends Controller
             abort(403);
 
 
-        return Inertia::render('tenants/tickets/index');
+        return Inertia::render('tenants/tickets/IndexTickets');
     }
 
     
@@ -29,6 +29,6 @@ class TicketController extends Controller
             abort(403);
         
 
-        return Inertia::render('tenants/tickets/show', ['item' => $ticket->load('pictures', 'interventions')]);
+        return Inertia::render('tenants/tickets/ShowTicket', ['item' => $ticket->load('pictures', 'interventions')]);
     }
 };

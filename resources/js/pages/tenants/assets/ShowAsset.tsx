@@ -18,6 +18,10 @@ import { useState } from 'react';
 export default function ShowAsset({ item }: { item: Asset }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
+            title: `Index assets`,
+            href: `/assets`,
+        },
+        {
             title: `${item.reference_code} - ${item.maintainable.name}`,
             href: ``,
         },

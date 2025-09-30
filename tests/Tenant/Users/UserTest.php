@@ -32,7 +32,7 @@ it('can render the index users page', function () {
     $response->assertOk()
         ->assertInertia(
             fn($page) =>
-            $page->component('tenants/users/index')
+            $page->component('tenants/users/IndexUsers')
                 ->has('users', 4)
         );
 });
@@ -43,7 +43,7 @@ it('can render the show user page', function () {
     $response->assertOk()
         ->assertInertia(
             fn($page) =>
-            $page->component('tenants/users/show')
+            $page->component('tenants/users/ShowUser')
                 ->has('item')
                 ->where('item.id', $user->id)
         );
@@ -54,7 +54,7 @@ it('can render the create user page', function () {
     $response->assertOk()
         ->assertInertia(
             fn($page) =>
-            $page->component('tenants/users/create')
+            $page->component('tenants/users/CreateUpdateUser')
         );
 });
 
@@ -64,7 +64,7 @@ it('can render the edit user page', function () {
     $response->assertOk()
         ->assertInertia(
             fn($page) =>
-            $page->component('tenants/users/create')
+            $page->component('tenants/users/CreateUpdateUser')
                 ->has('user')
                 ->where('user.id', $user->id)
         );

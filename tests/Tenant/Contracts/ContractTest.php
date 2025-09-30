@@ -460,7 +460,7 @@ it('can render the index page with all contracts', function () {
 
     $response->assertInertia(
         fn($page) =>
-        $page->component('tenants/contracts/index')
+        $page->component('tenants/contracts/IndexContracts')
             ->has('items', 4)
             ->has('statuses', count($statuses))
             ->has('renewalTypes', count($renewalTypes))
@@ -475,7 +475,7 @@ it('can render the show contract page', function () {
 
     $response->assertInertia(
         fn($page) =>
-        $page->component('tenants/contracts/show')
+        $page->component('tenants/contracts/ShowContract')
             ->has('item')
             ->where('item.id', $contract->id)
     );
@@ -487,7 +487,7 @@ it('can render the create contract page', function () {
 
     $response->assertInertia(
         fn($page) =>
-        $page->component('tenants/contracts/create')
+        $page->component('tenants/contracts/CreateUpdateContract')
     );
 });
 
@@ -497,7 +497,7 @@ it('can render the edit contract page', function () {
 
     $response->assertInertia(
         fn($page) =>
-        $page->component('tenants/contracts/create')
+        $page->component('tenants/contracts/CreateUpdateContract')
             ->has('contract')
     );
 });

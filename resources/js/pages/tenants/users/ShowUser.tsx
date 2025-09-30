@@ -1,31 +1,35 @@
 import ImageUploadModale from '@/components/ImageUploadModale';
 import Modale from '@/components/Modale';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, User } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { Pencil, Trash2, Upload } from 'lucide-react';
 import { useState } from 'react';
 
-export default function UserShow({ item }: { item: User }) {
+export default function ShowUser({ item }: { item: User }) {
     const [user, setUser] = useState(item);
+    const { showToast } = useToast();
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `${user.full_name}`,
+            title: `Index users`,
+            href: `/users`,
+        },
+        {
+            title: `${user.full_name} (${user.provider ? user.provider.name : 'Internal'})`,
             href: `/users/${user.id}`,
         },
     ];
-
-    console.log(user);
 
     const fetchUser = async () => {
         try {
             const response = await axios.get(route('api.users.show', user.id));
             setUser(response.data.data);
         } catch (error) {
-            console.log(error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -33,10 +37,10 @@ export default function UserShow({ item }: { item: User }) {
         try {
             const response = await axios.delete(route('api.users.destroy', user.id));
             if (response.data.status === 'success') {
-                window.location.href = route('tenant.users.index');
+                router.visit(route('tenant.users.index'));
             }
         } catch (error) {
-            console.log(error);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -44,15 +48,11 @@ export default function UserShow({ item }: { item: User }) {
     // const [uploadedImages, setUploadedImages] = useState([]);
 
     const handleUploadSuccess = (result) => {
-        // Ajouter l'image uploadée à la liste
-        // setUploadedImages((prev) => [...prev, result]);
-        console.log('Avatar uploadée avec succès:', result);
         fetchUser();
     };
 
     const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
 
-    // console.log(user.roles);
          const [activeTab, setActiveTab] = useState('information');
 
     return (

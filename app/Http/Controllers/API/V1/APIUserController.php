@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use Exception;
 use Illuminate\Support\Str;
 use App\Helpers\ApiResponse;
 use App\Models\Tenants\User;
 use App\Services\UserService;
 use Illuminate\Validation\Rules;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -27,7 +29,12 @@ class APIUserController extends Controller
             abort(403);
         }
 
-        return ApiResponse::success($user->load('provider:id,name'));
+        try {
+            return ApiResponse::success($user->load('provider:id,name'));
+        } catch (Exception $e) {
+            Log::info('Error during retrieving user : ' . $e->getMessage());
+            return ApiResponse::error('Error during retrieving user');
+        }
     }
 
     public function store(UserRequest $request)
@@ -112,7 +119,7 @@ class APIUserController extends Controller
             }
         );
 
-        // If the password was successfully reset, we will redirect the user back to
+        // If the pas sword was successfully reset, we will redirect the user back to
         // the application's home authenticated view. If there is an error we can
         // redirect them back to where they came from with their error message.
         if ($status == Password::PasswordReset) {
@@ -126,7 +133,14 @@ class APIUserController extends Controller
 
     public function destroy(User $user)
     {
-        $user->delete();
-        return ApiResponse::success('', 'User deleted');
+        try {
+            $user->delete();
+            return ApiResponse::successFlash('', 'User deleted');
+
+        } catch(Exception $e) {
+            Log::info('Error during deleting user : ' . $e->getMessage());
+            return ApiResponse::error('Error during deleting user');
+
+        }
     }
 };

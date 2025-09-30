@@ -15,8 +15,12 @@ export default function ShowTicket({ item }: { item: Ticket }) {
     const { showToast } = useToast();
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Show tickets`,
-            href: `/tickets/${ticket}`,
+            title: `Index tickets`,
+            href: `/tickets`,
+        },
+        {
+            title: `${ticket.code} -  ${ticket.ticketable.maintainable.name} - ${ticket.ticketable.reference_code}`,
+            href: `/tickets/${ticket.id}`,
         },
     ];
 

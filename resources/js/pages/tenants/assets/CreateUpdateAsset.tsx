@@ -98,7 +98,7 @@ type SearchedLocation = {
     code: string;
 };
 
-export default function CreateAsset({
+export default function CreateUpdateAsset({
     asset,
     categories,
     documentTypes,
@@ -218,7 +218,7 @@ export default function CreateAsset({
                     });
                 }
             } catch (error) {
-                 showToast(error.response.data.message, error.response.data.status);
+                showToast(error.response.data.message, error.response.data.status);
                 setErrors(error.response.data.errors);
             }
         } else {
@@ -310,7 +310,7 @@ export default function CreateAsset({
         const files = data.contracts[contractIndex].files.filter((file: ContractFile, indexFile: number) => {
             return fileIndex !== indexFile ? file : null;
         });
-        console.log(files)
+        console.log(files);
 
         setData((prev) => {
             const updatedContracts = [...prev.contracts];
@@ -1206,7 +1206,7 @@ export default function CreateAsset({
                                 multiple={true}
                                 searchUrl={route('api.documents.search')}
                                 selectedItems={existingDocuments}
-                                getDisplayText={(document) => document.name +  '-' + document.mime_type}
+                                getDisplayText={(document) => document.name + '-' + document.mime_type}
                                 getKey={(document) => document.id}
                                 onSelect={(documents) => {
                                     setExistingDocuments(documents);

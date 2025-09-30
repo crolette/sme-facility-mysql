@@ -5,7 +5,7 @@ import { BreadcrumbItem, Provider } from '@/types';
 import { Head } from '@inertiajs/react';
 import { Pencil, PlusCircle } from 'lucide-react';
 
-export default function ProviderIndex({ providers }: { providers: Provider[] }) {
+export default function IndexProviders({ providers }: { providers: Provider[] }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index providers`,
@@ -20,7 +20,8 @@ export default function ProviderIndex({ providers }: { providers: Provider[] }) 
                 <a href={route(`tenant.providers.create`)}>
                     <Button>
                         <PlusCircle />
-                        Create provider</Button>
+                        Create provider
+                    </Button>
                 </a>
                 <Table>
                     <TableHead>
@@ -49,7 +50,9 @@ export default function ProviderIndex({ providers }: { providers: Provider[] }) 
                                                 Delete
                                             </Button> */}
                                             <a href={route(`tenant.providers.edit`, item.id)}>
-                                                <Button><Pencil /></Button>
+                                                <Button>
+                                                    <Pencil />
+                                                </Button>
                                             </a>
                                             {/* <a href={route(`tenant.providers.show`, item.id)}>
                                                 <Button variant={'outline'}>See</Button>

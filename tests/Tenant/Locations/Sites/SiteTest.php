@@ -37,7 +37,7 @@ it('can render the index sites page', function () {
 
     $response->assertInertia(
         fn($page) =>
-        $page->component('tenants/locations/index')
+        $page->component('tenants/locations/IndexLocations')
             ->has('items', 3)
     );
 });
@@ -51,7 +51,7 @@ it('can render the create site page', function () {
 
 
     $response->assertInertia(
-        fn($page) => $page->component('tenants/locations/create')
+        fn($page) => $page->component('tenants/locations/CreateUpdateLocation')
             ->has('locationTypes', 3)
     );
 });
@@ -145,7 +145,7 @@ it('can render the show site page', function () {
     $response->assertOk();
 
     $response->assertInertia(
-        fn($page) => $page->component('tenants/locations/show')
+        fn($page) => $page->component('tenants/locations/ShowLocation')
             ->has('item')
             ->where('item.location_type.level', $site->locationType->level)
             ->where('item.maintainable.description', $site->maintainable->description)
@@ -162,7 +162,7 @@ it('can render the update site page', function () {
     $response->assertOk();
 
     $response->assertInertia(
-        fn($page) => $page->component('tenants/locations/create')
+        fn($page) => $page->component('tenants/locations/CreateUpdateLocation')
             ->has('location')
             ->has('locationTypes', 3)
             ->where('location.reference_code', $site->reference_code)

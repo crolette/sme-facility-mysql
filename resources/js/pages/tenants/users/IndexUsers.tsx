@@ -5,7 +5,7 @@ import { BreadcrumbItem, User } from '@/types';
 import { Head } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
 
-export default function UserIndex({ users }: { users: User[] }) {
+export default function IndexUsers({ users }: { users: User[] }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index users`,

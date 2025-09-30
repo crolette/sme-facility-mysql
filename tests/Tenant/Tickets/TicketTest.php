@@ -55,7 +55,7 @@ it('can render the index tickets page', function () {
 
     $response->assertInertia(
         fn($page) =>
-        $page->component('tenants/tickets/index')
+        $page->component('tenants/tickets/IndexTicket')
     );
 });
 
@@ -68,7 +68,7 @@ it('can render the show ticket page', function () {
     $response->assertOk();
 
     $response->assertInertia(
-        fn($page) => $page->component('tenants/tickets/show')
+        fn($page) => $page->component('tenants/tickets/ShowTicket')
             ->has('item')->where('item.code', $ticket->code)
     );
     $response->assertOk();
@@ -83,7 +83,7 @@ it('can render interventions in the ticket page', function () {
 
     $response->assertInertia(
         fn($page) =>
-        $page->component('tenants/tickets/show')
+        $page->component('tenants/tickets/ShowTicket')
             ->has('item')
             ->has('item.interventions', 2)
             ->has('item.interventions.0.actions', 1)

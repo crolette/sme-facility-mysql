@@ -28,7 +28,7 @@ class ContractController extends Controller
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
 
-        return Inertia::render('tenants/contracts/index', ['items' => $contracts, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
+        return Inertia::render('tenants/contracts/IndexContracts', ['items' => $contracts, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
     }
 
     /**
@@ -45,7 +45,7 @@ class ContractController extends Controller
         $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
         $noticePeriods = array_column(NoticePeriodEnum::cases(), 'value');
 
-        return Inertia::render('tenants/contracts/create', ['statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
+        return Inertia::render('tenants/contracts/CreateUpdateContract', ['statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
     }
 
     /**
@@ -61,7 +61,7 @@ class ContractController extends Controller
         $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
         $noticePeriods = array_column(NoticePeriodEnum::cases(), 'value');
 
-        return Inertia::render('tenants/contracts/create', ['contract' => $contract->load('provider'), 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods, 'objects' => $contract->getObjects()]);
+        return Inertia::render('tenants/contracts/CreateUpdateContract', ['contract' => $contract->load('provider'), 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods, 'objects' => $contract->getObjects()]);
     }
 
 
@@ -74,6 +74,6 @@ class ContractController extends Controller
             abort(403);
         // dd(Contract::where('notice_date', '>', Carbon::now())->get());
         // dd($contract->end_date, $contract->end_date->subYears(5) < $contract->start_date);
-        return Inertia::render('tenants/contracts/show', ['item' => $contract->load('provider','documents'), 'objects' => $contract->getObjects()]);
+        return Inertia::render('tenants/contracts/ShowContract', ['item' => $contract->load('provider','documents'), 'objects' => $contract->getObjects()]);
     }
 }
