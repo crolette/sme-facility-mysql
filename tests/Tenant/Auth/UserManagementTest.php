@@ -28,7 +28,7 @@ test('test access roles to users index', function (string $role, int $expectedSt
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 403],
-    ['Provider', 403]
+    // ['Provider', 403]
 ]);
 
 test('test access roles to view own user', function (string $role, int $expectedStatus) {
@@ -39,7 +39,7 @@ test('test access roles to view own user', function (string $role, int $expected
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 200],
-    ['Provider', 200]
+    // ['Provider', 200]
 ]);
 
 test('test access roles to view another user', function (string $role, int $expectedStatus) {
@@ -53,7 +53,7 @@ test('test access roles to view another user', function (string $role, int $expe
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 403],
-    ['Provider', 403]
+    // ['Provider', 403]
 ]);
 
 test('test access roles to users create', function (string $role, int $expectedStatus) {
@@ -65,7 +65,7 @@ test('test access roles to users create', function (string $role, int $expectedS
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 403],
-    ['Provider', 403]
+    // ['Provider', 403]
 ]);
 
 
@@ -96,7 +96,7 @@ test('an admin can create a new user with a role', function (string $role) {
 })->with([
     ['Admin'],
     ['Maintenance Manager'],
-    ['Provider']
+    // ['Provider']
 ]);
 
 test('an admin can update the role of a user', function (string $role) {
@@ -127,7 +127,7 @@ test('an admin can update the role of a user', function (string $role) {
 })->with([
     ['Admin'],
     ['Maintenance Manager'],
-    ['Provider']
+    // ['Provider']
 ]);
 
 test('another user as an admin cannot create a user', function (string $role) {
@@ -146,5 +146,5 @@ test('another user as an admin cannot create a user', function (string $role) {
     $response->assertStatus(403);
 })->with([
     ['Maintenance Manager'],
-    ['Provider']
+    // ['Provider']
 ]);

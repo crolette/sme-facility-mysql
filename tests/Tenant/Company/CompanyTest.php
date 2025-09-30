@@ -43,7 +43,7 @@ it('can render the company profile page', function() {
 
     $response->assertInertia(
         fn($page) =>
-        $page->component('settings/company')->has('company')
+        $page->component('settings/company')->has('item')
             
     );
 });

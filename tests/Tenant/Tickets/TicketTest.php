@@ -55,7 +55,7 @@ it('can render the index tickets page', function () {
 
     $response->assertInertia(
         fn($page) =>
-        $page->component('tenants/tickets/IndexTicket')
+        $page->component('tenants/tickets/IndexTickets')
     );
 });
 
