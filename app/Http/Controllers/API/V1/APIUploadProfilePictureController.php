@@ -21,4 +21,10 @@ class APIUploadProfilePictureController extends Controller
         $user->save();
         return ApiResponse::success('', 'Profile picture uploaded');
     }
+
+    public function destroy(User $user)
+    {
+        $this->userService->deleteAvatar($user);
+        return ApiResponse::success('', 'Profile picture deleted');
+    }
 };

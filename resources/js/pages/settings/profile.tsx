@@ -11,6 +11,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import axios from 'axios';
+import { useToast } from '@/components/ToastrContext';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,25 +24,31 @@ const breadcrumbs: BreadcrumbItem[] = [
 type ProfileForm = {
     first_name: string;
     last_name: string;
-    email: string;
 };
 
-export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
+export default function Profile() {
     const { auth } = usePage<SharedData>().props;
+    const { showToast } = useToast();
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
+    const { data, setData, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
         first_name: auth.user.first_name,
         last_name: auth.user.last_name,
-        email: auth.user.email,
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submit: FormEventHandler = async (e) => {
         e.preventDefault();
 
-        patch(route('profile.update'), {
-            preserveScroll: true,
-        });
+        try {
+            const response = await axios.patch(route('tenant.profile.update', auth.user.id), data)
+            if (response.data.status === 'success') {
+                showToast(response.data.message, response.data.success);
+            }
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.success);
+        }
     };
+
+    console.log(auth.user);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -50,6 +58,9 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                 <div className="space-y-6">
                     <HeadingSmall title="Profile information" description="Update your name and email address" />
 
+                    <div>
+                        
+                    </div>
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">
                             <Label htmlFor="name">First Name</Label>
@@ -89,17 +100,13 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                 id="email"
                                 type="email"
                                 className="mt-1 block w-full"
-                                value={data.email}
-                                onChange={(e) => setData('email', e.target.value)}
-                                required
-                                autoComplete="username"
+                                disabled
                                 placeholder="Email address"
                             />
 
-                            <InputError className="mt-2" message={errors.email} />
                         </div>
 
-                        {mustVerifyEmail && auth.user.email_verified_at === null && (
+                        {/* {mustVerifyEmail && auth.user.email_verified_at === null && (
                             <div>
                                 <p className="text-muted-foreground -mt-4 text-sm">
                                     Your email address is unverified.{' '}
@@ -119,7 +126,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                     </div>
                                 )}
                             </div>
-                        )}
+                        )} */}
 
                         <div className="flex items-center gap-4">
                             <Button disabled={processing}>Save</Button>
@@ -137,7 +144,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                     </form>
                 </div>
 
-                <DeleteUser />
+                {/* <DeleteUser /> */}
             </SettingsLayout>
         </AppLayout>
     );

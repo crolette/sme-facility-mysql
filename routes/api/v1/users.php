@@ -61,5 +61,7 @@ Route::middleware([
 
     Route::patch('/{user}', [APIUserController::class, 'update'])->name('api.users.update');
     Route::delete('/{user}', [APIUserController::class, 'destroy'])->name('api.users.destroy');
+
     Route::post('/{user}/logo', [APIUploadProfilePictureController::class, 'store'])->name('api.users.picture.store');
+    Route::delete('/{user}/logo', [APIUploadProfilePictureController::class, 'destroy'])->name('api.users.picture.destroy');
 });

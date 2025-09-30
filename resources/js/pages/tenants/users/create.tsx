@@ -26,8 +26,12 @@ interface FormDataUser {
 export default function UserCreateUpdate({ user, roles }: { user?: User; roles: [] }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Create/Update providers`,
-            href: `/providers`,
+            title: `User`,
+            href: `/users`,
+        },
+        {
+            title: `Create/Update user`,
+            href: `/users/create`,
         },
     ];
     const { showToast } = useToast();

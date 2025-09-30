@@ -71,7 +71,7 @@ it('can render the edit user page', function () {
 });
 
 
-it('can post a new "loginable" user and return the password', function () {
+it('can post a new "loginable" user', function () {
 
     $file1 = UploadedFile::fake()->image('avatar.png');
 
@@ -87,14 +87,13 @@ it('can post a new "loginable" user and return the password', function () {
 
     $response = $this->postToTenant('api.users.store', $formData);
     $response->assertStatus(200)
-        ->assertJson(
-            fn(AssertableJson $json) =>
-            $json->where('status', 'success')
-        );
+        ->assertJson([
+            'status' => 'success',
+        ]);
 
     $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
 
-    assertNotNull($createdUser->password);
+    assertNull($createdUser->password);
 
     assertDatabaseHas('users', [
         'first_name' => 'Jane',
@@ -217,4 +216,58 @@ it('can delete an existing user', function () {
         ]);
 
     assertDatabaseMissing('users', ['id' => $user->id]);
+});
+
+it('can, as a logged user, upload an avatar', function() {
+    $user = User::factory()->withRole('Admin')->create();
+    $this->actingAs($user, 'tenant');
+
+
+    $file1 = UploadedFile::fake()->image('avatar.png');
+
+    $formData = [
+        'image' => $file1
+    ];
+
+    $response = $this->postToTenant('api.users.picture.store', $formData, $user->id);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+    $user->refresh();
+    Storage::disk('tenants')->assertExists($user->avatar);
+
+    
+});
+
+it('can, as a logged user, delete his avatar', function() {
+
+    $user = User::factory()->withRole('Admin')->create();
+    $this->actingAs($user, 'tenant');
+
+
+    $file1 = UploadedFile::fake()->image('avatar.png');
+
+    $formData = [
+        'image' => $file1
+    ];
+
+    $response = $this->postToTenant('api.users.picture.store', $formData, $user->id);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+        $user->refresh();
+        
+    expect(Storage::disk('tenants')->exists($user->avatar))->toBeTrue();
+
+    $response = $this->deleteFromTenant('api.users.picture.destroy',  $user->id);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+        
+    $avatar = $user->avatar;
+    expect(Storage::disk('tenants')->exists($avatar))->toBeFalse();
 });

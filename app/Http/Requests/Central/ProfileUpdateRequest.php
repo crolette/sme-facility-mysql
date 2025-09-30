@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Settings;
+namespace App\Http\Requests\Central;
 
 use App\Models\Central\CentralUser;
 use Illuminate\Contracts\Validation\ValidationRule;
@@ -20,7 +20,14 @@ class ProfileUpdateRequest extends FormRequest
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
 
-          
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email',
+                'max:255',
+                Rule::unique(CentralUser::class)->ignore($this->user()->id),
+            ],
         ];
     }
 }

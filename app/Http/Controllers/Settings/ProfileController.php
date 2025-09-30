@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\Settings;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Settings\ProfileUpdateRequest;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Helpers\ApiResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Http\Requests\Settings\ProfileUpdateRequest;
 
 class ProfileController extends Controller
 {
@@ -27,17 +29,23 @@ class ProfileController extends Controller
     /**
      * Update the user's profile settings.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request)
     {
-        $request->user()->fill($request->validated());
+        try {
+            $request->user()->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+            // if ($request->user()->isDirty('email')) {
+            //     $request->user()->email_verified_at = null;
+            // }
+
+            $request->user()->save();
+
+            return ApiResponse::success('Profile updated');
+        } catch(Exception $e) {
+            Log::info('Error while updating user : ' . $e->getMessage());
+            return ApiResponse::error('Error while updating user');
         }
-
-        $request->user()->save();
-
-        return to_route('profile.edit');
+     
     }
 
     /**

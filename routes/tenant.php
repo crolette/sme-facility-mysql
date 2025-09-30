@@ -187,6 +187,6 @@ Route::middleware(array_merge([
     // Route::post('/interventions/{intervention}/external', [InterventionProviderController::class, 'store'])->name('tenant.intervention.provider.store')->middleware('signed');
 });
 
-require __DIR__ . '/settings.php';
+require __DIR__ . '/tenant_settings.php';
 require __DIR__ . '/tenant_auth.php';
 require __DIR__ . '/tenant_api.php';

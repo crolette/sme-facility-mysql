@@ -6,15 +6,9 @@ use Exception;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Models\Tenants\User;
-use App\Models\Tenants\Document;
 use App\Models\Tenants\Provider;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Barryvdh\Debugbar\Facades\Debugbar;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use App\Models\Tenants\UserNotificationPreference;
 
 class UserService
 {
@@ -44,7 +38,6 @@ class UserService
     }
     public function uploadAndAttachAvatar(User $user, $file, string $name): User
     {
-
         $tenantId = tenancy()->tenant->id;
         $directory = "$tenantId/users/$user->id/avatar";
 
@@ -67,6 +60,14 @@ class UserService
         foreach ($files as $file) {
             Storage::disk('tenants')->delete($file);
         }
+    }
+
+    public function deleteAvatar($user)
+    {
+        Storage::disk('tenants')->delete($user->avatar);
+
+        $user->avatar = null ;
+        $user->save();
     }
 
     public function attachProvider(User $user, int $providerId): User
