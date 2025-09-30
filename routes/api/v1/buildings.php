@@ -9,6 +9,7 @@ use App\Services\ContractService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Controllers\API\V1\APIBuildingController;
@@ -22,8 +23,15 @@ Route::middleware([
     \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
     'auth:tenant'
 ])->prefix('/v1/buildings')->group(function () {
-    Route::get('/', function () {
+    Route::get('/', function (Request $request) {
+        if($request->site) {
+            $buildings = Building::where('level_id', $request->site)->get();
+
+            return ApiResponse::success($buildings);
+        }
+
         return ApiResponse::success(Building::all());
+
     })->name('api.buildings.index');
 
     Route::post('/', [APIBuildingController::class, 'store'])->name('api.buildings.store');

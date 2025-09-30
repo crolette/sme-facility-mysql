@@ -2,6 +2,7 @@
 import InputError from '@/components/input-error';
 import SearchableInput from '@/components/SearchableInput';
 import FileManager from '@/components/tenant/FileManager';
+import SearchLocationForAsset from '@/components/tenant/searchLocationForAsset';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -10,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { Asset, AssetCategory, CentralType, Provider, User, type BreadcrumbItem } from '@/types';
+import { Asset, AssetCategory, CentralType, Provider, TenantBuilding, TenantFloor, TenantRoom, TenantSite, User, type BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
@@ -119,7 +120,11 @@ export default function CreateUpdateAsset({
 }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Create asset`,
+            title: `Index assets`,
+            href: '/assets',
+        },
+        {
+            title: asset ? `Update asset ${asset.name}` : `Create asset`,
             href: '/assets/create',
         },
     ];
@@ -164,8 +169,6 @@ export default function CreateUpdateAsset({
         existing_contracts: [],
         existing_documents: [],
     });
-
-    console.log(data);
 
     const [listIsOpen, setListIsOpen] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
@@ -240,17 +243,19 @@ export default function CreateUpdateAsset({
         }
     };
 
-    const setSelectedLocation = (location: SearchedLocation) => {
+    const setSelectedLocation = (location: SearchedLocation | TenantBuilding | TenantFloor | TenantSite | TenantRoom, type? : string) => {
         if (!location) {
             return;
         }
 
+        console.log("SELECTED LOCATION", location, type ?? null);
+
         setData('locationReference', location.reference_code);
         setData('locationId', location.id);
-        setData('locationType', location.type);
+        setData('locationType', location.type ?? type);
         setData('locationName', location.name);
         setLocations([]);
-        setListIsOpen(!listIsOpen);
+        setListIsOpen(false);
         setData('q', '');
     };
 
@@ -310,7 +315,6 @@ export default function CreateUpdateAsset({
         const files = data.contracts[contractIndex].files.filter((file: ContractFile, indexFile: number) => {
             return fileIndex !== indexFile ? file : null;
         });
-        console.log(files);
 
         setData((prev) => {
             const updatedContracts = [...prev.contracts];
@@ -320,11 +324,9 @@ export default function CreateUpdateAsset({
             };
             return { ...prev, contracts: updatedContracts };
         });
-        console.log('removeContractDocument');
-        console.log(contractIndex, fileIndex);
     };
 
-    console.log(data.contracts);
+
 
     const addFileModalForm = () => {
         return (
@@ -436,6 +438,7 @@ export default function CreateUpdateAsset({
     const [showContractFileModal, setShowContractFileModal] = useState(false);
     const [indexContractForFiles, setIndexContractForFiles] = useState<number | null>(null);
 
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Create asset`} />
@@ -497,50 +500,58 @@ export default function CreateUpdateAsset({
                             </>
                         ) : (
                             <>
-                                <Label htmlFor="search">Search</Label>
-                                <div className="relative">
+                                <Label>Search or navigate through your hierarchy</Label>
+
+                                {/* <Label htmlFor="search">Search</Label> */}
+                                <div className="relative mb-2">
                                     <Input
                                         type="search"
                                         value={data.q}
                                         onChange={(e) => setData('q', e.target.value)}
                                         placeholder="Search by code or name to add a level"
                                     />
-                                    <ul className="bg-background absolute z-10 flex w-full flex-col border" aria-autocomplete="list" role="listbox">
-                                        {isSearching && (
-                                            <li value="0" key="" className="">
-                                                Searching...
-                                            </li>
-                                        )}
-                                        {listIsOpen &&
-                                            locations &&
-                                            locations.length > 0 &&
-                                            locations?.map((location) => (
-                                                <li
-                                                    role="option"
-                                                    value={location.reference_code}
-                                                    key={location.reference_code}
-                                                    onClick={() => setSelectedLocation(location)}
-                                                    className="hover:bg-foreground hover:text-background cursor-pointer p-2 text-sm"
-                                                >
-                                                    {location.name + ' (' + location.reference_code + ')'}
+                                        <ul
+                                            className="bg-background absolute z-10 flex w-full flex-col"
+                                            aria-autocomplete="list"
+                                            role="listbox"
+                                        >
+                                            {isSearching && (
+                                                <li value="0" key="" className="">
+                                                    Searching...
                                                 </li>
-                                            ))}
-                                        {listIsOpen && locations && locations.length == 0 && (
-                                            <>
-                                                <li value="0" key="">
-                                                    No results
-                                                </li>
-                                            </>
-                                        )}
-                                    </ul>
+                                            )}
+                                            {listIsOpen &&
+                                                locations &&
+                                                locations.length > 0 &&
+                                                locations?.map((location) => (
+                                                    <li
+                                                        role="option"
+                                                        value={location.reference_code}
+                                                        key={location.reference_code}
+                                                        onClick={() => setSelectedLocation(location)}
+                                                        className="hover:bg-foreground hover:text-background cursor-pointer p-2 text-sm"
+                                                    >
+                                                        {location.name + ' (' + location.reference_code + ')'}
+                                                    </li>
+                                                ))}
+                                            {listIsOpen && locations && locations.length == 0 && (
+                                                <>
+                                                    <li value="0" key="">
+                                                        No results
+                                                    </li>
+                                                </>
+                                            )}
+                                        </ul>
                                 </div>
+                                <SearchLocationForAsset onSelect={setSelectedLocation} />
                                 {/* {data.locationName && ( */}
                                 <>
-                                    <Label htmlFor="locationType">Level</Label>
+                                    <Label htmlFor="locationType">Selected Level</Label>
                                     <Input
                                         required
                                         type="text"
                                         disabled
+                                        className="font-bold"
                                         value={data.locationName ? data.locationName + ' - ' + data.locationReference : 'No location selected'}
                                     />
                                     <InputError className="mt-2" message={errors?.locationType ?? ''} />

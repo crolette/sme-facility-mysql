@@ -51,9 +51,6 @@ class AssetCreateRequest extends FormRequest
     public function rules(): array
     {
 
-        // $data = $this->all();
-
-        // $isCreate = $this->isMethod('post');
         $type = $this->input('locationType');
 
 

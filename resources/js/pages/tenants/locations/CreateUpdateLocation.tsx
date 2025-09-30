@@ -169,8 +169,6 @@ export default function CreateUpdateLocation({
         }
     };
 
-    console.log(errors);
-
     const [showFileModal, setShowFileModal] = useState(false);
     const [newFileName, setNewFileName] = useState('');
     const [newFileDescription, setNewFileDescription] = useState('');

@@ -22,8 +22,16 @@ Route::middleware([
     \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
     'auth:tenant'
 ])->prefix('/v1/floors')->group(function () {
-    Route::get('/', function () {
+    Route::get('/', function (Request $request) {
+
+        if($request->building) {
+            $floors = Floor::where('level_id', $request->building)->get();
+            return ApiResponse::success($floors);
+        }
+
+
         return ApiResponse::success(Floor::all());
+
     })->name('api.floors.index');
 
     Route::post('/', [APIFloorController::class, 'store'])->name('api.floors.store');
