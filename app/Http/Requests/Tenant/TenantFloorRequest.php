@@ -6,6 +6,7 @@ use App\Models\LocationType;
 use Illuminate\Validation\Rule;
 use App\Models\Tenants\Building;
 use App\Models\Central\CategoryType;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Foundation\Http\FormRequest;
 
 class TenantFloorRequest extends FormRequest
@@ -26,6 +27,14 @@ class TenantFloorRequest extends FormRequest
         $data = $this->all();
 
         isset($data['need_qr_code']) && ($data['need_qr_code'] === 'true' || $data['need_qr_code'] === true) ? $data['need_qr_code'] = true : $data['need_qr_code'] = false;
+
+        Debugbar::info($data);
+
+        if (isset($data['surface_floor']) && ($data['surface_floor'] === 0 || $data['surface_floor'] === '0'))
+            $data['surface_floor'] = null;
+
+        if (isset($data['surface_walls']) && ($data['surface_walls'] === 0 || $data['surface_walls'] === '0'))
+            $data['surface_walls'] = null;
 
         $this->replace($data);
     }

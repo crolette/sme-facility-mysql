@@ -170,7 +170,7 @@ const MENUS = {
 };
 
 
-export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu = "provider", infos }: SideBarMenuProps) {
+export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu = "asset", infos }: SideBarMenuProps) {
 
     const navSidebar = MENUS[menu];
 

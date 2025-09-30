@@ -69,6 +69,10 @@ class APISiteController extends Controller
             if ($contractRequest->validated('contracts'))
                 $this->contractService->createWithModel($site, $contractRequest->validated('contracts'));
 
+            if ($contractRequest->validated('existing_contracts'))
+                $this->contractService->attachExistingContractsToModel($site, $contractRequest->validated('existing_contracts'));
+            
+
             if ($siteRequest->validated('need_qr_code') === true)
                 $this->qrCodeService->createAndAttachQR($site);
 

@@ -61,6 +61,7 @@ export default function SearchLocationForAsset({ onSelect }: SearchLocationForAs
 
     return (
         <div className="text-sm">
+            {sites ? (
             <ul>
                 {sites?.map((site) => (
                     <li
@@ -141,7 +142,10 @@ export default function SearchLocationForAsset({ onSelect }: SearchLocationForAs
                         )}
                     </li>
                 ))}
-            </ul>
+                </ul>
+            ) : (
+                    <p className="animate-pulse">Searching locations... </p>
+                )}
         </div>
     );
 }

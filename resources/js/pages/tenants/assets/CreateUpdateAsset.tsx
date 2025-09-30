@@ -1226,7 +1226,7 @@ export default function CreateUpdateAsset({
                                         documents.map((elem) => elem.id),
                                     );
                                 }}
-                                placeholder="Add existing contracts..."
+                                placeholder="Add existing documents..."
                             />
                             <Button onClick={() => setShowFileModal(!showFileModal)} type="button" className="block">
                                 Add file

@@ -70,6 +70,10 @@ class APIBuildingController extends Controller
             if ($contractRequest->validated('contracts'))
                 $this->contractService->createWithModel($building, $contractRequest->validated('contracts'));
 
+
+            if ($contractRequest->validated('existing_contracts'))
+                $this->contractService->attachExistingContractsToModel($building, $contractRequest->validated('existing_contracts'));
+
             if ($documentUploadRequest->validated('files')) {
                 $documentService->uploadAndAttachDocuments($building, $documentUploadRequest->validated('files'));
             }

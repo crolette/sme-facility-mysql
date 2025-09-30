@@ -26,6 +26,13 @@ class TenantRoomRequest extends FormRequest
 
         isset($data['need_qr_code']) && ($data['need_qr_code'] === 'true' || $data['need_qr_code'] === true) ? $data['need_qr_code'] = true : $data['need_qr_code'] = false;
 
+
+        if (isset($data['surface_floor']) && ($data['surface_floor'] === 0 || $data['surface_floor'] === '0'))
+            $data['surface_floor'] = null;
+
+        if (isset($data['surface_walls']) && ($data['surface_walls'] === 0 || $data['surface_walls'] === '0'))
+            $data['surface_walls'] = null;
+
         $this->replace($data);
     }
 

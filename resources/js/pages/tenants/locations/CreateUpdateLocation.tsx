@@ -52,6 +52,8 @@ type TypeFormData = {
     levelType: string | number;
     locationType: string | number;
     locationTypeName: string;
+    existing_contracts: [];
+    existing_documents: [];
     maintenance_manager_id: number | null;
     maintenance_manager_name: string;
     need_maintenance: boolean;
@@ -106,6 +108,8 @@ export default function CreateUpdateLocation({
         },
     ];
 
+   const [existingContracts, setExistingContracts] = useState<Contract[]>([]);
+    const [existingDocuments, setExistingDocuments] = useState<Document[]>([]);
     const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
     const { data, setData } = useForm<TypeFormData>({
         name: location?.maintainable?.name ?? '',
@@ -133,6 +137,8 @@ export default function CreateUpdateLocation({
         last_maintenance_date: location?.maintainable.last_maintenance_date ?? '',
         providers: [],
         contracts: [],
+            existing_contracts: [],
+    existing_documents: [],
         address: location?.address ?? '',
     });
     const [errors, setErrors] = useState({});
@@ -356,10 +362,11 @@ export default function CreateUpdateLocation({
                         <p>Location Code: {location.code} </p>
                     </div>
                 )}
-                <form onSubmit={submit}>
-                    <div>
+                <form onSubmit={submit} className='flex flex-col gap-4'>
+                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                        <h5>Location</h5>
                         {levelTypes && (
-                            <>
+                            <div>
                                 <Label htmlFor="level">Level</Label>
                                 <select
                                     name="level"
@@ -384,390 +391,415 @@ export default function CreateUpdateLocation({
                                     ))}
                                 </select>
                                 <InputError className="mt-2" message={errors.levelType} />
+                            </div>
+                        )}
+                        {locationTypes && (
+                            <>
+                                <Label htmlFor="location-type">Location type</Label>
+                                <select
+                                    name="location-type"
+                                    required
+                                    value={data.locationType}
+                                    onChange={(e) => {
+                                        setData('locationType', e.target.value);
+                                        setData('locationTypeName', locationTypes.find((type) => type.id === parseInt(e.target.value))?.slug ?? '');
+                                    }}
+                                    disabled={location ? true : false}
+                                    id="location-type"
+                                    className={cn(
+                                        'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                    )}
+                                >
+                                    <option value="" disabled>
+                                        -- Select a location type --
+                                    </option>
+                                    {locationTypes.map((type) => (
+                                        <option value={type.id} key={type.id}>
+                                            {type.label}
+                                        </option>
+                                    ))}
+                                </select>
+                                <InputError className="mt-2" message={errors.locationType ?? ''} />
                             </>
                         )}
                     </div>
-                    {locationTypes && (
-                        <div>
-                            <Label htmlFor="location-type">Location type</Label>
-                            <select
-                                name="location-type"
-                                required
-                                value={data.locationType}
-                                onChange={(e) => {
-                                    setData('locationType', e.target.value);
-                                    setData('locationTypeName', locationTypes.find((type) => type.id === parseInt(e.target.value))?.slug ?? '');
-                                }}
-                                disabled={location ? true : false}
-                                id="location-type"
-                                className={cn(
-                                    'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                    'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                    'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                                )}
-                            >
-                                <option value="" disabled>
-                                    -- Select a location type --
-                                </option>
-                                {locationTypes.map((type) => (
-                                    <option value={type.id} key={type.id}>
-                                        {type.label}
-                                    </option>
-                                ))}
-                            </select>
-                            <InputError className="mt-2" message={errors.locationType ?? ''} />
-                        </div>
-                    )}
+                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                        <h5>Information</h5>
 
-                    <Label htmlFor="name">Name</Label>
-                    <Input
-                        id="name"
-                        type="text"
-                        required
-                        autoFocus
-                        maxLength={100}
-                        value={data.name}
-                        onChange={(e) => setData('name', e.target.value)}
-                        placeholder="Name"
-                    />
-                    <InputError className="mt-2" message={errors.name ?? ''} />
+                        <Label htmlFor="name">Name</Label>
+                        <Input
+                            id="name"
+                            type="text"
+                            required
+                            autoFocus
+                            maxLength={100}
+                            value={data.name}
+                            onChange={(e) => setData('name', e.target.value)}
+                            placeholder="Name"
+                        />
+                        <InputError className="mt-2" message={errors.name ?? ''} />
 
-                     <Label htmlFor="name">Description</Label>
-                    <Input
-                        id="description"
-                        type="text"
-                        required
-                        // disabled={type?.prefix ? true : false}
-                        maxLength={255}
-                        value={data.description}
-                        onChange={(e) => setData('description', e.target.value)}
-                        placeholder="Description"
-                    />
-                    <InputError className="mt-2" message={errors.description ?? ''} />
+                        <Label htmlFor="name">Description</Label>
+                        <Input
+                            id="description"
+                            type="text"
+                            required
+                            // disabled={type?.prefix ? true : false}
+                            maxLength={255}
+                            value={data.description}
+                            onChange={(e) => setData('description', e.target.value)}
+                            placeholder="Description"
+                        />
+                        <InputError className="mt-2" message={errors.description ?? ''} />
 
-                    {!location && (
-                        <div>
-                            <Label htmlFor="need_qr_code">Need QR Code ?</Label>
-                            <Checkbox
-                                id="need_qr_code"
-                                name="need_qr_code"
-                                checked={data.need_qr_code ?? true}
-                                onClick={() => setData('need_qr_code', !data.need_qr_code)}
-                            />
-                            <InputError className="mt-2" message={errors.need_qr_code ?? ''} />
-                        </div>
-                    )}
-
-                    {routeName === 'sites' && (
-                        <>
-                            <Label htmlFor="address">Address</Label>
-                            <Input
-                                id="address"
-                                type="text"
-                                required
-                                autoFocus
-                                maxLength={100}
-                                value={data.address}
-                                onChange={(e) => setData('address', e.target.value)}
-                                placeholder="address"
-                            />
-                            <InputError className="mt-2" message={errors.address ?? ''} />
-                        </>
-                    )}
-
-                    {data.locationTypeName === 'outdoor' && (
-                        <div className="flex">
-                            <div className="w-full">
-                                <Label htmlFor="surface_floor">Surface outdoor</Label>
-                                <Input
-                                    id="surface_outdoor"
-                                    type="number"
-                                    min={0}
-                                    step="0.01"
-                                    value={data.surface_outdoor ?? ''}
-                                    placeholder="Surface outdoor (max. 2 decimals) : 4236.3"
-                                    onChange={(e) => setData('surface_outdoor', parseFloat(e.target.value))}
+                        {!location && (
+                            <div>
+                                <Label htmlFor="need_qr_code">Need QR Code ?</Label>
+                                <Checkbox
+                                    id="need_qr_code"
+                                    name="need_qr_code"
+                                    checked={data.need_qr_code ?? true}
+                                    onClick={() => setData('need_qr_code', !data.need_qr_code)}
                                 />
-                                <InputError className="mt-2" message={errors.surface_outdoor ?? ''} />
+                                <InputError className="mt-2" message={errors.need_qr_code ?? ''} />
                             </div>
-                            {outdoorMaterials && (
-                                <div className="w-full">
-                                    <Label htmlFor="outdoor_material_id">outdoor material</Label>
-                                    <select
-                                        name="outdoor_material_id-type"
-                                        value={data.outdoor_material_id ?? ''}
-                                        onChange={(e) => {
-                                            if (e.target.value !== 'other') {
-                                                setData('outdoor_material_other', '');
-                                            }
-                                            setData('outdoor_material_id', e.target.value);
-                                        }}
-                                        id="outdoor_material_id"
-                                        className={cn(
-                                            'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                            'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                                        )}
-                                    >
-                                        <option value="" disabled>
-                                            -- Select a outdoor material --
-                                        </option>
+                        )}
 
-                                        {outdoorMaterials.map((type) => (
-                                            <option value={type.id} key={type.id}>
-                                                {type.label}
+                        {routeName === 'sites' && (
+                            <>
+                                <Label htmlFor="address">Address</Label>
+                                <Input
+                                    id="address"
+                                    type="text"
+                                    required
+                                    autoFocus
+                                    maxLength={100}
+                                    value={data.address}
+                                    onChange={(e) => setData('address', e.target.value)}
+                                    placeholder="address"
+                                />
+                                <InputError className="mt-2" message={errors.address ?? ''} />
+                            </>
+                        )}
+
+                        {data.locationTypeName === 'outdoor' && (
+                            <div className="flex">
+                                <div className="w-full">
+                                    <Label htmlFor="surface_floor">Surface outdoor</Label>
+                                    <Input
+                                        id="surface_outdoor"
+                                        type="number"
+                                        min={0}
+                                        step="0.01"
+                                        value={data.surface_outdoor ?? ''}
+                                        placeholder="Surface outdoor (max. 2 decimals) : 4236.3"
+                                        onChange={(e) => setData('surface_outdoor', parseFloat(e.target.value))}
+                                    />
+                                    <InputError className="mt-2" message={errors.surface_outdoor ?? ''} />
+                                </div>
+                                {outdoorMaterials && (
+                                    <div className="w-full">
+                                        <Label htmlFor="outdoor_material_id">outdoor material</Label>
+                                        <select
+                                            name="outdoor_material_id-type"
+                                            value={data.outdoor_material_id ?? ''}
+                                            onChange={(e) => {
+                                                if (e.target.value !== 'other') {
+                                                    setData('outdoor_material_other', '');
+                                                }
+                                                setData('outdoor_material_id', e.target.value);
+                                            }}
+                                            id="outdoor_material_id"
+                                            className={cn(
+                                                'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                            )}
+                                        >
+                                            <option value="" disabled>
+                                                -- Select a outdoor material --
                                             </option>
-                                        ))}
-                                        <option value="other">Other</option>
-                                    </select>
-                                    <InputError className="mt-2" message={errors.locationType ?? ''} />
-                                    {data.outdoor_material_id === 'other' && (
-                                        <div>
-                                            <Input
-                                                type="text"
-                                                value={data.outdoor_material_other}
-                                                placeholder="other outdoor material"
-                                                onChange={(e) => setData('outdoor_material_other', e.target.value)}
-                                            />
+
+                                            {outdoorMaterials.map((type) => (
+                                                <option value={type.id} key={type.id}>
+                                                    {type.label}
+                                                </option>
+                                            ))}
+                                            <option value="other">Other</option>
+                                        </select>
+                                        <InputError className="mt-2" message={errors.locationType ?? ''} />
+                                        {data.outdoor_material_id === 'other' && (
+                                            <div>
+                                                <Input
+                                                    type="text"
+                                                    value={data.outdoor_material_other}
+                                                    placeholder="other outdoor material"
+                                                    onChange={(e) => setData('outdoor_material_other', e.target.value)}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {data.locationTypeName !== 'outdoor' && (
+                            <>
+                                <div className="flex">
+                                    <div className="w-full">
+                                        <Label htmlFor="surface_floor">Surface floor</Label>
+                                        <Input
+                                            id="surface_floor"
+                                            type="number"
+                                            min={0}
+                                            step="0.01"
+                                            value={data.surface_floor ?? ''}
+                                            placeholder="Surface floor (max. 2 decimals) : 4236.3"
+                                            onChange={(e) => setData('surface_floor', parseFloat(e.target.value))}
+                                        />
+                                        <InputError className="mt-2" message={errors.surface_floor ?? ''} />
+                                    </div>
+                                    {floorMaterials && (
+                                        <div className="w-full">
+                                            <Label htmlFor="floor_material_id">floor material</Label>
+                                            <select
+                                                name="floor_material_id-type"
+                                                value={data.floor_material_id ?? ''}
+                                                onChange={(e) => {
+                                                    if (e.target.value !== 'other') {
+                                                        setData('floor_material_other', '');
+                                                    }
+                                                    setData('floor_material_id', e.target.value);
+                                                }}
+                                                id="floor_material_id"
+                                                className={cn(
+                                                    'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                    'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                    'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                                )}
+                                            >
+                                                <option value="" disabled>
+                                                    -- Select a floor material --
+                                                </option>
+
+                                                {floorMaterials.map((type) => (
+                                                    <option value={type.id} key={type.id}>
+                                                        {type.label}
+                                                    </option>
+                                                ))}
+                                                <option value="other">Other</option>
+                                            </select>
+                                            <InputError className="mt-2" message={errors.locationType ?? ''} />
+                                            {data.floor_material_id === 'other' && (
+                                                <div>
+                                                    <Input
+                                                        type="text"
+                                                        value={data.floor_material_other}
+                                                        placeholder="other floor material"
+                                                        onChange={(e) => setData('floor_material_other', e.target.value)}
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
                                     )}
                                 </div>
-                            )}
-                        </div>
-                    )}
-
-                    {data.locationTypeName !== 'outdoor' && (
-                        <>
-                            <div className="flex">
-                                <div className="w-full">
-                                    <Label htmlFor="surface_floor">Surface floor</Label>
-                                    <Input
-                                        id="surface_floor"
-                                        type="number"
-                                        min={0}
-                                        step="0.01"
-                                        value={data.surface_floor ?? ''}
-                                        placeholder="Surface floor (max. 2 decimals) : 4236.3"
-                                        onChange={(e) => setData('surface_floor', parseFloat(e.target.value))}
-                                    />
-                                    <InputError className="mt-2" message={errors.surface_floor ?? ''} />
-                                </div>
-                                {floorMaterials && (
+                                <div className="flex">
                                     <div className="w-full">
-                                        <Label htmlFor="floor_material_id">floor material</Label>
-                                        <select
-                                            name="floor_material_id-type"
-                                            value={data.floor_material_id ?? ''}
-                                            onChange={(e) => {
-                                                if (e.target.value !== 'other') {
-                                                    setData('floor_material_other', '');
-                                                }
-                                                setData('floor_material_id', e.target.value);
-                                            }}
-                                            id="floor_material_id"
-                                            className={cn(
-                                                'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                                            )}
-                                        >
-                                            <option value="" disabled>
-                                                -- Select a floor material --
-                                            </option>
-
-                                            {floorMaterials.map((type) => (
-                                                <option value={type.id} key={type.id}>
-                                                    {type.label}
-                                                </option>
-                                            ))}
-                                            <option value="other">Other</option>
-                                        </select>
-                                        <InputError className="mt-2" message={errors.locationType ?? ''} />
-                                        {data.floor_material_id === 'other' && (
-                                            <div>
-                                                <Input
-                                                    type="text"
-                                                    value={data.floor_material_other}
-                                                    placeholder="other floor material"
-                                                    onChange={(e) => setData('floor_material_other', e.target.value)}
-                                                />
-                                            </div>
-                                        )}
+                                        <Label htmlFor="surface_walls">Surface walls</Label>
+                                        <Input
+                                            id="surface_walls"
+                                            type="number"
+                                            min={0}
+                                            step="0.01"
+                                            value={data.surface_walls ?? ''}
+                                            onChange={(e) => setData('surface_walls', parseFloat(e.target.value))}
+                                            placeholder="Surface walls (max. 2 decimals) : 4236.3"
+                                        />
+                                        <InputError className="mt-2" message={errors.surface_walls ?? ''} />
                                     </div>
-                                )}
-                            </div>
-                            <div className="flex">
-                                <div className="w-full">
-                                    <Label htmlFor="surface_walls">Surface walls</Label>
-                                    <Input
-                                        id="surface_walls"
-                                        type="number"
-                                        min={0}
-                                        step="0.01"
-                                        value={data.surface_walls ?? ''}
-                                        onChange={(e) => setData('surface_walls', parseFloat(e.target.value))}
-                                        placeholder="Surface walls (max. 2 decimals) : 4236.3"
-                                    />
-                                    <InputError className="mt-2" message={errors.surface_walls ?? ''} />
-                                </div>
-                                {wallMaterials && (
-                                    <div className="w-full">
-                                        <Label htmlFor="wall_material_id">Wall material</Label>
-                                        <select
-                                            name="wall_material_id"
-                                            value={data.wall_material_id ?? ''}
-                                            onChange={(e) => {
-                                                if (e.target.value !== 'other') {
-                                                    setData('wall_material_other', '');
-                                                }
-                                                setData('wall_material_id', e.target.value);
-                                            }}
-                                            id="wall_material_id"
-                                            className={cn(
-                                                'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                                            )}
-                                        >
-                                            <option value="" disabled>
-                                                -- Select a wall material --
-                                            </option>
-
-                                            {wallMaterials.map((type) => (
-                                                <option value={type.id} key={type.id}>
-                                                    {type.label}
+                                    {wallMaterials && (
+                                        <div className="w-full">
+                                            <Label htmlFor="wall_material_id">Wall material</Label>
+                                            <select
+                                                name="wall_material_id"
+                                                value={data.wall_material_id ?? ''}
+                                                onChange={(e) => {
+                                                    if (e.target.value !== 'other') {
+                                                        setData('wall_material_other', '');
+                                                    }
+                                                    setData('wall_material_id', e.target.value);
+                                                }}
+                                                id="wall_material_id"
+                                                className={cn(
+                                                    'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                    'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                    'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                                )}
+                                            >
+                                                <option value="" disabled>
+                                                    -- Select a wall material --
                                                 </option>
-                                            ))}
-                                            <option value="other">Other</option>
-                                        </select>
-                                        <InputError className="mt-2" message={errors.locationType ?? ''} />
-                                        {data.wall_material_id === 'other' && (
-                                            <div>
-                                                <Input
-                                                    type="text"
-                                                    value={data.wall_material_other}
-                                                    placeholder="other wall material"
-                                                    onChange={(e) => setData('wall_material_other', e.target.value)}
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        </>
-                    )}
 
-                   
-                    <div>
-                        <Label htmlFor="need_maintenance">Need maintenance ?</Label>
-                        <Checkbox
-                            id="need_maintenance"
-                            name="need_maintenance"
-                            checked={data.need_maintenance}
-                            onClick={() => setData('need_maintenance', !data.need_maintenance)}
-                        />
-                        <InputError className="mt-2" message={errors.need_maintenance ?? ''} />
-                    </div>
-
-                    {data.need_maintenance && (
-                        <>
-                            <div className="flex flex-col gap-4 md:flex-row">
-                                <div className="w-full">
-                                    <Label htmlFor="maintenance_frequency">Maintenance frequency</Label>
-                                    <select
-                                        name="maintenance_frequency"
-                                        value={data.maintenance_frequency ?? ''}
-                                        onChange={(e) => setData('maintenance_frequency', e.target.value)}
-                                        id=""
-                                        required={data.need_maintenance}
-                                        className={cn(
-                                            'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                            'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                                        )}
-                                    >
-                                        {frequencies && frequencies.length > 0 && (
-                                            <>
-                                                <option value="" disabled className="bg-background text-foreground">
-                                                    Select an option
-                                                </option>
-                                                {frequencies?.map((frequency, index) => (
-                                                    <option value={frequency} key={index} className="bg-background text-foreground">
-                                                        {frequency}
+                                                {wallMaterials.map((type) => (
+                                                    <option value={type.id} key={type.id}>
+                                                        {type.label}
                                                     </option>
                                                 ))}
-                                            </>
-                                        )}
-                                    </select>
-
-                                    <InputError className="mt-2" message={errors.maintenance_frequency ?? ''} />
+                                                <option value="other">Other</option>
+                                            </select>
+                                            <InputError className="mt-2" message={errors.locationType ?? ''} />
+                                            {data.wall_material_id === 'other' && (
+                                                <div>
+                                                    <Input
+                                                        type="text"
+                                                        value={data.wall_material_other}
+                                                        placeholder="other wall material"
+                                                        onChange={(e) => setData('wall_material_other', e.target.value)}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
-
-                                <div className="w-full">
-                                    <Label htmlFor="last_maintenance_date">Date last maintenance</Label>
-                                    <Input
-                                        id="last_maintenance_date"
-                                        type="date"
-                                        value={data.last_maintenance_date ?? ''}
-                                        max={todayDate}
-                                        onChange={(e) => setData('last_maintenance_date', e.target.value)}
-                                        placeholder="Date last maintenance"
-                                    />
-                                    <InputError className="mt-2" message={errors.last_maintenance_date ?? ''} />
-                                </div>
-                                <div className="w-full">
-                                    <Label htmlFor="next_maintenance_date">Date next maintenance</Label>
-                                    <Input
-                                        id="next_maintenance_date"
-                                        type="date"
-                                        value={data.next_maintenance_date ?? ''}
-                                        min = {todayDate}
-                                        onChange={(e) => setData('next_maintenance_date', e.target.value)}
-                                        placeholder="Date last maintenance"
-                                    />
-                                    <InputError className="mt-2" message={errors.next_maintenance_date ?? ''} />
-                                </div>
-                            </div>
-                        </>
-                    )}
-                    <div></div>
-                    <div>
-                        <label className="mb-2 block text-sm font-medium">Maintenance manager</label>
-                        <SearchableInput<User>
-                            searchUrl={route('api.users.search')}
-                            displayValue={data.maintenance_manager_name}
-                            getDisplayText={(user) => user.full_name}
-                            getKey={(user) => user.id}
-                            onSelect={(user) => {
-                                setData('maintenance_manager_id', user.id);
-                                setData('maintenance_manager_name', user.full_name);
-                            }}
-                            placeholder="Rechercher un manager..."
-                            className="mb-4"
-                        />
+                            </>
+                        )}
                     </div>
-                    <div>
-                        <label className="mb-2 block text-sm font-medium">Providers</label>
-                        <SearchableInput<Provider>
-                            multiple={true}
-                            searchUrl={route('api.providers.search')}
-                            selectedItems={data.providers}
-                            getDisplayText={(provider) => provider.name}
-                            getKey={(provider) => provider.id}
-                            onSelect={(providers) => {
-                                setData('providers', providers);
-                            }}
-                            placeholder="Search providers..."
-                        />
+
+                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                        <h5>Maintenance</h5>
+
+                        <div>
+                            <Label htmlFor="need_maintenance">Need maintenance ?</Label>
+                            <Checkbox
+                                id="need_maintenance"
+                                name="need_maintenance"
+                                checked={data.need_maintenance}
+                                onClick={() => setData('need_maintenance', !data.need_maintenance)}
+                            />
+                            <InputError className="mt-2" message={errors.need_maintenance ?? ''} />
+                        </div>
+
+                        {data.need_maintenance && (
+                            <>
+                                <div className="flex flex-col gap-4 md:flex-row">
+                                    <div className="w-full">
+                                        <Label htmlFor="maintenance_frequency">Maintenance frequency</Label>
+                                        <select
+                                            name="maintenance_frequency"
+                                            value={data.maintenance_frequency ?? ''}
+                                            onChange={(e) => setData('maintenance_frequency', e.target.value)}
+                                            id=""
+                                            required={data.need_maintenance}
+                                            className={cn(
+                                                'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                            )}
+                                        >
+                                            {frequencies && frequencies.length > 0 && (
+                                                <>
+                                                    <option value="" disabled className="bg-background text-foreground">
+                                                        Select an option
+                                                    </option>
+                                                    {frequencies?.map((frequency, index) => (
+                                                        <option value={frequency} key={index} className="bg-background text-foreground">
+                                                            {frequency}
+                                                        </option>
+                                                    ))}
+                                                </>
+                                            )}
+                                        </select>
+
+                                        <InputError className="mt-2" message={errors.maintenance_frequency ?? ''} />
+                                    </div>
+
+                                    <div className="w-full">
+                                        <Label htmlFor="last_maintenance_date">Date last maintenance</Label>
+                                        <Input
+                                            id="last_maintenance_date"
+                                            type="date"
+                                            value={data.last_maintenance_date ?? ''}
+                                            max={todayDate}
+                                            onChange={(e) => setData('last_maintenance_date', e.target.value)}
+                                            placeholder="Date last maintenance"
+                                        />
+                                        <InputError className="mt-2" message={errors.last_maintenance_date ?? ''} />
+                                    </div>
+                                    <div className="w-full">
+                                        <Label htmlFor="next_maintenance_date">Date next maintenance</Label>
+                                        <Input
+                                            id="next_maintenance_date"
+                                            type="date"
+                                            value={data.next_maintenance_date ?? ''}
+                                            min={todayDate}
+                                            onChange={(e) => setData('next_maintenance_date', e.target.value)}
+                                            placeholder="Date last maintenance"
+                                        />
+                                        <InputError className="mt-2" message={errors.next_maintenance_date ?? ''} />
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">Maintenance manager</label>
+                            <SearchableInput<User>
+                                searchUrl={route('api.users.search')}
+                                displayValue={data.maintenance_manager_name}
+                                getDisplayText={(user) => user.full_name}
+                                getKey={(user) => user.id}
+                                onSelect={(user) => {
+                                    setData('maintenance_manager_id', user.id);
+                                    setData('maintenance_manager_name', user.full_name);
+                                }}
+                                placeholder="Rechercher un manager..."
+                                className="mb-4"
+                            />
+                        </div>
+                    </div>
+                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                        <h5>Providers</h5>
+                        <div>
+                            <label className="mb-2 block text-sm font-medium">Providers</label>
+                            <SearchableInput<Provider>
+                                multiple={true}
+                                searchUrl={route('api.providers.search')}
+                                selectedItems={data.providers}
+                                getDisplayText={(provider) => provider.name}
+                                getKey={(provider) => provider.id}
+                                onSelect={(providers) => {
+                                    setData('providers', providers);
+                                }}
+                                placeholder="Search providers..."
+                            />
+                        </div>
                     </div>
 
                     {!location && (
-                        <>
+                        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                             {/* Contracts */}
                             <div className="flex items-center gap-2">
                                 <h5>Contract</h5>
-                                <PlusCircleIcon onClick={() => setCountContracts((prev) => prev + 1)} />
+                                <p className="">
+                                    Add new contract <PlusCircleIcon className="inline-block" onClick={() => setCountContracts((prev) => prev + 1)} />
+                                </p>
                             </div>
+                            <SearchableInput<Contract>
+                                multiple={true}
+                                searchUrl={route('api.contracts.search')}
+                                selectedItems={existingContracts}
+                                getDisplayText={(contract) => contract.name}
+                                getKey={(contract) => contract.id}
+                                onSelect={(contracts) => {
+                                    setExistingContracts(contracts);
+                                    setData(
+                                        'existing_contracts',
+                                        contracts.map((elem) => elem.id),
+                                    );
+                                }}
+                                placeholder="Add existing contracts..."
+                            />
 
                             {countContracts > 0 &&
                                 [...Array(countContracts)].map((_, index) => (
@@ -965,14 +997,31 @@ export default function CreateUpdateLocation({
                                         </div>
                                     </div>
                                 ))}
-                        </>
+                        </div>
                     )}
+
                     {!location && (
-                        <div id="files" className="flex w-fit flex-col space-y-2">
-                            <Label>Document</Label>
+                        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                            <h5>Documents</h5>
+                            <SearchableInput<Document>
+                                multiple={true}
+                                searchUrl={route('api.documents.search')}
+                                selectedItems={existingDocuments}
+                                getDisplayText={(document) => document.name + '-' + document.mime_type}
+                                getKey={(document) => document.id}
+                                onSelect={(documents) => {
+                                    setExistingDocuments(documents);
+                                    setData(
+                                        'existing_documents',
+                                        documents.map((elem) => elem.id),
+                                    );
+                                }}
+                                placeholder="Add existing documents..."
+                            />
                             <Button onClick={() => setShowFileModal(!showFileModal)} type="button">
                                 Add document
                             </Button>
+
                             {selectedDocuments.length > 0 && (
                                 <ul className="flex gap-4">
                                     {selectedDocuments.map((document, index) => {

@@ -67,6 +67,9 @@ class APIFloorController extends Controller
             if ($contractRequest->validated('contracts'))
                 $this->contractService->createWithModel($floor, $contractRequest->validated('contracts'));
 
+            if ($contractRequest->validated('existing_contracts'))
+                $this->contractService->attachExistingContractsToModel($floor, $contractRequest->validated('existing_contracts'));
+
             if ($documentUploadRequest->validated('files')) {
                 $documentService->uploadAndAttachDocuments($floor, $documentUploadRequest->validated('files'));
             }

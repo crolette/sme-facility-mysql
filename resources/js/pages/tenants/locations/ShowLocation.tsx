@@ -142,6 +142,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                     <SidebarMenuAssetLocation
                         activeTab={activeTab}
                         setActiveTab={setActiveTab}
+                        menu='location'
                         infos={{
                             name: location.name,
                             code: location.code,
