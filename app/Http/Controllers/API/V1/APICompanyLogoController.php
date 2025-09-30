@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\API\V1;
 
+use Exception;
 use App\Helpers\ApiResponse;
+use Illuminate\Http\Request;
 use App\Models\Tenants\Company;
 use App\Http\Controllers\Controller;
 use App\Services\CompanyLogoService;
@@ -23,5 +25,20 @@ class APICompanyLogoController extends Controller
         session(['tenantLogo' => $company->logo]);
 
         return ApiResponse::success('', 'Logo uploaded');
+    }
+
+    public function destroy(Request $request)
+    {
+        try {
+            $company = Company::first();
+    
+            $this->logoService->deleteExistingFiles($company);
+            return ApiResponse::success('', 'Logo deleted');
+
+        } catch(Exception $e) {
+            Log::info('Error while deleting logo : ' . $e->getMessage());
+            return ApiResponse::error('Error while deleting logo');
+        }
+
     }
 };

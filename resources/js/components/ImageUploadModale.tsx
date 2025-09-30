@@ -10,7 +10,7 @@ interface ImageUploadModalProps {
     onClose: () => void;
     uploadUrl: string;
     title?: string;
-    onUploadSuccess?: (result: any) => void; // ou un type plus spécifique selon votre API
+    onUploadSuccess?: (result: any) => void; 
 }
 
 // Props pour Modal

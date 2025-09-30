@@ -20,7 +20,7 @@ class CompanyProfileController extends Controller
     public function show(): Response
     {
         return Inertia::render('settings/company', [
-            'company' => Company::first(),
+            'item' => Company::first(),
         ]);
     }
 

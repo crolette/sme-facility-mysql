@@ -47,9 +47,12 @@ class CompanyLogoService
             }
         }
 
+        Storage::disk('tenants')->deleteDirectory($this->directory);
+
         $company->logo = null;
         $company->save();
 
         return $company;
     }
+
 };

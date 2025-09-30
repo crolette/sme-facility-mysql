@@ -21,6 +21,7 @@ use App\Enums\ContractDurationEnum;
 
 use App\Models\Central\CategoryType;
 use App\Enums\ContractRenewalTypesEnum;
+use Illuminate\Support\Facades\Storage;
 use function PHPUnit\Framework\assertCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -34,18 +35,18 @@ beforeEach(function () {
 
 });
 
-// it('can render the company profile page', function() {
+it('can render the company profile page', function() {
 
-//     $company = Company::factory()->create();
+    $company = Company::factory()->create();
 
-//     $response = $this->getFromTenant('tenant.company.show');
+    $response = $this->getFromTenant('tenant.company.show');
 
-//     $response->assertInertia(
-//         fn($page) =>
-//         $page->component('settings/company')->has('company')->where('company.name', $company->name)->where('company.vat_number', $company->vat_number)
+    $response->assertInertia(
+        fn($page) =>
+        $page->component('settings/company')->has('company')
             
-//     );
-// });
+    );
+});
 
 it('can upload a new logo for the company', function() {
     $file1 = UploadedFile::fake()->image('logo.png');
@@ -61,4 +62,31 @@ it('can upload a new logo for the company', function() {
         ]);
 
     Storage::disk('tenants')->assertExists(Company::first()->logo);
+});
+
+it('can delete a logo of the company', function() {
+
+    $file1 = UploadedFile::fake()->image('logo.png');
+
+    $formData = [
+        'image' => $file1
+    ];
+
+    $response = $this->postToTenant('api.company.logo.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    Storage::disk('tenants')->assertExists(Company::first()->logo);
+
+    $logo = Company::first()->logo;
+
+    $response = $this->deleteFromTenant('api.company.logo.destroy', []);
+    $response->assertStatus(200)->assertJson([
+            'status' => 'success',
+        ]);
+
+
+        expect(Storage::disk('tenants')->exists($logo))->toBeFalse();
 });

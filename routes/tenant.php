@@ -2,23 +2,17 @@
 
 declare(strict_types=1);
 
-use App\Models\Tenant;
-use App\Mail\PasswordReset;
+use App\Helpers\ApiResponse;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
-use App\Models\Tenants\User;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Models\Tenants\Company;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Tenants\Building;
-use App\Mail\NewTenantCreatedMail;
-use Illuminate\Support\Facades\URL;
-use App\Models\Tenants\Intervention;
 use Illuminate\Support\Facades\Route;
-use App\Mail\NewTenantPasswordCreation;
 use Stancl\Tenancy\Middleware\ScopeSessions;
-use App\Mail\SendInterventionToProviderEmail;
 use App\Http\Controllers\Tenants\UserController;
 use App\Http\Controllers\Tenants\TicketController;
 use App\Http\Controllers\API\V1\APITicketController;
@@ -37,8 +31,6 @@ use App\Http\Controllers\Tenants\InterventionActionController;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Tenants\InterventionProviderController;
 use App\Http\Controllers\Tenants\CreateTicketFromQRCodeController;
-use App\Mail\ScheduledNotificationMail;
-use App\Models\Tenants\ScheduledNotification;
 
 /*
 |--------------------------------------------------------------------------
@@ -129,6 +121,12 @@ Route::middleware([
     });
 
     Route::prefix('company')->group(function() {
+        Route::get('/', function() {
+            $company = Company::first();
+
+            return ApiResponse::success($company);
+
+        })->name('api.company.logo.show');
         Route::post('/logo', [APICompanyLogoController::class, 'store'])->name('api.company.logo.store');
         Route::delete('/logo', [APICompanyLogoController::class, 'destroy'])->name('api.company.logo.destroy');
     });
