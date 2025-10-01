@@ -142,13 +142,18 @@ Route::middleware([
 
             // Post a new picture to an asset
             Route::post('/pictures/', function (PictureUploadRequest $pictureUploadRequest, PictureService $pictureService, Asset $asset) {
+                Debugbar::info($pictureUploadRequest);
 
                 $files = $pictureUploadRequest->validated('pictures');
                 if ($files) {
                     $pictureService->uploadAndAttachPictures($asset, $files);
+                    return ApiResponse::success(null, 'Pictures added');
                 }
 
-                return ApiResponse::success(null, 'Pictures added');
+                return ApiResponse::error('No valid pictures');
+
+
+
             })->name('api.assets.pictures.post');
 
             // Get all tickets from an asset

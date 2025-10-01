@@ -7,6 +7,7 @@ use App\Models\Tenants\Provider;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProviderController extends Controller
 {
@@ -54,6 +55,9 @@ class ProviderController extends Controller
     {
         if (Auth::user()->cannot('view', $provider))
             abort(403);
+
+        // dd(basename(Storage::disk('tenants')->path($provider->logo)));
+
 
         return Inertia::render('tenants/providers/ShowProvider', ['item' => $provider->load('users', 'contracts', 'contracts.provider')]);
     }

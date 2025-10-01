@@ -2,14 +2,13 @@
 
 namespace App\Services;
 
+use App\Jobs\CompressProviderLogoJob;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
-use App\Models\Tenants\Document;
 use App\Models\Tenants\Provider;
-use Illuminate\Support\Facades\Auth;
-use Barryvdh\Debugbar\Facades\Debugbar;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Laravel\Facades\Image;
 
 class LogoService
 {
@@ -24,6 +23,8 @@ class LogoService
 
     public function uploadAndAttachLogo(Provider $provider, $file, ?string $name = null): Provider
     {
+        $file = $file[0];
+
         $directory = $this->directory . $provider->id . '/logo';
         if ($provider->logo !== null) {
             $provider = $this->deleteExistingFiles($provider);
@@ -34,7 +35,34 @@ class LogoService
 
         $provider->logo = $path;
 
+        Log::info('DISPATCH COMPRESS LOGO JOB');
+        CompressProviderLogoJob::dispatch($provider)->onQueue('default');
+
         return $provider;
+    }
+
+    public function compressLogo(Provider $provider) {
+        Log::info('--- START COMPRESSING PROVIDER LOGO : ' . $provider->logo);
+
+        $path = $provider->logo;
+
+        $newFileName =  Str::chopEnd(basename(Storage::disk('tenants')->path($provider->logo)), ['.png', '.jpg', '.jpeg']) . '.webp';
+
+        $image = Image::read(Storage::disk('tenants')->path($provider->logo))->scaleDown(width: 1200, height: 1200)
+            ->toWebp(quality: 75);
+
+        $saved = Storage::disk('tenants')->put($this->directory . $provider->id . '/logo/' . $newFileName, $image);
+
+        $provider->update(
+            [
+                'logo' => $this->directory . $provider->id . '/logo/' . $newFileName
+            ]
+            );
+
+        if ($saved)
+            Storage::disk('tenants')->delete($path);
+
+        Log::info('--- END COMPRESSING PROVIDER LOGO : ' . $provider->logo);
     }
 
     public function deleteExistingFiles(Provider $provider)

@@ -8,10 +8,20 @@ use Illuminate\Support\Str;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Provider;
 use Illuminate\Support\Facades\DB;
+use App\Jobs\CompressUserAvatarJob;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Laravel\Facades\Image;
 
 class UserService
 {
+    protected $tenantId;
+
+    public function __construct()
+    {
+        $this->tenantId = tenancy()->tenant->id ?? null;
+    }
+
     public function create($request): User | Exception
     {
         try {
@@ -38,6 +48,9 @@ class UserService
     }
     public function uploadAndAttachAvatar(User $user, $file, string $name): User
     {
+
+        $file = $file[0];
+
         $tenantId = tenancy()->tenant->id;
         $directory = "$tenantId/users/$user->id/avatar";
 
@@ -52,7 +65,35 @@ class UserService
 
         $user->avatar = $path;
 
+        Log::info('DISPATCH COMPRESS AVATAR JOB');
+        CompressUserAvatarJob::dispatch($user)->onQueue('default');
+
         return $user;
+    }
+
+    public function compressAvatar(User $user)
+    {
+        Log::info('--- START COMPRESSING USER AVATAR : ' . $user->id . ' - ' . $user->avatar);
+
+        $path = $user->avatar;
+
+        $newFileName =  Str::chopEnd(basename(Storage::disk('tenants')->path($user->avatar)), ['.png', '.jpg', '.jpeg']) . '.webp';
+
+        $image = Image::read(Storage::disk('tenants')->path($user->avatar))->scaleDown(width: 1200, height: 1200)
+            ->toWebp(quality: 75);
+
+        $saved = Storage::disk('tenants')->put("$this->tenantId/users/$user->id/avatar/$newFileName", $image);
+
+        $user->update(
+            [
+                'avatar' => "$this->tenantId/users/$user->id/avatar/$newFileName"
+            ]
+        );
+
+        if ($saved)
+            Storage::disk('tenants')->delete($path);
+
+        Log::info('--- END COMPRESSING USER AVATAR : ' . $user->id . ' - ' . $user->avatar);
     }
 
     public function deleteExistingFiles($files)

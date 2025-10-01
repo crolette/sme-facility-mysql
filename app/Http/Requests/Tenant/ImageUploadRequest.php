@@ -2,13 +2,14 @@
 
 namespace App\Http\Requests\Tenant;
 
+use Illuminate\Http\File;
 use Illuminate\Support\Str;
+use App\Models\Tenants\Picture;
 use Illuminate\Validation\Rule;
 use App\Models\Tenants\Provider;
 use App\Rules\NotDisposableEmail;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\File;
 
 class ImageUploadRequest extends FormRequest
 {
@@ -30,7 +31,8 @@ class ImageUploadRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'image' => 'nullable|file|mimes:png,jpg,jpeg|max:' . Provider::maxUploadSizeKB(),
+            'pictures' => 'nullable|array|max:1',
+            'pictures.*' => 'image|mimes:jpg,jpeg,png|max:' . Picture::maxUploadSizeKB(),
         ];
     }
 }

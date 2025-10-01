@@ -4,6 +4,7 @@ import { FormEventHandler, useEffect, useState } from 'react';
 import { Button } from '../ui/button';
 import { useToast } from '../ToastrContext';
 import { PlusCircle, Trash2 } from 'lucide-react';
+import ImageUploadModale from '../ImageUploadModale';
 
 interface PictureManagerProps {
     itemCodeId: number | string;
@@ -80,11 +81,11 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
                     pictures.length > 0 &&
                     pictures.map((picture, index) => {
                         return (
-                            <div key={index} className="w-32 relative">
+                            <div key={index} className="relative w-32">
                                 <a href={route('api.file.download', { path: picture.path })} download className="w-fit cursor-pointer">
                                     <img src={route(showRoute, picture.id)} className="aspect-square object-cover" alt={picture.filename} />
                                 </a>
-                                <Button className='absolute top-2 right-2' variant={'destructive'} onClick={() => deletePicture(picture.id)}>
+                                <Button className="absolute top-2 right-2" variant={'destructive'} onClick={() => deletePicture(picture.id)}>
                                     <Trash2 />
                                 </Button>
                             </div>
@@ -92,11 +93,21 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
                     })}
             </div>
 
-            {addPictures && (
+            <ImageUploadModale
+                isOpen={addPictures}
+                onClose={() => {
+                    setNewPictures(null);
+                    setAddPictures(false);
+                }}
+                uploadUrl={route(uploadRoute, itemCodeId)}
+                onUploadSuccess={fetchPictures}
+            />
+
+            {/* {addPictures && (
                 <div className="bg-background/50 absolute inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">
-                        <div className="bg-background flex flex-col gap-4 items-center justify-center p-4">
-                        <p className='font-semibold'>Add new pictures</p>
+                        <div className="bg-background flex flex-col items-center justify-center gap-4 p-4">
+                            <p className="font-semibold">Add new pictures</p>
                             <form onSubmit={postNewPictures} className="flex flex-col gap-4">
                                 <input
                                     type="file"
@@ -108,7 +119,7 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
                                     }}
                                     accept="image/png, image/jpeg, image/jpg"
                                 />
-                                <div className='space-x-4 flex justify-between'>
+                                <div className="flex justify-between space-x-4">
                                     <Button disabled={newPictures == null}>Add new pictures</Button>
                                     <Button
                                         onClick={() => {
@@ -125,7 +136,7 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
                         </div>
                     </div>
                 </div>
-            )}
+            )} */}
         </div>
     );
 };

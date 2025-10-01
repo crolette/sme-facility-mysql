@@ -1,37 +1,19 @@
 <?php
 
 use App\Helpers\ApiResponse;
-use App\Http\Controllers\API\V1\APIInterventionActionController;
-use App\Models\Tenants\Room;
-use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
-use App\Models\Tenants\Asset;
-use App\Models\Tenants\Floor;
-use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Picture;
-use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
-use App\Services\PictureService;
-use App\Services\DocumentService;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Debugbar\Facades\Debugbar;
-use App\Http\Requests\Tenant\PictureUploadRequest;
-use App\Http\Requests\Tenant\DocumentUploadRequest;
-use App\Http\Controllers\API\V1\APITicketController;
 use App\Http\Controllers\API\V1\DestroyPictureController;
 use App\Http\Controllers\API\V1\UpdateDocumentController;
-use App\Http\Controllers\API\V1\APIInterventionController;
 use App\Http\Controllers\API\V1\APISearchAssetsLocationController;
 use App\Http\Controllers\API\V1\DestroyDocumentController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\API\V1\ApiSearchLocationController;
-use App\Http\Controllers\Tenants\ForceDeleteAssetController;
-use App\Http\Controllers\API\V1\ApiSearchTrashedAssetController;
-use App\Http\Controllers\API\V1\Tickets\InterventionForLocationController;
-use App\Http\Controllers\Tenants\RestoreSoftDeletedAssetController;
 use App\Models\LocationType;
-use App\Services\QRCodeService;
 
 Route::prefix('/v1/')->group(
     function () {

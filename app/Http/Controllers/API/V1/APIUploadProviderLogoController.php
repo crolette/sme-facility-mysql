@@ -27,7 +27,7 @@ class APIUploadProviderLogoController extends Controller
         if (Auth::user()->cannot('update', $provider))
             return ApiResponse::notAuthorized();
 
-        $provider = $this->logoService->uploadAndAttachLogo($provider, $request->validated('image'));
+        $provider = $this->logoService->uploadAndAttachLogo($provider, $request->validated('pictures'));
         $provider->save();
         return ApiResponse::success('', 'Logo uploaded');
     }

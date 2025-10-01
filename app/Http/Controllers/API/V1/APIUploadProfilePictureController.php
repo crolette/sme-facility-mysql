@@ -17,7 +17,7 @@ class APIUploadProfilePictureController extends Controller
 
     public function store(ImageUploadRequest $request, User $user)
     {
-        $user = $this->userService->uploadAndAttachAvatar($user, $request->validated('image'), $user->fullName);
+        $user = $this->userService->uploadAndAttachAvatar($user, $request->validated('pictures'), $user->fullName);
         $user->save();
         return ApiResponse::success('', 'Profile picture uploaded');
     }

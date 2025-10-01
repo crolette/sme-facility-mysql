@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Jobs\CompressPictureJob;
 use Exception;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Laravel\Facades\Image;
 
 class PictureService
 {
@@ -29,11 +31,11 @@ class PictureService
 
                 $fileName = Carbon::now()->isoFormat('YYYYMMDDHHMM') . '_' . Str::slug($newfileName, '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $file->extension();
 
-                // TODO Compress pictures
+
                 $path = Storage::disk('tenants')->putFileAs($directory, $file, $fileName);
 
                 $picture = new Picture([
-                    'path' => $path,
+                    'path' => $directory . '/' . $fileName,
                     'filename' => $fileName,
                     'directory' => $directory,
                     'size' => $file->getSize(),
@@ -46,9 +48,40 @@ class PictureService
                 }
 
                 $model->pictures()->save($picture);
+
+                Log::info('DISPATCH COMPRESS PICTURE JOB');
+                CompressPictureJob::dispatch($picture)->onQueue('default');
+
             } catch (Exception $e) {
                 Log::info('Erreur: ' . $e->getMessage());
             }
         }
+    }
+
+    public function compressPicture(Picture $picture) {
+        Log::info('--- START COMPRESSING PICTURE : ' . $picture->filename);
+
+        $path = $picture->path;
+        
+        $newFileName = Str::chopEnd($picture->filename, ['.png', '.jpg', '.jpeg']) . '.webp';
+        Log::info('newFileName : ' . $newFileName);
+
+        $image = Image::read(Storage::disk('tenants')->path($path))->scaleDown(width: 1200, height: 1200)
+            ->toWebp(quality: 75);
+
+        $saved = Storage::disk('tenants')->put($picture->directory . '/' . $newFileName , $image);
+
+        $picture->update([
+            'path' => $picture->directory . '/' . $newFileName,
+            'filename' => $newFileName,
+            'size' => $image->size(),
+            'mime_type' => $image->mimetype(),
+        ]);
+
+        if($saved)
+            Storage::disk('tenants')->delete($path);
+
+        Log::info('--- END COMPRESSING PICTURE : ' . $picture->filename);
+
     }
 };
