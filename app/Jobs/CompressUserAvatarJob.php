@@ -41,9 +41,9 @@ class CompressUserAvatarJob implements ShouldQueue
         app(UserService::class)->compressAvatar($this->user);
     }
 
-    public function failed(DecoderException|Exception $exception): void
+    public function failed($exception): void
     {
-        Log::error('!!! FAILED COMPRESS LOGO JOB : ' . $this->user->avatar . ' - ' . $this->user->id);
+        Log::error('!!! FAILED COMPRESS AVATAR JOB : ' . $this->user->avatar . ' - ' . $this->user->id);
         Log::error($exception);
     }
 }

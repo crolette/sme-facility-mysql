@@ -39,7 +39,7 @@ class CompressProviderLogoJob implements ShouldQueue
         app(LogoService::class)->compressLogo($this->provider);
     }
 
-    public function failed(DecoderException|Exception $exception): void
+    public function failed($exception): void
     {
         Log::error('!!! FAILED COMPRESS LOGO JOB : ' . $this->provider->logo . ' - ' . $this->provider->name);
         Log::error($exception);

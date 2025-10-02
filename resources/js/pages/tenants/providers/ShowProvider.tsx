@@ -69,9 +69,6 @@ export default function ShowProvider({ item }: { item: Provider }) {
     // const [uploadedImages, setUploadedImages] = useState([]);
 
     const handleUploadSuccess = (result) => {
-        // Ajouter l'image uploadée à la liste
-        // setUploadedImages((prev) => [...prev, result]);
-        console.log('Image uploadée avec succès:', result);
         fetchProvider();
     };
 

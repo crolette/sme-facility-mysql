@@ -9,6 +9,7 @@ use App\Services\LogoService;
 use App\Models\Tenants\Provider;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Tenant\PictureUploadRequest;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Storage;
@@ -26,7 +27,7 @@ class APIProviderController extends Controller
     }
 
 
-    public function store(ProviderRequest $request)
+    public function store(ProviderRequest $request, PictureUploadRequest $pictureRequest)
     {
         if (Auth::user()->cannot('create', Provider::class))
             return ApiResponse::notAuthorized();
@@ -35,13 +36,13 @@ class APIProviderController extends Controller
 
             DB::beginTransaction();
 
-            $provider = new Provider($request->safe()->except('logo'));
+            $provider = new Provider($request->validated());
             $provider->providerCategory()->associate($request->validated('categoryId'));
 
             $provider->save();
 
-            if ($request->validated('logo')) {
-                $provider = $this->logoService->uploadAndAttachLogo($provider, $request->validated('logo'), $request->validated('name'));
+            if ($pictureRequest->validated('pictures')) {
+                $provider = $this->logoService->uploadAndAttachLogo($provider, $pictureRequest->validated('pictures'), $request->validated('name'));
                 $provider->save();
             }
 
@@ -56,7 +57,7 @@ class APIProviderController extends Controller
         return ApiResponse::error();
     }
 
-    public function update(ProviderRequest $request, Provider $provider)
+    public function update(ProviderRequest $request, Provider $provider, PictureUploadRequest $pictureRequest)
     {
         if (Auth::user()->cannot('update', $provider))
             return ApiResponse::notAuthorized();
@@ -65,10 +66,12 @@ class APIProviderController extends Controller
 
             DB::beginTransaction();
 
-            $provider->update($request->safe()->except('logo'));
+            $provider->update($request->validated());
 
-            if (!$request->validated('logo') === null)
-                $provider = $this->logoService->uploadAndAttachLogo($provider, $request->validated('logo'), $request->validated('name'));
+            if ($pictureRequest->validated('pictures')) {
+                $provider = $this->logoService->uploadAndAttachLogo($provider, $pictureRequest->validated('pictures'), $request->validated('name'));
+                $provider->save();
+            }
 
             $categoryId = $request->validated('categoryId') ?? null;
             if ($categoryId && $categoryId !== $provider->providerCategory->id) {
@@ -95,6 +98,6 @@ class APIProviderController extends Controller
             return ApiResponse::notAuthorized();
         
         $provider->delete();
-        return ApiResponse::success('', 'Provider deleted');
+        return ApiResponse::successFlash('', 'Provider deleted');
     }
 };

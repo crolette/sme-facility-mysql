@@ -23,12 +23,10 @@ beforeEach(function () {
 
 it('can, as a logged user, upload an avatar', function () {
 
-
-
     $file1 = UploadedFile::fake()->image('avatar.png');
 
     $formData = [
-        'image' => $file1
+        'pictures' => [$file1]
     ];
 
     $response = $this->postToTenant('api.users.picture.store', $formData, $this->user->id);
@@ -46,7 +44,7 @@ it('can, as a logged user, delete his avatar', function () {
     $file1 = UploadedFile::fake()->image('avatar.png');
 
     $formData = [
-        'image' => $file1
+        'pictures' => [$file1]
     ];
 
     $response = $this->postToTenant('api.users.picture.store', $formData, $this->user->id);

@@ -34,6 +34,7 @@ class LogoService
         $path = Storage::disk('tenants')->putFileAs($directory, $file, $fileName);
 
         $provider->logo = $path;
+        $provider->save();
 
         Log::info('DISPATCH COMPRESS LOGO JOB');
         CompressProviderLogoJob::dispatch($provider)->onQueue('default');

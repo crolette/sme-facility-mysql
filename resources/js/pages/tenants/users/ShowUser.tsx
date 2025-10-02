@@ -7,7 +7,7 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, User } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
-import { Pencil, Trash2, Upload } from 'lucide-react';
+import { Pencil, Trash, Trash2, Upload } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ShowUser({ item }: { item: User }) {
@@ -50,6 +50,18 @@ export default function ShowUser({ item }: { item: User }) {
     const handleUploadSuccess = (result) => {
         fetchUser();
     };
+
+        const deleteProfilePicture = async () => {
+            try {
+                const response = await axios.delete(route('api.users.picture.destroy', auth.user.id));
+                if (response.data.status === 'success') {
+                    showToast(response.data.message, response.data.status);
+                    fetchUser();
+                }
+            } catch (error) {
+                showToast(error.response.data.message, error.response.data.status);
+            }
+        };
 
     const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
 
@@ -105,7 +117,7 @@ export default function ShowUser({ item }: { item: User }) {
                                             </p>
                                         )}
                                     </div>
-                                    <div>
+                                    <div className="relative w-fit">
                                         {user.avatar && (
                                             <div>
                                                 <img
@@ -113,10 +125,14 @@ export default function ShowUser({ item }: { item: User }) {
                                                     alt=""
                                                     className="h-40 w-40 rounded-full object-cover"
                                                 />
-                                                {/* FIXME Add button to delete Avatar */}
-                                                {/* <Button type="button" onClick={deleteLogo} variant={'destructive'}>
-                                                    Remove logo
-                                                </Button> */}
+                                                <Button
+                                                    type="button"
+                                                    onClick={deleteProfilePicture}
+                                                    variant={'destructive'}
+                                                    className="absolute top-2 right-2"
+                                                >
+                                                    <Trash></Trash>
+                                                </Button>
                                             </div>
                                         )}
                                     </div>

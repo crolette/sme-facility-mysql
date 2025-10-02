@@ -52,7 +52,9 @@ it('can upload a new logo for the company', function() {
     $file1 = UploadedFile::fake()->image('logo.png');
 
     $formData = [
-        'image' => $file1
+        'pictures' => [
+            $file1
+        ]
     ];
 
     $response = $this->postToTenant('api.company.logo.store', $formData);
@@ -69,7 +71,9 @@ it('can delete a logo of the company', function() {
     $file1 = UploadedFile::fake()->image('logo.png');
 
     $formData = [
-        'image' => $file1
+        'pictures' => [
+            $file1
+        ]
     ];
 
     $response = $this->postToTenant('api.company.logo.store', $formData);

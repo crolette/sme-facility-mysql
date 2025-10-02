@@ -62,7 +62,7 @@ beforeEach(function () {
         'phone_number' => '+32450987654',
         'categoryId' => $this->categoryType->id,
         'website' => 'www.website.com',
-        'logo' => $file1
+        'pictures' => [$file1]
     ];
 });
 
@@ -174,7 +174,7 @@ test('test access roles to post a new logo to a provider', function (string $rol
 
     $file1 = UploadedFile::fake()->image('avatar.png');
     
-    $formData = ['image' => $file1];
+    $formData = ['pictures' => [$file1]];
 
     $response = $this->postToTenant('api.providers.logo.store', $formData, $this->provider);
     $response->assertStatus($expectedStatus);
@@ -190,7 +190,7 @@ test('test access roles to delete a logo of a provider', function (string $role,
 
     $file1 = UploadedFile::fake()->image('avatar.png');
 
-    $formData = ['image' => $file1];
+    $formData = ['pictures' => [$file1]];
 
     $this->postToTenant('api.providers.logo.store', $formData, $this->provider);
 

@@ -1,7 +1,7 @@
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useState } from 'react';
 
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
@@ -13,6 +13,9 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import axios from 'axios';
 import { useToast } from '@/components/ToastrContext';
+import ImageUploadModale from '@/components/ImageUploadModale';
+import { Trash, Upload } from 'lucide-react';
+import { router } from '@inertiajs/core';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -28,6 +31,7 @@ type ProfileForm = {
 
 export default function Profile() {
     const { auth } = usePage<SharedData>().props;
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const { showToast } = useToast();
 
     const { data, setData, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
@@ -42,13 +46,26 @@ export default function Profile() {
             const response = await axios.patch(route('tenant.profile.update', auth.user.id), data)
             if (response.data.status === 'success') {
                 showToast(response.data.message, response.data.success);
+                
             }
         } catch (error) {
             showToast(error.response.data.message, error.response.data.success);
         }
     };
 
-    console.log(auth.user);
+        const deleteProfilePicture = async () => {
+            try {
+                const response = await axios.delete(route('api.users.picture.destroy', auth.user.id));
+                if (response.data.status === 'success') {
+                    showToast(response.data.message, response.data.status);
+                    window.location.reload();
+                }
+            } catch (error) {
+                showToast(error.response.data.message, error.response.data.status);
+            }
+        };
+
+    console.log(auth.user)
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -58,9 +75,7 @@ export default function Profile() {
                 <div className="space-y-6">
                     <HeadingSmall title="Profile information" description="Update your name and email address" />
 
-                    <div>
-                        
-                    </div>
+                    <div></div>
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">
                             <Label htmlFor="name">First Name</Label>
@@ -96,37 +111,8 @@ export default function Profile() {
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email address</Label>
 
-                            <Input
-                                id="email"
-                                type="email"
-                                className="mt-1 block w-full"
-                                disabled
-                                placeholder="Email address"
-                            />
-
+                            <Input id="email" type="email" className="mt-1 block w-full" disabled placeholder="Email address" />
                         </div>
-
-                        {/* {mustVerifyEmail && auth.user.email_verified_at === null && (
-                            <div>
-                                <p className="text-muted-foreground -mt-4 text-sm">
-                                    Your email address is unverified.{' '}
-                                    <Link
-                                        href={route('verification.send')}
-                                        method="post"
-                                        as="button"
-                                        className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
-                                    >
-                                        Click here to resend the verification email.
-                                    </Link>
-                                </p>
-
-                                {status === 'verification-link-sent' && (
-                                    <div className="mt-2 text-sm font-medium text-green-600">
-                                        A new verification link has been sent to your email address.
-                                    </div>
-                                )}
-                            </div>
-                        )} */}
 
                         <div className="flex items-center gap-4">
                             <Button disabled={processing}>Save</Button>
@@ -144,7 +130,29 @@ export default function Profile() {
                     </form>
                 </div>
 
-                {/* <DeleteUser /> */}
+                <div>
+                    <HeadingSmall title="Profile picture" description="Update your profile picture" />
+                    {auth.user.avatar && (
+                        <div className="relative w-fit">
+                            <img src={route('api.image.show', { path: auth.user.avatar })} alt="" className="h-40 w-40 rounded-full object-cover" />
+                            <Button type="button" onClick={deleteProfilePicture} variant={'destructive'} className="absolute top-2 right-2">
+                                <Trash></Trash>
+                            </Button>
+                        </div>
+                    )}
+                    <Button onClick={() => setIsModalOpen(true)} variant={'secondary'}>
+                        <Upload size={20} />
+                        Update profile picture
+                    </Button>
+                    <ImageUploadModale
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        uploadUrl={route('api.users.picture.store', auth.user.id)}
+                        onUploadSuccess={() => {
+                             window.location.reload();;
+                        }}
+                    />
+                </div>
             </SettingsLayout>
         </AppLayout>
     );

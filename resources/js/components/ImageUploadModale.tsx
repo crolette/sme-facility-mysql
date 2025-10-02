@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { ImageIcon, Upload, X } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Button } from './ui/button';
 import { useToast } from './ToastrContext';
 import { useForm } from '@inertiajs/react';
@@ -34,7 +34,7 @@ const Modale = ({ isOpen, onClose, children, title }: ModaleProps) => {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
             {/* Overlay */}
-            <div className="bg-opacity-50 fixed inset-0 bg-black/80 transition-opacity" onClick={onClose} />
+            <div className="bg-opacity-50 fixed inset-0 bg-black/80 transition-opacity" onClick={onClose} onDragOver={(e) => e.preventDefault()} />
 
             {/* Contenu de la modale */}
             <div className="bg-background relative z-10 mx-4 w-full max-w-lg rounded-lg shadow-xl">
@@ -63,9 +63,6 @@ export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUpload
         pictures: []
     })
 
-    console.log(data);
-    console.log(previews);
-
     const handleFileSelect = (files: FileList | null) => {
 
         if (!files)
@@ -87,8 +84,6 @@ setError(null);
              return () => urls.forEach((url) => URL.revokeObjectURL(url));
         }
     };
-
-    console.log(previews);
 
     const handleUpload = async () => {
         // if (!selectedFile) return;
@@ -135,18 +130,33 @@ setError(null);
         onClose();
     };
 
-    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-    };
+    const dropZoneRef = useRef<HTMLDivElement>(null);
 
-    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            const event = { target: { files } };
-            handleFileSelect(event);
-        }
-    };
+    useEffect(() => {
+        const element = dropZoneRef.current;
+        if (!element) return;
+
+        const handleDragOver = (e: DragEvent) => {
+            e.preventDefault();
+            e.dataTransfer!.dropEffect = 'copy';
+        };
+
+        const handleDrop = (e: DragEvent) => {
+            e.preventDefault();
+            const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileSelect(files);
+                }
+        };
+
+        element.addEventListener('dragover', handleDragOver);
+        element.addEventListener('drop', handleDrop);
+
+        return () => {
+            element.removeEventListener('dragover', handleDragOver);
+            element.removeEventListener('drop', handleDrop);
+        };
+    }, []);
 
     return (
         <Modale isOpen={isOpen} onClose={handleClose} title={title}>
@@ -155,24 +165,21 @@ setError(null);
                 <div
                     className="hover:border-foreground border-foreground/30 cursor-pointer rounded-lg border-2 border-dashed p-2 text-center transition-colors"
                     onClick={() => fileInputRef.current?.click()}
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
+                    // onDragOver={handleDragOver}
+                    // onDrop={handleDrop}
+                    ref={dropZoneRef}
                 >
                     {previews ? (
-                        <div className="flex flex-wrap gap-2 items-center justify-evenly">
-                                {previews.map((preview, index) => (
-                                    <div className="max-w-1/4" key={index}>
-                                        <img
-                                            src={preview.url}
-                                            alt="Aperçu"
-                                            className="mx-auto aspect-square max-h-40 rounded object-cover"
-                                        />
-                                        <p className="text-xs">{preview?.name}</p>
-                                    </div>
-                                ))}
+                        <div className="pointer-events-none flex flex-wrap items-center justify-evenly gap-2">
+                            {previews.map((preview, index) => (
+                                <div className="max-w-1/4" key={index}>
+                                    <img src={preview.url} alt="Aperçu" className="mx-auto aspect-square max-h-40 rounded object-cover" />
+                                    <p className="text-xs">{preview?.name}</p>
+                                </div>
+                            ))}
                         </div>
                     ) : (
-                        <div className="space-y-2">
+                        <div className="pointer-events-none space-y-2">
                             <ImageIcon size={48} className="mx-auto" />
                             <p className="text-gray-600">Click to select or drag & drop a picture</p>
                             <p className="text-sm text-gray-500">PNG, JPG, JPEG up to 5MB</p>
@@ -188,7 +195,7 @@ setError(null);
                     max={3}
                     accept="image/png, image/jpeg, image/jpg"
                     onChange={(e) => handleFileSelect(e.target.files)}
-                    className="hidden"
+                    className="pointer-events-none hidden"
                 />
 
                 {/* Erreur */}

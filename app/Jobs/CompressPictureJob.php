@@ -39,7 +39,7 @@ class CompressPictureJob implements ShouldQueue
         app(PictureService::class)->compressPicture($this->picture);
     }
 
-    public function failed(DecoderException|Exception $exception): void
+    public function failed($exception): void
     {
         Log::error('!!! FAILED COMPRESSPICTURE JOB : ' . $this->picture->path . ' - ' . $this->picture->id);
         Log::error($exception);

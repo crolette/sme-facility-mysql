@@ -64,6 +64,7 @@ class UserService
         $path = Storage::disk('tenants')->putFileAs($directory, $file, $fileName);
 
         $user->avatar = $path;
+        $user->save();
 
         Log::info('DISPATCH COMPRESS AVATAR JOB');
         CompressUserAvatarJob::dispatch($user)->onQueue('default');

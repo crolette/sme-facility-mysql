@@ -78,7 +78,7 @@ it('can post a new provider', function () {
         'phone_number' => '+32450987654',
         'categoryId' => $this->categoryType->id,
         'website' => 'www.website.com',
-        'logo' => $file1
+        'pictures' => [$file1]
     ];
 
     $response = $this->postToTenant('api.providers.store', $formData);

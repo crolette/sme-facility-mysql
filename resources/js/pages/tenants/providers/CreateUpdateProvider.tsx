@@ -1,3 +1,4 @@
+import InputError from '@/components/input-error';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +8,7 @@ import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Provider } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
-import { FormEventHandler } from 'react';
+import { FormEventHandler, useState } from 'react';
 
 type TypeFormData = {
     name: string;
@@ -17,7 +18,7 @@ type TypeFormData = {
     vat_number: string;
     address: string;
     categoryId: number | string;
-    logo: File | null;
+    pictures: File[] | null;
 };
 
 export default function CreateUpdateProvider({ provider, providerCategories }: { provider?: Provider; providerCategories: CentralType[] }) {
@@ -29,6 +30,7 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
     ];
 
     const { showToast } = useToast();
+    const [errors, setErrors] = useState<TypeFormData>();
     const { data, setData } = useForm<TypeFormData>({
         name: provider?.name ?? '',
         phone_number: provider?.phone_number ?? '',
@@ -37,8 +39,10 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
         vat_number: provider?.vat_number ?? '',
         address: provider?.address ?? '',
         categoryId: provider?.category_type_id ?? '',
-        logo: null,
+        pictures: [],
     });
+
+    console.log(data);
 
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
@@ -52,6 +56,7 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
                 }
             } catch (error) {
                 showToast(error.response.data.message, error.response.data.status);
+               setErrors(error.response.data.errors);
             }
         } else {
             try {
@@ -61,15 +66,19 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
                     },
                 });
                 if (response.data.status === 'success') {
-                    router.visit(route('tenant.providers.show', provider.id), {
+                    router.visit(route('tenant.providers.index'), {
                         preserveScroll: false,
                     });
                 }
             } catch (error) {
+                console.log(error)
                 showToast(error.response.data.message, error.response.data.status);
+                setErrors(error.response.data.errors)
             }
         }
     };
+
+    console.log(errors);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -106,14 +115,19 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
                     </select>
                     <Label>Email</Label>
                     <Input type="email" onChange={(e) => setData('email', e.target.value)} value={data.email} required />
+                    <InputError className="mt-2" message={errors?.email ?? ''} />
                     <Label>Website</Label>
                     <Input type="text" onChange={(e) => setData('website', e.target.value)} value={data.website} />
+                    <InputError className="mt-2" message={errors?.website ?? ''} />
                     <Label>Address</Label>
                     <Input type="text" onChange={(e) => setData('address', e.target.value)} value={data.address} />
+                    <InputError className="mt-2" message={errors?.address ?? ''} />
                     <Label>VAT</Label>
                     <Input type="text" onChange={(e) => setData('vat_number', e.target.value)} value={data.vat_number} />
+                    <InputError className="mt-2" message={errors?.vat_number ?? ''} />
                     <Label>Phone</Label>
                     <Input type="text" onChange={(e) => setData('phone_number', e.target.value)} value={data.phone_number} required />
+                    <InputError className="mt-2" message={errors?.phone_number ?? ''} />
                     {!provider && (
                         <>
                             <Label>Logo</Label>
@@ -121,10 +135,15 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
                                 type="file"
                                 name="logo"
                                 id="logo"
-                                onChange={(e) => setData('logo', e.target.files ? e.target.files[0] : null)}
-                                accept="image/png, image/jpeg, image/jpg"
+                                onChange={(e) => setData('pictures', e.target.files ? [e.target.files[0]] : null)}
+                                // accept="image/png, image/jpeg, image/jpg"
                             />
                             <p className="text-xs">Accepted files: png, jpg - Maximum file size: 4MB</p>
+                            {errors?.pictures && (
+                                errors?.pictures.map((error) => {
+                                    <InputError className="mt-2" message={error ?? ''} />;
+                                })
+                            )}
                         </>
                     )}
 

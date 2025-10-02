@@ -12,6 +12,7 @@ use App\Models\Tenants\Building;
 use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Storage;
 use function PHPUnit\Framework\assertCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -230,10 +231,18 @@ it('can create an asset with uploaded pictures', function () {
         'imageable_type' => 'App\Models\Tenants\Asset',
         'imageable_id' => 1
     ]);
+
+    $pictures = Asset::first()->pictures;
+
+    foreach($pictures as $picture) {
+        expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
+    }
+
+    
 });
 
 it('can add pictures to an asset', function () {
-    $this->asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->forLocation($this->room)->create();
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->image('test.jpg');
 
@@ -244,13 +253,20 @@ it('can add pictures to an asset', function () {
         ]
     ];
 
-    $response = $this->postToTenant('api.assets.pictures.post', $formData, $this->asset);
+    $response = $this->postToTenant('api.assets.pictures.post', $formData, $asset);
     $response->assertSessionHasNoErrors();
     assertDatabaseCount('pictures', 2);
     assertDatabaseHas('pictures', [
         'imageable_type' => 'App\Models\Tenants\Asset',
         'imageable_id' => 1
     ]);
+
+    $pictures = Asset::first()->pictures;
+
+    foreach ($pictures as $picture) {
+        expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
+    }
+
 });
 
 it('cannot create a new asset with non existing building', function () {

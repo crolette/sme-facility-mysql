@@ -86,7 +86,6 @@ it('a provider can access to the intervention page', function () {
 
     $actionTypesCount = CategoryType::where('category', 'action')->count();
 
-    // signed middleware has to be remove from the route to test
     $response = $this->getFromTenant('tenant.intervention.provider', $interventionTwo->id);
     $response->assertSessionHasNoErrors();
     $response->assertOk();
@@ -98,8 +97,6 @@ it('a provider can access to the intervention page', function () {
                 ->has('pastInterventions', 2)
                 ->where('intervention.id', $interventionTwo->id)
     );
-
-
 });
 
 
