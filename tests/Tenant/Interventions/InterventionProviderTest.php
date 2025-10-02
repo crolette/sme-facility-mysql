@@ -92,7 +92,7 @@ it('a provider can access to the intervention page', function () {
     $response->assertOk();
     $response->assertInertia(
         fn($page) => 
-            $page->component('tenants/interventions/ProviderPage')
+            $page->component('tenants/interventions/InterventionProviderPage')
                 ->has('intervention')
                 ->has('actionTypes', $actionTypesCount)
                 ->has('pastInterventions', 2)
