@@ -95,6 +95,7 @@ class Asset extends Model
         static::forceDeleting(function ($asset) {
             $asset->maintainable()->delete();
             $asset->tickets()->delete();
+            $asset->pictures()->delete();
         });
     }
 

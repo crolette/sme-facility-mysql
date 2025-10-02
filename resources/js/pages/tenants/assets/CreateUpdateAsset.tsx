@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 import { Asset, AssetCategory, CentralType, Provider, TenantBuilding, TenantFloor, TenantRoom, TenantSite, User, type BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
-import { MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
+import { Loader, MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
@@ -131,6 +131,7 @@ export default function CreateUpdateAsset({
     const [errors, setErrors] = useState<TypeFormData>();
     const { showToast } = useToast();
     const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
+    const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const { data, setData } = useForm<TypeFormData>({
         q: '',
         name: asset?.maintainable.name ?? '',
@@ -210,12 +211,14 @@ export default function CreateUpdateAsset({
 
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
+        setIsProcessing(true);
 
         if (asset) {
             try {
                 const response = await axios.patch(route(`api.assets.update`, asset.reference_code), data);
 
                 if (response.data.status === 'success') {
+                    setIsProcessing(false);
                     router.visit(route(`tenant.assets.show`, response.data.data.reference_code), {
                         preserveScroll: false,
                     });
@@ -223,6 +226,7 @@ export default function CreateUpdateAsset({
             } catch (error) {
                 showToast(error.response.data.message, error.response.data.status);
                 setErrors(error.response.data.errors);
+                setIsProcessing(false);
             }
         } else {
             try {
@@ -232,11 +236,13 @@ export default function CreateUpdateAsset({
                     },
                 });
                 if (response.data.status === 'success') {
+                    setIsProcessing(false);
                     router.visit(route(`tenant.assets.index`), {
                         preserveScroll: false,
                     });
                 }
             } catch (error) {
+                setIsProcessing(false);
                 showToast(error.response.data.message, error.response.data.status);
                 setErrors(error.response.data.errors);
             }
@@ -247,8 +253,6 @@ export default function CreateUpdateAsset({
         if (!location) {
             return;
         }
-
-        console.log("SELECTED LOCATION", location, type ?? null);
 
         setData('locationReference', location.reference_code);
         setData('locationId', location.id);
@@ -1271,6 +1275,21 @@ export default function CreateUpdateAsset({
                         </a>
                     </div>
                 </form>
+
+                {isProcessing && (
+                    <div className="bg-background/50 fixed inset-0 z-50">
+                        <div className="bg-background/20 flex h-dvh items-center justify-center">
+                            <div className="bg-background flex items-center justify-center p-10">
+                                    <div className="flex flex-col items-center gap-4">
+                                        <Loader size={48} className="animate-pulse" />
+                                        <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
+                                        <p className="mx-auto">Asset is being created...</p>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {showFileModal && addFileModalForm()}
                 <FileManager
                     documents={data.contracts[indexContractForFiles]?.files ?? []}

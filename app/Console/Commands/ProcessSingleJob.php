@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class ProcessSingleJob extends Command
 {
@@ -37,7 +38,9 @@ class ProcessSingleJob extends Command
                 try {
                     $this->info('Processing job...');
                     $job = json_decode($jobData, true);
+                    Log::info($job);
                     $command = unserialize($job['data']['command']);
+                    Log::info($command);
                     $command->handle();
                     $this->info('Job completed successfully');
                     $processed++;

@@ -71,6 +71,7 @@ class Room extends Model
         static::deleting(function ($room) {
             $room->maintainable()->delete();
             $room->notifications()->delete();
+            $room->pictures()->delete();
         });
     }
 

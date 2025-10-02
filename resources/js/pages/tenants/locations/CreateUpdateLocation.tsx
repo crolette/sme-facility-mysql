@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { CentralType, LocationType, TenantBuilding, TenantFloor, TenantRoom, TenantSite, User, type BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
-import { MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
+import { Loader, MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
@@ -107,7 +107,7 @@ export default function CreateUpdateLocation({
             href: '/locations/create',
         },
     ];
-
+const [isProcessing, setIsProcessing] = useState<boolean>(false);
    const [existingContracts, setExistingContracts] = useState<Contract[]>([]);
     const [existingDocuments, setExistingDocuments] = useState<Document[]>([]);
     const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
@@ -144,16 +144,18 @@ export default function CreateUpdateLocation({
     const [errors, setErrors] = useState({});
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
+        setIsProcessing(true);
         if (location) {
             try {
                 const response = await axios.patch(route(`api.${routeName}.update`, location.reference_code), data);
                 if (response.data.status === 'success') {
+                    setIsProcessing(false);
                     router.visit(route(`tenant.${routeName}.show`, location.reference_code), {
                         preserveScroll: false,
                     });
                 }
             } catch (error) {
-                console.log(error);
+                setIsProcessing(false);
                 setErrors(error.response.data.errors);
             }
         } else {
@@ -164,12 +166,13 @@ export default function CreateUpdateLocation({
                     },
                 });
                 if (response.data.status === 'success') {
+                    setIsProcessing(false);
                     router.visit(route(`tenant.${routeName}.index`), {
                         preserveScroll: false,
                     });
                 }
             } catch (error) {
-                console.log(error);
+                setIsProcessing(false);
                 setErrors(error.response.data.errors);
             }
         }
@@ -1062,6 +1065,19 @@ export default function CreateUpdateLocation({
                     </div>
                 </form>
                 {showFileModal && addFileModalForm()}
+                {isProcessing && (
+                                    <div className="bg-background/50 fixed inset-0 z-50">
+                                        <div className="bg-background/20 flex h-dvh items-center justify-center">
+                                            <div className="bg-background flex items-center justify-center p-10">
+                                                    <div className="flex flex-col items-center gap-4">
+                                                        <Loader size={48} className="animate-pulse" />
+                                                        <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
+                                                        <p className="mx-auto">{routeName} is being created...</p>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
             </div>
         </AppLayout>
     );

@@ -53,7 +53,7 @@ export default function ShowUser({ item }: { item: User }) {
 
         const deleteProfilePicture = async () => {
             try {
-                const response = await axios.delete(route('api.users.picture.destroy', auth.user.id));
+                const response = await axios.delete(route('api.users.picture.destroy', user.id));
                 if (response.data.status === 'success') {
                     showToast(response.data.message, response.data.status);
                     fetchUser();

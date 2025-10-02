@@ -79,6 +79,7 @@ class Building extends Model
             }
             $building->maintainable()->delete();
             $building->notifications()->delete();
+            $building->pictures()->delete();
         });
     }
 

@@ -73,6 +73,7 @@ class Site extends Model
             $site->maintainable()->delete();
 
             $site->notifications()->delete();
+            $site->pictures()->delete();
         });
     }
 

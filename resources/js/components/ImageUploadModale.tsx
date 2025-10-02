@@ -20,6 +20,7 @@ interface ModaleProps {
     onClose: () => void;
     title: string;
     children: React.ReactNode;
+    uploading?: boolean
 }
 
 interface TypeFormData {
@@ -28,7 +29,7 @@ interface TypeFormData {
 
 const __MAXFILESIZE = 6;
 
-const Modale = ({ isOpen, onClose, children, title }: ModaleProps) => {
+const Modale = ({ isOpen, onClose, children, title, uploading }: ModaleProps) => {
     if (!isOpen) return null;
 
     return (
@@ -39,9 +40,10 @@ const Modale = ({ isOpen, onClose, children, title }: ModaleProps) => {
             {/* Contenu de la modale */}
             <div className="bg-background relative z-10 mx-4 w-full max-w-lg rounded-lg shadow-xl">
                 {/* Header */}
+
                 <div className="border-foreground flex items-center justify-between border-b p-4">
                     <h3 className="text-lg font-semibold">{title}</h3>
-                    <Button onClick={onClose} className="hover:bg-foreground/80 rounded-full transition-colors" type="button">
+                    <Button onClick={onClose} disabled={uploading} className="hover:bg-foreground/80 rounded-full transition-colors" type="button">
                         <X size={20} className="" />
                     </Button>
                 </div>
@@ -159,9 +161,11 @@ setError(null);
     }, []);
 
     return (
-        <Modale isOpen={isOpen} onClose={handleClose} title={title}>
+        <Modale isOpen={isOpen} onClose={handleClose} title={title} uploading={uploading}>
             <div className="space-y-4">
                 {/* Zone de drop/sélection */}
+                
+
                 <div
                     className="hover:border-foreground border-foreground/30 cursor-pointer rounded-lg border-2 border-dashed p-2 text-center transition-colors"
                     onClick={() => fileInputRef.current?.click()}

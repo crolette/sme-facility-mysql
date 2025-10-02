@@ -1,0 +1,147 @@
+[2025-10-02 11:10:29] production.INFO: DISPATCH COMPRESS PICTURE JOB {"auth_user_id":2,"auth_user_email":"super@sme-facility.com"} 
+[2025-10-02 11:13:35] production.INFO: DISPATCH COMPRESS AVATAR JOB {"auth_user_id":2,"auth_user_email":"super@sme-facility.com"} 
+[2025-10-02 11:19:50] production.INFO: DISPATCH COMPRESS AVATAR JOB {"auth_user_id":2,"auth_user_email":"super@sme-facility.com"} 
+[2025-10-02 11:22:28] production.INFO: DISPATCH COMPRESS AVATAR JOB {"auth_user_id":2,"auth_user_email":"super@sme-facility.com"} 
+[2025-10-02 11:31:39] production.INFO: DISPATCH COMPRESS AVATAR JOB {"auth_user_id":2,"auth_user_email":"super@sme-facility.com"} 
+[2025-10-02 11:32:02] production.INFO: array (
+  'uuid' => 'cabcc04d-8a13-48b0-b9fe-411b07e6fa1e',
+  'displayName' => 'App\\Jobs\\CompressUserAvatarJob',
+  'job' => 'Illuminate\\Queue\\CallQueuedHandler@call',
+  'maxTries' => 3,
+  'maxExceptions' => NULL,
+  'failOnTimeout' => false,
+  'backoff' => '15',
+  'timeout' => 120,
+  'retryUntil' => NULL,
+  'data' => 
+  array (
+    'commandName' => 'App\\Jobs\\CompressUserAvatarJob',
+    'command' => 'O:30:"App\\Jobs\\CompressUserAvatarJob":2:{s:4:"user";O:45:"Illuminate\\Contracts\\Database\\ModelIdentifier":5:{s:5:"class";s:23:"App\\Models\\Tenants\\User";s:2:"id";i:8;s:9:"relations";a:0:{}s:10:"connection";s:6:"tenant";s:15:"collectionClass";N;}s:5:"queue";s:7:"default";}',
+  ),
+  'createdAt' => 1759404699,
+  'tenant_id' => 'wbxp',
+  'id' => 'jjPNqTtOW4bGpXSDWjrxpmtS8mrrTzoE',
+  'attempts' => 0,
+  'delay' => NULL,
+)  
+[2025-10-02 11:35:54] production.INFO: DISPATCH COMPRESS AVATAR JOB {"auth_user_id":2,"auth_user_email":"super@sme-facility.com"} 
+[2025-10-02 11:36:50] production.INFO: HANDLE COMPRESS AVATAR JOB  
+[2025-10-02 11:36:50] production.INFO: --- START COMPRESSING USER AVATAR : 8 - wbxp/users/8/avatar/202510021110_avatar_jonathan-de-dijcker.jpg  
+[2025-10-02 11:36:50] production.INFO: --- END COMPRESSING USER AVATAR : 8 - wbxp/users/8/avatar/202510021110_avatar_jonathan-de-dijcker.webp  
+[2025-10-02 11:41:45] production.INFO: DISPATCH COMPRESS PICTURE JOB {"auth_user_id":2,"auth_user_email":"super@sme-facility.com"} 
+[2025-10-02 11:41:45] production.INFO: DISPATCH COMPRESS PICTURE JOB {"auth_user_id":2,"auth_user_email":"super@sme-facility.com"} 
+[2025-10-02 11:41:45] production.INFO: DISPATCH COMPRESS PICTURE JOB {"auth_user_id":2,"auth_user_email":"super@sme-facility.com"} 
+[2025-10-02 11:41:47] production.INFO: HANDLE COMPRESSPICTURE JOB  
+[2025-10-02 11:41:47] production.INFO: --- START COMPRESSING PICTURE : 202510021110_img-20250226-030619-1_782bc9c7.jpg  
+[2025-10-02 11:41:47] production.INFO: newFileName : 202510021110_img-20250226-030619-1_782bc9c7.webp  
+[2025-10-02 11:41:48] production.INFO: HANDLE COMPRESSPICTURE JOB  
+[2025-10-02 11:41:48] production.INFO: --- START COMPRESSING PICTURE : 202510021110_img-4383_4c0885f4.jpg  
+[2025-10-02 11:41:48] production.INFO: newFileName : 202510021110_img-4383_4c0885f4.webp  
+[2025-10-02 11:41:49] production.INFO: --- END COMPRESSING PICTURE : 202510021110_img-20250226-030619-1_782bc9c7.webp  
+[2025-10-02 11:41:49] production.INFO: HANDLE COMPRESSPICTURE JOB  
+[2025-10-02 11:41:49] production.INFO: --- START COMPRESSING PICTURE : 202510021110_dscf2852jpg_27636894.jpg  
+[2025-10-02 11:41:49] production.INFO: newFileName : 202510021110_dscf2852jpg_27636894.webp  
+[2025-10-02 11:41:50] production.INFO: --- END COMPRESSING PICTURE : 202510021110_dscf2852jpg_27636894.webp  
+[2025-10-02 11:41:53] production.INFO: --- END COMPRESSING PICTURE : 202510021110_img-4383_4c0885f4.webp  
+[2025-10-02 11:51:56] production.INFO: DISPATCH COMPRESS PICTURE JOB {"auth_user_id":2,"auth_user_email":"super@sme-facility.com"} 
+[2025-10-02 11:51:56] production.INFO: DISPATCH COMPRESS PICTURE JOB {"auth_user_id":2,"auth_user_email":"super@sme-facility.com"} 
+[2025-10-02 11:51:57] production.INFO: HANDLE COMPRESSPICTURE JOB  
+[2025-10-02 11:51:57] production.INFO: --- START COMPRESSING PICTURE : 202510021110_2f428115-4280-4cff-87bc-87350128d918_bd5049d0.jpg  
+[2025-10-02 11:51:57] production.INFO: newFileName : 202510021110_2f428115-4280-4cff-87bc-87350128d918_bd5049d0.webp  
+[2025-10-02 11:51:57] production.INFO: --- END COMPRESSING PICTURE : 202510021110_2f428115-4280-4cff-87bc-87350128d918_bd5049d0.webp  
+[2025-10-02 11:51:57] production.INFO: HANDLE COMPRESSPICTURE JOB  
+[2025-10-02 11:51:57] production.INFO: --- START COMPRESSING PICTURE : 202510021110_61799c66-e4c5-4771-be69-6f8b9880fee1_0b12d072.jpg  
+[2025-10-02 11:51:57] production.INFO: newFileName : 202510021110_61799c66-e4c5-4771-be69-6f8b9880fee1_0b12d072.webp  
+[2025-10-02 11:51:57] production.INFO: --- END COMPRESSING PICTURE : 202510021110_61799c66-e4c5-4771-be69-6f8b9880fee1_0b12d072.webp  
+[2025-10-02 11:52:28] production.ERROR: Command "queue:stop" is not defined.
+
+Did you mean one of these?
+    inertia:stop-ssr
+    queue:batches-table
+    queue:clear
+    queue:failed
+    queue:failed-table
+    queue:flush
+    queue:forget
+    queue:listen
+    queue:monitor
+    queue:prune-batches
+    queue:prune-failed
+    queue:restart
+    queue:retry
+    queue:retry-batch
+    queue:table
+    queue:work {"exception":"[object] (Symfony\\Component\\Console\\Exception\\CommandNotFoundException(code: 0): Command \"queue:stop\" is not defined.
+
+Did you mean one of these?
+    inertia:stop-ssr
+    queue:batches-table
+    queue:clear
+    queue:failed
+    queue:failed-table
+    queue:flush
+    queue:forget
+    queue:listen
+    queue:monitor
+    queue:prune-batches
+    queue:prune-failed
+    queue:restart
+    queue:retry
+    queue:retry-batch
+    queue:table
+    queue:work at /home/wahu4243/sme-facility/vendor/symfony/console/Application.php:725)
+[stacktrace]
+#0 /home/wahu4243/sme-facility/vendor/symfony/console/Application.php(283): Symfony\\Component\\Console\\Application->find()
+#1 /home/wahu4243/sme-facility/vendor/symfony/console/Application.php(192): Symfony\\Component\\Console\\Application->doRun()
+#2 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Foundation/Console/Kernel.php(197): Symfony\\Component\\Console\\Application->run()
+#3 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1234): Illuminate\\Foundation\\Console\\Kernel->handle()
+#4 /home/wahu4243/sme-facility/artisan(16): Illuminate\\Foundation\\Application->handleCommand()
+#5 {main}
+"} 
+[2025-10-02 11:57:28] production.ERROR: Tenant could not be identified on domain www {"exception":"[object] (Stancl\\Tenancy\\Exceptions\\TenantCouldNotBeIdentifiedOnDomainException(code: 0): Tenant could not be identified on domain www at /home/wahu4243/sme-facility/vendor/stancl/tenancy/src/Resolvers/DomainTenantResolver.php:48)
+[stacktrace]
+#0 /home/wahu4243/sme-facility/vendor/stancl/tenancy/src/Resolvers/Contracts/CachedTenantResolver.php(34): Stancl\\Tenancy\\Resolvers\\DomainTenantResolver->resolveWithoutCache()
+#1 /home/wahu4243/sme-facility/vendor/stancl/tenancy/src/Middleware/IdentificationMiddleware.php(26): Stancl\\Tenancy\\Resolvers\\Contracts\\CachedTenantResolver->resolve()
+#2 /home/wahu4243/sme-facility/vendor/stancl/tenancy/src/Middleware/InitializeTenancyBySubdomain.php(51): Stancl\\Tenancy\\Middleware\\IdentificationMiddleware->initializeTenancy()
+#3 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Stancl\\Tenancy\\Middleware\\InitializeTenancyBySubdomain->handle()
+#4 /home/wahu4243/sme-facility/vendor/stancl/tenancy/src/Middleware/PreventAccessFromCentralDomains.php(29): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}()
+#5 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Stancl\\Tenancy\\Middleware\\PreventAccessFromCentralDomains->handle()
+#6 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}()
+#7 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Routing/Router.php(821): Illuminate\\Pipeline\\Pipeline->then()
+#8 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Routing/Router.php(800): Illuminate\\Routing\\Router->runRouteWithinStack()
+#9 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Routing/Router.php(764): Illuminate\\Routing\\Router->runRoute()
+#10 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Routing/Router.php(753): Illuminate\\Routing\\Router->dispatchToRoute()
+#11 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(200): Illuminate\\Routing\\Router->dispatch()
+#12 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(180): Illuminate\\Foundation\\Http\\Kernel->Illuminate\\Foundation\\Http\\{closure}()
+#13 /home/wahu4243/sme-facility/vendor/barryvdh/laravel-debugbar/src/Middleware/InjectDebugbar.php(59): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}()
+#14 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Barryvdh\\Debugbar\\Middleware\\InjectDebugbar->handle()
+#15 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}()
+#16 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/ConvertEmptyStringsToNull.php(31): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle()
+#17 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\ConvertEmptyStringsToNull->handle()
+#18 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TransformsRequest.php(21): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}()
+#19 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/TrimStrings.php(51): Illuminate\\Foundation\\Http\\Middleware\\TransformsRequest->handle()
+#20 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\TrimStrings->handle()
+#21 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePostSize.php(27): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}()
+#22 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePostSize->handle()
+#23 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/PreventRequestsDuringMaintenance.php(109): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}()
+#24 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\PreventRequestsDuringMaintenance->handle()
+#25 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Http/Middleware/HandleCors.php(61): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}()
+#26 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\HandleCors->handle()
+#27 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Http/Middleware/TrustProxies.php(58): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}()
+#28 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\TrustProxies->handle()
+#29 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Foundation/Http/Middleware/InvokeDeferredCallbacks.php(22): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}()
+#30 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Foundation\\Http\\Middleware\\InvokeDeferredCallbacks->handle()
+#31 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Http/Middleware/ValidatePathEncoding.php(26): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}()
+#32 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(219): Illuminate\\Http\\Middleware\\ValidatePathEncoding->handle()
+#33 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Pipeline/Pipeline.php(137): Illuminate\\Pipeline\\Pipeline->Illuminate\\Pipeline\\{closure}()
+#34 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(175): Illuminate\\Pipeline\\Pipeline->then()
+#35 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Foundation/Http/Kernel.php(144): Illuminate\\Foundation\\Http\\Kernel->sendRequestThroughRouter()
+#36 /home/wahu4243/sme-facility/vendor/laravel/framework/src/Illuminate/Foundation/Application.php(1219): Illuminate\\Foundation\\Http\\Kernel->handle()
+#37 /home/wahu4243/sme-facility/public/index.php(20): Illuminate\\Foundation\\Application->handleRequest()
+#38 {main}
+"} 
+[2025-10-02 12:04:50] production.INFO: DISPATCH COMPRESS PICTURE JOB {"auth_user_id":2,"auth_user_email":"super@sme-facility.com"} 
+[2025-10-02 12:04:50] production.INFO: HANDLE COMPRESSPICTURE JOB  
+[2025-10-02 12:04:50] production.INFO: --- START COMPRESSING PICTURE : 202510021210_c7179fff-2b97-4a32-93b1-b3549b21a924_fb7fa533.jpg  
+[2025-10-02 12:04:50] production.INFO: newFileName : 202510021210_c7179fff-2b97-4a32-93b1-b3549b21a924_fb7fa533.webp  
+[2025-10-02 12:04:51] production.INFO: --- END COMPRESSING PICTURE : 202510021210_c7179fff-2b97-4a32-93b1-b3549b21a924_fb7fa533.webp  

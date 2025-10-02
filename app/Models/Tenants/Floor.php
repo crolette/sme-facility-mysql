@@ -72,6 +72,7 @@ class Floor extends Model
             }
             $floor->maintainable()->delete();
             $floor->notifications()->delete();
+            $floor->pictures()->delete();
         });
     }
 
