@@ -34,7 +34,7 @@ class InterventionProviderController extends Controller
 
         $types = CategoryType::where('category', 'action')->get();
 
-        return Inertia::render('tenants/interventions/ProviderPage', ['intervention' => $intervention, 'email' => $request->email, 'actionTypes' => $types, 'query' => $request->getQueryString(), 'pastInterventions' => $pastInterventions]);
+        return Inertia::render('tenants/interventions/InterventionProviderPage', ['intervention' => $intervention, 'email' => $request->email, 'actionTypes' => $types, 'query' => $request->getQueryString(), 'pastInterventions' => $pastInterventions]);
     }
 
     public function store(Intervention $intervention, InterventionActionRequest $request, PictureUploadRequest $pictureUploadRequest) 

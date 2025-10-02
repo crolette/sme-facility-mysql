@@ -3,6 +3,7 @@ import { ImageIcon, Upload, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { Button } from './ui/button';
 import { useToast } from './ToastrContext';
+import { useForm } from '@inertiajs/react';
 
 // Props pour ImageUploadModal
 interface ImageUploadModalProps {
@@ -21,6 +22,12 @@ interface ModaleProps {
     children: React.ReactNode;
 }
 
+interface TypeFormData {
+    pictures: FileList | null
+}
+
+const __MAXFILESIZE = 6;
+
 const Modale = ({ isOpen, onClose, children, title }: ModaleProps) => {
     if (!isOpen) return null;
 
@@ -30,7 +37,7 @@ const Modale = ({ isOpen, onClose, children, title }: ModaleProps) => {
             <div className="bg-opacity-50 fixed inset-0 bg-black/80 transition-opacity" onClick={onClose} />
 
             {/* Contenu de la modale */}
-            <div className="bg-background relative z-10 mx-4 w-full max-w-md rounded-lg shadow-xl">
+            <div className="bg-background relative z-10 mx-4 w-full max-w-lg rounded-lg shadow-xl">
                 {/* Header */}
                 <div className="border-foreground flex items-center justify-between border-b p-4">
                     <h3 className="text-lg font-semibold">{title}</h3>
@@ -47,62 +54,62 @@ const Modale = ({ isOpen, onClose, children, title }: ModaleProps) => {
 };
 
 export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUploadSuccess, title = 'Upload image' }: ImageUploadModalProps) {
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [preview, setPreview] = useState(null);
+    const [previews, setPreviews] = useState<{ url: string, name: string}[] | null>(null);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { showToast } = useToast();
     const fileInputRef = useRef(null);
+    const { data, setData } = useForm<TypeFormData>({
+        pictures: []
+    })
+
+    console.log(data);
+    console.log(previews);
 
     const handleFileSelect = (files: FileList | null) => {
-        const file = files?.[0];
-        if (file) {
-            const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg'];
 
-            if (!allowedTypes.includes(file.type)) {
-                setError('Select a picture (JPG, JPEG, PNG).');
-                return;
-            }
+        if (!files)
+            return;
 
-            // Vérifier la taille (par exemple, max 4MB)
-            if (file.size > 4 * 1024 * 1024) {
-                setError('File is too big (max 4MB).');
-                return;
-            }
+        if (files?.length > 3) {
+            setData('pictures', null);
+            return setError('Max 3 files');
 
-            setSelectedFile(file);
-            setError(null);
+        }
 
-            // Créer un aperçu
-            const reader = new FileReader();
-            reader.onload = (e) => setPreview(e.target.result);
-            reader.readAsDataURL(file);
+        if (files?.length > 0) {
+            setData('pictures', files);
+setError(null);
+             const urls = Array.from(files).map((file) => ({url: URL.createObjectURL(file), name: file.name}));
+             setPreviews(urls);
+
+             // Nettoyage
+             return () => urls.forEach((url) => URL.revokeObjectURL(url));
         }
     };
 
+    console.log(previews);
+
     const handleUpload = async () => {
-        if (!selectedFile) return;
+        // if (!selectedFile) return;
 
         setUploading(true);
         setError(null);
 
         try {
-            const formData = new FormData();
-            formData.append('image', selectedFile);
+            // const formData = new FormData();
+            // formData.append('pictures', [selectedFile]);
 
-            const response = await axios.post(uploadUrl, formData, {
+            // console.log(formData);
+
+            const response = await axios.post(uploadUrl, data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
             showToast(response.data.message, response.data.status);
 
-            if (response.data.status == 'error') {
-                 showToast(response.data.message, response.data.status);
-                throw new Error(`Erreur d'upload: ${response.status}`);
-            }
-
-            const result = await response.data.message;
+            const result = response.data.message;
 
             // Notifier le succès au composant parent
             if (onUploadSuccess) {
@@ -112,6 +119,8 @@ export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUpload
             // Réinitialiser et fermer
             handleClose();
         } catch (err) {
+              showToast(err.response.data.message, err.response.data.status);
+            //   throw new Error(`Erreur d'upload: ${response.status}`);
             setError(err.message || "Erreur lors de l'upload");
         } finally {
             setUploading(false);
@@ -119,8 +128,8 @@ export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUpload
     };
 
     const handleClose = () => {
-        setSelectedFile(null);
-        setPreview(null);
+        setData('pictures', null);
+        setPreviews(null);
         setError(null);
         setUploading(false);
         onClose();
@@ -144,15 +153,23 @@ export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUpload
             <div className="space-y-4">
                 {/* Zone de drop/sélection */}
                 <div
-                    className="hover:border-foreground border-foreground/30 cursor-pointer rounded-lg border-2 border-dashed p-6 text-center transition-colors"
+                    className="hover:border-foreground border-foreground/30 cursor-pointer rounded-lg border-2 border-dashed p-2 text-center transition-colors"
                     onClick={() => fileInputRef.current?.click()}
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
                 >
-                    {preview ? (
-                        <div className="space-y-2">
-                            <img src={preview} alt="Aperçu" className="mx-auto max-h-40 rounded" />
-                            <p className="text-sm">{selectedFile?.name}</p>
+                    {previews ? (
+                        <div className="flex flex-wrap gap-2 items-center justify-evenly">
+                                {previews.map((preview, index) => (
+                                    <div className="max-w-1/4" key={index}>
+                                        <img
+                                            src={preview.url}
+                                            alt="Aperçu"
+                                            className="mx-auto aspect-square max-h-40 rounded object-cover"
+                                        />
+                                        <p className="text-xs">{preview?.name}</p>
+                                    </div>
+                                ))}
                         </div>
                     ) : (
                         <div className="space-y-2">
@@ -167,6 +184,8 @@ export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUpload
                 <input
                     ref={fileInputRef}
                     type="file"
+                    multiple
+                    max={3}
                     accept="image/png, image/jpeg, image/jpg"
                     onChange={(e) => handleFileSelect(e.target.files)}
                     className="hidden"
@@ -180,7 +199,7 @@ export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUpload
                     <Button onClick={handleClose} disabled={uploading} variant={'secondary'}>
                         Annuler
                     </Button>
-                    <Button onClick={handleUpload} disabled={!selectedFile || uploading}>
+                    <Button onClick={handleUpload} disabled={data.pictures === null || data.pictures?.length == 0 || uploading}>
                         {uploading ? (
                             <>
                                 <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />

@@ -181,10 +181,10 @@ Route::middleware(array_merge([
     Route::post('/', [APITicketController::class, 'store'])->name('api.tickets.store');
 
 
-    Route::get('/{intervention}/external', [InterventionProviderController::class, 'create'])->name('tenant.intervention.provider');
-    // Route::get('/interventions/{intervention}/external', [InterventionProviderController::class, 'create'])->name('tenant.intervention.provider')->middleware('signed');
-    Route::post('/{intervention}/external', [InterventionProviderController::class, 'store'])->name('tenant.intervention.provider.store');
-    // Route::post('/interventions/{intervention}/external', [InterventionProviderController::class, 'store'])->name('tenant.intervention.provider.store')->middleware('signed');
+    // Route::get('/{intervention}/external', [InterventionProviderController::class, 'create'])->name('tenant.intervention.provider');
+    Route::get('/interventions/{intervention}/external', [InterventionProviderController::class, 'create'])->name('tenant.intervention.provider')->middleware('signed');
+    // Route::post('/{intervention}/external', [InterventionProviderController::class, 'store'])->name('tenant.intervention.provider.store');
+    Route::post('/interventions/{intervention}/external', [InterventionProviderController::class, 'store'])->name('tenant.intervention.provider.store')->middleware('signed');
 });
 
 require __DIR__ . '/tenant_settings.php';

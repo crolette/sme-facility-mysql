@@ -20,9 +20,10 @@ type InterventionFormData = {
     finished_at: null | string;
     intervention_costs: null | number;
     creator_email: null | string;
+    pictures: FileList | null
 };
 
-export default function ProviderPage({ intervention, email, actionTypes, query, pastInterventions }: { intervention: Intervention; email: string; actionTypes: CentralType[]; query: string; pastInterventions: Intervention[] }) {
+export default function InterventionProviderPage({ intervention, email, actionTypes, query, pastInterventions }: { intervention: Intervention; email: string; actionTypes: CentralType[]; query: string; pastInterventions: Intervention[] }) {
 
      const [errors, setErrors] = useState<{ [key: string]: string }>();
      const [isProcessing, setIsProcessing] = useState(false);
@@ -39,7 +40,8 @@ export default function ProviderPage({ intervention, email, actionTypes, query, 
     started_at: null,
     finished_at: null,
     intervention_costs: null,
-    creator_email: email,
+            creator_email: email,
+    pictures: []
     })
 
        const submitInterventionAction: FormEventHandler = async (e) => {
@@ -48,7 +50,11 @@ export default function ProviderPage({ intervention, email, actionTypes, query, 
            const url = route('tenant.intervention.provider.store', intervention.id) + '?' + query
 
            try {
-               const response = await axios.post(url, data);
+               const response = await axios.post(url, data, {
+                   headers: {
+                       'Content-Type': 'multipart/form-data',
+                   },
+               });
                if (response.data.status === 'success') {
                    //    closeModale();
                    console.log(response);
@@ -62,6 +68,7 @@ export default function ProviderPage({ intervention, email, actionTypes, query, 
                setShowErrorModale(true);
            }
        };
+    console.log(data);
     
     return (
         <>
@@ -152,6 +159,17 @@ export default function ProviderPage({ intervention, email, actionTypes, query, 
                                 <Label>Finished at</Label>
                                 <Input type="time" value={data.finished_at ?? ''} onChange={(e) => setData('finished_at', e.target.value)} />
                                 <InputError message={errors?.finished_at ?? ''} />
+                                <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                                    <h5>Pictures</h5>
+                                    <Input
+                                        type="file"
+                                        multiple
+                                        onChange={(e) =>
+                                            setData("pictures", e.target.files)
+                                        }
+                                        accept="image/png, image/jpeg, image/jpg"
+                                    />
+                                </div>
                                 <Button>Add intervention</Button>
                             </form>
                         </div>

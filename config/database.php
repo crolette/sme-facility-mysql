@@ -174,6 +174,15 @@ return [
 
             ],
         ],
+        'queue' => [
+            'url' => env('REDIS_URL'),
+            'host' => env('REDIS_HOST', '/home/wahu4243/.cpanel/redis/redis.sock'),
+            'port' => env('REDIS_PORT', 0),
+            'password' => env('REDIS_PASSWORD'),
+            'database' => env('REDIS_QUEUE_DB', '3'),
+            'prefix' => env('REDIS_QUEUE_PREFIX', 'wow_resto_queue_'),
+
+        ],
 
 
     ],

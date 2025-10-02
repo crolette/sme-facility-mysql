@@ -20,7 +20,7 @@ class APICompanyLogoController extends Controller
     public function store(CompanyLogoRequest $request)
     {
         $company = Company::first();
-        $this->logoService->uploadAndAttachLogo($company, $request->validated('image'));
+        $this->logoService->uploadAndAttachLogo($company, $request->validated('pictures'));
 
         session(['tenantLogo' => $company->logo]);
 

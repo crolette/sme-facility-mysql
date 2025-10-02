@@ -18,7 +18,7 @@ class ProcessSingleJob extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Process jobs from Redis queue in production';
 
     /**
      * Execute the console command.
