@@ -16,7 +16,8 @@ class AssetsExportController extends Controller
      */
     public function index()
     {
-        return new AssetsExport();
+        return Excel::download(new AssetsExport(), 'assets.xlsx');
+        // return new AssetsExport();
     }
 
     /**

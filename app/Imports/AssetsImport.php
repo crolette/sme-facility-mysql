@@ -114,9 +114,18 @@ class AssetsImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, With
         $data = [
             'name' => $rowData['name'],
             'description' => $rowData['description'],
-            'need_maintenance' => $rowData['need_maintenance'] ?? false,
+            'purchase_date' => $rowData['purchase_date'],
+            'purchase_cost' => $rowData['purchase_cost'],
+            'under_warranty' => $rowData['under_warranty'],
+            'need_maintenance' => $rowData['need_maintenance'],
+            'end_warranty_date' => $rowData['end_warranty_date'],
+            'maintenance_frequency' => $rowData['maintenance_frequency'],
+            'next_maintenance_date' => $rowData['next_maintenance_date'],
+            'last_maintenance_date' => $rowData['last_maintenance_date'],
         ];
 
+
+   
         return $data;
     }
 
@@ -146,23 +155,32 @@ class AssetsImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, With
         isset($data['under_warranty']) && ($data['under_warranty'] === 'Yes') ? $data['under_warranty'] = true : $data['under_warranty'] = false;
         isset($data['need_maintenance']) && ($data['need_maintenance'] === 'Yes') ? $data['need_maintenance'] = true : $data['need_maintenance'] = false;
 
-        if (isset($data['need_maintenance']) && $data['need_maintenance'] === true && !isset($data['next_maintenance_date'])) {
-            if (isset($data['maintenance_frequency']) && $data['maintenance_frequency'] !== MaintenanceFrequency::ONDEMAND->value) {
-                $data['next_maintenance_date'] = isset($data['last_maintenance_date']) ? calculateNextMaintenanceDate($data['maintenance_frequency'], $data['last_maintenance_date']) : calculateNextMaintenanceDate($data['maintenance_frequency']);
+        if($data['need_maintenance'] === true) {
+            if(!isset($data['next_maintenance_date'])) {
+                if (isset($data['maintenance_frequency']) && $data['maintenance_frequency'] !== MaintenanceFrequency::ONDEMAND->value) {
+                    $data['next_maintenance_date'] = isset($data['last_maintenance_date']) ? calculateNextMaintenanceDate($data['maintenance_frequency'], $data['last_maintenance_date']) : calculateNextMaintenanceDate($data['maintenance_frequency']);
+                }
+            } else {
+                $data['next_maintenance_date'] = Carbon::instance(Date::excelToDateTimeObject($data['next_maintenance_date']))->format('Y-m-d');
             }
         }
+
+        if(isset($data['last_maintenance_date']))
+            $data['last_maintenance_date'] = Carbon::instance(Date::excelToDateTimeObject($data['last_maintenance_date']))->format('Y-m-d');
+
         if ($data['need_maintenance'] === false) {
             $data['next_maintenance_date'] = null;
             $data['last_maintenance_date'] = null;
         }
 
-        if(isset($data['purchase_date']))
-            $date['purchase_date'] = Carbon::instance(Date::excelToDateTimeObject($data['purchase_date']))->format('Y-m-d');
+        if(isset($data['purchase_date'])) {
+
+            $data['purchase_date'] = Carbon::instance(Date::excelToDateTimeObject($data['purchase_date']))->format('Y-m-d');
+
+        }
 
         if(isset($data['end_warranty_date']))
-            $date['end_warranty_date'] = Carbon::instance(Date::excelToDateTimeObject($data['end_warranty_date']))->format('Y-m-d');
-
-        
+            $data['end_warranty_date'] = Carbon::instance(Date::excelToDateTimeObject($data['end_warranty_date']))->format('Y-m-d');
 
         return $data;
     }
@@ -189,11 +207,30 @@ class AssetsImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, With
             'purchase_date' => ['nullable', 'date', Rule::date()->todayOrBefore()],
             'purchase_cost' => 'nullable|numeric|gt:0|decimal:0,2',
             'under_warranty' => "boolean",
-            'end_warranty_date' => ['nullable', 'date', 'required_if_accepted:under_warranty',  Rule::when($this->input('under_warranty') === true, 'after:today'),   Rule::when($this->filled('purchase_date'), 'after:purchase_date')],
+            'end_warranty_date' => [
+                'nullable',
+                'date',
+                'required_if_accepted:under_warranty',
+            ],
             'need_maintenance' => "boolean",
             'maintenance_frequency' => ['nullable', 'required_if_accepted:need_maintenance', Rule::in($frequencies)],
             'next_maintenance_date' => ['nullable', 'date', Rule::date()->todayOrAfter()],
             'last_maintenance_date' =>  ['nullable', 'date', Rule::date()->todayOrBefore()],
         ];
+    }
+
+    public function withValidator($validator) 
+    {
+        $validator->after(function($validator) {
+            // dump($validator);
+            // $data = $validator->getData();
+            // dump($data);
+            if ('*.under_warranty' === true && '*.under_warranty_date' <= now())
+                $validator->errors()->add('under_warranty_date','End of warranty date must be in the future.');
+
+            if (!empty('*.purchase_date') && '*.under_warranty_date' <= '*.purchase_date')
+                $validator->errors()->add('under_warranty_date', 'End of warranty date must be after purchase date.');
+
+        });
     }
 }

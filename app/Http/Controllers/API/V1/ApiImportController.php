@@ -46,6 +46,7 @@ class ApiImportController extends Controller
                 $failure->values(); // The values of the row that has failed.
             }
             Log::info($failures);
+            dump($failures);
 
             return ApiResponse::error('Error during import');
         }

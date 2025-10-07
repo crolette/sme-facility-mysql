@@ -67,6 +67,7 @@ it('can import and create new assets', function() {
 
     assertDatabaseCount('assets', 2);
 
+    $asset = Asset::first();
     assertDatabaseHas('assets', 
         [
             'code' => 'A0001',
@@ -80,11 +81,21 @@ it('can import and create new assets', function() {
             'depreciation_duration' => null,
         ],
     );
-
-    $asset = Asset::first();
-
     assertNotEmpty($asset->qr_code);
 
+    assertDatabaseHas('maintainables', 
+    [
+        'maintainable_type' => get_class($asset),
+        'maintainable_id' => $asset->id,
+        'name' => 'PC Portable Dell',
+        'description' => 'PC Portable de nouvelle génération',
+        'purchase_cost' => 2500.00,
+        'under_warranty' => 1,
+        'end_warranty_date' => '2026-08-08',
+        'need_maintenance' => 0
+    ]);
+
+    $secondAsset = Asset::find(2);
     assertDatabaseHas(
         'assets',
         [
@@ -101,7 +112,24 @@ it('can import and create new assets', function() {
         ],
     );
 
-    $secondAsset = Asset::find(2);
+    assertDatabaseHas(
+        'maintainables',
+        [
+            'maintainable_type' => get_class($secondAsset),
+            'maintainable_id' => $secondAsset->id,
+            'name' => 'Ferrari Rouge',
+            'description' => 'La voiture du boss !',
+            'purchase_cost' => 1234.00,
+            'purchase_date' => '2025-01-01',
+            'under_warranty' => 1,
+            'end_warranty_date' => '2027-01-01',
+            'need_maintenance' => 1,
+            'maintenance_frequency' => 'annual',
+            'next_maintenance_date' => '2026-09-02',
+            'last_maintenance_date' => '2025-09-02'
+        ]
+    );
+
     assertNull($secondAsset->qr_code);
 
 });
