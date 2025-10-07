@@ -6,7 +6,7 @@ import SettingsLayout from '@/layouts/settings/layout';
 import { FormEventHandler, useState } from 'react';
 import ImageUploadModale from '@/components/ImageUploadModale';
 import { Button } from '@/components/ui/button';
-import { Trash2, Upload } from 'lucide-react';
+import { Loader, Trash2, Upload } from 'lucide-react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 import { useToast } from '@/components/ToastrContext';
 import axios from 'axios';
@@ -30,15 +30,16 @@ interface TypeFormData {
 export default function ImportExportSettings() {
     // const [isModalOpen, setIsModalOpen] = useState(false);
     const { showToast } = useToast();
+    const [isProcessing, setIsProcessing] = useState<boolean>(false);
     
-    const { data, setData } = useForm<TypeFormData>({
+    const { data, setData} = useForm<TypeFormData>({
         file: null
     })
     
 
     const uploadFile: FormEventHandler = async (e) => {
         e.preventDefault()
-
+        setIsProcessing(true);
         console.log("UPLOAD FILE");
         try {
              const response = await axios.post(route('api.tenant.import.assets'), data, {
@@ -53,10 +54,11 @@ export default function ImportExportSettings() {
         } catch (error) {
             console.log(error);
             showToast(error.response.data.message, error.response.data.status);
+        } finally {
+            setData('file', null);
+            setIsProcessing(false);
         }
     }
-
-    console.log(data);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -82,7 +84,19 @@ export default function ImportExportSettings() {
                                 (e.target.files && e.target.files?.length > 0) ? setData('file', e.target.files[0]) : null
                             )}
                         />
-                        <Button> Submit </Button>
+                        <Button disabled={isProcessing}>
+                            {isProcessing ? (
+                                <>
+                                    <Loader className='animate-pulse' />
+                                    <span>Submitting...</span>
+                                </>
+                            ): (
+                                    <span>
+                                        
+                                        Submit
+                                </span>
+                            )}
+                        </Button>
                     </form>
 
                     {/* <ImageUploadModale

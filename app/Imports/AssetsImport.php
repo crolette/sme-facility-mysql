@@ -2,15 +2,23 @@
 
 namespace App\Imports;
 
-use App\Models\Central\CategoryType;
+use Exception;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Row;
-use App\Models\Tenants\Asset;
 use App\Models\Translation;
+use App\Models\Tenants\Asset;
+use App\Services\AssetService;
+use App\Services\QRCodeService;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Collection;
+use App\Enums\MaintenanceFrequency;
 use Illuminate\Support\Facades\Log;
+use App\Models\Central\CategoryType;
+use App\Services\MaintainableService;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\OnEachRow;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
@@ -19,6 +27,7 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 
 class AssetsImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, WithStartRow, WithValidation
 {
+ 
     /**
     * @param array $row
     *
@@ -29,10 +38,30 @@ class AssetsImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, With
         foreach($rows as $row) {
             Log::info($row);
             if(!$row['reference_code']) {
-                Log::info('+++ Create new asset : ' . $row['name']);
+
+                $assetData = $this->transformRowForAssetCreation($row);
+
+                $asset = app(AssetService::class)->create($assetData);
+                $asset = app(AssetService::class)->attachLocation($asset, 'site', 1);
+
+                // Search the category type based on the localized label selected in the excel file
+                $translation = Translation::where('translatable_type', (CategoryType::class))->where('label', $row['category'])->first();
+                if(!$translation)
+                    throw new Exception('Category type not existing');
+
+                $asset->assetCategory()->associate($translation->translatable->id);
+                $asset->save();
+
+                $maintainableData = $this->transformRowForMaintainableCreation($row);
+
+                app(MaintainableService::class)->create($asset, $maintainableData);
+
+                if ($row['need_qr_code'] === true)
+                    app(QRCodeService::class)->createAndAttachQR($asset);
+
             } else {
                 Log::info('*** Update asset : ' . $row['name'] . ' - ' . $row['reference_code']);
-                $asset = Asset::where('reference_code', $row['reference_code'])->first();
+                $asset = Asset::where('code', $row['code'])->first();
                 $asset->update(
                     [
                         'brand' => $row['brand'],
@@ -44,7 +73,6 @@ class AssetsImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, With
                 // Search the category type based on the localized label selected in the excel file
                 $translation = Translation::where('translatable_type', (CategoryType::class))->where('label', $row['category'])->first();
                 $asset->assetCategory()->associate($translation->translatable->id);
-                
 
                 $asset->maintainable->update(
                     [
@@ -54,10 +82,42 @@ class AssetsImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, With
                 );
 
                 $asset->save();
+
+                if ($row['need_qr_code'] === true)
+                    app(QRCodeService::class)->createAndAttachQR($asset);
             }
 
         }
         
+    }
+
+    private function transformRowForAssetCreation($rowData) {
+
+        $data = [
+            'brand' => $rowData['brand'] ?? null,
+            'model' => $rowData['model'] ?? null,
+            'serial_number' => $rowData['serial_number'] ?? null,
+            'surface' => $rowData['surface'] ?? null,
+            'is_mobile' => $rowData['is_mobile'],
+            'depreciable' => $rowData['depreciable'],
+            'depreciation_start_date' => $rowData['depreciation_start_date'] ?? null,
+            'depreciation_end_date' => $rowData['depreciation_end_date'] ?? null,
+            'depreciation_duration' => $rowData['depreciation_duration'] ?? null,
+            'residual_value' => $rowData['residual_value'] ?? null,
+        ];
+
+        return $data;
+    }
+
+    private function transformRowForMaintainableCreation($rowData) 
+    {
+        $data = [
+            'name' => $rowData['name'],
+            'description' => $rowData['description'],
+            'need_maintenance' => $rowData['need_maintenance'] ?? false,
+        ];
+
+        return $data;
     }
 
     public function startRow(): int
@@ -65,10 +125,44 @@ class AssetsImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, With
         return 3;
     }
 
-    public function prepareForValidation($data, $index)
+    public function prepareForValidation($data)
     {
         isset($data['need_qr_code']) && ($data['need_qr_code'] === 'Yes') ? $data['need_qr_code'] = true : $data['need_qr_code'] = false;
         isset($data['is_mobile']) && ($data['is_mobile'] === 'Yes') ? $data['is_mobile'] = true : $data['is_mobile'] = false;
+        isset($data['depreciable']) && ($data['depreciable'] === 'Yes') ? $data['depreciable'] = true : $data['depreciable'] = false;
+
+        if ($data['depreciable'] === false) {
+            $data['depreciation_start_date'] = null;
+            $data['depreciation_end_date'] = null;
+            $data['depreciation_duration'] = null;
+            $data['residual_value'] = null;
+        } 
+        else {
+            $startDate = Carbon::instance(Date::excelToDateTimeObject($data['depreciation_start_date']));
+            $data['depreciation_start_date'] = $startDate->format('Y-m-d');
+            $data['depreciation_end_date'] = $startDate->addYears($data['depreciation_duration'])->format('Y-m-d');
+        }
+
+        isset($data['under_warranty']) && ($data['under_warranty'] === 'Yes') ? $data['under_warranty'] = true : $data['under_warranty'] = false;
+        isset($data['need_maintenance']) && ($data['need_maintenance'] === 'Yes') ? $data['need_maintenance'] = true : $data['need_maintenance'] = false;
+
+        if (isset($data['need_maintenance']) && $data['need_maintenance'] === true && !isset($data['next_maintenance_date'])) {
+            if (isset($data['maintenance_frequency']) && $data['maintenance_frequency'] !== MaintenanceFrequency::ONDEMAND->value) {
+                $data['next_maintenance_date'] = isset($data['last_maintenance_date']) ? calculateNextMaintenanceDate($data['maintenance_frequency'], $data['last_maintenance_date']) : calculateNextMaintenanceDate($data['maintenance_frequency']);
+            }
+        }
+        if ($data['need_maintenance'] === false) {
+            $data['next_maintenance_date'] = null;
+            $data['last_maintenance_date'] = null;
+        }
+
+        if(isset($data['purchase_date']))
+            $date['purchase_date'] = Carbon::instance(Date::excelToDateTimeObject($data['purchase_date']))->format('Y-m-d');
+
+        if(isset($data['end_warranty_date']))
+            $date['end_warranty_date'] = Carbon::instance(Date::excelToDateTimeObject($data['end_warranty_date']))->format('Y-m-d');
+
+        
 
         return $data;
     }
@@ -77,14 +171,29 @@ class AssetsImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, With
 
     public function rules(): array
     {
+        $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
+        
         return [
             'reference_code' => ['nullable'],
             'code' => ['nullable'],
-            'name' => 'required|string|min:4|max:100',
-            'description' => 'nullable|string|min:10|max:255',
             'model' => ['nullable', 'string', 'max:100'],
             'brand' => ['nullable', 'string', 'max:100'],
             'serial_number' => ['nullable', 'string', 'max:50'],
+            'depreciable' => "boolean",
+            "depreciation_start_date" => 'nullable|date|required_if_accepted:depreciable',
+            "depreciation_end_date" => 'nullable|date',
+            "depreciation_duration" => 'nullable|required_with:depreciation_start_date|numeric|gt:0',
+
+            'name' => 'required|string|min:4|max:100',
+            'description' => 'nullable|string|min:10|max:255',
+            'purchase_date' => ['nullable', 'date', Rule::date()->todayOrBefore()],
+            'purchase_cost' => 'nullable|numeric|gt:0|decimal:0,2',
+            'under_warranty' => "boolean",
+            'end_warranty_date' => ['nullable', 'date', 'required_if_accepted:under_warranty',  Rule::when($this->input('under_warranty') === true, 'after:today'),   Rule::when($this->filled('purchase_date'), 'after:purchase_date')],
+            'need_maintenance' => "boolean",
+            'maintenance_frequency' => ['nullable', 'required_if_accepted:need_maintenance', Rule::in($frequencies)],
+            'next_maintenance_date' => ['nullable', 'date', Rule::date()->todayOrAfter()],
+            'last_maintenance_date' =>  ['nullable', 'date', Rule::date()->todayOrBefore()],
         ];
     }
 }

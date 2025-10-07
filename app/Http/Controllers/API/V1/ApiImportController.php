@@ -31,8 +31,10 @@ class ApiImportController extends Controller
             return ApiResponse::notAuthorized();
 
         try {
+            
             Excel::import(new AssetsImport, $request->file);
             return ApiResponse::success('', 'Assets imported');
+
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
 

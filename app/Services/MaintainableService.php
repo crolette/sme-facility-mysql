@@ -9,14 +9,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class MaintainableService
 {
-    public function create(Model $model, $request)
+    public function create(Model $model, array $data)
     {
-        $maintainable = $model->maintainable()->create([...$request->validated()]);
+        $maintainable = $model->maintainable()->create([...$data]);
 
-        $maintainable->providers()->sync(collect($request->validated('providers'))->pluck('id'));
+        if(isset($data['providers']))
+        $maintainable->providers()->sync(collect($data['providers'])->pluck('id'));
 
-        if ($request->validated('maintenance_manager_id')) {
-            $maintainable->manager()->associate($request->validated('maintenance_manager_id'))->save();
+        if(isset($data['maintenance_manager_id'])) {
+            $maintainable->manager()->associate($data['maintenance_manager_id'])->save();
         }
     }
 

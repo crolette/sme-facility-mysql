@@ -16,6 +16,17 @@ use Illuminate\Support\Facades\DB;
 
 class AssetService
 {
+
+    public function create(array $data) : Asset
+    {
+
+        $asset = new Asset([
+            ...$data,
+        ]);
+
+        return $asset;
+    }
+
     public function attachLocation(Asset $asset, $locationType, $locationId): Asset | bool
     {
         try {
