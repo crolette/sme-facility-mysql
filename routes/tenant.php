@@ -26,6 +26,7 @@ use App\Http\Controllers\Tenants\TenantSiteController;
 use App\Http\Controllers\Tenants\TenantAssetController;
 use App\Http\Controllers\Tenants\TenantFloorController;
 use App\Http\Controllers\Tenants\AssetsExportController;
+use App\Http\Controllers\Tenants\ImportExportController;
 use App\Http\Controllers\Tenants\InterventionController;
 use App\Http\Controllers\API\V1\APICompanyLogoController;
 use App\Http\Controllers\Tenants\TenantBuildingController;
@@ -105,7 +106,11 @@ Route::middleware([
 
     })->name('tenant.pdf.qr-codes');
 
-    Route::get('/assets/export', [AssetsExportController::class, 'index'])->name('tenant.assets.export');
+    Route::prefix('/settings/import-export/')->group(function() {
+        Route::get('/', [ImportExportController::class, 'show'])->name('tenant.import-export');
+        Route::get('/assets/export', [AssetsExportController::class, 'index'])->name('tenant.assets.export');
+
+    });
 
     Route::resource('sites', TenantSiteController::class)->parameters(['sites' => 'site'])->only('index', 'show', 'create', 'edit')->names('tenant.sites');
     Route::resource('buildings', TenantBuildingController::class)->parameters(['buildings' => 'building'])->only('index', 'show', 'create', 'edit')->names('tenant.buildings');

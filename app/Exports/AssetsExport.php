@@ -18,6 +18,7 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
+use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 
 class AssetsExport implements FromQuery, WithMapping, Responsable, WithHeadings, ShouldAutoSize, WithStyles, WithColumnFormatting
 {
@@ -26,8 +27,8 @@ class AssetsExport implements FromQuery, WithMapping, Responsable, WithHeadings,
     
 
     public function query() {
-
-        return Asset::query();
+        
+        return Asset::query()->whereIn('id', [37,49]);
     }
 
     public function map($asset): array
@@ -37,9 +38,10 @@ class AssetsExport implements FromQuery, WithMapping, Responsable, WithHeadings,
             $asset->reference_code,
             $asset->code,
             $asset->category,
+            $asset->qr_code ? 'Yes' : 'No',
             $asset->name,
             $asset->description,
-            $asset->is_mobile,
+            $asset->is_mobile ? 'Yes' : 'No',
             $asset->location->name ?? $asset->location->full_name,
             $asset->location->reference_code ?? $asset->location->email,
             $asset->brand,
@@ -56,22 +58,43 @@ class AssetsExport implements FromQuery, WithMapping, Responsable, WithHeadings,
     public function headings(): array
     {
         return [
-            'Reference Code',
-            'Code',
-            'Category',
-            'Name',
-            'Description',
-            'Is Mobile ? ',
-            'Location name',
-            'Location code',
-            'Brand',
-            'Model',
-            'Serial number',
-            'Depreciable ?',
-            'Depreciation Start date',
-            'Depreciation End date',
-            'Depreciation duration (years)',
-            'Surface',
+            [
+                'reference_code',
+                'code',
+                'category',
+                'need_qr_code',
+                'name',
+                'description',
+                'is_mobile',
+                'location_name',
+                'location_code',
+                'brand',
+                'model',
+                'serial_number',
+                'depreciable',
+                'depreciation_start_date',
+                'depreciation_end_date',
+                'surface'
+            ],
+            [
+                'Reference Code',
+                'Code',
+                'Category',
+                'Need QR Code ?',
+                'Name',
+                'Description',
+                'Is Mobile ? ',
+                'Location name',
+                'Location code',
+                'Brand',
+                'Model',
+                'Serial number',
+                'Depreciable ?',
+                'Depreciation Start date',
+                'Depreciation End date',
+                'Depreciation duration (years)',
+                'Surface (m²)',
+            ]
         ];
     }
 
@@ -88,16 +111,21 @@ class AssetsExport implements FromQuery, WithMapping, Responsable, WithHeadings,
         $protection = $sheet->getProtection();
         $protection->setPassword('');
         $protection->setSheet(true);
-        $sheet->protectCells('A:A', '');
         $sheet->protectCells('1:1', '');
+        $sheet->protectCells('2:2', '');
+        $sheet->protectCells('A:A', '');
         $sheet->protectCells('B:B', '');
+        $sheet->getRowDimension('1')->setRowHeight(0);
+        $sheet->freezePane('A3');
+        
 
-        $validation = $sheet->getStyle('C2:M9999')->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+        $validation = $sheet->getStyle('C3:M9999')->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
 
         $categories = CategoryType::where('category', 'asset')->get()->pluck('label');
         $categoriesList = $categories->join(',');
 
-        $validation = $sheet->getDataValidation('C2');
+        // Validation on Category List
+        $validation = $sheet->getDataValidation('C3');
         $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
         $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
         $validation->setAllowBlank(false);
@@ -110,16 +138,33 @@ class AssetsExport implements FromQuery, WithMapping, Responsable, WithHeadings,
         $validation->setPrompt('Please pick a value from the drop-down list.');
         $validation->setFormula1('"'.$categoriesList.'"');
 
-        $sheet->setDataValidation('C2:C9999', clone $validation);
+        $sheet->setDataValidation('C3:C9999', clone $validation);
 
-     
+        // Boolean on Need Qr Code ?
+        $validation = $sheet->getDataValidation('D3');
+        $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+        $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
+        $validation->setShowDropDown(true);
+        $validation->setFormula1('"Yes,No"');
+        $sheet->setDataValidation('D3:D9999', clone $validation);
+        // $validation->setAllowBlank(false);
+
+        // Boolean on Is Mobile ?
+        $validation = $sheet->getDataValidation('G3');
+        $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+        $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
+        $validation->setShowDropDown(true);
+        $validation->setFormula1('"Yes,No"');
+        $sheet->setDataValidation('G3:G9999', clone $validation);
+
+      
         
 
 
 
         return [
             // Style the first row as bold text.
-            1    => ['font' => ['bold' => true]],
+            2    => ['font' => ['bold' => true]],
 
         ];
     }

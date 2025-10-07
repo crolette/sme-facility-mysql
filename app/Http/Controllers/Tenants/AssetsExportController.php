@@ -16,12 +16,6 @@ class AssetsExportController extends Controller
      */
     public function index()
     {
-        // $asset = Asset::first();
-        // dd($asset->location->name);
-        // $categories = CategoryType::where('category', 'asset')->get()->pluck('label');
-        // $categoriesList = $categories->join(',');
-        // dd($categoriesList);
-
         return new AssetsExport();
     }
 

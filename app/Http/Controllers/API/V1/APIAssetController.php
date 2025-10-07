@@ -51,6 +51,7 @@ class APIAssetController extends Controller
 
             $asset->assetCategory()->associate($assetRequest->validated('categoryId'));
             $asset->save();
+            
             $this->maintainableService->create($asset, $maintainableRequest);
 
             if ($contractRequest->validated('contracts'))
