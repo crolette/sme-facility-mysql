@@ -4,16 +4,27 @@ namespace App\Exports;
 
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
+use App\Models\Tenants\User;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Building;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Maatwebsite\Excel\Events\AfterSheet;
+use Maatwebsite\Excel\Concerns\WithTitle;
+use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\RegistersEventListeners;
 
-class AssetDataSheet implements FromCollection, WithHeadings, ShouldAutoSize
+class AssetDataSheet implements FromCollection, WithHeadings, ShouldAutoSize, WithTitle, WithEvents
 {
+    use RegistersEventListeners;
+    
+    public function title(): string
+    {
+        return 'Datas';
+    }
     /**
     * @return \Illuminate\Support\Collection
     */
@@ -38,6 +49,11 @@ class AssetDataSheet implements FromCollection, WithHeadings, ShouldAutoSize
             return $room->reference_code . ' - ' . $room->name;
         });
 
+        $users = User::select('id', 'first_name', 'last_name','email')->whereNull('provider_id')->get();
+        $usersConcatenated = $users->map(function ($user) {
+            return $user->full_name . ' - ' . $user->email;
+        });
+
         // Trouver la longueur max
         $maxRows = max($sites->count(), $buildings->count(), $floors->count(), $rooms->count());
 
@@ -48,6 +64,7 @@ class AssetDataSheet implements FromCollection, WithHeadings, ShouldAutoSize
                 $buildingsConcatenated->get($i, ''),
                 $floorsConcatenated->get($i, ''),
                 $roomsConcatenated->get($i, ''),
+                $usersConcatenated->get($i, ''),
             ]);
         }
 
@@ -64,28 +81,59 @@ class AssetDataSheet implements FromCollection, WithHeadings, ShouldAutoSize
         ];
     }
 
-    public function registerEvents(): array
+    public static function afterSheet(AfterSheet $event)
     {
-        return [
-            AfterSheet::class => function (AfterSheet $event) {
-                $spreadsheet = $event->sheet->getParent();
+        // if ($event->sheet->getTitle() === 'Datas') {
+            $spreadsheet = $event->sheet->getParent();
+            // \Log::info($spreadsheet);
+            $dataSheet = $spreadsheet->getSheetByName('Datas');
+            // \Log::info($dataSheet);
 
-                $spreadsheet->addNamedRange(
-                    new \PhpOffice\PhpSpreadsheet\NamedRange(
-                        'sites',
-                        $event->sheet->getDelegate(),
-                        '$A$2:$A$50'
-                    )
-                );
+            // Syntaxe alternative plus explicite
+            $sites = new \PhpOffice\PhpSpreadsheet\NamedRange(
+                'sites',
+                $dataSheet,
+                '$A$2:$A$50'
+            );
 
-                $spreadsheet->addNamedRange(
-                    new \PhpOffice\PhpSpreadsheet\NamedRange(
-                        'buildings',
-                        $event->sheet->getDelegate(),
-                        '$B$2:$B$50'
-                    )
-                );
-            }
-        ];
+            $spreadsheet->addNamedRange($sites);
+
+            $buildings = new \PhpOffice\PhpSpreadsheet\NamedRange(
+                'buildings',
+                $dataSheet,
+                '$B$2:$B$50'
+            );
+
+            $spreadsheet->addNamedRange($buildings);
+
+            $floors = new \PhpOffice\PhpSpreadsheet\NamedRange(
+                'floors',
+                $dataSheet,
+                '$C$2:$C$50'
+            );
+
+            $spreadsheet->addNamedRange($floors);
+
+            $rooms = new \PhpOffice\PhpSpreadsheet\NamedRange(
+                'rooms',
+                $dataSheet,
+                '$D$2:$D$50'
+            );
+
+            $spreadsheet->addNamedRange($rooms);
+
+            $users = new \PhpOffice\PhpSpreadsheet\NamedRange(
+                'users',
+                $dataSheet,
+                '$E$2:$E$50'
+            );
+
+            $spreadsheet->addNamedRange($users);
+
+            // Vérification debug
+            // \Log::info('Named ranges:', $spreadsheet->getNamedRanges());
+        // }
     }
+
+    
 }
