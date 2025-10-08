@@ -56,7 +56,7 @@ class APISiteController extends Controller
                 'address' => $siteRequest->validated('address')
             ]);
 
-            $this->maintainableService->create($site, $maintainableRequest);
+            $this->maintainableService->create($site, $maintainableRequest->validated());
 
             if ($documentUploadRequest->validated('files')) {
                 $documentService->uploadAndAttachDocuments($site, $documentUploadRequest->validated('files'));

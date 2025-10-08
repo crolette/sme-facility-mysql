@@ -56,6 +56,40 @@ it('can render the create building page', function () {
     );
 });
 
+it('can create a new building with minimal information', function () {
+
+    $siteType = LocationType::factory()->create(['level' => 'site']);
+    $buildingType = LocationType::factory()->create(['level' => 'building']);
+    $site = Site::factory()->create();
+
+    $formData = [
+        'name' => 'New building',
+        'description' => 'Description new building',
+        'levelType' => $site->id,
+        'locationType' => $buildingType->id,
+    ];
+
+    $response = $this->postToTenant('api.buildings.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    assertDatabaseCount('buildings', 1);
+    assertDatabaseCount('maintainables', 2);
+
+    assertDatabaseHas('buildings', [
+        'location_type_id' => $buildingType->id,
+        'code' => $buildingType->prefix . '01',
+        'reference_code' => $site->reference_code . '-' . $buildingType->prefix . '01',
+        'level_id' => $siteType->id,
+
+    ]);
+
+    assertDatabaseHas('maintainables', [
+        'name' => 'New building',
+        'description' => 'Description new building',
+    ]);
+});
+
 it('can create a new building', function () {
 
     $siteType = LocationType::factory()->create(['level' => 'site']);

@@ -62,6 +62,8 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
                 $asset = Asset::where('code', $row['code'])->first();
                 $asset->update([...$assetData]);
 
+               
+
                 // Search the category type based on the localized label selected in the excel file
                 $translation = Translation::where('translatable_type', (CategoryType::class))->where('label', $row['category'])->first();
                 if (!$translation)
@@ -70,6 +72,7 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
 
                 $asset = app(AssetService::class)->attachLocationFromImport($asset, $assetData);
 
+                // BUG UPDATE MAINTAINABLE - CHECK / TESTS !!!
                 $asset->maintainable->update([...$maintainableData]);
 
                 $asset->save();

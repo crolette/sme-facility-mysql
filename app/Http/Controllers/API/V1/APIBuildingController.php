@@ -21,10 +21,12 @@ use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Requests\Tenant\TenantBuildingRequest;
 use App\Http\Requests\Tenant\MaintainableUpdateRequest;
 use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
+use App\Services\BuildingService;
 
 class APIBuildingController extends Controller
 {
     public function __construct(
+        protected BuildingService $buildingService,
         protected QRCodeService $qrCodeService,
         protected MaintainableService $maintainableService,
         protected ContractService $contractService
@@ -40,32 +42,9 @@ class APIBuildingController extends Controller
         try {
             DB::beginTransaction();
 
-            $site = Site::find($buildingRequest->validated('levelType'));
-            $buildingType = LocationType::find($buildingRequest->validated('locationType'));
-            $count = Building::where('location_type_id', $buildingType->id)->where('level_id', $site->id)->count();
+            $building = $this->buildingService->create($buildingRequest->validated());
 
-            $code = generateCodeNumber($count + 1, $buildingType->prefix);
-            $referenceCode = $site->reference_code . '-' . $code;
-
-            $building = Building::create([
-                'code' => $code,
-                'surface_floor' => $buildingRequest->validated('surface_floor'),
-                'floor_material_id'  => $buildingRequest->validated('floor_material_id') === 'other' ? null :  $buildingRequest->validated('floor_material_id'),
-                'floor_material_other'  => $buildingRequest->validated('floor_material_other'),
-                'surface_walls' => $buildingRequest->validated('surface_walls'),
-                'wall_material_id'  => $buildingRequest->validated('wall_material_id') === 'other' ? null :  $buildingRequest->validated('wall_material_id'),
-                'wall_material_other'  => $buildingRequest->validated('wall_material_other'),
-                'surface_outdoor' => $buildingRequest->validated('surface_outdoor'),
-                'outdoor_material_id'  => $buildingRequest->validated('outdoor_material_id') === 'other' ? null :  $buildingRequest->validated('outdoor_material_id'),
-                'outdoor_material_other'  => $buildingRequest->validated('outdoor_material_other'),
-                'reference_code' => $referenceCode,
-                'location_type_id' => $buildingType->id
-            ]);
-
-            $building->site()->associate($site);
-            $building->save();
-
-            $this->maintainableService->create($building, $maintainableRequest);
+            $this->maintainableService->create($building, $maintainableRequest->validated());
 
             if ($contractRequest->validated('contracts'))
                 $this->contractService->createWithModel($building, $contractRequest->validated('contracts'));
@@ -116,17 +95,7 @@ class APIBuildingController extends Controller
         try {
             DB::beginTransaction();
 
-            $building->update([
-                'surface_floor' => $buildingRequest->validated('surface_floor'),
-                'floor_material_id'  => $buildingRequest->validated('floor_material_id') === 'other' ? null :  $buildingRequest->validated('floor_material_id'),
-                'floor_material_other'  => $buildingRequest->validated('floor_material_other'),
-                'surface_walls' => $buildingRequest->validated('surface_walls'),
-                'wall_material_id'  => $buildingRequest->validated('wall_material_id') === 'other' ? null :  $buildingRequest->validated('wall_material_id'),
-                'wall_material_other'  => $buildingRequest->validated('wall_material_other'),
-                'surface_outdoor' => $buildingRequest->validated('surface_outdoor'),
-                'outdoor_material_id'  => $buildingRequest->validated('outdoor_material_id') === 'other' ? null :  $buildingRequest->validated('outdoor_material_id'),
-                'outdoor_material_other'  => $buildingRequest->validated('outdoor_material_other'),
-            ]);
+            $building = $this->buildingService->update($building, $buildingRequest->validated());
 
             $this->maintainableService->update($building->maintainable, $maintainableRequest);
 
