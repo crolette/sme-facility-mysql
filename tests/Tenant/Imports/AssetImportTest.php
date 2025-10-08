@@ -8,40 +8,26 @@ use App\Models\Tenants\User;
 use App\Imports\AssetsImport;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
-use App\Enums\NoticePeriodEnum;
 use App\Models\Tenants\Building;
-
-use App\Models\Tenants\Contract;
-use App\Models\Tenants\Document;
 use App\Models\Tenants\Provider;
-use App\Enums\ContractStatusEnum;
-
 use Illuminate\Http\UploadedFile;
-use App\Enums\ContractDurationEnum;
-
 use App\Models\Central\CategoryType;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Enums\ContractRenewalTypesEnum;
-
 use Illuminate\Support\Facades\Storage;
-use function PHPUnit\Framework\assertCount;
-use function Pest\Laravel\assertDatabaseHas;
-use function PHPUnit\Framework\assertEquals;
-use function Pest\Laravel\assertDatabaseCount;
-use function Pest\Laravel\assertDatabaseEmpty;
-use function Pest\Laravel\assertDatabaseMissing;
-use function PHPUnit\Framework\assertNotEmpty;
 use function PHPUnit\Framework\assertNull;
-use function PHPUnit\Framework\assertSame;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseCount;
+use function PHPUnit\Framework\assertNotEmpty;
 
 beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
+    User::factory()->withRole('Maintenance Manager')->create(['email' => 'crolweb@gmail.com']);
     $this->actingAs($this->user, 'tenant');
 
-    $this->siteType = LocationType::factory()->create(['level' => 'site']);
-    $this->buildingType = LocationType::factory()->create(['level' => 'building']);
-    $this->floorType = LocationType::factory()->create(['level' => 'floor']);
-    $this->roomType = LocationType::factory()->create(['level' => 'room']);
+    $this->siteType = LocationType::factory()->create(['level' => 'site', 'prefix' => 'S']);
+    $this->buildingType = LocationType::factory()->create(['level' => 'building', 'prefix' => 'B']);
+    $this->floorType = LocationType::factory()->create(['level' => 'floor', 'prefix' => 'L']);
+    $this->roomType = LocationType::factory()->create(['level' => 'room', 'prefix' => 'R']);
     CategoryType::factory()->count(2)->create(['category' => 'provider']);
     $this->securityCat = CategoryType::factory()->create(['category' => 'asset', 'slug' => 'Security']);
     $this->furnitureCat = CategoryType::factory()->create(['category' => 'asset', 'slug' => 'Furniture']);
@@ -65,7 +51,7 @@ it('can import and create new assets', function() {
 
     Excel::import(new AssetsImport, $file);
 
-    assertDatabaseCount('assets', 2);
+    assertDatabaseCount('assets', 5);
 
     $asset = Asset::first();
     assertDatabaseHas('assets', 
@@ -74,7 +60,9 @@ it('can import and create new assets', function() {
             'brand' => 'Dell',
             'model' => 'Inspiron',
             'serial_number' => 'X36-AD-65',
-            'category_type_id' => $this->furnitureCat->id,
+            'is_mobile' => 1,
+            'location_type' => User::class,
+            'category_type_id' => $this->securityCat->id,
             'depreciable' => 0,
             'depreciation_start_date' => null,
             'depreciation_end_date' => null,
@@ -87,8 +75,9 @@ it('can import and create new assets', function() {
     [
         'maintainable_type' => get_class($asset),
         'maintainable_id' => $asset->id,
-        'name' => 'PC Portable Dell',
-        'description' => 'PC Portable de nouvelle génération',
+        'name' => 'PC Gaming',
+        'description' => 'PC Gaming Crolweb',
+         'purchase_date' => null,
         'purchase_cost' => 2500.00,
         'under_warranty' => 1,
         'end_warranty_date' => '2026-08-08',
@@ -104,7 +93,9 @@ it('can import and create new assets', function() {
             'model' => 'F40',
             'serial_number' => 'VROUMVROUM',
             'depreciable' => 1,
-            'category_type_id' => $this->securityCat->id,
+            'location_type' => Site::class,
+            'location_id' => $this->site->id,
+            'category_type_id' => $this->furnitureCat->id,
             'depreciation_start_date' => '2025-01-01',
             'depreciation_end_date' => '2029-01-01',
             'depreciation_duration' => 4,
@@ -117,8 +108,8 @@ it('can import and create new assets', function() {
         [
             'maintainable_type' => get_class($secondAsset),
             'maintainable_id' => $secondAsset->id,
-            'name' => 'Ferrari Rouge',
-            'description' => 'La voiture du boss !',
+            'name' => 'Bureau gaming',
+            'description' => 'Le bureau du boss',
             'purchase_cost' => 1234.00,
             'purchase_date' => '2025-01-01',
             'under_warranty' => 1,
@@ -131,5 +122,117 @@ it('can import and create new assets', function() {
     );
 
     assertNull($secondAsset->qr_code);
+
+    assertDatabaseHas(
+        'assets',
+        [
+            'code' => 'A0003',
+            'location_type' => Building::class,
+            'location_id' => $this->building->id,
+        ],
+    );
+
+    assertDatabaseHas(
+        'assets',
+        [
+            'code' => 'A0004',
+            'location_type' => Floor::class,
+            'location_id' => $this->floor->id,
+        ],
+    );
+
+    assertDatabaseHas(
+        'assets',
+        [
+            'code' => 'A0005',
+            'location_type' => Room::class,
+            'location_id' => $this->room->id,
+        ],
+    );
+
+});
+
+it('can import and create new asset with maintenance', function () {
+
+    Storage::fake('local');
+
+    $file = UploadedFile::fake()->createWithContent('assets.xlsx', file_get_contents(base_path('tests/fixtures/assets_maintenance.xlsx')));
+
+    Excel::import(new AssetsImport, $file);
+
+    assertDatabaseCount('assets', 4);
+
+    assertDatabaseHas(
+        'maintainables',
+        [
+            'need_maintenance' => 1,
+            'maintenance_frequency' => 'annual',
+            'next_maintenance_date' => Carbon::now()->addDays(365)->toDateString(),
+            'last_maintenance_date' => null
+        ]
+    );
+
+    assertDatabaseHas(
+        'maintainables',
+        [
+            'need_maintenance' => 1,
+            'maintenance_frequency' => 'monthly',
+            'next_maintenance_date' => Carbon::now()->addDays(30)->toDateString(),
+            'last_maintenance_date' => null
+        ]
+    );
+
+    assertDatabaseHas(
+        'maintainables',
+        [
+            'need_maintenance' => 1,
+            'maintenance_frequency' => 'biannual',
+            'next_maintenance_date' => Carbon::instance(new DateTime('2025-10-06'))->addDays(180)->toDateString(),
+            'last_maintenance_date' => '2025-10-06'
+        ]
+    );
+
+    assertDatabaseHas(
+        'maintainables',
+        [
+            'maintainable_type' => Asset::class,
+            'maintainable_id' => 4,
+            'need_maintenance' => 1,
+            'maintenance_frequency' => 'biennial',
+            'next_maintenance_date' => '2026-12-24',
+            'last_maintenance_date' => '2024-12-24'
+        ]
+    );
+
+});
+
+it('can import and create new asset with depreciable', function () {
+
+    Storage::fake('local');
+
+    $file = UploadedFile::fake()->createWithContent('assets.xlsx', file_get_contents(base_path('tests/fixtures/assets_depreciable.xlsx')));
+
+    Excel::import(new AssetsImport, $file);
+
+    assertDatabaseCount('assets', 2);
+
+    assertDatabaseHas(
+        'assets',
+        [
+            'id' => 1,
+            'depreciable' => 0,
+        ]
+    );
+
+    assertDatabaseHas(
+        'assets',
+        [
+            'id' => 2,
+            'depreciable' => 1,
+            'depreciation_start_date' => '2025-01-01',
+            'depreciation_end_date' => '2029-01-01',
+            'depreciation_duration' => 4
+        ]
+    );
 
 });

@@ -175,7 +175,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $categoriesList = $categories->join(',');
 
         // Validation on Category List
-        $validation = $sheet->getDataValidation('C3');
+        $validation = $sheet->getDataValidation('E3');
         $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
         $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
         $validation->setAllowBlank(false);
@@ -188,11 +188,11 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $validation->setPrompt('Please pick a value from the drop-down list.');
         $validation->setFormula1('"' . $categoriesList . '"');
 
-        $sheet->setDataValidation('C3:C9999', clone $validation);
+        $sheet->setDataValidation('E3:E9999', clone $validation);
 
 
         // Boolean on Need Qr Code ?
-        $validation = $sheet->getDataValidation('D3');
+        $validation = $sheet->getDataValidation('F3');
         $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
         $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
         $validation->setAllowBlank(false);
@@ -204,21 +204,59 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $validation->setPromptTitle('Pick from list');
         $validation->setPrompt('Please pick a value from the drop-down list.');
         $validation->setFormula1('"Yes,No"');
-        $sheet->setDataValidation('D3:D9999', clone $validation);
+        $sheet->setDataValidation('F3:F9999', clone $validation);
         // $validation->setAllowBlank(false);
 
         // Boolean on Is Mobile ?
         $sheet->setDataValidation('G3:G9999', clone $validation);
 
         // Depreciable ?
-        $sheet->setDataValidation('O3:O9999', clone $validation);
+        $sheet->setDataValidation('P3:P9999', clone $validation);
+
+        // Conditional formatting on depreciation_start_date
+        $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
+        $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
+        $conditional->addCondition('AND($P3="Yes",ISBLANK($Q3))');
+        $conditional->getStyle()->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFF0000');
+        $sheet->getStyle('Q3:Q1000')->setConditionalStyles([$conditional]);
+
+        // Conditional formatting on depreciation_duration
+        $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
+        $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
+        $conditional->addCondition('AND($P3="Yes",ISBLANK($S3))');
+        $conditional->getStyle()->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFF0000');
+        $sheet->getStyle('S3:S1000')->setConditionalStyles([$conditional]);
 
         // Under warranty
-        $sheet->setDataValidation('V3:V9999', clone $validation);
+        $sheet->setDataValidation('W3:W9999', clone $validation);
+
+        // Conditional formatting on end_warranty_date
+        $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
+        $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
+        $conditional->addCondition('AND($W3="Yes",ISBLANK($X3))');
+        $conditional->getStyle()->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFF0000');
+        $sheet->getStyle('X3:X1000')->setConditionalStyles([$conditional]);
+
         //Need maintenance
-        $sheet->setDataValidation('X3:X9999', clone $validation);
+        $sheet->setDataValidation('Y3:Y9999', clone $validation);
+
+        // Conditional formatting on maintenance_frequency
+        $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
+        $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
+        $conditional->addCondition('AND($Y3="Yes",ISBLANK($Z3))');
+        $conditional->getStyle()->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFF0000');
+        $sheet->getStyle('Z3:Z1000')->setConditionalStyles([$conditional]);
 
 
+        // Site
         $validation = $sheet->getDataValidation('H3');
         $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
         $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
@@ -229,19 +267,23 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $validation->setErrorTitle('Input error');
         $validation->setError('Value is not in list.');
         $validation->setPromptTitle('Pick from list');
-        $validation->setPrompt('Please pick a value from the drop-down list.');
+        $validation->setPrompt('Please pick a value from the drop-down list. Select only the location where the asset belongs.');
         $validation->setFormula1('sites');
         $sheet->setDataValidation('H3:H9999', clone $validation);
 
+        // Building
         $validation->setFormula1('buildings');
         $sheet->setDataValidation('I3:I9999', clone $validation);
 
+        // Floor
         $validation->setFormula1('floors');
         $sheet->setDataValidation('J3:J9999', clone $validation);
 
+        // Room
         $validation->setFormula1('rooms');
         $sheet->setDataValidation('K3:K9999', clone $validation);
 
+        // Users
         $validation->setFormula1('users');
         $sheet->setDataValidation('L3:L9999', clone $validation);
 
@@ -266,6 +308,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
 
         $sheet->getStyle('L3:L1000')->setConditionalStyles([$conditional2]);
 
+        // Maintenance Frequency
         $frequencies = collect(array_column(MaintenanceFrequency::cases(), 'value'));
         $frequenciesList = $frequencies->join(',');
 
