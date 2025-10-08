@@ -10,9 +10,6 @@ import { Trash2, Upload } from 'lucide-react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 import { useToast } from '@/components/ToastrContext';
 import axios from 'axios';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Sheet, SheetClose } from '@/components/ui/sheet';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

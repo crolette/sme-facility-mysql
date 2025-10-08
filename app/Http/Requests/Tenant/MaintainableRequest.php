@@ -35,11 +35,6 @@ class MaintainableRequest extends FormRequest
             $data['last_maintenance_date'] = null;
         }
 
-
-        // if ($data['under_warranty'] === false) {
-        //     $data['end_warranty_date'] = null;
-        // }
-
         $this->replace($data);
     }
 
