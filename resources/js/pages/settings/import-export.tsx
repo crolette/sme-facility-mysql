@@ -60,6 +60,24 @@ export default function ImportExportSettings() {
         }
     }
 
+    const exportAssets: FormEventHandler = async (e) => {
+        e.preventDefault();
+        setIsProcessing(true);
+console.log('Export FILE');
+        try {
+            const response = await axios.get(route('tenant.assets.export'));
+            console.log(response.data);
+            if (response.data.status === 'success') {
+                showToast(response.data.message, response.data.status);
+            }
+        } catch (error) {
+            console.log(error);
+            showToast(error.response.data.message, error.response.data.status);
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Company" />
@@ -68,33 +86,26 @@ export default function ImportExportSettings() {
                 <div className="w-full space-y-6 space-x-2">
                     <div className="relative gap-4">
                         <HeadingSmall title="Import/Export" />
-                        <a href={route('tenant.assets.export')} >
-                        <Button variant={'secondary'}>
-                            <BiSolidFilePdf size={20} />
-                            Exporter les assets
-                        </Button>
-                    </a>
+                            <Button variant={'secondary'} onClick={exportAssets} disabled={isProcessing}>
+                                <BiSolidFilePdf size={20} />
+                                Exporter les assets
+                            </Button>
                     </div>
                     <form action="" onSubmit={uploadFile}>
                         <input
                             type="file"
                             name=""
                             id=""
-                            onChange={(e) => (
-                                (e.target.files && e.target.files?.length > 0) ? setData('file', e.target.files[0]) : null
-                            )}
+                            onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
                         />
                         <Button disabled={isProcessing}>
                             {isProcessing ? (
                                 <>
-                                    <Loader className='animate-pulse' />
+                                    <Loader className="animate-pulse" />
                                     <span>Submitting...</span>
                                 </>
-                            ): (
-                                    <span>
-                                        
-                                        Submit
-                                </span>
+                            ) : (
+                                <span>Submit</span>
                             )}
                         </Button>
                     </form>
