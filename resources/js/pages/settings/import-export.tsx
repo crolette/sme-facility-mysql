@@ -24,7 +24,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface TypeFormData {
     file: File | null;
-    [key: string] : any
 }
 
 export default function ImportExportSettings() {
@@ -63,7 +62,7 @@ export default function ImportExportSettings() {
     const exportAssets: FormEventHandler = async (e) => {
         e.preventDefault();
         setIsProcessing(true);
-console.log('Export FILE');
+
         try {
             const response = await axios.get(route('tenant.assets.export'));
             console.log(response.data);
@@ -78,6 +77,8 @@ console.log('Export FILE');
         }
     };
 
+    console.log(data);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Company" />
@@ -86,15 +87,16 @@ console.log('Export FILE');
                 <div className="w-full space-y-6 space-x-2">
                     <div className="relative gap-4">
                         <HeadingSmall title="Import/Export" />
-                            <Button variant={'secondary'} onClick={exportAssets} disabled={isProcessing}>
-                                <BiSolidFilePdf size={20} />
-                                Exporter les assets
-                            </Button>
+                        <Button variant={'secondary'} onClick={exportAssets} disabled={isProcessing}>
+                            <BiSolidFilePdf size={20} />
+                            Exporter les assets
+                        </Button>
                     </div>
                     <form action="" onSubmit={uploadFile}>
                         <input
                             type="file"
                             name=""
+                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                             id=""
                             onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
                         />

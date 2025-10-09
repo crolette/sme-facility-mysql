@@ -19,6 +19,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Tenant\ProviderRequest;
+use App\Jobs\ImportExcelAssetsJob;
 
 class ApiImportController extends Controller
 {
@@ -40,8 +41,15 @@ class ApiImportController extends Controller
         }
 
         try {
-            Excel::import(new AssetsImport, $request->file);
-            return ApiResponse::success('', 'Assets imported');
+
+            $directory = tenancy()->tenant->id . "/imports/"; // e.g., "webxp/tickets/1/pictures"
+            $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . $request->file->getClientOriginalName();
+            Storage::disk('tenants')->putFileAs($directory, $request->file, $fileName);
+
+            Log::info('DISPATCH IMPORT EXCEL JOB : ' . $directory . $fileName);
+            ImportExcelAssetsJob::dispatch(Auth::user(), $directory . $fileName);
+
+            return ApiResponse::success('', 'Assets will be imported, you will receive an email when it\'s done.');
 
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
