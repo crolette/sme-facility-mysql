@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Storage;
@@ -27,11 +28,18 @@ class ApiImportController extends Controller
 
     public function store(Request $request)
     {
-        if (Auth::user()->cannot('create', Asset::class))
-            return ApiResponse::notAuthorized();
+
+        if (!Gate::allows('import-excel')) {
+            ApiResponse::notAuthorized();
+            return redirect()->back();
+        }
+
+        if (Auth::user()->cannot('create', Asset::class)) {
+            ApiResponse::notAuthorized();
+            return redirect()->back();
+        }
 
         try {
-            
             Excel::import(new AssetsImport, $request->file);
             return ApiResponse::success('', 'Assets imported');
 

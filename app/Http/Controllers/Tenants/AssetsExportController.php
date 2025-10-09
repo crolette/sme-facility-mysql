@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Tenants;
 
+use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 use App\Exports\AssetsExport;
 use App\Models\Tenants\Asset;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
 
 class AssetsExportController extends Controller
@@ -16,6 +18,11 @@ class AssetsExportController extends Controller
      */
     public function index()
     {
+        if (!Gate::allows('export-excel')) {
+            ApiResponse::notAuthorized();
+            return redirect()->back();
+        }
+
         return Excel::download(new AssetsExport(), 'assets.xlsx');
         // return new AssetsExport();
     }
