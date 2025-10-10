@@ -29,7 +29,7 @@ class PictureService
 
                 $newfileName = Str::chopEnd($file->getClientOriginalName(), ['.png', '.jpg', '.jpeg']);
 
-                $fileName = Carbon::now()->isoFormat('YYYYMMDDHHMM') . '_' . Str::slug($newfileName, '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $file->extension();
+                $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . Str::slug($newfileName, '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $file->extension();
 
 
                 $path = Storage::disk('tenants')->putFileAs($directory, $file, $fileName);

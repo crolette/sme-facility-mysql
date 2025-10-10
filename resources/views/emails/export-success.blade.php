@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>{{ 'Ticket closed: ' . $ticket->code}}</title>
+    <title>{{ 'Assets exported'}}</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
         .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px; }
@@ -18,18 +18,16 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="title">{{ 'Ticket closed: ' . $ticket->closed . ' - ' . $ticket->ticketable->name}}</h1>
+            <h1 class="title">{{ 'Assets exported'}}</h1>
         </div>
 
         <div class="content">
             <div class="alert">
-                        <strong>🛡️ Ticket</strong>
+                        <strong>Assets exported</strong>
                     </div>
                     <div class="details">
-                        <strong>Emplacement :</strong> {{ $ticket->asset_code }}  {{ $ticket->ticketable->name }}<br>
-                        <strong>Problem :</strong> {{ $ticket->description }}<br>
+                        <p>Assets exported - Find enclosed</p>
                     </div>
-
         </div>
 
         <div class="footer">
