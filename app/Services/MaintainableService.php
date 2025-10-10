@@ -14,11 +14,47 @@ class MaintainableService
         $maintainable = $model->maintainable()->create([...$data]);
 
         if(isset($data['providers']))
-        $maintainable->providers()->sync(collect($data['providers'])->pluck('id'));
+            $maintainable->providers()->sync(collect($data['providers'])->pluck('id'));
 
         if(isset($data['maintenance_manager_id'])) {
             $maintainable->manager()->associate($data['maintenance_manager_id'])->save();
         }
+    }
+
+    public function updateOrCreate(Model $model, array $data)
+    {
+        $maintainable = $model->maintainable()->updateOrCreate(
+            [
+                'maintainable_type' => get_class($model),
+                'maintainable_id' => $model->id
+            ],
+            [
+                ...$data
+            ]
+            );
+
+        if (isset($data['providers']))
+            $maintainable->providers()->sync(collect($data['providers'])->pluck('id'));
+
+        if(isset($data['maintenance_manager_id']) && $maintainable->manager === null) {
+                $maintainable->manager()->associate($data['maintenance_manager_id'])->save();
+        }
+
+        if($maintainable->manager && !isset($data['maintenance_manager_id']))
+            $maintainable->manager()->dissociate();
+
+        if (isset($data['maintenance_manager_id']) && ($maintainable->manager?->id !== $data['maintenance_manager_id'])) {
+            app(MaintainableNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($maintainable, $maintainable->manager);
+            $maintainable->manager()->associate($data['maintenance_manager_id'])->save();
+        }
+
+        if ($maintainable->wasChanged('maintenance_frequency'))
+            $maintainable->next_maintenance_date = calculateNextMaintenanceDate($data['maintenance_frequency'], $data['last_maintenance_date'] ?? null);
+
+        $maintainable->save();
+        
+        return $model;
+
     }
 
     public function update(Maintainable $maintainable, $request)

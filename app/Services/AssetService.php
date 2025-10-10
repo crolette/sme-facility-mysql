@@ -28,6 +28,16 @@ class AssetService
         return $asset;
     }
 
+    public function update(Asset $asset, array $data)
+    {
+        $asset->update(
+            [
+                ...$data
+            ], 
+        );
+
+    }
+
     public function attachLocation(Asset $asset, $locationType, $locationId): Asset | bool
     {
         try {
@@ -100,6 +110,11 @@ class AssetService
 
         if (!$location)
             throw new Exception("No location found");
+
+
+        if($asset->location_type === get_class($location) && $asset->location_id === $location->id)
+            return;
+
 
         if (!$asset->code) {
             $asset->code = $this->createAssetCodeNumber();

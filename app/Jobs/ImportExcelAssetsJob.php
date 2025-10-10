@@ -19,9 +19,9 @@ class ImportExcelAssetsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $tries = 3;
-    public $backoff = 15;
-    public $timeout = 120;
+    public $tries = 1;
+    // public $backoff = 15;
+    // public $timeout = 120;
 
     /**
      * Create a new job instance.
@@ -65,7 +65,7 @@ class ImportExcelAssetsJob implements ShouldQueue
 
     public function failed($exception): void
     {
-        Log::error('!!! FAILED EXPORT ASSETS EXCEL');
+        Log::error('!!! FAILED IMPORT ASSETS EXCEL');
         Log::error($exception);
     }
 }

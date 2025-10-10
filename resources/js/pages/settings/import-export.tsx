@@ -31,7 +31,7 @@ export default function ImportExportSettings() {
     const { showToast } = useToast();
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     
-    const { data, setData} = useForm<TypeFormData>({
+    const { data, setData, reset} = useForm<TypeFormData>({
         file: null
     })
     
@@ -39,22 +39,19 @@ export default function ImportExportSettings() {
     const uploadFile: FormEventHandler = async (e) => {
         e.preventDefault()
         setIsProcessing(true);
-        console.log("UPLOAD FILE");
         try {
              const response = await axios.post(route('api.tenant.import.assets'), data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 }
             });
-            console.log(response.data);
             if (response.data.status === 'success') {
                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.log(error);
             showToast(error.response.data.message, error.response.data.status);
         } finally {
-            setData('file', null);
+            reset();
             setIsProcessing(false);
         }
     }
