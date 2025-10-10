@@ -1,3 +1,5 @@
+import Footer from '@/components/footer';
+import { Button } from '@/components/ui/button';
 import { Head, Link } from '@inertiajs/react';
 import { type ReactNode } from 'react';
 
@@ -8,13 +10,12 @@ interface AppLayoutProps {
 export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
     return (
         <>
-            <Head title="Welcome">
-            </Head>
-            <div className="bg-background font-website flex min-h-screen w-full flex-col items-center">
-                <header className="mb-6 w-full text-sm not-has-[nav]:hidden text-background mt-6">
-                    <nav className="bg-logo container mx-auto flex items-center justify-between gap-4 px-20 py-10 rounded-md shadow-2xl">
+            <Head title="Welcome"></Head>
+            <div className="font-website flex min-h-screen w-full flex-col items-center bg-white">
+                <header className="z-50 mb-6 w-full text-sm not-has-[nav]:hidden sticky top-0">
+                    <nav className="bg-logo container mx-auto flex items-center justify-between gap-4 rounded-b-md px-20 py-10 shadow-2xl">
                         <img src="images/logo.png" alt="" className="w-50" />
-                        <ul className="flex gap-12 text-xl font-semibold">
+                        <ul className="flex gap-12 text-lg font-semibold">
                             <li>
                                 <Link href={'/who'} className="!no-underline">
                                     Pour qui ?
@@ -36,29 +37,15 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                                     Contact
                                 </Link>
                             </li>
+                            <li>
+                                <Button variant={"cta"}>Demo</Button>
+                            </li>
                         </ul>
-
-                        {/* {auth.user ? (
-                            <Link
-                                href={route('central.dashboard')}
-                                className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
-                            >
-                                Dashboard
-                            </Link>
-                        ) : (
-                            <>
-                                <Link
-                                    href={route('central.login')}
-                                    className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
-                                >
-                                    Log in
-                                </Link>
-                            </>
-                        )} */}
                     </nav>
                 </header>
-                <div className="flex w-full flex-col items-center">
-                    <main className="container flex w-full flex-col items-center p-10">{children}</main>
+                <div className="w-full ">
+                    <main className=" ">{children}</main>
+                    <Footer/>
                 </div>
             </div>
         </>
