@@ -11,13 +11,13 @@
 @theme {
     --font-sans:
         'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-    --font-website: "Nunito Sans", serif; 
+    --font-website: 'Nunito Sans', serif;
 
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
 
-    --color-logo : var(--logo);
+    --color-logo: var(--logo);
     --color-background: var(--background);
     --color-foreground: var(--foreground);
 
@@ -46,6 +46,8 @@
     --color-website-secondary: var(--website-secondary);
     --color-website-primary: var(--website-primary);
     --color-website-border: var(--website-border);
+    --color-website-font: var(--website-font);
+    --color-website-card: var(--website-card);
 
     --color-border: var(--border);
     --color-input: var(--input);
@@ -87,10 +89,12 @@
 }
 
 :root {
-    --website-primary: #224E91;
-    --website-secondary: #E3EBFC;
-    --website-cta: #FFD700; 
-    --website-border: #5770A1;
+    --website-primary: #224e91;
+    --website-secondary: #e3ebfc;
+    --website-cta: #ffd700;
+    --website-border: #5770a1;
+    --website-font: #0d0d3a;
+    --website-card: #ebf5ff;
     --logo: #111154;
     --background: oklch(0.9656 0.0171 248.01);
     --foreground: oklch(0.145 0 0);
@@ -112,7 +116,7 @@
     --border: oklch(42.935% 0.11812 258.322);
     --input: oklch(0.922 0 0);
     --ring: oklch(0.87 0 0);
-    --cta : ;
+    --cta: ;
     --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
     --chart-3: oklch(0.398 0.07 227.392);
@@ -175,10 +179,9 @@
     }
 }
 
-a  {
+a {
     @apply underline;
     cursor: pointer;
-
 }
 
 a:hover {
@@ -209,12 +212,14 @@ h5 {
     font-size: clamp(1.125rem, 2.5vw, 1.5rem);
 }
 
+h6 {
+    font-size: clamp(0.8rem, 1.5vw, 1.25rem);
+}
+
 label:has(input:required) {
     /* color: oklch(38.385% 0.05163 19.666); */
     font-weight: bold;
 }
-
-
 
 div:has(+ input:required)::after {
     content: '*';
@@ -238,54 +243,53 @@ label:has(+ input:required)::after {
 
 /* Light styling for presentation */
 details {
-  /* border-block-end: 1px solid #000; */
-  margin-block: .5rem;
-  padding-block: .5rem;
+    /* border-block-end: 1px solid #000; */
+    margin-block: 0.5rem;
+    padding-block: 0.5rem;
 }
 
 summary {
-  /* Pin the custom marker to the container */
-  position: relative;
-  /* Register summary as an anchor element */
-  anchor-name: --summary;
-  
-  &::marker {
-    content: "";
-  }
-  
-  &::before,
-  &::after {
-    /* Custom marker dimensions */
-    content: "";
-    border-block-start: 3px solid orangered;
-    height: 0;
-    width: 1rem;
-    
-    /* Positions the lines */
-    inset-block-start: 50%;
-    inset-inline-end: 0;
-    
-    /* Anchor the shape to the summary */
-    position: absolute;
-    position-anchor: --summary;
-    position-area: top end;
-  }
-  
-  /* Rotate just the ::after line to create a "+"" shape */
-  &::after {
-    transform: rotate(90deg);
-    transform-origin: 50%;
-  }
+    /* Pin the custom marker to the container */
+    position: relative;
+    /* Register summary as an anchor element */
+    anchor-name: --summary;
+
+    &::marker {
+        content: '';
+    }
+
+    &::before,
+    &::after {
+        /* Custom marker dimensions */
+        content: '';
+        border-block-start: 3px solid orangered;
+        height: 0;
+        width: 1rem;
+
+        /* Positions the lines */
+        inset-block-start: 50%;
+        inset-inline-end: 0;
+
+        /* Anchor the shape to the summary */
+        position: absolute;
+        position-anchor: --summary;
+        position-area: top end;
+    }
+
+    /* Rotate just the ::after line to create a "+"" shape */
+    &::after {
+        transform: rotate(90deg);
+        transform-origin: 50%;
+    }
 }
 
 /* Rotate the line when open */
 details[open] summary::after {
-  transform: rotate(0deg);
+    transform: rotate(0deg);
 }
-
 
 /* WEBSITE */
 
 .blob {
-    border-radius: 55% 45% 68% 32% / 30% 30% 70% 70% ;
+    border-radius: 55% 45% 68% 32% / 30% 30% 70% 70%;
 }
