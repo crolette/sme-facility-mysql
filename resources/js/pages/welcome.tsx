@@ -8,23 +8,27 @@ export default function Welcome() {
             <section className="bg-logo -mt-20 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
                 <div className="container mx-auto grid h-full gap-10 px-4 py-20 md:max-w-2/3 md:grid-cols-[2fr_1fr] md:gap-30 md:p-10">
                     <div className="flex flex-col items-center justify-center gap-10 md:max-w-lg">
-                        <p className="text-4xl font-semibold">Et si la gestion de vos installations devenait facile?</p>
-                        <h1 className="!text-lg">SME-Facility booste la productivité et la croissance de votre entreprise.</h1>
-                        <p>
+                        <h1 className="">
+                            Le système de gestion de facility management
+                            <span className="font-extrabold"> idéal pour les PME.</span>
+                        </h1>
+                        <p className="">
                             Véritable outil de Facility management, SME-Facility centralise l'information sur les équipements, simplifie votre
-                            quotidien et renforce la collaboration.
+                            quotidien et renforce la collaboration. SME-Facility booste la productivité et la croissance de votre entreprise.
                         </p>
                         <div className="flex flex-col gap-6 md:flex-row md:gap-10">
-                            <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
+                            <Button variant={'cta'} className="">
+                                Prendre rendez-vous pour une démo
+                            </Button>
                             <Button variant={'transparent'}>Découvrir les fonctionnalités</Button>
                         </div>
                     </div>
-                    <div className="mx-auto my-auto">
+                    <div className="mx-auto my-auto w-full bg-red-500">
                         <img src="images/home/fm_sm.jpg" alt="" className="blob max-h-72 w-auto rounded-md shadow-2xl" />
                     </div>
                 </div>
             </section>
-            <section className="min-h-screen py-40">
+            <section className="flex min-h-screen items-center py-40">
                 <div className="container mx-auto h-full space-y-10 px-4 py-10 text-black md:max-w-2/3 md:p-10">
                     <h2>Un outil pour gérer toutes vos installations</h2>
                     <div className="grid gap-6 md:grid-cols-2">
@@ -70,8 +74,8 @@ export default function Welcome() {
                     </div>
                 </div>
             </section>
-            <section className="bg-website-card min-h-screen py-40">
-                <div className="text-website-font container mx-auto h-full space-y-10 px-4 py-10 md:max-w-2/3 md:p-10">
+            <section className="bg-website-card flex min-h-screen items-center py-40">
+                <div className="text-website-font flex-flex-col space-y-10px-4 container mx-auto h-full items-center py-10 md:max-w-2/3 md:p-10">
                     <h2>La résolution d'un problème n'a jamais été ausi facile</h2>
                     <div className="relative grid md:grid-cols-[2fr_1fr]">
                         <div className="relative space-y-6">
@@ -119,7 +123,7 @@ export default function Welcome() {
                     </div>
                 </div>
             </section>
-            <section className="min-h-screen py-40">
+            <section className="flex min-h-screen items-center py-40">
                 <div className="text-website-font container mx-auto h-full space-y-10 px-4 py-10 md:max-w-2/3 md:p-10">
                     <h2 className="">Gestion facile de vos installations</h2>
                     <p>SME-Facility ... </p>
