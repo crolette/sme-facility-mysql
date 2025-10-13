@@ -11,14 +11,12 @@ interface AppLayoutProps {
 export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
     const [showMobileMenu, setShowMobileMenu] = useState(false);
 
-    console.log(showMobileMenu);
-
     return (
         <>
             <Head title="Welcome"></Head>
             <div className="font-website flex min-h-screen w-full flex-col items-center bg-white">
-                <header className="sticky top-0 z-50 mb-6 w-full text-sm not-has-[nav]:hidden">
-                    <nav className="bg-logo container mx-auto flex flex-row items-center justify-between gap-4 rounded-b-md px-10 py-6 shadow-2xl lg:px-20 lg:py-10">
+                <header className="sticky top-0 z-50 container mb-6 w-full text-sm not-has-[nav]:hidden">
+                    <nav className="bg-logo mx-auto flex flex-row items-center justify-between gap-4 rounded-b-md px-10 py-6 shadow-2xl lg:px-20 lg:py-10">
                         <a href={route('home')}>
                             <img src="../images/logo.png" alt="" className="w-32 lg:w-50" />
                         </a>

@@ -241,6 +241,14 @@ label:has(+ input:required)::after {
     background-color: var(--color-required);
 }
 
+.website-details {
+    details {
+        margin-block: 0rem;
+        padding-block: 0rem;
+        /* border-block-end: 1px solid #000; */
+    }
+}
+
 /* Light styling for presentation */
 details {
     /* border-block-end: 1px solid #000; */
@@ -268,7 +276,7 @@ summary {
 
         /* Positions the lines */
         inset-block-start: 50%;
-        inset-inline-end: 0;
+        inset-inline-end: 2%;
 
         /* Anchor the shape to the summary */
         position: absolute;

@@ -23,7 +23,7 @@ export default function Welcome() {
                             <Button variant={'transparent'}>Découvrir les fonctionnalités</Button>
                         </div>
                     </div>
-                    <div className="mx-auto my-auto w-full bg-red-500">
+                    <div className="mx-auto my-auto">
                         <img src="images/home/fm_sm.jpg" alt="" className="blob max-h-72 w-auto rounded-md shadow-2xl" />
                     </div>
                 </div>

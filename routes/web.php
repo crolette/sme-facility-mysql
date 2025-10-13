@@ -43,6 +43,10 @@ foreach (config('tenancy.central_domains') as $domain) {
             });
         });
 
+        Route::get('pricing', function () {
+            return Inertia::render('website/pricing');
+        });
+
         // Route::get('/mail', function () {
         //     $param1 = User::first();
 
