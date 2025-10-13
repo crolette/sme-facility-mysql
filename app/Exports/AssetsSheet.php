@@ -148,6 +148,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $sheet->protectCells('2:2', '');
         $sheet->protectCells('A:A', '');
         $sheet->protectCells('B:B', '');
+        $sheet->protectCells('AD:AD', '');
         $sheet->getRowDimension('1')->setRowHeight(0);
         $sheet->freezePane('F3');
 
