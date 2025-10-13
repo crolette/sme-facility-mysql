@@ -24,6 +24,7 @@ class PermissionsSeeder extends Seeder
                 'roles' => ['assign'],
                 'permissions' => ['assign'],
                 'company' => ['view', 'update'],
+                'excel' => ['export', 'import'],
                 'users' => ['view any', 'view', 'create', 'update', 'delete'],
                 'locations' => ['view any', 'view', 'create', 'update', 'delete'],
                 'assets' => ['view any', 'view', 'create', 'update', 'delete', 'force delete', 'restore'],

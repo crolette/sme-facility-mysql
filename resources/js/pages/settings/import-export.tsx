@@ -24,7 +24,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface TypeFormData {
     file: File | null;
-    [key: string] : any
 }
 
 export default function ImportExportSettings() {
@@ -32,7 +31,7 @@ export default function ImportExportSettings() {
     const { showToast } = useToast();
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     
-    const { data, setData} = useForm<TypeFormData>({
+    const { data, setData, reset} = useForm<TypeFormData>({
         file: null
     })
     
@@ -40,13 +39,29 @@ export default function ImportExportSettings() {
     const uploadFile: FormEventHandler = async (e) => {
         e.preventDefault()
         setIsProcessing(true);
-        console.log("UPLOAD FILE");
         try {
              const response = await axios.post(route('api.tenant.import.assets'), data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 }
             });
+            if (response.data.status === 'success') {
+                showToast(response.data.message, response.data.status);
+            }
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
+        } finally {
+            reset();
+            setIsProcessing(false);
+        }
+    }
+
+    const exportAssets: FormEventHandler = async (e) => {
+        e.preventDefault();
+        setIsProcessing(true);
+
+        try {
+            const response = await axios.get(route('tenant.assets.export'));
             console.log(response.data);
             if (response.data.status === 'success') {
                 showToast(response.data.message, response.data.status);
@@ -55,10 +70,11 @@ export default function ImportExportSettings() {
             console.log(error);
             showToast(error.response.data.message, error.response.data.status);
         } finally {
-            setData('file', null);
             setIsProcessing(false);
         }
-    }
+    };
+
+    console.log(data);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -68,33 +84,27 @@ export default function ImportExportSettings() {
                 <div className="w-full space-y-6 space-x-2">
                     <div className="relative gap-4">
                         <HeadingSmall title="Import/Export" />
-                        <a href={route('tenant.assets.export')} >
-                        <Button variant={'secondary'}>
+                        <Button variant={'secondary'} onClick={exportAssets} disabled={isProcessing}>
                             <BiSolidFilePdf size={20} />
                             Exporter les assets
                         </Button>
-                    </a>
                     </div>
                     <form action="" onSubmit={uploadFile}>
                         <input
                             type="file"
                             name=""
+                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                             id=""
-                            onChange={(e) => (
-                                (e.target.files && e.target.files?.length > 0) ? setData('file', e.target.files[0]) : null
-                            )}
+                            onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
                         />
                         <Button disabled={isProcessing}>
                             {isProcessing ? (
                                 <>
-                                    <Loader className='animate-pulse' />
+                                    <Loader className="animate-pulse" />
                                     <span>Submitting...</span>
                                 </>
-                            ): (
-                                    <span>
-                                        
-                                        Submit
-                                </span>
+                            ) : (
+                                <span>Submit</span>
                             )}
                         </Button>
                     </form>

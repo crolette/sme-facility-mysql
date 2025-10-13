@@ -14,6 +14,7 @@ use Illuminate\Support\Collection;
 use App\Enums\MaintenanceFrequency;
 use Illuminate\Support\Facades\Log;
 use App\Models\Central\CategoryType;
+use App\Services\AssetExportImportService;
 use App\Services\MaintainableService;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Error;
@@ -37,45 +38,34 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
     public function collection(Collection $rows)
     {
         foreach($rows as $row) {
-            $assetData = $this->transformRowForAssetCreation($row);
-            $maintainableData = $this->transformRowForMaintainableCreation($row);
+            $assetHash = $row['hash'];
+            $rowWithoutHash = $row;
+            unset($rowWithoutHash['hash']);
 
-            if(!$row['reference_code']) {
-                $asset = app(AssetService::class)->create($assetData);
+            $calculatedHash = app(AssetExportImportService::class)->calculateHash([...$rowWithoutHash]);
 
+            if($assetHash !== $calculatedHash) {
+                $assetData = $this->transformRowForAssetCreation($row);
+                $maintainableData = $this->transformRowForMaintainableCreation($row);
+
+                if($row['reference_code']) {
+                    $asset = Asset::where('code', $row['code'])->first();
+                    app(AssetService::class)->update($asset, $assetData);
+                } else {
+                    $asset = app(AssetService::class)->create($assetData);
+                }
+                
                 $asset = app(AssetService::class)->attachLocationFromImport($asset, $assetData);
 
-                // Search the category type based on the localized label selected in the excel file
                 $translation = Translation::where('translatable_type', (CategoryType::class))->where('label', $row['category'])->first();
+
                 if(!$translation)
                     throw new Exception('Category type not existing');
 
                 $asset->assetCategory()->associate($translation->translatable->id);
                 $asset->save();             
 
-                app(MaintainableService::class)->create($asset, $maintainableData);
-
-                if ($row['need_qr_code'] === true)
-                    app(QRCodeService::class)->createAndAttachQR($asset);
-
-            } else {
-                $asset = Asset::where('code', $row['code'])->first();
-                $asset->update([...$assetData]);
-
-               
-
-                // Search the category type based on the localized label selected in the excel file
-                $translation = Translation::where('translatable_type', (CategoryType::class))->where('label', $row['category'])->first();
-                if (!$translation)
-                    throw new Exception('Category type not existing');
-                $asset->assetCategory()->associate($translation->translatable->id);
-
-                $asset = app(AssetService::class)->attachLocationFromImport($asset, $assetData);
-
-                // BUG UPDATE MAINTAINABLE - CHECK / TESTS !!!
-                $asset->maintainable->update([...$maintainableData]);
-
-                $asset->save();
+                app(MaintainableService::class)->updateOrCreate($asset, $maintainableData);
 
                 if ($row['need_qr_code'] === true)
                     app(QRCodeService::class)->createAndAttachQR($asset);
@@ -93,11 +83,11 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
             'serial_number' => $rowData['serial_number'] ?? null,
             'surface' => $rowData['surface'] ?? null,
             'is_mobile' => $rowData['is_mobile'],
-            'site' => $rowData['site'],
-            'building' => $rowData['building'],
-            'floor' => $rowData['floor'],
-            'room' => $rowData['room'],
-            'user' => $rowData['user'],
+            'site' => $rowData['location_type_site'],
+            'building' => $rowData['location_type_building'],
+            'floor' => $rowData['location_type_floor'],
+            'room' => $rowData['location_type_room'],
+            'user' => $rowData['location_type_user'],
             'depreciable' => $rowData['depreciable'],
             'depreciation_start_date' => $rowData['depreciation_start_date'] ?? null,
             'depreciation_end_date' => $rowData['depreciation_end_date'] ?? null,
@@ -116,8 +106,8 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
             'purchase_date' => $rowData['purchase_date'],
             'purchase_cost' => $rowData['purchase_cost'],
             'under_warranty' => $rowData['under_warranty'],
-            'need_maintenance' => $rowData['need_maintenance'],
             'end_warranty_date' => $rowData['end_warranty_date'],
+            'need_maintenance' => $rowData['need_maintenance'],
             'maintenance_frequency' => $rowData['maintenance_frequency'],
             'next_maintenance_date' => $rowData['next_maintenance_date'],
             'last_maintenance_date' => $rowData['last_maintenance_date'],

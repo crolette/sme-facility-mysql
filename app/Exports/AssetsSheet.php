@@ -2,20 +2,22 @@
 
 namespace App\Exports;
 
+use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
+use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Building;
 use App\Enums\MaintenanceFrequency;
+use Illuminate\Support\Facades\Log;
 use App\Models\Central\CategoryType;
-use App\Models\Tenants\Room;
-use App\Models\Tenants\User;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use App\Services\AssetExportImportService;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithStyles;
@@ -45,37 +47,13 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
 
     public function map($asset): array
     {
+        $rowData = app(AssetExportImportService::class)->generateDataForHash($asset);
+        $hash = app(AssetExportImportService::class)->calculateHash($rowData);
+        Log::info($rowData);
+        
+        $rowExcel = app(AssetExportImportService::class)->generateExcelDisplayData($asset);
         // Debugbar::info($asset->id, $asset->location);
-        return [
-            $asset->reference_code,
-            $asset->code,
-            $asset->name,
-            $asset->description,
-            $asset->category,
-            $asset->qr_code ? 'Yes' : 'No',
-            $asset->is_mobile ? 'Yes' : 'No',
-            $asset->location_type === Site::class ? 'SITE' : null,
-            $asset->location_type === Building::class ? 'BUILDING' : null,
-            $asset->location_type === Floor::class ? 'FLOOR' : null,
-            $asset->location_type === Room::class ? $asset->location->reference_code . ' - ' . $asset->location->name : null,
-            $asset->location_type === User::class ? $asset->location->full_name . ' - ' . $asset->location->email : null,
-            $asset->brand,
-            $asset->model,
-            $asset->serial_number,
-            $asset->depreciable ? 'Yes' : 'No',
-            $asset->depreciation_start_date ? Date::dateTimeToExcel($asset->depreciation_start_date) : null,
-            $asset->depreciation_end_date ? Date::dateTimeToExcel($asset->depreciation_end_date) : null,
-            $asset->depreciation_duration,
-            $asset->surface,
-            $asset->maintainable->purchase_date ? Date::dateTimeToExcel($asset->maintainable->purchase_date) : null,
-            $asset->maintainable->purchase_cost ?? null,
-            $asset->maintainable->under_warranty ? 'Yes' : 'No',
-            $asset->maintainable->end_warranty_date ? Date::dateTimeToExcel($asset->maintainable->end_warranty_date) : null,
-            $asset->maintainable->need_maintenance ? 'Yes' : 'No',
-            $asset->maintainable->maintenance_frequency ?? null,
-            $asset->maintainable->next_maintenance_date ? Date::dateTimeToExcel($asset->maintainable->next_maintenance_date) : null,
-            $asset->maintainable->last_maintenance_date ? Date::dateTimeToExcel($asset->maintainable->last_maintenance_date) : null,
-        ];
+        return array_merge(array_values($rowExcel), [$hash]);
     }
 
     public function headings(): array
@@ -89,11 +67,11 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
                 'category',
                 'need_qr_code',
                 'is_mobile',
-                'site',
-                'building',
-                'floor',
-                'room',
-                'user',
+                'location_type_site',
+                'location_type_building',
+                'location_type_floor',
+                'location_type_room',
+                'location_type_user',
                 'brand',
                 'model',
                 'serial_number',
@@ -101,6 +79,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
                 'depreciation_start_date',
                 'depreciation_end_date',
                 'depreciation_duration',
+                'residual_value',
                 'surface',
                 'purchase_date',
                 'purchase_cost',
@@ -110,6 +89,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
                 'maintenance_frequency',
                 'next_maintenance_date',
                 'last_maintenance_date',
+                'hash'
             ],
             [
                 'Reference Code',
@@ -131,6 +111,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
                 'Depreciation Start date',
                 'Depreciation End date',
                 'Depreciation duration (years)',
+                'Residual value',
                 'Surface (m²)',
                 'Purchase date',
                 'Purchase cost',
@@ -140,6 +121,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
                 'maintenance_frequency',
                 'next_maintenance_date',
                 'last_maintenance_date',
+                '_hash'
             ]
         ];
     }
@@ -149,10 +131,10 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         return [
             'Q' => NumberFormat::FORMAT_DATE_DDMMYYYY,
             'R' => NumberFormat::FORMAT_DATE_DDMMYYYY,
-            'U' => NumberFormat::FORMAT_DATE_DDMMYYYY,
-            'X' => NumberFormat::FORMAT_DATE_DDMMYYYY,
-            'AA' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'V' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'Y' => NumberFormat::FORMAT_DATE_DDMMYYYY,
             'AB' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'AC' => NumberFormat::FORMAT_DATE_DDMMYYYY,
         ];
     }
 
@@ -232,28 +214,28 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $sheet->getStyle('S3:S1000')->setConditionalStyles([$conditional]);
 
         // Under warranty
-        $sheet->setDataValidation('W3:W9999', clone $validation);
+        $sheet->setDataValidation('X3:X9999', clone $validation);
 
         // Conditional formatting on end_warranty_date
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
-        $conditional->addCondition('AND($W3="Yes",ISBLANK($X3))');
+        $conditional->addCondition('AND($X3="Yes",ISBLANK($X3))');
         $conditional->getStyle()->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFF0000');
-        $sheet->getStyle('X3:X1000')->setConditionalStyles([$conditional]);
+        $sheet->getStyle('Y3:Y1000')->setConditionalStyles([$conditional]);
 
         //Need maintenance
-        $sheet->setDataValidation('Y3:Y9999', clone $validation);
+        $sheet->setDataValidation('Z3:Z9999', clone $validation);
 
         // Conditional formatting on maintenance_frequency
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
-        $conditional->addCondition('AND($Y3="Yes",ISBLANK($Z3))');
+        $conditional->addCondition('AND($Z3="Yes",ISBLANK($Z3))');
         $conditional->getStyle()->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFF0000');
-        $sheet->getStyle('Z3:Z1000')->setConditionalStyles([$conditional]);
+        $sheet->getStyle('AA3:AA1000')->setConditionalStyles([$conditional]);
 
 
         // Site
@@ -312,7 +294,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $frequencies = collect(array_column(MaintenanceFrequency::cases(), 'value'));
         $frequenciesList = $frequencies->join(',');
 
-        $validation = $sheet->getDataValidation('Z3');
+        $validation = $sheet->getDataValidation('AA3');
         $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
         $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
         $validation->setAllowBlank(false);
@@ -325,7 +307,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $validation->setPrompt('Please pick a value from the drop-down list.');
         $validation->setFormula1('"' . $frequenciesList . '"');
 
-        $sheet->setDataValidation('Z3:Z9999', clone $validation);
+        $sheet->setDataValidation('AA3:AA9999', clone $validation);
 
 
 

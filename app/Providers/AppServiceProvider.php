@@ -2,12 +2,14 @@
 
 namespace App\Providers;
 
+use App\Models\Tenants\User;
 use App\Models\Tenants\Contract;
 use Illuminate\Support\Facades\DB;
 use App\Observers\ContractObserver;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -29,6 +31,14 @@ class AppServiceProvider extends ServiceProvider
         // grant complete access to super admin
         Gate::before(function ($user, $ability) {
             return $user->hasRole('Super Admin') ? true : null;
+        });
+
+        Gate::define('import-excel', function (User $user) {
+            return $user->can('import excel');
+        });
+
+        Gate::define('export-excel', function (User $user) {
+            return $user->can('export excel');
         });
 
         if (tenant()) {
