@@ -42,7 +42,8 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
 
     public function query()
     {
-        return Asset::query()->whereIn('id', [37, 49]);
+        return Asset::query();
+        // return Asset::query()->whereIn('id', [37, 49]);
     }
 
     public function map($asset): array
@@ -50,7 +51,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $rowData = app(AssetExportImportService::class)->generateDataForHash($asset);
         $hash = app(AssetExportImportService::class)->calculateHash($rowData);
         Log::info($rowData);
-        
+
         $rowExcel = app(AssetExportImportService::class)->generateExcelDisplayData($asset);
         // Debugbar::info($asset->id, $asset->location);
         return array_merge(array_values($rowExcel), [$hash]);
@@ -317,6 +318,4 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
 
         ];
     }
-
-    
 }
