@@ -6,7 +6,7 @@ export default function Welcome() {
     return (
         <WebsiteLayout>
             <section className="bg-logo -mt-20 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
-                <div className="container mx-auto grid h-full gap-10 px-4 py-20 md:grid-cols-[2fr_1fr] md:gap-30 md:p-10">
+                <div className="container mx-auto grid h-full gap-10 px-4 py-20 md:max-w-2/3 md:grid-cols-[2fr_1fr] md:gap-30 md:p-10">
                     <div className="flex flex-col items-center justify-center gap-10 md:max-w-lg">
                         <p className="text-4xl font-semibold">Et si la gestion de vos installations devenait facile?</p>
                         <h1 className="!text-lg">SME-Facility booste la productivité et la croissance de votre entreprise.</h1>
@@ -25,7 +25,7 @@ export default function Welcome() {
                 </div>
             </section>
             <section className="min-h-screen py-40">
-                <div className="container mx-auto h-full space-y-10 px-4 py-10 text-black md:p-10">
+                <div className="container mx-auto h-full space-y-10 px-4 py-10 text-black md:max-w-2/3 md:p-10">
                     <h2>Un outil pour gérer toutes vos installations</h2>
                     <div className="grid gap-6 md:grid-cols-2">
                         <div className="flex flex-col space-y-6 md:items-end">
@@ -71,7 +71,7 @@ export default function Welcome() {
                 </div>
             </section>
             <section className="bg-website-card min-h-screen py-40">
-                <div className="text-website-font container mx-auto h-full space-y-10 px-4 py-10 md:p-10">
+                <div className="text-website-font container mx-auto h-full space-y-10 px-4 py-10 md:max-w-2/3 md:p-10">
                     <h2>La résolution d'un problème n'a jamais été ausi facile</h2>
                     <div className="relative grid md:grid-cols-[2fr_1fr]">
                         <div className="relative space-y-6">
@@ -116,6 +116,69 @@ export default function Welcome() {
                             </div>
                         </div>
                         <div></div>
+                    </div>
+                </div>
+            </section>
+            <section className="min-h-screen py-40">
+                <div className="text-website-font container mx-auto h-full space-y-10 px-4 py-10 md:max-w-2/3 md:p-10">
+                    <h2 className="">Gestion facile de vos installations</h2>
+                    <p>SME-Facility ... </p>
+
+                    <div className="from-website-primary text-website-secondary mx-auto grid grid-cols-1 gap-6 rounded-md bg-linear-to-r to-white p-6 lg:grid-cols-[2fr_1fr]">
+                        <div>
+                            <h3>Facilitez</h3>
+                            <p className="font-semibold">vous la vie avec un seul outil</p>
+                            <ul className="mt-5 ml-10 list-disc space-y-10">
+                                <li>Application web intuitive et facile d'utilisation</li>
+                                <li>Application web intuitive et facile d'utilisation</li>
+                                <li>Application web intuitive et facile d'utilisation</li>
+                            </ul>
+                        </div>
+                        <div className="relative flex items-center justify-end">
+                            <img src="images/Digital tools-bro.svg" alt="" className="max-h-11/12" />
+                        </div>
+                    </div>
+                    <div className="text-website-font to-website-secondary mx-auto grid grid-cols-1 gap-6 rounded-md bg-linear-to-r from-white p-6 lg:grid-cols-[1fr_2fr]">
+                        <div className="relative flex items-center justify-end">
+                            <img src="images/Electrician-bro.svg" alt="" className="max-h-11/12" />
+                        </div>
+                        <div>
+                            <h3>Planifiez</h3>
+                            <p className="font-semibold">rapidement et simplement vos maintenances</p>
+                            <ul className="mt-5 ml-10 list-disc space-y-10">
+                                <li>Application web intuitive et facile d'utilisation</li>
+                                <li>Application web intuitive et facile d'utilisation</li>
+                                <li>Application web intuitive et facile d'utilisation</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div className="from-website-primary text-website-secondary mx-auto grid min-h-[420px] grid-cols-1 gap-6 rounded-md bg-linear-to-r to-white p-6 lg:grid-cols-[2fr_1fr]">
+                        <div>
+                            <h3>Facilitez</h3>
+                            <p className="font-semibold">vous la vie avec un seul outil</p>
+                            <ul className="mt-5 ml-10 list-disc space-y-10">
+                                <li>Application web intuitive et facile d'utilisation</li>
+                                <li>Application web intuitive et facile d'utilisation</li>
+                                <li>Application web intuitive et facile d'utilisation</li>
+                            </ul>
+                        </div>
+                        <div className="relative flex items-center justify-end">
+                            <img src="images/Office management-pana.svg" alt="" className="max-h-11/12" />
+                        </div>
+                    </div>
+                    <div className="text-website-font to-website-secondary mx-auto grid grid-cols-1 gap-6 rounded-md bg-linear-to-r from-white p-6 lg:grid-cols-[1fr_2fr]">
+                        <div className="relative flex items-center justify-end">
+                            <img src="images/Download-amico.svg" alt="" className="max-h-11/12" />
+                        </div>
+                        <div>
+                            <h3>Centralisez</h3>
+                            <p className="font-semibold">vous la vie avec un seul outil</p>
+                            <ul className="mt-5 ml-10 list-disc space-y-10">
+                                <li>Application web intuitive et facile d'utilisation</li>
+                                <li>Application web intuitive et facile d'utilisation</li>
+                                <li>Application web intuitive et facile d'utilisation</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </section>

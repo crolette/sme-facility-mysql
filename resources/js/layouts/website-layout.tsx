@@ -1,5 +1,5 @@
-import Footer from '@/components/footer';
 import { Button } from '@/components/ui/button';
+import Footer from '@/components/website/footer';
 import { Head, Link } from '@inertiajs/react';
 import { Menu, X } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
@@ -18,21 +18,25 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
             <Head title="Welcome"></Head>
             <div className="font-website flex min-h-screen w-full flex-col items-center bg-white">
                 <header className="sticky top-0 z-50 mb-6 w-full text-sm not-has-[nav]:hidden">
-                    <nav className="bg-logo container mx-auto flex flex-row items-center justify-between gap-4 rounded-b-md px-10 py-6 shadow-2xl md:px-20 md:py-10">
+                    <nav className="bg-logo container mx-auto flex flex-row items-center justify-between gap-4 rounded-b-md px-10 py-6 shadow-2xl lg:px-20 lg:py-10">
                         <a href={route('home')}>
-                            <img src="images/logo.png" alt="" className="w-32 md:w-50" />
+                            <img src="../images/logo.png" alt="" className="w-32 lg:w-50" />
                         </a>
-                        <Menu size={24} onClick={() => setShowMobileMenu(true)} />
+
                         <ul className="hidden gap-12 text-lg font-semibold md:flex">
                             <li>
-                                <Link href={'/who'} className="!no-underline">
+                                <Link href={'/features/qr-code'} className="!no-underline">
+                                    Fonctionnalités
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href={'/who/manager'} className="!no-underline">
                                     Pour qui ?
                                 </Link>
                             </li>
-
                             <li>
-                                <Link href={'/who'} className="!no-underline">
-                                    Fonctionnalités
+                                <Link href={'/why/sme'} className="!no-underline">
+                                    Pour quoi choisir SME-Facility ?
                                 </Link>
                             </li>
                             <li>
@@ -40,17 +44,14 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                                     Tarifs
                                 </Link>
                             </li>
-                            <li>
-                                <Link href={'/contact'} className="!no-underline">
-                                    Contact
-                                </Link>
-                            </li>
+
                             <li>
                                 <Button variant={'cta'}>Demo</Button>
                             </li>
                         </ul>
+                        <Menu size={24} onClick={() => setShowMobileMenu(true)} className="block md:hidden" />
                         {showMobileMenu && (
-                            <div className="absolute inset-0 flex h-screen w-full flex-col items-center justify-center bg-red-500">
+                            <div className="absolute inset-0 flex h-screen w-full flex-col items-center justify-center bg-red-500 md:hidden">
                                 MENU
                                 <X onClick={() => setShowMobileMenu(false)} />
                             </div>

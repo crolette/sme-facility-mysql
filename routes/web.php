@@ -25,13 +25,31 @@ foreach (config('tenancy.central_domains') as $domain) {
             return Inertia::render('welcome');
         })->name('home');
 
-        Route::get('/mail', function () {
-            $param1 = User::first();
 
-            $param2 = Tenant::first();
-
-            return (new NewTenantCreatedMail($param1, $param2))->render();
+        Route::prefix('features')->group(function () {
+            Route::get('/qr-code', function () {
+                return Inertia::render('website/features/qr-code');
+            });
         });
+
+        Route::prefix('who')->group(function () {
+            Route::get('/manager', function () {
+                return Inertia::render('website/who/manager');
+            });
+        });
+        Route::prefix('why')->group(function () {
+            Route::get('/sme', function () {
+                return Inertia::render('website/why-sme/why-sme');
+            });
+        });
+
+        // Route::get('/mail', function () {
+        //     $param1 = User::first();
+
+        //     $param2 = Tenant::first();
+
+        //     return (new NewTenantCreatedMail($param1, $param2))->render();
+        // });
 
         Route::middleware(['web', AuthenticateCentral::class])->group(function () {
             Route::get('dashboard', function () {
@@ -42,7 +60,7 @@ foreach (config('tenancy.central_domains') as $domain) {
 
             Route::get('tenants', [CentralTenantController::class, 'index'])->name('central.tenants.index');
 
-            Route::get('api/tenants', function() {
+            Route::get('api/tenants', function () {
                 $tenants = Tenant::with('domain')->get();
                 return ApiResponse::success($tenants);
             })->name('api.central.tenants.index');
@@ -67,17 +85,17 @@ foreach (config('tenancy.central_domains') as $domain) {
 
             Route::resource('category-types', CentralCategoryTypeController::class)->parameters(['category-types' => 'categoryType'])->names('central.types');
 
-            Route::post('/tenant-notif/', function(Request $request) {
+            Route::post('/tenant-notif/', function (Request $request) {
 
                 try {
                     $tenant = Tenant::findOrFail($request->tenant);
                     $email = $tenant->email;
 
                     Debugbar::info($tenant, $email);
-                    
+
                     $tenant->run(function () use ($email, $tenant) {
                         $admin = User::where('email', $email)->first();
-                        
+
                         Debugbar::info($admin);
 
                         event(new NewTenantCreatedEvent($admin, $tenant));
@@ -90,9 +108,6 @@ foreach (config('tenancy.central_domains') as $domain) {
                     Log::info($e->getMessage());
                     return ApiResponse::error($e->getMessage());
                 }
-                
-
-                
             })->name('send-notif-tenant-admin');
         });
     });
