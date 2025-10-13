@@ -141,14 +141,14 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
 
     public function styles(Worksheet $sheet)
     {
-        // $protection = $sheet->getProtection();
-        // $protection->setPassword('');
-        // $protection->setSheet(true);
-        // $sheet->protectCells('1:1', '');
-        // $sheet->protectCells('2:2', '');
-        // $sheet->protectCells('A:A', '');
-        // $sheet->protectCells('B:B', '');
-        // $sheet->getRowDimension('1')->setRowHeight(0);
+        $protection = $sheet->getProtection();
+        $protection->setPassword('');
+        $protection->setSheet(true);
+        $sheet->protectCells('1:1', '');
+        $sheet->protectCells('2:2', '');
+        $sheet->protectCells('A:A', '');
+        $sheet->protectCells('B:B', '');
+        $sheet->getRowDimension('1')->setRowHeight(0);
         $sheet->freezePane('F3');
 
 
