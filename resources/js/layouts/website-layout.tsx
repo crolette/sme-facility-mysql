@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import Footer from '@/components/website/footer';
 import { Head, Link } from '@inertiajs/react';
 import { Menu, X } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 interface AppLayoutProps {
     children: ReactNode;
@@ -11,17 +11,29 @@ interface AppLayoutProps {
 export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
     const [showMobileMenu, setShowMobileMenu] = useState(false);
 
+    useEffect(() => {
+        if (showMobileMenu) {
+            if (typeof window != 'undefined' && window.document) {
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        if (!showMobileMenu) {
+            document.body.style.overflow = 'unset';
+        }
+    }, [showMobileMenu]);
+
     return (
         <>
             <Head title="Welcome"></Head>
-            <div className="font-website flex min-h-screen w-full flex-col items-center bg-white">
+            <div className="font-website relative flex min-h-screen w-full flex-col items-center bg-white">
                 <header className="sticky top-0 z-50 container mb-6 w-full text-sm not-has-[nav]:hidden">
-                    <nav className="bg-logo mx-auto flex flex-row items-center justify-between gap-4 rounded-b-md px-10 py-6 shadow-2xl lg:px-20 lg:py-10">
+                    <nav className="bg-logo mx-auto flex flex-row items-center justify-between gap-4 rounded-b-md px-5 py-6 shadow-2xl lg:px-5 lg:py-10">
                         <a href={route('home')}>
-                            <img src="../images/logo.png" alt="" className="w-32 lg:w-50" />
+                            <img src="../images/logo.png" alt="" className="w-32 lg:w-42" />
                         </a>
 
-                        <ul className="hidden gap-12 text-lg font-semibold md:flex">
+                        <ul className="hidden gap-8 text-lg font-semibold md:flex md:shrink-0 md:items-center lg:gap-12">
                             <li>
                                 <Link href={'/features/qr-code'} className="!no-underline">
                                     Fonctionnalités
@@ -48,16 +60,21 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                             </li>
                         </ul>
                         <Menu size={24} onClick={() => setShowMobileMenu(true)} className="block md:hidden" />
-                        {showMobileMenu && (
-                            <div className="absolute inset-0 flex h-screen w-full flex-col items-center justify-center bg-red-500 md:hidden">
-                                MENU
-                                <X onClick={() => setShowMobileMenu(false)} />
-                            </div>
-                        )}
                     </nav>
+                    {showMobileMenu && (
+                        <div className="bg-logo/80 absolute inset-0 flex h-screen items-center justify-center overflow-x-hidden">
+                            <div className="absolute inset-0 flex h-screen items-center justify-center bg-transparent md:hidden">
+                                <div className="bg-logo/90 flex h-full w-10/12 flex-col items-center justify-center">
+                                    MENU
+                                    <X onClick={() => setShowMobileMenu(false)} />
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </header>
+
                 <div className="w-full">
-                    <main className="">{children}</main>
+                    <main className="website">{children}</main>
                     <Footer />
                 </div>
             </div>

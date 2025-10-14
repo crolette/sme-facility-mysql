@@ -1,4 +1,4 @@
-import { Settings } from 'lucide-react';
+import { Boxes, ChartLine, QrCode, ReceiptText, Settings } from 'lucide-react';
 
 export default function OurSolutions() {
     return (
@@ -8,56 +8,59 @@ export default function OurSolutions() {
                 <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
                     <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
                         <div className="flex gap-4">
-                            <Settings size={24} />
+                            <Boxes size={24} className="shrink-0" />
                             <h6 className="font-semibold">Inventaire de vos équipements</h6>
                         </div>
-                        <p>Centralisation des données</p>
+                        <p>Ayez une vue d’ensemble sur vos équipements et installations en répertoriant tout dans une seule application.</p>
                         <a href="" className="text-website-primary">
                             En savoir plus
                         </a>
                     </div>
                     <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
                         <div className="flex gap-4">
-                            <Settings size={24} />
-                            <h6 className="font-semibold">Inventaire de vos équipements</h6>
+                            <Settings size={24} className="shrink-0" />
+                            <h6 className="font-semibold">Gestion de la maintenance et de vos interventions</h6>
                         </div>
-                        <p>Centralisation des données</p>
+                        <p>Planifiez et gérez vos maintenances préventives et actives ainsi que les interventions sur vos équipements.</p>
                         <a href="" className="text-website-primary">
                             En savoir plus
                         </a>
                     </div>
                     <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
                         <div className="flex gap-4">
-                            <Settings size={24} />
-                            <h6 className="font-semibold">Inventaire de vos équipements</h6>
+                            <ReceiptText size={24} className="shrink-0" />
+                            <h6 className="font-semibold">Gestion des contrats et des garanties</h6>
                         </div>
-                        <p>Centralisation des données</p>
+                        <p>
+                            Gérez vos contrats et les garanties pour ne plus oublier quand il faut arrêter ou changer un contrat ou étendre une
+                            garantie.
+                        </p>
                         <a href="" className="text-website-primary">
                             En savoir plus
                         </a>
                     </div>
                     <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
                         <div className="flex gap-4">
-                            <Settings size={24} />
-                            <h6 className="font-semibold">Inventaire de vos équipements</h6>
+                            <QrCode size={24} className="shrink-0" />
+                            <h6 className="font-semibold">QR Code/Ticketing</h6>
                         </div>
-                        <p>Centralisation des données</p>
+                        <p>Soyez mis rapidement au courant lorsqu’un de vos équipements est défectueux et intervenez rapidement.</p>
                         <a href="" className="text-website-primary">
                             En savoir plus
                         </a>
                     </div>
                     <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
                         <div className="flex gap-4">
-                            <Settings size={24} />
-                            <h6 className="font-semibold">Inventaire de vos équipements</h6>
+                            <ChartLine size={24} className="shrink-0" />
+                            <h6 className="font-semibold">Statistiques</h6>
                         </div>
-                        <p>Centralisation des données</p>
+                        <p>Visualisez les rapports et statistiques sur vos installations pour encore mieux planifiez.</p>
                         <a href="" className="text-website-primary">
                             En savoir plus
                         </a>
                     </div>
                     <div className="relative grid grid-cols-[2fr_1fr]">
-                        <img src="../images/pexels-edmond-dantes-4342352.jpg" alt="" className="h-full" />
+                        <img src="../images/pexels-edmond-dantes-4342352.jpg" alt="" className="h-full w-auto object-cover" />
 
                         <div className="relative">
                             <div className="bg-logo text-website-secondary absolute top-6 -left-10 rounded-2xl p-2 text-sm">
