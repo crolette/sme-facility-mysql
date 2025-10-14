@@ -72,11 +72,9 @@ export default function Welcome() {
                             </div>
                         </div>
                     </div>
-                    <div className="bg-website-primary text-website-card mx-auto rounded-md p-6 shadow-xl md:w-fit">
+                    <div className="bg-website-primary text-website-card mx-auto flex flex-col items-center gap-4 rounded-md p-6 shadow-xl md:w-fit">
                         <p>Découvrez notre FAQ et notre vidéo de présentation</p>
-                        <Button variant={'cta'} className="mx-auto">
-                            FAQ
-                        </Button>
+                        <Button variant={'cta'}>FAQ</Button>
                     </div>
                 </div>
             </section>
@@ -112,7 +110,9 @@ export default function Welcome() {
                                         <Settings />
                                         <p className="">Traitez le problème</p>
                                     </div>
-                                    <p>Réglez le problème en interne ou demandez l'intervention d'un prestataire externe.</p>
+                                    <p>
+                                        Planifiez une intervention et transmettez les informations au responsable de maintenance ou à un prestataire.
+                                    </p>
                                 </div>
                             </div>
                             <div className="relative w-full">
