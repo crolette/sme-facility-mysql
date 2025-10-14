@@ -24,5 +24,25 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('SME_2025!fwebxp')
             ]);
         }
+
+        if (!CentralUser::where('email', 'alain.delahaut@gmail.com')->first()) {
+
+            CentralUser::factory()->create([
+                'first_name' => 'Alain',
+                'last_name' => 'Delahaut',
+                'email' => 'alain.delahaut@gmail.com',
+                'password' => Hash::make('SME_2025!fwebxp')
+            ]);
+        }
+
+        if (!CentralUser::where('email', 'crolweb@gmail.com')->first()) {
+
+            CentralUser::factory()->create([
+                'first_name' => 'Jonathan',
+                'last_name' => 'De Dijcker',
+                'email' => 'crolweb@gmail.com',
+                'password' => Hash::make('SME_2025!fwebxp')
+            ]);
+        }
     }
 }
