@@ -1,10 +1,12 @@
 import { Linkedin, Youtube } from 'lucide-react';
 import OurSolutions from './our_solutions';
+import WhySMESection from './why-sme-section';
 
 export default function Footer() {
     return (
         <>
             <OurSolutions />
+            <WhySMESection />
 
             <footer className="bg-logo flex flex-col items-center justify-center space-y-10 px-4 py-10 text-white md:p-20">
                 <div className="container grid gap-12 md:grid-cols-4">
@@ -19,25 +21,66 @@ export default function Footer() {
                     <div className="flex flex-col gap-6">
                         <h6>Gérer vos installations</h6>
                         <ul className="text-website-border text-md flex flex-col gap-4">
-                            <li>QR Code</li>
-                            <li>Maintenance</li>
-                            <li>Contrats</li>
-                            <li>Garanties</li>
-                            <li>Interventions</li>
+                            <li>
+                                <a href={route('website.features.qrcode')} className="!no-underline">
+                                    QR Code
+                                </a>
+                            </li>
+                            <li>
+                                <a href={route('website.features.maintenance')} className="!no-underline">
+                                    Maintenance
+                                </a>
+                            </li>
+                            <li>
+                                <a href={route('website.features.contracts')} className="!no-underline">
+                                    Contrats
+                                </a>
+                            </li>
+                            <li>
+                                <a href={route('website.features.documents')} className="!no-underline">
+                                    Documents
+                                </a>
+                            </li>
+                            <li>
+                                <a href={route('website.features.assets')} className="!no-underline">
+                                    Inventaire
+                                </a>
+                            </li>
+                            <li>
+                                <a href={route('website.features.statistics')} className="!no-underline">
+                                    Statistiques
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div className="flex flex-col gap-6">
                         <h6>Pour qui ?</h6>
                         <ul className="text-website-border text-md flex flex-col gap-4">
-                            <li>Facility Manager</li>
-                            <li>Responsable de maintenance</li>
-                            <li>PME</li>
+                            <li>
+                                <a href={route('website.who.facility-manager')} className="!no-underline">
+                                    Facility Manager
+                                </a>
+                            </li>
+                            <li>
+                                <a href={route('website.who.maintenance-manager')} className="!no-underline">
+                                    Responsable de maintenance
+                                </a>
+                            </li>
+                            <li>
+                                <a href={route('website.who.sme')} className="!no-underline">
+                                    PME
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div className="flex flex-col gap-6">
                         <h6>Avec SME-Facility</h6>
                         <ul className="text-website-border text-md flex flex-col gap-4">
-                            <li>Qui somme-nous ?</li>
+                            <li>
+                                <a href={route('website.why')} className="!no-underline">
+                                    Qui somme-nous ?
+                                </a>
+                            </li>
                             <li>FAQ</li>
                             <li>Implémentation</li>
                             <li>Recrutement</li>

@@ -40,7 +40,7 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                                 </a>
                                 <ul className="bg-logo absolute top-full -ml-3 hidden w-52 flex-col gap-4 rounded-b-md p-3 pt-2 group-hover:flex">
                                     <li>
-                                        <Link href={route('website.features.central')} className="!no-underline">
+                                        <Link href={route('website.features.assets')} className="!no-underline">
                                             Assets
                                         </Link>
                                     </li>
@@ -60,15 +60,15 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                                         </Link>
                                     </li>
                                     <li>
-                                        <Link href={route('website.features.qr')} className="!no-underline">
+                                        <Link href={route('website.features.qrcode')} className="!no-underline">
                                             QR Code
                                         </Link>
                                     </li>
-                                    <li>
+                                    {/* <li>
                                         <Link href={route('website.features.roles')} className="!no-underline">
                                             Roles
                                         </Link>
-                                    </li>
+                                    </li> */}
                                     <li>
                                         <Link href={route('website.features.statistics')} className="!no-underline">
                                             Statistiques
