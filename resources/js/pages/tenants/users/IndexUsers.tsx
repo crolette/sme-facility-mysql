@@ -1,17 +1,20 @@
+import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, User } from '@/types';
+import { BreadcrumbItem, PaginatedData } from '@/types';
 import { Head } from '@inertiajs/react';
 import { PlusCircle } from 'lucide-react';
 
-export default function IndexUsers({ users }: { users: User[] }) {
+export default function IndexUsers({ items }: { items: PaginatedData }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index users`,
             href: `/users`,
         },
     ];
+
+    console.log(items);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -20,7 +23,8 @@ export default function IndexUsers({ users }: { users: User[] }) {
                 <a href={route(`tenant.users.create`)}>
                     <Button>
                         <PlusCircle />
-                        Create user</Button>
+                        Create user
+                    </Button>
                 </a>
                 <Table>
                     <TableHead>
@@ -34,8 +38,8 @@ export default function IndexUsers({ users }: { users: User[] }) {
                         </TableHeadRow>
                     </TableHead>
                     <TableBody>
-                        {users &&
-                            users.map((item, index) => {
+                        {items.data &&
+                            items.data.map((item, index) => {
                                 return (
                                     <TableBodyRow key={index}>
                                         <TableBodyData>
@@ -46,7 +50,7 @@ export default function IndexUsers({ users }: { users: User[] }) {
                                             <a href={`mailto:${item.email}`}>{item.email}</a>
                                         </TableBodyData>
                                         <TableBodyData>{item.can_login ? 'YES' : 'NO'}</TableBodyData>
-                                        <TableBodyData>{(item.roles && item.roles.length > 0) ? item.roles[0].name : ''}</TableBodyData>
+                                        <TableBodyData>{item.roles && item.roles.length > 0 ? item.roles[0].name : ''}</TableBodyData>
                                         <TableBodyData>
                                             {item.provider ? (
                                                 <a href={route('tenant.providers.show', item.provider?.id)}>{item.provider?.name}</a>
@@ -59,6 +63,7 @@ export default function IndexUsers({ users }: { users: User[] }) {
                             })}
                     </TableBody>
                 </Table>
+                <Pagination items={items} />
             </div>
         </AppLayout>
     );

@@ -34,7 +34,7 @@ Route::middleware([
         // Route::middleware(['auth'])->group(function () {
 
         Route::get('/', function () {
-            return ApiResponse::success(Asset::withoutTrashed()->get());
+            return ApiResponse::success(Asset::withoutTrashed()->paginate());
         })->name('api.assets.index');
 
         Route::post('/', [APIAssetController::class, 'store'])->name('api.assets.store');
@@ -61,14 +61,14 @@ Route::middleware([
 
             Route::post('/qr/regen', function (Asset $asset, QRCodeService $qRCodeService) {
 
-                if(Auth::user()->cannot('update', $asset))
-                        return ApiResponse::notAuthorized();
+                if (Auth::user()->cannot('update', $asset))
+                    return ApiResponse::notAuthorized();
 
                 $qRCodeService->createAndAttachQR($asset);
                 return ApiResponse::success([], 'QR Code created');
             })->name('api.assets.qr.regen');
 
-            Route::prefix('/documents')->group(function() {
+            Route::prefix('/documents')->group(function () {
                 // Get all the documents from an asset
                 Route::get('', function ($asset) {
                     $asset = Asset::withTrashed()->with('documents')->where('reference_code', $asset)->first();
@@ -91,7 +91,7 @@ Route::middleware([
                     return ApiResponse::success([], 'Document added');
                 })->name('api.assets.documents.post');
 
-                Route::patch('', function(Asset $asset, Request $request) {
+                Route::patch('', function (Asset $asset, Request $request) {
                     $validated = $request->validateWithBag('errors', [
                         'document_id' => 'required|exists:documents,id'
                     ]);
@@ -101,14 +101,14 @@ Route::middleware([
                 })->name('api.assets.documents.detach');
             });
 
-         
 
-            
+
+
             Route::prefix('/contracts')->group(function () {
 
                 Route::get('', function (Asset $asset) {
 
-                    $assetContracts = Asset::where('reference_code', $asset->reference_code)->with(['contracts', 'contracts.provider'])->first()->contracts;
+                    $assetContracts = Asset::where('reference_code', $asset->reference_code)->with(['contracts', 'contracts.provider'])->first()->contracts()->with('provider')->paginate();
 
                     return ApiResponse::success($assetContracts ?? [], 'Contract');
                 })->name('api.assets.contracts');
@@ -123,16 +123,16 @@ Route::middleware([
 
                 // Remove/Detach a contract from an asset
                 Route::delete('', function (Asset $asset, Request $request) {
-                    Debugbar::info($request);                    
-                    $validated = $request->validateWithBag('errors',[
+                    Debugbar::info($request);
+                    $validated = $request->validateWithBag('errors', [
                         'contract_id' => 'required|exists:contracts,id'
                     ]);
-                        app(ContractService::class)->detachExistingContractFromModel($asset, $validated['contract_id']);
-                        return ApiResponse::success([], 'Contract removed');
+                    app(ContractService::class)->detachExistingContractFromModel($asset, $validated['contract_id']);
+                    return ApiResponse::success([], 'Contract removed');
                 })->name('api.assets.contracts.delete');
             });
 
-               
+
 
             // Get all pictures from an asset
             Route::get('/pictures/', function ($asset) {
@@ -151,24 +151,18 @@ Route::middleware([
                 }
 
                 return ApiResponse::error('No valid pictures');
-
-
-
             })->name('api.assets.pictures.post');
 
             // Get all tickets from an asset
             Route::get('/tickets/', function (Asset $asset) {
-             
-                return  $asset ? ApiResponse::success($asset->tickets) : ApiResponse::error('No asset');
-                
 
+                return  $asset ? ApiResponse::success($asset->tickets) : ApiResponse::error('No asset');
             })->name('api.assets.tickets');
 
             // Get all interventions from an asset
             Route::get('/interventions/', function (Asset $asset) {
 
                 return  $asset ? ApiResponse::success($asset->interventions()->with('pictures')->where('ticket_id', null)->get()) : ApiResponse::error('No asset');
-
             })->name('api.assets.interventions');
         });
 

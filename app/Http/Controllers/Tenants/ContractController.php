@@ -24,7 +24,7 @@ class ContractController extends Controller
         if (Auth::user()->cannot('viewAny', Contract::class))
             abort(403);
 
-        $contracts = Contract::select('id', 'name', 'type', 'provider_id', 'status', 'renewal_type', 'end_date', 'internal_reference', 'provider_reference')->with('provider:id,name,category_type_id')->get();
+        $contracts = Contract::select('id', 'name', 'type', 'provider_id', 'status', 'renewal_type', 'end_date', 'internal_reference', 'provider_reference')->with('provider:id,name,category_type_id')->paginate();
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
 
@@ -74,6 +74,6 @@ class ContractController extends Controller
             abort(403);
         // dd(Contract::where('notice_date', '>', Carbon::now())->get());
         // dd($contract->end_date, $contract->end_date->subYears(5) < $contract->start_date);
-        return Inertia::render('tenants/contracts/ShowContract', ['item' => $contract->load('provider','documents'), 'objects' => $contract->getObjects()]);
+        return Inertia::render('tenants/contracts/ShowContract', ['item' => $contract->load('provider', 'documents'), 'objects' => $contract->getObjects()]);
     }
 }

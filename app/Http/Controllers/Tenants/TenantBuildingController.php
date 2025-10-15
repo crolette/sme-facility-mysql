@@ -43,7 +43,7 @@ class TenantBuildingController extends Controller
         if (Auth::user()->cannot('viewAny', Building::class))
             abort(403);
 
-        $buildings = Building::all();
+        $buildings = Building::paginate();
         return Inertia::render('tenants/locations/IndexLocations', ['items' => $buildings, 'routeName' => 'buildings']);
     }
 
@@ -79,7 +79,7 @@ class TenantBuildingController extends Controller
             abort(403);
 
         $building = Building::where('reference_code', $building->reference_code)->with(['site', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers', 'contracts', 'contracts.provider'])->first();
-        $building->append('level_path' ,'floor_material', 'wall_material', 'outdoor_material');
+        $building->append('level_path', 'floor_material', 'wall_material', 'outdoor_material');
 
 
         return Inertia::render('tenants/locations/ShowLocation', ['routeName' => 'buildings', 'item' => $building]);

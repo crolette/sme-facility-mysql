@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Tenants;
 
 use Inertia\Inertia;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Services\AssetService;
 use App\Enums\NoticePeriodEnum;
@@ -16,7 +17,9 @@ use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
 use App\Enums\ContractRenewalTypesEnum;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Models\Tenants\InterventionAction;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class TenantAssetController extends Controller
 {
@@ -31,14 +34,35 @@ class TenantAssetController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         if (Auth::user()->cannot('viewAny', Asset::class))
             abort(403);
 
-        $assets = Asset::withoutTrashed()->get();
+        Debugbar::info($request->query('trashed'));
+        if ($request->query('trashed')) {
+            Debugbar::info('TRASHET');
+            $assets = Asset::onlyTrashed();
+        } else {
+            Debugbar::info('NOT TRASHET');
+            $assets = Asset::withoutTrashed();
+        }
 
-        return Inertia::render('tenants/assets/IndexAssets', ['items' => $assets]);
+        if ($request->query('category')) {
+            $assets->where('category_type_id', $request->query('category'));
+        };
+
+        if ($request->query('q')) {
+            $assets->whereHas('maintainable', function (Builder $query) use ($request) {
+                $query->where('name', 'like', '%' . $request->query('q') . '%');
+            });
+        }
+
+
+        $assets = $assets->paginate()->withQueryString();
+        $categories = CategoryType::where('category', 'asset')->get();
+
+        return Inertia::render('tenants/assets/IndexAssets', ['items' => $assets, 'filters' => $request->only(['q', 'sortBy', 'trashed', 'orderBy', 'category']), 'categories' => $categories]);
     }
 
     /**
@@ -72,15 +96,15 @@ class TenantAssetController extends Controller
         $action = InterventionAction::first();
 
         $asset = Asset::where('reference_code', $asset->reference_code)->with(['maintainable.manager:id,first_name,last_name', 'contracts:id,name,type,provider_id,status,renewal_type,end_date,internal_reference,provider_reference', 'contracts.provider:id,name,logo', 'maintainable.providers:id,name'])->first();
-    // dd($asset);
+        // dd($asset);
         return Inertia::render('tenants/assets/ShowAsset', ['item' => $asset->append('level_path')]);
     }
 
     public function showDeleted($id)
     {
-        $asset = Asset::withTrashed()->with(['documents','pictures','tickets.pictures'])->findOrFail($id);
+        $asset = Asset::withTrashed()->with(['documents', 'pictures', 'tickets.pictures'])->findOrFail($id);
 
-        
+
         return Inertia::render('tenants/assets/ShowAsset', ['item' => $asset]);
     }
 

@@ -1,16 +1,17 @@
 import Modale from '@/components/Modale';
+import { Pagination } from '@/components/pagination';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from '@/types';
+import { BreadcrumbItem, PaginatedData, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from '@/types';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
 import { Pencil, PlusCircle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
-export default function IndexSites({ items, routeName }: { locations: TenantSite[] | TenantBuilding[] | TenantFloor[]; routeName: string }) {
+export default function IndexSites({ items, routeName }: { items: PaginatedData; routeName: string }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index ${routeName}`,
@@ -18,7 +19,9 @@ export default function IndexSites({ items, routeName }: { locations: TenantSite
         },
     ];
 
-    const [locations, setLocations] = useState(items);
+    console.log(items);
+
+    const [locations, setLocations] = useState(items.data);
     const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
     const [locationToDelete, setLocationToDelete] = useState<TenantSite | TenantBuilding | TenantFloor | TenantRoom | null>(null);
     const { showToast } = useToast();
@@ -54,9 +57,12 @@ export default function IndexSites({ items, routeName }: { locations: TenantSite
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sites" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className='flex space-x-2'>
+                <div className="flex space-x-2">
                     <a href={route(`tenant.${routeName}.create`)}>
-                        <Button><PlusCircle />Create</Button>
+                        <Button>
+                            <PlusCircle />
+                            Create
+                        </Button>
                     </a>
                     <a href={route('tenant.pdf.qr-codes', { type: routeName })} target="__blank">
                         <Button variant={'secondary'}>
@@ -110,6 +116,7 @@ export default function IndexSites({ items, routeName }: { locations: TenantSite
                             })}
                     </TableBody>
                 </Table>
+                <Pagination items={items} />
             </div>
             <Modale
                 title={`Delete ${routeName}`}

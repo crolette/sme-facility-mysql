@@ -15,6 +15,31 @@ export interface NavGroup {
     items: NavItem[];
 }
 
+export interface Error {
+    [key: string]: [];
+}
+
+export interface PaginatedData {
+    // data: Asset[] | Contract[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+    links: {
+        url: string | null;
+        label: string;
+        active: boolean;
+    }[];
+}
+
+export interface AssetsPaginated extends PaginatedData {
+    data: Asset[];
+}
+
+export interface ContractsPaginated extends PaginatedData {
+    data: Contract[];
+}
+
 export interface NavItem {
     title: string;
     href: string;

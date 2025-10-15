@@ -1,15 +1,16 @@
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
-import { Contract } from '@/types';
+import { Contract, ContractsPaginated } from '@/types';
 import axios from 'axios';
-import { useState } from 'react';
-import { Button } from '../ui/button';
-import Modale from '../Modale';
-import { Pill } from '../ui/pill';
 import { Pencil, Trash2, Unlink } from 'lucide-react';
+import { useState } from 'react';
+import Modale from '../Modale';
+import { Pagination } from '../pagination';
+import { Button } from '../ui/button';
+import { Pill } from '../ui/pill';
 
 interface ContractsList {
     getUrl: string;
-    items: Contract[];
+    items?: ContractsPaginated;
     editable?: boolean;
     removable?: boolean;
     contractableReference?: string | null;
@@ -26,7 +27,6 @@ export const ContractsList = ({
     routeName = null,
     onContractsChange,
 }: ContractsList) => {
-
     const fetchContracts = async () => {
         if (!contractableReference) return;
 
@@ -40,6 +40,7 @@ export const ContractsList = ({
         }
     };
 
+    fetchContracts();
 
     const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
     const [contractToDelete, setContractToDelete] = useState<Contract | null>(null);
@@ -75,7 +76,7 @@ export const ContractsList = ({
 
     return (
         <>
-            {items && items.length > 0 && (
+            {items.data && items.data.length > 0 && (
                 <Table>
                     <TableHead>
                         <TableHeadRow>
@@ -92,7 +93,7 @@ export const ContractsList = ({
                     </TableHead>
                     <TableBody>
                         {items &&
-                            items.map((contract) => {
+                            items.data.map((contract) => {
                                 return (
                                     <TableBodyRow key={contract.id}>
                                         <TableBodyData>
@@ -145,6 +146,7 @@ export const ContractsList = ({
                     </TableBody>
                 </Table>
             )}
+            <Pagination items={items} />
             <Modale
                 title={'Delete contract'}
                 message={`Are you sure you want to delete this contract ${contractToDelete?.name} ?`}

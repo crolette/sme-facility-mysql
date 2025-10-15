@@ -5,11 +5,7 @@ namespace App\Http\Controllers\Tenants;
 use App\Enums\RoleTypes;
 use Inertia\Inertia;
 use App\Models\Tenants\User;
-use Illuminate\Http\Request;
-use App\Models\Tenants\Ticket;
-use App\Models\Tenants\Provider;
 use App\Http\Controllers\Controller;
-use App\Models\Tenants\Intervention;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
@@ -22,8 +18,8 @@ class UserController extends Controller
         if (Auth::user()->cannot('viewAny', User::class)) {
             abort(403);
         }
-        $users = User::withoutRole('Super Admin')->get()->load('roles:id,name', 'provider:id,name');
-        return Inertia::render('tenants/users/IndexUsers', ['users' => $users]);
+        $users = User::withoutRole('Super Admin')->with('roles:id,name', 'provider:id,name')->paginate();
+        return Inertia::render('tenants/users/IndexUsers', ['items' => $users]);
     }
 
     /**

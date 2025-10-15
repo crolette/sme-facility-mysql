@@ -41,7 +41,7 @@ class TenantFloorController extends Controller
         if (Auth::user()->cannot('viewAny', Floor::class))
             abort(403);
 
-        $floors = Floor::with('building')->get();
+        $floors = Floor::with('building')->paginate();
         return Inertia::render('tenants/locations/IndexLocations', ['items' => $floors, 'routeName' => 'floors']);
     }
 

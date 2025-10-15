@@ -43,7 +43,7 @@ class TenantSiteController extends Controller
         if (Auth::user()->cannot('viewAny', Site::class))
             abort(403);
 
-        $sites = Site::all();
+        $sites = Site::paginate();
 
         return Inertia::render('tenants/locations/IndexLocations', ['items' => $sites, 'routeName' => 'sites']);
     }

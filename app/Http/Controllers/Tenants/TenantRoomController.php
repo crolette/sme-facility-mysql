@@ -33,7 +33,7 @@ class TenantRoomController extends Controller
         if (Auth::user()->cannot('viewAny', Room::class))
             abort(403);
 
-        $locations = Room::with('floor')->get();
+        $locations = Room::with('floor')->paginate();
         return Inertia::render('tenants/locations/IndexLocations', ['items' => $locations, 'routeName' => 'rooms']);
     }
 
