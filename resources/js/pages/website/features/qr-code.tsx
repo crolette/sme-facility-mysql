@@ -7,7 +7,7 @@ export default function FeaturesQrCode() {
         <WebsiteLayout>
             <Head>
                 <meta name="robots" content="index, follow"></meta>
-                <meta property="title" content="SME-Facility | Signalement d’incident par QR Code" />
+                <meta property="title" content="Signalement d’incident par QR Code | SME-Facility" />
                 <meta
                     name="description"
                     itemProp="description"
@@ -49,7 +49,7 @@ export default function FeaturesQrCode() {
                     <div className="mx-auto flex h-full flex-col gap-10 px-4 md:max-w-11/12 md:gap-30">
                         <div className="grid gap-6 md:grid-cols-3">
                             <div className="from-website-border rounded-md bg-linear-to-t to-transparent p-0.5">
-                                <div className="grid h-full grid-rows-2 rounded-md bg-white p-6">
+                                <div className="grid h-full grid-rows-[1fr_2fr] gap-4 rounded-md bg-white p-6">
                                     <h6 className="font-semibold">Signalement ultra rapide</h6>
                                     <p>
                                         Un QR code sur chaque équipement ou local permet de créer un ticket en quelques secondes, sans login ni
@@ -58,7 +58,7 @@ export default function FeaturesQrCode() {
                                 </div>
                             </div>
                             <div className="from-website-border rounded-md bg-linear-to-t to-transparent p-0.5">
-                                <div className="grid h-full grid-rows-2 rounded-md bg-white p-6">
+                                <div className="grid h-full grid-rows-[1fr_2fr] gap-4 rounded-md bg-white p-6">
                                     <h6 className="font-semibold">Communication directe et efficace</h6>
                                     <p>
                                         Dès qu’un ticket est soumis, le responsable reçoit un email avec toutes les informations nécessaires pour
@@ -67,7 +67,7 @@ export default function FeaturesQrCode() {
                                 </div>
                             </div>
                             <div className="from-website-border rounded-md bg-linear-to-t to-transparent p-0.5">
-                                <div className="grid h-full grid-rows-2 rounded-md bg-white p-6">
+                                <div className="grid h-full grid-rows-[1fr_2fr] gap-4 rounded-md bg-white p-6">
                                     <h6 className="font-semibold">Traçabilité des incidents</h6>
                                     <p>
                                         Tous les tickets sont liés à l’actif concerné, garantissant une vision claire de l’historique des problèmes et
@@ -76,46 +76,59 @@ export default function FeaturesQrCode() {
                                 </div>
                             </div>
                         </div>
-                        <img src="../images/Group 20.png" alt="" className="w-full" />
+                        <img src="/images/Group 20.png" alt="" className="w-full" />
 
-                        <div className="border-website-border w-full rounded-md border p-6">
+                        <div className="border-website-border flex w-full flex-col gap-4 rounded-md border p-6">
                             <details className="" open>
                                 <summary className="text-2xl font-bold">
-                                    Gérez vos tickets
+                                    <h3>Scan simple et universel</h3>
                                     <hr className="mt-3" />
                                 </summary>
-                                <p className="mt-3 text-lg">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed viverra, purus eget ullamcorper ullamcorper, tellus
-                                    magna interdum magna, et lacinia nisl purus vel dui. Nullam vel pulvinar diam, vitae aliquam nisi. Aliquam id arcu
-                                    nec diam bibendum malesuada vel nec purus. Nunc semper, mi quis porttitor euismod, enim justo dictum felis, at
-                                    elementum arcu odio id tellus. Donec molestie lacinia egestas. Quisque in odio et turpis iaculis egestas. Vivamus
-                                    imperdiet vestibulum mauris, ac accumsan dui volutpat id. Sed vitae nibh ligula.
+                                <p className="mt-6 text-lg">
+                                    Chaque QR code est associé à un équipement ou un local précis. Il suffit de le scanner avec un smartphone pour
+                                    ouvrir un formulaire web clair et intuitif : description du problème, photo optionnelle et envoi immédiat.
                                 </p>
                             </details>
                             <details className="">
                                 <summary className="text-2xl font-bold">
-                                    Gérez vos tickets
+                                    <h3>Aucune installation requise</h3>
                                     <hr className="mt-3" />
                                 </summary>
-                                <p className="mt-3 text-lg">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed viverra, purus eget ullamcorper ullamcorper, tellus
-                                    magna interdum magna, et lacinia nisl purus vel dui. Nullam vel pulvinar diam, vitae aliquam nisi. Aliquam id arcu
-                                    nec diam bibendum malesuada vel nec purus. Nunc semper, mi quis porttitor euismod, enim justo dictum felis, at
-                                    elementum arcu odio id tellus. Donec molestie lacinia egestas. Quisque in odio et turpis iaculis egestas. Vivamus
-                                    imperdiet vestibulum mauris, ac accumsan dui volutpat id. Sed vitae nibh ligula.
+                                <p className="mt-6 text-lg">
+                                    Le système est pensé pour être accessible à tous — même sans compte utilisateur. Parfait pour les collaborateurs
+                                    internes, visiteurs, ou prestataires qui doivent signaler un dysfonctionnement ponctuel.
                                 </p>
                             </details>
                             <details className="">
                                 <summary className="text-2xl font-bold">
-                                    Gérez vos tickets
+                                    <h3>Notification automatique au responsable</h3>
                                     <hr className="mt-3" />
                                 </summary>
-                                <p className="mt-3 text-lg">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed viverra, purus eget ullamcorper ullamcorper, tellus
-                                    magna interdum magna, et lacinia nisl purus vel dui. Nullam vel pulvinar diam, vitae aliquam nisi. Aliquam id arcu
-                                    nec diam bibendum malesuada vel nec purus. Nunc semper, mi quis porttitor euismod, enim justo dictum felis, at
-                                    elementum arcu odio id tellus. Donec molestie lacinia egestas. Quisque in odio et turpis iaculis egestas. Vivamus
-                                    imperdiet vestibulum mauris, ac accumsan dui volutpat id. Sed vitae nibh ligula.
+                                <p className="mt-6 text-lg">
+                                    Dès qu’un ticket est créé, le responsable de maintenance ou le facility manager reçoit un email détaillant la
+                                    demande : description, photo, localisation, QR code d’origine. Il peut alors attribuer la tâche à un technicien
+                                    interne ou à un prestataire externe.
+                                </p>
+                            </details>
+                            <details className="">
+                                <summary className="text-2xl font-bold">
+                                    <h3>Centralisation et suivi des tickets</h3>
+                                    <hr className="mt-3" />
+                                </summary>
+                                <p className="mt-6 text-lg">
+                                    Chaque ticket est automatiquement rattaché à l’actif ou au local correspondant. Depuis l’application, le
+                                    responsable peut consulter l’historique complet : incidents passés, interventions réalisées, délais de traitement.
+                                </p>
+                            </details>
+                            <details className="">
+                                <summary className="text-2xl font-bold">
+                                    <h3>Gain de temps et meilleure réactivité</h3>
+                                    <hr className="mt-3" />
+                                </summary>
+                                <p className="mt-6 text-lg">
+                                    En éliminant les échanges informels (emails, appels, messages), le QR code simplifie la remontée d’information
+                                    depuis le terrain. Les problèmes sont signalés plus vite, les interventions mieux planifiées et les délais de
+                                    résolution réduits.
                                 </p>
                             </details>
                         </div>

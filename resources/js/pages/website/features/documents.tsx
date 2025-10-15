@@ -7,7 +7,7 @@ export default function FeaturesDocuments() {
         <WebsiteLayout>
             <Head>
                 <meta name="robots" content="index, follow"></meta>
-                <meta property="title" content="SME-Facility | Centralisation des documents et fichiers" />
+                <meta property="title" content="Centralisation des documents et fichiers | SME-Facility" />
                 <meta
                     name="description"
                     itemProp="description"
@@ -26,12 +26,12 @@ export default function FeaturesDocuments() {
                     <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-2 md:p-10">
                         <div className="flex flex-col justify-center gap-10 md:max-w-lg">
                             <h1 className="leading-16">
-                                Signalez un problème en <span className="font-extrabold"> un scan. </span>
+                                Tous vos documents, <span className="font-extrabold">accessibles en un clic </span>
                             </h1>
                             <p className="">
-                                Les QR codes SME-Facility permettent à n’importe quel utilisateur — collaborateur, occupant ou visiteur — de signaler
-                                un incident instantanément. Un simple scan ouvre un formulaire de ticketing : description, photo, validation. Le
-                                responsable de maintenance reçoit aussitôt la notification et peut planifier l’intervention.
+                                SME-Facility centralise l’ensemble des documents liés à vos équipements, contrats et interventions. Plus besoin de
+                                chercher dans plusieurs dossiers : chaque fichier est rattaché à son actif ou à son opération, accessible
+                                instantanément par votre équipe.
                             </p>
                             <div className="flex flex-col gap-6 md:flex-row md:gap-10">
                                 <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
@@ -49,73 +49,82 @@ export default function FeaturesDocuments() {
                     <div className="mx-auto flex h-full flex-col gap-10 px-4 md:max-w-11/12 md:gap-30">
                         <div className="grid gap-6 md:grid-cols-3">
                             <div className="from-website-border rounded-md bg-linear-to-t to-transparent p-0.5">
-                                <div className="grid h-full grid-rows-2 rounded-md bg-white p-6">
-                                    <h6 className="font-semibold">Signalement ultra rapide</h6>
+                                <div className="grid h-full grid-rows-[1fr_2fr] gap-4 rounded-md bg-white p-6">
+                                    <h6 className="font-semibold">Accès rapide à l’information</h6>
                                     <p>
-                                        Un QR code sur chaque équipement ou local permet de créer un ticket en quelques secondes, sans login ni
-                                        application à installer.
+                                        Chaque document est relié à son contexte (équipement, contrat, intervention) pour une recherche immédiate et
+                                        intuitive.
                                     </p>
                                 </div>
                             </div>
                             <div className="from-website-border rounded-md bg-linear-to-t to-transparent p-0.5">
-                                <div className="grid h-full grid-rows-2 rounded-md bg-white p-6">
-                                    <h6 className="font-semibold">Communication directe et efficace</h6>
+                                <div className="grid h-full grid-rows-[1fr_2fr] gap-4 rounded-md bg-white p-6">
+                                    <h6 className="font-semibold">Partage et collaboration simplifiés</h6>
                                     <p>
-                                        Dès qu’un ticket est soumis, le responsable reçoit un email avec toutes les informations nécessaires pour
-                                        planifier une intervention.
+                                        Les utilisateurs autorisés peuvent consulter les fichiers dont ils ont besoin, sans échange d’emails ni
+                                        doublons.
                                     </p>
                                 </div>
                             </div>
                             <div className="from-website-border rounded-md bg-linear-to-t to-transparent p-0.5">
-                                <div className="grid h-full grid-rows-2 rounded-md bg-white p-6">
-                                    <h6 className="font-semibold">Traçabilité des incidents</h6>
-                                    <p>
-                                        Tous les tickets sont liés à l’actif concerné, garantissant une vision claire de l’historique des problèmes et
-                                        des actions menées.
-                                    </p>
+                                <div className="grid h-full grid-rows-[1fr_2fr] gap-4 rounded-md bg-white p-6">
+                                    <h6 className="font-semibold">Archivage et traçabilité garantis</h6>
+                                    <p>Toutes les pièces jointes sont conservées et historisées, assurant une parfaite traçabilité documentaire.</p>
                                 </div>
                             </div>
                         </div>
                         <img src="/images/Group 20.png" alt="" className="w-full" />
 
-                        <div className="border-website-border w-full rounded-md border p-6">
+                        <div className="border-website-border flex w-full flex-col gap-4 rounded-md border p-6">
                             <details className="" open>
                                 <summary className="text-2xl font-bold">
-                                    Gérez vos tickets
+                                    <h3>Rattachement documentaire contextuel</h3>
                                     <hr className="mt-3" />
                                 </summary>
-                                <p className="mt-3 text-lg">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed viverra, purus eget ullamcorper ullamcorper, tellus
-                                    magna interdum magna, et lacinia nisl purus vel dui. Nullam vel pulvinar diam, vitae aliquam nisi. Aliquam id arcu
-                                    nec diam bibendum malesuada vel nec purus. Nunc semper, mi quis porttitor euismod, enim justo dictum felis, at
-                                    elementum arcu odio id tellus. Donec molestie lacinia egestas. Quisque in odio et turpis iaculis egestas. Vivamus
-                                    imperdiet vestibulum mauris, ac accumsan dui volutpat id. Sed vitae nibh ligula.
+                                <p className="mt-6 text-lg">
+                                    Chaque document (photo, rapport, devis, certificat, fiche technique, contrat, etc.) peut être attaché directement
+                                    à un actif, une intervention ou un fournisseur. Vous retrouvez toujours la bonne information, au bon endroit.
                                 </p>
                             </details>
                             <details className="">
                                 <summary className="text-2xl font-bold">
-                                    Gérez vos tickets
+                                    <h3>Consultation rapide depuis une interface unique</h3>
                                     <hr className="mt-3" />
                                 </summary>
-                                <p className="mt-3 text-lg">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed viverra, purus eget ullamcorper ullamcorper, tellus
-                                    magna interdum magna, et lacinia nisl purus vel dui. Nullam vel pulvinar diam, vitae aliquam nisi. Aliquam id arcu
-                                    nec diam bibendum malesuada vel nec purus. Nunc semper, mi quis porttitor euismod, enim justo dictum felis, at
-                                    elementum arcu odio id tellus. Donec molestie lacinia egestas. Quisque in odio et turpis iaculis egestas. Vivamus
-                                    imperdiet vestibulum mauris, ac accumsan dui volutpat id. Sed vitae nibh ligula.
+                                <p className="mt-6 text-lg">
+                                    Plus de fichiers dispersés ou versions contradictoires : SME-Facility réunit toute la documentation dans une seule
+                                    interface claire. Les utilisateurs peuvent accéder en ligne aux documents dont ils ont besoin, selon leurs
+                                    permissions.
                                 </p>
                             </details>
                             <details className="">
                                 <summary className="text-2xl font-bold">
-                                    Gérez vos tickets
+                                    <h3>Gestion collaborative et sécurisée</h3>
                                     <hr className="mt-3" />
                                 </summary>
-                                <p className="mt-3 text-lg">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed viverra, purus eget ullamcorper ullamcorper, tellus
-                                    magna interdum magna, et lacinia nisl purus vel dui. Nullam vel pulvinar diam, vitae aliquam nisi. Aliquam id arcu
-                                    nec diam bibendum malesuada vel nec purus. Nunc semper, mi quis porttitor euismod, enim justo dictum felis, at
-                                    elementum arcu odio id tellus. Donec molestie lacinia egestas. Quisque in odio et turpis iaculis egestas. Vivamus
-                                    imperdiet vestibulum mauris, ac accumsan dui volutpat id. Sed vitae nibh ligula.
+                                <p className="mt-6 text-lg">
+                                    Les documents sont stockés dans un environnement cloud sécurisé. Les membres autorisés — internes ou externes —
+                                    peuvent y accéder sans échange de pièces jointes, améliorant la productivité et la cohérence des informations.
+                                </p>
+                            </details>
+                            <details className="">
+                                <summary className="text-2xl font-bold">
+                                    <h3>Traçabilité et conformité documentaire</h3>
+                                    <hr className="mt-3" />
+                                </summary>
+                                <p className="mt-6 text-lg">
+                                    Chaque fichier est historisé et lié à un contexte précis, permettant de retrouver rapidement la version utilisée
+                                    lors d’une intervention, d’un audit ou d’un renouvellement de contrat.
+                                </p>
+                            </details>
+                            <details className="">
+                                <summary className="text-2xl font-bold">
+                                    <h3>Gain de temps et réduction des erreurs</h3>
+                                    <hr className="mt-3" />
+                                </summary>
+                                <p className="mt-6 text-lg">
+                                    La centralisation élimine les pertes de documents, les doublons et les recherches inutiles. Les équipes gagnent du
+                                    temps, les audits deviennent simples, et la gestion documentaire plus fluide et fiable.
                                 </p>
                             </details>
                         </div>

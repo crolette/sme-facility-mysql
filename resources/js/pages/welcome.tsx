@@ -53,7 +53,7 @@ export default function Welcome() {
                 <div className="container mx-auto">
                     <div className="mx-auto h-full space-y-10 px-4 py-10 text-black md:max-w-11/12 md:p-10">
                         <h2>Gagnez du temps et facilitez votre gestion</h2>
-                        <h3 className="l">Une seule plateforme pour toutes vos installations</h3>
+                        <h3 className="">Une seule plateforme pour toutes vos installations</h3>
                         <div className="grid gap-6 md:grid-cols-2">
                             <div className="flex flex-col space-y-6 md:items-end">
                                 <div className="card bg-website-secondary flex flex-col rounded-md p-6 shadow-xl md:w-72">
@@ -103,7 +103,7 @@ export default function Welcome() {
             </section>
             <section className="bg-website-card flex min-h-screen items-center py-40">
                 <div className="container mx-auto">
-                    <div className="text-website-font flex-flex-col mx-auto h-full items-center space-y-10 px-4 py-10 md:max-w-11/12 md:p-10">
+                    <div className="text-website-font flex-flex-col mx-auto h-full items-center space-y-10 px-4 py-10 md:max-w-11/12 md:p-6 lg:p-10">
                         <h2 className="">Interventions accélérées et suivies en temps réel</h2>
                         <h3 className="">La résolution des problèmes n’a jamais été aussi fluide.</h3>
                         <div className="relative grid md:grid-cols-[2fr_1fr]">
@@ -157,7 +157,7 @@ export default function Welcome() {
                 <div className="container mx-auto">
                     <div className="text-website-font mx-auto h-full space-y-14 px-4 py-10 md:max-w-11/12 md:p-10">
                         <h2 className="">Une application simple, rapide et complète</h2>
-                        <p>Pourquoi se compliquer la gestion des installations si tout peut se faire avec SME-Facility?</p>
+                        <h3>Pourquoi se compliquer la gestion des installations si tout peut se faire avec SME-Facility?</h3>
 
                         <div className="from-website-primary text-website-secondary mx-auto grid grid-cols-1 gap-10 rounded-md bg-linear-to-r to-white p-10 lg:grid-cols-[2fr_1fr]">
                             <div className="">
@@ -183,12 +183,12 @@ export default function Welcome() {
                                 </ul>
                             </div>
                             <div className="relative flex items-center justify-center md:justify-end">
-                                <img src="images/Digital tools-bro.svg" alt="" className="max-h-72 md:max-h-11/12" />
+                                <img src="images/Digital tools-bro.svg" alt="" className="mx-auto max-h-64 lg:max-h-11/12" />
                             </div>
                         </div>
                         <div className="text-website-font to-website-secondary mx-auto grid grid-cols-1 gap-10 rounded-md bg-linear-to-r from-white p-10 lg:grid-cols-[1fr_2fr]">
-                            <div className="relative order-2 flex items-center justify-center md:order-none md:justify-end">
-                                <img src="images/Electrician-bro.svg" alt="" className="max-h-72 md:max-h-11/12" />
+                            <div className="relative order-2 flex items-center justify-center md:justify-end lg:order-none">
+                                <img src="images/Electrician-bro.svg" alt="" className="mx-auto max-h-64 lg:max-h-11/12" />
                             </div>
                             <div className="">
                                 <h3>
@@ -234,12 +234,12 @@ export default function Welcome() {
                                 </ul>
                             </div>
                             <div className="relative flex items-center justify-center md:justify-end">
-                                <img src="images/Office management-pana.svg" alt="" className="max-h-72 md:max-h-11/12" />
+                                <img src="images/Office management-pana.svg" alt="" className="mx-auto max-h-64 lg:max-h-11/12" />
                             </div>
                         </div>
                         <div className="text-website-font to-website-card mx-auto grid grid-cols-1 gap-10 rounded-md bg-linear-to-r from-white p-10 lg:grid-cols-[1fr_2fr]">
-                            <div className="relative order-2 flex items-center justify-center md:order-none md:justify-end">
-                                <img src="images/Download-amico.svg" alt="" className="max-h-72 md:max-h-11/12" />
+                            <div className="relative order-2 flex items-center justify-center md:justify-end lg:order-none">
+                                <img src="images/Download-amico.svg" alt="" className="mx-auto max-h-64 lg:max-h-11/12" />
                             </div>
                             <div className="flex flex-col gap-4">
                                 <h3>
@@ -273,7 +273,7 @@ export default function Welcome() {
                                     </span>
                                 </h3>
                                 <ul className="mt-5 ml-5 space-y-10">
-                                    <li>
+                                    <li className="">
                                         <Check size={16} className="mr-4 inline-block" />
                                         Un QR code par équipement ou local
                                     </li>
@@ -288,7 +288,7 @@ export default function Welcome() {
                                 </ul>
                             </div>
                             <div className="relative flex items-center justify-center md:justify-end">
-                                <img src="images/QR Code-bro.svg" alt="" className="max-h-72 md:max-h-11/12" />
+                                <img src="images/QR Code-bro.svg" alt="" className="mx-auto max-h-64 lg:max-h-11/12" />
                             </div>
                         </div>
                     </div>

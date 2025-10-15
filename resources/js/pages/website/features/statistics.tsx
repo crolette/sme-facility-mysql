@@ -7,7 +7,7 @@ export default function FeaturesStatistics() {
         <WebsiteLayout>
             <Head>
                 <meta name="robots" content="index, follow"></meta>
-                <meta property="title" content="SME-Facility | Tableau de bord et statistiques maintenance" />
+                <meta property="title" content="Tableau de bord et statistiques maintenance | SME-Facility" />
                 <meta
                     name="description"
                     itemProp="description"
@@ -26,12 +26,12 @@ export default function FeaturesStatistics() {
                     <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-2 md:p-10">
                         <div className="flex flex-col justify-center gap-10 md:max-w-lg">
                             <h1 className="leading-16">
-                                Signalez un problème en <span className="font-extrabold"> un scan. </span>
+                                Analysez, pilotez et <span className="font-extrabold">améliorez vos performances.</span>
                             </h1>
                             <p className="">
-                                Les QR codes SME-Facility permettent à n’importe quel utilisateur — collaborateur, occupant ou visiteur — de signaler
-                                un incident instantanément. Un simple scan ouvre un formulaire de ticketing : description, photo, validation. Le
-                                responsable de maintenance reçoit aussitôt la notification et peut planifier l’intervention.
+                                Grâce à son tableau de bord intégré, SME-Facility fournit une vision claire et chiffrée de votre activité. Suivez vos
+                                interventions, détectez les retards, mesurez les temps moyens de traitement et pilotez la performance de votre
+                                maintenance.
                             </p>
                             <div className="flex flex-col gap-6 md:flex-row md:gap-10">
                                 <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
@@ -49,73 +49,80 @@ export default function FeaturesStatistics() {
                     <div className="mx-auto flex h-full flex-col gap-10 px-4 md:max-w-11/12 md:gap-30">
                         <div className="grid gap-6 md:grid-cols-3">
                             <div className="from-website-border rounded-md bg-linear-to-t to-transparent p-0.5">
-                                <div className="grid h-full grid-rows-2 rounded-md bg-white p-6">
-                                    <h6 className="font-semibold">Signalement ultra rapide</h6>
+                                <div className="grid h-full grid-rows-[1fr_2fr] gap-4 rounded-md bg-white p-6">
+                                    <h6 className="font-semibold">Indicateurs clés en temps réel</h6>
+                                    <p>Visualisez l’évolution de vos interventions et maintenances grâce à des KPI clairs et actualisés.</p>
+                                </div>
+                            </div>
+                            <div className="from-website-border rounded-md bg-linear-to-t to-transparent p-0.5">
+                                <div className="grid h-full grid-rows-[1fr_2fr] gap-4 rounded-md bg-white p-6">
+                                    <h6 className="font-semibold">Pilotage simplifié pour les responsables</h6>
                                     <p>
-                                        Un QR code sur chaque équipement ou local permet de créer un ticket en quelques secondes, sans login ni
-                                        application à installer.
+                                        Les statistiques sont accessibles aux administrateurs et Facility Managers pour un suivi global de l’activité.
                                     </p>
                                 </div>
                             </div>
                             <div className="from-website-border rounded-md bg-linear-to-t to-transparent p-0.5">
-                                <div className="grid h-full grid-rows-2 rounded-md bg-white p-6">
-                                    <h6 className="font-semibold">Communication directe et efficace</h6>
-                                    <p>
-                                        Dès qu’un ticket est soumis, le responsable reçoit un email avec toutes les informations nécessaires pour
-                                        planifier une intervention.
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="from-website-border rounded-md bg-linear-to-t to-transparent p-0.5">
-                                <div className="grid h-full grid-rows-2 rounded-md bg-white p-6">
-                                    <h6 className="font-semibold">Traçabilité des incidents</h6>
-                                    <p>
-                                        Tous les tickets sont liés à l’actif concerné, garantissant une vision claire de l’historique des problèmes et
-                                        des actions menées.
-                                    </p>
+                                <div className="grid h-full grid-rows-[1fr_2fr] gap-4 rounded-md bg-white p-6">
+                                    <h6 className="font-semibold">Amélioration continue et décisions éclairées</h6>
+                                    <p>Identifiez les points de blocage, optimisez vos ressources et améliorez vos délais d’intervention.</p>
                                 </div>
                             </div>
                         </div>
-                        <img src="../images/Group 20.png" alt="" className="w-full" />
+                        <img src="/images/Group 20.png" alt="" className="w-full" />
 
-                        <div className="border-website-border w-full rounded-md border p-6">
+                        <div className="border-website-border flex w-full flex-col gap-4 rounded-md border p-6">
                             <details className="" open>
                                 <summary className="text-2xl font-bold">
-                                    Gérez vos tickets
+                                    <h3>Tableau de bord visuel et intuitif</h3>
                                     <hr className="mt-3" />
                                 </summary>
-                                <p className="mt-3 text-lg">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed viverra, purus eget ullamcorper ullamcorper, tellus
-                                    magna interdum magna, et lacinia nisl purus vel dui. Nullam vel pulvinar diam, vitae aliquam nisi. Aliquam id arcu
-                                    nec diam bibendum malesuada vel nec purus. Nunc semper, mi quis porttitor euismod, enim justo dictum felis, at
-                                    elementum arcu odio id tellus. Donec molestie lacinia egestas. Quisque in odio et turpis iaculis egestas. Vivamus
-                                    imperdiet vestibulum mauris, ac accumsan dui volutpat id. Sed vitae nibh ligula.
+                                <p className="mt-6 text-lg">
+                                    SME-Facility met à disposition un tableau de bord dynamique présentant vos principaux indicateurs : nombre total
+                                    d’interventions, maintenance en retard, temps moyen de résolution et répartition des types d’intervention. Les
+                                    graphiques facilitent la lecture et la comparaison dans le temps.
                                 </p>
                             </details>
                             <details className="">
                                 <summary className="text-2xl font-bold">
-                                    Gérez vos tickets
+                                    <h3>Suivi de la performance opérationnelle</h3>
                                     <hr className="mt-3" />
                                 </summary>
-                                <p className="mt-3 text-lg">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed viverra, purus eget ullamcorper ullamcorper, tellus
-                                    magna interdum magna, et lacinia nisl purus vel dui. Nullam vel pulvinar diam, vitae aliquam nisi. Aliquam id arcu
-                                    nec diam bibendum malesuada vel nec purus. Nunc semper, mi quis porttitor euismod, enim justo dictum felis, at
-                                    elementum arcu odio id tellus. Donec molestie lacinia egestas. Quisque in odio et turpis iaculis egestas. Vivamus
-                                    imperdiet vestibulum mauris, ac accumsan dui volutpat id. Sed vitae nibh ligula.
+                                <p className="mt-6 text-lg">
+                                    Les responsables peuvent mesurer la réactivité et la charge de travail des équipes, évaluer les prestataires et
+                                    identifier les zones nécessitant une attention particulière. Ces données favorisent une gestion proactive et un
+                                    meilleur équilibre des ressources.
                                 </p>
                             </details>
                             <details className="">
                                 <summary className="text-2xl font-bold">
-                                    Gérez vos tickets
+                                    <h3>Détection rapide des anomalies</h3>
                                     <hr className="mt-3" />
                                 </summary>
-                                <p className="mt-3 text-lg">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed viverra, purus eget ullamcorper ullamcorper, tellus
-                                    magna interdum magna, et lacinia nisl purus vel dui. Nullam vel pulvinar diam, vitae aliquam nisi. Aliquam id arcu
-                                    nec diam bibendum malesuada vel nec purus. Nunc semper, mi quis porttitor euismod, enim justo dictum felis, at
-                                    elementum arcu odio id tellus. Donec molestie lacinia egestas. Quisque in odio et turpis iaculis egestas. Vivamus
-                                    imperdiet vestibulum mauris, ac accumsan dui volutpat id. Sed vitae nibh ligula.
+                                <p className="mt-6 text-lg">
+                                    Les maintenances en retard et les interventions non clôturées apparaissent clairement dans le tableau de bord.
+                                    Vous pouvez ainsi agir immédiatement pour corriger les retards et maintenir la qualité du service.
+                                </p>
+                            </details>
+                            <details className="">
+                                <summary className="text-2xl font-bold">
+                                    <h3>Vision globale pour la prise de décision</h3>
+                                    <hr className="mt-3" />
+                                </summary>
+                                <p className="mt-6 text-lg">
+                                    En centralisant les indicateurs clés, SME-Facility aide les administrateurs et Facility Managers à suivre les
+                                    tendances et à orienter leurs décisions : planification, investissements, priorisation des interventions ou
+                                    renforcement des contrats de maintenance.
+                                </p>
+                            </details>
+                            <details className="">
+                                <summary className="text-2xl font-bold">
+                                    <h3>Support à l’amélioration continue</h3>
+                                    <hr className="mt-3" />
+                                </summary>
+                                <p className="mt-6 text-lg">
+                                    Les statistiques constituent un levier d’amélioration : elles permettent d’analyser l’efficacité des processus,
+                                    d’ajuster les fréquences de maintenance et de démontrer la valeur ajoutée du service auprès de la direction.
                                 </p>
                             </details>
                         </div>

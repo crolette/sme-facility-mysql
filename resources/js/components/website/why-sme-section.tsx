@@ -8,23 +8,24 @@ export default function WhySMESection() {
                     <h2>Pourquoi choisir SME-Facility ?</h2>
                     <h3>Une solution conçue pour les PME</h3>
                     <ul className="ml-6 flex flex-col gap-4">
-                        <li>
-                            <BadgeEuro className="mr-6 inline-block" /> Coût maîtrisé : abonnement simple et abordable{' '}
-                        </li>
-                        <li>
-                            <User className="mr-6 inline-block" />
-                            Démarrage immédiat : aucune installation, aucun paramétrage complexe
-                        </li>
-                        <li>
-                            <BadgeCheck className="mr-6 inline-block" />
-                            Accompagnement humain : aide à l’import de données, conseil en Facility Management
-                        </li>
-                        <li>
+                        <li className="flex gap-4">
                             <BadgeEuro className="mr-6 inline-block" />
-                            Proximité : développée par une PME, pour les PME
+                            <p>Coût maîtrisé : abonnement simple et abordable</p>
+                        </li>
+                        <li className="flex gap-4">
+                            <User className="mr-6 inline-block" />
+                            <p>Démarrage immédiat : aucune installation, aucun paramétrage complexe</p>
+                        </li>
+                        <li className="flex gap-4">
+                            <BadgeCheck className="mr-6 inline-block" />
+                            <p>Accompagnement humain : aide à l’import de données, conseil en Facility Management</p>
+                        </li>
+                        <li className="flex gap-4">
+                            <BadgeEuro className="mr-6 inline-block" />
+                            <p>Proximité : développée par une PME, pour les PME</p>
                         </li>
                     </ul>
-                    <a href={route('website.why')} className="!text-website-primary">
+                    <a href={route('website.why')} className="!text-white">
                         En savoir plus
                     </a>
                 </div>
