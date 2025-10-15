@@ -5,6 +5,7 @@ use App\Models\Tenant;
 use App\Helpers\ApiResponse;
 use App\Models\Tenants\User;
 use Illuminate\Http\Request;
+use App\Http\Middleware\setLocale;
 use App\Mail\NewTenantCreatedMail;
 use Illuminate\Support\Facades\Log;
 use App\Events\NewTenantCreatedEvent;
@@ -21,17 +22,7 @@ use App\Notifications\TenantAdminCreatedPasswordResetNotification;
 
 foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->group(function () {
-        Route::get('/', function () {
-            return Inertia::render('welcome');
-        })->name('home');
 
-        Route::get('/mail', function () {
-            $param1 = User::first();
-
-            $param2 = Tenant::first();
-
-            return (new NewTenantCreatedMail($param1, $param2))->render();
-        });
 
         Route::middleware(['web', AuthenticateCentral::class])->group(function () {
             Route::get('dashboard', function () {
@@ -42,7 +33,7 @@ foreach (config('tenancy.central_domains') as $domain) {
 
             Route::get('tenants', [CentralTenantController::class, 'index'])->name('central.tenants.index');
 
-            Route::get('api/tenants', function() {
+            Route::get('api/tenants', function () {
                 $tenants = Tenant::with('domain')->get();
                 return ApiResponse::success($tenants);
             })->name('api.central.tenants.index');
@@ -67,7 +58,7 @@ foreach (config('tenancy.central_domains') as $domain) {
 
             Route::resource('category-types', CentralCategoryTypeController::class)->parameters(['category-types' => 'categoryType'])->names('central.types');
 
-            Route::post('/tenant-notif/', function(Request $request) {
+            Route::post('/tenant-notif/', function (Request $request) {
 
                 try {
                     $tenant = Tenant::findOrFail($request->tenant);
@@ -86,13 +77,11 @@ foreach (config('tenancy.central_domains') as $domain) {
                     Log::info($e->getMessage());
                     return ApiResponse::error($e->getMessage());
                 }
-                
-
-                
             })->name('send-notif-tenant-admin');
         });
     });
 }
 
 
+require __DIR__ . '/website.php';
 require __DIR__ . '/central_auth.php';
