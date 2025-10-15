@@ -5,7 +5,7 @@ import { Head } from '@inertiajs/react';
 export default function FeaturesAssets() {
     return (
         <WebsiteLayout>
-            <Head>
+            <Head title="Inventaire et gestion des équipements">
                 <meta name="robots" content="index, follow"></meta>
                 <meta property="title" content="Inventaire et gestion des équipements | SME-Facility" />
                 <meta
@@ -28,14 +28,20 @@ export default function FeaturesAssets() {
                             <h1 className="">
                                 Gardez une <span className="font-extrabold">vue claire sur vos équipements</span>
                             </h1>
+                            <h2 className="!text-xl">
+                                SME-Facility centralise l’ensemble de vos équipements et installations dans une base claire et structurée.
+                            </h2>
                             <p className="">
-                                SME-Facility centralise l’ensemble de vos équipements et installations dans une base claire et structurée. Vous
-                                visualisez, organisez et suivez facilement votre patrimoine technique tout en reliant chaque élément à ses
+                                Vous visualisez, organisez et suivez facilement votre patrimoine technique tout en reliant chaque élément à ses
                                 maintenances, contrats, garanties et interventions.
                             </p>
-                            <div className="flex flex-col gap-6 md:flex-row md:gap-10">
-                                <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
-                                <Button variant={'transparent'}>Découvrir les formules</Button>
+                            <div className="flex flex-col items-center gap-6 md:flex-row md:gap-10">
+                                <a href={route('website.contact')}>
+                                    <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
+                                </a>
+                                <a href={route('website.pricing')}>
+                                    <Button variant={'transparent'}>Découvrir les formules</Button>
+                                </a>
                             </div>
                         </div>
                         <div className="mx-auto my-auto">
@@ -77,7 +83,7 @@ export default function FeaturesAssets() {
 
                         <div className="border-website-border flex w-full flex-col gap-4 rounded-md border p-6">
                             <details className="" open>
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Recensement structuré des actifs</h3>
                                     <hr className="mt-3" />
                                 </summary>
@@ -88,7 +94,7 @@ export default function FeaturesAssets() {
                                 </p>
                             </details>
                             <details className="">
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Liaison automatique avec les autres modules</h3>
                                     <hr className="mt-3" />
                                 </summary>
@@ -99,7 +105,7 @@ export default function FeaturesAssets() {
                                 </p>
                             </details>
                             <details className="">
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Recherche et filtres avancés</h3>
 
                                     <hr className="mt-3" />
@@ -110,7 +116,7 @@ export default function FeaturesAssets() {
                                 </p>
                             </details>
                             <details className="">
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Historique complet de la vie des équipements</h3>
 
                                     <hr className="mt-3" />
@@ -122,7 +128,7 @@ export default function FeaturesAssets() {
                                 </p>
                             </details>
                             <details className="">
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Simplicité d’utilisation et accessibilité cloud</h3>
 
                                     <hr className="mt-3" />

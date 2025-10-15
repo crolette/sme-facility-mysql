@@ -18,6 +18,13 @@ foreach (config('tenancy.central_domains') as $domain) {
                     return Inertia::render('welcome');
                 })->name('home');
 
+                Route::get('/contact', function () {
+                    return Inertia::render('website/features/qr-code');
+                })->name('website.contact');
+
+                Route::get('/faq', function () {
+                    return Inertia::render('website/features/qr-code');
+                })->name('website.faq');
 
                 Route::prefix('features')->group(function () {
                     Route::get('/qr-code', function () {
@@ -45,7 +52,7 @@ foreach (config('tenancy.central_domains') as $domain) {
                     })->name('website.features.statistics');
 
                     Route::get('/roles', function () {
-                        return Inertia::render('website/features/qr-code');
+                        return Inertia::render('website/features/roles');
                     })->name('website.features.roles');
                 });
 

@@ -1,12 +1,14 @@
+import { Button } from '@/components/ui/button';
 import WebsiteLayout from '@/layouts/website-layout';
 import { Head } from '@inertiajs/react';
+import { Building, Building2, Check, Factory, X } from 'lucide-react';
 
 export default function Pricing() {
     return (
         <WebsiteLayout>
-            <Head>
+            <Head title={'Tarifs'}>
                 <meta name="robots" content="index, follow"></meta>
-                <meta property="title" content="SME-Facility | Application de Facility Management pour PME" />
+                <meta property="title" content="Tarification application facility management | SME-Facility" />
                 <meta
                     name="description"
                     itemProp="description"
@@ -21,137 +23,135 @@ export default function Pricing() {
                 />
             </Head>
             <section className="text-website-font w-full">
-                <div className="container mx-auto md:max-w-10/12 md:p-10">
-                    <h1>Notre tarification est aussi simple que notre produit</h1>
-                    <p>Un peu de patience... Plus d'informations très bientôt</p>
+                <div className="container mx-auto">
+                    {/* <div className="mx-auto grid h-full gap-10 md:grid-cols-2 md:p-10 lg:max-w-11/12"></div> */}
+                    <div className="mx-auto flex flex-col gap-10 p-4 md:p-10 lg:max-w-11/12">
+                        <h1>Notre tarification est aussi simple que notre produit</h1>
+                        <h2>Blabla</h2>
+                        {/* <p>Un peu de patience... Plus d'informations très bientôt</p> */}
 
-                    {/* <div className="grid grid-cols-3 gap-10">
-                        <div className="flex flex-col gap-6 rounded-md border p-10">
-                            <h2 className="text-center">Starter</h2>
-                            <div className="text-center">
-                                <p>A partir de</p>
-                                <p className={'text-2xl font-extrabold'}>149€ / mois</p>
+                        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+                            <div className="flex flex-col gap-6 rounded-md border p-6 lg:p-10">
+                                <Building size={36} className="mx-auto" />
+                                <h3 className="text-center">Starter</h3>
+                                <div className="text-center">
+                                    <p>A partir de</p>
+                                    <p className={'text-2xl font-extrabold'}>149€ / mois</p>
+                                </div>
+                                <ul className="flex flex-col gap-6">
+                                    <li className="flex gap-4">
+                                        <Check />
+                                        <p>1 site</p>
+                                    </li>
+                                    <li className="flex gap-4">
+                                        <Check />
+                                        <p>Assets illimités</p>
+                                    </li>
+                                    <li className="flex gap-4">
+                                        <Check />
+                                        <p>Jusqu'à 5 utilisateurs</p>
+                                    </li>
+                                    <li className="flex gap-4">
+                                        <Check />
+                                        <p>20 GB d'espace de stockage</p>
+                                    </li>
+                                    <li className="flex gap-4">
+                                        <X />
+                                        <p>Gestion des prestataires</p>
+                                    </li>
+                                    <li className="flex gap-4">
+                                        <X />
+                                        <p>Gestion des contrats</p>
+                                    </li>
+                                    <li className="flex gap-4">
+                                        <X />
+                                        <p>Statistiques</p>
+                                    </li>
+                                </ul>
+                                <Button variant={'cta'} className="">
+                                    Démarrer aujourd'hui
+                                </Button>
                             </div>
-                            <ul className="flex flex-col gap-6">
-                                <li className="flex gap-4">
-                                    <Check />
-                                    <p>1 site</p>
-                                </li>
-                                <li className="flex gap-4">
-                                    <Check />
-                                    <p>Assets illimités</p>
-                                </li>
-                                <li className="flex gap-4">
-                                    <Check />
-                                    <p>QR codes illimités</p>
-                                </li>
-                                <li className="flex gap-4">
-                                    <Check />
-                                    <p>20 GB d'espace de stockage</p>
-                                </li>
-                            </ul>
-                            <Button variant={'cta'} className="">
-                                Démarrer aujourd'hui
-                            </Button>
-                        </div>
-                        <div className="flex flex-col gap-6 rounded-md border p-10">
-                            <h2 className="text-center">Premium</h2>
-                            <div className="text-center">
-                                <p>A partir de</p>
-                                <p className={'text-2xl font-extrabold'}>299€ / mois</p>
+                            <div className="flex flex-col gap-6 rounded-md border p-6 lg:p-10">
+                                <Building2 size={36} className="mx-auto" />
+                                <h3 className="text-center">Premium</h3>
+                                <div className="text-center">
+                                    <p>A partir de</p>
+                                    <p className={'text-2xl font-extrabold'}>299€ / mois</p>
+                                </div>
+                                <ul className="flex flex-col gap-6">
+                                    <li className="flex gap-4">
+                                        <Check />
+                                        <p>2 sites</p>
+                                    </li>
+                                    <li className="flex gap-4">
+                                        <Check />
+                                        <p>Assets illimités</p>
+                                    </li>
+                                    <li className="flex gap-4">
+                                        <Check />
+                                        <p>Jusqu'à 15 utilisateurs</p>
+                                    </li>
+                                    <li className="flex gap-4">
+                                        <Check />
+                                        <p>50 GB d'espace de stockage</p>
+                                    </li>
+                                    <li className="flex gap-4">
+                                        <Check />
+                                        <p>Gestion des prestataires</p>
+                                    </li>
+                                    <li className="flex gap-4">
+                                        <Check />
+                                        <p>Gestion des contrats</p>
+                                    </li>
+                                    <li className="flex gap-4">
+                                        <Check />
+                                        <p>Statistiques</p>
+                                    </li>
+                                </ul>
+                                <Button variant={'cta'} className="">
+                                    Démarrer aujourd'hui
+                                </Button>
                             </div>
-                            <ul className="flex flex-col gap-6">
-                                <li className="flex gap-4">
-                                    <Check />
-                                    <p>2 sites</p>
-                                </li>
-                                <li className="flex gap-4">
-                                    <Check />
-                                    <p>Assets illimités</p>
-                                </li>
-                                <li className="flex gap-4">
-                                    <Check />
-                                    <p>QR codes illimités</p>
-                                </li>
-                                <li className="flex gap-4">
-                                    <Check />
-                                    <p>50 GB d'espace de stockage</p>
-                                </li>
-                            </ul>
-                            <Button variant={'cta'} className="">
-                                Démarrer aujourd'hui
-                            </Button>
-                        </div>
-                        <div className="flex flex-col gap-6 rounded-md border p-10">
-                            <h2 className="text-center">Entreprise</h2>
-                            <div className="text-center">
-                                <p>Offre</p>
-                                <p className={'text-2xl font-extrabold'}>sur demande</p>
+                            <div className="flex flex-col gap-6 rounded-md border p-6 sm:col-span-2 lg:col-auto lg:p-10">
+                                <Factory size={36} className="mx-auto" />
+                                <h3 className="text-center">Entreprise</h3>
+                                <div className="text-center">
+                                    <p>Offre</p>
+                                    <p className={'text-2xl font-extrabold'}>sur demande</p>
+                                </div>
+                                <ul className="flex flex-col gap-6">
+                                    <li className="flex gap-4">
+                                        <Check />
+                                        <p>Vous devez gérer plus de 2 sites ?</p>
+                                    </li>
+                                    <li className="flex gap-4">
+                                        <Check />
+                                        <p>Vous avez besoin de plus d'espace de stockage ?</p>
+                                    </li>
+                                    <li className="flex gap-4">
+                                        <Check />
+                                        <p>Support personnalisé</p>
+                                    </li>
+                                </ul>
+                                <Button variant={'cta'} className="">
+                                    Discutons-en
+                                </Button>
                             </div>
-                            <ul className="flex flex-col gap-6">
-                                <li className="flex gap-4">
-                                    <Check />
-                                    <p>Vous devez gérer plus de 2 sites ?</p>
-                                </li>
-                                <li className="flex gap-4">
-                                    <Check />
-                                    <p>Vous avez besoin de plus d'espace de stockage ?</p>
-                                </li>
-                                <li className="flex gap-4">
-                                    <Check />
-                                    <p>Support personnalisé</p>
-                                </li>
-                            </ul>
-                            <Button variant={'cta'} className="">
-                                Discutons-en
-                            </Button>
                         </div>
-                    </div> */}
-                </div>
-            </section>
-            {/* <section className="text-website-font w-full">
-                <div className="container mx-auto grid h-full gap-10 px-4 py-20 md:max-w-2/3">
-                    <h2 className="mx-auto">Foire Aux Questions</h2>
-                    <div className="website-details mx-auto flex w-full flex-col rounded-md border">
-                        <div className="rounded-md">
-                            <details className="bg-website-card rounded-md">
-                                <summary className="border-b px-6 py-4">Combien de temps faut-il pour démarrer ?</summary>
-                                <p className="bg-white p-6">
-                                    Véritable outil de Facility management, SME-Facility centralise l'information sur les équipements, simplifie votre
-                                    quotidien et renforce la collaboration. SME-Facility booste la productivité et la croissance de votre entreprise.
-                                </p>
-                            </details>
-                        </div>
-                        <div className="rounded-md">
-                            <details className="bg-website-card rounded-md">
-                                <summary className="border-b px-6 py-4">Combien de temps faut-il pour démarrer ?</summary>
-                                <p className="bg-white p-6">
-                                    Véritable outil de Facility management, SME-Facility centralise l'information sur les équipements, simplifie votre
-                                    quotidien et renforce la collaboration. SME-Facility booste la productivité et la croissance de votre entreprise.
-                                </p>
-                            </details>
-                        </div>
-                        <div className="rounded-md">
-                            <details className="bg-website-card rounded-md">
-                                <summary className="border-b px-6 py-4">Combien de temps faut-il pour démarrer ?</summary>
-                                <p className="bg-white p-6">
-                                    Véritable outil de Facility management, SME-Facility centralise l'information sur les équipements, simplifie votre
-                                    quotidien et renforce la collaboration. SME-Facility booste la productivité et la croissance de votre entreprise.
-                                </p>
-                            </details>
-                        </div>
-                        <div className="bg-website-card rounded-md">
-                            <details className="">
-                                <summary className="px-6 py-4">Combien de temps faut-il pour démarrer ?</summary>
-                                <p className="rounded-md bg-white p-6">
-                                    Véritable outil de Facility management, SME-Facility centralise l'information sur les équipements, simplifie votre
-                                    quotidien et renforce la collaboration. SME-Facility booste la productivité et la croissance de votre entreprise.
-                                </p>
-                            </details>
-                        </div>
+                        {/* <div className="mx-auto flex flex-col items-center gap-4">
+                            <p>Vous n’êtes pas encore convaincu que SME-Facility soit fait pour vous ?</p>
+                            <p>
+                                Pas de problème, nous pouvons vous proposer une démo afin de vous montrer la facilité d’utilisation de notre outil.
+                                Prenez rendez-vous avec nous afin de convenir d’un rendez-vous.
+                            </p>
+                            <a href={route('website.contact')}>
+                                <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
+                            </a>
+                        </div> */}
                     </div>
                 </div>
-            </section> */}
+            </section>
         </WebsiteLayout>
     );
 }

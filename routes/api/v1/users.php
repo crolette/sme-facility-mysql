@@ -35,9 +35,9 @@ Route::middleware([
     })->name('api.users.search');
 
     Route::get('/maintenance', function (Request $request) {
-        $query  = User::role(['Admin', 'Maintenance Manager'])->select('id', 'first_name', 'last_name');
+        $query  = User::role(['Admin', 'Maintenance Manager'])->select('id', 'first_name', 'last_name', 'email');
 
-        $query->whereDoesntHave('provider');
+        // $query->whereDoesntHave('provider');
 
         if ($request->query('q')) {
             $query->where(function ($subquery) use ($request) {

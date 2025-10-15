@@ -5,9 +5,9 @@ import { Head } from '@inertiajs/react';
 export default function WhoMaintenanceManager() {
     return (
         <WebsiteLayout>
-            <Head>
+            <Head title="Application mobile pour Responsables de maintenance">
                 <meta name="robots" content="index, follow"></meta>
-                <meta property="title" content="SME-Facility | Application mobile pour Responsables de maintenance" />
+                <meta property="title" content="Application mobile pour Responsables de maintenance | SME-Facility" />
                 <meta
                     name="description"
                     itemProp="description"
@@ -22,25 +22,32 @@ export default function WhoMaintenanceManager() {
                 />
             </Head>
             <section className="bg-website-border -mt-28 flex min-h-screen w-full flex-col items-center justify-center py-20 md:-mt-38">
-                <div className="container">
-                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-[2fr_1fr] md:px-10 md:py-16">
+                <div className="container mx-auto">
+                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:grid-cols-[2fr_1fr] md:px-10 md:py-16 lg:max-w-11/12">
                         <div className="flex flex-col justify-center gap-10 md:max-w-lg">
                             <h1 className="leading-16">
                                 <span className="font-extrabold">Gardez le contrôle sur vos interventions et vos équipes</span>, où que vous soyez.
                             </h1>
-                            <p className="">
+                            <h2 className="!text-xl">
                                 SME-Facility accompagne les responsables de maintenance dans la gestion quotidienne des interventions, des équipes et
-                                des équipements. Sur le terrain ou au bureau, vous disposez d’un outil mobile, simple et efficace pour organiser,
-                                suivre et optimiser vos opérations de maintenance.
+                                des équipements.
+                            </h2>
+                            <p className="">
+                                Sur le terrain ou au bureau, vous disposez d’un outil mobile, simple et efficace pour organiser, suivre et optimiser
+                                vos opérations de maintenance.
                             </p>
+                            <div className="flex flex-col items-center gap-6 md:flex-row md:gap-10">
+                                <a href={route('website.contact')}>
+                                    <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
+                                </a>
+                                <a href={route('website.pricing')}>
+                                    <Button variant={'transparent'}>Découvrir les formules</Button>
+                                </a>
+                            </div>
                         </div>
                         <div className="mx-auto my-auto">
-                            <img src="../images/Group 22.png" alt="" className="" />
+                            <img src="/images/Group 22.png" alt="" className="" />
                         </div>
-                    </div>
-                    <div className="flex flex-col gap-6 md:flex-row md:gap-10">
-                        <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
-                        <Button variant={'transparent'}>Découvrir les formules</Button>
                     </div>
                 </div>
             </section>
@@ -60,13 +67,13 @@ export default function WhoMaintenanceManager() {
                                 </p>
                             </div>
                             <div className="flex items-center">
-                                <img src="../images/Group 22.png" alt="" className="" />
+                                <img src="/images/Group 22.png" alt="" className="" />
                             </div>
                         </div>
                         <div className="relative grid grid-cols-1 gap-10 overflow-hidden p-10 md:grid-cols-2">
                             <span className="text-border/10 absolute top-1/3 -right-24 -translate-1/2 font-sans text-[256px] font-extrabold">2</span>
                             <div className="order-2 flex items-center md:order-none">
-                                <img src="../images/Group 22.png" alt="" className="" />
+                                <img src="/images/Group 22.png" alt="" className="" />
                             </div>
                             <div className="space-y-4">
                                 <p className="font-bold">Planification et suivi des maintenances</p>
@@ -90,13 +97,13 @@ export default function WhoMaintenanceManager() {
                                 </p>
                             </div>
                             <div className="flex items-center">
-                                <img src="../images/Group 22.png" alt="" className="" />
+                                <img src="/images/Group 22.png" alt="" className="" />
                             </div>
                         </div>
                         <div className="relative grid grid-cols-1 gap-10 overflow-hidden p-10 md:grid-cols-2">
                             <span className="text-border/10 absolute top-1/4 -right-24 -translate-1/2 font-sans text-[256px] font-extrabold">4</span>
                             <div className="order-2 flex items-center md:order-none">
-                                <img src="../images/Group 22.png" alt="" className="" />
+                                <img src="/images/Group 22.png" alt="" className="" />
                             </div>
                             <div className="space-y-4">
                                 <p className="font-bold">Indicateurs de performance et aide à la décision</p>

@@ -5,9 +5,9 @@ import { Head } from '@inertiajs/react';
 export default function FeaturesContracts() {
     return (
         <WebsiteLayout>
-            <Head>
+            <Head title="Gestion des contrats et garanties">
                 <meta name="robots" content="index, follow"></meta>
-                <meta property="title" content="SME-Facility | Gestion des contrats et garanties" />
+                <meta property="title" content="Gestion des contrats et garanties | SME-Facility" />
                 <meta
                     name="description"
                     itemProp="description"
@@ -33,9 +33,13 @@ export default function FeaturesContracts() {
                                 dates d’échéance depuis une interface unique, tout en recevant des alertes automatiques avant les renouvellements ou
                                 les fins de garantie.
                             </p>
-                            <div className="flex flex-col gap-6 md:flex-row md:gap-10">
-                                <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
-                                <Button variant={'transparent'}>Découvrir les formules</Button>
+                            <div className="flex flex-col items-center gap-6 md:flex-row md:gap-10">
+                                <a href={route('website.contact')}>
+                                    <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
+                                </a>
+                                <a href={route('website.pricing')}>
+                                    <Button variant={'transparent'}>Découvrir les formules</Button>
+                                </a>
                             </div>
                         </div>
                         <div className="mx-auto my-auto">
@@ -80,7 +84,7 @@ export default function FeaturesContracts() {
 
                         <div className="border-website-border flex w-full flex-col gap-4 rounded-md border p-6">
                             <details className="" open>
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Encodage complet des contrats</h3>
                                     <hr className="mt-3" />
                                 </summary>
@@ -91,7 +95,7 @@ export default function FeaturesContracts() {
                                 </p>
                             </details>
                             <details className="">
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Association directe aux assets ou locaux</h3>
                                     <hr className="mt-3" />
                                 </summary>
@@ -101,7 +105,7 @@ export default function FeaturesContracts() {
                                 </p>
                             </details>
                             <details className="">
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Notifications automatiques par email</h3>
                                     <hr className="mt-3" />
                                 </summary>
@@ -112,7 +116,7 @@ export default function FeaturesContracts() {
                                 </p>
                             </details>
                             <details className="">
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Suivi du cycle de vie des contrats</h3>
                                     <hr className="mt-3" />
                                 </summary>
@@ -123,7 +127,7 @@ export default function FeaturesContracts() {
                                 </p>
                             </details>
                             <details className="">
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Gestion des garanties intégrée aux assets</h3>
                                     <hr className="mt-3" />
                                 </summary>

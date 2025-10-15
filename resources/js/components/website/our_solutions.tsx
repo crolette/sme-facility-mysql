@@ -2,12 +2,11 @@ import { Boxes, ChartLine, FileStack, QrCode, ReceiptText, Settings } from 'luci
 
 export default function OurSolutions() {
     return (
-        <section className="bg-website-secondary min-h-screen py-40">
+        <section className="bg-website-secondary min-h-screen py-20">
             <div className="container mx-auto">
                 <div className="text-website-font mx-auto h-full space-y-10 px-4 py-10 text-sm md:max-w-11/12 md:p-10">
                     <h2>Nos solutions</h2>
                     <h3>Découvrez tout ce que SME-Facility peut faire pour vous </h3>
-                    <p className="italic">Une solution unique, pensée pour les PME.</p>
                     <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
                         <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
                             <div className="flex gap-4">
@@ -81,6 +80,7 @@ export default function OurSolutions() {
                         </div>
                     </div>
                 </div>
+                <p className="text-website-font text-center text-xl italic">Une solution unique, pensée pour les PME.</p>
             </div>
         </section>
     );

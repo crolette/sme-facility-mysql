@@ -182,7 +182,10 @@
 a {
     @apply underline;
     cursor: pointer;
-    /* font-size: clamp(0.8rem, 1.35vw, 1.2rem); */
+}
+
+nav a {
+    font-size: clamp(0.8rem, 1.35vw, 1.2rem);
 }
 
 a:hover {
@@ -221,7 +224,7 @@ h5 {
 
 h6 {
     font-size: clamp(1rem, 1.75vw, 1.25rem);
-    line-height: 1.5rem;
+    line-height: 2rem;
 }
 
 label:has(input:required) {

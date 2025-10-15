@@ -6,7 +6,7 @@ import { BadgeCheck, Bell, Check, Clock, Group, QrCode, Settings } from 'lucide-
 export default function Welcome() {
     return (
         <WebsiteLayout>
-            <Head>
+            <Head title="Solution de Facility Management pour PME">
                 <meta name="robots" content="index, follow"></meta>
                 <meta property="title" content="Solution de Facility Management pour PME | SME-Facility" />
                 <meta
@@ -24,7 +24,7 @@ export default function Welcome() {
             </Head>
             <section className="bg-logo -mt-28 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
                 <div className="container mx-auto">
-                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-[2fr_1fr] md:gap-10 md:p-10">
+                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:grid-cols-[2fr_1fr] md:gap-10 md:p-10 lg:max-w-11/12">
                         <div className="flex flex-col items-center justify-center gap-10">
                             <h1 className="">
                                 Le système de gestion de facility management
@@ -35,12 +35,13 @@ export default function Welcome() {
                                 SME-Facility centralise la gestion de vos équipements, maintenances et contrats. Un outil tout-en-un qui simplifie
                                 votre quotidien, réduit vos coûts et renforce la collaboration au sein de votre entreprise.
                             </p>
-                            <p className="self-start italic">Solution cloud, simple, rapide et prête à l’emploi.</p>
-                            <div className="flex flex-col gap-6 md:flex-row md:gap-10">
-                                <Button variant={'cta'} className="">
-                                    Prendre rendez-vous pour une démo
-                                </Button>
-                                <Button variant={'transparent'}>Découvrir les fonctionnalités</Button>
+                            <div className="flex flex-col items-center gap-6 md:flex-row md:gap-10">
+                                <a href={route('website.contact')}>
+                                    <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
+                                </a>
+                                <a href={route('website.pricing')}>
+                                    <Button variant={'transparent'}>Découvrir les formules</Button>
+                                </a>
                             </div>
                         </div>
                         <div className="mx-auto my-auto">
@@ -94,10 +95,7 @@ export default function Welcome() {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-website-primary text-website-card mx-auto flex flex-col items-center gap-4 rounded-md p-6 shadow-xl md:w-fit">
-                            <p>Découvrez notre FAQ et notre vidéo de présentation</p>
-                            <Button variant={'cta'}>FAQ</Button>
-                        </div>
+                        <p className="text-center text-xl italic">Solution cloud, simple, rapide et prête à l’emploi.</p>
                     </div>
                 </div>
             </section>
@@ -149,7 +147,7 @@ export default function Welcome() {
                                 </div>
                             </div>
                         </div>
-                        <p className="self-start italic">SME-Facility facilite chaque étape, du signalement à la résolution.</p>
+                        <p className="text-center text-xl italic">SME-Facility facilite chaque étape, du signalement à la résolution.</p>
                     </div>
                 </div>
             </section>

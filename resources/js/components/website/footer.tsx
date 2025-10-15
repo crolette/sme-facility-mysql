@@ -1,4 +1,5 @@
 import { Linkedin, Youtube } from 'lucide-react';
+import FaqSection from './faq_section';
 import OurSolutions from './our_solutions';
 import WhySMESection from './why-sme-section';
 
@@ -7,6 +8,7 @@ export default function Footer() {
         <>
             <OurSolutions />
             <WhySMESection />
+            <FaqSection />
 
             <footer className="bg-logo flex flex-col items-center justify-center space-y-10 px-4 py-10 text-white md:p-20">
                 <div className="container grid gap-12 md:grid-cols-4">
@@ -81,10 +83,18 @@ export default function Footer() {
                                     Qui somme-nous ?
                                 </a>
                             </li>
-                            <li>FAQ</li>
+                            <li>
+                                <a href={route('website.faq')} className="!no-underline">
+                                    FAQ
+                                </a>
+                            </li>
                             <li>Implémentation</li>
                             <li>Recrutement</li>
-                            <li>Contact</li>
+                            <li>
+                                <a href={route('website.contact')} className="!no-underline">
+                                    Contact
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>

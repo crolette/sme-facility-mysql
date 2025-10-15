@@ -5,7 +5,7 @@ import { Head } from '@inertiajs/react';
 export default function FeaturesStatistics() {
     return (
         <WebsiteLayout>
-            <Head>
+            <Head title="Tableau de bord et statistiques maintenance">
                 <meta name="robots" content="index, follow"></meta>
                 <meta property="title" content="Tableau de bord et statistiques maintenance | SME-Facility" />
                 <meta
@@ -33,9 +33,13 @@ export default function FeaturesStatistics() {
                                 interventions, détectez les retards, mesurez les temps moyens de traitement et pilotez la performance de votre
                                 maintenance.
                             </p>
-                            <div className="flex flex-col gap-6 md:flex-row md:gap-10">
-                                <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
-                                <Button variant={'transparent'}>Découvrir les formules</Button>
+                            <div className="flex flex-col items-center gap-6 md:flex-row md:gap-10">
+                                <a href={route('website.contact')}>
+                                    <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
+                                </a>
+                                <a href={route('website.pricing')}>
+                                    <Button variant={'transparent'}>Découvrir les formules</Button>
+                                </a>
                             </div>
                         </div>
                         <div className="mx-auto my-auto">
@@ -73,7 +77,7 @@ export default function FeaturesStatistics() {
 
                         <div className="border-website-border flex w-full flex-col gap-4 rounded-md border p-6">
                             <details className="" open>
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Tableau de bord visuel et intuitif</h3>
                                     <hr className="mt-3" />
                                 </summary>
@@ -84,7 +88,7 @@ export default function FeaturesStatistics() {
                                 </p>
                             </details>
                             <details className="">
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Suivi de la performance opérationnelle</h3>
                                     <hr className="mt-3" />
                                 </summary>
@@ -95,7 +99,7 @@ export default function FeaturesStatistics() {
                                 </p>
                             </details>
                             <details className="">
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Détection rapide des anomalies</h3>
                                     <hr className="mt-3" />
                                 </summary>
@@ -105,7 +109,7 @@ export default function FeaturesStatistics() {
                                 </p>
                             </details>
                             <details className="">
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Vision globale pour la prise de décision</h3>
                                     <hr className="mt-3" />
                                 </summary>
@@ -116,7 +120,7 @@ export default function FeaturesStatistics() {
                                 </p>
                             </details>
                             <details className="">
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Support à l’amélioration continue</h3>
                                     <hr className="mt-3" />
                                 </summary>

@@ -5,9 +5,9 @@ import { Head } from '@inertiajs/react';
 export default function WhoFacilityManager() {
     return (
         <WebsiteLayout>
-            <Head>
+            <Head title={'Outil de Facility Management pour les Facility Managers'}>
                 <meta name="robots" content="index, follow"></meta>
-                <meta property="title" content="SME-Facility | Outil de Facility Management pour les Facility Managers" />
+                <meta property="title" content="Outil de Facility Management pour les Facility Managers | SME-Facility" />
                 <meta
                     name="description"
                     itemProp="description"
@@ -23,25 +23,32 @@ export default function WhoFacilityManager() {
             </Head>
             <section className="bg-website-border -mt-28 flex min-h-screen w-full flex-col items-center justify-center py-20 md:-mt-38">
                 <div className="container mx-auto">
-                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-[2fr_1fr] md:px-10 md:py-16">
+                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:grid-cols-[2fr_1fr] md:px-10 md:py-16 lg:max-w-11/12">
                         <div className="flex flex-col justify-center gap-10 md:max-w-lg">
                             <h1 className="leading-16">
                                 <span className="font-extrabold">Pilotez vos installations</span> avec précision et optimisez vos opérations de
                                 maintenance.
                             </h1>
-                            <p className="">
+                            <h2 className="!text-xl">
                                 SME-Facility offre aux Facility Managers une plateforme complète de gestion des installations et du cycle de vie des
-                                équipements. En centralisant les données techniques, les interventions et les prestataires, vous maîtrisez vos coûts,
-                                sécurisez vos opérations et améliorez la performance de vos sites.
+                                équipements.
+                            </h2>
+                            <p className="">
+                                En centralisant les données techniques, les interventions et les prestataires, vous maîtrisez vos coûts, sécurisez vos
+                                opérations et améliorez la performance de vos sites.
                             </p>
+                            <div className="flex flex-col items-center gap-6 md:flex-row md:gap-10">
+                                <a href={route('website.contact')}>
+                                    <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
+                                </a>
+                                <a href={route('website.pricing')}>
+                                    <Button variant={'transparent'}>Découvrir les formules</Button>
+                                </a>
+                            </div>
                         </div>
                         <div className="mx-auto my-auto">
-                            <img src="../images/Group 22.png" alt="" className="" />
+                            <img src="/images/Group 22.png" alt="" className="" />
                         </div>
-                    </div>
-                    <div className="mx-auto flex w-full flex-col items-center justify-center gap-6 md:flex-row md:gap-10">
-                        <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
-                        <Button variant={'transparent'}>Découvrir les formules</Button>
                     </div>
                 </div>
             </section>
@@ -60,13 +67,13 @@ export default function WhoFacilityManager() {
                                 </p>
                             </div>
                             <div className="flex items-center">
-                                <img src="../images/Group 22.png" alt="" className="" />
+                                <img src="/images/Group 22.png" alt="" className="" />
                             </div>
                         </div>
                         <div className="relative grid grid-cols-1 gap-10 overflow-hidden p-10 md:grid-cols-2">
                             <span className="text-border/10 absolute top-1/3 -right-24 -translate-1/2 font-sans text-[256px] font-extrabold">2</span>
                             <div className="order-2 flex items-center md:order-none">
-                                <img src="../images/Group 22.png" alt="" className="" />
+                                <img src="/images/Group 22.png" alt="" className="" />
                             </div>
                             <div className="space-y-4">
                                 <p className="font-bold">Automatisez vos rappels et échéances</p>
@@ -89,13 +96,13 @@ export default function WhoFacilityManager() {
                                 </p>
                             </div>
                             <div className="flex items-center">
-                                <img src="../images/Group 22.png" alt="" className="" />
+                                <img src="/images/Group 22.png" alt="" className="" />
                             </div>
                         </div>
                         <div className="relative grid grid-cols-1 gap-10 overflow-hidden p-10 md:grid-cols-2">
                             <span className="text-border/10 absolute top-1/4 -right-24 -translate-1/2 font-sans text-[256px] font-extrabold">4</span>
                             <div className="order-2 flex items-center md:order-none">
-                                <img src="../images/Group 22.png" alt="" className="" />
+                                <img src="/images/Group 22.png" alt="" className="" />
                             </div>
                             <div className="space-y-4">
                                 <p className="font-bold">Démarrez immédiatement, sans paramétrage complexe</p>

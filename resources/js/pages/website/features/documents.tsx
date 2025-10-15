@@ -5,7 +5,7 @@ import { Head } from '@inertiajs/react';
 export default function FeaturesDocuments() {
     return (
         <WebsiteLayout>
-            <Head>
+            <Head title="Centralisation des documents et fichiers">
                 <meta name="robots" content="index, follow"></meta>
                 <meta property="title" content="Centralisation des documents et fichiers | SME-Facility" />
                 <meta
@@ -33,9 +33,13 @@ export default function FeaturesDocuments() {
                                 chercher dans plusieurs dossiers : chaque fichier est rattaché à son actif ou à son opération, accessible
                                 instantanément par votre équipe.
                             </p>
-                            <div className="flex flex-col gap-6 md:flex-row md:gap-10">
-                                <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
-                                <Button variant={'transparent'}>Découvrir les formules</Button>
+                            <div className="flex flex-col items-center gap-6 md:flex-row md:gap-10">
+                                <a href={route('website.contact')}>
+                                    <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
+                                </a>
+                                <a href={route('website.pricing')}>
+                                    <Button variant={'transparent'}>Découvrir les formules</Button>
+                                </a>
                             </div>
                         </div>
                         <div className="mx-auto my-auto">
@@ -77,7 +81,7 @@ export default function FeaturesDocuments() {
 
                         <div className="border-website-border flex w-full flex-col gap-4 rounded-md border p-6">
                             <details className="" open>
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Rattachement documentaire contextuel</h3>
                                     <hr className="mt-3" />
                                 </summary>
@@ -87,7 +91,7 @@ export default function FeaturesDocuments() {
                                 </p>
                             </details>
                             <details className="">
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Consultation rapide depuis une interface unique</h3>
                                     <hr className="mt-3" />
                                 </summary>
@@ -98,7 +102,7 @@ export default function FeaturesDocuments() {
                                 </p>
                             </details>
                             <details className="">
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Gestion collaborative et sécurisée</h3>
                                     <hr className="mt-3" />
                                 </summary>
@@ -108,7 +112,7 @@ export default function FeaturesDocuments() {
                                 </p>
                             </details>
                             <details className="">
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Traçabilité et conformité documentaire</h3>
                                     <hr className="mt-3" />
                                 </summary>
@@ -118,7 +122,7 @@ export default function FeaturesDocuments() {
                                 </p>
                             </details>
                             <details className="">
-                                <summary className="text-2xl font-bold">
+                                <summary className="cursor-pointer text-2xl font-bold">
                                     <h3>Gain de temps et réduction des erreurs</h3>
                                     <hr className="mt-3" />
                                 </summary>

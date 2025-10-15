@@ -5,9 +5,9 @@ import { Head } from '@inertiajs/react';
 export default function WhoSME() {
     return (
         <WebsiteLayout>
-            <Head>
+            <Head title={'Application de Facility Management pour PME'}>
                 <meta name="robots" content="index, follow"></meta>
-                <meta property="title" content="SME-Facility | Application de Facility Management pour PME" />
+                <meta property="title" content="Application de Facility Management pour PME | SME-Facility" />
                 <meta
                     name="description"
                     itemProp="description"
@@ -22,26 +22,32 @@ export default function WhoSME() {
                 />
             </Head>
             <section className="bg-website-border -mt-28 flex min-h-screen w-full flex-col items-center justify-center py-20 md:-mt-38">
-                <div className="container">
+                <div className="container mx-auto">
                     <div className="mx-auto grid h-full gap-10 px-4 py-20 md:grid-cols-[2fr_1fr] md:px-10 md:py-16 lg:max-w-11/12">
                         <div className="flex flex-col justify-center gap-10 md:max-w-lg">
                             <h1 className="leading-16">
                                 Simplifiez la gestion de vos équipements et{' '}
                                 <span className="font-extrabold">concentrez-vous sur votre activité.</span>
                             </h1>
-                            <p className="">
+                            <h2 className="!text-xl">
                                 Avec SME-Facility, les TPME disposent enfin d’un outil de facility management simple, complet et prêt à l’emploi.
+                            </h2>
+                            <p className="">
                                 Gagnez du temps, structurez vos opérations de maintenance et améliorez la productivité sans complexité technique.
                             </p>
+                            <div className="flex flex-col items-center gap-6 md:flex-row md:gap-10">
+                                <a href={route('website.contact')}>
+                                    <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
+                                </a>
+                                <a href={route('website.pricing')}>
+                                    <Button variant={'transparent'}>Découvrir les formules</Button>
+                                </a>
+                            </div>
                         </div>
                         <div className="mx-auto my-auto">
-                            <img src="../images/Group 22.png" alt="" className="" />
+                            <img src="/images/Group 22.png" alt="" className="" />
                         </div>
                     </div>
-                </div>
-                <div className="flex flex-col gap-6 md:flex-row md:gap-10">
-                    <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
-                    <Button variant={'transparent'}>Découvrir les formules</Button>
                 </div>
             </section>
             <section className="text-website-font flex min-h-screen w-full flex-col items-center justify-center gap-20 py-40">
@@ -59,13 +65,13 @@ export default function WhoSME() {
                                 </p>
                             </div>
                             <div className="flex items-center">
-                                <img src="../images/Group 22.png" alt="" className="" />
+                                <img src="/images/Group 22.png" alt="" className="" />
                             </div>
                         </div>
                         <div className="relative grid grid-cols-1 gap-10 overflow-hidden p-10 md:grid-cols-2">
                             <span className="text-border/10 absolute top-1/3 -right-24 -translate-1/2 font-sans text-[256px] font-extrabold">2</span>
                             <div className="order-2 flex items-center md:order-none">
-                                <img src="../images/Group 22.png" alt="" className="" />
+                                <img src="/images/Group 22.png" alt="" className="" />
                             </div>
                             <div className="space-y-4">
                                 <p className="font-bold">Automatisez vos rappels et échéances</p>
@@ -88,7 +94,7 @@ export default function WhoSME() {
                                 </p>
                             </div>
                             <div className="flex items-center">
-                                <img src="../images/Group 22.png" alt="" className="" />
+                                <img src="/images/Group 22.png" alt="" className="" />
                             </div>
                         </div>
                         <div className="relative grid grid-cols-1 gap-10 overflow-hidden p-10 md:grid-cols-2">
