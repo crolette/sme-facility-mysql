@@ -9,7 +9,7 @@ One DB per Tenant : prefix : `tenant_`
 
 ## Database
 
-**PostreSQL**
+**MySQL**
 
 - Public
 
