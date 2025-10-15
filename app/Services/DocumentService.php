@@ -21,7 +21,7 @@ class DocumentService
 
         foreach ($files as $file) {
             $directory = "$tenantId/$modelType/$modelId/documents";
-            $fileName = Carbon::now()->isoFormat('YYYYMMDDHHMM') . '_' . Str::slug($file['name'], '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $file['file']->extension();
+            $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . Str::slug($file['name'], '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $file['file']->extension();
 
             $path = Storage::disk('tenants')->putFileAs($directory, $file['file'], $fileName);
 
@@ -49,7 +49,7 @@ class DocumentService
         $tenantId = tenancy()->tenant->id;
         foreach ($files as $file) {
             $directory = "$tenantId/contracts/$contract->id/documents";
-            $fileName = Carbon::now()->isoFormat('YYYYMMDDHHMM') . '_' . Str::slug($file['name'], '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $file['file']->extension();
+            $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . Str::slug($file['name'], '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $file['file']->extension();
 
             $path = Storage::disk('tenants')->putFileAs($directory, $file['file'], $fileName);
 

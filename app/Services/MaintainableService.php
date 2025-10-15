@@ -9,15 +9,52 @@ use Illuminate\Database\Eloquent\Model;
 
 class MaintainableService
 {
-    public function create(Model $model, $request)
+    public function create(Model $model, array $data)
     {
-        $maintainable = $model->maintainable()->create([...$request->validated()]);
+        $maintainable = $model->maintainable()->create([...$data]);
 
-        $maintainable->providers()->sync(collect($request->validated('providers'))->pluck('id'));
+        if(isset($data['providers']))
+            $maintainable->providers()->sync(collect($data['providers'])->pluck('id'));
 
-        if ($request->validated('maintenance_manager_id')) {
-            $maintainable->manager()->associate($request->validated('maintenance_manager_id'))->save();
+        if(isset($data['maintenance_manager_id'])) {
+            $maintainable->manager()->associate($data['maintenance_manager_id'])->save();
         }
+    }
+
+    public function updateOrCreate(Model $model, array $data)
+    {
+        $maintainable = $model->maintainable()->updateOrCreate(
+            [
+                'maintainable_type' => get_class($model),
+                'maintainable_id' => $model->id
+            ],
+            [
+                ...$data
+            ]
+            );
+
+        if (isset($data['providers']))
+            $maintainable->providers()->sync(collect($data['providers'])->pluck('id'));
+
+        if(isset($data['maintenance_manager_id']) && $maintainable->manager === null) {
+                $maintainable->manager()->associate($data['maintenance_manager_id'])->save();
+        }
+
+        if($maintainable->manager && !isset($data['maintenance_manager_id']))
+            $maintainable->manager()->dissociate();
+
+        if (isset($data['maintenance_manager_id']) && ($maintainable->manager?->id !== $data['maintenance_manager_id'])) {
+            app(MaintainableNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($maintainable, $maintainable->manager);
+            $maintainable->manager()->associate($data['maintenance_manager_id'])->save();
+        }
+
+        if ($maintainable->wasChanged('maintenance_frequency'))
+            $maintainable->next_maintenance_date = calculateNextMaintenanceDate($data['maintenance_frequency'], $data['last_maintenance_date'] ?? null);
+
+        $maintainable->save();
+        
+        return $model;
+
     }
 
     public function update(Maintainable $maintainable, $request)

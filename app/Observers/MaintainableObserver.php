@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use Illuminate\Support\Facades\Log;
 use App\Models\Tenants\Maintainable;
 use App\Services\MaintainableNotificationSchedulingService;
 use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;

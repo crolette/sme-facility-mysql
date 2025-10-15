@@ -28,6 +28,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Import/Export',
+        href: '/settings/import-export',
+        icon: null,
+    },
+    {
         title: 'Company',
         href: '/settings/company',
         icon: null,

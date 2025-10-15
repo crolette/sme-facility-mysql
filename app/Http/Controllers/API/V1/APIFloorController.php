@@ -62,7 +62,7 @@ class APIFloorController extends Controller
             $floor->building()->associate($building);
             $floor->save();
 
-            $this->maintainableService->create($floor, $maintainableRequest);
+            $this->maintainableService->create($floor, $maintainableRequest->validated());
 
             if ($contractRequest->validated('contracts'))
                 $this->contractService->createWithModel($floor, $contractRequest->validated('contracts'));

@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Tenants\Asset;
+use Illuminate\Support\Facades\Log;
 use App\Services\AssetNotificationSchedulingService;
 use App\Services\MaintainableNotificationSchedulingService;
 use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
@@ -17,7 +18,6 @@ class AssetObserver implements ShouldHandleEventsAfterCommit
 
     public function updated(Asset $asset)
     {
-        // dump('--- ASSET OBSERVER UPDATED ---');
         app(AssetNotificationSchedulingService::class)->updateForAsset($asset);
     }
 

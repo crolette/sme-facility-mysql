@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 import { Asset, BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
-import { ArchiveRestore, Loader2, Pencil, PlusCircle, QrCode, Shredder, Trash2 } from 'lucide-react';
+import { ArchiveRestore, Loader2, Pencil, PlusCircle, Shredder, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
@@ -17,13 +17,11 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
             title: `Index assets`,
             href: `/assets`,
         },
-        
     ];
     const { showToast } = useToast();
 
     const [assets, setAssets] = useState<Asset[]>(items);
     const [isLoading, setIsLoading] = useState<boolean>(false);
-
 
     const [activeAssetsTab, setActiveAssetsTab] = useState(true);
     const [trashedAssetsTab, setTrashedAssetsTab] = useState(false);
@@ -59,7 +57,7 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-             showToast(error.response.data.message, error.response.data.status);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -69,7 +67,7 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
             setAssets(response.data.data);
             setIsLoading(false);
         } catch (error) {
-             showToast(error.response.data.message, error.response.data.status);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -80,11 +78,11 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
             setTrashedAssets(response.data.data);
             setIsLoading(false);
         } catch (error) {
-             showToast(error.response.data.message, error.response.data.status);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
-    const [assetToDelete, setAssetToDelete] = useState<Asset | null >(null);
+    const [assetToDelete, setAssetToDelete] = useState<Asset | null>(null);
 
     const deleteAsset = async () => {
         try {
@@ -96,7 +94,7 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-             showToast(error.response.data.message, error.response.data.status);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -134,7 +132,7 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
             <Head title="Assets" />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="flex gap-10 border-b-2 border-accent">
+                <div className="border-accent flex gap-10 border-b-2">
                     <ul className="flex pl-4">
                         <li
                             className={cn(
@@ -142,8 +140,8 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                                 activeAssetsTab ? 'bg-primary text-background' : 'bg-secondary',
                             )}
                             onClick={() => {
-                                setActiveAssetsTab(!activeAssetsTab);
-                                setTrashedAssetsTab(!trashedAssetsTab);
+                                setActiveAssetsTab(true);
+                                setTrashedAssetsTab(false);
                             }}
                         >
                             active
@@ -154,22 +152,25 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                                 trashedAssetsTab ? 'bg-primary text-background' : 'bg-secondary',
                             )}
                             onClick={() => {
-                                setActiveAssetsTab(!activeAssetsTab);
-                                setTrashedAssetsTab(!trashedAssetsTab);
+                                setActiveAssetsTab(false);
+                                setTrashedAssetsTab(true);
                             }}
                         >
                             trashed
                         </li>
                     </ul>
                     <a href={route(`tenant.assets.create`)} className="w-fit">
-                        <Button><PlusCircle />Create</Button>
+                        <Button>
+                            <PlusCircle />
+                            Create
+                        </Button>
                     </a>
-                    <a href={route('tenant.pdf.qr-codes', {type: 'assets'})} target='__blank'>
-                                            <Button variant={'secondary'}>
-                                                <BiSolidFilePdf size={20} />
-                                                Download QR Codes
-                                            </Button>
-                                        </a>
+                    <a href={route('tenant.pdf.qr-codes', { type: 'assets' })} target="__blank">
+                        <Button variant={'secondary'}>
+                            <BiSolidFilePdf size={20} />
+                            Download QR Codes
+                        </Button>
+                    </a>
                 </div>
                 {isLoading && (
                     <div className="my-4 flex gap-4">
@@ -203,13 +204,11 @@ export default function IndexAssets({ items }: { items: Asset[] }) {
                                                 <TableBodyData>{asset.maintainable.name}</TableBodyData>
                                                 <TableBodyData>{asset.maintainable.description}</TableBodyData>
 
-                                                <TableBodyData className='space-x-2'>
-                                            
-
+                                                <TableBodyData className="space-x-2">
                                                     <a href={route(`tenant.assets.edit`, asset.reference_code)}>
                                                         <Button>
-                                                            <Pencil/>
-                                                            </Button>
+                                                            <Pencil />
+                                                        </Button>
                                                     </a>
                                                     <Button
                                                         onClick={() => {

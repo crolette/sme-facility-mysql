@@ -8,6 +8,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 
 class TenantAdminCreatedPasswordResetNotification extends ResetPassword
 {
@@ -23,7 +24,12 @@ class TenantAdminCreatedPasswordResetNotification extends ResetPassword
 
     protected function resetUrl($notifiable)
     {
+        // $tenantUrl = 'https://' . $this->tenant->domain->domain;
         
+        // Log::info('Tenant URL Reset Password : ' . $tenantUrl . '.sme-facility.com/reset-password/' . $this->token . '?' . http_build_query([
+        //     'email' => $notifiable->getEmailForPasswordReset(),
+        // ]));
+
         if(env('APP_ENV') === "production") {
             $tenantUrl = 'https://' . $this->tenant->domain->domain;
             return $tenantUrl . '.sme-facility.com/reset-password/' . $this->token . '?' . http_build_query([

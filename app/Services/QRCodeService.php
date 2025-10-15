@@ -23,7 +23,7 @@ class QRCodeService
 
         $qr_hash = generateQRCodeHash($model);
 
-        $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDHHMM')  . '.png';
+        $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDhhmm')  . '.png';
         
         $route = route('tenant.' . $modelType . '.tickets.create', $qr_hash);
 

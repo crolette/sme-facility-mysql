@@ -42,16 +42,14 @@ class APIAssetController extends Controller
 
         try {
             DB::beginTransaction();
-
-            $asset = new Asset([
-                ...$assetRequest->validated(),
-            ]);
-
+            
+            $asset = $this->assetService->create($assetRequest->validated());
             $asset = $this->assetService->attachLocation($asset, $assetRequest->validated('locationType'), $assetRequest->validated('locationId'));
 
             $asset->assetCategory()->associate($assetRequest->validated('categoryId'));
             $asset->save();
-            $this->maintainableService->create($asset, $maintainableRequest);
+            
+            $this->maintainableService->create($asset, $maintainableRequest->validated());
 
             if ($contractRequest->validated('contracts'))
                 $this->contractService->createWithModel($asset, $contractRequest->validated('contracts'));

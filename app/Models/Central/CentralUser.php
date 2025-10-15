@@ -27,8 +27,6 @@ class CentralUser extends Authenticatable
         'last_name',
         'email',
         'password',
-        'username',
-
     ];
 
     protected $appends = [

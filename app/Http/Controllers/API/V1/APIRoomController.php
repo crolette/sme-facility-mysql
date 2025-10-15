@@ -68,7 +68,8 @@ class APIRoomController extends Controller
 
             $room->save();
 
-            $this->maintainableService->create($room, $maintainableRequest);
+            $this->maintainableService->create($room, $maintainableRequest->validated());
+            
             if ($contractRequest->validated('contracts'))
                 $this->contractService->createWithModel($room, $contractRequest->validated('contracts'));
 

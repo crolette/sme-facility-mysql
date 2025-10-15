@@ -20,7 +20,7 @@ Route::middleware([
 ])->prefix('/v1/users')->group(function () {
 
     Route::get('/search', function (Request $request) {
-        $query  = User::select('id', 'first_name', 'last_name', 'email');
+        $query  = User::select('id', 'first_name', 'last_name', 'email')->withoutRole('Super Admin');
 
         if ($request->query('q')) {
             $query->where(function ($subquery) use ($request) {

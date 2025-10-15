@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -23,12 +24,15 @@ class SendInterventionToProviderListener
      */
     public function handle(SendInterventionToProviderEvent $event): void
     {
+        Log::info('*** SendInterventionToProviderEvent ***');
+        Log::info($event->intervention);
+
         if (env('APP_ENV') === "local") {
-                Mail::to('crolweb@gmail.com')
-                    ->send(new SendInterventionToProviderEmail($event->intervention, $event->url));
+            Mail::to('crolweb@gmail.com')
+                ->send(new SendInterventionToProviderEmail($event->intervention, $event->url));
         } else {
-                Mail::to($event->email)
-                    ->send(new SendInterventionToProviderEmail($event->intervention, $event->url));
+            Mail::to($event->email)
+                ->send(new SendInterventionToProviderEmail($event->intervention, $event->url));
         }
     }
 }

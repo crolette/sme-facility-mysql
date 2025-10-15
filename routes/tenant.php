@@ -6,11 +6,13 @@ use App\Helpers\ApiResponse;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
+use App\Exports\AssetsExport;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Company;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Tenants\Building;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\ScopeSessions;
 use App\Http\Controllers\Tenants\UserController;
@@ -23,6 +25,8 @@ use App\Http\Controllers\Tenants\TenantRoomController;
 use App\Http\Controllers\Tenants\TenantSiteController;
 use App\Http\Controllers\Tenants\TenantAssetController;
 use App\Http\Controllers\Tenants\TenantFloorController;
+use App\Http\Controllers\Tenants\AssetsExportController;
+use App\Http\Controllers\Tenants\ImportExportController;
 use App\Http\Controllers\Tenants\InterventionController;
 use App\Http\Controllers\API\V1\APICompanyLogoController;
 use App\Http\Controllers\Tenants\TenantBuildingController;
@@ -102,6 +106,12 @@ Route::middleware([
 
     })->name('tenant.pdf.qr-codes');
 
+    Route::prefix('/settings/import-export/')->group(function() {
+        Route::get('/', [ImportExportController::class, 'show'])->name('tenant.import-export');
+        Route::get('/assets/export', [AssetsExportController::class, 'index'])->name('tenant.assets.export');
+
+    });
+
     Route::resource('sites', TenantSiteController::class)->parameters(['sites' => 'site'])->only('index', 'show', 'create', 'edit')->names('tenant.sites');
     Route::resource('buildings', TenantBuildingController::class)->parameters(['buildings' => 'building'])->only('index', 'show', 'create', 'edit')->names('tenant.buildings');
     Route::resource('floors', TenantFloorController::class)->parameters(['floors' => 'floor'])->only('index', 'show', 'create', 'edit')->names('tenant.floors');
@@ -119,6 +129,8 @@ Route::middleware([
         Route::get('/{provider}', [ProviderController::class, 'show'])->name('tenant.providers.show');
         Route::get('/{provider}/edit', [ProviderController::class, 'edit'])->name('tenant.providers.edit');
     });
+
+  
 
     Route::prefix('company')->group(function() {
         Route::get('/', function() {
