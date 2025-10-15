@@ -39,7 +39,7 @@ export default function FeaturesDocuments() {
                             </div>
                         </div>
                         <div className="mx-auto my-auto">
-                            <img src="../images/Group 22.png" alt="" className="" />
+                            <img src="/images/Group 22.png" alt="" className="" />
                         </div>
                     </div>
                 </div>
@@ -76,7 +76,7 @@ export default function FeaturesDocuments() {
                                 </div>
                             </div>
                         </div>
-                        <img src="../images/Group 20.png" alt="" className="w-full" />
+                        <img src="/images/Group 20.png" alt="" className="w-full" />
 
                         <div className="border-website-border w-full rounded-md border p-6">
                             <details className="" open>

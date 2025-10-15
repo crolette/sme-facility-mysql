@@ -24,16 +24,6 @@ foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->group(function () {
 
 
-        Route::get('/', function (Request $request) {
-            $locale = $request->getPreferredLanguage(['fr', 'nl', 'en', 'de']) ?? 'fr';
-            return redirect()->to('/' . $locale);
-        });
-
-
-
-
-
-
         Route::middleware(['web', AuthenticateCentral::class])->group(function () {
             Route::get('dashboard', function () {
 

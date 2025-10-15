@@ -30,7 +30,7 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                 <header className="sticky top-0 z-50 container mb-6 w-full text-sm not-has-[nav]:hidden">
                     <nav className="bg-logo mx-auto flex flex-row items-center justify-between gap-4 rounded-b-md px-5 py-6 shadow-2xl lg:px-5 lg:py-10">
                         <a href={route('home')}>
-                            <img src="../images/logo.png" alt="" className="w-32 lg:w-42" />
+                            <img src="/images/logo.png" alt="" className="w-32 lg:w-42" />
                         </a>
 
                         <ul className="hidden gap-8 text-lg font-semibold md:flex md:shrink-0 md:items-center lg:gap-12">
