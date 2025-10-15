@@ -1,25 +1,8 @@
 <?php
 
 use Inertia\Inertia;
-use App\Models\Tenant;
-use App\Helpers\ApiResponse;
-use App\Models\Tenants\User;
-use Illuminate\Http\Request;
-use App\Http\Middleware\setLocale;
-use App\Mail\NewTenantCreatedMail;
-use Illuminate\Support\Facades\Log;
-use App\Events\NewTenantCreatedEvent;
 use Illuminate\Support\Facades\Route;
-use Barryvdh\Debugbar\Facades\Debugbar;
-use Illuminate\Support\Facades\Password;
-use App\Http\Middleware\AuthenticateCentral;
-use App\Http\Controllers\Central\CentralTenantController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
-use App\Http\Controllers\Central\AdminLocationTypeController;
-use App\Http\Controllers\Central\CentralCategoryTypeController;
-use App\Http\Controllers\Central\CentralAssetCategoryController;
-use App\Http\Controllers\Central\RegisterCentralTenantController;
-use App\Notifications\TenantAdminCreatedPasswordResetNotification;
 
 foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->group(function () {
