@@ -2,46 +2,46 @@ import { Button } from '@/components/ui/button';
 import WebsiteLayout from '@/layouts/website-layout';
 import { Head } from '@inertiajs/react';
 
-export default function WhoSME() {
+export default function WhoMaintenanceManager() {
     return (
         <WebsiteLayout>
             <Head>
                 <meta name="robots" content="index, follow"></meta>
-                <meta property="title" content="SME-Facility | Application de Facility Management pour PME" />
+                <meta property="title" content="SME-Facility | Application mobile pour Responsables de maintenance" />
                 <meta
                     name="description"
                     itemProp="description"
                     property="description"
-                    content="Optimisez la gestion de vos équipements et la maintenance de votre PME avec SME-Facility, la solution cloud simple, rapide et prête à l’emploi."
+                    content="Supervisez vos interventions, vos techniciens et vos équipements depuis une seule interface. SME-Facility simplifie la maintenance au quotidien."
                 />
 
-                <meta property="og:title" content="Simplifiez la gestion de vos équipements avec SME-Facility" />
+                <meta property="og:title" content="Gardez le contrôle de vos opérations de maintenance avec SME-Facility" />
                 <meta
                     property="og:description"
-                    content="SME-Facility aide les PME à centraliser la maintenance, suivre les contrats et automatiser les rappels. Un outil complet pour gagner du temps et booster la productivité."
+                    content="Planifiez, suivez et analysez vos interventions où que vous soyez. SME-Facility offre aux responsables de maintenance une gestion fluide, mobile et performante des opérations."
                 />
             </Head>
             <section className="bg-website-border -mt-28 flex min-h-screen w-full flex-col items-center justify-center py-20 md:-mt-38">
                 <div className="container">
-                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:grid-cols-[2fr_1fr] md:px-10 md:py-16 lg:max-w-11/12">
+                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-[2fr_1fr] md:px-10 md:py-16">
                         <div className="flex flex-col justify-center gap-10 md:max-w-lg">
                             <h1 className="leading-16">
-                                Simplifiez la gestion de vos équipements et{' '}
-                                <span className="font-extrabold">concentrez-vous sur votre activité.</span>
+                                <span className="font-extrabold">Gardez le contrôle sur vos interventions et vos équipes</span>, où que vous soyez.
                             </h1>
                             <p className="">
-                                Avec SME-Facility, les TPME disposent enfin d’un outil de facility management simple, complet et prêt à l’emploi.
-                                Gagnez du temps, structurez vos opérations de maintenance et améliorez la productivité sans complexité technique.
+                                SME-Facility accompagne les responsables de maintenance dans la gestion quotidienne des interventions, des équipes et
+                                des équipements. Sur le terrain ou au bureau, vous disposez d’un outil mobile, simple et efficace pour organiser,
+                                suivre et optimiser vos opérations de maintenance.
                             </p>
                         </div>
                         <div className="mx-auto my-auto">
                             <img src="../images/Group 22.png" alt="" className="" />
                         </div>
                     </div>
-                </div>
-                <div className="flex flex-col gap-6 md:flex-row md:gap-10">
-                    <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
-                    <Button variant={'transparent'}>Découvrir les formules</Button>
+                    <div className="flex flex-col gap-6 md:flex-row md:gap-10">
+                        <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
+                        <Button variant={'transparent'}>Découvrir les formules</Button>
+                    </div>
                 </div>
             </section>
             <section className="text-website-font flex min-h-screen w-full flex-col items-center justify-center gap-20 py-40">
@@ -51,11 +51,12 @@ export default function WhoSME() {
                             <span className="text-border/10 absolute top-1/3 left-14 -translate-1/2 font-sans text-[256px] font-extrabold">1</span>
 
                             <div className="space-y-4">
-                                <p className="font-bold">Centralisez vos informations et équipements</p>
+                                <p className="font-bold">Une vision globale et centralisée du parc technique</p>
                                 <p>
-                                    Finis les fichiers dispersés et les informations perdues : SME-Facility rassemble l’ensemble de vos équipements,
-                                    contrats et interventions dans un seul espace sécurisé. Vous disposez d’un inventaire numérique complet,
-                                    accessible en tout lieu, pour suivre vos actifs techniques en temps réel.
+                                    Accédez en temps réel à l’ensemble de vos actifs : équipements critiques, contrats, sites, prestataires et
+                                    interventions. SME-Facility vous fournit une cartographie claire de votre patrimoine technique, facilitant la
+                                    priorisation des actions et la prise de décision stratégique. L’historique détaillé des entretiens et
+                                    interventions garantit une traçabilité complète.
                                 </p>
                             </div>
                             <div className="flex items-center">
@@ -68,11 +69,12 @@ export default function WhoSME() {
                                 <img src="../images/Group 22.png" alt="" className="" />
                             </div>
                             <div className="space-y-4">
-                                <p className="font-bold">Automatisez vos rappels et échéances</p>
+                                <p className="font-bold">Planification et suivi des maintenances</p>
                                 <p>
-                                    Ne ratez plus un entretien, un contrat ou une vérification réglementaire. Le système vous envoie des alertes
-                                    automatiques pour toutes les échéances importantes. Vous anticipez les interventions et évitez les arrêts
-                                    imprévus, tout en réduisant la charge administrative.
+                                    Automatisez vos plans de maintenance préventive et générez des rappels pour chaque échéance. Vous pouvez suivre
+                                    l’avancement des interventions en direct, évaluer la charge des équipes et analyser la performance des
+                                    prestataires. Les bons d’intervention numériques standardisent les processus et améliorent la qualité du
+                                    reporting.
                                 </p>
                             </div>
                         </div>
@@ -80,11 +82,11 @@ export default function WhoSME() {
                             <span className="text-border/10 absolute top-1/3 left-14 -translate-1/2 font-sans text-[256px] font-extrabold">3</span>
 
                             <div className="space-y-4">
-                                <p className="font-bold">Simplifiez la communication avec vos prestataires</p>
+                                <p className="font-bold">Gestion documentaire et conformité simplifiée</p>
                                 <p>
-                                    Avec le portail de ticketing, vos techniciens, sous-traitants ou partenaires peuvent échanger directement sur
-                                    chaque demande. Les notifications par email tiennent toutes les parties informées, pour un suivi fluide et
-                                    transparent.
+                                    SME-Facility intègre la gestion documentaire contextualisée : notices techniques, photos, rapports, certificats ou
+                                    documents contractuels sont accessibles depuis chaque équipement. Grâce aux QR codes et à l’accès mobile, vos
+                                    techniciens disposent toujours de la bonne information, réduisant les risques d’erreur et facilitant les audits.
                                 </p>
                             </div>
                             <div className="flex items-center">
@@ -97,11 +99,11 @@ export default function WhoSME() {
                                 <img src="../images/Group 22.png" alt="" className="" />
                             </div>
                             <div className="space-y-4">
-                                <p className="font-bold">Démarrez immédiatement, sans paramétrage complexe</p>
+                                <p className="font-bold">Indicateurs de performance et aide à la décision</p>
                                 <p>
-                                    SME-Facility est 100 % cloud : aucune installation, aucune configuration technique. En quelques minutes, vous
-                                    définissez vos préférences d’entreprise et commencez à gérer vos équipements. Une interface intuitive vous
-                                    garantit une prise en main rapide et des gains de productivité immédiats.
+                                    Les tableaux de bord et KPI intégrés permettent d’évaluer la disponibilité des équipements, la réactivité des
+                                    interventions et le respect des SLA. SME-Facility devient un véritable outil d’aide à la décision, orienté vers la
+                                    performance opérationnelle et la maîtrise des coûts.
                                 </p>
                             </div>
                         </div>

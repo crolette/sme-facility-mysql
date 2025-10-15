@@ -1,14 +1,31 @@
-import { Button } from '@/components/ui/button';
 import WebsiteLayout from '@/layouts/website-layout';
-import { Check } from 'lucide-react';
+import { Head } from '@inertiajs/react';
 
 export default function Pricing() {
     return (
         <WebsiteLayout>
+            <Head>
+                <meta name="robots" content="index, follow"></meta>
+                <meta property="title" content="SME-Facility | Application de Facility Management pour PME" />
+                <meta
+                    name="description"
+                    itemProp="description"
+                    property="description"
+                    content="Optimisez la gestion de vos équipements et la maintenance de votre PME avec SME-Facility, la solution cloud simple, rapide et prête à l’emploi."
+                />
+
+                <meta property="og:title" content="Simplifiez la gestion de vos équipements avec SME-Facility" />
+                <meta
+                    property="og:description"
+                    content="SME-Facility aide les PME à centraliser la maintenance, suivre les contrats et automatiser les rappels. Un outil complet pour gagner du temps et booster la productivité."
+                />
+            </Head>
             <section className="text-website-font w-full">
-                <div className="container mx-auto md:max-w-2/3 md:p-10">
+                <div className="container mx-auto md:max-w-10/12 md:p-10">
                     <h1>Notre tarification est aussi simple que notre produit</h1>
-                    <div className="grid grid-cols-3 gap-10">
+                    <p>Un peu de patience... Plus d'informations très bientôt</p>
+
+                    {/* <div className="grid grid-cols-3 gap-10">
                         <div className="flex flex-col gap-6 rounded-md border p-10">
                             <h2 className="text-center">Starter</h2>
                             <div className="text-center">
@@ -89,10 +106,10 @@ export default function Pricing() {
                                 Discutons-en
                             </Button>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </section>
-            <section className="text-website-font w-full">
+            {/* <section className="text-website-font w-full">
                 <div className="container mx-auto grid h-full gap-10 px-4 py-20 md:max-w-2/3">
                     <h2 className="mx-auto">Foire Aux Questions</h2>
                     <div className="website-details mx-auto flex w-full flex-col rounded-md border">
@@ -134,7 +151,7 @@ export default function Pricing() {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section> */}
         </WebsiteLayout>
     );
 }

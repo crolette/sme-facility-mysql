@@ -2,46 +2,47 @@ import { Button } from '@/components/ui/button';
 import WebsiteLayout from '@/layouts/website-layout';
 import { Head } from '@inertiajs/react';
 
-export default function WhoSME() {
+export default function WhoFacilityManager() {
     return (
         <WebsiteLayout>
             <Head>
                 <meta name="robots" content="index, follow"></meta>
-                <meta property="title" content="SME-Facility | Application de Facility Management pour PME" />
+                <meta property="title" content="SME-Facility | Outil de Facility Management pour les Facility Managers" />
                 <meta
                     name="description"
                     itemProp="description"
                     property="description"
-                    content="Optimisez la gestion de vos équipements et la maintenance de votre PME avec SME-Facility, la solution cloud simple, rapide et prête à l’emploi."
+                    content="Centralisez vos installations, planifiez vos maintenances et suivez vos KPI avec SME-Facility, la plateforme complète pour Facility Managers exigeants."
                 />
 
-                <meta property="og:title" content="Simplifiez la gestion de vos équipements avec SME-Facility" />
+                <meta property="og:title" content="Pilotez vos installations avec précision grâce à SME-Facility" />
                 <meta
                     property="og:description"
-                    content="SME-Facility aide les PME à centraliser la maintenance, suivre les contrats et automatiser les rappels. Un outil complet pour gagner du temps et booster la productivité."
+                    content="Avec SME-Facility, les Facility Managers disposent d’un outil complet pour gérer le parc technique, automatiser la maintenance préventive et mesurer la performance opérationnelle."
                 />
             </Head>
             <section className="bg-website-border -mt-28 flex min-h-screen w-full flex-col items-center justify-center py-20 md:-mt-38">
-                <div className="container">
-                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:grid-cols-[2fr_1fr] md:px-10 md:py-16 lg:max-w-11/12">
+                <div className="container mx-auto">
+                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-[2fr_1fr] md:px-10 md:py-16">
                         <div className="flex flex-col justify-center gap-10 md:max-w-lg">
                             <h1 className="leading-16">
-                                Simplifiez la gestion de vos équipements et{' '}
-                                <span className="font-extrabold">concentrez-vous sur votre activité.</span>
+                                <span className="font-extrabold">Pilotez vos installations</span> avec précision et optimisez vos opérations de
+                                maintenance.
                             </h1>
                             <p className="">
-                                Avec SME-Facility, les TPME disposent enfin d’un outil de facility management simple, complet et prêt à l’emploi.
-                                Gagnez du temps, structurez vos opérations de maintenance et améliorez la productivité sans complexité technique.
+                                SME-Facility offre aux Facility Managers une plateforme complète de gestion des installations et du cycle de vie des
+                                équipements. En centralisant les données techniques, les interventions et les prestataires, vous maîtrisez vos coûts,
+                                sécurisez vos opérations et améliorez la performance de vos sites.
                             </p>
                         </div>
                         <div className="mx-auto my-auto">
                             <img src="../images/Group 22.png" alt="" className="" />
                         </div>
                     </div>
-                </div>
-                <div className="flex flex-col gap-6 md:flex-row md:gap-10">
-                    <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
-                    <Button variant={'transparent'}>Découvrir les formules</Button>
+                    <div className="mx-auto flex w-full flex-col items-center justify-center gap-6 md:flex-row md:gap-10">
+                        <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
+                        <Button variant={'transparent'}>Découvrir les formules</Button>
+                    </div>
                 </div>
             </section>
             <section className="text-website-font flex min-h-screen w-full flex-col items-center justify-center gap-20 py-40">

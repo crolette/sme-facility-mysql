@@ -2,23 +2,23 @@ import { Button } from '@/components/ui/button';
 import WebsiteLayout from '@/layouts/website-layout';
 import { Head } from '@inertiajs/react';
 
-export default function FeaturesQrCode() {
+export default function FeaturesDocuments() {
     return (
         <WebsiteLayout>
             <Head>
                 <meta name="robots" content="index, follow"></meta>
-                <meta property="title" content="SME-Facility | Signalement d’incident par QR Code" />
+                <meta property="title" content="SME-Facility | Centralisation des documents et fichiers" />
                 <meta
                     name="description"
                     itemProp="description"
                     property="description"
-                    content="Permettez à chacun de signaler un problème en un scan. SME-Facility simplifie la création de tickets grâce aux QR codes placés sur vos équipements et locaux."
+                    content="Centralisez tous vos documents techniques, contrats et rapports dans une interface unique. SME-Facility simplifie la gestion documentaire et améliore la traçabilité de vos données."
                 />
 
-                <meta property="og:title" content="Signalez un incident en un scan avec SME-Facility" />
+                <meta property="og:title" content="Tous vos documents accessibles en un clic" />
                 <meta
                     property="og:description"
-                    content="Les QR codes SME-Facility permettent à tout utilisateur de créer un ticket instantanément. Le responsable reçoit la demande et planifie l’intervention en un clic."
+                    content="SME-Facility centralise la gestion documentaire de votre entreprise : fiches techniques, contrats, rapports et photos, reliés à vos équipements et interventions pour un accès rapide et sécurisé."
                 />
             </Head>
             <section className="bg-website-primary -mt-20 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">

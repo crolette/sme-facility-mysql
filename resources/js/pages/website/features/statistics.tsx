@@ -2,23 +2,23 @@ import { Button } from '@/components/ui/button';
 import WebsiteLayout from '@/layouts/website-layout';
 import { Head } from '@inertiajs/react';
 
-export default function FeaturesQrCode() {
+export default function FeaturesStatistics() {
     return (
         <WebsiteLayout>
             <Head>
                 <meta name="robots" content="index, follow"></meta>
-                <meta property="title" content="SME-Facility | Signalement d’incident par QR Code" />
+                <meta property="title" content="SME-Facility | Tableau de bord et statistiques maintenance" />
                 <meta
                     name="description"
                     itemProp="description"
                     property="description"
-                    content="Permettez à chacun de signaler un problème en un scan. SME-Facility simplifie la création de tickets grâce aux QR codes placés sur vos équipements et locaux."
+                    content="Pilotez vos interventions et suivez vos KPI maintenance. SME-Facility offre un tableau de bord visuel pour analyser la performance et améliorer la gestion de vos équipements."
                 />
 
-                <meta property="og:title" content="Signalez un incident en un scan avec SME-Facility" />
+                <meta property="og:title" content="Analysez et pilotez vos performances de maintenance" />
                 <meta
                     property="og:description"
-                    content="Les QR codes SME-Facility permettent à tout utilisateur de créer un ticket instantanément. Le responsable reçoit la demande et planifie l’intervention en un clic."
+                    content="Avec SME-Facility, suivez vos statistiques en temps réel : interventions effectuées, retards, temps moyens et répartition des maintenances. Prenez des décisions éclairées pour optimiser vos opérations."
                 />
             </Head>
             <section className="bg-website-primary -mt-20 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">

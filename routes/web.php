@@ -5,6 +5,7 @@ use App\Models\Tenant;
 use App\Helpers\ApiResponse;
 use App\Models\Tenants\User;
 use Illuminate\Http\Request;
+use App\Http\Middleware\setLocale;
 use App\Mail\NewTenantCreatedMail;
 use Illuminate\Support\Facades\Log;
 use App\Events\NewTenantCreatedEvent;
@@ -21,39 +22,17 @@ use App\Notifications\TenantAdminCreatedPasswordResetNotification;
 
 foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->group(function () {
-        Route::get('/', function () {
-            return Inertia::render('welcome');
-        })->name('home');
 
 
-        Route::prefix('features')->group(function () {
-            Route::get('/qr-code', function () {
-                return Inertia::render('website/features/qr-code');
-            });
+        Route::get('/', function (Request $request) {
+            $locale = $request->getPreferredLanguage(['fr', 'nl', 'en', 'de']) ?? 'fr';
+            return redirect()->to('/' . $locale);
         });
 
-        Route::prefix('who')->group(function () {
-            Route::get('/manager', function () {
-                return Inertia::render('website/who/manager');
-            });
-        });
-        Route::prefix('why')->group(function () {
-            Route::get('/sme', function () {
-                return Inertia::render('website/why-sme/why-sme');
-            });
-        });
 
-        Route::get('pricing', function () {
-            return Inertia::render('website/pricing');
-        });
 
-        // Route::get('/mail', function () {
-        //     $param1 = User::first();
 
-        //     $param2 = Tenant::first();
 
-        //     return (new NewTenantCreatedMail($param1, $param2))->render();
-        // });
 
         Route::middleware(['web', AuthenticateCentral::class])->group(function () {
             Route::get('dashboard', function () {
@@ -118,4 +97,5 @@ foreach (config('tenancy.central_domains') as $domain) {
 }
 
 
+require __DIR__ . '/website.php';
 require __DIR__ . '/central_auth.php';

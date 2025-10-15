@@ -1,17 +1,17 @@
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import { CentralType, Intervention, Provider, User } from '@/types';
 import axios from 'axios';
+import { Loader, Pencil, PlusCircle, Trash2, X } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
+import Modale from '../Modale';
+import SearchableInput from '../SearchableInput';
+import { useToast } from '../ToastrContext';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import { Pill } from '../ui/pill';
 import { Textarea } from '../ui/textarea';
 import { InterventionActionManager } from './interventionActionManager';
-import { Pill } from '../ui/pill';
-import SearchableInput from '../SearchableInput';
-import { Loader, Pencil, Plus, PlusCircle, Trash2, X } from 'lucide-react';
-import { useToast } from '../ToastrContext';
-import Modale from '../Modale';
 
 interface InterventionManagerProps {
     itemCodeId: number | string;
@@ -55,16 +55,15 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         }
     };
 
-    console.log(interventions);
-
     const [interventionTypes, setInterventionTypes] = useState<CentralType[]>([]);
 
     const fetchInterventionTypes = async () => {
         try {
             const response = await axios.get(route('api.category-types', { type: 'intervention' }));
+            console.log(response.data.data);
             setInterventionTypes(response.data.data);
         } catch (error) {
-            console.log(error)
+            console.log(error);
         }
     };
 
@@ -87,7 +86,6 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         pictures: [],
     };
 
-    
     const [interventionDataForm, setInterventionDataForm] = useState<InterventionFormData>(interventionData);
     console.log(interventionDataForm);
 
@@ -120,13 +118,13 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
 
     const submitIntervention: FormEventHandler = async (e) => {
         e.preventDefault();
-         setIsProcessing(true);
+        setIsProcessing(true);
 
         try {
             const response = await axios.post(route('api.interventions.store'), interventionDataForm, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                }
+                },
             });
             if (response.data.status === 'success') {
                 closeModale();
@@ -135,7 +133,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         } catch (error) {
             console.error(error);
             setIsProcessing(false);
-             showToast(error.response.data.message, error.response.data.status);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -176,10 +174,9 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                 setIsProcessing(false);
                 setInterventionDataForm(interventionData);
                 showToast(response.data.message, response.data.status);
-
             }
         } catch (error) {
-             showToast(error.response.data.message, error.response.data.status);
+            showToast(error.response.data.message, error.response.data.status);
             setIsProcessing(false);
         }
     };
@@ -192,8 +189,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
     const [showDeleteInterventionModale, setShowDeleteInterventionModale] = useState(false);
     const [interventionToDelete, setInterventionToDelete] = useState<null | Intervention>(null);
     const deleteIntervention = async () => {
-        if (!interventionToDelete)
-            return;
+        if (!interventionToDelete) return;
 
         try {
             const response = await axios.delete(route('api.interventions.destroy', interventionToDelete.id));
@@ -219,15 +215,14 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
     const [interventionToSend, setInterventionToSend] = useState<number | null>(null);
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
-    const [providers, setProviders] = useState<Provider[] | null>(null)
-    const [providerEmail, setProviderEmail] = useState<User | null>()
+    const [providers, setProviders] = useState<Provider[] | null>(null);
+    const [providerEmail, setProviderEmail] = useState<User | null>();
 
     const sendIntervention = (id: number) => {
         fetchProviders(id);
         setInterventionToSend(id);
         setSendInterventionToProviderModale(true);
     };
-
 
     const fetchProviders = async (id: number) => {
         try {
@@ -238,14 +233,13 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         } catch (error) {
             showToast(error.response.data.message, error.response.data.status);
         }
-    }
+    };
 
     const sendInterventionMail = async () => {
-        if (!interventionToSend || !providerEmail)
-            return;
+        if (!interventionToSend || !providerEmail) return;
 
         setIsProcessing(true);
-        
+
         try {
             const response = await axios.post(route('api.interventions.send-provider', interventionToSend), providerEmail);
             if (response.data.status === 'success') {
@@ -255,9 +249,8 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         } catch (error) {
             showToast(error.response.data.message, error.response.data.status);
             setIsProcessing(false);
-         }
-    }
-
+        }
+    };
 
     const closeSendInterventionToProviderModale = () => {
         setSendInterventionToProviderModale(false);
@@ -265,7 +258,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         setProviders(null);
         setInterventionToSend(null);
         setIsProcessing(false);
-    }
+    };
 
     return (
         <div className="border-sidebar-border bg-sidebar font rounded-md border p-4 shadow-xl">
@@ -302,9 +295,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                         <TableBody>
                             <TableBodyRow className="">
                                 <TableBodyData>
-                                    <a href={route("tenant.interventions.show", intervention.id)}>
-                                        {intervention.type}
-                                        </a>
+                                    <a href={route('tenant.interventions.show', intervention.id)}>{intervention.type}</a>
                                 </TableBodyData>
                                 <TableBodyData className="overflow-ellipsis">{intervention.description}</TableBodyData>
                                 <TableBodyData>
@@ -320,10 +311,14 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                             <Button onClick={() => editIntervention(intervention.id)}>
                                                 <Pencil />
                                             </Button>
-                                            <Button type="button" variant="destructive" onClick={() => {
-                                                setInterventionToDelete(intervention);
-                                                setShowDeleteInterventionModale(true);
-                                            }}>
+                                            <Button
+                                                type="button"
+                                                variant="destructive"
+                                                onClick={() => {
+                                                    setInterventionToDelete(intervention);
+                                                    setShowDeleteInterventionModale(true);
+                                                }}
+                                            >
                                                 <Trash2 />
                                             </Button>
                                         </>
@@ -344,18 +339,18 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                         </TableBody>
                     </Table>
                 ))}
-             <Modale
-                            title={'Delete intervention'}
-                            message={
-                                'Are you sure to delete this intervention ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.'
-                            }
-                            isOpen={showDeleteInterventionModale}
-                            onConfirm={deleteIntervention}
-                            onCancel={() => {
-                                setInterventionToDelete(null);
-                                setShowDeleteInterventionModale(false);
-                            }}
-                        />
+            <Modale
+                title={'Delete intervention'}
+                message={
+                    'Are you sure to delete this intervention ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.'
+                }
+                isOpen={showDeleteInterventionModale}
+                onConfirm={deleteIntervention}
+                onCancel={() => {
+                    setInterventionToDelete(null);
+                    setShowDeleteInterventionModale(false);
+                }}
+            />
             {sendInterventionToProviderModale && (
                 <div className="bg-background/50 fixed inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">
@@ -537,10 +532,12 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                             <Input
                                                 type="file"
                                                 multiple
-                                                onChange={(e) =>  setInterventionDataForm((prev) => ({
-                                                ...prev,
-                                                pictures: e.target.files,
-                                            }))}
+                                                onChange={(e) =>
+                                                    setInterventionDataForm((prev) => ({
+                                                        ...prev,
+                                                        pictures: e.target.files,
+                                                    }))
+                                                }
                                                 accept="image/png, image/jpeg, image/jpg"
                                             />
                                         </div>

@@ -2,27 +2,27 @@ import { Button } from '@/components/ui/button';
 import WebsiteLayout from '@/layouts/website-layout';
 import { Head } from '@inertiajs/react';
 
-export default function FeaturesQrCode() {
+export default function FeaturesAssets() {
     return (
         <WebsiteLayout>
             <Head>
                 <meta name="robots" content="index, follow"></meta>
-                <meta property="title" content="SME-Facility | Signalement d’incident par QR Code" />
+                <meta property="title" content="SME-Facility | Inventaire et gestion des équipements" />
                 <meta
                     name="description"
                     itemProp="description"
                     property="description"
-                    content="Permettez à chacun de signaler un problème en un scan. SME-Facility simplifie la création de tickets grâce aux QR codes placés sur vos équipements et locaux."
+                    content="Centralisez vos équipements dans une base claire et reliée à vos maintenances, contrats et interventions. SME-Facility simplifie la gestion et le suivi de votre parc technique."
                 />
 
-                <meta property="og:title" content="Signalez un incident en un scan avec SME-Facility" />
+                <meta property="og:title" content="Gardez une vue claire sur vos équipements" />
                 <meta
                     property="og:description"
-                    content="Les QR codes SME-Facility permettent à tout utilisateur de créer un ticket instantanément. Le responsable reçoit la demande et planifie l’intervention en un clic."
+                    content="SME-Facility vous permet de recenser, organiser et suivre vos équipements en un seul endroit. Visualisez votre patrimoine technique et gérez vos actifs avec simplicité et précision."
                 />
             </Head>
             <section className="bg-website-primary -mt-20 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
-                <div className="container">
+                <div className="container mx-auto">
                     <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-2 md:p-10">
                         <div className="flex flex-col justify-center gap-10 md:max-w-lg">
                             <h1 className="leading-16">
@@ -44,8 +44,8 @@ export default function FeaturesQrCode() {
                     </div>
                 </div>
             </section>
-            <section className="text-website-font flex min-h-screen w-full flex-col items-center justify-center py-40">
-                <div className="container">
+            <section className="text-website-font min-h-screen w-full py-40">
+                <div className="container mx-auto">
                     <div className="mx-auto flex h-full flex-col gap-10 px-4 md:max-w-11/12 md:gap-30">
                         <div className="grid gap-6 md:grid-cols-3">
                             <div className="from-website-border rounded-md bg-linear-to-t to-transparent p-0.5">

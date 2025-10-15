@@ -34,23 +34,77 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                         </a>
 
                         <ul className="hidden gap-8 text-lg font-semibold md:flex md:shrink-0 md:items-center lg:gap-12">
-                            <li>
-                                <Link href={'/features/qr-code'} className="!no-underline">
+                            <li className="group relative">
+                                <a className="block py-2 !no-underline" id="features">
                                     Fonctionnalités
-                                </Link>
+                                </a>
+                                <ul className="bg-logo absolute top-full -ml-3 hidden w-52 flex-col gap-4 rounded-b-md p-3 pt-2 group-hover:flex">
+                                    <li>
+                                        <Link href={route('website.features.central')} className="!no-underline">
+                                            Assets
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('website.features.documents')} className="!no-underline">
+                                            Documents
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('website.features.maintenance')} className="!no-underline">
+                                            Maintenance
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('website.features.contracts')} className="!no-underline">
+                                            Contracts
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('website.features.qr')} className="!no-underline">
+                                            QR Code
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('website.features.roles')} className="!no-underline">
+                                            Roles
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('website.features.statistics')} className="!no-underline">
+                                            Statistiques
+                                        </Link>
+                                    </li>
+                                </ul>
                             </li>
-                            <li>
-                                <Link href={'/who/manager'} className="!no-underline">
+                            <li className="group relative">
+                                <a className="block py-2 !no-underline" id="features">
                                     Pour qui ?
-                                </Link>
+                                </a>
+                                <ul className="bg-logo absolute top-full -ml-3 hidden w-72 flex-col gap-4 rounded-b-md p-3 pt-2 group-hover:flex">
+                                    <li>
+                                        <Link href={route('website.who.sme')} className="!no-underline" id="features">
+                                            PME
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('website.who.facility-manager')} className="!no-underline" id="features">
+                                            Facility Manager
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link href={route('website.who.maintenance-manager')} className="!no-underline" id="features">
+                                            Responsable de maintenance
+                                        </Link>
+                                    </li>
+                                </ul>
                             </li>
                             <li>
-                                <Link href={'/why/sme'} className="!no-underline">
+                                <Link href={route('website.why')} className="!no-underline" id="why">
                                     Pour quoi choisir SME-Facility ?
                                 </Link>
                             </li>
                             <li>
-                                <Link href={'/pricing'} className="!no-underline">
+                                <Link href={route('website.pricing')} className="!no-underline">
                                     Tarifs
                                 </Link>
                             </li>
