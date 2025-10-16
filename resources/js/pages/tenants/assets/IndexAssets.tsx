@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { Asset, AssetsPaginated, BreadcrumbItem, CentralType } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
-import { ArchiveRestore, Loader2, Pencil, PlusCircle, Shredder, Trash2 } from 'lucide-react';
+import { ArchiveRestore, Loader, Pencil, PlusCircle, Shredder, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
@@ -19,7 +19,7 @@ export interface SearchParams {
     q: string | null;
     sortBy: string | null;
     orderBy: string | null;
-    trashed: boolean;
+    trashed: boolean | null;
 }
 
 export default function IndexAssets({ items, filters, categories }: { items: AssetsPaginated; filters: SearchParams; categories: CentralType[] }) {
@@ -37,8 +37,6 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
         orderBy: filters.orderBy,
         trashed: filters.trashed === '1' ? true : false,
     });
-
-    const [prevQuery, setPrevQuery] = useState(query);
 
     const { showToast } = useToast();
 
@@ -58,6 +56,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                 setTrashedAssetsTab(true);
                 setActiveAssetsTab(false);
                 fetchTrashedAssets();
+                setQuery({ category: null, q: null, sortBy: null, orderBy: null, trashed: null });
                 setShowDeleteDefinitelyModale(false);
                 showToast(response.data.message, response.data.status);
             }
@@ -72,9 +71,10 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
         try {
             const response = await axios.post(route(`api.assets.restore`, asset.reference_code));
             if (response.data.status === 'success') {
-                setTrashedAssetsTab(!trashedAssetsTab);
-                setActiveAssetsTab(!activeAssetsTab);
-                fetchAssets();
+                // setTrashedAssetsTab(!trashedAssetsTab);
+                // setActiveAssetsTab(!activeAssetsTab);
+                // fetchAssets();
+                setQuery({ category: null, q: null, sortBy: null, orderBy: null, trashed: null });
                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {
@@ -110,9 +110,10 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
         try {
             const response = await axios.delete(route(`api.assets.destroy`, assetToDelete?.reference_code));
             if (response.data.status === 'success') {
-                setSearch('');
-                fetchAssets();
+                // setSearch('');
+                // fetchAssets();
                 setShowDeleteModale(!showDeleteModale);
+                setQuery({ category: null, q: null, sortBy: null, orderBy: null, trashed: null });
                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {
@@ -121,20 +122,39 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
     };
 
     const [trashedAssets, setTrashedAssets] = useState<Asset[]>();
-    const [search, setSearch] = useState(query.q);
-    const [debouncedSearch, setDebouncedSearch] = useState<string>('');
+
+    const [prevQuery, setPrevQuery] = useState(query);
 
     useEffect(() => {
         if (query.trashed !== trashedAssetsTab) {
-            router.visit(route('tenant.assets.index', { trashed: trashedAssetsTab ? 1 : 0 }));
+            router.visit(route('tenant.assets.index', { trashed: trashedAssetsTab ? 1 : 0 }), {
+                onStart: () => {
+                    setIsLoading(true);
+                },
+                onFinish: () => {
+                    setIsLoading(false);
+                },
+            });
         }
     }, [trashedAssetsTab]);
 
     const setCategorySearch = (id: number) => {
-        router.visit(route('tenant.assets.index', { ...query, category: id ? id : 0, trashed: trashedAssetsTab }));
+        router.visit(route('tenant.assets.index', { ...query, category: id ? id : 0, trashed: trashedAssetsTab }), {
+            onStart: () => {
+                setIsLoading(true);
+            },
+            onFinish: () => {
+                setIsLoading(false);
+            },
+        });
     };
 
+    const [search, setSearch] = useState(query.q);
+    const [debouncedSearch, setDebouncedSearch] = useState<string>('');
+
     useEffect(() => {
+        if (!search) return;
+
         const handler = setTimeout(() => {
             setDebouncedSearch(search);
         }, 500);
@@ -146,13 +166,24 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
 
     useEffect(() => {
         if (query.q !== debouncedSearch && debouncedSearch?.length > 2) {
-            router.visit(route('tenant.assets.index', { ...query, q: debouncedSearch }));
+            router.visit(route('tenant.assets.index', { ...query, q: debouncedSearch }), {
+                onStart: () => {
+                    setIsLoading(true);
+                },
+                onFinish: () => {
+                    setIsLoading(false);
+                },
+            });
         }
     }, [debouncedSearch]);
 
     const clearSearch = () => {
         router.visit(route('tenant.assets.index', { ...query, q: null }));
     };
+
+    useEffect(() => {
+        if (query !== prevQuery) router.visit(route('tenant.assets.index', { ...query }));
+    }, [query]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -199,33 +230,48 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                         </Button>
                     </a>
                 </div>
-                <div className="flex flex-row items-center gap-4">
-                    Search
-                    <Label htmlFor="category">Category</Label>
-                    <select name="category" id="category" value={query.category ?? 0} onChange={(e) => setCategorySearch(parseInt(e.target.value))}>
-                        <option value={0} aria-readonly>
-                            Select a category
-                        </option>
-                        {categories.map((category) => (
-                            <option key={category.label} value={category.id}>
-                                {category.label}
-                            </option>
-                        ))}
-                    </select>
-                    <div className="flex items-center gap-2">
-                        <Label htmlFor="category">Search</Label>
-                        <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} />
-                        <Button onClick={clearSearch} size={'xs'}>
-                            Clear Search
-                        </Button>
+                <div>
+                    <div className="flex w-full justify-between gap-2">
+                        <details className="border-border relative w-full rounded-md border-2 p-1" open={isLoading ? false : undefined}>
+                            <summary>Search</summary>
+
+                            <div className="bg-border border-border text-background dark:text-foreground absolute top-full flex flex-col items-center gap-4 rounded-b-md border-2 p-2 sm:flex-row">
+                                <div className="flex flex-col items-center gap-2">
+                                    <Label htmlFor="category">Category</Label>
+                                    <select
+                                        name="category"
+                                        id="category"
+                                        value={query.category ?? 0}
+                                        onChange={(e) => setCategorySearch(parseInt(e.target.value))}
+                                    >
+                                        <option value={0} aria-readonly>
+                                            Select a category
+                                        </option>
+                                        {categories.map((category) => (
+                                            <option key={category.label} value={category.id}>
+                                                {category.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="flex flex-col items-center gap-2">
+                                    <Label htmlFor="category">Search</Label>
+                                    <div className="relative">
+                                        <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} />
+                                        <X
+                                            onClick={() => setQuery((prev) => ({ ...prev, q: null }))}
+                                            className={'absolute top-1/2 right-0 -translate-1/2'}
+                                        />
+                                    </div>
+                                </div>
+                                <Button onClick={clearSearch} size={'xs'}>
+                                    Clear Search
+                                </Button>
+                            </div>
+                        </details>
                     </div>
                 </div>
-                {isLoading && (
-                    <div className="my-4 flex gap-4">
-                        <Loader2 size={24} className="animate-spin" />
-                        <p className="animate-pulse">Loading...</p>
-                    </div>
-                )}
+
                 <Table>
                     <TableHead>
                         <TableHeadRow>
@@ -237,73 +283,78 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                             <TableHeadData></TableHeadData>
                         </TableHeadRow>
                     </TableHead>
-                    {!isLoading && (
-                        <>
-                            <TableBody>
-                                {assets.length > 0 ? (
-                                    assets.map((asset, index) => {
-                                        return (
-                                            <TableBodyRow key={index}>
-                                                <TableBodyData>
-                                                    {asset.deleted_at ? (
-                                                        <a href={route(`tenant.assets.deleted`, asset.id)}> {asset.reference_code} </a>
-                                                    ) : (
-                                                        <a href={route(`tenant.assets.show`, asset.reference_code)}> {asset.reference_code} </a>
-                                                    )}
-                                                </TableBodyData>
-                                                <TableBodyData>{asset.code}</TableBodyData>
-                                                <TableBodyData>{asset.category}</TableBodyData>
-                                                <TableBodyData>{asset.maintainable.name}</TableBodyData>
-                                                <TableBodyData>{asset.maintainable.description}</TableBodyData>
+                    <TableBody>
+                        {isLoading ? (
+                            <TableBodyRow>
+                                <TableBodyData>
+                                    <p className="flex animate-pulse gap-2">
+                                        <Loader />
+                                        Searching...
+                                    </p>
+                                </TableBodyData>
+                            </TableBodyRow>
+                        ) : assets.length > 0 ? (
+                            assets.map((asset, index) => {
+                                return (
+                                    <TableBodyRow key={index}>
+                                        <TableBodyData>
+                                            {asset.deleted_at ? (
+                                                <a href={route(`tenant.assets.deleted`, asset.id)}> {asset.reference_code} </a>
+                                            ) : (
+                                                <a href={route(`tenant.assets.show`, asset.reference_code)}> {asset.reference_code} </a>
+                                            )}
+                                        </TableBodyData>
+                                        <TableBodyData>{asset.code}</TableBodyData>
+                                        <TableBodyData>{asset.category}</TableBodyData>
+                                        <TableBodyData>{asset.maintainable.name}</TableBodyData>
+                                        <TableBodyData>{asset.maintainable.description}</TableBodyData>
 
-                                                <TableBodyData className="space-x-2">
-                                                    {asset.deleted_at ? (
-                                                        <>
-                                                            <Button onClick={() => restoreAsset(asset)} variant={'green'}>
-                                                                <ArchiveRestore />
-                                                                {/* Restore */}
-                                                            </Button>
-                                                            <Button
-                                                                onClick={() => {
-                                                                    setAssetToDeleteDefinitely(asset.reference_code);
-                                                                    setShowDeleteDefinitelyModale(true);
-                                                                }}
-                                                                variant={'destructive'}
-                                                            >
-                                                                <Shredder />
-                                                                {/* Delete definitely */}
-                                                            </Button>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <a href={route(`tenant.assets.edit`, asset.reference_code)}>
-                                                                <Button>
-                                                                    <Pencil />
-                                                                </Button>
-                                                            </a>
-                                                            <Button
-                                                                onClick={() => {
-                                                                    setAssetToDelete(asset);
-                                                                    setShowDeleteModale(true);
-                                                                }}
-                                                                variant={'destructive'}
-                                                            >
-                                                                <Trash2 />
-                                                            </Button>
-                                                        </>
-                                                    )}
-                                                </TableBodyData>
-                                            </TableBodyRow>
-                                        );
-                                    })
-                                ) : (
-                                    <TableBodyRow key={0}>
-                                        <TableBodyData>No results...</TableBodyData>
+                                        <TableBodyData className="space-x-2">
+                                            {asset.deleted_at ? (
+                                                <>
+                                                    <Button onClick={() => restoreAsset(asset)} variant={'green'}>
+                                                        <ArchiveRestore />
+                                                        {/* Restore */}
+                                                    </Button>
+                                                    <Button
+                                                        onClick={() => {
+                                                            setAssetToDeleteDefinitely(asset.reference_code);
+                                                            setShowDeleteDefinitelyModale(true);
+                                                        }}
+                                                        variant={'destructive'}
+                                                    >
+                                                        <Shredder />
+                                                        {/* Delete definitely */}
+                                                    </Button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <a href={route(`tenant.assets.edit`, asset.reference_code)}>
+                                                        <Button>
+                                                            <Pencil />
+                                                        </Button>
+                                                    </a>
+                                                    <Button
+                                                        onClick={() => {
+                                                            setAssetToDelete(asset);
+                                                            setShowDeleteModale(true);
+                                                        }}
+                                                        variant={'destructive'}
+                                                    >
+                                                        <Trash2 />
+                                                    </Button>
+                                                </>
+                                            )}
+                                        </TableBodyData>
                                     </TableBodyRow>
-                                )}
-                            </TableBody>
-                        </>
-                    )}
+                                );
+                            })
+                        ) : (
+                            <TableBodyRow key={0}>
+                                <TableBodyData>No results...</TableBodyData>
+                            </TableBodyRow>
+                        )}
+                    </TableBody>
                 </Table>
 
                 {/* pagination */}

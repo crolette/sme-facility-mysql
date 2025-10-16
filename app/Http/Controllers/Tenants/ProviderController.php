@@ -3,24 +3,48 @@
 namespace App\Http\Controllers\Tenants;
 
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 use App\Models\Tenants\Provider;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ProviderController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         if (Auth::user()->cannot('viewAny', Provider::class))
             abort(403);
 
-        $providers = Provider::all();
-        return Inertia::render('tenants/providers/IndexProviders', ['providers' => $providers]);
+        $providers = Provider::query();
+
+        $validator = Validator::make($request->all(), [
+            'q' => 'string|max:255|nullable',
+            'category' => 'integer|nullable|gt:0',
+            'sortBy' => 'in:asc,desc'
+        ]);
+
+        $validator = $validator->validated();
+
+
+        if (isset($validator['category'])) {
+            $providers->where('category_type_id', $request->query('category'));
+        }
+
+        if (isset($validator['q'])) {
+            $providers->where('name', 'like', '%' . $validator['q'] . '%');
+        }
+
+
+
+        $categories = CategoryType::where('category', 'provider')->get();
+
+        return Inertia::render('tenants/providers/IndexProviders', ['items' => $providers->paginate()->withQueryString(), 'categories' => $categories, 'filters' => $request->only(['q', 'category'])]);
     }
 
     /**

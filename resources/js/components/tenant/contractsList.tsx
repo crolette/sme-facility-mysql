@@ -1,7 +1,7 @@
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import { Contract, ContractsPaginated } from '@/types';
 import axios from 'axios';
-import { Pencil, Trash2, Unlink } from 'lucide-react';
+import { Loader, Pencil, Trash2, Unlink } from 'lucide-react';
 import { useState } from 'react';
 import Modale from '../Modale';
 import { Pagination } from '../pagination';
@@ -12,6 +12,7 @@ interface ContractsList {
     getUrl: string;
     items?: ContractsPaginated;
     editable?: boolean;
+    isLoading?: boolean;
     removable?: boolean;
     contractableReference?: string | null;
     routeName?: string | null;
@@ -21,6 +22,7 @@ interface ContractsList {
 export const ContractsList = ({
     getUrl,
     items,
+    isLoading,
     editable = false,
     removable = false,
     contractableReference = null,
@@ -39,6 +41,8 @@ export const ContractsList = ({
             console.log(error);
         }
     };
+
+    const [isSearching, setIsSearching] = useState(isLoading);
 
     fetchContracts();
 
@@ -76,76 +80,88 @@ export const ContractsList = ({
 
     return (
         <>
-            {items.data && items.data.length > 0 && (
-                <Table>
-                    <TableHead>
-                        <TableHeadRow>
-                            <TableHeadData>Name</TableHeadData>
-                            <TableHeadData>Type</TableHeadData>
-                            <TableHeadData>Status</TableHeadData>
-                            <TableHeadData>Internal #</TableHeadData>
-                            <TableHeadData>Provider #</TableHeadData>
-                            <TableHeadData>Renewal</TableHeadData>
-                            <TableHeadData>Provider</TableHeadData>
-                            <TableHeadData>End date</TableHeadData>
-                            {(editable || removable) && <TableHeadData></TableHeadData>}
-                        </TableHeadRow>
-                    </TableHead>
-                    <TableBody>
-                        {items &&
-                            items.data.map((contract) => {
-                                return (
-                                    <TableBodyRow key={contract.id}>
-                                        <TableBodyData>
-                                            <a href={route(`tenant.contracts.show`, contract.id)}> {contract.name} </a>
-                                        </TableBodyData>
-                                        <TableBodyData>{contract.type}</TableBodyData>
-                                        <TableBodyData>
-                                            <Pill variant={contract.status}>{contract.status}</Pill>
-                                        </TableBodyData>
-                                        <TableBodyData>{contract.internal_reference}</TableBodyData>
-                                        <TableBodyData>{contract.provider_reference}</TableBodyData>
-                                        <TableBodyData>{contract.renewal_type}</TableBodyData>
-                                        <TableBodyData>
-                                            <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>
-                                        </TableBodyData>
-                                        <TableBodyData>{contract.end_date}</TableBodyData>
+            <Table>
+                <TableHead>
+                    <TableHeadRow>
+                        <TableHeadData>Name</TableHeadData>
+                        <TableHeadData>Type</TableHeadData>
+                        <TableHeadData>Status</TableHeadData>
+                        <TableHeadData>Internal #</TableHeadData>
+                        <TableHeadData>Provider #</TableHeadData>
+                        <TableHeadData>Renewal</TableHeadData>
+                        <TableHeadData>Provider</TableHeadData>
+                        <TableHeadData>End date</TableHeadData>
+                        {(editable || removable) && <TableHeadData></TableHeadData>}
+                    </TableHeadRow>
+                </TableHead>
+                <TableBody>
+                    {isLoading || isSearching ? (
+                        <TableBodyRow>
+                            <TableBodyData>
+                                <p className="flex animate-pulse gap-2">
+                                    <Loader />
+                                    Searching...
+                                </p>
+                            </TableBodyData>
+                        </TableBodyRow>
+                    ) : items.data.length > 0 ? (
+                        items.data.map((contract) => {
+                            return (
+                                <TableBodyRow key={contract.id}>
+                                    <TableBodyData>
+                                        <a href={route(`tenant.contracts.show`, contract.id)}> {contract.name} </a>
+                                    </TableBodyData>
+                                    <TableBodyData>{contract.type}</TableBodyData>
+                                    <TableBodyData>
+                                        <Pill variant={contract.status}>{contract.status}</Pill>
+                                    </TableBodyData>
+                                    <TableBodyData>{contract.internal_reference}</TableBodyData>
+                                    <TableBodyData>{contract.provider_reference}</TableBodyData>
+                                    <TableBodyData>{contract.renewal_type}</TableBodyData>
+                                    <TableBodyData>
+                                        <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>
+                                    </TableBodyData>
+                                    <TableBodyData>{contract.end_date}</TableBodyData>
 
-                                        {(editable || removable) && (
-                                            <TableBodyData className="flex space-x-2">
-                                                {removable && (
-                                                    <>
-                                                        <Button onClick={() => removeContract(contract.id)} variant={'outline'}>
-                                                            <Unlink />
+                                    {(editable || removable) && (
+                                        <TableBodyData className="flex space-x-2">
+                                            {removable && (
+                                                <>
+                                                    <Button onClick={() => removeContract(contract.id)} variant={'outline'}>
+                                                        <Unlink />
+                                                    </Button>
+                                                </>
+                                            )}
+                                            {editable && (
+                                                <>
+                                                    <a href={route(`tenant.contracts.edit`, contract.id)}>
+                                                        <Button>
+                                                            <Pencil />
                                                         </Button>
-                                                    </>
-                                                )}
-                                                {editable && (
-                                                    <>
-                                                        <a href={route(`tenant.contracts.edit`, contract.id)}>
-                                                            <Button>
-                                                                <Pencil />
-                                                            </Button>
-                                                        </a>
-                                                        <Button
-                                                            onClick={() => {
-                                                                setContractToDelete(contract);
-                                                                setShowDeleteModale(true);
-                                                            }}
-                                                            variant={'destructive'}
-                                                        >
-                                                            <Trash2 />
-                                                        </Button>
-                                                    </>
-                                                )}
-                                            </TableBodyData>
-                                        )}
-                                    </TableBodyRow>
-                                );
-                            })}
-                    </TableBody>
-                </Table>
-            )}
+                                                    </a>
+                                                    <Button
+                                                        onClick={() => {
+                                                            setContractToDelete(contract);
+                                                            setShowDeleteModale(true);
+                                                        }}
+                                                        variant={'destructive'}
+                                                    >
+                                                        <Trash2 />
+                                                    </Button>
+                                                </>
+                                            )}
+                                        </TableBodyData>
+                                    )}
+                                </TableBodyRow>
+                            );
+                        })
+                    ) : (
+                        <TableBodyRow key={0}>
+                            <TableBodyData>No results...</TableBodyData>
+                        </TableBodyRow>
+                    )}
+                </TableBody>
+            </Table>
             <Pagination items={items} />
             <Modale
                 title={'Delete contract'}

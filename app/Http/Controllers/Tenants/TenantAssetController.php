@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
 use App\Enums\ContractRenewalTypesEnum;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Support\Facades\Validator;
 use App\Models\Tenants\InterventionAction;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 
@@ -39,30 +40,35 @@ class TenantAssetController extends Controller
         if (Auth::user()->cannot('viewAny', Asset::class))
             abort(403);
 
-        Debugbar::info($request->query('trashed'));
-        if ($request->query('trashed')) {
-            Debugbar::info('TRASHET');
+        $validator = Validator::make($request->all(), [
+            'q' => 'string|max:255|nullable',
+            'category' => 'integer|nullable|gt:0',
+            'sortBy' => 'in:asc,desc',
+            'orderBy' => 'string|nullable',
+            'trashed' => 'nullable|in:1,0'
+        ]);
+
+        $validatedFields = $validator->validated();
+
+        if (isset($validatedFields['trashed']) && $validatedFields['trashed'] === '1') {
             $assets = Asset::onlyTrashed();
         } else {
-            Debugbar::info('NOT TRASHET');
             $assets = Asset::withoutTrashed();
         }
 
-        if ($request->query('category')) {
-            $assets->where('category_type_id', $request->query('category'));
+        if (isset($validatedFields['category'])) {
+            $assets->where('category_type_id', $validatedFields['category']);
         };
 
-        if ($request->query('q')) {
-            $assets->whereHas('maintainable', function (Builder $query) use ($request) {
-                $query->where('name', 'like', '%' . $request->query('q') . '%');
+        if (isset($validatedFields['q'])) {
+            $assets->whereHas('maintainable', function (Builder $query) use ($validatedFields) {
+                $query->where('name', 'like', '%' . $validatedFields['q'] . '%');
             });
         }
 
-
-        $assets = $assets->paginate()->withQueryString();
         $categories = CategoryType::where('category', 'asset')->get();
 
-        return Inertia::render('tenants/assets/IndexAssets', ['items' => $assets, 'filters' => $request->only(['q', 'sortBy', 'trashed', 'orderBy', 'category']), 'categories' => $categories]);
+        return Inertia::render('tenants/assets/IndexAssets', ['items' => $assets->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'sortBy', 'trashed', 'orderBy', 'category']), 'categories' => $categories]);
     }
 
     /**
