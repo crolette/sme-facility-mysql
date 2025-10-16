@@ -139,7 +139,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
     }, [trashedAssetsTab]);
 
     const setCategorySearch = (id: number) => {
-        router.visit(route('tenant.assets.index', { ...query, category: id ? id : 0, trashed: trashedAssetsTab }), {
+        router.visit(route('tenant.assets.index', { ...query, category: id ? id : null, trashed: trashedAssetsTab }), {
             onStart: () => {
                 setIsLoading(true);
             },
@@ -178,11 +178,26 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
     }, [debouncedSearch]);
 
     const clearSearch = () => {
-        router.visit(route('tenant.assets.index', { ...query, q: null }));
+        router.visit(route('tenant.assets.index', { ...query, q: null }), {
+            onStart: () => {
+                setIsLoading(true);
+            },
+            onFinish: () => {
+                setIsLoading(false);
+            },
+        });
     };
 
     useEffect(() => {
-        if (query !== prevQuery) router.visit(route('tenant.assets.index', { ...query }));
+        if (query !== prevQuery)
+            router.visit(route('tenant.assets.index', { ...query }), {
+                onStart: () => {
+                    setIsLoading(true);
+                },
+                onFinish: () => {
+                    setIsLoading(false);
+                },
+            });
     }, [query]);
 
     return (
@@ -217,18 +232,6 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                             trashed
                         </li>
                     </ul>
-                    <a href={route(`tenant.assets.create`)} className="w-fit">
-                        <Button>
-                            <PlusCircle />
-                            Create
-                        </Button>
-                    </a>
-                    <a href={route('tenant.pdf.qr-codes', { type: 'assets' })} target="__blank">
-                        <Button variant={'secondary'}>
-                            <BiSolidFilePdf size={20} />
-                            Download QR Codes
-                        </Button>
-                    </a>
                 </div>
                 <div>
                     <div className="flex w-full justify-between gap-2">
@@ -256,8 +259,8 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                 </div>
                                 <div className="flex flex-col items-center gap-2">
                                     <Label htmlFor="category">Search</Label>
-                                    <div className="relative">
-                                        <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} />
+                                    <div className="relative text-black dark:text-white">
+                                        <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} className="" />
                                         <X
                                             onClick={() => setQuery((prev) => ({ ...prev, q: null }))}
                                             className={'absolute top-1/2 right-0 -translate-1/2'}
@@ -269,6 +272,20 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                 </Button>
                             </div>
                         </details>
+                        <div className="flex space-x-2">
+                            <a href={route(`tenant.assets.create`)} className="w-fit">
+                                <Button>
+                                    <PlusCircle />
+                                    Create
+                                </Button>
+                            </a>
+                            <a href={route('tenant.pdf.qr-codes', { type: 'assets' })} target="__blank">
+                                <Button variant={'secondary'}>
+                                    <BiSolidFilePdf size={20} />
+                                    Download QR Codes
+                                </Button>
+                            </a>
+                        </div>
                     </div>
                 </div>
 

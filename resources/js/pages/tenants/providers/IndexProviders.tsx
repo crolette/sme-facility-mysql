@@ -86,7 +86,15 @@ export default function IndexProviders({ items, categories, filters }: { items: 
     const [prevQuery, setPrevQuery] = useState(query);
 
     useEffect(() => {
-        if (query !== prevQuery) router.visit(route('tenant.providers.index', { ...query }));
+        if (query !== prevQuery)
+            router.visit(route('tenant.providers.index', { ...query }), {
+                onStart: () => {
+                    setIsLoading(true);
+                },
+                onFinish: () => {
+                    setIsLoading(false);
+                },
+            });
     }, [query]);
 
     return (
@@ -117,7 +125,7 @@ export default function IndexProviders({ items, categories, filters }: { items: 
                             </div>
                             <div className="flex flex-col items-center gap-2">
                                 <Label htmlFor="category">Search</Label>
-                                <div className="relative">
+                                <div className="relative text-black dark:text-white">
                                     <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} />
                                     <X
                                         onClick={() => setQuery((prev) => ({ ...prev, q: null }))}

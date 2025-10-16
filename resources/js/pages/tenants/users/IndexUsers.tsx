@@ -66,7 +66,14 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
     }, [debouncedSearch]);
 
     const clearSearch = () => {
-        router.visit(route('tenant.users.index'));
+        router.visit(route('tenant.users.index'), {
+            onStart: () => {
+                setIsLoading(true);
+            },
+            onFinish: () => {
+                setIsLoading(false);
+            },
+        });
     };
 
     const setRoleSearch = (role: string) => {
@@ -126,7 +133,15 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
     const [prevQuery, setPrevQuery] = useState(query);
 
     useEffect(() => {
-        if (query !== prevQuery) router.visit(route('tenant.users.index', { ...query }));
+        if (query !== prevQuery)
+            router.visit(route('tenant.users.index', { ...query }), {
+                onStart: () => {
+                    setIsLoading(true);
+                },
+                onFinish: () => {
+                    setIsLoading(false);
+                },
+            });
     }, [query]);
 
     return (
@@ -164,7 +179,7 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
                             </div>
                             <div className="flex flex-col items-center gap-2">
                                 <Label htmlFor="category">Search</Label>
-                                <div className="relative">
+                                <div className="relative text-black dark:text-white">
                                     <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} />
                                     <X
                                         onClick={() => setQuery((prev) => ({ ...prev, q: null }))}
@@ -174,7 +189,7 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
                             </div>
                             <div className="flex flex-col items-center gap-2">
                                 <Label htmlFor="category">Provider Search</Label>
-                                <div className="relative">
+                                <div className="relative text-black dark:text-white">
                                     <Input type="text" value={providerSearch ?? ''} onChange={(e) => setProviderSearch(e.target.value)} />
                                     <X
                                         onClick={() => setQuery((prev) => ({ ...prev, provider: null }))}

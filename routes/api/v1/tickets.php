@@ -28,7 +28,7 @@ Route::middleware([
     // Get all tickets
     Route::get('/', [APITicketController::class, 'index'])->name('api.tickets.index');
 
-    Route::prefix('{ticket}')->group(function() {
+    Route::prefix('{ticket}')->group(function () {
         // Get a specific ticket
         Route::get('/', [APITicketController::class, 'show'])->name('api.tickets.get');
         Route::delete('/', [APITicketController::class, 'destroy'])->name('api.tickets.destroy');
@@ -60,37 +60,5 @@ Route::middleware([
         Route::get('/interventions', function (Ticket $ticket) {
             return ApiResponse::success($ticket->load('interventions')->interventions);
         })->name('api.tickets.interventions');
-
     });
-    
-
-    
-
-    // TODO are documents needed for a ticket ?
-    // Get all the documents from a ticket
-    // Route::get('/{ticket}/documents/', function (Ticket $ticket) {
-    //     if (Auth::user()->cannot('update', $ticket))
-    //         return ApiResponse::notAuthorized();
-
-    //     return ApiResponse::success($ticket->load('documents')->documents);
-    // })->name('api.tickets.documents');
-
-    // // Post a new document to the ticket
-    // Route::post('/{ticket}/documents/', function (DocumentUploadRequest $documentUploadRequest, DocumentService $documentService, Ticket $ticket) {
-
-    //     if (Auth::user()->cannot('update', $ticket))
-    //         return ApiResponse::notAuthorized();
-
-    //     $files = $documentUploadRequest->validated('files');
-    //     if ($files) {
-    //         $documentService->uploadAndAttachDocuments($ticket, $files);
-    //     }
-
-    //     return ApiResponse::success([], 'Document added');
-    // })->name('api.tickets.documents.post');
-
-   
-
 });
-
-

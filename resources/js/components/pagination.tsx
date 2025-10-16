@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 
 function Pagination({ items, className }: { items: PaginatedData; className?: string }) {
     return (
-        <div className={cn('flex w-full flex-wrap justify-between', className)}>
+        <div className={cn('mt-2 flex w-full flex-wrap gap-4', className)}>
             {items.links && items.links[0].url ? (
                 <Link href={items.links[0].url}>
                     <Button variant={'secondary'}>Previous</Button>

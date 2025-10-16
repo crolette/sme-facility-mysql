@@ -22,6 +22,7 @@ use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
 use App\Enums\ContractRenewalTypesEnum;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Tenant\TenantFloorRequest;
 use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
@@ -36,13 +37,35 @@ class TenantFloorController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         if (Auth::user()->cannot('viewAny', Floor::class))
             abort(403);
 
-        $floors = Floor::with('building')->paginate();
-        return Inertia::render('tenants/locations/IndexLocations', ['items' => $floors, 'routeName' => 'floors']);
+        $validator = Validator::make($request->all(), [
+            'q' => 'string|max:255|nullable',
+            'category' => 'integer|nullable|gt:0',
+            'sortBy' => 'in:asc,desc',
+            'orderBy' => 'string|nullable',
+        ]);
+
+        $validatedFields = $validator->validated();
+
+        $locations = Floor::with('building');
+
+        if (isset($validatedFields['category'])) {
+            $locations->where('location_type_id', $validatedFields['category']);
+        };
+
+        if (isset($validatedFields['q'])) {
+            $locations->whereHas('maintainable', function (Builder $query) use ($validatedFields) {
+                $query->where('name', 'like', '%' . $validatedFields['q'] . '%');
+            });
+        }
+
+        $categories = LocationType::where('level', 'floor')->get();
+
+        return Inertia::render('tenants/locations/IndexLocations', ['items' => $locations->paginate()->withQueryString(), 'categories' => $categories, 'filters' =>  $validator->safe()->only(['q', 'sortBy',  'orderBy', 'category']), 'routeName' => 'floors']);
     }
 
     /**
