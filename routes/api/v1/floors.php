@@ -24,14 +24,13 @@ Route::middleware([
 ])->prefix('/v1/floors')->group(function () {
     Route::get('/', function (Request $request) {
 
-        if($request->building) {
+        if ($request->building) {
             $floors = Floor::where('level_id', $request->building)->get();
             return ApiResponse::success($floors);
         }
 
 
         return ApiResponse::success(Floor::all());
-
     })->name('api.floors.index');
 
     Route::post('/', [APIFloorController::class, 'store'])->name('api.floors.store');
@@ -90,13 +89,13 @@ Route::middleware([
                 return ApiResponse::success([], 'Document removed');
             })->name('api.floors.documents.detach');
         });
-       
+
 
         Route::prefix('contracts')->group(function () {
 
             Route::get('', function (Floor $floor) {
 
-                $contracts = Floor::where('reference_code', $floor->reference_code)->with(['contracts', 'contracts.provider'])->first()->contracts;
+                $contracts = Floor::where('reference_code', $floor->reference_code)->with(['contracts', 'contracts.provider'])->first()->contracts()->with('provider')->paginate();
 
                 return ApiResponse::success($contracts ?? [], 'Contract');
             })->name('api.floors.contracts');

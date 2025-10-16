@@ -26,14 +26,13 @@ Route::middleware([
 ])->prefix('/v1/rooms')->group(
     function () {
         Route::get('/', function (Request $request) {
-            
+
             if ($request->floor) {
                 $rooms = Room::where('level_id', $request->floor)->get();
                 return ApiResponse::success($rooms);
             }
 
             return ApiResponse::success(Room::all());
-
         })->name('api.rooms.index');
 
         Route::post('/', [APIRoomController::class, 'store'])->name('api.rooms.store');
@@ -61,7 +60,7 @@ Route::middleware([
                 return ApiResponse::success($room->load('assets')->assets);
             })->name('api.rooms.assets');
 
-            Route::prefix('/documents')->group(function() {
+            Route::prefix('/documents')->group(function () {
                 // Get all documents from a room
                 Route::get('', function (Room $room) {
                     return ApiResponse::success($room->load('documents')->documents);
@@ -93,13 +92,13 @@ Route::middleware([
                     return ApiResponse::success([], 'Document removed');
                 })->name('api.rooms.documents.detach');
             });
-           
 
-            Route::prefix('contracts')->group(function() {
+
+            Route::prefix('contracts')->group(function () {
 
                 Route::get('', function (Room $room) {
 
-                    $contracts = Room::where('reference_code', $room->reference_code)->with(['contracts', 'contracts.provider'])->first()->contracts;
+                    $contracts = Room::where('reference_code', $room->reference_code)->with(['contracts', 'contracts.provider'])->first()->contracts()->with('provider')->paginate();
 
                     return ApiResponse::success($contracts ?? [], 'Contract');
                 })->name('api.rooms.contracts');
@@ -120,7 +119,6 @@ Route::middleware([
                     app(ContractService::class)->detachExistingContractFromModel($room, $validated['contract_id']);
                     return ApiResponse::success([], 'Contract removed');
                 })->name('api.rooms.contracts.delete');
-
             });
 
             // Get all tickets from a room

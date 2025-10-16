@@ -1,4 +1,3 @@
-import SearchableInput from '@/components/SearchableInput';
 import { ContractsList } from '@/components/tenant/contractsList';
 import { DocumentManager } from '@/components/tenant/documentManager';
 import { InterventionManager } from '@/components/tenant/interventionManager';
@@ -8,11 +7,11 @@ import { TicketManager } from '@/components/tenant/ticketManager';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
-import { Asset, Contract, type BreadcrumbItem} from '@/types';
+import { Asset, Contract, type BreadcrumbItem } from '@/types';
 import { router } from '@inertiajs/core';
-import { Head, useForm } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import axios from 'axios';
-import { ArchiveRestore, CircleCheckBig, Pencil, PlusCircle, QrCode, Shredder, Trash2 } from 'lucide-react';
+import { ArchiveRestore, CircleCheckBig, Pencil, QrCode, Shredder, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ShowAsset({ item }: { item: Asset }) {
@@ -30,8 +29,6 @@ export default function ShowAsset({ item }: { item: Asset }) {
     const { showToast } = useToast();
 
     const [asset, setAsset] = useState(item);
-    const [existingContracts, setExistingContracts] = useState(asset.contracts ?? []);
-    
 
     const fetchAsset = async () => {
         const response = await axios.get(route('api.assets.show', asset.reference_code));
@@ -41,36 +38,6 @@ export default function ShowAsset({ item }: { item: Asset }) {
     const updateContracts = (newContracts: Contract[]) => {
         setAsset((prev) => ({ ...prev, contracts: newContracts }));
         setExistingContracts(newContracts);
-    }
-
-    const fetchContracts = async () => {
-        try {
-            const response = await axios.get(route('api.assets.contracts', asset.reference_code));
-            if (response.data.status === 'success') {
-                updateContracts(response.data.data)
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    };
-
-    const [addExistingContractModale, setAddExistingContractModale] = useState<boolean>(false);
-
-    const addExistingContractToAsset = async () => {
-        const contracts = {
-            existing_contracts: existingContracts.map((elem) => elem.id),
-        };
-
-        try {
-            const response = await axios.post(route('api.assets.contracts.post', asset.reference_code), contracts);
-            if (response.data.status === 'success') {
-                setAddExistingContractModale(false);
-                fetchContracts();
-                showToast(response.data.message, response.data.status);
-            }
-        } catch (error) {
-            showToast(error.response.data.message, error.response.data.status);
-        }
     };
 
     const deleteAsset = async (asset: Asset) => {
@@ -86,26 +53,23 @@ export default function ShowAsset({ item }: { item: Asset }) {
     };
 
     const restoreAsset = async (asset: Asset) => {
-          try {
-              const response = await axios.delete(route(`api.tenant.assets.restore`, asset.reference_code));
+        try {
+            const response = await axios.delete(route(`api.tenant.assets.restore`, asset.reference_code));
 
-              showToast(response.data.message, response.data.status);
-          } catch (error) {
-              showToast(error.response.data.message, error.response.data.status);
-          }
-        
+            showToast(response.data.message, response.data.status);
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
+        }
     };
 
     const deleteDefinitelyAsset = async (asset: Asset) => {
-          try {
-              const response = await axios.delete(route(`api.tenant.assets.force`, asset.reference_code));
+        try {
+            const response = await axios.delete(route(`api.tenant.assets.force`, asset.reference_code));
 
-              showToast(response.data.message, response.data.status);
-          } catch (error) {
-              showToast(error.response.data.message, error.response.data.status);
-          }
-        
-        
+            showToast(response.data.message, response.data.status);
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
+        }
     };
 
     const generateQR = async () => {
@@ -118,7 +82,6 @@ export default function ShowAsset({ item }: { item: Asset }) {
         } catch (error) {
             showToast(error.response.data.message, error.response.data.status);
         }
-        
     };
 
     const markMaintenanceDone = async () => {
@@ -133,10 +96,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
         }
     };
 
- 
     const [activeTab, setActiveTab] = useState('information');
-   
-    
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -276,32 +236,15 @@ export default function ShowAsset({ item }: { item: Asset }) {
                         )}
 
                         {activeTab === 'contracts' && (
-                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
-                                <div className="flex items-center justify-between gap-2">
-                                    <h2>Contracts</h2>
-                                        {!asset.deleted_at && (
-                                    <div className="space-y-2 space-x-4 sm:space-y-0">
-                                        <Button onClick={() => setAddExistingContractModale(true)}>
-                                            <PlusCircle />
-                                            Add existing contract
-                                        </Button>
-                                        <Button onClick={() => router.get(route('tenant.contracts.create'))}>
-                                            <PlusCircle />
-                                            Add new contract
-                                        </Button>
-                                        
-                                        </div>
-                                        )}
-                                </div>
-                                <ContractsList
-                                    items={asset.contracts}
-                                    contractableReference={asset.reference_code}
-                                    getUrl="api.assets.contracts"
-                                    routeName="assets"
-                                    removable
-                                    onContractsChange={updateContracts}
-                                />
-                            </div>
+                            <ContractsList
+                                // items={asset.contracts}
+                                contractableReference={asset.reference_code}
+                                getUrl="api.assets.contracts"
+                                routeName="assets"
+                                parameter="asset"
+                                removable
+                                // onContractsChange={updateContracts}
+                            />
                         )}
 
                         {activeTab === 'providers' && (
@@ -363,37 +306,6 @@ export default function ShowAsset({ item }: { item: Asset }) {
                     </div>
                 </div>
             </div>
-
-            {addExistingContractModale && (
-                <div className="bg-background/50 fixed inset-0 z-50">
-                    <div className="bg-background/20 flex h-dvh items-center justify-center">
-                        <div className="bg-background flex flex-col items-center justify-center p-4 text-center md:max-w-1/3">
-                            <p>Add Existing contract</p>
-                            <SearchableInput<Contract>
-                                multiple={true}
-                                searchUrl={route('api.contracts.search')}
-                                selectedItems={existingContracts}
-                                getDisplayText={(contract) => contract.name}
-                                getKey={(contract) => contract.id}
-                                onSelect={(contracts) => {
-                                    setExistingContracts(contracts);
-                                }}
-                                placeholder="Search contracts..."
-                            />
-                            <Button
-                                variant="secondary"
-                                onClick={() => {
-                                    setAddExistingContractModale(false);
-                                    setExistingContracts(asset.contracts);
-                                }}
-                            >
-                                Cancel
-                            </Button>
-                            <Button onClick={addExistingContractToAsset}>Add contract</Button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </AppLayout>
     );
 }

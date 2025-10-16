@@ -1,12 +1,15 @@
-import { ContractsList } from '@/components/tenant/contractsList';
+import Modale from '@/components/Modale';
+import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Pill } from '@/components/ui/pill';
+import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, ContractsPaginated } from '@/types';
+import { BreadcrumbItem, Contract, ContractsPaginated } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { PlusCircle, X } from 'lucide-react';
+import axios from 'axios';
+import { Loader, Pencil, PlusCircle, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export interface SearchParams {
@@ -36,6 +39,38 @@ export default function IndexContracts({
             href: `/contracts`,
         },
     ];
+
+    const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
+    const [contractToDelete, setContractToDelete] = useState<Contract | null>(null);
+
+    const deleteContract = async () => {
+        if (!contractToDelete) return;
+
+        try {
+            const response = await axios.delete(route('api.contracts.destroy', contractToDelete.id));
+            if (response.data.status === 'success') {
+                router.visit(route('tenant.contracts.index'));
+                setShowDeleteModale(false);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const removeContract = async (contract_id: number) => {
+        if (!contractableReference) return;
+
+        try {
+            const response = await axios.delete(route(`api.${routeName}.contracts.delete`, contractableReference), {
+                data: { contract_id: contract_id },
+            });
+            if (response.data.status === 'success') {
+                router.visit(route('tenant.contracts.index'));
+            }
+        } catch {
+            // console.log(error);
+        }
+    };
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -214,8 +249,89 @@ export default function IndexContracts({
                         </Button>
                     </a>
                 </div>
-                <ContractsList getUrl={'api.contracts.index'} items={items} editable isLoading={isLoading} />
+
+                <Table>
+                    <TableHead>
+                        <TableHeadRow>
+                            <TableHeadData>Name</TableHeadData>
+                            <TableHeadData>Type</TableHeadData>
+                            <TableHeadData>Status</TableHeadData>
+                            <TableHeadData>Internal #</TableHeadData>
+                            <TableHeadData>Provider #</TableHeadData>
+                            <TableHeadData>Renewal</TableHeadData>
+                            <TableHeadData>Provider</TableHeadData>
+                            <TableHeadData>End date</TableHeadData>
+                            <TableHeadData></TableHeadData>
+                        </TableHeadRow>
+                    </TableHead>
+                    <TableBody>
+                        {isLoading ? (
+                            <TableBodyRow>
+                                <TableBodyData>
+                                    <p className="flex animate-pulse gap-2">
+                                        <Loader />
+                                        Searching...
+                                    </p>
+                                </TableBodyData>
+                            </TableBodyRow>
+                        ) : items.data.length > 0 ? (
+                            items.data.map((contract) => {
+                                return (
+                                    <TableBodyRow key={contract.id}>
+                                        <TableBodyData>
+                                            <a href={route(`tenant.contracts.show`, contract.id)}> {contract.name} </a>
+                                        </TableBodyData>
+                                        <TableBodyData>{contract.type}</TableBodyData>
+                                        <TableBodyData>
+                                            <Pill variant={contract.status}>{contract.status}</Pill>
+                                        </TableBodyData>
+                                        <TableBodyData>{contract.internal_reference}</TableBodyData>
+                                        <TableBodyData>{contract.provider_reference}</TableBodyData>
+                                        <TableBodyData>{contract.renewal_type}</TableBodyData>
+                                        <TableBodyData>
+                                            <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>
+                                        </TableBodyData>
+                                        <TableBodyData>{contract.end_date}</TableBodyData>
+
+                                        <TableBodyData className="flex space-x-2">
+                                            <a href={route(`tenant.contracts.edit`, contract.id)}>
+                                                <Button>
+                                                    <Pencil />
+                                                </Button>
+                                            </a>
+                                            <Button
+                                                onClick={() => {
+                                                    setContractToDelete(contract);
+                                                    setShowDeleteModale(true);
+                                                }}
+                                                variant={'destructive'}
+                                            >
+                                                <Trash2 />
+                                            </Button>
+                                        </TableBodyData>
+                                    </TableBodyRow>
+                                );
+                            })
+                        ) : (
+                            <TableBodyRow key={0}>
+                                <TableBodyData>No results...</TableBodyData>
+                            </TableBodyRow>
+                        )}
+                    </TableBody>
+                </Table>
+                <Pagination items={items} />
+                {/* <ContractsList getUrl={'api.contracts.index'} items={items} editable isLoading={isLoading} /> */}
             </div>
+            <Modale
+                title={'Delete contract'}
+                message={`Are you sure you want to delete this contract ${contractToDelete?.name} ?`}
+                isOpen={showDeleteModale}
+                onConfirm={deleteContract}
+                onCancel={() => {
+                    setShowDeleteModale(false);
+                    setContractToDelete(null);
+                }}
+            />
         </AppLayout>
     );
 }

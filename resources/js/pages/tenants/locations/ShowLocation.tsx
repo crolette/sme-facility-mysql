@@ -12,10 +12,9 @@ import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import { Contract, TenantBuilding, TenantFloor, TenantRoom, TenantSite, type BreadcrumbItem } from '@/types';
-import { router } from '@inertiajs/core';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
-import { CircleCheckBig, Move, Pencil, PlusCircle, QrCode } from 'lucide-react';
+import { CircleCheckBig, Move, Pencil, QrCode } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ShowLocation({ item, routeName }: { item: TenantSite | TenantBuilding | TenantFloor | TenantRoom; routeName: string }) {
@@ -46,7 +45,6 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                 fetchLocation();
                 showToast(response.data.message, response.data.status);
             }
-
         } catch (error) {
             showToast(error.response.data.message, error.response.data.status);
         }
@@ -64,47 +62,45 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
         }
     };
 
- 
+    const [existingContracts, setExistingContracts] = useState(location.contracts ?? []);
 
-        const [existingContracts, setExistingContracts] = useState(location.contracts ?? []);
+    const updateContracts = (newContracts: Contract[]) => {
+        setLocation((prev) => ({ ...prev, contracts: newContracts }));
+        // setExistingContracts(newContracts);
+    };
 
-        const updateContracts = (newContracts: Contract[]) => {
-            setLocation((prev) => ({ ...prev, contracts: newContracts }));
-            // setExistingContracts(newContracts);
-        };
-
-        const fetchContracts = async () => {
-            try {
-                const response = await axios.get(route(`api.${routeName}.contracts`, location.reference_code));
-                console.log(response.data);
-                if (response.data.status === 'success') {
-                    updateContracts(response.data.data);
-                }
-            } catch (error) {
-                console.log(error);
+    const fetchContracts = async () => {
+        try {
+            const response = await axios.get(route(`api.${routeName}.contracts`, location.reference_code));
+            console.log(response.data);
+            if (response.data.status === 'success') {
+                updateContracts(response.data.data);
             }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const [addExistingContractModale, setAddExistingContractModale] = useState<boolean>(false);
+
+    const addExistingContractToAsset = async () => {
+        const contracts = {
+            existing_contracts: existingContracts.map((elem) => elem.id),
         };
-    
-     const [addExistingContractModale, setAddExistingContractModale] = useState<boolean>(false);
 
-     const addExistingContractToAsset = async () => {
-         const contracts = {
-             existing_contracts: existingContracts.map((elem) => elem.id),
-         };
+        try {
+            const response = await axios.post(route(`api.${routeName}.contracts.post`, location.reference_code), contracts);
+            if (response.data.status === 'success') {
+                setAddExistingContractModale(false);
+                fetchContracts();
+                showToast(response.data.message, response.data.status);
+            }
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
+        }
+    };
 
-         try {
-             const response = await axios.post(route(`api.${routeName}.contracts.post`, location.reference_code), contracts);
-             if (response.data.status === 'success') {
-                 setAddExistingContractModale(false);
-                 fetchContracts();
-                  showToast(response.data.message, response.data.status);
-             }
-         } catch (error) {
-                showToast(error.response.data.message, error.response.data.status);
-         }
-     };
-
-     const [activeTab, setActiveTab] = useState('information');
+    const [activeTab, setActiveTab] = useState('information');
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -142,7 +138,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                     <SidebarMenuAssetLocation
                         activeTab={activeTab}
                         setActiveTab={setActiveTab}
-                        menu='location'
+                        menu="location"
                         infos={{
                             name: location.name,
                             code: location.code,
@@ -244,29 +240,15 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                         )}
 
                         {activeTab === 'contracts' && (
-                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
-                                <div className="flex items-center justify-between gap-2">
-                                    <h2>Contracts</h2>
-                                    <div className="space-y-2 space-x-4 sm:space-y-0">
-                                        <Button onClick={() => setAddExistingContractModale(true)}>
-                                            <PlusCircle />
-                                            Add existing contract
-                                        </Button>
-                                        <Button onClick={() => router.get(route('tenant.contracts.create'))}>
-                                            <PlusCircle />
-                                            Add new contract
-                                        </Button>
-                                    </div>
-                                </div>
-                                <ContractsList
-                                    items={location.contracts}
-                                    contractableReference={location.reference_code}
-                                    getUrl={`api.${routeName}.contracts`}
-                                    routeName={routeName}
-                                    removable
-                                    onContractsChange={updateContracts}
-                                />
-                            </div>
+                            <ContractsList
+                                // items={location.contracts}
+                                contractableReference={location.reference_code}
+                                getUrl={`api.${routeName}.contracts`}
+                                routeName={routeName}
+                                removable
+                                parameter={routeName.substring(0, routeName.length - 1)}
+                                // onContractsChange={updateContracts}
+                            />
                         )}
 
                         {activeTab === 'assets' && <AssetManager itemCode={location.reference_code} type={routeName} />}
