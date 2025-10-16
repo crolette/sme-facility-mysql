@@ -22,9 +22,9 @@ class ApiSearchTrashedAssetController extends Controller
             $assets = Asset::onlyTrashed()->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(code) LIKE ?', ['%' . strtolower($search) . '%'])
                     ->orWhereRaw('LOWER(reference_code) LIKE ?', ['%' . strtolower($search) . '%']);
-            })->get();
+            })->paginate();
         } else {
-            $assets = Asset::onlyTrashed()->get();
+            $assets = Asset::onlyTrashed()->paginate();
         }
 
 

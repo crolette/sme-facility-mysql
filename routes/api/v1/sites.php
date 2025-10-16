@@ -55,7 +55,7 @@ Route::middleware([
                 return ApiResponse::success($site->load('assets')->assets);
             })->name('api.sites.assets');
 
-            Route::prefix('/documents')->group(function() {
+            Route::prefix('/documents')->group(function () {
 
                 // Get all documents from a site
                 Route::get('', function (Site $site) {
@@ -83,12 +83,12 @@ Route::middleware([
                 // Detach a document from a location
                 Route::patch('', function (Site $site, Request $request) {
                     Debugbar::info('detach document', $request->all());
-                    
+
                     $validated = $request->validateWithBag('errors', [
                         'document_id' => 'required|exists:documents,id'
                     ]);
-                    
-                    
+
+
                     app(DocumentService::class)->detachDocumentFromModel($site, $validated['document_id']);
                     return ApiResponse::success([], 'Document removed');
                 })->name('api.sites.documents.detach');
@@ -98,7 +98,7 @@ Route::middleware([
 
                 Route::get('', function (Site $site) {
 
-                    $contracts = Site::where('reference_code', $site->reference_code)->with(['contracts', 'contracts.provider'])->first()->contracts;
+                    $contracts = Site::where('reference_code', $site->reference_code)->with(['contracts', 'contracts.provider'])->first()->contracts()->with('provider')->paginate();
 
                     return ApiResponse::success($contracts ?? [], 'Contract');
                 })->name('api.sites.contracts');

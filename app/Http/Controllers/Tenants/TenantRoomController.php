@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Tenants;
 use Inertia\Inertia;
 use App\Models\LocationType;
 use App\Models\Tenants\Room;
+use Illuminate\Http\Request;
 use App\Models\Tenants\Floor;
 use App\Enums\NoticePeriodEnum;
 use App\Services\QRCodeService;
@@ -16,6 +17,8 @@ use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
 use App\Enums\ContractRenewalTypesEnum;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Validator;
 
 class TenantRoomController extends Controller
 {
@@ -27,14 +30,37 @@ class TenantRoomController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
 
         if (Auth::user()->cannot('viewAny', Room::class))
             abort(403);
 
-        $locations = Room::with('floor')->get();
-        return Inertia::render('tenants/locations/IndexLocations', ['items' => $locations, 'routeName' => 'rooms']);
+        $validator = Validator::make($request->all(), [
+            'q' => 'string|max:255|nullable',
+            'category' => 'integer|nullable|gt:0',
+            'sortBy' => 'in:asc,desc',
+            'orderBy' => 'string|nullable',
+        ]);
+
+        $validatedFields = $validator->validated();
+
+        $locations = Room::with('floor');
+
+        if (isset($validatedFields['category'])) {
+            $locations->where('location_type_id', $validatedFields['category']);
+        };
+
+        if (isset($validatedFields['q'])) {
+            $locations->whereHas('maintainable', function (Builder $query) use ($validatedFields) {
+                $query->where('name', 'like', '%' . $validatedFields['q'] . '%');
+            });
+        }
+
+        $categories = LocationType::where('level', 'room')->get();
+
+
+        return Inertia::render('tenants/locations/IndexLocations', ['items' => $locations->paginate()->withQueryString(), 'categories' => $categories, 'filters' =>  $validator->safe()->only(['q', 'sortBy',  'orderBy', 'category']), 'routeName' => 'rooms']);
     }
 
     /**

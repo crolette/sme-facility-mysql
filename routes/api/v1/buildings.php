@@ -24,14 +24,13 @@ Route::middleware([
     'auth:tenant'
 ])->prefix('/v1/buildings')->group(function () {
     Route::get('/', function (Request $request) {
-        if($request->site) {
+        if ($request->site) {
             $buildings = Building::where('level_id', $request->site)->get();
 
             return ApiResponse::success($buildings);
         }
 
         return ApiResponse::success(Building::all());
-
     })->name('api.buildings.index');
 
     Route::post('/', [APIBuildingController::class, 'store'])->name('api.buildings.store');
@@ -44,7 +43,7 @@ Route::middleware([
         Route::post('/qr/regen', function (Building $building, QRCodeService $qRCodeService) {
             if (Auth::user()->cannot('update', $building))
                 return ApiResponse::notAuthorized();
-            
+
             $qRCodeService->createAndAttachQR($building);
             return ApiResponse::success([], 'QR Code created');
         })->name('api.buildings.qr.regen');
@@ -58,7 +57,7 @@ Route::middleware([
             return ApiResponse::success($building->load('assets')->assets);
         })->name('api.buildings.assets');
 
-        Route::prefix('/documents')->group(function() {
+        Route::prefix('/documents')->group(function () {
 
             // Get all documents from a building
             Route::get('', function (Building $building) {
@@ -92,7 +91,7 @@ Route::middleware([
                 return ApiResponse::success([], 'Document removed');
             })->name('api.buildings.documents.detach');
         });
-        
+
 
 
 
@@ -100,7 +99,7 @@ Route::middleware([
 
             Route::get('', function (Building $building) {
 
-                $contracts = Building::where('reference_code', $building->reference_code)->with(['contracts', 'contracts.provider'])->first()->contracts;
+                $contracts = Building::where('reference_code', $building->reference_code)->with(['contracts', 'contracts.provider'])->first()->contracts()->with('provider')->paginate();
 
                 return ApiResponse::success($contracts ?? [], 'Contract');
             })->name('api.buildings.contracts');

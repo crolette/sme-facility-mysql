@@ -1,53 +1,114 @@
+import { Pagination } from '@/components/pagination';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Pill } from '@/components/ui/pill';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { BreadcrumbItem, Ticket } from '@/types';
-import { Head } from '@inertiajs/react';
+import { BreadcrumbItem, PaginatedData, TicketStatus } from '@/types';
+import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
+import { Loader, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-export default function IndexTickets() {
+export interface SearchParams {
+    status: string | null;
+    q: string | null;
+    sortBy: string | null;
+    orderBy: string | null;
+}
+
+export default function IndexTickets({ items, filters, statuses }: { items: PaginatedData; filters: SearchParams; statuses: TicketStatus }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index tickets`,
             href: `/tickets`,
         },
     ];
-    const [fetchTicketStatus, setFetchTicketStatus] = useState<null | 'open' | 'ongoing' | 'closed'>('open');
-    const [fetchingData, setFetchingData] = useState<boolean>(true);
+
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const { showToast } = useToast();
 
-    const fetchTickets = async () => {
-        try {
-            const response = await axios.get(route('api.tickets.index', { status: fetchTicketStatus }));
-            setTickets(response.data.data);
-            setFetchingData(false);
-        } catch (error) {
-            showToast(error.response.data.message, error.response.data.status);
-        }
-    };
+    const [query, setQuery] = useState<SearchParams>({
+        status: filters.status ?? null,
+        q: filters.q,
+        sortBy: filters.sortBy,
+        orderBy: filters.orderBy,
+    });
 
-    const [tickets, setTickets] = useState<Ticket[]>([]);
-
-    useEffect(() => {
-        setFetchingData(true);
-        fetchTickets();
-    }, [fetchTicketStatus]);
+    const [prevQuery, setPrevQuery] = useState(query);
 
     const changeStatusTicket = async (id: number, status: string) => {
         try {
             const response = await axios.patch(route('api.tickets.status', id), { status: status });
             if (response.data.status === 'success') {
-                fetchTickets();
+                router.visit(route('tenant.tickets.index', { ...query, q: debouncedSearch }), {
+                    onStart: () => {
+                        setIsLoading(true);
+                    },
+                    onFinish: () => {
+                        setIsLoading(false);
+                    },
+                });
                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {
             showToast(error.response.data.message, error.response.data.status);
         }
     };
+
+    const [search, setSearch] = useState(query.q);
+    const [debouncedSearch, setDebouncedSearch] = useState<string>('');
+
+    useEffect(() => {
+        if (!search) return;
+
+        const handler = setTimeout(() => {
+            setDebouncedSearch(search);
+        }, 500);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [search]);
+
+    useEffect(() => {
+        if (query.q !== debouncedSearch && debouncedSearch?.length > 2) {
+            router.visit(route('tenant.tickets.index', { ...query, q: debouncedSearch }), {
+                onStart: () => {
+                    setIsLoading(true);
+                },
+                onFinish: () => {
+                    setIsLoading(false);
+                },
+            });
+        }
+    }, [debouncedSearch]);
+
+    const clearSearch = () => {
+        router.visit(route('tenant.tickets.index'), {
+            onStart: () => {
+                setIsLoading(true);
+            },
+            onFinish: () => {
+                setIsLoading(false);
+            },
+        });
+    };
+
+    useEffect(() => {
+        if (query !== prevQuery)
+            router.visit(route('tenant.tickets.index', { ...query }), {
+                onStart: () => {
+                    setIsLoading(true);
+                },
+                onFinish: () => {
+                    setIsLoading(false);
+                },
+            });
+    }, [query]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -58,10 +119,10 @@ export default function IndexTickets() {
                         <li
                             className={cn(
                                 'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-6 py-1',
-                                fetchTicketStatus === null ? 'bg-primary text-background' : 'bg-secondary',
+                                query.status === null ? 'bg-primary text-background' : 'bg-secondary',
                             )}
                             onClick={() => {
-                                setFetchTicketStatus(null);
+                                setQuery((prev) => ({ ...prev, q: null, status: null }));
                             }}
                         >
                             all
@@ -70,10 +131,10 @@ export default function IndexTickets() {
                         <li
                             className={cn(
                                 'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-6 py-1',
-                                fetchTicketStatus === 'open' ? 'bg-primary text-background' : 'bg-secondary',
+                                query.status === 'open' ? 'bg-primary text-background' : 'bg-secondary',
                             )}
                             onClick={() => {
-                                setFetchTicketStatus('open');
+                                setQuery((prev) => ({ ...prev, q: null, status: 'open' }));
                             }}
                         >
                             open
@@ -81,10 +142,10 @@ export default function IndexTickets() {
                         <li
                             className={cn(
                                 'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-6 py-1',
-                                fetchTicketStatus === 'ongoing' ? 'bg-primary text-background' : 'bg-secondary',
+                                query.status === 'ongoing' ? 'bg-primary text-background' : 'bg-secondary',
                             )}
                             onClick={() => {
-                                setFetchTicketStatus('ongoing');
+                                setQuery((prev) => ({ ...prev, q: null, status: 'ongoing' }));
                             }}
                         >
                             ongoing
@@ -92,10 +153,10 @@ export default function IndexTickets() {
                         <li
                             className={cn(
                                 'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-6 py-1',
-                                fetchTicketStatus === 'closed' ? 'bg-primary text-background' : 'bg-secondary',
+                                query.status === 'closed' ? 'bg-primary text-background' : 'bg-secondary',
                             )}
                             onClick={() => {
-                                setFetchTicketStatus('closed');
+                                setQuery((prev) => ({ ...prev, q: null, status: 'closed' }));
                             }}
                         >
                             closed
@@ -103,25 +164,55 @@ export default function IndexTickets() {
                     </ul>
                 </div>
 
+                <div className="flex w-full justify-between gap-2">
+                    <details className="border-border relative w-full rounded-md border-2 p-1" open={isLoading ? false : undefined}>
+                        <summary>Search</summary>
+
+                        <div className="bg-border border-border text-background dark:text-foreground absolute top-full flex flex-col items-center gap-4 rounded-b-md border-2 p-2 sm:flex-row">
+                            <div className="flex flex-col items-center gap-2">
+                                <Label htmlFor="category">Search</Label>
+                                <div className="relative text-black dark:text-white">
+                                    <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} className="" />
+                                    <X
+                                        onClick={() => setQuery((prev) => ({ ...prev, q: null }))}
+                                        className={'absolute top-1/2 right-0 -translate-1/2'}
+                                    />
+                                </div>
+                            </div>
+                            <Button onClick={clearSearch} size={'xs'}>
+                                Clear Search
+                            </Button>
+                        </div>
+                    </details>
+                </div>
+
                 <div className="">
-                    <h3 className="inline">Tickets {!fetchingData && `(${tickets?.length ?? 0})`}</h3>
-                    {fetchingData && <p>Loading tickets...</p>}
-                    {!fetchingData && tickets && tickets?.length > 0 && (
-                        <Table>
-                            <TableHead>
-                                <TableHeadRow>
-                                    <TableHeadData>Code</TableHeadData>
-                                    <TableHeadData>Related to</TableHeadData>
-                                    <TableHeadData>Status</TableHeadData>
-                                    <TableHeadData>Reporter</TableHeadData>
-                                    <TableHeadData>Description</TableHeadData>
-                                    <TableHeadData>Created at</TableHeadData>
-                                    <TableHeadData>Updated at</TableHeadData>
-                                    <TableHeadData></TableHeadData>
-                                </TableHeadRow>
-                            </TableHead>
-                            <TableBody>
-                                {tickets?.map((ticket, index) => (
+                    <h3 className="inline">Tickets {!isLoading && `(${items.total ?? 0})`}</h3>
+                    <Table>
+                        <TableHead>
+                            <TableHeadRow>
+                                <TableHeadData>Code</TableHeadData>
+                                <TableHeadData>Related to</TableHeadData>
+                                <TableHeadData>Status</TableHeadData>
+                                <TableHeadData>Reporter</TableHeadData>
+                                <TableHeadData>Description</TableHeadData>
+                                <TableHeadData>Created at</TableHeadData>
+                                <TableHeadData>Updated at</TableHeadData>
+                                <TableHeadData></TableHeadData>
+                            </TableHeadRow>
+                        </TableHead>
+                        <TableBody>
+                            {isLoading ? (
+                                <TableBodyRow>
+                                    <TableBodyData>
+                                        <p className="flex animate-pulse gap-2">
+                                            <Loader />
+                                            Loading...
+                                        </p>
+                                    </TableBodyData>
+                                </TableBodyRow>
+                            ) : (
+                                items?.data?.map((ticket, index) => (
                                     <TableBodyRow key={index}>
                                         <TableBodyData>
                                             <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
@@ -137,7 +228,7 @@ export default function IndexTickets() {
                                         <TableBodyData>{ticket.created_at}</TableBodyData>
                                         <TableBodyData>{ticket.updated_at}</TableBodyData>
 
-                                        <TableBodyData className='space-x-2'>
+                                        <TableBodyData className="space-x-2">
                                             {ticket.status == 'open' && (
                                                 <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'ongoing')}>
                                                     Ongoing
@@ -160,10 +251,11 @@ export default function IndexTickets() {
                                             )}
                                         </TableBodyData>
                                     </TableBodyRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    )}
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                    <Pagination items={items} />
                 </div>
             </div>
         </AppLayout>

@@ -3,7 +3,6 @@ import { usePage } from '@inertiajs/react';
 
 export default function AppLogo() {
     const tenant = usePage<SharedData>().props.tenant;
-    console.log(tenant);
     return (
         <>
             {tenant.logo ? (

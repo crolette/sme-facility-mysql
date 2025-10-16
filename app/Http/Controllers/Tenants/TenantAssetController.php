@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Tenants;
 
 use Inertia\Inertia;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Services\AssetService;
 use App\Enums\NoticePeriodEnum;
@@ -16,7 +17,10 @@ use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
 use App\Enums\ContractRenewalTypesEnum;
+use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Support\Facades\Validator;
 use App\Models\Tenants\InterventionAction;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class TenantAssetController extends Controller
 {
@@ -31,14 +35,40 @@ class TenantAssetController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         if (Auth::user()->cannot('viewAny', Asset::class))
             abort(403);
 
-        $assets = Asset::withoutTrashed()->get();
+        $validator = Validator::make($request->all(), [
+            'q' => 'string|max:255|nullable',
+            'category' => 'integer|nullable|gt:0',
+            'sortBy' => 'in:asc,desc',
+            'orderBy' => 'string|nullable',
+            'trashed' => 'nullable|in:1,0'
+        ]);
 
-        return Inertia::render('tenants/assets/IndexAssets', ['items' => $assets]);
+        $validatedFields = $validator->validated();
+
+        if (isset($validatedFields['trashed']) && $validatedFields['trashed'] === '1') {
+            $assets = Asset::onlyTrashed();
+        } else {
+            $assets = Asset::withoutTrashed();
+        }
+
+        if (isset($validatedFields['category'])) {
+            $assets->where('category_type_id', $validatedFields['category']);
+        };
+
+        if (isset($validatedFields['q'])) {
+            $assets->whereHas('maintainable', function (Builder $query) use ($validatedFields) {
+                $query->where('name', 'like', '%' . $validatedFields['q'] . '%');
+            });
+        }
+
+        $categories = CategoryType::where('category', 'asset')->get();
+
+        return Inertia::render('tenants/assets/IndexAssets', ['items' => $assets->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'sortBy', 'trashed', 'orderBy', 'category']), 'categories' => $categories]);
     }
 
     /**
@@ -72,15 +102,15 @@ class TenantAssetController extends Controller
         $action = InterventionAction::first();
 
         $asset = Asset::where('reference_code', $asset->reference_code)->with(['maintainable.manager:id,first_name,last_name', 'contracts:id,name,type,provider_id,status,renewal_type,end_date,internal_reference,provider_reference', 'contracts.provider:id,name,logo', 'maintainable.providers:id,name'])->first();
-    // dd($asset);
+        // dd($asset);
         return Inertia::render('tenants/assets/ShowAsset', ['item' => $asset->append('level_path')]);
     }
 
     public function showDeleted($id)
     {
-        $asset = Asset::withTrashed()->with(['documents','pictures','tickets.pictures'])->findOrFail($id);
+        $asset = Asset::withTrashed()->with(['documents', 'pictures', 'tickets.pictures'])->findOrFail($id);
 
-        
+
         return Inertia::render('tenants/assets/ShowAsset', ['item' => $asset]);
     }
 
