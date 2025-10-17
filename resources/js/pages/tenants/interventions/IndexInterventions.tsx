@@ -78,21 +78,6 @@ export default function IndexInterventions({
     const [interventionDataForm, setInterventionDataForm] = useState<InterventionFormData>(interventionData);
     const [addIntervention, setAddIntervention] = useState<boolean>(false);
 
-    const [interventionTypes, setInterventionTypes] = useState<CentralType[]>([]);
-    const fetchInterventionTypes = async () => {
-        try {
-            const response = await axios.get(route('api.category-types', { type: 'intervention' }));
-            console.log(response.data.data);
-            setInterventionTypes(response.data.data);
-        } catch (error) {
-            console.log(error);
-        }
-    };
-    const openModale = () => {
-        if (interventionTypes.length === 0) fetchInterventionTypes();
-        setAddIntervention(true);
-    };
-
     const closeModale = () => {
         setInterventionDataForm(interventionData);
         setAddIntervention(false);
@@ -103,7 +88,6 @@ export default function IndexInterventions({
         const intervention = items.data.find((intervention) => {
             return intervention.id === id;
         });
-        if (interventionTypes.length === 0) fetchInterventionTypes();
 
         setInterventionDataForm((prev) => ({
             ...prev,
@@ -194,7 +178,6 @@ export default function IndexInterventions({
     };
 
     const setStatusSearch = (status: string | null) => {
-        console.log(status);
         if (status === query.status) status = null;
 
         router.visit(route('tenant.interventions.index', { ...query, status: status ?? '' }), {
@@ -253,13 +236,10 @@ export default function IndexInterventions({
                 router.visit(route('tenant.interventions.index', { ...query }));
             }
         } catch (error) {
-            console.error(error);
             showToast(error.response.data.message, error.response.data.status);
             setIsLoading(false);
         }
     };
-
-    console.log(items.data);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -339,6 +319,7 @@ export default function IndexInterventions({
                         <TableHeadRow>
                             <TableHeadData className="w-52">Description</TableHeadData>
                             <TableHeadData>Type</TableHeadData>
+                            <TableHeadData>Asset</TableHeadData>
                             <TableHeadData>Priority</TableHeadData>
                             <TableHeadData>Status</TableHeadData>
                             <TableHeadData>Planned at</TableHeadData>
@@ -367,6 +348,11 @@ export default function IndexInterventions({
                                             </a>
                                         </TableBodyData>
                                         <TableBodyData>{item.type}</TableBodyData>
+                                        <TableBodyData>
+                                            <a href={item.interventionable?.location_route ?? ''}>
+                                                {item.interventionable?.reference_code ?? 'NULL'}
+                                            </a>
+                                        </TableBodyData>
                                         <TableBodyData>
                                             <Pill variant={item.priority}>{item.priority}</Pill>
                                         </TableBodyData>
@@ -447,7 +433,7 @@ export default function IndexInterventions({
                                         }
                                     >
                                         <option value="">Select intervention type</option>
-                                        {interventionTypes?.map((interventionType) => (
+                                        {types?.map((interventionType) => (
                                             <option key={interventionType.id} value={interventionType.id}>
                                                 {interventionType.label}
                                             </option>

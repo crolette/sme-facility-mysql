@@ -31,7 +31,7 @@ class InterventionController extends Controller
         ]);
 
         $validatedFields = $validator->validated();
-        $interventions = Intervention::query();
+        $interventions = Intervention::with('interventionable');
 
         if (isset($validatedFields['status'])) {
             $interventions->where('status', $validatedFields['status']);

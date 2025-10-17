@@ -9,6 +9,10 @@ import { useState } from 'react';
 export default function ShowIntervention({ intervention }: { intervention: Intervention }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
+            title: `Index interventions`,
+            href: `/interventions/`,
+        },
+        {
             title: `Show intervention`,
             href: `/interventions/${intervention}`,
         },
@@ -66,7 +70,7 @@ export default function ShowIntervention({ intervention }: { intervention: Inter
                             />
                         )}
 
-                        {activeTab === 'actions' && (
+                        {/* {activeTab === 'actions' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                 <h2>Actions</h2>
                                 <div className="">
@@ -99,7 +103,7 @@ export default function ShowIntervention({ intervention }: { intervention: Inter
                                     </ul>
                                 </div>
                             </div>
-                        )}
+                        )} */}
                     </div>
                 </div>
             </div>
