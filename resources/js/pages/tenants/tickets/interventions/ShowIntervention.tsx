@@ -1,3 +1,4 @@
+import { InterventionActionManager } from '@/components/tenant/interventionActionManager';
 import { PictureManager } from '@/components/tenant/pictureManager';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
 import AppLayout from '@/layouts/app-layout';
@@ -13,16 +14,12 @@ export default function ShowIntervention({ intervention }: { intervention: Inter
         },
     ];
 
-
     const [activeTab, setActiveTab] = useState('information');
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Intervention" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="flex flex-wrap items-center gap-4">
-                    
-                    
-                </div>
+                <div className="flex flex-wrap items-center gap-4"></div>
                 <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_6fr]">
                     <SidebarMenuAssetLocation
                         activeTab={activeTab}
@@ -39,18 +36,25 @@ export default function ShowIntervention({ intervention }: { intervention: Inter
                     />
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
-                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h2>Intervention information</h2>
-                                <div className="">
-                                    <p>Intervention type : {intervention.type}</p>
-                                    <p>Planned at : {intervention.type}</p>
-                                    <p>Description : {intervention.description}</p>
-                                    <p>Total costs : {intervention.total_costs}</p>
-                                    <p>Created at : {intervention.created_at}</p>
-                                    <p>Updated at : {intervention.updated_at}</p>
+                            <>
+                                <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                                    <h2>Intervention information</h2>
+                                    <div className="">
+                                        <p>Intervention type : {intervention.type}</p>
+                                        <p>Planned at : {intervention.type}</p>
+                                        <p>Description : {intervention.description}</p>
+                                        <p>Total costs : {intervention.total_costs}</p>
+                                        <p>Created at : {intervention.created_at}</p>
+                                        <p>Updated at : {intervention.updated_at}</p>
+                                    </div>
+                                    <div></div>
                                 </div>
-                                <div></div>
-                            </div>
+                                <InterventionActionManager
+                                    interventionId={intervention.id}
+                                    actionsChanged={console.log('change')}
+                                    closed={closed ? true : intervention.status === 'completed' || intervention.status === 'cancelled' ? true : false}
+                                />
+                            </>
                         )}
                         {activeTab === 'pictures' && (
                             <PictureManager

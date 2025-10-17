@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Tenants\Ticket;
 use App\Enums\InterventionStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
 use Illuminate\Support\Facades\Validator;
 
@@ -40,16 +41,19 @@ class InterventionController extends Controller
             $interventions->where('priority', $validatedFields['priority']);
         };
 
+        if (isset($validatedFields['type'])) {
+            $interventions->where('intervention_type_id', $validatedFields['type']);
+        };
+
         if (isset($validatedFields['q'])) {
             $interventions->where('description', 'like', '%' . $validatedFields['q'] . '%');
         }
 
-
-
-
         $priorities = array_column(PriorityLevel::cases(), 'value');
         $statuses = array_column(InterventionStatus::cases(), 'value');
-        return Inertia::render('tenants/interventions/IndexInterventions', ['items' => $interventions->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'sortBy', 'status', 'orderBy', 'type', 'priority']), 'priorities' => $priorities, 'statuses' => $statuses]);
+        $types = CategoryType::where('category', 'intervention')->get();
+
+        return Inertia::render('tenants/interventions/IndexInterventions', ['items' => $interventions->orderBy('planned_at', 'asc')->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'sortBy', 'status', 'orderBy', 'type', 'priority']), 'priorities' => $priorities, 'types' => $types, 'statuses' => $statuses]);
     }
 
     /**

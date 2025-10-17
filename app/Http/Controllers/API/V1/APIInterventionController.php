@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Log;
 class APIInterventionController extends Controller
 {
 
-    public function __construct(protected PictureService $pictureService){}
+    public function __construct(protected PictureService $pictureService) {}
     // public function index(Request $request)
     // {
     //     $status = $request->query('status');
@@ -46,13 +46,11 @@ class APIInterventionController extends Controller
     {
         $intervention->load('ticket', 'interventionable');
         return ApiResponse::success($intervention, 'Intervention');
-
     }
 
 
     public function store(InterventionRequest $request, PictureUploadRequest $pictureUploadRequest)
     {
-        Debugbar::info('store intervention', $request->validated());
         try {
             DB::beginTransaction();
 
@@ -100,7 +98,7 @@ class APIInterventionController extends Controller
         return ApiResponse::error('Error during Intervention creation');
     }
 
-    public function update(InterventionRequest $request, Intervention $intervention)
+    public function update(InterventionRequest $request, Intervention $intervention, PictureUploadRequest $pictureUploadRequest)
     {
         try {
             DB::beginTransaction();
@@ -108,6 +106,12 @@ class APIInterventionController extends Controller
             $intervention->update([
                 ...$request->safe()->except('locationType', 'locationId', 'ticket_id')
             ]);
+            $intervention->interventionType()->associate($request->validated('intervention_type_id'));
+            $intervention->save();
+
+            if ($pictureUploadRequest->validated('pictures')) {
+                $this->pictureService->uploadAndAttachPictures($intervention, $pictureUploadRequest->validated('pictures'));
+            }
 
             DB::commit();
             return ApiResponse::success(null, 'Intervention updated');

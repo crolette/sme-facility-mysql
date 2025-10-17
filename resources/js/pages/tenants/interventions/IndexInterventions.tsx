@@ -1,14 +1,18 @@
+import Modale from '@/components/Modale';
 import { Pagination } from '@/components/pagination';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Pill } from '@/components/ui/pill';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, InterventionStatus, PaginatedData, PriorityLevel } from '@/types';
+import { BreadcrumbItem, CentralType, Intervention, InterventionStatus, PaginatedData, PriorityLevel } from '@/types';
 import { Head, router } from '@inertiajs/react';
+import axios from 'axios';
 import { Loader, Pencil, Trash2, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { FormEventHandler, useEffect, useState } from 'react';
 
 export interface SearchParams {
     q: string | null;
@@ -19,16 +23,33 @@ export interface SearchParams {
     priority: string | null;
 }
 
+type InterventionFormData = {
+    intervention_id: null | number;
+    intervention_type_id: null | number;
+    status: null | string;
+    priority: null | string;
+    planned_at: null | string;
+    description: null | string;
+    repair_delay: null | string;
+    total_costs: null | number;
+    locationType: null | string;
+    locationId: null | number | string;
+    ticket_id: null | number;
+    pictures: FileList | null;
+};
+
 export default function IndexInterventions({
     items,
     filters,
     statuses,
+    types,
     priorities,
 }: {
     items: PaginatedData;
     filters: SearchParams;
     statuses: InterventionStatus;
     priorities: PriorityLevel;
+    types: CentralType[];
 }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -37,6 +58,92 @@ export default function IndexInterventions({
         },
     ];
     const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    const interventionData = {
+        intervention_id: null,
+        intervention_type_id: null,
+        status: null,
+        priority: null,
+        planned_at: null,
+        description: null,
+        repair_delay: null,
+        total_costs: null,
+        locationType: null,
+        locationId: null,
+        ticket_id: null,
+        pictures: [],
+    };
+
+    const [isProcessing, setIsProcessing] = useState<boolean>(false);
+    const [interventionDataForm, setInterventionDataForm] = useState<InterventionFormData>(interventionData);
+    const [addIntervention, setAddIntervention] = useState<boolean>(false);
+
+    const [interventionTypes, setInterventionTypes] = useState<CentralType[]>([]);
+    const fetchInterventionTypes = async () => {
+        try {
+            const response = await axios.get(route('api.category-types', { type: 'intervention' }));
+            console.log(response.data.data);
+            setInterventionTypes(response.data.data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    const openModale = () => {
+        if (interventionTypes.length === 0) fetchInterventionTypes();
+        setAddIntervention(true);
+    };
+
+    const closeModale = () => {
+        setInterventionDataForm(interventionData);
+        setAddIntervention(false);
+        setIsProcessing(false);
+    };
+
+    const editIntervention = (id: number) => {
+        const intervention = items.data.find((intervention) => {
+            return intervention.id === id;
+        });
+        if (interventionTypes.length === 0) fetchInterventionTypes();
+
+        setInterventionDataForm((prev) => ({
+            ...prev,
+            intervention_id: id,
+            intervention_type_id: intervention?.intervention_type_id ?? null,
+            status: intervention?.status ?? null,
+            priority: intervention?.priority ?? null,
+            planned_at: intervention?.planned_at ? formatDateForInput(intervention?.planned_at) : null,
+            description: intervention?.description ?? null,
+            repair_delay: intervention?.repair_delay ? formatDateForInput(intervention?.repair_delay) : null,
+            total_costs: intervention?.total_costs ?? null,
+            ticket_id: intervention?.ticket_id ?? null,
+            locationType: intervention?.ticket_id ? null : intervention?.interventionable_type,
+            locationId: intervention?.ticket_id ? null : (intervention?.interventionable_id ?? null),
+        }));
+        setAddIntervention(true);
+    };
+
+    function formatDateForInput(dateStr: string) {
+        const [day, month, year] = dateStr.split('-');
+        return `${year}-${month}-${day}`;
+    }
+
+    const submitEditIntervention: FormEventHandler = async (e) => {
+        e.preventDefault();
+        setIsProcessing(true);
+
+        try {
+            const response = await axios.patch(route('api.interventions.update', interventionDataForm.intervention_id), interventionDataForm);
+            if (response.data.status === 'success') {
+                setAddIntervention(false);
+                setIsProcessing(false);
+                showToast(response.data.message, response.data.status);
+                router.visit(route('tenant.interventions.index'));
+            }
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
+            setIsProcessing(false);
+        }
+    };
 
     const [query, setQuery] = useState<SearchParams>({
         q: filters.q ?? null,
@@ -86,8 +193,10 @@ export default function IndexInterventions({
         });
     };
 
-    const setStatusSearch = (status: string) => {
+    const setStatusSearch = (status: string | null) => {
         console.log(status);
+        if (status === query.status) status = null;
+
         router.visit(route('tenant.interventions.index', { ...query, status: status ?? '' }), {
             onStart: () => {
                 setIsLoading(true);
@@ -98,7 +207,9 @@ export default function IndexInterventions({
         });
     };
 
-    const setPrioritySearch = (priority: string) => {
+    const setPrioritySearch = (priority: string | null) => {
+        if (priority === query.priority) priority = null;
+
         router.visit(route('tenant.interventions.index', { ...query, priority: priority }), {
             onStart: () => {
                 setIsLoading(true);
@@ -109,39 +220,13 @@ export default function IndexInterventions({
         });
     };
 
-    const [providerSearch, setProviderSearch] = useState(query.provider);
-    const [debouncedProviderSearch, setDebouncedProviderSearch] = useState<string>('');
-
-    useEffect(() => {
-        if (!providerSearch) return;
-
-        const handler = setTimeout(() => {
-            setDebouncedProviderSearch(providerSearch);
-        }, 500);
-
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [providerSearch]);
-
-    useEffect(() => {
-        if (query.provider !== debouncedProviderSearch && debouncedProviderSearch?.length > 2) {
-            router.visit(route('tenant.users.index', { ...query, provider: debouncedProviderSearch }), {
-                onStart: () => {
-                    setIsLoading(true);
-                },
-                onFinish: () => {
-                    setIsLoading(false);
-                },
-            });
-        }
-    }, [debouncedProviderSearch]);
+    const { showToast } = useToast();
 
     const [prevQuery, setPrevQuery] = useState(query);
 
     useEffect(() => {
         if (query !== prevQuery)
-            router.visit(route('tenant.users.index', { ...query }), {
+            router.visit(route('tenant.interventions.index', { ...query }), {
                 onStart: () => {
                     setIsLoading(true);
                 },
@@ -151,43 +236,85 @@ export default function IndexInterventions({
             });
     }, [query]);
 
+    const [showDeleteInterventionModale, setShowDeleteInterventionModale] = useState(false);
+    const [interventionToDelete, setInterventionToDelete] = useState<null | Intervention>(null);
+    const deleteIntervention = async () => {
+        if (!interventionToDelete) return;
+
+        try {
+            setIsLoading(true);
+            const response = await axios.delete(route('api.interventions.destroy', interventionToDelete.id), {});
+
+            if (response.data.status === 'success') {
+                showToast(response.data.message, response.data.status);
+                setShowDeleteInterventionModale(false);
+                setInterventionToDelete(null);
+
+                router.visit(route('tenant.interventions.index', { ...query }));
+            }
+        } catch (error) {
+            console.error(error);
+            showToast(error.response.data.message, error.response.data.status);
+            setIsLoading(false);
+        }
+    };
+
+    console.log(items.data);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sites" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex w-full justify-between">
-                    <details className="border-border relative w-full cursor-pointer rounded-md border-2 p-1" open={isLoading ? false : undefined}>
+                    <details className="border-border relative w-full cursor-pointer rounded-md border-2 p-2" open={isLoading ? false : undefined}>
                         <summary>Search</summary>
 
                         <div className="bg-border border-border text-background dark:text-foreground absolute top-full flex flex-col items-center gap-4 rounded-b-md border-2 p-2 sm:flex-row">
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="status">status</Label>
+                                <Label htmlFor="status">Type</Label>
+                                <select
+                                    name="type"
+                                    id="type"
+                                    value={query.type ?? ''}
+                                    onChange={(e) => setQuery((prev) => ({ ...prev, type: e.target.value }))}
+                                >
+                                    <option value={''} aria-readonly>
+                                        Select a type
+                                    </option>
+                                    {types.map((type) => (
+                                        <option key={type.id} value={type.id}>
+                                            {type.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex flex-col items-center gap-2">
+                                <Label htmlFor="status">Status</Label>
                                 <select name="status" id="status" value={query.status ?? ''} onChange={(e) => setStatusSearch(e.target.value)}>
                                     <option value={''} aria-readonly>
                                         Select a status
                                     </option>
                                     {statuses.map((status) => (
-                                        <option value={status}>{status}</option>
+                                        <option key={status} value={status}>
+                                            {status}
+                                        </option>
                                     ))}
-
-                                    <option value={'manager'}>Maintenance Manager</option>
                                 </select>
                             </div>
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="canLogin">canLogin</Label>
+                                <Label htmlFor="canLogin">Priority</Label>
                                 <div className="space-x-1">
                                     {priorities.map((priority) => (
-                                        <Pill variant={query.status === priority ? 'active' : ''} onClick={() => setPrioritySearch(priority)}>
+                                        <Pill
+                                            key={priority}
+                                            size={'sm'}
+                                            className="cursor-pointer"
+                                            variant={query.priority === priority ? 'active' : 'default'}
+                                            onClick={() => setPrioritySearch(priority)}
+                                        >
                                             {priority}
                                         </Pill>
                                     ))}
-
-                                    {/* <Pill variant={query.canLogin === 'no' ? 'active' : ''} onClick={() => setCanLoginSearch('no')}>
-                                        No
-                                    </Pill>
-                                    <Pill variant={query.canLogin === null ? 'active' : ''} onClick={() => setCanLoginSearch('all')}>
-                                        All
-                                    </Pill> */}
                                 </div>
                             </div>
                             <div className="flex flex-col items-center gap-2">
@@ -206,28 +333,18 @@ export default function IndexInterventions({
                             </Button>
                         </div>
                     </details>
-                    {/* <a href={route(`tenant.users.create`)}>
-                        <Button>
-                            <PlusCircle />
-                            Create user
-                        </Button>
-                    </a> */}
                 </div>
                 <Table>
                     <TableHead>
                         <TableHeadRow>
+                            <TableHeadData className="w-52">Description</TableHeadData>
                             <TableHeadData>Type</TableHeadData>
-                            <TableHeadData className="w-32">Description</TableHeadData>
                             <TableHeadData>Priority</TableHeadData>
                             <TableHeadData>Status</TableHeadData>
                             <TableHeadData>Planned at</TableHeadData>
                             <TableHeadData>Repair delay</TableHeadData>
                             <TableHeadData>Total costs</TableHeadData>
-                            <TableHeadData>
-                                {/* <Button onClick={() => sendIntervention(intervention.id)} variant={'secondary'}> */}
-                                Send to provider
-                                {/* </Button> */}
-                            </TableHeadData>
+                            <TableHeadData></TableHeadData>
                         </TableHeadRow>
                     </TableHead>
                     <TableBody>
@@ -244,32 +361,34 @@ export default function IndexInterventions({
                             items.data.map((item, index) => {
                                 return (
                                     <TableBodyRow key={index}>
-                                        <TableBodyData>
-                                            <a href={route('tenant.interventions.show', item.id)}>{item.type}</a>
+                                        <TableBodyData className="">
+                                            <a href={route('tenant.interventions.show', item.id)}>
+                                                <p className="">{item.description}</p>
+                                            </a>
                                         </TableBodyData>
-                                        <TableBodyData className="overflow-ellipsis">{item.description}</TableBodyData>
+                                        <TableBodyData>{item.type}</TableBodyData>
                                         <TableBodyData>
                                             <Pill variant={item.priority}>{item.priority}</Pill>
                                         </TableBodyData>
-                                        <TableBodyData>{item.status}</TableBodyData>
+                                        <TableBodyData>
+                                            <Pill variant={item.status}>{item.status}</Pill>
+                                        </TableBodyData>
                                         <TableBodyData>{item.planned_at ?? 'Not planned'}</TableBodyData>
                                         <TableBodyData>{item.repair_delay ?? 'No repair delay'}</TableBodyData>
                                         <TableBodyData>{item.total_costs ? `${item.total_costs} €` : '-'}</TableBodyData>
                                         <TableBodyData className="flex space-x-2">
                                             {!closed && (
                                                 <>
-                                                    <Button
-                                                    // onClick={() => editIntervention(item.id)}
-                                                    >
+                                                    <Button onClick={() => editIntervention(item.id)}>
                                                         <Pencil />
                                                     </Button>
                                                     <Button
                                                         type="button"
                                                         variant="destructive"
-                                                        // onClick={() => {
-                                                        //     setInterventionToDelete(intervention);
-                                                        //     setShowDeleteInterventionModale(true);
-                                                        // }}
+                                                        onClick={() => {
+                                                            setInterventionToDelete(item);
+                                                            setShowDeleteInterventionModale(true);
+                                                        }}
                                                     >
                                                         <Trash2 />
                                                     </Button>
@@ -288,6 +407,179 @@ export default function IndexInterventions({
                 </Table>
                 <Pagination items={items} />
             </div>
+            <Modale
+                title={'Delete intervention'}
+                message={
+                    'Are you sure to delete this intervention ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.'
+                }
+                isOpen={showDeleteInterventionModale}
+                onConfirm={deleteIntervention}
+                onCancel={() => {
+                    setInterventionToDelete(null);
+                    setShowDeleteInterventionModale(false);
+                }}
+            />
+
+            {addIntervention && (
+                <div className="bg-background/50 fixed inset-0 z-50">
+                    <div className="bg-background/20 flex h-dvh items-center justify-center">
+                        <div className="bg-background flex items-center justify-center p-10">
+                            {isProcessing && (
+                                <div className="flex flex-col items-center gap-4">
+                                    <Loader size={48} className="animate-pulse" />
+                                    <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
+                                    <p className="mx-auto">Intervention is being added...</p>
+                                </div>
+                            )}
+                            {!isProcessing && (
+                                <form onSubmit={submitEditIntervention} className="flex w-full flex-col space-y-4">
+                                    <Label>Intervention Type</Label>
+                                    <select
+                                        name="intervention_type"
+                                        id="intervention_type"
+                                        required
+                                        value={interventionDataForm.intervention_type_id ?? ''}
+                                        onChange={(e) =>
+                                            setInterventionDataForm((prev) => ({
+                                                ...prev,
+                                                intervention_type_id: parseInt(e.target.value),
+                                            }))
+                                        }
+                                    >
+                                        <option value="">Select intervention type</option>
+                                        {interventionTypes?.map((interventionType) => (
+                                            <option key={interventionType.id} value={interventionType.id}>
+                                                {interventionType.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <Label>Status</Label>
+                                    <select
+                                        name=""
+                                        id=""
+                                        required
+                                        value={interventionDataForm.status ?? ''}
+                                        onChange={(e) =>
+                                            setInterventionDataForm((prev) => ({
+                                                ...prev,
+                                                status: e.target.value,
+                                            }))
+                                        }
+                                    >
+                                        <option value="">Select status</option>
+                                        <option value="draft">draft</option>
+                                        <option value="planned">planned</option>
+                                        <option value="in progress">in progress</option>
+                                        <option value="waiting for parts">waiting for parts</option>
+                                        <option value="completed">completed</option>
+                                        <option value="cancelled">cancelled</option>
+                                    </select>
+                                    <Label>Priority</Label>
+                                    <select
+                                        name=""
+                                        id=""
+                                        required
+                                        value={interventionDataForm.priority ?? ''}
+                                        onChange={(e) =>
+                                            setInterventionDataForm((prev) => ({
+                                                ...prev,
+                                                priority: e.target.value,
+                                            }))
+                                        }
+                                    >
+                                        <option value="">Select priority</option>
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                        <option value="urgent">Urgent</option>
+                                    </select>
+                                    <Label>Description</Label>
+                                    <Textarea
+                                        placeholder="description"
+                                        value={interventionDataForm.description ?? ''}
+                                        onChange={(e) =>
+                                            setInterventionDataForm((prev) => ({
+                                                ...prev,
+                                                description: e.target.value,
+                                            }))
+                                        }
+                                    ></Textarea>
+                                    {/* {!closed && (
+                                        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                                            <h5>Pictures</h5>
+                                            <Input
+                                                type="file"
+                                                multiple
+                                                onChange={(e) =>
+                                                    setInterventionDataForm((prev) => ({
+                                                        ...prev,
+                                                        pictures: e.target.files,
+                                                    }))
+                                                }
+                                                accept="image/png, image/jpeg, image/jpg"
+                                            />
+                                        </div>
+                                    )} */}
+                                    <Label>Planned at</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="date"
+                                            value={interventionDataForm.planned_at ?? ''}
+                                            onChange={(e) =>
+                                                setInterventionDataForm((prev) => ({
+                                                    ...prev,
+                                                    planned_at: e.target.value,
+                                                }))
+                                            }
+                                        />
+                                        <Button
+                                            variant={'outline'}
+                                            type="button"
+                                            onClick={() =>
+                                                setInterventionDataForm((prev) => ({
+                                                    ...prev,
+                                                    planned_at: null,
+                                                }))
+                                            }
+                                        >
+                                            Clear planned at
+                                        </Button>
+                                    </div>
+                                    <Label>Repair delay</Label>
+                                    <div className="flex gap-2">
+                                        <Input
+                                            type="date"
+                                            value={interventionDataForm.repair_delay ?? ''}
+                                            onChange={(e) =>
+                                                setInterventionDataForm((prev) => ({
+                                                    ...prev,
+                                                    repair_delay: e.target.value,
+                                                }))
+                                            }
+                                        />
+                                        <Button
+                                            variant={'outline'}
+                                            type="button"
+                                            onClick={() =>
+                                                setInterventionDataForm((prev) => ({
+                                                    ...prev,
+                                                    repair_delay: null,
+                                                }))
+                                            }
+                                        >
+                                            Clear Repair delay
+                                        </Button>
+                                    </div>
+                                    <Button type="submit">Submit</Button>
+                                    <Button onClick={closeModale} type="button" variant={'secondary'}>
+                                        Cancel
+                                    </Button>
+                                </form>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </AppLayout>
     );
 }

@@ -155,7 +155,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
             repair_delay: intervention?.repair_delay ? formatDateForInput(intervention?.repair_delay) : null,
             total_costs: intervention?.total_costs ?? null,
             ticket_id: intervention?.ticket_id ?? null,
-            locationType: intervention?.ticket_id ? null : type,
+            locationType: intervention?.ticket_id ? null : intervention?.interventionable_type,
             locationId: intervention?.ticket_id ? null : (intervention?.interventionable_id ?? null),
         }));
         setAddIntervention(true);
@@ -339,6 +339,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                         </TableBody>
                     </Table>
                 ))}
+
             <Modale
                 title={'Delete intervention'}
                 message={
@@ -351,6 +352,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                     setShowDeleteInterventionModale(false);
                 }}
             />
+
             {sendInterventionToProviderModale && (
                 <div className="bg-background/50 fixed inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">
@@ -439,6 +441,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                     </div>
                 </div>
             )}
+
             {addIntervention && (
                 <div className="bg-background/50 fixed inset-0 z-50">
                     <div className="bg-background/20 flex h-dvh items-center justify-center">

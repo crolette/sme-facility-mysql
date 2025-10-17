@@ -89,6 +89,7 @@
 }
 
 :root {
+    color-scheme: light dark;
     --website-primary: #224e91;
     --website-secondary: #e3ebfc;
     --website-cta: #ffd700;
@@ -182,6 +183,21 @@
 a {
     @apply underline;
     cursor: pointer;
+}
+
+select {
+    font-size: 14px;
+    font-family: var(--font-sans);
+    border: 1px solid white;
+    border-radius: var(--radius-md);
+    padding: 8px 8px;
+}
+
+option {
+    color: var(--color-foreground);
+    font-size: var(--text-sm);
+    font-family: var(--font-sans);
+    background-color: var(--color-background);
 }
 
 nav a {
