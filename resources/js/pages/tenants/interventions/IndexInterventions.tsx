@@ -11,7 +11,7 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, CentralType, Intervention, InterventionStatus, PaginatedData, PriorityLevel } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
-import { Loader, Pencil, Trash2, X } from 'lucide-react';
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, Loader, Pencil, Trash2, X } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 
 export interface SearchParams {
@@ -322,8 +322,36 @@ export default function IndexInterventions({
                             <TableHeadData>Asset</TableHeadData>
                             <TableHeadData>Priority</TableHeadData>
                             <TableHeadData>Status</TableHeadData>
-                            <TableHeadData>Planned at</TableHeadData>
-                            <TableHeadData>Repair delay</TableHeadData>
+                            <TableHeadData>
+                                <div className="flex items-center gap-2">
+                                    <ArrowDownNarrowWide
+                                        size={16}
+                                        className="cursor-pointer"
+                                        onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'planned_at', sortBy: 'asc' }))}
+                                    />
+                                    Planned at
+                                    <ArrowDownWideNarrow
+                                        size={16}
+                                        className="cursor-pointer"
+                                        onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'planned_at', sortBy: 'desc' }))}
+                                    />
+                                </div>
+                            </TableHeadData>
+                            <TableHeadData>
+                                <div className="flex items-center gap-2">
+                                    <ArrowDownNarrowWide
+                                        size={16}
+                                        className="cursor-pointer"
+                                        onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'repair_delay', sortBy: 'asc' }))}
+                                    />
+                                    Repair delay
+                                    <ArrowDownWideNarrow
+                                        size={16}
+                                        className="cursor-pointer"
+                                        onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'repair_delay', sortBy: 'desc' }))}
+                                    />
+                                </div>
+                            </TableHeadData>
                             <TableHeadData>Total costs</TableHeadData>
                             <TableHeadData></TableHeadData>
                         </TableHeadRow>

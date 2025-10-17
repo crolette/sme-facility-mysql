@@ -53,7 +53,7 @@ class InterventionController extends Controller
         $statuses = array_column(InterventionStatus::cases(), 'value');
         $types = CategoryType::where('category', 'intervention')->get();
 
-        return Inertia::render('tenants/interventions/IndexInterventions', ['items' => $interventions->orderBy('planned_at', 'asc')->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'sortBy', 'status', 'orderBy', 'type', 'priority']), 'priorities' => $priorities, 'types' => $types, 'statuses' => $statuses]);
+        return Inertia::render('tenants/interventions/IndexInterventions', ['items' => $interventions->orderBy($validatedFields['orderBy'] ?? 'planned_at', $validatedFields['sortBy'] ?? 'asc')->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'sortBy', 'status', 'orderBy', 'type', 'priority']), 'priorities' => $priorities, 'types' => $types, 'statuses' => $statuses]);
     }
 
     /**
