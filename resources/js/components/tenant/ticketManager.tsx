@@ -2,15 +2,16 @@ import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData
 import { Ticket } from '@/types';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
+import { Loader } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
+import ModaleForm from '../ModaleForm';
+import { useToast } from '../ToastrContext';
 import { Button } from '../ui/button';
 import { Checkbox } from '../ui/checkbox';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { Textarea } from '../ui/textarea';
 import { Pill } from '../ui/pill';
-import { useToast } from '../ToastrContext';
-import { Loader } from 'lucide-react';
+import { Textarea } from '../ui/textarea';
 
 interface TicketManagerProps {
     itemCode: string;
@@ -32,7 +33,7 @@ type FormDataTicket = {
 
 export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = true }: TicketManagerProps) => {
     const auth = usePage().props.auth.user;
-     const { showToast } = useToast();
+    const { showToast } = useToast();
 
     const [tickets, setTickets] = useState<Ticket[]>();
     const [addTicketModal, setAddTicketModal] = useState<boolean>(false);
@@ -72,10 +73,10 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
             const response = await axios.patch(route('api.tickets.status', id), { status: 'closed' });
             if (response.data.status === 'success') {
                 fetchTickets();
-                 showToast(response.data.message, response.data.status);
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-             showToast(error.response.data.message, error.response.data.status);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -113,8 +114,7 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
             if (response.data.status === 'success') {
                 fetchTickets();
                 closeModalTicket();
-                 showToast(response.data.message, response.data.status);
-
+                showToast(response.data.message, response.data.status);
             }
             // }
         } catch (error) {
@@ -123,10 +123,9 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
         }
     };
 
-
     const submitNewTicket: FormEventHandler = async (e) => {
         e.preventDefault();
-         setIsProcessing(true);
+        setIsProcessing(true);
         try {
             const response = await axios.post(route('api.tickets.store'), newTicketData, {
                 headers: {
@@ -135,13 +134,12 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
             });
             if (response.data.status === 'success') {
                 fetchTickets();
-                 setIsProcessing(false);
+                setIsProcessing(false);
                 closeModalTicket();
                 showToast(response.data.message, response.data.status);
-
             }
         } catch (error) {
-             setIsProcessing(false);
+            setIsProcessing(false);
             showToast(error.response.data.message, error.response.data.status);
         }
     };
@@ -211,92 +209,81 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
             )}
 
             {addTicketModal && (
-                <div className="bg-background/50 fixed inset-0 z-50">
-                    <div className="bg-background/20 flex h-dvh items-center justify-center">
-                        <div className="bg-background flex items-center justify-center p-10">
-                            {isProcessing && (
-                                <div className="flex flex-col items-center gap-4">
-                                    <Loader size={48} className="animate-pulse" />
-                                    <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
-                                    <p className="mx-auto">Ticket is being created...</p>
-                                </div>
-                            )}
-                            {!isProcessing && (
-                                <form onSubmit={submitTypeTicket === 'edit' ? submitEditTicket : submitNewTicket} className="flex flex-col gap-4">
-                                    <Label>E-mail</Label>
+                <ModaleForm title={'Add new ticket'}>
+                    {isProcessing && (
+                        <div className="flex flex-col items-center gap-4">
+                            <Loader size={48} className="animate-pulse" />
+                            <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
+                            <p className="mx-auto">Ticket is being created...</p>
+                        </div>
+                    )}
+                    {!isProcessing && (
+                        <form onSubmit={submitTypeTicket === 'edit' ? submitEditTicket : submitNewTicket} className="flex flex-col gap-4">
+                            <Label>E-mail</Label>
+                            <Input type="text" name="email" value={newTicketData.reporter_email} required disabled placeholder="Reporter email" />
+                            <Label>Description</Label>
+                            <Textarea
+                                name="description"
+                                id="description"
+                                required
+                                minLength={10}
+                                maxLength={250}
+                                placeholder="Ticket description"
+                                onChange={(e) =>
+                                    setNewTicketData((prev) => ({
+                                        ...prev,
+                                        description: e.target.value,
+                                    }))
+                                }
+                                value={newTicketData.description}
+                            />
+                            {submitTypeTicket === 'new' && (
+                                <>
+                                    <Label>Pictures</Label>
                                     <Input
-                                        type="text"
-                                        name="email"
-                                        value={newTicketData.reporter_email}
-                                        required
-                                        disabled
-                                        placeholder="Reporter email"
-                                    />
-                                    <Label>Description</Label>
-                                    <Textarea
-                                        name="description"
-                                        id="description"
-                                        required
-                                        minLength={10}
-                                        maxLength={250}
-                                        placeholder="Ticket description"
-                                        onChange={(e) =>
+                                        type="file"
+                                        multiple
+                                        max={3}
+                                        accept="image/png, image/jpeg, image/jpg"
+                                        onChange={(e) => {
+                                            // const pictures = { pictures: };
                                             setNewTicketData((prev) => ({
                                                 ...prev,
-                                                description: e.target.value,
-                                            }))
-                                        }
-                                        value={newTicketData.description}
+                                                pictures: e.target.files,
+                                            }));
+                                        }}
                                     />
-                                    {submitTypeTicket === 'new' && (
-                                        <>
-                                            <Label>Pictures</Label>
-                                            <Input
-                                                type="file"
-                                                multiple
-                                                max={3}
-                                                accept="image/png, image/jpeg, image/jpg"
-                                                onChange={(e) => {
-                                                    // const pictures = { pictures: };
-                                                    setNewTicketData((prev) => ({
-                                                        ...prev,
-                                                        pictures: e.target.files,
-                                                    }));
-                                                }}
-                                            />
 
-                                            <div className="flex items-center gap-4">
-                                                <div>
-                                                    <Label htmlFor="notified">Do you want to be notified of changes ? </Label>
-                                                    <p className="text-xs">You will receive an e-mail when the ticket is closed.</p>
-                                                </div>
-                                                <Checkbox
-                                                    id="notified"
-                                                    checked={newTicketData.being_notified}
-                                                    onClick={() => {
-                                                        setNewTicketData((prev) => ({
-                                                            ...prev,
-                                                            being_notified: !newTicketData.being_notified,
-                                                        }));
-                                                    }}
-                                                />
-                                            </div>
-                                        </>
-                                    )}
-                                    {submitTypeTicket === 'new' ? (
-                                        <Button disabled={isProcessing}>Add new ticket</Button>
-                                    ) : (
-                                        <Button disabled={isProcessing}>Edit ticket</Button>
-                                    )}
-
-                                    <Button onClick={closeModalTicket} type="button" variant={'secondary'}>
-                                        Cancel
-                                    </Button>
-                                </form>
+                                    <div className="flex items-center gap-4">
+                                        <div>
+                                            <Label htmlFor="notified">Do you want to be notified of changes ? </Label>
+                                            <p className="text-xs">You will receive an e-mail when the ticket is closed.</p>
+                                        </div>
+                                        <Checkbox
+                                            id="notified"
+                                            checked={newTicketData.being_notified}
+                                            onClick={() => {
+                                                setNewTicketData((prev) => ({
+                                                    ...prev,
+                                                    being_notified: !newTicketData.being_notified,
+                                                }));
+                                            }}
+                                        />
+                                    </div>
+                                </>
                             )}
-                        </div>
-                    </div>
-                </div>
+                            {submitTypeTicket === 'new' ? (
+                                <Button disabled={isProcessing}>Add new ticket</Button>
+                            ) : (
+                                <Button disabled={isProcessing}>Edit ticket</Button>
+                            )}
+
+                            <Button onClick={closeModalTicket} type="button" variant={'secondary'}>
+                                Cancel
+                            </Button>
+                        </form>
+                    )}
+                </ModaleForm>
             )}
         </div>
     );

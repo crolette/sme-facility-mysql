@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import InputError from '@/components/input-error';
+import ModaleForm from '@/components/ModaleForm';
 import SearchableInput from '@/components/SearchableInput';
 import FileManager from '@/components/tenant/FileManager';
 import SearchLocationForAsset from '@/components/tenant/searchLocationForAsset';
@@ -77,7 +78,7 @@ type TypeFormData = {
     maintenance_frequency: string | null;
     next_maintenance_date: string | null;
     last_maintenance_date: string | null;
-    contracts: { Contract, files }[];
+    contracts: { Contract; files }[];
     existing_contracts: [];
     existing_documents: [];
     files: {
@@ -249,7 +250,7 @@ export default function CreateUpdateAsset({
         }
     };
 
-    const setSelectedLocation = (location: SearchedLocation | TenantBuilding | TenantFloor | TenantSite | TenantRoom, type? : string) => {
+    const setSelectedLocation = (location: SearchedLocation | TenantBuilding | TenantFloor | TenantSite | TenantRoom, type?: string) => {
         if (!location) {
             return;
         }
@@ -330,78 +331,66 @@ export default function CreateUpdateAsset({
         });
     };
 
-
-
     const addFileModalForm = () => {
         return (
-            <div className="bg-background/50 fixed inset-0 z-50">
-                <div className="bg-background/20 flex h-dvh items-center justify-center">
-                    <div className="bg-background flex items-center justify-center p-4">
-                        <div className="flex flex-col gap-2">
-                            <form onSubmit={addFile} className="space-y-2">
-                                <p className="text-center">Add new document</p>
-                                <select
-                                    name="documentType"
-                                    required
-                                    value={newDocumentType ?? ''}
-                                    onChange={(e) => setNewDocumentType(parseInt(e.target.value))}
-                                    id=""
-                                    className={cn(
-                                        'border-input placeholder:text-muted-foreground flex w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                                    )}
-                                >
-                                    {documentTypes && documentTypes.length > 0 && (
-                                        <>
-                                            <option value="" disabled className="bg-background text-foreground">
-                                                Select an option
-                                            </option>
-                                            {documentTypes?.map((documentType) => (
-                                                <option value={documentType.id} key={documentType.id} className="bg-background text-foreground">
-                                                    {documentType.label}
-                                                </option>
-                                            ))}
-                                        </>
-                                    )}
-                                </select>
-                                <Input
-                                    type="file"
-                                    name=""
-                                    id=""
-                                    onChange={(e) => setNewFile(e.target.files ? e.target.files[0] : null)}
-                                    required
-                                    accept="image/png, image/jpeg, image/jpg, .pdf"
-                                />
+            <ModaleForm title={'Add new document'}>
+                <div className="flex flex-col gap-2">
+                    <form onSubmit={addFile} className="space-y-2">
+                        <p className="text-center"></p>
+                        <select
+                            name="documentType"
+                            required
+                            value={newDocumentType ?? ''}
+                            onChange={(e) => setNewDocumentType(parseInt(e.target.value))}
+                            id=""
+                            className={cn(
+                                'border-input placeholder:text-muted-foreground flex w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                            )}
+                        >
+                            {documentTypes && documentTypes.length > 0 && (
+                                <>
+                                    <option value="" disabled className="bg-background text-foreground">
+                                        Select an option
+                                    </option>
+                                    {documentTypes?.map((documentType) => (
+                                        <option value={documentType.id} key={documentType.id} className="bg-background text-foreground">
+                                            {documentType.label}
+                                        </option>
+                                    ))}
+                                </>
+                            )}
+                        </select>
+                        <Input
+                            type="file"
+                            name=""
+                            id=""
+                            onChange={(e) => setNewFile(e.target.files ? e.target.files[0] : null)}
+                            required
+                            accept="image/png, image/jpeg, image/jpg, .pdf"
+                        />
 
-                                <Input
-                                    type="text"
-                                    name="name"
-                                    required
-                                    placeholder="Document name"
-                                    onChange={(e) => setNewFileName(e.target.value)}
-                                />
-                                <p className="text-border text-foreground text-xs">Le nom servira également à la sauvegarde du nom du fichier</p>
-                                <Input
-                                    type="text"
-                                    name="description"
-                                    id="description"
-                                    minLength={10}
-                                    maxLength={250}
-                                    placeholder="Document description"
-                                    onChange={(e) => setNewFileDescription(e.target.value)}
-                                />
-                                <div className="flex justify-between">
-                                    <Button>Submit</Button>
-                                    <Button type="button" onClick={closeFileModal} variant="secondary">
-                                        Cancel
-                                    </Button>
-                                </div>
-                            </form>
+                        <Input type="text" name="name" required placeholder="Document name" onChange={(e) => setNewFileName(e.target.value)} />
+                        <p className="text-border text-foreground text-xs">Le nom servira également à la sauvegarde du nom du fichier</p>
+                        <Input
+                            type="text"
+                            name="description"
+                            id="description"
+                            minLength={10}
+                            maxLength={250}
+                            placeholder="Document description"
+                            onChange={(e) => setNewFileDescription(e.target.value)}
+                        />
+                        <div className="flex justify-between">
+                            <Button>Submit</Button>
+                            <Button type="button" onClick={closeFileModal} variant="secondary">
+                                Cancel
+                            </Button>
                         </div>
-                    </div>
+                    </form>
                 </div>
-            </div>
+            </ModaleForm>
         );
     };
 
@@ -441,7 +430,6 @@ export default function CreateUpdateAsset({
 
     const [showContractFileModal, setShowContractFileModal] = useState(false);
     const [indexContractForFiles, setIndexContractForFiles] = useState<number | null>(null);
-
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -514,38 +502,34 @@ export default function CreateUpdateAsset({
                                         onChange={(e) => setData('q', e.target.value)}
                                         placeholder="Search by code or name to add a level"
                                     />
-                                        <ul
-                                            className="bg-background absolute z-10 flex w-full flex-col"
-                                            aria-autocomplete="list"
-                                            role="listbox"
-                                        >
-                                            {isSearching && (
-                                                <li value="0" key="" className="">
-                                                    Searching...
+                                    <ul className="bg-background absolute z-10 flex w-full flex-col" aria-autocomplete="list" role="listbox">
+                                        {isSearching && (
+                                            <li value="0" key="" className="">
+                                                Searching...
+                                            </li>
+                                        )}
+                                        {listIsOpen &&
+                                            locations &&
+                                            locations.length > 0 &&
+                                            locations?.map((location) => (
+                                                <li
+                                                    role="option"
+                                                    value={location.reference_code}
+                                                    key={location.reference_code}
+                                                    onClick={() => setSelectedLocation(location)}
+                                                    className="hover:bg-foreground hover:text-background cursor-pointer p-2 text-sm"
+                                                >
+                                                    {location.name + ' (' + location.reference_code + ')'}
                                                 </li>
-                                            )}
-                                            {listIsOpen &&
-                                                locations &&
-                                                locations.length > 0 &&
-                                                locations?.map((location) => (
-                                                    <li
-                                                        role="option"
-                                                        value={location.reference_code}
-                                                        key={location.reference_code}
-                                                        onClick={() => setSelectedLocation(location)}
-                                                        className="hover:bg-foreground hover:text-background cursor-pointer p-2 text-sm"
-                                                    >
-                                                        {location.name + ' (' + location.reference_code + ')'}
-                                                    </li>
-                                                ))}
-                                            {listIsOpen && locations && locations.length == 0 && (
-                                                <>
-                                                    <li value="0" key="">
-                                                        No results
-                                                    </li>
-                                                </>
-                                            )}
-                                        </ul>
+                                            ))}
+                                        {listIsOpen && locations && locations.length == 0 && (
+                                            <>
+                                                <li value="0" key="">
+                                                    No results
+                                                </li>
+                                            </>
+                                        )}
+                                    </ul>
                                 </div>
                                 <SearchLocationForAsset onSelect={setSelectedLocation} />
                                 {/* {data.locationName && ( */}
@@ -1277,17 +1261,13 @@ export default function CreateUpdateAsset({
                 </form>
 
                 {isProcessing && (
-                    <div className="bg-background/50 fixed inset-0 z-50">
-                        <div className="bg-background/20 flex h-dvh items-center justify-center">
-                            <div className="bg-background flex items-center justify-center p-10">
-                                    <div className="flex flex-col items-center gap-4">
-                                        <Loader size={48} className="animate-pulse" />
-                                        <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
-                                        <p className="mx-auto">Asset is being created...</p>
-                                    </div>
-                            </div>
+                    <ModaleForm>
+                        <div className="flex flex-col items-center gap-4">
+                            <Loader size={48} className="animate-pulse" />
+                            <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
+                            <p className="mx-auto">Asset is being created...</p>
                         </div>
-                    </div>
+                    </ModaleForm>
                 )}
 
                 {showFileModal && addFileModalForm()}

@@ -1,3 +1,4 @@
+import ModaleForm from '@/components/ModaleForm';
 import SearchableInput from '@/components/SearchableInput';
 import { AssetManager } from '@/components/tenant/assetManager';
 import { ContractsList } from '@/components/tenant/contractsList';
@@ -286,37 +287,32 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                 </div>
             </div>
             {addExistingContractModale && (
-                <div className="bg-background/50 fixed inset-0 z-50">
-                    <div className="bg-background/20 flex h-dvh items-center justify-center">
-                        <div className="bg-background flex flex-col items-center justify-center p-4 text-center md:max-w-1/3">
-                            <p>Add Existing contract</p>
-                            <SearchableInput<Contract>
-                                multiple={true}
-                                searchUrl={route('api.contracts.search')}
-                                selectedItems={existingContracts}
-                                getDisplayText={(contract) => contract.name}
-                                getKey={(contract) => contract.id}
-                                onSelect={(contracts) => {
-                                    console.log(contracts);
-                                    // const prev = existingContracts;
-                                    // prev.push(contracts);
-                                    setExistingContracts(contracts);
-                                }}
-                                placeholder="Search contracts..."
-                            />
-                            <Button
-                                variant="secondary"
-                                onClick={() => {
-                                    setAddExistingContractModale(false);
-                                    setExistingContracts(location.contracts);
-                                }}
-                            >
-                                Cancel
-                            </Button>
-                            <Button onClick={addExistingContractToAsset}>Add contract</Button>
-                        </div>
-                    </div>
-                </div>
+                <ModaleForm title={'Add Existing contract'}>
+                    <SearchableInput<Contract>
+                        multiple={true}
+                        searchUrl={route('api.contracts.search')}
+                        selectedItems={existingContracts}
+                        getDisplayText={(contract) => contract.name}
+                        getKey={(contract) => contract.id}
+                        onSelect={(contracts) => {
+                            console.log(contracts);
+                            // const prev = existingContracts;
+                            // prev.push(contracts);
+                            setExistingContracts(contracts);
+                        }}
+                        placeholder="Search contracts..."
+                    />
+                    <Button
+                        variant="secondary"
+                        onClick={() => {
+                            setAddExistingContractModale(false);
+                            setExistingContracts(location.contracts);
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button onClick={addExistingContractToAsset}>Add contract</Button>
+                </ModaleForm>
             )}
         </AppLayout>
     );

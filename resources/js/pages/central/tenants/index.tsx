@@ -1,4 +1,5 @@
 import Modale from '@/components/Modale';
+import ModaleForm from '@/components/ModaleForm';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/central/app-layout';
@@ -6,7 +7,7 @@ import { Tenant, type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { Loader } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,7 +18,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 interface TypeFormData {
     tenant: string | null;
-    [key: string]: any
+    [key: string]: any;
 }
 
 export default function IndexTenants({ items }: { items: Tenant[] }) {
@@ -32,12 +33,11 @@ export default function IndexTenants({ items }: { items: Tenant[] }) {
             const response = await axios.get(route('api.central.tenants.index'));
             if (response.data.type === 'success') {
                 setTenants(response.data.data);
-                }
+            }
         } catch (error) {
-             showToast(error.response.data.message, error.response.data.type);
+            showToast(error.response.data.message, error.response.data.type);
         }
-    }
-
+    };
 
     const { data, setData } = useForm<TypeFormData>({
         tenant: null,
@@ -88,9 +88,7 @@ export default function IndexTenants({ items }: { items: Tenant[] }) {
                     {tenants.length > 0 &&
                         tenants.map((tenant) => (
                             <li key={tenant.id} className="flex items-center justify-between gap-4">
-                                <p>
-                                    {tenant.company_name}
-                                </p>
+                                <p>{tenant.company_name}</p>
                                 <div className="flex gap-2">
                                     <Button
                                         onClick={() => {
@@ -108,7 +106,7 @@ export default function IndexTenants({ items }: { items: Tenant[] }) {
                                     <a href={route('central.tenants.show', tenant.id)}>
                                         <Button variant={'outline'}>See</Button>
                                     </a>
-                                    <a href={tenant.domain_address} target='__blank'>
+                                    <a href={tenant.domain_address} target="__blank">
                                         <Button variant={'outline'}>Access domain</Button>
                                     </a>
 
@@ -133,17 +131,13 @@ export default function IndexTenants({ items }: { items: Tenant[] }) {
                 }}
             />
             {isProcessing && (
-                <div className="bg-background/50 fixed inset-0 z-50">
-                    <div className="bg-background/20 flex h-dvh items-center justify-center">
-                        <div className="bg-background flex items-center justify-center p-4 text-center md:w-1/3">
-                            <div className="flex flex-col items-center gap-4">
-                                <Loader size={48} className="animate-pulse" />
-                                <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
-                                <p className="mx-auto">Tenant is being created...</p>
-                            </div>
-                        </div>
+                <ModaleForm>
+                    <div className="flex flex-col items-center gap-4">
+                        <Loader size={48} className="animate-pulse" />
+                        <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
+                        <p className="mx-auto">Tenant is being created...</p>
                     </div>
-                </div>
+                </ModaleForm>
             )}
         </AppLayout>
     );

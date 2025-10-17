@@ -17,9 +17,9 @@ export default function Modale({
         <>
             {isOpen && (
                 <>
-                    <div className="bg-background/50 fixed inset-0 z-50">
-                        <div className="bg-background/20 flex h-dvh items-center justify-center">
-                            <div className="bg-background flex items-center justify-center p-4 text-center md:max-w-1/3">
+                    <div className="bg-background/50 fixed inset-0 z-50 overflow-y-auto">
+                        <div className="bg-background/20 flex min-h-dvh items-center justify-center">
+                            <div className="bg-background flex max-h-[90vh] items-center justify-center overflow-y-auto p-10 text-center md:max-w-1/3">
                                 <div className="flex flex-col gap-4">
                                     <p className="text-destructive mx-auto text-3xl font-bold">{title}</p>
                                     <p className="mx-auto w-2/3">{message}</p>

@@ -1,4 +1,5 @@
 import Modale from '@/components/Modale';
+import ModaleForm from '@/components/ModaleForm';
 import { Pagination } from '@/components/pagination';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
@@ -435,90 +436,88 @@ export default function IndexInterventions({
             />
 
             {addIntervention && (
-                <div className="bg-background/50 fixed inset-0 z-50">
-                    <div className="bg-background/20 flex h-dvh items-center justify-center">
-                        <div className="bg-background flex items-center justify-center p-10">
-                            {isProcessing && (
-                                <div className="flex flex-col items-center gap-4">
-                                    <Loader size={48} className="animate-pulse" />
-                                    <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
-                                    <p className="mx-auto">Intervention is being added...</p>
-                                </div>
-                            )}
-                            {!isProcessing && (
-                                <form onSubmit={submitEditIntervention} className="flex w-full flex-col space-y-4">
-                                    <Label>Intervention Type</Label>
-                                    <select
-                                        name="intervention_type"
-                                        id="intervention_type"
-                                        required
-                                        value={interventionDataForm.intervention_type_id ?? ''}
-                                        onChange={(e) =>
-                                            setInterventionDataForm((prev) => ({
-                                                ...prev,
-                                                intervention_type_id: parseInt(e.target.value),
-                                            }))
-                                        }
-                                    >
-                                        <option value="">Select intervention type</option>
-                                        {types?.map((interventionType) => (
-                                            <option key={interventionType.id} value={interventionType.id}>
-                                                {interventionType.label}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <Label>Status</Label>
-                                    <select
-                                        name=""
-                                        id=""
-                                        required
-                                        value={interventionDataForm.status ?? ''}
-                                        onChange={(e) =>
-                                            setInterventionDataForm((prev) => ({
-                                                ...prev,
-                                                status: e.target.value,
-                                            }))
-                                        }
-                                    >
-                                        <option value="">Select status</option>
-                                        <option value="draft">draft</option>
-                                        <option value="planned">planned</option>
-                                        <option value="in progress">in progress</option>
-                                        <option value="waiting for parts">waiting for parts</option>
-                                        <option value="completed">completed</option>
-                                        <option value="cancelled">cancelled</option>
-                                    </select>
-                                    <Label>Priority</Label>
-                                    <select
-                                        name=""
-                                        id=""
-                                        required
-                                        value={interventionDataForm.priority ?? ''}
-                                        onChange={(e) =>
-                                            setInterventionDataForm((prev) => ({
-                                                ...prev,
-                                                priority: e.target.value,
-                                            }))
-                                        }
-                                    >
-                                        <option value="">Select priority</option>
-                                        <option value="low">Low</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="high">High</option>
-                                        <option value="urgent">Urgent</option>
-                                    </select>
-                                    <Label>Description</Label>
-                                    <Textarea
-                                        placeholder="description"
-                                        value={interventionDataForm.description ?? ''}
-                                        onChange={(e) =>
-                                            setInterventionDataForm((prev) => ({
-                                                ...prev,
-                                                description: e.target.value,
-                                            }))
-                                        }
-                                    ></Textarea>
-                                    {/* {!closed && (
+                <ModaleForm title={'Edit intervention'}>
+                    {isProcessing && (
+                        <div className="flex flex-col items-center gap-4">
+                            <Loader size={48} className="animate-pulse" />
+                            <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
+                            <p className="mx-auto">Intervention is being added...</p>
+                        </div>
+                    )}
+                    {!isProcessing && (
+                        <form onSubmit={submitEditIntervention} className="flex w-full flex-col space-y-4">
+                            <Label>Intervention Type</Label>
+                            <select
+                                name="intervention_type"
+                                id="intervention_type"
+                                required
+                                value={interventionDataForm.intervention_type_id ?? ''}
+                                onChange={(e) =>
+                                    setInterventionDataForm((prev) => ({
+                                        ...prev,
+                                        intervention_type_id: parseInt(e.target.value),
+                                    }))
+                                }
+                            >
+                                <option value="">Select intervention type</option>
+                                {types?.map((interventionType) => (
+                                    <option key={interventionType.id} value={interventionType.id}>
+                                        {interventionType.label}
+                                    </option>
+                                ))}
+                            </select>
+                            <Label>Status</Label>
+                            <select
+                                name=""
+                                id=""
+                                required
+                                value={interventionDataForm.status ?? ''}
+                                onChange={(e) =>
+                                    setInterventionDataForm((prev) => ({
+                                        ...prev,
+                                        status: e.target.value,
+                                    }))
+                                }
+                            >
+                                <option value="">Select status</option>
+                                <option value="draft">draft</option>
+                                <option value="planned">planned</option>
+                                <option value="in progress">in progress</option>
+                                <option value="waiting for parts">waiting for parts</option>
+                                <option value="completed">completed</option>
+                                <option value="cancelled">cancelled</option>
+                            </select>
+                            <Label>Priority</Label>
+                            <select
+                                name=""
+                                id=""
+                                required
+                                value={interventionDataForm.priority ?? ''}
+                                onChange={(e) =>
+                                    setInterventionDataForm((prev) => ({
+                                        ...prev,
+                                        priority: e.target.value,
+                                    }))
+                                }
+                            >
+                                <option value="">Select priority</option>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                                <option value="urgent">Urgent</option>
+                            </select>
+                            <Label>Description</Label>
+                            <Textarea
+                                placeholder="description"
+                                value={interventionDataForm.description ?? ''}
+                                onChange={(e) =>
+                                    setInterventionDataForm((prev) => ({
+                                        ...prev,
+                                        description: e.target.value,
+                                    }))
+                                }
+                            ></Textarea>
+                            {/* {!closed && (
                                         <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                             <h5>Pictures</h5>
                                             <Input
@@ -534,65 +533,63 @@ export default function IndexInterventions({
                                             />
                                         </div>
                                     )} */}
-                                    <Label>Planned at</Label>
-                                    <div className="flex gap-2">
-                                        <Input
-                                            type="date"
-                                            value={interventionDataForm.planned_at ?? ''}
-                                            onChange={(e) =>
-                                                setInterventionDataForm((prev) => ({
-                                                    ...prev,
-                                                    planned_at: e.target.value,
-                                                }))
-                                            }
-                                        />
-                                        <Button
-                                            variant={'outline'}
-                                            type="button"
-                                            onClick={() =>
-                                                setInterventionDataForm((prev) => ({
-                                                    ...prev,
-                                                    planned_at: null,
-                                                }))
-                                            }
-                                        >
-                                            Clear planned at
-                                        </Button>
-                                    </div>
-                                    <Label>Repair delay</Label>
-                                    <div className="flex gap-2">
-                                        <Input
-                                            type="date"
-                                            value={interventionDataForm.repair_delay ?? ''}
-                                            onChange={(e) =>
-                                                setInterventionDataForm((prev) => ({
-                                                    ...prev,
-                                                    repair_delay: e.target.value,
-                                                }))
-                                            }
-                                        />
-                                        <Button
-                                            variant={'outline'}
-                                            type="button"
-                                            onClick={() =>
-                                                setInterventionDataForm((prev) => ({
-                                                    ...prev,
-                                                    repair_delay: null,
-                                                }))
-                                            }
-                                        >
-                                            Clear Repair delay
-                                        </Button>
-                                    </div>
-                                    <Button type="submit">Submit</Button>
-                                    <Button onClick={closeModale} type="button" variant={'secondary'}>
-                                        Cancel
-                                    </Button>
-                                </form>
-                            )}
-                        </div>
-                    </div>
-                </div>
+                            <Label>Planned at</Label>
+                            <div className="flex gap-2">
+                                <Input
+                                    type="date"
+                                    value={interventionDataForm.planned_at ?? ''}
+                                    onChange={(e) =>
+                                        setInterventionDataForm((prev) => ({
+                                            ...prev,
+                                            planned_at: e.target.value,
+                                        }))
+                                    }
+                                />
+                                <Button
+                                    variant={'outline'}
+                                    type="button"
+                                    onClick={() =>
+                                        setInterventionDataForm((prev) => ({
+                                            ...prev,
+                                            planned_at: null,
+                                        }))
+                                    }
+                                >
+                                    Clear planned at
+                                </Button>
+                            </div>
+                            <Label>Repair delay</Label>
+                            <div className="flex gap-2">
+                                <Input
+                                    type="date"
+                                    value={interventionDataForm.repair_delay ?? ''}
+                                    onChange={(e) =>
+                                        setInterventionDataForm((prev) => ({
+                                            ...prev,
+                                            repair_delay: e.target.value,
+                                        }))
+                                    }
+                                />
+                                <Button
+                                    variant={'outline'}
+                                    type="button"
+                                    onClick={() =>
+                                        setInterventionDataForm((prev) => ({
+                                            ...prev,
+                                            repair_delay: null,
+                                        }))
+                                    }
+                                >
+                                    Clear Repair delay
+                                </Button>
+                            </div>
+                            <Button type="submit">Submit</Button>
+                            <Button onClick={closeModale} type="button" variant={'secondary'}>
+                                Cancel
+                            </Button>
+                        </form>
+                    )}
+                </ModaleForm>
             )}
         </AppLayout>
     );

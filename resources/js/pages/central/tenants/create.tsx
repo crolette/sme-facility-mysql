@@ -1,5 +1,6 @@
 import { AddressForm } from '@/components/addressForm';
 import InputError from '@/components/input-error';
+import ModaleForm from '@/components/ModaleForm';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -82,7 +83,7 @@ export default function CreateTenant({ company }: { company?: Tenant }) {
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
         setIsProcessing(true);
-        
+
         if (company) {
             try {
                 const response = await axios.patch(route('central.tenants.update', company.id), data, {
@@ -92,7 +93,7 @@ export default function CreateTenant({ company }: { company?: Tenant }) {
                         Accept: 'application/json',
                     },
                 });
-                if (response.data.status === 'success') {  
+                if (response.data.status === 'success') {
                     setIsProcessing(false);
                     showToast(response.data.message, response.data.type);
                 }
@@ -100,7 +101,6 @@ export default function CreateTenant({ company }: { company?: Tenant }) {
                 setIsProcessing(false);
                 showToast(error.response.data.message, error.response.data.type);
             }
-            
         } else {
             try {
                 const response = await axios.post(route('central.tenants.store'), data);
@@ -113,9 +113,7 @@ export default function CreateTenant({ company }: { company?: Tenant }) {
                 console.log(error);
                 setIsProcessing(false);
                 showToast(error.response.data.message, error.response.data.type);
-                
             }
-            
         }
     };
 
@@ -278,17 +276,13 @@ export default function CreateTenant({ company }: { company?: Tenant }) {
                 </form>
             </div>
             {isProcessing && (
-                <div className="bg-background/50 fixed inset-0 z-50">
-                    <div className="bg-background/20 flex h-dvh items-center justify-center">
-                        <div className="bg-background flex items-center justify-center p-4 text-center md:w-1/3">
-                            <div className="flex flex-col items-center gap-4">
-                                <Loader size={48} className="animate-pulse" />
-                                <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
-                                <p className="mx-auto">Tenant is being created...</p>
-                            </div>
-                        </div>
+                <ModaleForm>
+                    <div className="flex flex-col items-center gap-4">
+                        <Loader size={48} className="animate-pulse" />
+                        <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
+                        <p className="mx-auto">Tenant is being created...</p>
                     </div>
-                </div>
+                </ModaleForm>
             )}
         </AppLayout>
     );

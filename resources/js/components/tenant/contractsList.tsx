@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Loader, Pencil, PlusCircle, Trash2, Unlink } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Modale from '../Modale';
+import ModaleForm from '../ModaleForm';
 import { PaginationAPI } from '../pagination_api';
 import SearchableInput from '../SearchableInput';
 import { useToast } from '../ToastrContext';
@@ -234,36 +235,31 @@ export const ContractsList = ({
                     }}
                 />
                 {addExistingContractModale && (
-                    <div className="bg-background/50 fixed inset-0 z-50">
-                        <div className="bg-background/20 flex h-dvh items-center justify-center">
-                            <div className="bg-background flex flex-col items-center justify-center gap-4 p-4 text-center md:max-w-1/3">
-                                <p>Add Existing contract</p>
-                                <SearchableInput<Contract>
-                                    multiple={true}
-                                    searchUrl={route('api.contracts.search')}
-                                    selectedItems={existingContracts}
-                                    getDisplayText={(contract) => contract.name}
-                                    getKey={(contract) => contract.id}
-                                    onSelect={(contracts) => {
-                                        setExistingContracts(contracts);
-                                    }}
-                                    placeholder="Search contracts..."
-                                />
-                                <div className="flex gap-4">
-                                    <Button
-                                        variant="secondary"
-                                        onClick={() => {
-                                            setAddExistingContractModale(false);
-                                            // setExistingContracts(contracts);
-                                        }}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button onClick={addExistingContractToAsset}>Add contract</Button>
-                                </div>
-                            </div>
+                    <ModaleForm title={'Add Existing contract'}>
+                        <SearchableInput<Contract>
+                            multiple={true}
+                            searchUrl={route('api.contracts.search')}
+                            selectedItems={existingContracts}
+                            getDisplayText={(contract) => contract.name}
+                            getKey={(contract) => contract.id}
+                            onSelect={(contracts) => {
+                                setExistingContracts(contracts);
+                            }}
+                            placeholder="Search contracts..."
+                        />
+                        <div className="flex gap-4">
+                            <Button
+                                variant="secondary"
+                                onClick={() => {
+                                    setAddExistingContractModale(false);
+                                    // setExistingContracts(contracts);
+                                }}
+                            >
+                                Cancel
+                            </Button>
+                            <Button onClick={addExistingContractToAsset}>Add contract</Button>
                         </div>
-                    </div>
+                    </ModaleForm>
                 )}
             </div>
         </>

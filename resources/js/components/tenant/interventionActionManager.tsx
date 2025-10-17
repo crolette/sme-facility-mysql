@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Pencil, PlusCircle, Trash2 } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import Modale from '../Modale';
+import ModaleForm from '../ModaleForm';
 import { useToast } from '../ToastrContext';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -269,75 +270,80 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                 }}
             />
             {addInterventionAction && (
-                <div className="bg-background/50 fixed inset-0 z-50">
-                    <div className="bg-background/20 flex h-dvh items-center justify-center">
-                        <div className="bg-background flex items-center justify-center p-4">
-                            <form
-                                onSubmit={submitType === 'new' ? submitInterventionAction : submitEditInterventionAction}
-                                className="flex flex-col space-y-2"
+                <ModaleForm title={'Add new action'}>
+                    <form
+                        onSubmit={submitType === 'new' ? submitInterventionAction : submitEditInterventionAction}
+                        className="flex flex-col space-y-4"
+                    >
+                        <div className="flex flex-col gap-2 space-y-2">
+                            <Label>Action Type</Label>
+                            <select
+                                name="action_type"
+                                id="intervention_type"
+                                required
+                                value={interventionActionDataForm.action_type_id ?? ''}
+                                onChange={(e) =>
+                                    setInterventionActionDataForm((prev) => ({
+                                        ...prev,
+                                        action_type_id: parseInt(e.target.value),
+                                    }))
+                                }
                             >
-                                <Label>Action Type</Label>
-                                <select
-                                    name="action_type"
-                                    id="intervention_type"
-                                    required
-                                    value={interventionActionDataForm.action_type_id ?? ''}
-                                    onChange={(e) =>
-                                        setInterventionActionDataForm((prev) => ({
-                                            ...prev,
-                                            action_type_id: parseInt(e.target.value),
-                                        }))
-                                    }
-                                >
-                                    <option value="">Select action type</option>
-                                    {interventionActionTypes?.map((interventionActionType) => (
-                                        <option key={interventionActionType.id} value={interventionActionType.id}>
-                                            {interventionActionType.label}
-                                        </option>
-                                    ))}
-                                </select>
-
-                                <Label>Description</Label>
-                                <Textarea
-                                    placeholder="description"
-                                    value={interventionActionDataForm.description ?? ''}
-                                    onChange={(e) =>
-                                        setInterventionActionDataForm((prev) => ({
-                                            ...prev,
-                                            description: e.target.value,
-                                        }))
-                                    }
-                                ></Textarea>
-                                {!closed && (
-                                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                        <h5>Pictures</h5>
-                                        <Input
-                                            type="file"
-                                            multiple
-                                            onChange={(e) =>
-                                                setInterventionActionDataForm((prev) => ({
-                                                    ...prev,
-                                                    pictures: e.target.files,
-                                                }))
-                                            }
-                                            accept="image/png, image/jpeg, image/jpg"
-                                        />
-                                    </div>
-                                )}
-                                <Label>Intervention costs</Label>
+                                <option value="">Select action type</option>
+                                {interventionActionTypes?.map((interventionActionType) => (
+                                    <option key={interventionActionType.id} value={interventionActionType.id}>
+                                        {interventionActionType.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Description</Label>
+                            <Textarea
+                                placeholder="description"
+                                value={interventionActionDataForm.description ?? ''}
+                                onChange={(e) =>
+                                    setInterventionActionDataForm((prev) => ({
+                                        ...prev,
+                                        description: e.target.value,
+                                    }))
+                                }
+                            ></Textarea>
+                        </div>
+                        {!closed && (
+                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                                <h5>Pictures</h5>
                                 <Input
-                                    type="number"
-                                    step="0.01"
-                                    min="0"
-                                    value={interventionActionDataForm.intervention_costs ?? ''}
+                                    type="file"
+                                    multiple
                                     onChange={(e) =>
                                         setInterventionActionDataForm((prev) => ({
                                             ...prev,
-                                            intervention_costs: parseFloat(e.target.value),
+                                            pictures: e.target.files,
                                         }))
                                     }
+                                    accept="image/png, image/jpeg, image/jpg"
                                 />
-                                <Label>Intervention date</Label>
+                            </div>
+                        )}
+                        <div className="space-y-2">
+                            <Label>Intervention costs</Label>
+                            <Input
+                                type="number"
+                                step="0.01"
+                                min="0"
+                                value={interventionActionDataForm.intervention_costs ?? ''}
+                                onChange={(e) =>
+                                    setInterventionActionDataForm((prev) => ({
+                                        ...prev,
+                                        intervention_costs: parseFloat(e.target.value),
+                                    }))
+                                }
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Intervention date</Label>
+                            <div className="flex flex-col gap-4 sm:flex-row">
                                 <Input
                                     type="date"
                                     value={interventionActionDataForm.intervention_date ?? ''}
@@ -348,9 +354,11 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                                         }))
                                     }
                                 />
+
                                 <Button
                                     variant={'outline'}
                                     type="button"
+                                    className="w-full"
                                     onClick={() =>
                                         setInterventionActionDataForm((prev) => ({
                                             ...prev,
@@ -360,7 +368,11 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                                 >
                                     Clear planned at
                                 </Button>
-                                <Label>Started at</Label>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Started at</Label>
+                            <div className="flex flex-col gap-4 sm:flex-row">
                                 <Input
                                     type="time"
                                     value={interventionActionDataForm.started_at ?? ''}
@@ -374,6 +386,7 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                                 <Button
                                     variant={'outline'}
                                     type="button"
+                                    className="w-full"
                                     onClick={() =>
                                         setInterventionActionDataForm((prev) => ({
                                             ...prev,
@@ -383,7 +396,11 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                                 >
                                     Clear Started at
                                 </Button>
-                                <Label>Finished at</Label>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Finished at</Label>
+                            <div className="flex flex-col gap-4 sm:flex-row">
                                 <Input
                                     type="time"
                                     value={interventionActionDataForm.finished_at ?? ''}
@@ -397,6 +414,7 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                                 <Button
                                     variant={'outline'}
                                     type="button"
+                                    className="w-full"
                                     onClick={() =>
                                         setInterventionActionDataForm((prev) => ({
                                             ...prev,
@@ -406,14 +424,16 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                                 >
                                     Clear finished at
                                 </Button>
-                                <Button type="submit">Submit</Button>
-                                <Button onClick={cancelModale} type="button">
-                                    Cancel
-                                </Button>
-                            </form>
+                            </div>
                         </div>
-                    </div>
-                </div>
+                        <div className="flex gap-4">
+                            <Button type="submit">Submit</Button>
+                            <Button onClick={cancelModale} type="button" variant={'outline'}>
+                                Cancel
+                            </Button>
+                        </div>
+                    </form>
+                </ModaleForm>
             )}
         </>
     );

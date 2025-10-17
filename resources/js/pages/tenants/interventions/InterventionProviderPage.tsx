@@ -1,10 +1,10 @@
 import InputError from '@/components/input-error';
+import ModaleForm from '@/components/ModaleForm';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, CentralType, Intervention, InterventionAction, Ticket } from '@/types';
+import { CentralType, Intervention, InterventionAction } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { BadgeAlert, BadgeCheck, Loader } from 'lucide-react';
@@ -20,56 +20,66 @@ type InterventionFormData = {
     finished_at: null | string;
     intervention_costs: null | number;
     creator_email: null | string;
-    pictures: FileList | null
+    pictures: FileList | null;
 };
 
-export default function InterventionProviderPage({ intervention, email, actionTypes, query, pastInterventions }: { intervention: Intervention; email: string; actionTypes: CentralType[]; query: string; pastInterventions: Intervention[] }) {
+export default function InterventionProviderPage({
+    intervention,
+    email,
+    actionTypes,
+    query,
+    pastInterventions,
+}: {
+    intervention: Intervention;
+    email: string;
+    actionTypes: CentralType[];
+    query: string;
+    pastInterventions: Intervention[];
+}) {
+    const [errors, setErrors] = useState<{ [key: string]: string }>();
+    const [isProcessing, setIsProcessing] = useState(false);
+    const [showSuccessModale, setShowSuccessModale] = useState<boolean>(false);
+    const [showErrorModale, setShowErrorModale] = useState<boolean>(false);
 
-     const [errors, setErrors] = useState<{ [key: string]: string }>();
-     const [isProcessing, setIsProcessing] = useState(false);
-     const [showSuccessModale, setShowSuccessModale] = useState<boolean>(false);
-     const [showErrorModale, setShowErrorModale] = useState<boolean>(false);
+    const { data, setData } = useForm<InterventionFormData>({
+        action_id: null,
+        intervention_id: intervention.id,
+        action_type_id: null,
+        description: null,
+        intervention_date: Date.now().toString(),
+        started_at: null,
+        finished_at: null,
+        intervention_costs: null,
+        creator_email: email,
+        pictures: [],
+    });
 
-    const { data, setData } = useForm<InterventionFormData>(
-        {
-         action_id: null,
-    intervention_id: intervention.id,
-    action_type_id: null,
-    description: null,
-    intervention_date: Date.now().toString(),
-    started_at: null,
-    finished_at: null,
-    intervention_costs: null,
-            creator_email: email,
-    pictures: []
-    })
+    const submitInterventionAction: FormEventHandler = async (e) => {
+        e.preventDefault();
+        setIsProcessing(true);
+        const url = route('tenant.intervention.provider.store', intervention.id) + '?' + query;
 
-       const submitInterventionAction: FormEventHandler = async (e) => {
-           e.preventDefault();
-           setIsProcessing(true);
-           const url = route('tenant.intervention.provider.store', intervention.id) + '?' + query
-
-           try {
-               const response = await axios.post(url, data, {
-                   headers: {
-                       'Content-Type': 'multipart/form-data',
-                   },
-               });
-               if (response.data.status === 'success') {
-                   //    closeModale();
-                   console.log(response);
-                   setIsProcessing(false);
-                   setShowSuccessModale(true);
-               }
-           } catch (error) {
-               console.error(error);
-               setErrors(error.response.data.errors);
-               setIsProcessing(false);
-               setShowErrorModale(true);
-           }
-       };
+        try {
+            const response = await axios.post(url, data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            if (response.data.status === 'success') {
+                //    closeModale();
+                console.log(response);
+                setIsProcessing(false);
+                setShowSuccessModale(true);
+            }
+        } catch (error) {
+            console.error(error);
+            setErrors(error.response.data.errors);
+            setIsProcessing(false);
+            setShowErrorModale(true);
+        }
+    };
     console.log(data);
-    
+
     return (
         <>
             <Head title="Intervention Ticket" />
@@ -164,9 +174,7 @@ export default function InterventionProviderPage({ intervention, email, actionTy
                                     <Input
                                         type="file"
                                         multiple
-                                        onChange={(e) =>
-                                            setData("pictures", e.target.files)
-                                        }
+                                        onChange={(e) => setData('pictures', e.target.files)}
                                         accept="image/png, image/jpeg, image/jpg"
                                     />
                                 </div>
@@ -201,53 +209,41 @@ export default function InterventionProviderPage({ intervention, email, actionTy
                 </div>
             </div>
             {showSuccessModale && (
-                <div className="bg-background/50 fixed inset-0 z-50">
-                    <div className="bg-background/20 flex h-dvh items-center justify-center">
-                        <div className="bg-background flex items-center justify-center p-4 text-center md:w-1/3">
-                            <div className="flex flex-col items-center gap-4">
-                                <BadgeCheck size={48} className="text-chart-2" />
-                                <p className="text-chart-2 mx-auto text-3xl font-bold">Thank you</p>
-                                <p className="mx-auto">Intervention submitted</p>
-                                <p className="mx-auto">You can now close this window.</p>
-                                <div className="mx-auto flex gap-4"></div>
-                            </div>
-                        </div>
+                <ModaleForm>
+                    <div className="flex flex-col items-center gap-4">
+                        <BadgeCheck size={48} className="text-chart-2" />
+                        <p className="text-chart-2 mx-auto text-3xl font-bold">Thank you</p>
+                        <p className="mx-auto">Intervention submitted</p>
+                        <p className="mx-auto">You can now close this window.</p>
+                        <div className="mx-auto flex gap-4"></div>
                     </div>
-                </div>
+                </ModaleForm>
             )}
             {showErrorModale && (
-                <div className="bg-background/50 fixed inset-0 z-50">
-                    <div className="bg-background/20 flex h-dvh items-center justify-center">
-                        <div className="bg-background flex items-center justify-center p-4 text-center md:w-1/3">
-                            <div className="flex flex-col items-center gap-4">
-                                <BadgeAlert size={48} className="text-destructive" />
-                                <p className="text-destructive mx-auto text-3xl font-bold">Error</p>
-                                <p className="mx-auto">Error while submitting. Try again</p>
-                                <div className="mx-auto flex gap-4">
-                                    <Button variant={'secondary'} onClick={() => setShowErrorModale(false)}>
-                                        Close
-                                    </Button>
-                                </div>
-                            </div>
+                <ModaleForm>
+                    <div className="flex flex-col items-center gap-4">
+                        <BadgeAlert size={48} className="text-destructive" />
+                        <p className="text-destructive mx-auto text-3xl font-bold">Error</p>
+                        <p className="mx-auto">Error while submitting. Try again</p>
+                        <div className="mx-auto flex gap-4">
+                            <Button variant={'secondary'} onClick={() => setShowErrorModale(false)}>
+                                Close
+                            </Button>
                         </div>
                     </div>
-                </div>
+                </ModaleForm>
             )}
 
             {isProcessing && (
-                <div className="bg-background/50 fixed inset-0 z-50">
-                    <div className="bg-background/20 flex h-dvh items-center justify-center">
-                        <div className="bg-background flex items-center justify-center p-4 text-center md:w-1/3">
-                            <div className="flex flex-col items-center gap-4">
-                                <Loader size={48} className="animate-pulse" />
-                                <p className="mx-auto animate-pulse text-3xl font-bold">
-                                    Processing<span>...</span>
-                                </p>
-                                <p className="mx-auto">Intervention is being submitted...</p>
-                            </div>
-                        </div>
+                <ModaleForm>
+                    <div className="flex flex-col items-center gap-4">
+                        <Loader size={48} className="animate-pulse" />
+                        <p className="mx-auto animate-pulse text-3xl font-bold">
+                            Processing<span>...</span>
+                        </p>
+                        <p className="mx-auto">Intervention is being submitted...</p>
                     </div>
-                </div>
+                </ModaleForm>
             )}
         </>
     );

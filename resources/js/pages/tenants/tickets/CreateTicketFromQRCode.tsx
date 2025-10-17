@@ -1,10 +1,11 @@
 import InputError from '@/components/input-error';
+import ModaleForm from '@/components/ModaleForm';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Asset, TenantBuilding, TenantFloor, TenantRoom, TenantSite, Ticket } from '@/types';
+import { Asset, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from '@/types';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
 import { BadgeAlert, BadgeCheck, Loader } from 'lucide-react';
@@ -21,8 +22,13 @@ type FormDataTicket = {
     website: string;
 };
 
-export default function CreateTicketFromQRCode({ item, location_type }: { item: Asset | TenantSite | TenantBuilding | TenantFloor | TenantRoom; location_type: string }) {
-
+export default function CreateTicketFromQRCode({
+    item,
+    location_type,
+}: {
+    item: Asset | TenantSite | TenantBuilding | TenantFloor | TenantRoom;
+    location_type: string;
+}) {
     const updateTicketData = {
         website: '',
         ticket_id: null,
@@ -37,7 +43,7 @@ export default function CreateTicketFromQRCode({ item, location_type }: { item: 
     const [newTicketData, setNewTicketData] = useState<FormDataTicket>(updateTicketData);
 
     const submitTicket: FormEventHandler = async (e) => {
-         setIsProcessing(true);
+        setIsProcessing(true);
         e.preventDefault();
         try {
             const response = await axios.post(route('api.tickets.store'), newTicketData, {
@@ -66,8 +72,8 @@ export default function CreateTicketFromQRCode({ item, location_type }: { item: 
     return (
         <>
             <Head title="Tickets" />
-            <div className="bg-accent flex h-svh items-center justify-center">
-                <div className="border-sidebar-border bg-sidebar mx-auto flex w-1/2 flex-col rounded-md border p-4 shadow-xl">
+            <div className="bg-accent flex items-center justify-center">
+                <div className="border-sidebar-border bg-sidebar mx-auto flex w-10/12 flex-col rounded-md border p-4 shadow-xl md:w-1/2">
                     <h1>Create new ticket</h1>
                     <div className="my-4">
                         <h3>{item.name}</h3>
@@ -159,57 +165,45 @@ export default function CreateTicketFromQRCode({ item, location_type }: { item: 
                     </form>
                 </div>
                 {showSuccessModale && (
-                    <div className="bg-background/50 fixed inset-0 z-50">
-                        <div className="bg-background/20 flex h-dvh items-center justify-center">
-                            <div className="bg-background flex items-center justify-center p-4 text-center md:w-1/3">
-                                <div className="flex flex-col items-center gap-4">
-                                    <BadgeCheck size={48} className="text-chart-2" />
-                                    <p className="text-chart-2 mx-auto text-3xl font-bold">Thank you</p>
-                                    <p className="mx-auto">Ticket submitted</p>
-                                    <p className="mx-auto">You can now close this window.</p>
-                                    <div className="mx-auto flex gap-4">
-                                        {/* <Button variant={'secondary'} onClick={onCancel}>
+                    <ModaleForm>
+                        <div className="flex flex-col items-center gap-4">
+                            <BadgeCheck size={48} className="text-chart-2" />
+                            <p className="text-chart-2 mx-auto text-3xl font-bold">Thank you</p>
+                            <p className="mx-auto">Ticket submitted</p>
+                            <p className="mx-auto">You can now close this window.</p>
+                            <div className="mx-auto flex gap-4">
+                                {/* <Button variant={'secondary'} onClick={onCancel}>
                                         Close
                                     </Button> */}
-                                    </div>
-                                </div>
                             </div>
                         </div>
-                    </div>
+                    </ModaleForm>
                 )}
                 {showErrorModale && (
-                    <div className="bg-background/50 fixed inset-0 z-50">
-                        <div className="bg-background/20 flex h-dvh items-center justify-center">
-                            <div className="bg-background flex items-center justify-center p-4 text-center md:w-1/3">
-                                <div className="flex flex-col items-center gap-4">
-                                    <BadgeAlert size={48} className="text-destructive" />
-                                    <p className="text-destructive mx-auto text-3xl font-bold">Error</p>
-                                    <p className="mx-auto">Error while submitting. Try again</p>
-                                    <div className="mx-auto flex gap-4">
-                                        <Button variant={'secondary'} onClick={() => setShowErrorModale(false)}>
-                                            Close
-                                        </Button>
-                                    </div>
-                                </div>
+                    <ModaleForm>
+                        <div className="flex flex-col items-center gap-4">
+                            <BadgeAlert size={48} className="text-destructive" />
+                            <p className="text-destructive mx-auto text-3xl font-bold">Error</p>
+                            <p className="mx-auto">Error while submitting. Try again</p>
+                            <div className="mx-auto flex gap-4">
+                                <Button variant={'secondary'} onClick={() => setShowErrorModale(false)}>
+                                    Close
+                                </Button>
                             </div>
                         </div>
-                    </div>
+                    </ModaleForm>
                 )}
 
                 {isProcessing && (
-                    <div className="bg-background/50 fixed inset-0 z-50">
-                        <div className="bg-background/20 flex h-dvh items-center justify-center">
-                            <div className="bg-background flex items-center justify-center p-4 text-center md:w-1/3">
-                                <div className="flex flex-col items-center gap-4">
-                                    <Loader size={48} className="animate-pulse" />
-                                    <p className="mx-auto animate-pulse text-3xl font-bold">
-                                        Processing<span>...</span>
-                                    </p>
-                                    <p className="mx-auto">Ticket is being submitted...</p>
-                                </div>
-                            </div>
+                    <ModaleForm>
+                        <div className="flex flex-col items-center gap-4">
+                            <Loader size={48} className="animate-pulse" />
+                            <p className="mx-auto animate-pulse text-3xl font-bold">
+                                Processing<span>...</span>
+                            </p>
+                            <p className="mx-auto">Ticket is being submitted...</p>
                         </div>
-                    </div>
+                    </ModaleForm>
                 )}
             </div>
         </>

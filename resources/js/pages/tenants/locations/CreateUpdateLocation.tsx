@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import InputError from '@/components/input-error';
+import ModaleForm from '@/components/ModaleForm';
 import SearchableInput from '@/components/SearchableInput';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -107,8 +108,8 @@ export default function CreateUpdateLocation({
             href: '/locations/create',
         },
     ];
-const [isProcessing, setIsProcessing] = useState<boolean>(false);
-   const [existingContracts, setExistingContracts] = useState<Contract[]>([]);
+    const [isProcessing, setIsProcessing] = useState<boolean>(false);
+    const [existingContracts, setExistingContracts] = useState<Contract[]>([]);
     const [existingDocuments, setExistingDocuments] = useState<Document[]>([]);
     const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
     const { data, setData } = useForm<TypeFormData>({
@@ -137,8 +138,8 @@ const [isProcessing, setIsProcessing] = useState<boolean>(false);
         last_maintenance_date: location?.maintainable.last_maintenance_date ?? '',
         providers: [],
         contracts: [],
-            existing_contracts: [],
-    existing_documents: [],
+        existing_contracts: [],
+        existing_documents: [],
         address: location?.address ?? '',
     });
     const [errors, setErrors] = useState({});
@@ -227,7 +228,7 @@ const [isProcessing, setIsProcessing] = useState<boolean>(false);
             return files;
         });
     };
-    const todayDate = location ? '': new Date().toISOString().split('T')[0];
+    const todayDate = location ? '' : new Date().toISOString().split('T')[0];
 
     const addFileModalForm = () => {
         return (
@@ -354,7 +355,6 @@ const [isProcessing, setIsProcessing] = useState<boolean>(false);
         setCountContracts((prev) => prev - 1);
     };
 
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Create location type`} />
@@ -365,7 +365,7 @@ const [isProcessing, setIsProcessing] = useState<boolean>(false);
                         <p>Location Code: {location.code} </p>
                     </div>
                 )}
-                <form onSubmit={submit} className='flex flex-col gap-4'>
+                <form onSubmit={submit} className="flex flex-col gap-4">
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                         <h5>Location</h5>
                         {levelTypes && (
@@ -1066,18 +1066,14 @@ const [isProcessing, setIsProcessing] = useState<boolean>(false);
                 </form>
                 {showFileModal && addFileModalForm()}
                 {isProcessing && (
-                                    <div className="bg-background/50 fixed inset-0 z-50">
-                                        <div className="bg-background/20 flex h-dvh items-center justify-center">
-                                            <div className="bg-background flex items-center justify-center p-10">
-                                                    <div className="flex flex-col items-center gap-4">
-                                                        <Loader size={48} className="animate-pulse" />
-                                                        <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
-                                                        <p className="mx-auto">{routeName} is being created...</p>
-                                                    </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
+                    <ModaleForm>
+                        <div className="flex flex-col items-center gap-4">
+                            <Loader size={48} className="animate-pulse" />
+                            <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
+                            <p className="mx-auto">{routeName} is being created...</p>
+                        </div>
+                    </ModaleForm>
+                )}
             </div>
         </AppLayout>
     );
