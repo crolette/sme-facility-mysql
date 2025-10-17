@@ -9,7 +9,7 @@ import { Asset, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from '@/ty
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
 import { BadgeAlert, BadgeCheck, Camera, Folder, Loader } from 'lucide-react';
-import { FormEventHandler, useRef, useState } from 'react';
+import { FormEventHandler, useEffect, useRef, useState } from 'react';
 
 type FormDataTicket = {
     ticket_id: number | null;
@@ -71,8 +71,15 @@ export default function CreateTicketFromQRCode({
     const [isProcessing, setIsProcessing] = useState(false);
     const [showSuccessModale, setShowSuccessModale] = useState<boolean>(false);
     const [showErrorModale, setShowErrorModale] = useState<boolean>(false);
+    const [previewUrls, setpreviewUrls] = useState(null);
 
     console.log(newTicketData);
+
+    useEffect(() => {
+        setpreviewUrls(Array.from(newTicketData.pictures).map((file) => ({ url: URL.createObjectURL(file), name: file.name })));
+    }, [newTicketData.pictures]);
+
+    console.log(previewUrls);
 
     return (
         <>
@@ -135,6 +142,7 @@ export default function CreateTicketFromQRCode({
                         <InputError message={errors?.description} />
 
                         <Label htmlFor="pictures">Pictures</Label>
+
                         <div className="grid grid-cols-2 gap-4 sm:grid-cols-1">
                             <div
                                 className="bg-border space-y-3 rounded-md border-2 p-4 text-center sm:hidden"
@@ -160,13 +168,13 @@ export default function CreateTicketFromQRCode({
 
                             <div
                                 className="bg-border space-y-3 rounded-md border-2 p-4 text-center"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    fileCameraRef.current?.click();
+                                onClick={() => {
+                                    fileInputRef.current?.click();
                                 }}
                             >
                                 <p>Upload a picture from my phone</p>
                                 <Folder className="mx-auto" />
+                                <p className="text-xs italic">Maximum 3 pictures</p>
                                 <Input
                                     ref={fileInputRef}
                                     id="pictures"
@@ -184,6 +192,14 @@ export default function CreateTicketFromQRCode({
                                     }}
                                 />
                             </div>
+                        </div>
+                        <div className="pointer-events-none flex flex-wrap items-center justify-evenly gap-2">
+                            {previewUrls &&
+                                previewUrls.map((preview, index) => (
+                                    <div className="max-w-1/4" key={index}>
+                                        <img src={preview.url} alt="Aperçu" className="mx-auto aspect-square max-h-40 rounded object-cover" />
+                                    </div>
+                                ))}
                         </div>
 
                         <InputError message={errors?.pictures} />
