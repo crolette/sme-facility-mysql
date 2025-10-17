@@ -3,7 +3,13 @@
 namespace App\Http\Requests\Tenant;
 
 use App\Enums\PriorityLevel;
+use App\Models\Tenants\Room;
+use App\Models\Tenants\Site;
+use App\Models\Tenants\Asset;
+use App\Models\Tenants\Floor;
+use App\Models\Tenants\Ticket;
 use Illuminate\Validation\Rule;
+use App\Models\Tenants\Building;
 use App\Enums\InterventionStatus;
 use App\Models\Central\CategoryType;
 use Illuminate\Foundation\Http\FormRequest;
@@ -39,8 +45,8 @@ class InterventionRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'repair_delay' => ['nullable', 'date', Rule::date()->afterOrEqual(today())],
             'total_costs' => ['nullable', 'numeric', 'decimal:0,2'],
-
-            'locationType' => ['nullable', 'required_without:ticket_id', 'in:sites,buildings,floors,rooms,asset'],
+            // 
+            'locationType' => ['nullable', 'required_without:ticket_id', $isUpdate ? Rule::in([Site::class, Building::class, Floor::class, Room::class, Asset::class, Ticket::class]) : 'in:sites,buildings,floors,rooms,asset'],
             'locationId' => ['nullable', 'required_without:ticket_id'],
 
             'ticket_id' => ['nullable', Rule::exists('tickets', 'id')],

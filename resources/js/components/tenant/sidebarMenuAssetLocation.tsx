@@ -1,7 +1,7 @@
-import { cn } from "@/lib/utils";
-import { ChevronDown } from "lucide-react";
-import { useState } from "react";
-import { Pill } from "../ui/pill";
+import { cn } from '@/lib/utils';
+import { ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+import { Pill } from '../ui/pill';
 
 interface InfosProps {
     name: string;
@@ -16,7 +16,7 @@ interface SideBarMenuProps {
     activeTab: string;
     setActiveTab: (tab: string) => void;
     menu?: keyof typeof MENUS;
-    infos: InfosProps
+    infos: InfosProps;
 }
 
 const MENUS = {
@@ -30,10 +30,10 @@ const MENUS = {
             tabDisplay: 'pictures',
         },
 
-        {
-            tabName: 'actions',
-            tabDisplay: 'actions',
-        },
+        // {
+        //     tabName: 'actions',
+        //     tabDisplay: 'actions',
+        // },
     ],
     user: [
         {
@@ -169,9 +169,7 @@ const MENUS = {
     ],
 };
 
-
-export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu = "asset", infos }: SideBarMenuProps) {
-
+export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu = 'asset', infos }: SideBarMenuProps) {
     const navSidebar = MENUS[menu];
 
     const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -202,7 +200,7 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
                     <ChevronDown />
                 </li>
                 {showMobileMenu && (
-                    <div className="bg-sidebar shadow-accent absolute w-full shadow-xl rounded-b-md">
+                    <div className="bg-sidebar shadow-accent absolute w-full rounded-b-md shadow-xl">
                         {navSidebar.map((nav, index) => (
                             <li
                                 key={index}

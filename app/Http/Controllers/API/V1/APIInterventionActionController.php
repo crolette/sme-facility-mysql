@@ -30,9 +30,7 @@ class APIInterventionActionController extends Controller
         protected InterventionActionService $interventionActionService,
         protected PictureService $pictureService,
 
-    ){
-        
-    }
+    ) {}
 
     public function index(Intervention $intervention)
     {
@@ -44,7 +42,7 @@ class APIInterventionActionController extends Controller
         try {
             DB::beginTransaction();
 
-             $interventionAction = $this->interventionActionService->create($intervention, $request->validated());
+            $interventionAction = $this->interventionActionService->create($intervention, $request->validated());
             // $action = new InterventionAction($request->validated());
 
             // $action->actionType()->associate($request->validated('action_type_id'));
@@ -76,6 +74,7 @@ class APIInterventionActionController extends Controller
 
             $action->update($request->safe()->except('created_by', 'creator_email', 'updated_by'));
             $action->updater()->associate($request->validated('updated_by'));
+            $action->actionType()->associate($request['action_type_id']);
             $action->save();
 
 

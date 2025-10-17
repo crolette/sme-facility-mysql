@@ -1,5 +1,4 @@
 import { Pill } from '@/components/ui/pill';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { Intervention, Maintainable, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
@@ -16,10 +15,14 @@ export default function TenantDashboard({
     counts,
     maintainables,
     interventions,
+    overdueMaintenances,
+    overdueInterventions,
 }: {
-    counts: { ticketsCount: number, assetsCount: number, interventionsCount: number };
+    counts: { ticketsCount: number; assetsCount: number; interventionsCount: number };
     maintainables: Maintainable[];
     interventions: Intervention[];
+    overdueMaintenances: Maintainable[];
+    overdueInterventions: Intervention[];
 }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -59,6 +62,52 @@ export default function TenantDashboard({
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative h-fit flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
+                        <h2>OVERDUE MAINTENANCES</h2>
+                        {overdueMaintenances && overdueMaintenances.length > 0 ? (
+                            <ul className="flex flex-col gap-2">
+                                {overdueMaintenances.map((maintainable) => (
+                                    <li key={maintainable.id} className="even:bg-sidebar odd:bg-secondary p-2">
+                                        <a href={maintainable.maintainable.location_route} className="!no-underline">
+                                            <p>
+                                                {maintainable.next_maintenance_date}- {maintainable.name}
+                                            </p>
+                                            <p className="text-sm">
+                                                ({maintainable.maintainable.reference_code}) - {maintainable.maintenance_frequency}
+                                            </p>
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No maintenance planned</p>
+                        )}
+                    </div>
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative h-fit flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
+                        <h2>OVERDUE MAINTENANCES</h2>
+                        {overdueInterventions && overdueInterventions.length > 0 ? (
+                            <ul className="flex flex-col gap-2">
+                                {overdueInterventions.map((intervention) => (
+                                    <li key={intervention.id} className="even:bg-sidebar odd:bg-secondary p-2">
+                                        <a href={intervention.interventionable.location_route} className="!no-underline">
+                                            <p>
+                                                {intervention.planned_at} - {intervention.interventionable.name}{' '}
+                                                <Pill variant={intervention.priority}>{intervention.priority}</Pill>
+                                            </p>
+                                            <p className="text-sm">
+                                                ({intervention.interventionable.reference_code}) - {intervention.status} -{' '}
+                                                {intervention.intervention_type.label}
+                                            </p>
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p>No interventions planned</p>
+                        )}
+                    </div>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative h-fit flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
                         <h2>Next maintenances</h2>
                         {maintainables && maintainables.length > 0 ? (
                             <ul className="flex flex-col gap-2">
@@ -66,7 +115,7 @@ export default function TenantDashboard({
                                     <li key={maintainable.id} className="even:bg-sidebar odd:bg-secondary p-2">
                                         <a href={maintainable.maintainable.location_route} className="!no-underline">
                                             <p>
-                                                        {maintainable.next_maintenance_date}- {maintainable.name}
+                                                {maintainable.next_maintenance_date}- {maintainable.name}
                                             </p>
                                             <p className="text-sm">
                                                 ({maintainable.maintainable.reference_code}) - {maintainable.maintenance_frequency}

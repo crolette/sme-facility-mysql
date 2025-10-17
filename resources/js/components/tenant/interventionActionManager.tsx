@@ -2,14 +2,14 @@ import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData
 import { CentralType, InterventionAction } from '@/types';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
+import { Pencil, PlusCircle, Trash2 } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
+import Modale from '../Modale';
+import { useToast } from '../ToastrContext';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 import { Textarea } from '../ui/textarea';
-import { useToast } from '../ToastrContext';
-import { Pencil, Plus, PlusCircle, Trash2 } from 'lucide-react';
-import Modale from '../Modale';
 
 interface InterventionActionManagerProps {
     interventionId: number;
@@ -34,7 +34,7 @@ type InterventionFormData = {
     created_by: null | number;
     creator_email: null | string;
     updated_by: null | number;
-    pictures: FileList | null
+    pictures: FileList | null;
 };
 
 export const InterventionActionManager = ({ interventionId, closed, actionsChanged }: InterventionActionManagerProps) => {
@@ -83,7 +83,7 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
         created_by: auth?.user ? auth.user.id : null,
         creator_email: null,
         updated_by: null,
-        pictures: []
+        pictures: [],
     };
 
     const [interventionActionDataForm, setInterventionActionDataForm] = useState<InterventionFormData>(interventionActionData);
@@ -120,11 +120,10 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
             });
             if (response.data.status === 'success') {
                 closeModale();
-               showToast(response.data.message, response.data.status);
+                showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            
-           showToast(error.response.data.message, error.response.data.status);
+            showToast(error.response.data.message, error.response.data.status);
         }
     };
 
@@ -151,9 +150,7 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
 
     const submitEditInterventionAction: FormEventHandler = async (e) => {
         e.preventDefault();
-        if (!interventionActionDataForm.action_id)
-            return;
-
+        if (!interventionActionDataForm.action_id) return;
 
         try {
             const response = await axios.patch(
@@ -161,9 +158,9 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                 interventionActionDataForm,
             );
             if (response.data.status === 'success') {
+                console.log('success');
                 closeModale();
                 showToast(response.data.message, response.data.status);
-
             }
         } catch (error) {
             showToast(error.response.data.message, error.response.data.status);
@@ -183,28 +180,26 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
     const [showDeleteActionModale, setShowDeleteActionModale] = useState<boolean>(false);
     const [actionToDelete, setActionToDelete] = useState<null | InterventionAction>(null);
     const deleteInterventionAction = async () => {
-        if (!actionToDelete)
-            return;
+        if (!actionToDelete) return;
 
-            
-            try {
-                const response = await axios.delete(route('api.interventions.actions.destroy', actionToDelete.id));
-                if (response.data.status === 'success') {
-                    fetchInterventionActions();
-                    showToast(response.data.message, response.data.status);
-                    setShowDeleteActionModale(false);
-                    setActionToDelete(null);
-                }
-            } catch (error) {
-                showToast(error.response.data.message, error.response.data.status);
+        try {
+            const response = await axios.delete(route('api.interventions.actions.destroy', actionToDelete.id));
+            if (response.data.status === 'success') {
+                fetchInterventionActions();
+                showToast(response.data.message, response.data.status);
+                setShowDeleteActionModale(false);
+                setActionToDelete(null);
             }
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
+        }
     };
 
     return (
         <>
             <ul className={'bg-secondary p-2'}>
                 <div className="flex items-center gap-4">
-                    <span className='font-semibold'>Actions ({interventionActions.length})</span>
+                    <span className="font-semibold">Actions ({interventionActions.length})</span>
                     {!closed && (
                         <Button onClick={openModale} size="xs" variant={'outline'}>
                             <PlusCircle />

@@ -276,7 +276,7 @@ it('can update an existing intervention', function () {
         'description' => 'New intervention description',
         'repair_delay' => Carbon::now()->add('month', 5),
         'locationId' => $this->room->reference_code,
-        'locationType' => 'rooms'
+        'locationType' => get_class($this->room)
     ];
 
     $response = $this->patchToTenant('api.interventions.update', $formData, $intervention);
@@ -309,7 +309,7 @@ it('can delete an intervention', function () {
 });
 
 
-it('can upload pictures when creating an intervention', function() {
+it('can upload pictures when creating an intervention', function () {
 
     $file1 = UploadedFile::fake()->image('file1.png');
     $file2 = UploadedFile::fake()->image('file2.jpg');
@@ -335,7 +335,7 @@ it('can upload pictures when creating an intervention', function() {
             'status' => 'success',
         ]);
 
-        $intervention = Intervention::first();
+    $intervention = Intervention::first();
 
     assertDatabaseCount('pictures', 2);
     assertDatabaseHas('pictures', [
