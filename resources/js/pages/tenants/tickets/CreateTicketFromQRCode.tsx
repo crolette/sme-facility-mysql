@@ -8,8 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Asset, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from '@/types';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
-import { BadgeAlert, BadgeCheck, Loader } from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
+import { BadgeAlert, BadgeCheck, Camera, Folder, Loader } from 'lucide-react';
+import { FormEventHandler, useRef, useState } from 'react';
 
 type FormDataTicket = {
     ticket_id: number | null;
@@ -40,6 +40,9 @@ export default function CreateTicketFromQRCode({
         pictures: [],
     };
 
+    const fileCameraRef = useRef(null);
+    const fileInputRef = useRef(null);
+
     const [newTicketData, setNewTicketData] = useState<FormDataTicket>(updateTicketData);
 
     const submitTicket: FormEventHandler = async (e) => {
@@ -68,6 +71,8 @@ export default function CreateTicketFromQRCode({
     const [isProcessing, setIsProcessing] = useState(false);
     const [showSuccessModale, setShowSuccessModale] = useState<boolean>(false);
     const [showErrorModale, setShowErrorModale] = useState<boolean>(false);
+
+    console.log(newTicketData);
 
     return (
         <>
@@ -128,21 +133,59 @@ export default function CreateTicketFromQRCode({
                             value={newTicketData.description}
                         />
                         <InputError message={errors?.description} />
+
                         <Label htmlFor="pictures">Pictures</Label>
-                        <Input
-                            id="pictures"
-                            type="file"
-                            name="pictures"
-                            multiple
-                            accept="image/png, image/jpeg, image/jpg"
-                            onChange={(e) => {
-                                // const pictures = { pictures: };
-                                setNewTicketData((prev) => ({
-                                    ...prev,
-                                    pictures: e.target.files,
-                                }));
-                            }}
-                        />
+                        <div className="grid grid-cols-2 gap-4 sm:grid-cols-1">
+                            <div
+                                className="bg-border space-y-3 rounded-md border-2 p-4 text-center sm:hidden"
+                                onClick={() => fileCameraRef.current?.click()}
+                            >
+                                <p>Take a picture with my camera</p>
+                                <Camera className="mx-auto" />
+                                <Input
+                                    ref={fileCameraRef}
+                                    type="file"
+                                    accept="image/*"
+                                    capture="user"
+                                    className="pointer-events-none hidden"
+                                    onChange={(e) => {
+                                        // const pictures = { pictures: };
+                                        setNewTicketData((prev) => ({
+                                            ...prev,
+                                            pictures: e.target.files,
+                                        }));
+                                    }}
+                                />
+                            </div>
+
+                            <div
+                                className="bg-border space-y-3 rounded-md border-2 p-4 text-center"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    fileCameraRef.current?.click();
+                                }}
+                            >
+                                <p>Upload a picture from my phone</p>
+                                <Folder className="mx-auto" />
+                                <Input
+                                    ref={fileInputRef}
+                                    id="pictures"
+                                    type="file"
+                                    name="pictures"
+                                    multiple
+                                    className="pointer-events-none hidden"
+                                    accept="image/png, image/jpeg, image/jpg"
+                                    onChange={(e) => {
+                                        // const pictures = { pictures: };
+                                        setNewTicketData((prev) => ({
+                                            ...prev,
+                                            pictures: e.target.files,
+                                        }));
+                                    }}
+                                />
+                            </div>
+                        </div>
+
                         <InputError message={errors?.pictures} />
                         <InputError message={errors ? Object.getOwnPropertyDescriptor(errors, 'pictures.0')?.value : ''} />
                         <InputError message={errors ? Object.getOwnPropertyDescriptor(errors, 'pictures.1')?.value : ''} />
