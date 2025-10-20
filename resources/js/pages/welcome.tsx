@@ -22,9 +22,9 @@ export default function Welcome() {
                     content="SME-Facility centralise la gestion de vos équipements, maintenances et contrats dans une application web simple et complète. Gagnez du temps et optimisez vos opérations."
                 />
             </Head>
-            <section className="bg-logo -mt-28 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
+            <section className="bg-logo text-website-card -mt-28 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
                 <div className="container mx-auto">
-                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:grid-cols-[2fr_1fr] md:gap-10 md:p-10 lg:max-w-11/12">
+                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:grid-cols-[2fr_1fr] md:gap-10 md:px-10 lg:max-w-11/12">
                         <div className="flex flex-col items-center justify-center gap-10">
                             <h1 className="">
                                 Le système de gestion de facility management
@@ -213,7 +213,7 @@ export default function Welcome() {
                                 <h3>
                                     Gérez{' '}
                                     <span className="block text-lg">
-                                        vos contrats et garanties et anticipez vos renouvellements et restez conforme.
+                                        vos contrats et garanties, et anticipez vos renouvellements et restez conforme.
                                     </span>
                                 </h3>
                                 <ul className="mt-5 ml-5 space-y-10">

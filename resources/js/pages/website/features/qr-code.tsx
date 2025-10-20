@@ -21,7 +21,7 @@ export default function FeaturesQrCode() {
                     content="Les QR codes SME-Facility permettent à tout utilisateur de créer un ticket instantanément. Le responsable reçoit la demande et planifie l’intervention en un clic."
                 />
             </Head>
-            <section className="bg-website-primary -mt-20 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
+            <section className="bg-website-primary text-website-card -mt-20 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
                 <div className="container">
                     <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-2 md:p-10">
                         <div className="flex flex-col justify-center gap-10 md:max-w-lg">

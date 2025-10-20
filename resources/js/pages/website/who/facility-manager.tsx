@@ -21,7 +21,7 @@ export default function WhoFacilityManager() {
                     content="Avec SME-Facility, les Facility Managers disposent d’un outil complet pour gérer le parc technique, automatiser la maintenance préventive et mesurer la performance opérationnelle."
                 />
             </Head>
-            <section className="bg-website-border -mt-28 flex min-h-screen w-full flex-col items-center justify-center py-20 md:-mt-38">
+            <section className="bg-website-border text-website-card -mt-28 flex min-h-screen w-full flex-col items-center justify-center py-20 md:-mt-38">
                 <div className="container mx-auto">
                     <div className="mx-auto grid h-full gap-10 px-4 py-20 md:grid-cols-[2fr_1fr] md:px-10 md:py-16 lg:max-w-11/12">
                         <div className="flex flex-col justify-center gap-10 md:max-w-lg">

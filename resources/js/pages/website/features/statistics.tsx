@@ -21,9 +21,9 @@ export default function FeaturesStatistics() {
                     content="Avec SME-Facility, suivez vos statistiques en temps réel : interventions effectuées, retards, temps moyens et répartition des maintenances. Prenez des décisions éclairées pour optimiser vos opérations."
                 />
             </Head>
-            <section className="bg-website-primary -mt-20 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
+            <section className="bg-website-primary text-website-card -mt-20 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
                 <div className="container">
-                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-2 md:p-10">
+                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-2 md:px-10">
                         <div className="flex flex-col justify-center gap-10 md:max-w-lg">
                             <h1 className="leading-16">
                                 Analysez, pilotez et <span className="font-extrabold">améliorez vos performances.</span>
