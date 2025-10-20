@@ -1070,7 +1070,7 @@ export default function CreateUpdateLocation({
                         <div className="flex flex-col items-center gap-4">
                             <Loader size={48} className="animate-pulse" />
                             <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
-                            <p className="mx-auto">{routeName} is being created...</p>
+                            <p className="mx-auto">{location ? `${routeName} is being updated...` : `${routeName} is being created...`}</p>
                         </div>
                     </ModaleForm>
                 )}

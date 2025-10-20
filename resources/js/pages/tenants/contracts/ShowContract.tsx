@@ -1,9 +1,9 @@
 import Modale from '@/components/Modale';
 import { DocumentManager } from '@/components/tenant/documentManager';
-import { DocumentsList } from '@/components/tenant/documentsList';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
+import Field from '@/components/ui/field';
 import AppLayout from '@/layouts/app-layout';
 import { Asset, BreadcrumbItem, Contract, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from '@/types';
 import { Head, router } from '@inertiajs/react';
@@ -35,9 +35,9 @@ export default function ShowContract({ item, objects }: { item: Contract; object
         }
     };
 
-     const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
+    const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
     const [activeTab, setActiveTab] = useState('information');
-    
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Contract" />
@@ -68,22 +68,24 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                 <h2>Contract information</h2>
-                                <div>
-                                    <p>Name: {contract.name}</p>
-                                    <p>Type: {contract.type}</p>
-                                    <p>Internal reference: {contract.internal_reference}</p>
-                                    <p>Status: {contract.status}</p>
-                                    <p>Renewal Type: {contract.renewal_type}</p>
-                                    <p>Start date: {contract.start_date}</p>
-                                    <p>Contract duration: {contract.contract_duration}</p>
-                                    <p>End date : {contract.end_date}</p>
-                                    <p>Notice period: {contract.notice_period}</p>
-                                    <p>Notice date: {contract.notice_date}</p>
-                                    <p>Notes: {contract.notes}</p>
-                                    <p>
-                                        Provider: <a href={route('tenant.providers.show', contract.provider_id)}>{contract.provider.name}</a>
-                                    </p>
-                                    <p>Provider reference: {contract.provider_reference}</p>
+                                <div className="space-y-2">
+                                    <Field label={'Name'} text={contract.name} />
+                                    <div className="flex flex-wrap gap-4">
+                                        <Field label={'Internal reference'} text={contract.internal_reference ?? 'NA'} />
+                                        {contract.provider_reference && <Field label={'Provider reference'} text={contract.provider_reference} />}
+                                    </div>
+                                    <Field label={'Renewal Type:'} text={contract.renewal_type} />
+                                    <div className="flex gap-4">
+                                        <Field label={'Start date:'} text={contract.start_date} />
+                                        <Field label={'Contract duration:'} text={contract.contract_duration} />
+
+                                        <Field label={'End date:'} text={contract.end_date} />
+                                    </div>
+                                    <div className="flex gap-4">
+                                        <Field label={'Notice period:'} text={contract.notice_period} />
+                                        <Field label={'Notice date:'} text={contract.notice_date} />
+                                    </div>
+                                    <Field label={'Notes:'} text={contract.notes} />
                                 </div>
                             </div>
                         )}

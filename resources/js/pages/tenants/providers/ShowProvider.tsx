@@ -5,6 +5,7 @@ import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocati
 import { UsersList } from '@/components/tenant/usersList';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
+import Field from '@/components/ui/field';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Provider } from '@/types';
 import { router } from '@inertiajs/core';
@@ -77,7 +78,7 @@ export default function ShowProvider({ item }: { item: Provider }) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Sites" />
+            <Head title={provider.name} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex gap-2">
                     <a href={route(`tenant.providers.edit`, provider.id)}>
@@ -111,16 +112,13 @@ export default function ShowProvider({ item }: { item: Provider }) {
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                 <h2>Provider information</h2>
-                                <div className="grid grid-cols-[1fr_160px] gap-4">
-                                    <div>
-                                        <p>Category : {provider.category}</p>
-                                        <p>Name : {provider.name}</p>
-                                        <p>Address : {provider.address}</p>
-                                        <p>Phone number : {provider.phone_number}</p>
-                                        <p>VAT Number : {provider.vat_number}</p>
-                                        <p>
-                                            Email :<a href={`mailto:${provider.email}`}>{provider.email}</a>
-                                        </p>
+                                <div className="grid gap-4 sm:grid-cols-[1fr_160px]">
+                                    <div className="space-y-2">
+                                        <Field label={'Name'} text={provider.name} />
+                                        <Field label={'Address'} text={provider.address} />
+                                        <Field label={'Phone number'} text={provider.phone_number} />
+                                        <Field label={'VAT Number'} text={provider.vat_number} />
+                                        <Field label={'Email'} text={<a href={`mailto:${provider.email}`}>{provider.email}</a>} />
                                     </div>
                                     <div className="shrink-1">
                                         {provider.logo && (
@@ -141,10 +139,12 @@ export default function ShowProvider({ item }: { item: Provider }) {
                         )}
 
                         {activeTab === 'contracts' && (
-                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
-                                <h2>Contracts</h2>
-                                <ContractsList items={provider.contracts ?? []} getUrl="api.providers.contracts" routeName="providers" />
-                            </div>
+                            <ContractsList
+                                getUrl="api.providers.contracts"
+                                routeName="providers"
+                                parameter="provider"
+                                contractableReference={provider.id}
+                            />
                         )}
 
                         {activeTab === 'users' && (

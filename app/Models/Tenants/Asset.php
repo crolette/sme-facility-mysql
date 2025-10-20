@@ -67,8 +67,8 @@ class Asset extends Model
         'is_mobile' => 'boolean',
         'depreciable' => 'boolean',
         'residual_value' => 'decimal:2',
-        'depreciation_start_date' => 'date:Y-m-d',
-        'depreciation_end_date' => 'date:Y-m-d',
+        'depreciation_start_date' => 'date:d-m-Y',
+        'depreciation_end_date' => 'date:d-m-Y',
     ];
 
     // Ensure route model binding use the slug instead of ID
@@ -201,7 +201,7 @@ class Asset extends Model
 
     public function getQRCodeForPdf(): Attribute
     {
-        if(!$this->qr_code) {
+        if (!$this->qr_code) {
             return Attribute::make(
                 get: fn() => ''
             );

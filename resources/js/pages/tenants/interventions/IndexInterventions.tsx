@@ -372,8 +372,8 @@ export default function IndexInterventions({
                                 return (
                                     <TableBodyRow key={index}>
                                         <TableBodyData className="">
-                                            <a href={route('tenant.interventions.show', item.id)}>
-                                                <p className="">{item.description}</p>
+                                            <a href={route('tenant.interventions.show', item.id)} className="flex w-40">
+                                                <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{item.description}</p>
                                             </a>
                                         </TableBodyData>
                                         <TableBodyData>{item.type}</TableBodyData>

@@ -3,11 +3,11 @@ import { PictureManager } from '@/components/tenant/pictureManager';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
+import Field from '@/components/ui/field';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Ticket } from '@/types';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
-import { EyeClosed } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ShowTicket({ item }: { item: Ticket }) {
@@ -18,7 +18,7 @@ export default function ShowTicket({ item }: { item: Ticket }) {
             title: `Index tickets`,
             href: `/tickets`,
         },
-        
+
         {
             title: `${ticket.code} -  ${ticket.ticketable.maintainable.name} - ${ticket.ticketable.reference_code}`,
             href: `/tickets/${ticket.id}`,
@@ -77,52 +77,44 @@ export default function ShowTicket({ item }: { item: Ticket }) {
                             levelName: ticket.ticketable.name + ' - ' + ticket.ticketable.reference_code,
                         }}
                     />
-                    <div className="overflow-hidden">
+                    <div className="space-y-4 overflow-hidden">
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h2>Ticket information</h2>
-                                <div>
-                                    <p>Code: {ticket.code}</p>
-                                    <p>Creation date: {ticket.created_at}</p>
-                                    <p>Status: {ticket.status}</p>
-                                    <p>Description : {ticket.description}</p>
-                                    <p>Reporter : {ticket.reporter ? ticket.reporter.full_name : ticket.reporter_email}</p>
-                                    <p>Closer: {ticket.closer?.full_name}</p>
-                                    <p>Asset/Location</p>
-                                    <p>Code: {ticket.ticketable.code}</p>
-                                    <p>Name: {ticket.ticketable.maintainable.name}</p>
-                                    <p>Location: {ticket.ticketable.reference_code}</p>
+                                <h2>Information</h2>
+                                <div className="space-y-2">
+                                    <Field label={'Description'} text={ticket.description} />
+
+                                    <div className="flex gap-2">
+                                        <Field label={'Reporter'} text={ticket.reporter ? ticket.reporter.full_name : ticket.reporter_email} />
+                                        <Field label={'Creation date'} text={ticket.created_at} />
+                                    </div>
+
+                                    <div className="flex flex-wrap gap-2">
+                                        {ticket.closer && <Field label={'Closer'} text={ticket.closer?.full_name} />}
+                                        <Field label={'Closed at'} text={ticket.closed_at} />
+                                    </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* <DocumentManager
+                        {/* {activeTab === 'pictures' && ( */}
+                        <PictureManager
                             itemCodeId={ticket.id}
-                            getDocumentsUrl={`api.tickets.documents`}
-                            editRoute={`api.documents.update`}
-                            uploadRoute={`api.tickets.documents.post`}
-                            deleteRoute={`api.documents.delete`}
-                            showRoute={'api.documents.show'}
-                        /> */}
-
-                        {activeTab === 'pictures' && (
-                            <PictureManager
-                                itemCodeId={ticket.id}
-                                getPicturesUrl={`api.tickets.pictures`}
-                                uploadRoute={`api.tickets.pictures.post`}
-                                deleteRoute={`api.pictures.delete`}
-                                showRoute={'api.pictures.show'}
-                                canAdd={ticket.status === 'closed' ? false : true}
-                            />
-                        )}
-                        {activeTab === 'interventions' && (
-                            <InterventionManager
-                                itemCodeId={ticket.id}
-                                getInterventionsUrl="api.tickets.interventions"
-                                type="ticket"
-                                closed={ticket.status === 'closed' ? true : false}
-                            />
-                        )}
+                            getPicturesUrl={`api.tickets.pictures`}
+                            uploadRoute={`api.tickets.pictures.post`}
+                            deleteRoute={`api.pictures.delete`}
+                            showRoute={'api.pictures.show'}
+                            canAdd={ticket.status === 'closed' ? false : true}
+                        />
+                        {/* )} */}
+                        {/* {activeTab === 'interventions' && ( */}
+                        <InterventionManager
+                            itemCodeId={ticket.id}
+                            getInterventionsUrl="api.tickets.interventions"
+                            type="ticket"
+                            closed={ticket.status === 'closed' ? true : false}
+                        />
+                        {/* )} */}
                     </div>
                 </div>
             </div>

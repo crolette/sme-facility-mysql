@@ -6,6 +6,7 @@ import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocati
 import { TicketManager } from '@/components/tenant/ticketManager';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
+import Field from '@/components/ui/field';
 import AppLayout from '@/layouts/app-layout';
 import { Asset, Contract, type BreadcrumbItem } from '@/types';
 import { router } from '@inertiajs/core';
@@ -159,14 +160,16 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                 <h2>Asset information</h2>
                                 <div className="grid grid-cols-[1fr_160px] gap-4">
-                                    <div>
-                                        <p>Category : {asset.category}</p>
-                                        <p>Name : {asset.name}</p>
-                                        <p>Description : {asset.description}</p>
-                                        <p>Brand : {asset.brand}</p>
-                                        <p>Model : {asset.model}</p>
-                                        <p>Serial number : {asset.serial_number}</p>
-                                        <p>Surface : {asset.surface}</p>
+                                    <div className="space-y-2">
+                                        <Field label={'Name'} text={asset.name} />
+                                        <Field label={'category'} text={asset.category} />
+                                        <Field label={'Description'} text={asset.description} />
+                                        <div className="flex flex-wrap gap-4">
+                                            {asset.brand && <Field label={'Brand'} text={asset.brand} />}
+                                            {asset.model && <Field label={'model'} text={asset.model} />}
+                                            {asset.serial_number && <Field label={'Serial number'} text={asset.serial_number} />}
+                                        </div>
+                                        {asset.surface && <Field label={'Surface'} text={asset.surface} />}
                                     </div>
                                     <div className="shrink-1">
                                         {asset.qr_code && (
@@ -188,36 +191,41 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             <>
                                 <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
                                     <h2>Maintenance</h2>
-                                    <div>
-                                        <p>
-                                            Maintenance manager:
-                                            {asset.maintainable.manager ? (
-                                                <a href={route('tenant.users.show', asset.maintainable.manager.id)}>
-                                                    {' '}
-                                                    {asset.maintainable.manager.full_name}
-                                                </a>
-                                            ) : (
-                                                'No manager'
-                                            )}
-                                        </p>
+                                    <div className="space-y-2">
+                                        <Field
+                                            label={'Maintenance manager'}
+                                            text={
+                                                asset.maintainable.manager ? (
+                                                    <a href={route('tenant.users.show', asset.maintainable.manager.id)}>
+                                                        {' '}
+                                                        {asset.maintainable.manager.full_name}
+                                                    </a>
+                                                ) : (
+                                                    'No manager'
+                                                )
+                                            }
+                                        />
                                         {asset.maintainable.need_maintenance && (
                                             <>
-                                                <p>Maintenance frequency : {asset.maintainable.maintenance_frequency}</p>
-                                                <p>Next maintenance date : {asset.maintainable.next_maintenance_date}</p>
-                                                <p>Last maintenance date : {asset.maintainable.last_maintenance_date}</p>
+                                                <Field label={'Maintenance frequency'} text={asset.maintainable.maintenance_frequency} />
+                                                <Field
+                                                    label={'Next maintenance date'}
+                                                    text={asset.maintainable.next_maintenance_date ?? 'Not planned'}
+                                                />
+                                                <Field label={'Last maintenance date'} text={asset.maintainable.last_maintenance_date} />
                                             </>
                                         )}
                                     </div>
                                 </div>
 
                                 {asset.depreciable && (
-                                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
+                                    <div className="border-sidebar-border bg-sidebar mt-4 rounded-md border p-4">
                                         <h2>Depreciation</h2>
-                                        <div>
-                                            <p>depreciation_duration : {asset.depreciation_duration}</p>
-                                            <p>depreciation_start_date : {asset.depreciation_start_date}</p>
-                                            <p>depreciation_end_d : {asset.depreciation_end_date}</p>
-                                            <p>residual_value : {asset.residual_value}</p>
+                                        <div className="space-y-2">
+                                            <Field label={'Depreciation duration'} text={asset.depreciation_duration} />
+                                            <Field label={'Depreciation start date'} text={asset.depreciation_start_date} />
+                                            <Field label={'Depreciation end date'} text={asset.depreciation_end_date} />
+                                            <Field label={'Residual value'} text={asset.residual_value} />
                                         </div>
                                     </div>
                                 )}
@@ -227,10 +235,12 @@ export default function ShowAsset({ item }: { item: Asset }) {
                         {activeTab === 'warranty' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
                                 <h2>Purchase/Warranty</h2>
-                                <div>
-                                    <p>Purchase date : {asset.maintainable.purchase_date}</p>
-                                    <p>Purchase cost : {asset.maintainable.purchase_cost}</p>
-                                    {asset.maintainable.under_warranty && <p>End warranty date : {asset.maintainable.end_warranty_date}</p>}
+                                <div className="space-y-2">
+                                    <Field label={'Purchase date'} text={asset.maintainable.purchase_date} />
+                                    <Field label={'Purchase cost'} text={asset.maintainable.purchase_cost} />
+                                    {asset.maintainable.under_warranty && (
+                                        <Field label={'End warranty date'} text={asset.maintainable.end_warranty_date} />
+                                    )}
                                 </div>
                             </div>
                         )}
@@ -250,15 +260,19 @@ export default function ShowAsset({ item }: { item: Asset }) {
                         {activeTab === 'providers' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
                                 <h2>Providers</h2>
-
-                                <p>End contract date : {asset.contract_end_date}</p>
-                                <ul>
-                                    {asset.maintainable.providers?.map((provider, index) => (
-                                        <li key={index}>
-                                            <a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>
-                                        </li>
-                                    ))}
-                                </ul>
+                                <div className="space-y-2">
+                                    <Field label={'End contract date'} text={asset.contract_end_date} />
+                                    <ul>
+                                        {asset.maintainable.providers?.map((provider, index) => (
+                                            <li key={index}>
+                                                <Field
+                                                    label={'Providers'}
+                                                    text={<a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>}
+                                                />
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
                             </div>
                         )}
 

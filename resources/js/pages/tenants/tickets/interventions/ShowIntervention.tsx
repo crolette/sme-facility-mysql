@@ -1,6 +1,7 @@
 import { InterventionActionManager } from '@/components/tenant/interventionActionManager';
 import { PictureManager } from '@/components/tenant/pictureManager';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
+import Field from '@/components/ui/field';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Intervention } from '@/types';
 import { Head } from '@inertiajs/react';
@@ -43,13 +44,16 @@ export default function ShowIntervention({ intervention }: { intervention: Inter
                             <>
                                 <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                     <h2>Intervention information</h2>
-                                    <div className="">
-                                        <p>Intervention type : {intervention.type}</p>
-                                        <p>Planned at : {intervention.type}</p>
-                                        <p>Description : {intervention.description}</p>
-                                        <p>Total costs : {intervention.total_costs}</p>
-                                        <p>Created at : {intervention.created_at}</p>
-                                        <p>Updated at : {intervention.updated_at}</p>
+                                    <div className="space-y-2">
+                                        <Field label={'intervention type'} text={intervention.type} />
+                                        {intervention.planned_at && <Field label={'Planned at'} text={intervention.planned_at} />}
+                                        <Field label={'Description'} text={intervention.description} />
+                                        {intervention.total_costs && <Field label={'Total costs'} text={intervention.total_costs} />}
+                                        {intervention.repair_delay && <Field label={'Repair delay'} text={intervention.repair_delay} />}
+                                        <div className="flex flex-wrap gap-4">
+                                            <Field label={'Created at'} text={intervention.created_at} />
+                                            <Field label={'Updated at'} text={intervention.updated_at} />
+                                        </div>
                                     </div>
                                     <div></div>
                                 </div>

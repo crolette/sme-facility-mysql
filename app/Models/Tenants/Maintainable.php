@@ -48,12 +48,13 @@ class Maintainable extends Model
     {
         return [
             'purchase_date' => 'date:d-m-Y',
+            'purchase_cost' => 'decimal:2',
             'end_warranty_date' => 'date:d-m-Y',
             'under_warranty' => 'boolean',
             'need_maintenance' => 'boolean',
             'next_maintenance_date' => 'date:d-m-Y',
             'last_maintenance_date' => 'date:d-m-Y',
-            'maintenance_frequecy' => MaintenanceFrequency::class
+            'maintenance_frequecy' => MaintenanceFrequency::class,
         ];
     }
 

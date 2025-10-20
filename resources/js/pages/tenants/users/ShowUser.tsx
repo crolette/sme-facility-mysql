@@ -3,6 +3,7 @@ import Modale from '@/components/Modale';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
+import Field from '@/components/ui/field';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, User } from '@/types';
 import { Head, router } from '@inertiajs/react';
@@ -51,21 +52,21 @@ export default function ShowUser({ item }: { item: User }) {
         fetchUser();
     };
 
-        const deleteProfilePicture = async () => {
-            try {
-                const response = await axios.delete(route('api.users.picture.destroy', user.id));
-                if (response.data.status === 'success') {
-                    showToast(response.data.message, response.data.status);
-                    fetchUser();
-                }
-            } catch (error) {
-                showToast(error.response.data.message, error.response.data.status);
+    const deleteProfilePicture = async () => {
+        try {
+            const response = await axios.delete(route('api.users.picture.destroy', user.id));
+            if (response.data.status === 'success') {
+                showToast(response.data.message, response.data.status);
+                fetchUser();
             }
-        };
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
+        }
+    };
 
     const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
 
-         const [activeTab, setActiveTab] = useState('information');
+    const [activeTab, setActiveTab] = useState('information');
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -105,17 +106,12 @@ export default function ShowUser({ item }: { item: User }) {
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                 <div className="grid grid-cols-[1fr_160px] gap-4">
-                                    <div>
-                                        <p>Name : {user.full_name}</p>
-                                        <p>Email : {user.email}</p>
-                                        <p>Job position: {user.job_position}</p>
-                                        <p>Can login : {user.can_login ? 'YES' : 'NO'}</p>
-                                        <p>Role: {item.roles?.length > 0 ? item.roles[0].name : ''}</p>
-                                        {user.provider && (
-                                            <p>
-                                                Provider: <a href={route('tenant.providers.show', user.provider?.id)}>{user.provider?.name}</a>
-                                            </p>
-                                        )}
+                                    <div className="space-y-2">
+                                        <Field label={'Name'} text={user.full_name} />
+                                        <Field label={'Email'} text={user.email} />
+                                        {user.job_position && <Field label={'Job position'} text={user.job_position} />}
+                                        <Field label={'Can login'} text={user.can_login ? 'YES' : 'NO'} />
+                                        {user.roles?.length > 0 && <Field label={'Role'} text={user.roles?.length > 0 ? user.roles[0].name : ''} />}
                                     </div>
                                     <div className="relative w-fit">
                                         {user.avatar && (

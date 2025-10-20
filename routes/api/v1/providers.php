@@ -39,9 +39,9 @@ Route::middleware([
         if (Auth::user()->cannot('view', $provider))
             return ApiResponse::notAuthorized();
 
-        $provider->contracts;
 
-        return ApiResponse::success($provider->contracts);
+
+        return ApiResponse::success($provider->contracts()->with('provider')->paginate());
     })->name('api.providers.contracts');
 
     Route::post('/', [APIProviderController::class, 'store'])->name('api.providers.store');

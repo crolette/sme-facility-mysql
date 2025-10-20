@@ -23,7 +23,7 @@ const MENUS = {
     interventions: [
         {
             tabName: 'information',
-            tabDisplay: 'Infos',
+            tabDisplay: 'Information',
         },
         {
             tabName: 'pictures',
@@ -38,7 +38,7 @@ const MENUS = {
     user: [
         {
             tabName: 'information',
-            tabDisplay: 'Infos',
+            tabDisplay: 'Information',
         },
         {
             tabName: 'assets',
@@ -48,7 +48,7 @@ const MENUS = {
     asset: [
         {
             tabName: 'information',
-            tabDisplay: 'Infos',
+            tabDisplay: 'Information',
         },
         {
             tabName: 'maintenance',
@@ -86,7 +86,7 @@ const MENUS = {
     provider: [
         {
             tabName: 'information',
-            tabDisplay: 'Infos',
+            tabDisplay: 'Information',
         },
         {
             tabName: 'contracts',
@@ -100,21 +100,21 @@ const MENUS = {
     ticket: [
         {
             tabName: 'information',
-            tabDisplay: 'Infos',
+            tabDisplay: 'Information',
         },
-        {
-            tabName: 'pictures',
-            tabDisplay: 'pictures',
-        },
-        {
-            tabName: 'interventions',
-            tabDisplay: 'interventions',
-        },
+        // {
+        //     tabName: 'pictures',
+        //     tabDisplay: 'pictures',
+        // },
+        // {
+        //     tabName: 'interventions',
+        //     tabDisplay: 'interventions',
+        // },
     ],
     contract: [
         {
             tabName: 'information',
-            tabDisplay: 'Infos',
+            tabDisplay: 'Information',
         },
         {
             tabName: 'assets',
@@ -128,7 +128,7 @@ const MENUS = {
     location: [
         {
             tabName: 'information',
-            tabDisplay: 'Infos',
+            tabDisplay: 'Information',
         },
         {
             tabName: 'maintenance',
@@ -201,18 +201,21 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
                 </li>
                 {showMobileMenu && (
                     <div className="bg-sidebar shadow-accent absolute w-full rounded-b-md shadow-xl">
-                        {navSidebar.map((nav, index) => (
-                            <li
-                                key={index}
-                                onClick={() => {
-                                    setActiveTab(nav.tabName);
-                                    setShowMobileMenu(false);
-                                }}
-                                className={'hover:bg-accent cursor-pointer p-2 first-letter:uppercase'}
-                            >
-                                {nav.tabDisplay}
-                            </li>
-                        ))}
+                        {navSidebar.map(
+                            (nav, index) =>
+                                nav.tabName !== activeTab && (
+                                    <li
+                                        key={index}
+                                        onClick={() => {
+                                            setActiveTab(nav.tabName);
+                                            setShowMobileMenu(false);
+                                        }}
+                                        className={'hover:bg-accent cursor-pointer p-2 first-letter:uppercase'}
+                                    >
+                                        {nav.tabDisplay}
+                                    </li>
+                                ),
+                        )}
                     </div>
                 )}
             </ul>
@@ -222,7 +225,10 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
                     <li
                         key={index}
                         onClick={() => setActiveTab(nav.tabName)}
-                        className={cn(activeTab === nav.tabName ? 'bg-accent' : '', 'cursor-pointer p-2 first-letter:uppercase')}
+                        className={cn(
+                            activeTab === nav.tabName ? 'bg-accent first-letter:uppercase' : '',
+                            'cursor-pointer p-2 first-letter:uppercase',
+                        )}
                     >
                         {nav.tabDisplay}
                     </li>

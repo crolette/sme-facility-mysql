@@ -11,6 +11,7 @@ import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocati
 import { TicketManager } from '@/components/tenant/ticketManager';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
+import Field from '@/components/ui/field';
 import AppLayout from '@/layouts/app-layout';
 import { Contract, TenantBuilding, TenantFloor, TenantRoom, TenantSite, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
@@ -151,33 +152,30 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h2>Code</h2>
-                                <div className="grid grid-cols-[1fr_160px] gap-4">
-                                    <div>
-                                        <div>
-                                            <p>Code : {location.code}</p>
-                                            <p>Reference code : {location.reference_code}</p>
-                                            <p>Category : {location.category}</p>
-                                            <p>Name : {location.name}</p>
-                                            <p>Address : {location.address}</p>
-                                            <p>Description : {location.description}</p>
-                                            {location.location_type.slug === 'outdoor' ? (
-                                                <>
-                                                    <p>
-                                                        Outdoor: {location.surface_outdoor} ({location.outdoor_material})
-                                                    </p>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <p>
-                                                        Floor: {location.surface_floor} ({location.floor_material})
-                                                    </p>
-                                                    <p>
-                                                        Walls: {location.surface_walls} ({location.wall_material})
-                                                    </p>
-                                                </>
-                                            )}
-                                        </div>
+                                <h2>Information</h2>
+                                <div className="grid gap-4 sm:grid-cols-[1fr_160px]">
+                                    <div className="space-y-2">
+                                        <Field label={'Name'} text={location.name} />
+                                        <Field label={'Category'} text={location.category} />
+                                        {location.address && <Field label={'Address'} text={location.address} />}
+                                        <Field label={'Description'} text={location.description} />
+
+                                        {location.location_type.slug === 'outdoor' ? (
+                                            <>
+                                                <p>
+                                                    <Field label={'Outdoor'} text={`${location.surface_outdoor} - ${location.outdoor_material}`} />
+                                                </p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                {location.surface_floor && (
+                                                    <Field label={'Floor'} text={`${location.surface_floor} - ${location.floor_material}`} />
+                                                )}
+                                                {location.wall_material && (
+                                                    <Field label={'Walls'} text={`${location.surface_walls} - ${location.wall_material}`} />
+                                                )}
+                                            </>
+                                        )}
                                     </div>
                                     <div className="shrink-1">
                                         {location.qr_code && (
@@ -203,22 +201,28 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                 <h2>Maintenance</h2>
                                 <div>
-                                    <p>
-                                        Maintenance manager:
-                                        {location.maintainable.manager ? (
-                                            <a href={route('tenant.users.show', location.maintainable.manager.id)}>
-                                                {' '}
-                                                {location.maintainable.manager.full_name}
-                                            </a>
-                                        ) : (
-                                            'No manager'
-                                        )}
-                                    </p>
+                                    <Field
+                                        label={'Maintenance manager'}
+                                        text={
+                                            location.maintainable.manager ? (
+                                                <a href={route('tenant.users.show', location.maintainable.manager.id)}>
+                                                    {' '}
+                                                    {location.maintainable.manager.full_name}
+                                                </a>
+                                            ) : (
+                                                'No manager'
+                                            )
+                                        }
+                                    />
+
                                     {location.maintainable.need_maintenance && (
                                         <>
-                                            <p>Maintenance frequency : {location.maintainable.maintenance_frequency}</p>
-                                            <p>Next maintenance date : {location.maintainable.next_maintenance_date}</p>
-                                            <p>Last maintenance date : {location.maintainable.last_maintenance_date}</p>
+                                            <Field label={'Maintenance frequency'} text={location.maintainable.maintenance_frequency} />
+                                            <Field
+                                                label={'Next maintenance date'}
+                                                text={location.maintainable.next_maintenance_date ?? 'Not planned'}
+                                            />
+                                            <Field label={'Last maintenance date'} text={location.maintainable.last_maintenance_date} />
                                         </>
                                     )}
                                 </div>
@@ -232,7 +236,10 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                                     <ul>
                                         {location.maintainable.providers.map((provider, index) => (
                                             <li key={index}>
-                                                <a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>
+                                                <Field
+                                                    label={'Providers'}
+                                                    text={<a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>}
+                                                />
                                             </li>
                                         ))}
                                     </ul>
@@ -242,13 +249,11 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
 
                         {activeTab === 'contracts' && (
                             <ContractsList
-                                // items={location.contracts}
                                 contractableReference={location.reference_code}
                                 getUrl={`api.${routeName}.contracts`}
                                 routeName={routeName}
                                 removable
                                 parameter={routeName.substring(0, routeName.length - 1)}
-                                // onContractsChange={updateContracts}
                             />
                         )}
 
@@ -295,9 +300,6 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                         getDisplayText={(contract) => contract.name}
                         getKey={(contract) => contract.id}
                         onSelect={(contracts) => {
-                            console.log(contracts);
-                            // const prev = existingContracts;
-                            // prev.push(contracts);
                             setExistingContracts(contracts);
                         }}
                         placeholder="Search contracts..."

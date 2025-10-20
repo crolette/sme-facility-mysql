@@ -252,7 +252,9 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                             <Pill variant={ticket.status}>{ticket.status}</Pill>
                                         </TableBodyData>
                                         <TableBodyData>{ticket.reporter?.full_name ?? ticket.reporter_email}</TableBodyData>
-                                        <TableBodyData>{ticket.description}</TableBodyData>
+                                        <TableBodyData className="my-auto flex h-full w-40">
+                                            <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{ticket.description}</p>
+                                        </TableBodyData>
                                         <TableBodyData>{ticket.created_at}</TableBodyData>
                                         <TableBodyData>{ticket.updated_at}</TableBodyData>
 

@@ -46,7 +46,6 @@ export const ContractsList = ({
 
         try {
             const response = await axios.get(route(getUrl, { [parameter]: contractableReference, page: pageToLoad ?? null }));
-            console.log(response);
             if (response.data.status === 'success') {
                 setItems(response.data.data);
                 setExistingContracts(response.data.data.data);
