@@ -47,17 +47,17 @@ class Maintainable extends Model
     protected function casts(): array
     {
         return [
-            'purchase_date' => 'date:Y-m-d',
-            'end_warranty_date' => 'date:Y-m-d',
+            'purchase_date' => 'date:d-m-Y',
+            'end_warranty_date' => 'date:d-m-Y',
             'under_warranty' => 'boolean',
             'need_maintenance' => 'boolean',
-            'next_maintenance_date' => 'date:Y-m-d',
-            'last_maintenance_date' => 'date:Y-m-d',
+            'next_maintenance_date' => 'date:d-m-Y',
+            'last_maintenance_date' => 'date:d-m-Y',
             'maintenance_frequecy' => MaintenanceFrequency::class
         ];
     }
 
-    public const DEFAULT_NOTIFICATION_DELAY = 30;
+    public const DEFAULT_NOTIFICATION_DELAY = 7;
 
 
     public function maintainable()
@@ -84,5 +84,4 @@ class Maintainable extends Model
     {
         return $this->hasMany(Intervention::class);
     }
-    
 }
