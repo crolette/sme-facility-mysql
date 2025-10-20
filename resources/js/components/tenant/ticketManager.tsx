@@ -146,18 +146,20 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
 
     return (
         <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-            <h2 className="inline">Tickets ({tickets?.length ?? 0})</h2>
-            {canAdd && (
-                <Button
-                    className=""
-                    onClick={() => {
-                        setSubmitTypeTicket('new');
-                        setAddTicketModal(!addTicketModal);
-                    }}
-                >
-                    Add new ticket
-                </Button>
-            )}
+            <div className="flex justify-between">
+                <h2 className="inline">Tickets ({tickets?.length ?? 0})</h2>
+                {canAdd && (
+                    <Button
+                        className=""
+                        onClick={() => {
+                            setSubmitTypeTicket('new');
+                            setAddTicketModal(!addTicketModal);
+                        }}
+                    >
+                        Add new ticket
+                    </Button>
+                )}
+            </div>
 
             {tickets && tickets?.length > 0 && (
                 <Table>

@@ -9,7 +9,7 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Contract, ContractsPaginated } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
-import { Loader, Pencil, PlusCircle, Trash2, X } from 'lucide-react';
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, Loader, Pencil, PlusCircle, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export interface SearchParams {
@@ -275,7 +275,21 @@ export default function IndexContracts({
                             <TableHeadData>Provider #</TableHeadData>
                             <TableHeadData>Renewal</TableHeadData>
                             <TableHeadData>Provider</TableHeadData>
-                            <TableHeadData>End date</TableHeadData>
+                            <TableHeadData>
+                                <div className="flex items-center gap-2">
+                                    <ArrowDownNarrowWide
+                                        size={16}
+                                        className="cursor-pointer"
+                                        onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'end_date', sortBy: 'asc' }))}
+                                    />
+                                    End date
+                                    <ArrowDownWideNarrow
+                                        size={16}
+                                        className="cursor-pointer"
+                                        onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'end_date', sortBy: 'desc' }))}
+                                    />
+                                </div>
+                            </TableHeadData>
                             <TableHeadData></TableHeadData>
                         </TableHeadRow>
                     </TableHead>

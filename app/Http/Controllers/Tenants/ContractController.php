@@ -70,7 +70,7 @@ class ContractController extends Controller
 
 
 
-        return Inertia::render('tenants/contracts/IndexContracts', ['items' => $contracts->paginate(), 'filters' =>  $validator->safe()->only(['q', 'type', 'status', 'orderBy', 'sortBy', 'provider', 'renewalType']), 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
+        return Inertia::render('tenants/contracts/IndexContracts', ['items' => $contracts->orderBy($validatedFields['orderBy'] ?? 'end_date', $validatedFields['sortBy'] ?? 'asc')->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'type', 'status', 'orderBy', 'sortBy', 'provider', 'renewalType']), 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
     }
 
     /**

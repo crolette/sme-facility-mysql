@@ -40,7 +40,7 @@ class TicketController extends Controller
             $tickets->where('status', $validatedFields['status']);
         }
 
-        return Inertia::render('tenants/tickets/IndexTickets', ['items' => $tickets->paginate()->withQueryString(),  'filters' =>  $validator->safe()->only(['q', 'sortBy', 'status', 'orderBy']), 'statuses' => $statuses]);
+        return Inertia::render('tenants/tickets/IndexTickets', ['items' => $tickets->orderBy($validatedFields['orderBy'] ?? 'created_at', $validatedFields['sortBy'] ?? 'asc')->paginate()->withQueryString(),  'filters' =>  $validator->safe()->only(['q', 'sortBy', 'status', 'orderBy']), 'statuses' => $statuses]);
     }
 
 

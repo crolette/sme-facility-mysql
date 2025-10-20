@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 import { BreadcrumbItem, PaginatedData, TicketStatus } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
-import { Loader, X } from 'lucide-react';
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, Loader, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export interface SearchParams {
@@ -196,8 +196,36 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                 <TableHeadData>Status</TableHeadData>
                                 <TableHeadData>Reporter</TableHeadData>
                                 <TableHeadData>Description</TableHeadData>
-                                <TableHeadData>Created at</TableHeadData>
-                                <TableHeadData>Updated at</TableHeadData>
+                                <TableHeadData>
+                                    <div className="flex items-center gap-2">
+                                        <ArrowDownNarrowWide
+                                            size={16}
+                                            className="cursor-pointer"
+                                            onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'created_at', sortBy: 'asc' }))}
+                                        />
+                                        Created at
+                                        <ArrowDownWideNarrow
+                                            size={16}
+                                            className="cursor-pointer"
+                                            onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'created_at', sortBy: 'desc' }))}
+                                        />
+                                    </div>
+                                </TableHeadData>
+                                <TableHeadData>
+                                    <div className="flex items-center gap-2">
+                                        <ArrowDownNarrowWide
+                                            size={16}
+                                            className="cursor-pointer"
+                                            onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'updated_at', sortBy: 'asc' }))}
+                                        />
+                                        Updated at
+                                        <ArrowDownWideNarrow
+                                            size={16}
+                                            className="cursor-pointer"
+                                            onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'updated_at', sortBy: 'desc' }))}
+                                        />
+                                    </div>
+                                </TableHeadData>
                                 <TableHeadData></TableHeadData>
                             </TableHeadRow>
                         </TableHead>

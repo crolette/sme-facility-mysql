@@ -45,7 +45,7 @@ export default function IndexProviders({ items, categories, filters }: { items: 
     };
 
     const clearSearch = () => {
-        router.visit(route('tenant.providers.index', { ...query, q: null }), {
+        router.visit(route('tenant.providers.index'), {
             onStart: () => {
                 setIsLoading(true);
             },

@@ -178,7 +178,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
     }, [debouncedSearch]);
 
     const clearSearch = () => {
-        router.visit(route('tenant.assets.index', { ...query, q: null }), {
+        router.visit(route('tenant.assets.index'), {
             onStart: () => {
                 setIsLoading(true);
             },

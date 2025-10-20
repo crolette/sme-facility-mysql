@@ -62,7 +62,7 @@ export default function TenantDashboard({
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative h-fit flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
-                        <h2>OVERDUE MAINTENANCES</h2>
+                        <h2>Overdue maintenances</h2>
                         {overdueMaintenances && overdueMaintenances.length > 0 ? (
                             <ul className="flex flex-col gap-2">
                                 {overdueMaintenances.map((maintainable) => (
@@ -83,7 +83,7 @@ export default function TenantDashboard({
                         )}
                     </div>
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative h-fit flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
-                        <h2>OVERDUE MAINTENANCES</h2>
+                        <h2>Overdue interventions</h2>
                         {overdueInterventions && overdueInterventions.length > 0 ? (
                             <ul className="flex flex-col gap-2">
                                 {overdueInterventions.map((intervention) => (
