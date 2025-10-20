@@ -21,9 +21,9 @@ export default function FeaturesAssets() {
                     content="SME-Facility vous permet de recenser, organiser et suivre vos équipements en un seul endroit. Visualisez votre patrimoine technique et gérez vos actifs avec simplicité et précision."
                 />
             </Head>
-            <section className="bg-website-primary -mt-20 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
+            <section className="bg-website-primary text-website-card -mt-20 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
                 <div className="container mx-auto">
-                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-2 md:p-10">
+                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-2 md:px-10">
                         <div className="flex flex-col justify-center gap-10 md:max-w-lg">
                             <h1 className="">
                                 Gardez une <span className="font-extrabold">vue claire sur vos équipements</span>

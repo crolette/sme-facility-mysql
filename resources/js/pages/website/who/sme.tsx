@@ -21,7 +21,7 @@ export default function WhoSME() {
                     content="SME-Facility aide les PME à centraliser la maintenance, suivre les contrats et automatiser les rappels. Un outil complet pour gagner du temps et booster la productivité."
                 />
             </Head>
-            <section className="bg-website-border -mt-28 flex min-h-screen w-full flex-col items-center justify-center py-20 md:-mt-38">
+            <section className="bg-website-border text-website-card -mt-28 flex min-h-screen w-full flex-col items-center justify-center py-20 md:-mt-38">
                 <div className="container mx-auto">
                     <div className="mx-auto grid h-full gap-10 px-4 py-20 md:grid-cols-[2fr_1fr] md:px-10 md:py-16 lg:max-w-11/12">
                         <div className="flex flex-col justify-center gap-10 md:max-w-lg">
@@ -30,7 +30,7 @@ export default function WhoSME() {
                                 <span className="font-extrabold">concentrez-vous sur votre activité.</span>
                             </h1>
                             <h2 className="!text-xl">
-                                Avec SME-Facility, les TPME disposent enfin d’un outil de facility management simple, complet et prêt à l’emploi.
+                                Avec SME-Facility, les PME disposent enfin d’un outil de facility management simple, complet et prêt à l’emploi.
                             </h2>
                             <p className="">
                                 Gagnez du temps, structurez vos opérations de maintenance et améliorez la productivité sans complexité technique.

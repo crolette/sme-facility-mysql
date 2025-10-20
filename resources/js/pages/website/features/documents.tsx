@@ -21,9 +21,9 @@ export default function FeaturesDocuments() {
                     content="SME-Facility centralise la gestion documentaire de votre entreprise : fiches techniques, contrats, rapports et photos, reliés à vos équipements et interventions pour un accès rapide et sécurisé."
                 />
             </Head>
-            <section className="bg-website-primary -mt-20 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
+            <section className="bg-website-primary text-website-card -mt-20 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
                 <div className="container">
-                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-2 md:p-10">
+                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-2 md:px-10">
                         <div className="flex flex-col justify-center gap-10 md:max-w-lg">
                             <h1 className="leading-16">
                                 Tous vos documents, <span className="font-extrabold">accessibles en un clic </span>
