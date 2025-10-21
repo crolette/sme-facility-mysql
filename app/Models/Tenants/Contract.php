@@ -44,11 +44,11 @@ class Contract extends Model
     protected function casts(): array
     {
         return [
-            'created_at' => 'date:d-m-Y',
-            'updated_at' => 'date:d-m-Y',
-            'notice_date' => 'date:d-m-Y',
-            'end_date' => 'date:d-m-Y',
-            // 'start_date' => 'date:d-m-Y',
+            'created_at' => 'date:Y-m-d',
+            'updated_at' => 'date:Y-m-d',
+            'notice_date' => 'date:Y-m-d',
+            'end_date' => 'date:Y-m-d',
+            // 'start_date' => 'date:Y-m-d',
             'notice_period' => NoticePeriodEnum::class,
             'contract_duration' => ContractDurationEnum::class,
             'renewal_type' => ContractRenewalTypesEnum::class,

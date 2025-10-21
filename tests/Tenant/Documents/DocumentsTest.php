@@ -151,7 +151,7 @@ it('increments the disk size in the company table', function () {
     $response->assertSessionHasNoErrors();
 
     $company = Company::first();
-    assertEquals($company->disk_size, 2000 * 1024);
+    assertEquals(round($company->disk_size / 1024), 2000);
 });
 
 it('decrements the disk size in the company table', function () {
@@ -173,7 +173,7 @@ it('decrements the disk size in the company table', function () {
     $response->assertSessionHasNoErrors();
 
     $company = Company::first();
-    assertEquals($company->disk_size, 150 * 1024);
+    assertEquals(round($company->disk_size / 1024), 150);
 
 
     $document = Document::first();

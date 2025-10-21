@@ -200,7 +200,7 @@ option {
     background-color: var(--color-background);
 }
 
-nav a {
+nav a:not[data-slot-breadcrumb] {
     font-size: clamp(0.8rem, 1.35vw, 1.2rem);
 }
 

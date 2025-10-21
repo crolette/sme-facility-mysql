@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Jobs\CompressPictureJob;
+use App\Models\Tenants\Company;
 use Exception;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
@@ -31,8 +32,9 @@ class PictureService
 
                 $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . Str::slug($newfileName, '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $file->extension();
 
-
                 $path = Storage::disk('tenants')->putFileAs($directory, $file, $fileName);
+
+                Company::incrementDiskSize($file->getSize());
 
                 $picture = new Picture([
                     'path' => $directory . '/' . $fileName,
@@ -57,30 +59,34 @@ class PictureService
         }
     }
 
-    public function compressPicture(Picture $picture)
-    {
-        Log::info('--- START COMPRESSING PICTURE : ' . $picture->filename);
+    // public function compressPicture(Picture $picture)
+    // {
+    //     Log::info('--- START COMPRESSING PICTURE : ' . $picture->filename);
 
-        $path = $picture->path;
+    //     $path = $picture->path;
+    //     Company::decrementDiskSize(Storage::disk('tenants')->size($picture->path));
 
-        $newFileName = Str::chopEnd($picture->filename, ['.png', '.jpg', '.jpeg']) . '.webp';
-        Log::info('newFileName : ' . $newFileName);
 
-        $image = Image::read(Storage::disk('tenants')->path($path))->scaleDown(width: 1200, height: 1200)
-            ->toWebp(quality: 75);
+    //     $newFileName = Str::chopEnd($picture->filename, ['.png', '.jpg', '.jpeg']) . '.webp';
+    //     Log::info('newFileName : ' . $newFileName);
 
-        $saved = Storage::disk('tenants')->put($picture->directory . '/' . $newFileName, $image);
+    //     $image = Image::read(Storage::disk('tenants')->path($path))->scaleDown(width: 1200, height: 1200)
+    //         ->toWebp(quality: 75);
 
-        $picture->update([
-            'path' => $picture->directory . '/' . $newFileName,
-            'filename' => $newFileName,
-            'size' => $image->size(),
-            'mime_type' => $image->mimetype(),
-        ]);
+    //     $saved = Storage::disk('tenants')->put($picture->directory . '/' . $newFileName, $image);
 
-        if ($saved)
-            Storage::disk('tenants')->delete($path);
+    //     $picture->update([
+    //         'path' => $picture->directory . '/' . $newFileName,
+    //         'filename' => $newFileName,
+    //         'size' => $image->size(),
+    //         'mime_type' => $image->mimetype(),
+    //     ]);
 
-        Log::info('--- END COMPRESSING PICTURE : ' . $picture->filename);
-    }
+    //     if ($saved)
+    //         Storage::disk('tenants')->delete($path);
+
+    //     Company::incrementDiskSize(Storage::disk('tenants')->size($picture->path));
+
+    //     Log::info('--- END COMPRESSING PICTURE : ' . $picture->filename);
+    // }
 };

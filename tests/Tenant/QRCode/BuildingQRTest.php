@@ -49,7 +49,7 @@ it('creates a QR Code when need_qr_code is true at building\'s creation', functi
 
     $qr_hash = generateQRCodeHash($location);
 
-    $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDHHMM')  . '.png';
+    $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDhhmm')  . '.png';
     $qrPath = tenancy()->tenant->id . "/buildings/" . $location->id . "/qrcode/" . $fileName;
 
     assertDatabaseHas(
@@ -71,9 +71,9 @@ it('can regenerate a QR Code for a building', function () {
     $response = $this->postToTenant('api.buildings.qr.regen', [], $location->reference_code);
     $response->assertSessionHasNoErrors();
 
-    $qr_hash = generateQRCodeHash( $location);
+    $qr_hash = generateQRCodeHash($location);
 
-    $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDHHMM')  . '.png';
+    $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDhhmm')  . '.png';
     $qrPath = tenancy()->tenant->id . "/buildings/" . $location->id . "/qrcode/" . $fileName;
 
     assertDatabaseHas(

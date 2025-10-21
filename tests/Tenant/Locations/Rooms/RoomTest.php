@@ -54,7 +54,7 @@ it('can render the index rooms page', function () {
     $response->assertInertia(
         fn($page) =>
         $page->component('tenants/locations/IndexLocations')
-            ->has('items', 2)
+            ->has('items.data', 2)
             ->has('items.0.maintainable')
             ->where('items.0.floor.id', $room->floor->id)
     );

@@ -31,7 +31,7 @@ class LogoService
             $provider = $this->deleteExistingFiles($provider);
         }
 
-        $fileName = Carbon::now()->isoFormat('YYYYMMDDHHMM') . '_logo_' . Str::slug($name ?? $provider->name, '-') . '.' . $file->extension();
+        $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_logo_' . Str::slug($name ?? $provider->name, '-') . '.' . $file->extension();
         $path = Storage::disk('tenants')->putFileAs($directory, $file, $fileName);
 
         Company::incrementDiskSize($file->getSize());

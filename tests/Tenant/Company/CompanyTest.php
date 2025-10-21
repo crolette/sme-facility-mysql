@@ -32,23 +32,23 @@ use function Pest\Laravel\assertDatabaseMissing;
 beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
-
 });
 
-it('can render the company profile page', function() {
+it('can render the company profile page', function () {
 
-    $company = Company::factory()->create();
+    Company::factory()->create();
 
     $response = $this->getFromTenant('tenant.company.show');
+    $response->assertSessionHasNoErrors();
 
     $response->assertInertia(
         fn($page) =>
         $page->component('settings/company')->has('item')
-            
+
     );
 });
 
-it('can upload a new logo for the company', function() {
+it('can upload a new logo for the company', function () {
     $file1 = UploadedFile::fake()->image('logo.png');
 
     $formData = [
@@ -66,7 +66,7 @@ it('can upload a new logo for the company', function() {
     Storage::disk('tenants')->assertExists(Company::first()->logo);
 });
 
-it('can delete a logo of the company', function() {
+it('can delete a logo of the company', function () {
 
     $file1 = UploadedFile::fake()->image('logo.png');
 
@@ -88,9 +88,9 @@ it('can delete a logo of the company', function() {
 
     $response = $this->deleteFromTenant('api.company.logo.destroy', []);
     $response->assertStatus(200)->assertJson([
-            'status' => 'success',
-        ]);
+        'status' => 'success',
+    ]);
 
 
-        expect(Storage::disk('tenants')->exists($logo))->toBeFalse();
+    expect(Storage::disk('tenants')->exists($logo))->toBeFalse();
 });

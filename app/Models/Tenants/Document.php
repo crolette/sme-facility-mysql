@@ -37,8 +37,8 @@ class Document extends Model
     protected function casts(): array
     {
         return [
-            'created_at' => 'date:d-m-Y',
-            'updated_at' => 'date:d-m-Ys',
+            'created_at' => 'date:Y-m-d',
+            'updated_at' => 'date:Y-m-ds',
         ];
     }
 

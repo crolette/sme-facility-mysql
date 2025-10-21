@@ -49,8 +49,9 @@ class UserService
     }
     public function uploadAndAttachAvatar(User $user, $file, string $name): User
     {
-
-        $file = $file[0];
+        // dump($file);
+        if (is_array($file))
+            $file = $file[0];
 
         $tenantId = tenancy()->tenant->id;
         $directory = "$tenantId/users/$user->id/avatar";
@@ -61,7 +62,7 @@ class UserService
             $this->deleteExistingFiles($files);
         }
 
-        $fileName = Carbon::now()->isoFormat('YYYYMMDDHHMM') . '_avatar_' . Str::slug($name, '-') . '.' . $file->extension();
+        $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_avatar_' . Str::slug($name, '-') . '.' . $file->extension();
         $path = Storage::disk('tenants')->putFileAs($directory, $file, $fileName);
 
         $user->avatar = $path;

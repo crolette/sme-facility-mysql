@@ -12,7 +12,7 @@ use App\Jobs\ProcessTenantNotifications;
 use Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator;
 
 
-class DispatchTenantNotifications extends Command
+class CalculateDiskSize extends Command
 {
     /**
      * The name and signature of the console command.

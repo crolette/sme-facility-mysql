@@ -47,13 +47,13 @@ class Maintainable extends Model
     protected function casts(): array
     {
         return [
-            'purchase_date' => 'date:d-m-Y',
+            'purchase_date' => 'date:Y-m-d',
             'purchase_cost' => 'decimal:2',
-            'end_warranty_date' => 'date:d-m-Y',
+            'end_warranty_date' => 'date:Y-m-d',
             'under_warranty' => 'boolean',
             'need_maintenance' => 'boolean',
-            'next_maintenance_date' => 'date:d-m-Y',
-            'last_maintenance_date' => 'date:d-m-Y',
+            'next_maintenance_date' => 'date:Y-m-d',
+            'last_maintenance_date' => 'date:Y-m-d',
             'maintenance_frequecy' => MaintenanceFrequency::class,
         ];
     }

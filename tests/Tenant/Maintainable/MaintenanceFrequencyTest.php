@@ -66,9 +66,12 @@ it('can add maintenance frequency to asset without next_maintenance_date', funct
         'last_maintenance_date' => '2025-05-05'
     ];
 
-    $this->postToTenant('api.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertSessionHasNoErrors();
 
     assertDatabaseHas('maintainables', [
+        'maintainable_type' => Asset::class,
+        'maintainable_id' => Asset::first()->id,
         'maintenance_frequency' => 'monthly',
         'need_maintenance' => true,
         'last_maintenance_date' => '2025-05-05',
@@ -82,17 +85,20 @@ it('can add maintenance frequency to asset with next_maintenance_date', function
         ...$this->basicAssetData,
         'maintenance_frequency' => 'monthly',
         'need_maintenance' => true,
-        'next_maintenance_date' => '2025-10-10',
         'last_maintenance_date' => '2025-05-05',
+        'next_maintenance_date' => Carbon::now()->addDays(2)->toDateString(),
     ];
 
-    $this->postToTenant('api.assets.store', $formData);
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertSessionHasNoErrors();
 
     assertDatabaseHas('maintainables', [
+        'maintainable_type' => Asset::class,
+        'maintainable_id' => Asset::first()->id,
         'maintenance_frequency' => 'monthly',
         'need_maintenance' => true,
         'last_maintenance_date' => '2025-05-05',
-        'next_maintenance_date' => '2025-10-10'
+        'next_maintenance_date' => Carbon::now()->addDays(2)->toDateString()
     ]);
 });
 
@@ -104,13 +110,16 @@ it('can update maintenance frequency/date from asset', function () {
         ...$this->basicAssetData,
         'maintenance_frequency' => 'monthly',
         'need_maintenance' => true,
-        'next_maintenance_date' => '2025-10-10',
         'last_maintenance_date' => '2025-05-05',
+        'next_maintenance_date' => '2025-10-10',
     ];
 
-    $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+    $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+    $response->assertSessionHasNoErrors();
 
     assertDatabaseHas('maintainables', [
+        'maintainable_type' => Asset::class,
+        'maintainable_id' => $asset->id,
         'maintenance_frequency' => 'monthly',
         'need_maintenance' => true,
         'last_maintenance_date' => '2025-05-05',

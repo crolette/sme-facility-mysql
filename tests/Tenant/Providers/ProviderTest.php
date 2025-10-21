@@ -2,6 +2,7 @@
 
 use App\Models\Tenants\User;
 
+use App\Models\Tenants\Company;
 use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
@@ -9,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseEmpty;
+use function PHPUnit\Framework\assertEquals;
 
 beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
@@ -28,7 +30,7 @@ it('can render the index providers page', function () {
         ->assertInertia(
             fn($page) =>
             $page->component('tenants/providers/IndexProviders')
-                ->has('providers', 3)
+                ->has('items.data', 3)
         );
 });
 
@@ -65,9 +67,9 @@ it('can render the edit provider page', function () {
         );
 });
 
-it('can post a new provider', function () {
+it('can post a new provider with logo', function () {
 
-    $file1 = UploadedFile::fake()->image('logo.png');
+    $file1 = UploadedFile::fake()->image('logo.png')->size(1500);
 
 
     $formData = [
@@ -98,6 +100,9 @@ it('can post a new provider', function () {
         'category_type_id' => $this->categoryType->id,
         'logo' => Provider::first()->logo
     ]);
+
+    $company = Company::first();
+    assertEquals(round($company->disk_size / 1024), 1500);
 
     Storage::disk('tenants')->assertExists(Provider::first()->logo);
 });

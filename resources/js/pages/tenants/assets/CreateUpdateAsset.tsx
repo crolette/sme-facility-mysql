@@ -139,7 +139,7 @@ export default function CreateUpdateAsset({
         description: asset?.maintainable.description ?? '',
         surface: asset?.surface ?? null,
         depreciable: asset?.depreciable ?? false,
-        depreciation_start_date: asset?.depreciation_start_date ?? null,
+        depreciation_start_date: asset?.depreciation_start_date ?? '',
         depreciation_end_date: asset?.depreciation_end_date ?? null,
         depreciation_duration: asset?.depreciation_duration ?? null,
         contract_end_date: asset?.contract_end_date ?? null,
@@ -425,13 +425,13 @@ export default function CreateUpdateAsset({
         setCountContracts((prev) => prev - 1);
     };
 
-    useEffect(() => {
-        if (data.depreciation_duration && data.depreciation_duration > 0 && data.depreciation_start_date !== null) {
-            const date = new Date(data.depreciation_start_date); // Convertit la chaîne en objet Date
-            date.setFullYear(date.getFullYear() + data.depreciation_duration); // Ajoute les années
-            setData('depreciation_end_date', date.toISOString().split('T')[0]);
-        }
-    }, [data.depreciation_duration]);
+    // useEffect(() => {
+    //     if (data.depreciation_duration && data.depreciation_duration > 0 && data.depreciation_start_date !== null) {
+    //         const date = new Date(data.depreciation_start_date); // Convertit la chaîne en objet Date
+    //         date.setFullYear(date.getFullYear() + data.depreciation_duration); // Ajoute les années
+    //         setData('depreciation_end_date', date.toISOString().split('T')[0]);
+    //     }
+    // }, [data.depreciation_duration]);
 
     const [existingContracts, setExistingContracts] = useState<Contract[]>([]);
     const [existingDocuments, setExistingDocuments] = useState<Document[]>([]);
