@@ -38,7 +38,7 @@ it('can render the index sites page', function () {
     $response->assertInertia(
         fn($page) =>
         $page->component('tenants/locations/IndexLocations')
-            ->has('items', 3)
+            ->has('items.data', 3)
     );
 });
 

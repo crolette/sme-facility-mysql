@@ -33,7 +33,7 @@ it('can render the index users page', function () {
         ->assertInertia(
             fn($page) =>
             $page->component('tenants/users/IndexUsers')
-                ->has('users', 4)
+                ->has('items.data', 4)
         );
 });
 

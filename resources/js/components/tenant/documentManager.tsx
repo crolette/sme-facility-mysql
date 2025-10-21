@@ -124,6 +124,8 @@ export const DocumentManager = ({
             existing_documents: existingDocuments.map((elem) => elem.id),
         };
 
+        console.log(documents);
+
         setIsUpdating(true);
 
         try {

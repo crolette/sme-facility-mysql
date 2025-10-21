@@ -48,10 +48,10 @@ class Intervention extends Model
     {
         return [
             'total_costs' => 'decimal:2',
-            'planned_at' => 'date:d-m-Y',
-            'repair_delay' => 'date:d-m-Y',
-            'created_at' => 'date:d-m-Y',
-            'updated_at' => 'date:d-m-Y',
+            'planned_at' => 'date:Y-m-d',
+            'repair_delay' => 'date:Y-m-d',
+            'created_at' => 'date:Y-m-d',
+            'updated_at' => 'date:Y-m-d',
             'status' => InterventionStatus::class,
             'priority' => PriorityLevel::class
         ];

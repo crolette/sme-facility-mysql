@@ -26,7 +26,7 @@ interface FormDataUser {
 export default function CreateUpdateUser({ user, roles }: { user?: User; roles: [] }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `User`,
+            title: `Indes User`,
             href: `/users`,
         },
         {
@@ -72,9 +72,9 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
                 });
                 if (response.data.status === 'success') {
                     showToast(response.data.message, response.data.status);
-                      router.visit(route('tenant.users.index'), {
-                          preserveScroll: false,
-                      });
+                    router.visit(route('tenant.users.index'), {
+                        preserveScroll: false,
+                    });
                 }
                 reset();
             } catch (error) {
@@ -83,7 +83,7 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
             }
         }
     };
-    
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sites" />

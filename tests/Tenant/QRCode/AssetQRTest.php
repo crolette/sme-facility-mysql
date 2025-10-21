@@ -49,12 +49,12 @@ beforeEach(function () {
         'locationType' => 'site',
         'locationReference' => $this->site->reference_code,
         'categoryId' => $this->categoryType->id,
-        
+
     ];
 });
 
 
-it('creates a QR Code when need_qr_code is true', function() {
+it('creates a QR Code when need_qr_code is true', function () {
 
     $formData = [...$this->formData, 'need_qr_code' => true];
 
@@ -65,31 +65,7 @@ it('creates a QR Code when need_qr_code is true', function() {
 
     $qr_hash = generateQRCodeHash($asset);
 
-    $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDHHMM')  . '.png';
-     $qrPath = tenancy()->tenant->id . "/assets/" . $asset->id . "/qrcode/" . $fileName;
-
-    assertDatabaseHas('assets', 
-    [
-        'id' => $asset->id,
-        'qr_hash' => $qr_hash,
-        'qr_code' => $qrPath
-    ]);
-    
-    Storage::disk('tenants')->assertExists($asset->qrPath);
-
-});
-
-
-it('can regenerate a QR Code', function() {
-    $asset = Asset::factory()->forLocation($this->room)->create();
-
-    $response = $this->postToTenant('api.assets.qr.regen', [],$asset->reference_code);
-    $response->assertSessionHasNoErrors();
-
-
-    $qr_hash = generateQRCodeHash($asset);
-
-    $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDHHMM')  . '.png';
+    $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDhhmm')  . '.png';
     $qrPath = tenancy()->tenant->id . "/assets/" . $asset->id . "/qrcode/" . $fileName;
 
     assertDatabaseHas(
@@ -104,3 +80,27 @@ it('can regenerate a QR Code', function() {
     Storage::disk('tenants')->assertExists($asset->qrPath);
 });
 
+
+it('can regenerate a QR Code', function () {
+    $asset = Asset::factory()->forLocation($this->room)->create();
+
+    $response = $this->postToTenant('api.assets.qr.regen', [], $asset->reference_code);
+    $response->assertSessionHasNoErrors();
+
+
+    $qr_hash = generateQRCodeHash($asset);
+
+    $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDhhmm')  . '.png';
+    $qrPath = tenancy()->tenant->id . "/assets/" . $asset->id . "/qrcode/" . $fileName;
+
+    assertDatabaseHas(
+        'assets',
+        [
+            'id' => $asset->id,
+            'qr_hash' => $qr_hash,
+            'qr_code' => $qrPath
+        ]
+    );
+
+    Storage::disk('tenants')->assertExists($asset->qrPath);
+});

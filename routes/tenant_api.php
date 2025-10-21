@@ -1,6 +1,7 @@
 <?php
 
 use App\Helpers\ApiResponse;
+use App\Models\LocationType;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Picture;
 use App\Models\Tenants\Document;
@@ -9,11 +10,11 @@ use Illuminate\Support\Facades\Route;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Controllers\API\V1\DestroyPictureController;
 use App\Http\Controllers\API\V1\UpdateDocumentController;
-use App\Http\Controllers\API\V1\APISearchAssetsLocationController;
+use App\Http\Controllers\API\V1\UploadDocumentController;
 use App\Http\Controllers\API\V1\DestroyDocumentController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\API\V1\ApiSearchLocationController;
-use App\Models\LocationType;
+use App\Http\Controllers\API\V1\APISearchAssetsLocationController;
 
 Route::prefix('/v1/')->group(
     function () {
@@ -75,6 +76,8 @@ Route::prefix('/v1/')->group(
 
                     return ApiResponse::success($locationTypes, 'Success');
                 })->name('api.location-types');
+
+                Route::post('/documents', [UploadDocumentController::class, 'store'])->name('api.documents.store');
 
                 // Route to get the documents from a tenant - to display on show page
                 Route::patch('/documents/{document}', [UpdateDocumentController::class, 'update'])->name('api.documents.update');

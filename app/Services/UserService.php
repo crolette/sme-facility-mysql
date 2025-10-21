@@ -6,6 +6,7 @@ use Exception;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Models\Tenants\User;
+use App\Models\Tenants\Company;
 use App\Models\Tenants\Provider;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\CompressUserAvatarJob;
@@ -36,7 +37,7 @@ class UserService
 
             $user->save();
 
-            if(isset($request['role']))
+            if (isset($request['role']))
                 $user->assignRole($request['role']);
 
             DB::commit();
@@ -48,8 +49,9 @@ class UserService
     }
     public function uploadAndAttachAvatar(User $user, $file, string $name): User
     {
-
-        $file = $file[0];
+        // dump($file);
+        if (is_array($file))
+            $file = $file[0];
 
         $tenantId = tenancy()->tenant->id;
         $directory = "$tenantId/users/$user->id/avatar";
@@ -60,11 +62,13 @@ class UserService
             $this->deleteExistingFiles($files);
         }
 
-        $fileName = Carbon::now()->isoFormat('YYYYMMDDHHMM') . '_avatar_' . Str::slug($name, '-') . '.' . $file->extension();
+        $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_avatar_' . Str::slug($name, '-') . '.' . $file->extension();
         $path = Storage::disk('tenants')->putFileAs($directory, $file, $fileName);
 
         $user->avatar = $path;
         $user->save();
+
+        Company::incrementDiskSize(Storage::disk('tenants')->size($user->avatar));
 
         Log::info('DISPATCH COMPRESS AVATAR JOB');
         CompressUserAvatarJob::dispatch($user)->onQueue('default');
@@ -77,6 +81,8 @@ class UserService
         Log::info('--- START COMPRESSING USER AVATAR : ' . $user->id . ' - ' . $user->avatar);
 
         $path = $user->avatar;
+
+        Company::decrementDiskSize(Storage::disk('tenants')->size($user->avatar));
 
         $newFileName =  Str::chopEnd(basename(Storage::disk('tenants')->path($user->avatar)), ['.png', '.jpg', '.jpeg']) . '.webp';
 
@@ -94,21 +100,25 @@ class UserService
         if ($saved)
             Storage::disk('tenants')->delete($path);
 
+        Company::incrementDiskSize(Storage::disk('tenants')->size($user->avatar));
+
         Log::info('--- END COMPRESSING USER AVATAR : ' . $user->id . ' - ' . $user->avatar);
     }
 
     public function deleteExistingFiles($files)
     {
         foreach ($files as $file) {
+            Company::decrementDiskSize(Storage::disk('tenants')->size($file));
             Storage::disk('tenants')->delete($file);
         }
     }
 
     public function deleteAvatar($user)
     {
+        Company::decrementDiskSize(Storage::disk('tenants')->size($user->avatar));
         Storage::disk('tenants')->delete($user->avatar);
 
-        $user->avatar = null ;
+        $user->avatar = null;
         $user->save();
     }
 

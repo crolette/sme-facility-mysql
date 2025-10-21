@@ -58,7 +58,7 @@ it('can render the index assets page', function () {
     $response->assertInertia(
         fn($page) =>
         $page->component('tenants/assets/IndexAssets')
-            ->has('items', 4)
+            ->has('items.data', 4)
             ->where('items.0.maintainable.name', $asset->maintainable->name)
             ->where('items.0.location.id', $this->site->id)
             ->where('items.0.category', $asset->assetCategory->label)
@@ -234,11 +234,9 @@ it('can create an asset with uploaded pictures', function () {
 
     $pictures = Asset::first()->pictures;
 
-    foreach($pictures as $picture) {
+    foreach ($pictures as $picture) {
         expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
     }
-
-    
 });
 
 it('can add pictures to an asset', function () {
@@ -266,7 +264,6 @@ it('can add pictures to an asset', function () {
     foreach ($pictures as $picture) {
         expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
     }
-
 });
 
 it('cannot create a new asset with non existing building', function () {

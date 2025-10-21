@@ -41,12 +41,15 @@ class DocumentFactory extends Factory
         $categoryType = CategoryType::where('category', 'document')->first();
 
         $user = $this->customAttributes['user'];
-        $directoryName = $this->customAttributes['directoryName'];
-        $model = $this->customAttributes['model'];
+        // $directoryName = $this->customAttributes['directoryName'];
+        // $model = $this->customAttributes['model'];
+        $tenantId = tenancy()->tenant->id;
 
-        $directory = tenancy()->tenant->id . '/' . $directoryName . '/' . $model->id . '/documents';
+        $uuid = Str::substr(Str::uuid(), 0, 8);
+        $directory = "$tenantId/" . Carbon::now()->isoFormat('YYYYMMDDhhmm') . "documents/$uuid/";
+        $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . Str::slug($fakeName, '-') . '_' . $uuid  . '.' . $extension;
 
-        $fileName = Carbon::now()->isoFormat('YYYYMMDDHHMM') . '_' . Str::slug($fakeName, '-') . '_' .  Str::substr(Str::uuid(), 0, 8) . '.' . $extension;
+
 
         return [
             'path' => $directory . '/' . $fileName,

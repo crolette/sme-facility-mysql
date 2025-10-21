@@ -8,6 +8,8 @@ use App\Models\Tenants\Picture;
 use App\Services\PictureService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Database\Eloquent\Model;
+use App\Services\CompressPictureService;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -25,7 +27,7 @@ class CompressPictureJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public Picture $picture)
+    public function __construct(public Model $picture)
     {
         //
     }
@@ -36,7 +38,7 @@ class CompressPictureJob implements ShouldQueue
     public function handle(): void
     {
         Log::info('HANDLE COMPRESSPICTURE JOB');
-        app(PictureService::class)->compressPicture($this->picture);
+        app(CompressPictureService::class)->compressPicture($this->picture);
     }
 
     public function failed($exception): void

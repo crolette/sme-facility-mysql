@@ -482,12 +482,13 @@ it(
             'description' => fake()->paragraph(),
             'repair_delay' => Carbon::now()->addMonth(1),
             'locationId' => $this->asset->reference_code,
-            'locationType' => 'asset'
+            'locationType' => get_class($this->asset)
         ];
 
         $intervention = Intervention::first();
 
         $response = $this->patchToTenant('api.interventions.update', $formData, $intervention->id);
+        $response->assertSessionHasNoErrors();
         $response->assertStatus(200)
             ->assertJson([
                 'status' => 'success',
@@ -521,7 +522,7 @@ it(
             'priority' => 'medium',
             'status' => 'completed',
             'locationId' => $this->asset->reference_code,
-            'locationType' => 'asset'
+            'locationType' => get_class($this->asset)
         ];
 
         $intervention = Intervention::first();
@@ -548,7 +549,7 @@ it(
             'status' => 'cancelled',
             'description' => fake()->paragraph(),
             'locationId' => $this->asset->reference_code,
-            'locationType' => 'asset'
+            'locationType' => get_class($this->asset)
         ];
 
         $intervention = Intervention::first();

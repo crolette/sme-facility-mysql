@@ -9,6 +9,7 @@ use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Models\Tenants\Company;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use App\Http\Controllers\Controller;
@@ -32,6 +33,8 @@ class DestroyDocumentController extends Controller
                 Storage::disk('tenants')->deleteDirectory($document->directory);
 
             $document->delete();
+
+            Company::decrementDiskSize($document->size);
 
             return ApiResponse::success(null, 'Document deleted');
         } catch (Exception $e) {

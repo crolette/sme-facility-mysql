@@ -36,7 +36,7 @@ class Ticket extends Model
 
     protected $with = [
         'reporter:id,first_name,last_name',
-        
+
         'interventions',
     ];
 
@@ -49,9 +49,9 @@ class Ticket extends Model
     protected function casts(): array
     {
         return [
-            'closed_at' => 'date:d-m-Y',
-            'created_at' => 'date:d-m-Y',
-            'updated_at' => 'date:d-m-Y',
+            'closed_at' => 'date:Y-m-d',
+            'created_at' => 'date:Y-m-d',
+            'updated_at' => 'date:Y-m-d',
             'being_notified' => 'boolean',
             'status' => TicketStatus::class
         ];
@@ -67,8 +67,6 @@ class Ticket extends Model
             // TODO service to delete pictures from the disk
             $ticket->pictures()->delete();
         });
-
-        
     }
 
 

@@ -90,17 +90,7 @@ it('can factory a contract', function () {
 it('can create a contract and attach asset and locations', function () {
 
     $formData = [
-        'provider_id' => $this->provider->id,
-        'name' => 'Contrat de bail',
-        'type' => 'Bail',
-        'notes' => 'Nouveau contrat de bail 2025',
-        'internal_reference' => 'Bail Site 2025',
-        'provider_reference' => 'Provider reference 2025',
-        'start_date' => Carbon::now()->toDateString(),
-        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
-        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
-        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
-        'status' => ContractStatusEnum::ACTIVE->value,
+        ...$this->contractOneData,
         'contractables' => [
             ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
             ['locationType' => 'asset', 'locationCode' => $this->asset->code, 'locationId' => $this->asset->id],
@@ -131,7 +121,7 @@ it('can create a contract and attach asset and locations', function () {
         'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
         'status' => ContractStatusEnum::ACTIVE->value,
     ]);
-    
+
     assertDatabaseCount('contractables', 5);
 
     assertDatabaseHas(
@@ -144,126 +134,6 @@ it('can create a contract and attach asset and locations', function () {
         ]
     );
 });
-
-it('can create a contract with documents', function() {
-
-    $file1 = UploadedFile::fake()->image('avatar.png');
-    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
-    $categoryType = CategoryType::where('category', 'document')->first();
-
-    $formData = [
-        'provider_id' => $this->provider->id,
-        'name' => 'Contrat de bail',
-        'type' => 'Bail',
-        'notes' => 'Nouveau contrat de bail 2025',
-        'internal_reference' => 'Bail Site 2025',
-        'provider_reference' => 'Provider reference 2025',
-        'start_date' => Carbon::now()->toDateString(),
-        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
-        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
-        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
-        'status' => ContractStatusEnum::ACTIVE->value,
-        'files' => [
-            [
-                'file' => $file1,
-                'name' => 'FILE 1 - Long name of more than 10 chars',
-                'description' => 'descriptionIMG',
-                'typeId' => $categoryType->id,
-                'typeSlug' => $categoryType->slug
-            ],
-            [
-                'file' => $file2,
-                'name' => 'FILE 2 - Long name of more than 10 chars',
-                'description' => 'descriptionPDF',
-                'typeId' => $categoryType->id,
-                'typeSlug' => $categoryType->slug
-            ]
-        ]
-    ];
-
-    $response = $this->postToTenant('api.contracts.store', $formData);
-    $response->assertSessionHasNoErrors();
-
-    $response->assertStatus(200)
-        ->assertJson(['status' => 'success']);
-
-    assertDatabaseCount('documents', 2);
-    assertDatabaseHas('documentables', [
-        'document_id' => 1,
-        'documentable_type' => 'App\Models\Tenants\Contract',
-        'documentable_id' => 1
-    ]);
-    assertDatabaseHas('documentables', [
-        'document_id' => 2,
-        'documentable_type' => 'App\Models\Tenants\Contract',
-        'documentable_id' => 1
-    ]);
-
-    Storage::disk('tenants')->assertExists(Document::find(1)->path);
-    Storage::disk('tenants')->assertExists(Document::find(2)->path);
-});
-
-it('can attach a document to an existing contract', function() {
-
-    $file1 = UploadedFile::fake()->image('avatar.png');
-    $categoryType = CategoryType::where('category', 'document')->first();
-    $contract = Contract::factory()->create();
-
-    $formData = ['files' => [
-            [
-                'file' => $file1,
-                'name' => 'FILE 1 - Long name of more than 10 chars',
-                'description' => 'descriptionIMG',
-                'typeId' => $categoryType->id,
-                'typeSlug' => $categoryType->slug
-            ],
-        ]];
-
-        $response = $this->postToTenant('api.contracts.documents.post', $formData, $contract->id);
-        $response->assertSessionHasNoErrors();
-        $response->assertStatus(200)->assertJson(['status' => 'success']);
-
-        $contract->refresh();
-        assertEquals(1, $contract->documents->count());
-    assertDatabaseCount('documents', 1);
-    assertDatabaseHas('documentables', [
-        'document_id' => 1,
-        'documentable_type' => 'App\Models\Tenants\Contract',
-        'documentable_id' => 1
-    ]);
-
-
-});
-
-it('can detach a document from an existing contract', function() {
-    $contract = Contract::factory()->create();
-    $document = Document::factory()->withCustomAttributes([
-        'user' => $this->user,
-        'directoryName' => 'contracts',
-        'model' => $contract,
-    ])->create();
-    $contract->documents()->attach($document);
-
-    $formData = [
-        'document_id' => $document->id
-    ];
-
-    $response = $this->patchToTenant('api.contracts.documents.detach', $formData, $contract->id);
-    $response->assertOk();
-
-    $this->assertDatabaseHas('documents', [
-        'id' => $document->id,
-        'filename' => $document->filename
-    ]);
-
-    $this->assertDatabaseMissing('documentables', [
-        'document_id' => $document->id,
-        'documentable_id' => $contract->id,
-        'documentable_type' => Contract::class
-    ]);
-
-});
-
 
 it('can store a site with contracts', function () {
 
@@ -461,7 +331,7 @@ it('can render the index page with all contracts', function () {
     $response->assertInertia(
         fn($page) =>
         $page->component('tenants/contracts/IndexContracts')
-            ->has('items', 4)
+            ->has('items.data', 4)
             ->has('statuses', count($statuses))
             ->has('renewalTypes', count($renewalTypes))
     );

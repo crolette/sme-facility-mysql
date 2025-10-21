@@ -39,11 +39,11 @@ class InterventionAction extends Model
     {
         return [
             'intervention_costs' => 'decimal:2',
-            'intervention_date' => 'date:d-m-Y',
+            'intervention_date' => 'date:Y-m-d',
             'started_at' => 'date:H:i',
             'finished_at' => 'date:H:i',
-            'created_at' => 'date:d-m-Y H:i',
-            'updated_at' => 'date:d-m-Y H:i',
+            'created_at' => 'date:Y-m-d H:i',
+            'updated_at' => 'date:Y-m-d H:i',
         ];
     }
 
@@ -57,7 +57,7 @@ class InterventionAction extends Model
             $action->intervention->updateTotalCosts();
             $action->intervention->setUpdatedAt(Carbon::now());
         });
-        
+
         static::updated(function ($action) {
             $action->intervention->updateTotalCosts();
             $action->intervention->setUpdatedAt(Carbon::now());

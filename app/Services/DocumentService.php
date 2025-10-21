@@ -4,6 +4,8 @@ namespace App\Services;
 
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use App\Models\Tenants\Company;
+use App\Jobs\CompressPictureJob;
 use App\Models\Tenants\Contract;
 use App\Models\Tenants\Document;
 use Illuminate\Support\Facades\Auth;
@@ -13,68 +15,55 @@ use Illuminate\Support\Facades\Storage;
 
 class DocumentService
 {
+
+    public function store(array $file)
+    {
+        $tenantId = tenancy()->tenant->id;
+
+        $uuid = Str::substr(Str::uuid(), 0, 8);
+        $directory = "$tenantId/documents/" . Carbon::now()->isoFormat('YYYYMMDD') . "/$uuid/";
+        $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . Str::slug($file['name'], '-') . '_' . $uuid  . '.' . $file['file']->extension();
+
+        $path = Storage::disk('tenants')->putFileAs($directory, $file['file'], $fileName);
+
+        $document = new Document([
+            'path' => $path,
+            'filename' => $fileName,
+            'directory' => $directory,
+            'name' => $file['name'],
+            'description' => $file['description'] ?? null,
+            'size' => $file['file']->getSize(),
+            'mime_type' => $file['file']->getMimeType(),
+        ]);
+
+        Company::incrementDiskSize($file['file']->getSize());
+
+        $document->documentCategory()->associate($file['typeId']);
+        $document->uploader()->associate(Auth::guard('tenant')->user());
+        $document->save();
+
+        if (in_array($file['file']->extension(), ['png', 'jpg', 'jpeg'])) {
+            CompressPictureJob::dispatch($document)->onQueue('default');
+        }
+
+        return $document;
+    }
+
     public function uploadAndAttachDocuments(Model $model, array $files): void
     {
-        $tenantId = tenancy()->tenant->id;
-        $modelType = Str::plural(Str::lower(class_basename($model))); // e.g., "assets", "sites", "buildings"
-        $modelId = $model->id;
-
         foreach ($files as $file) {
-            $directory = "$tenantId/$modelType/$modelId/documents";
-            $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . Str::slug($file['name'], '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $file['file']->extension();
+            $document = $this->store($file);
 
-            $path = Storage::disk('tenants')->putFileAs($directory, $file['file'], $fileName);
-
-            $document = new Document([
-                'path' => $path,
-                'filename' => $fileName,
-                'directory' => $directory,
-                'name' => $file['name'],
-                'description' => $file['description'] ?? null,
-                'size' => $file['file']->getSize(),
-                'mime_type' => $file['file']->getMimeType(),
-            ]);
-
-            $document->documentCategory()->associate($file['typeId']);
-            $document->uploader()->associate(Auth::guard('tenant')->user());
-            $document->save();
-
-            // Attach to model (ensure polymorphic or many-to-many is set up accordingly)
             $model->documents()->attach($document);
+
+            if (in_array($file['file']->extension(), ['png', 'jpg', 'jpeg'])) {
+                CompressPictureJob::dispatch($document)->onQueue('default');
+            }
         }
     }
 
-    public function uploadAndAttachDocumentsForContract(Contract $contract, array $files)
+    public function detachDocumentFromModel(Model $model, int $documentId)
     {
-        $tenantId = tenancy()->tenant->id;
-        foreach ($files as $file) {
-            $directory = "$tenantId/contracts/$contract->id/documents";
-            $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . Str::slug($file['name'], '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $file['file']->extension();
-
-            $path = Storage::disk('tenants')->putFileAs($directory, $file['file'], $fileName);
-
-            $document = new Document([
-                'path' => $path,
-                'filename' => $fileName,
-                'directory' => $directory,
-                'name' => $file['name'],
-                'description' => $file['description'] ?? null,
-                'size' => $file['file']->getSize(),
-                'mime_type' => $file['file']->getMimeType(),
-            ]);
-
-            $document->documentCategory()->associate($file['typeId']);
-            $document->uploader()->associate(Auth::guard('tenant')->user());
-            $document->save();
-
-            // Attach to model (ensure polymorphic or many-to-many is set up accordingly)
-            $contract->documents()->attach($document);
-        }
-    }
-
-    public function detachDocumentFromModel(Model $model, int $documentId) 
-    {
-        Debugbar::info('detach detachDocumentFromModel', $documentId);
         $document = Document::find($documentId);
         $model->documents()->detach($document);
     }
@@ -85,7 +74,6 @@ class DocumentService
             if (!$model->documents()->find($documentId)) {
                 $document = Document::find($documentId);
                 $model->documents()->attach($document);
-
             }
         }
     }

@@ -136,11 +136,9 @@ class APIUserController extends Controller
         try {
             $user->delete();
             return ApiResponse::successFlash('', 'User deleted');
-
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             Log::info('Error during deleting user : ' . $e->getMessage());
             return ApiResponse::error('Error during deleting user');
-
         }
     }
 };

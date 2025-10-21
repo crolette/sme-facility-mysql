@@ -2,7 +2,7 @@ import { Pill } from '@/components/ui/pill';
 import AppLayout from '@/layouts/app-layout';
 import { Intervention, Maintainable, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
-import { Cuboid, Ticket, Wrench } from 'lucide-react';
+import { Cuboid, HardDrive, Ticket, Wrench } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -17,18 +17,30 @@ export default function TenantDashboard({
     interventions,
     overdueMaintenances,
     overdueInterventions,
+    diskSizes,
 }: {
     counts: { ticketsCount: number; assetsCount: number; interventionsCount: number };
     maintainables: Maintainable[];
     interventions: Intervention[];
     overdueMaintenances: Maintainable[];
     overdueInterventions: Intervention[];
+    diskSizes: { mb: number; gb: number; percent: number };
 }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-4 gap-4">
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex items-center justify-center overflow-hidden rounded-xl border p-4">
+                        <div className="flex flex-col">
+                            <p className="font-semibold uppercase">Disk space</p>
+                            <HardDrive strokeWidth={1} className="m-auto h-12 w-12" />
+                            <p className="text-lg">
+                                {diskSizes.gb} GB <span className="text-xs">({diskSizes.percent < 1 ? '< 1 ' : diskSizes.percent} %)</span>
+                            </p>
+                        </div>
+                        {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
+                    </div>
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex items-center justify-center overflow-hidden rounded-xl border p-4">
                         <a href={route('tenant.tickets.index')} className="w-full text-center !no-underline">
                             <div className="flex flex-col">

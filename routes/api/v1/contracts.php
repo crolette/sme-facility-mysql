@@ -47,7 +47,11 @@ Route::middleware([
                 if (Auth::user()->cannot('update', $contract))
                     return ApiResponse::notAuthorized();
 
-                app(DocumentService::class)->uploadAndAttachDocumentsForContract($contract, $request['files']);
+                if ($request->validated('files'))
+                    app(DocumentService::class)->uploadAndAttachDocuments($contract, $request['files']);
+
+                if ($request->validated('existing_documents'))
+                    app(DocumentService::class)->attachExistingDocumentsToModel($contract, $request->validated('existing_documents'));
 
                 return ApiResponse::success([], 'Document added');
             })->name('api.contracts.documents.post');

@@ -35,20 +35,23 @@ class CompanyLogoService
             $this->deleteExistingFiles($company);
         }
 
-        $fileName = 'logo'. '.' . $file->extension();
+        $fileName = 'logo' . '.' . $file->extension();
+
         $path = Storage::disk('tenants')->putFileAs($this->directory, $file, $fileName);
 
         $company->logo = $path;
         $company->save();
+        Company::incrementDiskSize($file->getSize());
 
         Log::info('DISPATCH COMPRESS COMPANY LOGO JOB');
         CompressCompanyLogoJob::dispatch($company)->onQueue('default');
-
     }
 
-    public function compressLogo(Company $company) 
+    public function compressLogo(Company $company)
     {
         Log::info('--- START COMPRESSING COMPANY LOGO : ' . $company->logo);
+
+        Company::decrementDiskSize(Storage::disk('tenants')->size($company->logo));
 
         $path = $company->logo;
 
@@ -65,8 +68,12 @@ class CompanyLogoService
             ]
         );
 
-        if ($saved)
+        if ($saved) {
             Storage::disk('tenants')->delete($path);
+        }
+
+
+        Company::incrementDiskSize(Storage::disk('tenants')->size($company->logo));
 
         Log::info('--- END COMPRESSING COMPANY LOGO : ' . $company->logo);
     }
@@ -76,6 +83,7 @@ class CompanyLogoService
         $files = Storage::disk('tenants')->files($this->directory);
         if (count($files) > 0) {
             foreach ($files as $file) {
+                Company::decrementDiskSize(Storage::disk('tenants')->size($file));
                 Storage::disk('tenants')->delete($file);
             }
         }
@@ -87,5 +95,4 @@ class CompanyLogoService
 
         return $company;
     }
-
 };
