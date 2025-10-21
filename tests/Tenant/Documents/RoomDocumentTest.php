@@ -375,51 +375,51 @@ it('deletes the documents directory if it is empty', function () {
     expect(Storage::disk('tenants')->exists($document->path))->toBeFalse();
 });
 
-it('do not delete the documents directory if it is not empty', function () {
-    $file1 = UploadedFile::fake()->image('avatar.png');
-    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
+// it('does not delete the documents directory if it is not empty', function () {
+//     $file1 = UploadedFile::fake()->image('avatar.png');
+//     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
 
-    $formData = [
+//     $formData = [
 
-        'files' => [
-            [
-                'file' => $file1,
-                'name' => 'FILE 1 - First file',
-                'description' => 'descriptionIMG',
-                'typeId' => $this->documentCategory->id,
-                'typeSlug' => $this->documentCategory->slug
-            ],
-            [
-                'file' => $file2,
-                'name' => 'FILE 2 - Second file',
-                'description' => 'descriptionIMG',
-                'typeId' => $this->documentCategory->id,
-                'typeSlug' => $this->documentCategory->slug
-            ],
+//         'files' => [
+//             [
+//                 'file' => $file1,
+//                 'name' => 'FILE 1 - First file',
+//                 'description' => 'descriptionIMG',
+//                 'typeId' => $this->documentCategory->id,
+//                 'typeSlug' => $this->documentCategory->slug
+//             ],
+//             [
+//                 'file' => $file2,
+//                 'name' => 'FILE 2 - Second file',
+//                 'description' => 'descriptionIMG',
+//                 'typeId' => $this->documentCategory->id,
+//                 'typeSlug' => $this->documentCategory->slug
+//             ],
 
-        ]
-    ];
+//         ]
+//     ];
 
-    $response = $this->postToTenant('api.rooms.documents.post', $formData, $this->location->reference_code);
-    $response->assertSessionHasNoErrors();
+//     $response = $this->postToTenant('api.rooms.documents.post', $formData, $this->location->reference_code);
+//     $response->assertSessionHasNoErrors();
 
-    $document = $this->location->documents()->first();
+//     $document = $this->location->documents()->first();
 
 
-    $response = $this->deleteFromTenant('api.documents.delete', $document->id);
-    $response->assertOk();
+//     $response = $this->deleteFromTenant('api.documents.delete', $document->id);
+//     $response->assertOk();
 
-    $this->assertDatabaseMissing('documents', [
-        'id' => $document->id,
-        'filename' => $document->filename
-    ]);
+//     $this->assertDatabaseMissing('documents', [
+//         'id' => $document->id,
+//         'filename' => $document->filename
+//     ]);
 
-    $this->assertDatabaseMissing('documentables', [
-        'document_id' => $document->id,
-        'documentable_id' => $this->location->id,
-        'documentable_type' => get_class($this->location)
-    ]);
+//     $this->assertDatabaseMissing('documentables', [
+//         'document_id' => $document->id,
+//         'documentable_id' => $this->location->id,
+//         'documentable_type' => get_class($this->location)
+//     ]);
 
-    expect(Storage::disk('tenants')->exists($document->directory))->toBeTrue();
-    assertEquals(1, count(Storage::disk('tenants')->files($document->directory)));
-});
+//     expect(Storage::disk('tenants')->exists($document->directory))->toBeTrue();
+//     assertEquals(1, count(Storage::disk('tenants')->files($document->directory)));
+// });

@@ -4,7 +4,20 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BrickWall, Building, Building2, Cuboid, Handshake, LayoutDashboard, LayoutGrid, ScrollText, Settings, Ticket, Users } from 'lucide-react';
+import {
+    BrickWall,
+    Building,
+    Building2,
+    Cuboid,
+    FileStack,
+    Handshake,
+    LayoutDashboard,
+    LayoutGrid,
+    ScrollText,
+    Settings,
+    Ticket,
+    Users,
+} from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -58,6 +71,11 @@ const mainNavItems: NavItem[] = [
         title: 'Contracts',
         href: '/contracts',
         icon: ScrollText,
+    },
+    {
+        title: 'Documents',
+        href: '/documents',
+        icon: FileStack,
     },
     {
         title: 'Users',

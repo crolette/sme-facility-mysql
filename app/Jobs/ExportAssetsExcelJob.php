@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -36,11 +37,11 @@ class ExportAssetsExcelJob implements ShouldQueue
     public function handle(): void
     {
         Log::info('BEGIN EXPORT ASSETS EXCEL JOB : ' . $this->user->email);
-        
+
         $directory = tenancy()->tenant->id . '/exports/' . Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_assets.xlsx';
 
-        Excel::store(new AssetsExport(), $directory , 'tenants');
-        
+        Excel::store(new AssetsExport(), $directory, 'tenants');
+
         Log::info('EXPORT ASSETS EXCEL JOB DONE');
 
         // Mail
@@ -57,6 +58,8 @@ class ExportAssetsExcelJob implements ShouldQueue
             Log::info("Mail sent to : {$this->user->email}");
         }
         Log::info('SUCCESS SENDING MAIL EXPORT');
+
+        Storage::disk('tenants')->delete($directory);
     }
 
     public function failed($exception): void

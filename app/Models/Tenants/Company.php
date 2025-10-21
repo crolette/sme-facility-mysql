@@ -11,12 +11,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Company extends Model
 {
     use HasFactory;
-    
+
     protected $table = 'company';
 
     protected $fillable = [
         'last_ticket_number',
         'last_asset_number',
+        'disk_size',
         'logo',
         'address',
         'vat_number',
@@ -24,7 +25,7 @@ class Company extends Model
     ];
 
     protected $hidden = [
-           'created_at',
+        'created_at',
         'updated_at',
         'last_ticket_number',
         'last_asset_number',
@@ -32,6 +33,8 @@ class Company extends Model
 
     protected $appends = [
         'logo_path',
+        'disk_size_mb',
+        'disk_size_gb'
     ];
 
     public const MAX_UPLOAD_SIZE_MB = 4;
@@ -39,6 +42,28 @@ class Company extends Model
     public static function maxUploadSizeKB(): int
     {
         return self::MAX_UPLOAD_SIZE_MB * 1024;
+    }
+
+    public static function incrementDiskSize($fileSize)
+    {
+        DB::transaction(
+            function () use ($fileSize) {
+                $company = self::lockForUpdate()->first();
+
+                $company->increment('disk_size', $fileSize);
+            }
+        );
+    }
+
+    public static function decrementDiskSize($fileSize)
+    {
+        DB::transaction(
+            function () use ($fileSize) {
+                $company = self::lockForUpdate()->first();
+
+                $company->decrement('disk_size', $fileSize);
+            }
+        );
     }
 
     public static function incrementAndGetAssetNumber(): int
@@ -63,6 +88,20 @@ class Company extends Model
 
             return $company->last_ticket_number;
         });
+    }
+
+    public function diskSizeMB(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => round($this->disk_size / 1024 / 1024, 2)
+        );
+    }
+
+    public function diskSizeGB(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => round($this->disk_size / 1024 / 1024 / 1024, 2)
+        );
     }
 
     public function logoPath(): Attribute

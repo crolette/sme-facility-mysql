@@ -4,17 +4,9 @@ namespace App\Http\Controllers\API\V1;
 
 use Exception;
 use App\Helpers\ApiResponse;
-use App\Models\Tenants\Room;
-use App\Models\Tenants\Site;
-use Illuminate\Http\Request;
-use App\Models\Tenants\Asset;
-use App\Models\Tenants\Floor;
-use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use App\Http\Controllers\Controller;
-use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\DocumentUpdateRequest;
-use App\Http\Requests\Tenant\DocumentUploadRequest;
 
 class UpdateDocumentController extends Controller
 {
@@ -30,7 +22,6 @@ class UpdateDocumentController extends Controller
             $document->update([...$request->validated()]);
 
             if ($document->category_type_id !== $request->validated('typeId')) {
-                $document->documentCategory()->dissociate();
                 $document->documentCategory()->associate($request->validated('typeId'));
                 $document->save();
             }

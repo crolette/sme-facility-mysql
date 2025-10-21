@@ -188,7 +188,7 @@ abstract class TenantTestCase extends BaseTestCase
             // Remettre à 0 les compteurs assets et tickets
             $company = Company::first();
             if ($company)
-                $company->update(['last_ticket_number' => 0, 'last_asset_number' => 0]);
+                $company->update(['last_ticket_number' => 0, 'last_asset_number' => 0, 'disk_size' => 0]);
 
 
 

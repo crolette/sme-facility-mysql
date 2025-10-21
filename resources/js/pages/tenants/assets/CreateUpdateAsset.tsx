@@ -371,7 +371,15 @@ export default function CreateUpdateAsset({
                             accept="image/png, image/jpeg, image/jpg, .pdf"
                         />
 
-                        <Input type="text" name="name" required placeholder="Document name" onChange={(e) => setNewFileName(e.target.value)} />
+                        <Input
+                            type="text"
+                            name="name"
+                            minLength={10}
+                            maxLength={250}
+                            required
+                            placeholder="Document name"
+                            onChange={(e) => setNewFileName(e.target.value)}
+                        />
                         <p className="text-border text-foreground text-xs">Le nom servira également à la sauvegarde du nom du fichier</p>
                         <Input
                             type="text"

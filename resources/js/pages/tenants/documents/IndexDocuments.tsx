@@ -1,27 +1,25 @@
+import Modale from '@/components/Modale';
+import ModaleForm from '@/components/ModaleForm';
+import { Pagination } from '@/components/pagination';
+import { useToast } from '@/components/ToastrContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
+import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { CentralType, Documents } from '@/types';
+import { BreadcrumbItem, CentralType, PaginatedData } from '@/types';
+import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
-import { Loader2, Pencil, PlusCircle, Trash2, Unlink } from 'lucide-react';
+import { Loader, Pencil, PlusCircle, Trash2, X } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
-import Modale from '../Modale';
-import ModaleForm from '../ModaleForm';
-import SearchableInput from '../SearchableInput';
-import { useToast } from '../ToastrContext';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
 
-interface DocumentManagerProps {
-    itemCodeId: number | string;
-    getDocumentsUrl: string;
-    uploadRoute: string;
-    editRoute: string;
-    deleteRoute: string;
-    showRoute: string;
-    removableRoute?: string;
-    canAdd?: boolean;
+export interface SearchParams {
+    q: string | null;
+    sortBy: string | null;
+    orderBy: string | null;
+    type: string | null;
 }
 
 type DocumentFormData = {
@@ -32,74 +30,95 @@ type DocumentFormData = {
     typeSlug: string;
 };
 
-export const DocumentManager = ({
-    itemCodeId,
-    getDocumentsUrl,
-    editRoute,
-    uploadRoute,
-    deleteRoute,
-    showRoute,
-    removableRoute,
-    canAdd = true,
-}: DocumentManagerProps) => {
+export default function IndexDocuments({ items, filters, types }: { items: PaginatedData; filters: SearchParams; types: CentralType[] }) {
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: `Index documents`,
+            href: `/documents`,
+        },
+    ];
+
+    const [debouncedSearch, setDebouncedSearch] = useState<string>('');
     const { showToast } = useToast();
-    const [documents, setDocuments] = useState<Documents[]>();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+
+    const [query, setQuery] = useState<SearchParams>({
+        q: filters.q ?? null,
+        sortBy: filters.sortBy ?? null,
+        orderBy: filters.orderBy ?? null,
+        type: filters.type ?? null,
+    });
+    const [search, setSearch] = useState(query.q);
+    const [prevQuery, setPrevQuery] = useState(query);
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
+    const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
+    const [documentToDelete, setDocumentToDelete] = useState(null);
 
     useEffect(() => {
-        fetchDocuments();
-    }, []);
+        if (!search) return;
 
-    const removeDocument = async (id: number) => {
-        if (!removableRoute || !id) return;
+        const handler = setTimeout(() => {
+            setDebouncedSearch(search);
+        }, 500);
 
-        setIsUpdating(true);
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [search]);
 
-        try {
-            const response = await axios.patch(route(removableRoute, itemCodeId), { document_id: id });
-            if (response.data.status === 'success') {
-                fetchDocuments();
-            }
-        } catch (error) {
-            showToast(error.response.data.message, error.response.data.status);
+    useEffect(() => {
+        if (query.q !== debouncedSearch && debouncedSearch?.length > 2) {
+            router.visit(route('tenant.documents.index', { ...query, q: debouncedSearch }), {
+                onStart: () => {
+                    setIsLoading(true);
+                },
+                onFinish: () => {
+                    setIsLoading(false);
+                },
+            });
         }
+    }, [debouncedSearch]);
 
-        setIsUpdating(false);
+    const clearSearch = () => {
+        router.visit(route('tenant.documents.index'), {
+            onStart: () => {
+                setIsLoading(true);
+            },
+            onFinish: () => {
+                setIsLoading(false);
+            },
+        });
     };
 
-    const [documentToDelete, setDocumentToDelete] = useState(null);
+    useEffect(() => {
+        if (query !== prevQuery)
+            router.visit(route('tenant.documents.index', { ...query }), {
+                onStart: () => {
+                    setIsLoading(true);
+                },
+                onFinish: () => {
+                    setIsLoading(false);
+                },
+            });
+    }, [query]);
+
     const deleteDocument = async () => {
         if (!documentToDelete) return;
 
         setIsUpdating(true);
         try {
-            const response = await axios.delete(route(deleteRoute, documentToDelete));
+            const response = await axios.delete(route('api.documents.delete', documentToDelete));
             if (response.data.status === 'success') {
-                fetchDocuments();
                 setShowDeleteModale(false);
                 setIsUpdating(false);
                 showToast(response.data.message, response.data.status);
+                router.visit(route('tenant.documents.index'));
             }
         } catch (error) {
             showToast(error.response.data.message, error.response.data.status);
             setIsUpdating(false);
         }
     };
-
-    const fetchDocuments = async () => {
-        try {
-            const response = await axios.get(route(getDocumentsUrl, itemCodeId));
-            setDocuments(response.data.data);
-            setIsUpdating(false);
-        } catch (error) {
-            console.error('Erreur lors de la recherche :', error);
-        }
-    };
-
-    const [showFileModal, setShowFileModal] = useState(false);
-    const [documentTypes, setDocumentTypes] = useState<CentralType[]>([]);
-    const [existingDocuments, setExistingDocuments] = useState<Documents[] | []>([]);
-    const [addExistingDocumentsModale, setAddExistingDocumentsModale] = useState<boolean>(false);
 
     const updateDocumentData = {
         documentId: 0,
@@ -109,53 +128,18 @@ export const DocumentManager = ({
         typeSlug: '',
     };
 
+    const [showFileModal, setShowFileModal] = useState(false);
     const [newFileData, setNewFileData] = useState<DocumentFormData>(updateDocumentData);
+    const [submitType, setSubmitType] = useState<'edit' | 'new'>('edit');
 
     const closeFileModal = () => {
         setNewFileData(updateDocumentData);
         setShowFileModal(!showFileModal);
-        setDocumentTypes([]);
-        fetchDocuments();
         setSubmitType('edit');
     };
 
-    const addExistingDocumentsToAsset = async () => {
-        const documents = {
-            existing_documents: existingDocuments.map((elem) => elem.id),
-        };
-
-        console.log(documents);
-
-        setIsUpdating(true);
-
-        try {
-            const response = await axios.post(route(uploadRoute, itemCodeId), documents);
-            if (response.data.status === 'success') {
-                setAddExistingDocumentsModale(false);
-                fetchDocuments();
-                setExistingDocuments([]);
-                showToast(response.data.message, response.data.status);
-            }
-        } catch (error) {
-            showToast(error.response.data.message, error.response.data.status);
-        }
-
-        setIsUpdating(false);
-    };
-
-    const fetchDocumentTypes = async () => {
-        try {
-            const response = await axios.get(route('api.category-types', { type: 'document' }));
-            setDocumentTypes(await response.data.data);
-        } catch (error) {
-            const errors = error.response.data.errors;
-        }
-    };
-
     const editFile = (id: number) => {
-        fetchDocumentTypes();
-
-        const document = documents?.find((document) => {
+        const document = items.data?.find((document) => {
             return document.id === id;
         });
 
@@ -170,40 +154,22 @@ export const DocumentManager = ({
             name: document?.name,
             description: document?.description,
             typeId: document?.category_type_id,
+            typeSlug: document?.document_category.slug,
         }));
 
         setShowFileModal(!showFileModal);
     };
-
-    const [submitType, setSubmitType] = useState<'edit' | 'new'>('edit');
-    const addNewFile = () => {
-        fetchDocumentTypes();
-        setSubmitType('new');
-        setShowFileModal(!showFileModal);
-    };
-
-    useEffect(() => {
-        if (documentTypes.length === 0) return;
-
-        const found = documentTypes.find((documentType) => documentType.id === newFileData.typeId);
-
-        if (found) {
-            setNewFileData((prev) => ({
-                ...prev,
-                typeSlug: found.slug,
-            }));
-        }
-    }, [documentTypes, newFileData.typeId]);
 
     const submitEditFile: FormEventHandler = async (e) => {
         e.preventDefault();
         setIsUpdating(true);
 
         try {
-            const response = await axios.patch(route(editRoute, newFileData.documentId), newFileData);
+            const response = await axios.patch(route(`api.documents.update`, newFileData.documentId), newFileData);
             if (response.data.status === 'success') {
                 closeFileModal();
                 showToast(response.data.message, response.data.status);
+                router.visit(route('tenant.documents.index'));
             }
         } catch (error) {
             showToast(error.response.data.message, error.response.data.status);
@@ -211,50 +177,81 @@ export const DocumentManager = ({
         setIsUpdating(false);
     };
 
+    const addNewFile = () => {
+        setSubmitType('new');
+        setShowFileModal(!showFileModal);
+    };
+
     const submitNewFile: FormEventHandler = async (e) => {
         e.preventDefault();
         setIsUpdating(true);
 
-        const newFile = {
-            files: [newFileData],
-        };
         try {
-            const response = await axios.post(route(uploadRoute, itemCodeId), newFile, {
+            const response = await axios.post(route('api.documents.store'), newFileData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
+
             if (response.data.status === 'success') {
                 closeFileModal();
                 showToast(response.data.message, response.data.status);
+                router.visit(route('tenant.documents.index'));
             }
         } catch (error) {
             showToast(error.response.data.message, error.response.data.status);
         }
     };
-    const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
 
     return (
-        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-            <div className="flex items-center justify-between">
-                <h2 className="inline">Documents ({documents?.length ?? 0})</h2>
-                <div className="space-x-4">
-                    {canAdd && (
-                        <>
-                            <Button onClick={() => setAddExistingDocumentsModale(true)}>
-                                {' '}
-                                <PlusCircle /> Add existing document
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title="Index documents" />
+            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
+                <div className="flex w-full justify-between">
+                    <details className="border-border relative w-full cursor-pointer rounded-md border-2 p-2" open={isLoading ? false : undefined}>
+                        <summary>Search</summary>
+
+                        <div className="bg-border border-border text-background dark:text-foreground absolute top-full flex flex-col items-center gap-4 rounded-b-md border-2 p-2 sm:flex-row">
+                            <div className="flex flex-col items-center gap-2">
+                                <Label htmlFor="status">Type</Label>
+                                <select
+                                    name="type"
+                                    id="type"
+                                    value={query.type ?? ''}
+                                    onChange={(e) => setQuery((prev) => ({ ...prev, type: e.target.value }))}
+                                >
+                                    <option value={''} aria-readonly>
+                                        Select a type
+                                    </option>
+                                    {types.map((type) => (
+                                        <option key={type.id} value={type.id}>
+                                            {type.label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="flex flex-col items-center gap-2">
+                                <Label htmlFor="category">Search</Label>
+                                <div className="relative text-black dark:text-white">
+                                    <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} />
+                                    <X
+                                        onClick={() => setQuery((prev) => ({ ...prev, q: null }))}
+                                        className={'absolute top-1/2 right-0 -translate-1/2'}
+                                    />
+                                </div>
+                            </div>
+
+                            <Button onClick={clearSearch} size={'sm'}>
+                                Clear Search
                             </Button>
-                            <Button onClick={() => addNewFile()}>
-                                {' '}
-                                <PlusCircle />
-                                Add new file
-                            </Button>
-                        </>
-                    )}
+                        </div>
+                    </details>
+                    <Button onClick={() => addNewFile()}>
+                        {' '}
+                        <PlusCircle />
+                        Add new file
+                    </Button>
                 </div>
-            </div>
-            {documents && documents.length > 0 && (
                 <Table>
                     <TableHead>
                         <TableHeadRow>
@@ -268,36 +265,41 @@ export const DocumentManager = ({
                         </TableHeadRow>
                     </TableHead>
                     <TableBody>
-                        {documents.map((document, index) => {
-                            const isImage = document.mime_type.startsWith('image/');
-                            const isPdf = document.mime_type === 'application/pdf';
-                            return (
-                                <TableBodyRow key={index}>
-                                    <TableBodyData>
-                                        <a href={route('api.file.download', { path: document.path })} download className="w-fit cursor-pointer">
-                                            {isImage && (
-                                                <img
-                                                    src={route(showRoute, document.id)}
-                                                    alt="preview"
-                                                    className="mx-auto h-10 w-10 rounded object-cover"
-                                                />
-                                            )}
-                                            {isPdf && <BiSolidFilePdf size={'40px'} className="mx-auto" />}
-                                        </a>
-                                    </TableBodyData>
+                        {isLoading ? (
+                            <TableBodyRow>
+                                <TableBodyData>
+                                    <p className="flex animate-pulse gap-2">
+                                        <Loader />
+                                        Searching...
+                                    </p>
+                                </TableBodyData>
+                            </TableBodyRow>
+                        ) : (
+                            items.data.map((document, index) => {
+                                const isImage = document.mime_type.startsWith('image/');
+                                const isPdf = document.mime_type === 'application/pdf';
+                                return (
+                                    <TableBodyRow key={index}>
+                                        <TableBodyData>
+                                            <a href={route('api.file.download', { path: document.path })} download className="w-fit cursor-pointer">
+                                                {isImage && (
+                                                    <img
+                                                        src={route('api.documents.show', document.id)}
+                                                        alt="preview"
+                                                        className="mx-auto h-10 w-10 rounded object-cover"
+                                                    />
+                                                )}
+                                                {isPdf && <BiSolidFilePdf size={'40px'} className="mx-auto" />}
+                                            </a>
+                                        </TableBodyData>
 
-                                    <TableBodyData>{document.sizeMo} Mo</TableBodyData>
-                                    <TableBodyData>{document.name}</TableBodyData>
-                                    <TableBodyData>{document.description}</TableBodyData>
-                                    <TableBodyData>{document.category}</TableBodyData>
-                                    <TableBodyData>{document.created_at}</TableBodyData>
-                                    <TableBodyData className="flex space-x-2">
-                                        {canAdd && (
+                                        <TableBodyData>{document.sizeMo} Mo</TableBodyData>
+                                        <TableBodyData>{document.name}</TableBodyData>
+                                        <TableBodyData>{document.description}</TableBodyData>
+                                        <TableBodyData>{document.category}</TableBodyData>
+                                        <TableBodyData>{document.created_at}</TableBodyData>
+                                        <TableBodyData className="flex space-x-2">
                                             <>
-                                                <Button variant={'outline'} onClick={() => removeDocument(document.id)}>
-                                                    <Unlink />
-                                                    Remove
-                                                </Button>
                                                 <Button onClick={() => editFile(document.id)}>
                                                     <Pencil />
                                                 </Button>
@@ -312,22 +314,27 @@ export const DocumentManager = ({
                                                     <Trash2 />
                                                 </Button>
                                             </>
-                                        )}
-                                    </TableBodyData>
-                                </TableBodyRow>
-                            );
-                        })}
+                                        </TableBodyData>
+                                    </TableBodyRow>
+                                );
+                            })
+                        )}
                     </TableBody>
                 </Table>
-            )}
-            {isUpdating && (
-                <ModaleForm>
-                    <Loader2 size={36} className="animate-spin" />
-                    <p className="animate-pulse">Updating...</p>
-                </ModaleForm>
-            )}
+                <Pagination items={items} />
+            </div>
+            <Modale
+                title={'Delete document'}
+                message={`Are you sure you want to delete this document ?`}
+                isOpen={showDeleteModale}
+                isUpdating={isUpdating}
+                onConfirm={deleteDocument}
+                onCancel={() => {
+                    setShowDeleteModale(false);
+                }}
+            />
             {showFileModal && (
-                <ModaleForm title={submitType === 'edit' ? 'Edit document' : 'Add document'}>
+                <ModaleForm title={submitType === 'edit' ? 'Edit document' : 'Add document'} isUpdating={isUpdating}>
                     <div className="flex flex-col gap-2">
                         <form onSubmit={submitType === 'edit' ? submitEditFile : submitNewFile} className="space-y-4">
                             <div>
@@ -349,12 +356,12 @@ export const DocumentManager = ({
                                         'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
                                     )}
                                 >
-                                    {documentTypes && documentTypes.length > 0 && (
+                                    {types && types.length > 0 && (
                                         <>
                                             <option value={0} disabled className="bg-background text-foreground">
                                                 Select an option
                                             </option>
-                                            {documentTypes?.map((documentType) => (
+                                            {types?.map((documentType) => (
                                                 <option value={documentType.id} key={documentType.id} className="bg-background text-foreground">
                                                     {documentType.label}
                                                 </option>
@@ -390,6 +397,8 @@ export const DocumentManager = ({
                                 name="name"
                                 value={newFileData.name}
                                 required
+                                minLength={10}
+                                maxLength={255}
                                 placeholder="Document name"
                                 onChange={(e) =>
                                     setNewFileData((prev) => ({
@@ -404,7 +413,6 @@ export const DocumentManager = ({
                                 name="description"
                                 id="description"
                                 value={newFileData.description}
-                                minLength={10}
                                 maxLength={250}
                                 placeholder="Document description"
                                 onChange={(e) =>
@@ -424,44 +432,6 @@ export const DocumentManager = ({
                     </div>
                 </ModaleForm>
             )}
-            <Modale
-                title={'Delete document'}
-                message={`Are you sure you want to delete this document ?`}
-                isOpen={showDeleteModale}
-                onConfirm={deleteDocument}
-                onCancel={() => {
-                    setShowDeleteModale(false);
-                }}
-            />
-            {addExistingDocumentsModale && (
-                <ModaleForm title={'Add existing document'}>
-                    <div className="space-y-4">
-                        <SearchableInput<Documents>
-                            multiple={true}
-                            searchUrl={route('api.documents.search')}
-                            selectedItems={existingDocuments}
-                            getDisplayText={(document) => document.name}
-                            getKey={(document) => document.id}
-                            onSelect={(documents) => {
-                                setExistingDocuments(documents);
-                            }}
-                            placeholder="Search documents..."
-                        />
-                        <div className="space-x-4">
-                            <Button onClick={addExistingDocumentsToAsset}>Add document</Button>
-                            <Button
-                                variant="secondary"
-                                onClick={() => {
-                                    setAddExistingDocumentsModale(false);
-                                    setExistingDocuments([]);
-                                }}
-                            >
-                                Cancel
-                            </Button>
-                        </div>
-                    </div>
-                </ModaleForm>
-            )}
-        </div>
+        </AppLayout>
     );
-};
+}

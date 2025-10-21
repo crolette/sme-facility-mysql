@@ -35,6 +35,7 @@ use App\Http\Controllers\Tenants\InterventionActionController;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Tenants\InterventionProviderController;
 use App\Http\Controllers\Tenants\CreateTicketFromQRCodeController;
+use App\Http\Controllers\Tenants\DocumentsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -77,39 +78,36 @@ Route::middleware([
 
     Route::get('dashboard', [DashboardController::class, 'show'])->name('tenant.dashboard');
 
-    Route::get('/pdf-qr-codes', function(Request $request) {  
+    Route::get('/pdf-qr-codes', function (Request $request) {
 
         $collection = collect([]);
 
-        $sites = Site::select('id','code', 'reference_code','qr_code', 'location_type_id')->where('qr_code', '!=', null)->get();
+        $sites = Site::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->where('qr_code', '!=', null)->get();
 
-        $buildings = Building::select('id','code', 'reference_code','qr_code', 'location_type_id')->where('qr_code', '!=', null)->get();
-        
-        $floors = Floor::select('id','code', 'reference_code','qr_code', 'location_type_id')->where('qr_code', '!=', null)->get();
-        
-        $rooms = Room::select('id','code', 'reference_code','qr_code', 'location_type_id')->where('qr_code', '!=', null)->get();
+        $buildings = Building::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->where('qr_code', '!=', null)->get();
+
+        $floors = Floor::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->where('qr_code', '!=', null)->get();
+
+        $rooms = Room::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->where('qr_code', '!=', null)->get();
 
         $assets = Asset::select('id', 'code', 'reference_code', 'qr_code', 'category_type_id')->where('qr_code', '!=', null)->get();
 
-        $codes = match($request->query('type')) {
+        $codes = match ($request->query('type')) {
             'sites' => $sites,
             'buildings' => $buildings,
             'floors' => $floors,
             'rooms' => $rooms,
             'assets' => $assets,
             default => $collection->merge($sites)->merge($buildings)->merge($floors)->merge($rooms)->merge($assets)
-
         };
 
         $pdf = Pdf::loadView('pdf.qr-codes', ['codes' => $codes])->setPaper('a4', 'portrait');
         return $pdf->stream('qrcode.pdf');
-
     })->name('tenant.pdf.qr-codes');
 
-    Route::prefix('/settings/import-export/')->group(function() {
+    Route::prefix('/settings/import-export/')->group(function () {
         Route::get('/', [ImportExportController::class, 'show'])->name('tenant.import-export');
         Route::get('/assets/export', [AssetsExportController::class, 'index'])->name('tenant.assets.export');
-
     });
 
     Route::resource('sites', TenantSiteController::class)->parameters(['sites' => 'site'])->only('index', 'show', 'create', 'edit')->names('tenant.sites');
@@ -130,14 +128,17 @@ Route::middleware([
         Route::get('/{provider}/edit', [ProviderController::class, 'edit'])->name('tenant.providers.edit');
     });
 
-  
 
-    Route::prefix('company')->group(function() {
-        Route::get('/', function() {
+    Route::prefix('/documents')->group(function () {
+        Route::get('/', [DocumentsController::class, 'index'])->name('tenant.documents.index');
+    });
+
+
+    Route::prefix('company')->group(function () {
+        Route::get('/', function () {
             $company = Company::first();
 
             return ApiResponse::success($company);
-
         })->name('api.company.logo.show');
         Route::post('/logo', [APICompanyLogoController::class, 'store'])->name('api.company.logo.store');
         Route::delete('/logo', [APICompanyLogoController::class, 'destroy'])->name('api.company.logo.destroy');
@@ -157,17 +158,15 @@ Route::middleware([
         Route::get('/{ticket}', [TicketController::class, 'show'])->name('tenant.tickets.show');
         // Route::get('/{ticket}/edit', [TicketController::class, 'update'])->name('tenant.tickets.update');
     });
-    
+
     // INTERVENTIONS
 
-    Route::prefix('interventions')->group(function() {
+    Route::prefix('interventions')->group(function () {
         Route::get('', [InterventionController::class, 'index'])->name('tenant.interventions.index');
         Route::get('/create/{ticket}', [InterventionController::class, 'create'])->name('tenant.interventions.create');
         Route::get('/{intervention}', [InterventionController::class, 'show'])->name('tenant.interventions.show');
         Route::get('/{intervention}/actions/create', [InterventionActionController::class, 'create'])->name('tenant.interventions.actions.create');
         Route::get('/{intervention}/actions/{action}/edit', [InterventionActionController::class, 'edit'])->name('tenant.interventions.actions.edit');
-
-
     });
 });
 
