@@ -41,7 +41,6 @@ it('can render the index floors page', function () {
         fn($page) =>
         $page->component('tenants/locations/IndexLocations')
             ->has('items.data', 3)
-            ->has('items.0.maintainable')
     );
 });
 

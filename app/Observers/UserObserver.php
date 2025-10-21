@@ -16,10 +16,12 @@ class UserObserver implements ShouldHandleEventsAfterCommit
         app(UserNotificationPreferenceService::class)->createDefaultUserNotificationPreferences($user);
     }
 
-    // Ajoutez aussi les autres événements pour voir
     public function updated(User $user)
     {
-        // \Log::info('UserObserver::updated called', ['user_id' => $user->id]);
+        if ($user->notification_preferences()->exists()) {
+            return;
+        }
+        app(UserNotificationPreferenceService::class)->createDefaultUserNotificationPreferences($user);
     }
 
     public function saving(User $user)

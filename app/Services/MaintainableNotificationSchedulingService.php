@@ -92,6 +92,8 @@ class MaintainableNotificationSchedulingService
         if ($maintainable->wasChanged('maintenance_manager_id') && $maintainable->manager) {
             $this->createScheduleForUser($maintainable, $maintainable->manager);
 
+            app(AssetNotificationSchedulingService::class)->scheduleForAsset($maintainable->maintainable, $maintainable->manager);
+
             // add notifications to the manager for the interventions linked to the maintainable
             $interventions = $maintainable->maintainable->interventions;
             if (count($interventions) > 0)

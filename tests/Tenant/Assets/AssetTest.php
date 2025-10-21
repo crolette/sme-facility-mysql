@@ -59,11 +59,11 @@ it('can render the index assets page', function () {
         fn($page) =>
         $page->component('tenants/assets/IndexAssets')
             ->has('items.data', 4)
-            ->where('items.0.maintainable.name', $asset->maintainable->name)
-            ->where('items.0.location.id', $this->site->id)
-            ->where('items.0.category', $asset->assetCategory->label)
-            ->where('items.0.location_type', get_class($this->site))
-            ->where('items.0.location_id', $this->site->id)
+            ->where('items.data.0.maintainable.name', $asset->maintainable->name)
+            ->where('items.data.0.location.id', $this->site->id)
+            ->where('items.data.0.category', $asset->assetCategory->label)
+            ->where('items.data.0.location_type', get_class($this->site))
+            ->where('items.data.0.location_id', $this->site->id)
     );
 });
 
