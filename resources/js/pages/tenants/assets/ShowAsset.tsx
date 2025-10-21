@@ -210,9 +210,10 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                                 <Field label={'Maintenance frequency'} text={asset.maintainable.maintenance_frequency} />
                                                 <Field
                                                     label={'Next maintenance date'}
+                                                    date
                                                     text={asset.maintainable.next_maintenance_date ?? 'Not planned'}
                                                 />
-                                                <Field label={'Last maintenance date'} text={asset.maintainable.last_maintenance_date} />
+                                                <Field label={'Last maintenance date'} date text={asset.maintainable.last_maintenance_date} />
                                             </>
                                         )}
                                     </div>
@@ -223,8 +224,8 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                         <h2>Depreciation</h2>
                                         <div className="space-y-2">
                                             <Field label={'Depreciation duration'} text={asset.depreciation_duration} />
-                                            <Field label={'Depreciation start date'} text={asset.depreciation_start_date} />
-                                            <Field label={'Depreciation end date'} text={asset.depreciation_end_date} />
+                                            <Field label={'Depreciation start date'} date text={asset.depreciation_start_date} />
+                                            <Field label={'Depreciation end date'} date text={asset.depreciation_end_date} />
                                             <Field label={'Residual value'} text={asset.residual_value} />
                                         </div>
                                     </div>
@@ -236,10 +237,10 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
                                 <h2>Purchase/Warranty</h2>
                                 <div className="space-y-2">
-                                    <Field label={'Purchase date'} text={asset.maintainable.purchase_date} />
+                                    <Field label={'Purchase date'} date text={asset.maintainable.purchase_date} />
                                     <Field label={'Purchase cost'} text={asset.maintainable.purchase_cost} />
                                     {asset.maintainable.under_warranty && (
-                                        <Field label={'End warranty date'} text={asset.maintainable.end_warranty_date} />
+                                        <Field label={'End warranty date'} date text={asset.maintainable.end_warranty_date} />
                                     )}
                                 </div>
                             </div>

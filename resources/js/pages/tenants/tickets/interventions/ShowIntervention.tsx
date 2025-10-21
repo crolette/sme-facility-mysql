@@ -46,13 +46,13 @@ export default function ShowIntervention({ intervention }: { intervention: Inter
                                     <h2>Intervention information</h2>
                                     <div className="space-y-2">
                                         <Field label={'intervention type'} text={intervention.type} />
-                                        {intervention.planned_at && <Field label={'Planned at'} text={intervention.planned_at} />}
+                                        {intervention.planned_at && <Field label={'Planned at'} date text={intervention.planned_at} />}
                                         <Field label={'Description'} text={intervention.description} />
                                         {intervention.total_costs && <Field label={'Total costs'} text={intervention.total_costs} />}
                                         {intervention.repair_delay && <Field label={'Repair delay'} text={intervention.repair_delay} />}
                                         <div className="flex flex-wrap gap-4">
-                                            <Field label={'Created at'} text={intervention.created_at} />
-                                            <Field label={'Updated at'} text={intervention.updated_at} />
+                                            <Field label={'Created at'} date text={intervention.created_at} />
+                                            <Field label={'Updated at'} date text={intervention.updated_at} />
                                         </div>
                                     </div>
                                     <div></div>

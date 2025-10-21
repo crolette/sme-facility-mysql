@@ -1,8 +1,13 @@
 import { Label } from "./label";
 
 
-export default function field({ label, text }: { label: string; text: string | number | Element }) {
-    
+export default function field({ label, text, date = false }: { label: string; text: string | number; date?: boolean }) {
+    if (date && typeof text === 'string') {
+        const [d, m, y] = text.split('-');
+        text = `${y}-${m}-${d}`;
+    };
+        
+
     return (
         <div className="flex gap-4 items-center">
             <Label className="first-letter:uppercase">{label}</Label>

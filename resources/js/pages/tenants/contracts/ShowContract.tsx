@@ -76,14 +76,14 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                                     </div>
                                     <Field label={'Renewal Type:'} text={contract.renewal_type} />
                                     <div className="flex gap-4">
-                                        <Field label={'Start date:'} text={contract.start_date} />
+                                        <Field label={'Start date:'} date text={contract.start_date} />
                                         <Field label={'Contract duration:'} text={contract.contract_duration} />
 
-                                        <Field label={'End date:'} text={contract.end_date} />
+                                        <Field label={'End date:'} date text={contract.end_date} />
                                     </div>
                                     <div className="flex gap-4">
                                         <Field label={'Notice period:'} text={contract.notice_period} />
-                                        <Field label={'Notice date:'} text={contract.notice_date} />
+                                        <Field label={'Notice date:'} date text={contract.notice_date} />
                                     </div>
                                     <Field label={'Notes:'} text={contract.notes} />
                                 </div>

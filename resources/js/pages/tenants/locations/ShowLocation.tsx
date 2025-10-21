@@ -220,9 +220,10 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                                             <Field label={'Maintenance frequency'} text={location.maintainable.maintenance_frequency} />
                                             <Field
                                                 label={'Next maintenance date'}
+                                                date
                                                 text={location.maintainable.next_maintenance_date ?? 'Not planned'}
                                             />
-                                            <Field label={'Last maintenance date'} text={location.maintainable.last_maintenance_date} />
+                                            <Field label={'Last maintenance date'} date text={location.maintainable.last_maintenance_date} />
                                         </>
                                     )}
                                 </div>
