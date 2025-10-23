@@ -20,7 +20,7 @@ class FloorFactory extends Factory
      */
     public function definition(): array
     {
-        $location = LocationType::where('level', 'floor')->first();
+        $location = LocationType::factory()->create(['level' => 'floor']);
         $building = Building::first();
 
         return [

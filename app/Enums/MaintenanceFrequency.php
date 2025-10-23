@@ -6,6 +6,7 @@ enum MaintenanceFrequency: string
 {
     case DAILY = 'daily';
     case WEEKLY = 'weekly';
+    case BIMONTHLY = "bimonthly";
     case MONTHLY = 'monthly';
     case QUARTERLY = 'quarterly';
     case BIANNUAL = 'biannual';
@@ -18,6 +19,7 @@ enum MaintenanceFrequency: string
         return match ($this) {
             self::DAILY => 1,
             self::WEEKLY => 7,
+            self::BIMONTHLY => 14,
             self::MONTHLY => 30,
             self::QUARTERLY => 90,
             self::BIANNUAL => 180,

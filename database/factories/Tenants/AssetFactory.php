@@ -25,7 +25,7 @@ class AssetFactory extends Factory
     public function definition(): array
     {
 
-        $category = CategoryType::where('category', 'asset')->first();
+        $category = CategoryType::factory()->create(['category' => 'asset']);
 
         $randomDepreciationDuration = fake()->randomDigitNotZero();
         return [

@@ -39,10 +39,22 @@ Route::middleware([
         if (Auth::user()->cannot('view', $provider))
             return ApiResponse::notAuthorized();
 
-
-
         return ApiResponse::success($provider->contracts()->with('provider')->paginate());
     })->name('api.providers.contracts');
+
+    Route::get('/{provider}/assets', function (Provider $provider) {
+        if (Auth::user()->cannot('view', $provider))
+            return ApiResponse::notAuthorized();
+
+        return ApiResponse::success($provider->assets()->paginate());
+    })->name('api.providers.assets');
+
+    Route::get('/{provider}/locations', function (Provider $provider) {
+        if (Auth::user()->cannot('view', $provider))
+            return ApiResponse::notAuthorized();
+
+        return ApiResponse::success($provider->locations()->paginate());
+    })->name('api.providers.locations');
 
     Route::post('/', [APIProviderController::class, 'store'])->name('api.providers.store');
     Route::get('/{provider}', [APIProviderController::class, 'show'])->name('api.providers.show');

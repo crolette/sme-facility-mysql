@@ -1,6 +1,8 @@
 import ImageUploadModale from '@/components/ImageUploadModale';
 import Modale from '@/components/Modale';
+import { AssetManager } from '@/components/tenant/assetManager';
 import { ContractsList } from '@/components/tenant/contractsList';
+import { LocationList } from '@/components/tenant/LocationList';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
 import { UsersList } from '@/components/tenant/usersList';
 import { useToast } from '@/components/ToastrContext';
@@ -12,7 +14,7 @@ import { router } from '@inertiajs/core';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
 import { Pencil, Trash, Trash2, Upload } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function ShowProvider({ item }: { item: Provider }) {
     const { showToast } = useToast();
@@ -75,6 +77,25 @@ export default function ShowProvider({ item }: { item: Provider }) {
 
     const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
     const [activeTab, setActiveTab] = useState('information');
+
+    const [assets, setAssets] = useState();
+
+    const fetchAssets = async () => {
+        try {
+            const response = await axios.get(route('api.providers.assets', provider.id));
+            if (response.data.status === 'success') {
+                setAssets(response.data.data);
+            }
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
+        }
+    };
+
+    useEffect(() => {
+        if (activeTab === 'assets') fetchAssets();
+    }, [activeTab]);
+
+    console.log(assets);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -154,6 +175,8 @@ export default function ShowProvider({ item }: { item: Provider }) {
                                 <UsersList items={provider.users} />
                             </div>
                         )}
+                        {activeTab === 'assets' && <AssetManager itemCode={provider.id} type={'providers'} />}
+                        {activeTab === 'locations' && <LocationList itemCode={provider.id} type={'providers'} getUrl={'api.providers.locations'} />}
                     </div>
                     <ImageUploadModale
                         isOpen={isModalOpen}

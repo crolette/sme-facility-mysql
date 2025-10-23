@@ -96,6 +96,14 @@ const MENUS = {
             tabName: 'users',
             tabDisplay: 'users',
         },
+        {
+            tabName: 'assets',
+            tabDisplay: 'assets',
+        },
+        {
+            tabName: 'locations',
+            tabDisplay: 'locations',
+        },
     ],
     ticket: [
         {

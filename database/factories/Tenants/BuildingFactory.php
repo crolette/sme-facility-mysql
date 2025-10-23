@@ -20,7 +20,7 @@ class BuildingFactory extends Factory
      */
     public function definition(): array
     {
-        $location = LocationType::where('level', 'building')->first();
+        $location = LocationType::factory()->create(['level' => 'building']);
         $siteLocation = Site::first();
 
 

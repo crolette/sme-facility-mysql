@@ -73,12 +73,27 @@ class Provider extends Model
 
     public function maintainables(): BelongsToMany
     {
-        return $this->belongsToMany(Maintainable::class, 'user_maintainable');
+        return $this->belongsToMany(Maintainable::class, 'provider_maintainable');
     }
 
     public function providerCategory(): BelongsTo
     {
         return $this->belongsTo(CategoryType::class, 'category_type_id');
+    }
+
+    public function assets()
+    {
+        // not trashed assets
+        return $this->maintainables()
+            ->where('maintainable_type', Asset::class)
+            ->with('maintainable')
+            ->whereHas('maintainable');
+    }
+
+    public function locations()
+    {
+        return $this->maintainables()
+            ->whereNot('maintainable_type', Asset::class)->with(['maintainable']);
     }
 
     public function category($locale = null): Attribute
