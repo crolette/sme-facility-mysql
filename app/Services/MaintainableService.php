@@ -13,10 +13,10 @@ class MaintainableService
     {
         $maintainable = $model->maintainable()->create([...$data]);
 
-        if(isset($data['providers']))
+        if (isset($data['providers']))
             $maintainable->providers()->sync(collect($data['providers'])->pluck('id'));
 
-        if(isset($data['maintenance_manager_id'])) {
+        if (isset($data['maintenance_manager_id'])) {
             $maintainable->manager()->associate($data['maintenance_manager_id'])->save();
         }
     }
@@ -31,16 +31,18 @@ class MaintainableService
             [
                 ...$data
             ]
-            );
+        );
 
         if (isset($data['providers']))
             $maintainable->providers()->sync(collect($data['providers'])->pluck('id'));
 
-        if(isset($data['maintenance_manager_id']) && $maintainable->manager === null) {
-                $maintainable->manager()->associate($data['maintenance_manager_id'])->save();
+
+
+        if (isset($data['maintenance_manager_id']) && $maintainable->manager === null) {
+            $maintainable->manager()->associate($data['maintenance_manager_id'])->save();
         }
 
-        if($maintainable->manager && !isset($data['maintenance_manager_id']))
+        if ($maintainable->manager && !isset($data['maintenance_manager_id']))
             $maintainable->manager()->dissociate();
 
         if (isset($data['maintenance_manager_id']) && ($maintainable->manager?->id !== $data['maintenance_manager_id'])) {
@@ -48,13 +50,16 @@ class MaintainableService
             $maintainable->manager()->associate($data['maintenance_manager_id'])->save();
         }
 
+
+
         if ($maintainable->wasChanged('maintenance_frequency'))
             $maintainable->next_maintenance_date = calculateNextMaintenanceDate($data['maintenance_frequency'], $data['last_maintenance_date'] ?? null);
 
-        $maintainable->save();
-        
-        return $model;
 
+
+        $maintainable->save();
+
+        return $model;
     }
 
     public function update(Maintainable $maintainable, $request)
@@ -74,8 +79,6 @@ class MaintainableService
 
         if ($maintainable->wasChanged('maintenance_frequency'))
             $maintainable->next_maintenance_date = calculateNextMaintenanceDate($request->validated('maintenance_frequency'), $request->validated('last_maintenance_date') ?? null);
-
-
 
         $maintainable->save();
     }

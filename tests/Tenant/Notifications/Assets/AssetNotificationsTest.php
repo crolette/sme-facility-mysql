@@ -30,11 +30,6 @@ beforeEach(function () {
 
     $this->manager = User::factory()->withRole('Maintenance Manager')->create();
 
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    LocationType::factory()->create(['level' => 'room']);
-    CategoryType::factory()->create(['category' => 'provider']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
 
     $this->site = Site::factory()->create();

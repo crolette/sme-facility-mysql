@@ -89,6 +89,7 @@ class ContractNotificationSchedulingService
 
             $createdNotification = $contract->notifications()->updateOrCreate([
                 'recipient_email' => $user->email,
+                'status' => 'pending',
                 'notification_type' => 'notice_date',
             ], [
                 ...$notification,
@@ -125,6 +126,7 @@ class ContractNotificationSchedulingService
 
             $createdNotification = $contract->notifications()->updateOrCreate([
                 'recipient_email' => $user->email,
+                'status' => 'pending',
                 'notification_type' => 'end_date',
             ], [
                 ...$notification,

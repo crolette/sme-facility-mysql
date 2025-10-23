@@ -78,6 +78,7 @@ class InterventionNotificationSchedulingService
             $createdNotification = $intervention->notifications()->updateOrCreate(
                 [
                     'recipient_email' => $user->email,
+                    'status' => 'pending',
                     'notification_type' => 'planned_at',
                 ],
                 [

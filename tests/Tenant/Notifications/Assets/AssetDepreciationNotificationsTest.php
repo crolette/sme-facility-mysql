@@ -30,11 +30,6 @@ beforeEach(function () {
 
     $this->manager = User::factory()->withRole('Maintenance Manager')->create();
 
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    LocationType::factory()->create(['level' => 'room']);
-    CategoryType::factory()->create(['category' => 'provider']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
 
     $this->site = Site::factory()->create();
@@ -42,10 +37,7 @@ beforeEach(function () {
     Floor::factory()->create();
     $this->provider = Provider::factory()->create();
 
-    $this->room = Room::factory()
-        ->for(LocationType::where('level', 'room')->first())
-        ->for(Floor::first())
-        ->create();
+    $this->room = Room::factory()->create();
 
     $this->basicAssetData = [
         'name' => 'New asset',
@@ -57,8 +49,6 @@ beforeEach(function () {
         'categoryId' => $this->categoryType->id,
     ];
 });
-
-// DEPRECIATION
 
 it('creates depreciation notification for a new created asset', function () {
 
@@ -98,6 +88,63 @@ it('creates depreciation notification for a new created asset', function () {
             'notifiable_id' => 1,
         ]
     );
+});
+
+it('creates a notification scheduled_at is in the past', function () {
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_manager_id' => $this->manager->id,
+        'depreciable' => true,
+        'depreciation_start_date' => Carbon::now()->toDateString(),
+        'depreciation_end_date' => Carbon::tomorrow()->toDateString(),
+        'depreciation_duration' => 3,
+        'residual_value' => 1250.69,
+    ];
+
+    $this->postToTenant('api.assets.store', $formData);
+
+    assertDatabaseCount('scheduled_notifications', 2);
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->admin->fullName,
+            'recipient_email' => $this->admin->email,
+            'notification_type' => 'depreciation_end_date',
+            'scheduled_at' => Carbon::tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'depreciation_end_date',
+            'scheduled_at' => Carbon::tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+});
+
+it('creates no notification if depreciation_end_date is today or in the past', function () {
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_manager_id' => $this->manager->id,
+        'depreciable' => true,
+        'depreciation_start_date' => Carbon::now()->subYears(2)->toDateString(),
+        'depreciation_end_date' => Carbon::now()->toDateString(),
+        'depreciation_duration' => 3,
+        'residual_value' => 1250.69,
+    ];
+
+    $this->postToTenant('api.assets.store', $formData);
+
+    assertDatabaseCount('scheduled_notifications', 0);
 });
 
 it('creates depreciation notification when depreciables passes from false to true', function () {
@@ -160,7 +207,6 @@ it('creates depreciation notification when depreciables passes from false to tru
 it(
     'updates depreciation notification when depreciable_end_date changes',
     function () {
-
         $formData = [
             ...$this->basicAssetData,
             'maintenance_manager_id' => $this->manager->id,
@@ -241,24 +287,6 @@ it(
         );
     }
 );
-
-it('creates no notification if depreciation_end_date is in the past', function () {
-
-    $formData = [
-        ...$this->basicAssetData,
-        'maintenance_manager_id' => $this->manager->id,
-        'depreciable' => true,
-        'depreciation_start_date' => Carbon::now()->subYears(2)->toDateString(),
-        'depreciation_end_date' => Carbon::now()->toDateString(),
-        'depreciation_duration' => 3,
-        'residual_value' => 1250.69,
-    ];
-
-    $this->postToTenant('api.assets.store', $formData);
-
-    assertDatabaseCount('scheduled_notifications', 0);
-});
-
 
 it('deletes depreciation notification when depreciable passes from true to false', function () {
 
@@ -464,6 +492,180 @@ it('creates notifications when notification preference depreciation_end_date of 
             'recipient_email' => $this->admin->email,
             'notification_type' => 'depreciation_end_date',
             'scheduled_at' => Carbon::now()->addYears(3)->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+});
+
+it('creates notification for maintenance manager when maintenance manager is added to an asset', function () {
+
+    $formData = [
+        ...$this->basicAssetData,
+        'depreciable' => true,
+        'depreciation_start_date' => Carbon::now()->toDateString(),
+        'depreciation_end_date' => Carbon::now()->addYear(3)->toDateString(),
+        'depreciation_duration' => 3,
+        'residual_value' => 1250.69,
+    ];
+
+    $this->postToTenant('api.assets.store', $formData);
+
+    assertDatabaseCount('scheduled_notifications', 1);
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_manager_id' => $this->manager->id,
+        'depreciable' => true,
+        'depreciation_start_date' => Carbon::now()->toDateString(),
+        'depreciation_end_date' => Carbon::now()->addYear(3)->toDateString(),
+        'depreciation_duration' => 3,
+        'residual_value' => 1250.69,
+    ];
+
+    $asset = Asset::first();
+
+    $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+
+    $asset->refresh();
+
+    assertDatabaseCount('scheduled_notifications', 2);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'depreciation_end_date',
+            'scheduled_at' => Carbon::now()->addYear(3)->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+});
+
+it('removes notification when maintenance manager is removed from the asset', function () {
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_manager_id' => $this->manager->id,
+        'depreciable' => true,
+        'depreciation_start_date' => Carbon::now()->toDateString(),
+        'depreciation_end_date' => Carbon::now()->addYear(3)->toDateString(),
+        'depreciation_duration' => 3,
+        'residual_value' => 1250.69,
+    ];
+
+    $this->postToTenant('api.assets.store', $formData);
+
+    assertDatabaseCount('scheduled_notifications', 2);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'depreciation_end_date',
+            'scheduled_at' => Carbon::now()->addYear(3)->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+
+    $formData = [
+        ...$this->basicAssetData,
+        'depreciable' => true,
+        'depreciation_start_date' => Carbon::now()->toDateString(),
+        'depreciation_end_date' => Carbon::now()->addYear(3)->toDateString(),
+        'depreciation_duration' => 3,
+        'residual_value' => 1250.69,
+    ];
+
+    $asset = Asset::first();
+
+    $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+
+    assertDatabaseCount('scheduled_notifications', 1);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'depreciation_end_date',
+            'scheduled_at' => Carbon::now()->addYear(3)->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+});
+
+it('removes old maintenance manager notification when new one is added', function () {
+
+    $tempManager = User::factory()->withRole('Maintenance Manager')->create();
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_manager_id' => $tempManager->id,
+        'depreciable' => true,
+        'depreciation_start_date' => Carbon::now()->toDateString(),
+        'depreciation_end_date' => Carbon::now()->addYear(3)->toDateString(),
+        'depreciation_duration' => 3,
+        'residual_value' => 1250.69,
+    ];
+
+    $this->postToTenant('api.assets.store', $formData);
+
+    assertDatabaseCount('scheduled_notifications', 2);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $tempManager->fullName,
+            'recipient_email' => $tempManager->email,
+            'notification_type' => 'depreciation_end_date',
+            'scheduled_at' => Carbon::now()->addYear(3)->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_manager_id' => $this->manager->id,
+        'depreciable' => true,
+        'depreciation_start_date' => Carbon::now()->toDateString(),
+        'depreciation_end_date' => Carbon::now()->addYear(3)->toDateString(),
+        'depreciation_duration' => 3,
+        'residual_value' => 1250.69,
+    ];
+
+    $asset = Asset::first();
+
+    $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+
+    assertDatabaseCount('scheduled_notifications', 2);
+
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'depreciation_end_date',
+            'scheduled_at' => Carbon::now()->addYear(3)->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $tempManager->fullName,
+            'recipient_email' => $tempManager->email,
+            'notification_type' => 'depreciation_end_date',
+            'scheduled_at' => Carbon::now()->addYear(3)->subDays(7)->toDateString(),
             'notifiable_type' => 'App\Models\Tenants\Asset',
             'notifiable_id' => 1,
         ]

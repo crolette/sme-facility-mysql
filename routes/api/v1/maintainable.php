@@ -19,12 +19,16 @@ Route::middleware([
         Route::prefix('{maintainable}')->group(function () {
 
             // Mark maintenance as done
-            Route::post('/done/', function (Maintainable $maintainable) {
+            Route::patch('/done/', function (Maintainable $maintainable) {
 
                 $maintainable->last_maintenance_date = Carbon::now()->toDateString();
 
                 if ($maintainable->maintenance_frequency !== MaintenanceFrequency::ONDEMAND->value)
                     $maintainable->next_maintenance_date = calculateNextMaintenanceDate($maintainable->maintenance_frequency);
+                else {
+                    $maintainable->next_maintenance_date = null;
+                }
+
 
                 $maintainable->save();
 

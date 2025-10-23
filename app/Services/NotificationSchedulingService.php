@@ -60,11 +60,11 @@ class NotificationSchedulingService
     public function updateScheduleForNextMaintenanceDate(UserNotificationPreference $preference)
     {
 
-        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
+        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->where('status', 'pending')->get();
 
         foreach ($scheduledNotifications as $notification) {
 
-            if ($notification->notifiable->maintainable->maintenance_frequency == MaintenanceFrequency::ONDEMAND->value || $notification->notifiable->maintainable->next_maintenance_date->subDays($preference->notification_delay_days) < now())
+            if ($notification->notifiable->maintainable->maintenance_frequency == MaintenanceFrequency::ONDEMAND->value)
                 continue;
 
             $newDate = $notification->notifiable->maintainable->next_maintenance_date->subDays($preference->notification_delay_days);
@@ -74,7 +74,7 @@ class NotificationSchedulingService
 
     public function updateScheduleForDepreciationEndDate(UserNotificationPreference $preference)
     {
-        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
+        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->where('status', 'pending')->get();
 
         foreach ($scheduledNotifications as $notification) {
             $newDate = $notification->notifiable->depreciation_end_date->subDays($preference->notification_delay_days);
@@ -86,7 +86,7 @@ class NotificationSchedulingService
     public function updateScheduleForEndWarrantyDate(UserNotificationPreference $preference)
     {
 
-        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
+        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->where('status', 'pending')->get();
 
         foreach ($scheduledNotifications as $notification) {
             $newDate = $notification->notifiable->maintainable->end_warranty_date->subDays($preference->notification_delay_days);
@@ -97,7 +97,7 @@ class NotificationSchedulingService
     public function updateScheduleForContractNoticeDate(UserNotificationPreference $preference)
     {
 
-        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
+        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->where('status', 'pending')->get();
 
         foreach ($scheduledNotifications as $notification) {
             $newDate = $notification->notifiable->notice_date->subDays($preference->notification_delay_days);
@@ -108,7 +108,7 @@ class NotificationSchedulingService
 
     public function updateScheduleForContractEndDate(UserNotificationPreference $preference)
     {
-        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
+        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->where('status', 'pending')->get();
 
         foreach ($scheduledNotifications as $notification) {
             $newDate = $notification->notifiable->end_date->subDays($preference->notification_delay_days);
@@ -118,7 +118,7 @@ class NotificationSchedulingService
 
     public function updateScheduleForPlannedAtDate(UserNotificationPreference $preference)
     {
-        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
+        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->where('status', 'pending')->get();
 
         foreach ($scheduledNotifications as $notification) {
             $newDate = $notification->notifiable->planned_at->subDays($preference->notification_delay_days);
@@ -129,7 +129,7 @@ class NotificationSchedulingService
 
     public function deleteScheduledNotificationForNotificationType(UserNotificationPreference $preference)
     {
-        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->get();
+        $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->where('status', 'pending')->get();
 
         foreach ($scheduledNotifications as $notification) {
             $notification->delete();
@@ -228,6 +228,6 @@ class NotificationSchedulingService
 
     private function searchEntity($modelClass, $column, $delayDays)
     {
-        return $modelClass::whereHas('maintainable', fn($query) => $query->where($column, '>', Carbon::now()->addDays($delayDays)))->get();
+        return $modelClass::whereHas('maintainable', fn($query) => $query->where($column, '>', Carbon::now()))->get();
     }
 }
