@@ -129,6 +129,7 @@ class NotificationSchedulingService
 
     public function deleteScheduledNotificationForNotificationType(UserNotificationPreference $preference)
     {
+        // dump('deleteScheduledNotificationForNotificationType');
         $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->where('status', 'pending')->get();
 
         foreach ($scheduledNotifications as $notification) {
@@ -138,8 +139,7 @@ class NotificationSchedulingService
 
     public function createScheduleForPlannedAtDate(UserNotificationPreference $preference)
     {
-        $delayDays = $preference->notification_delay_days;
-        $interventions = Intervention::where('planned_at', '>', Carbon::now()->addDays($delayDays))->get();
+        $interventions = Intervention::where('planned_at', '>', Carbon::now())->get();
 
         $user = $preference->user;
 
@@ -151,8 +151,7 @@ class NotificationSchedulingService
 
     public function createScheduleForContractNoticeDate(UserNotificationPreference $preference)
     {
-        $delayDays = $preference->notification_delay_days;
-        $contracts = Contract::where('notice_date', '>', Carbon::now()->addDays($delayDays))->get();
+        $contracts = Contract::where('notice_date', '>', Carbon::now())->get();
 
         $user = $preference->user;
 
@@ -164,8 +163,7 @@ class NotificationSchedulingService
 
     public function createScheduleForContractEndDate(UserNotificationPreference $preference)
     {
-        $delayDays = $preference->notification_delay_days;
-        $contracts = Contract::where('end_date', '>', Carbon::now()->addDays($delayDays))->get();
+        $contracts = Contract::where('end_date', '>', Carbon::now())->get();
 
         $user = $preference->user;
 
@@ -178,14 +176,12 @@ class NotificationSchedulingService
 
     public function createScheduleForWarrantyEndDate(UserNotificationPreference $preference)
     {
-        $delayDays = $preference->notification_delay_days;
-
         $assetsOrLocations = collect()
-            ->merge($this->searchEntity(Asset::class, 'end_warranty_date', $delayDays))
-            ->merge($this->searchEntity(Site::class, 'end_warranty_date', $delayDays))
-            ->merge($this->searchEntity(Building::class, 'end_warranty_date', $delayDays))
-            ->merge($this->searchEntity(Floor::class, 'end_warranty_date', $delayDays))
-            ->merge($this->searchEntity(Room::class, 'end_warranty_date', $delayDays));
+            ->merge($this->searchEntity(Asset::class, 'end_warranty_date'))
+            ->merge($this->searchEntity(Site::class, 'end_warranty_date'))
+            ->merge($this->searchEntity(Building::class, 'end_warranty_date'))
+            ->merge($this->searchEntity(Floor::class, 'end_warranty_date'))
+            ->merge($this->searchEntity(Room::class, 'end_warranty_date'));
 
         $user = $preference->user;
 
@@ -198,8 +194,7 @@ class NotificationSchedulingService
 
     public function createScheduleForDepreciationEndDate(UserNotificationPreference $preference)
     {
-        $delayDays = $preference->notification_delay_days;
-        $assets = Asset::where('depreciation_end_date', '>', Carbon::now()->addDays($delayDays))->get();
+        $assets = Asset::where('depreciation_end_date', '>', Carbon::now())->get();
 
         foreach ($assets as $asset) {
 
@@ -209,15 +204,14 @@ class NotificationSchedulingService
 
     public function createScheduleForNextMaintenanceDate(UserNotificationPreference $preference)
     {
-        $delayDays = $preference->notification_delay_days;
         $assetsOrLocations = collect([]);
 
         $assetsOrLocations = collect()
-            ->merge($this->searchEntity(Asset::class, 'next_maintenance_date', $delayDays))
-            ->merge($this->searchEntity(Site::class, 'next_maintenance_date', $delayDays))
-            ->merge($this->searchEntity(Building::class, 'next_maintenance_date', $delayDays))
-            ->merge($this->searchEntity(Floor::class, 'next_maintenance_date', $delayDays))
-            ->merge($this->searchEntity(Room::class, 'next_maintenance_date', $delayDays));
+            ->merge($this->searchEntity(Asset::class, 'next_maintenance_date'))
+            ->merge($this->searchEntity(Site::class, 'next_maintenance_date'))
+            ->merge($this->searchEntity(Building::class, 'next_maintenance_date'))
+            ->merge($this->searchEntity(Floor::class, 'next_maintenance_date'))
+            ->merge($this->searchEntity(Room::class, 'next_maintenance_date'));
 
         $user = $preference->user;
 
@@ -226,7 +220,7 @@ class NotificationSchedulingService
         }
     }
 
-    private function searchEntity($modelClass, $column, $delayDays)
+    private function searchEntity($modelClass, $column)
     {
         return $modelClass::whereHas('maintainable', fn($query) => $query->where($column, '>', Carbon::now()))->get();
     }

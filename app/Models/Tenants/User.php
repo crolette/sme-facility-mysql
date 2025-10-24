@@ -86,7 +86,7 @@ class User extends Authenticatable
         parent::boot();
 
         static::deleting(function ($user) {
-            $notifications = ScheduledNotification::where('recipient_email', $user->email)->get();
+            $notifications = ScheduledNotification::where('recipient_email', $user->email)->where('status', 'pending')->get();
             foreach ($notifications as $notification) {
                 $notification->delete();
             }
@@ -131,7 +131,7 @@ class User extends Authenticatable
     }
 
     public function locationRoute(): Attribute
-    {   
+    {
         return Attribute::make(
             get: fn() => route('tenant.users.show', $this->id)
         );

@@ -22,6 +22,9 @@ class ContractNotificationSchedulingService
             $this->createScheduleForContractEndDate($contract, $user);
             $this->createScheduleForContractNoticeDate($contract, $user);
         }
+
+        dump('contractables');
+        dump($contract->contractables);
     }
 
     public function updateScheduleForContract(Contract $contract)
@@ -69,7 +72,7 @@ class ContractNotificationSchedulingService
         $preference = $user->notification_preferences()->where('notification_type', 'notice_date')->first();
         $delayDays = $preference->notification_delay_days;
 
-        if ($preference && $preference->enabled && $contract->notice_date?->subDays($delayDays) > now()) {
+        if ($preference && $preference->enabled && $contract->notice_date?->toDateString() > Carbon::now()->toDateString()) {
 
             $notification = [
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,

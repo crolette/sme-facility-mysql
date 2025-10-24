@@ -178,7 +178,7 @@ class MaintainableNotificationSchedulingService
     {
         $preference = $user->notification_preferences()->where('notification_type', 'end_warranty_date')->first();
 
-        if ($preference && $preference->enabled  && $maintainable->end_warranty_date->subDays($preference->notification_delay_days) > now()) {
+        if ($preference && $preference->enabled  && $maintainable->end_warranty_date->toDateString() > Carbon::now()->toDateString()) {
             $delay = $preference->notification_delay_days;
 
             $notification = [
@@ -241,6 +241,7 @@ class MaintainableNotificationSchedulingService
 
     public function removeNotificationsForOldMaintenanceManager(Maintainable $maintainable, User $user)
     {
+        // dump('--- removeNotificationsForOldMaintenanceManager');
         // only remove notification if the user has the maintenance manager role
         if ($user->hasAnyRole('Admin'))
             return;

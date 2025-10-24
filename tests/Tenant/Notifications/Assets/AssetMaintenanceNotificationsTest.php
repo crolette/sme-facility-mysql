@@ -52,7 +52,7 @@ beforeEach(function () {
     ];
 });
 
-it('creates next maintenance date notification (for admin & manager) based on frequency when a new asset is created with next_maintenance_date defined', function ($frequency) {
+it('creates next_maintenance_date notification (for admin & manager) based on frequency when a new asset is created with next_maintenance_date defined', function ($frequency) {
 
     $formData = [
         ...$this->basicAssetData,
@@ -93,7 +93,7 @@ it('creates next maintenance date notification (for admin & manager) based on fr
     );
 })->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
 
-it('creates notification when next_maintenance_date is not defined and last_maintenance_date is defined', function ($frequency) {
+it('creates next_maintenance_date notification when next_maintenance_date is not defined and last_maintenance_date is defined', function ($frequency) {
 
     $formData = [
         ...$this->basicAssetData,
@@ -141,7 +141,7 @@ it('creates notification when next_maintenance_date is not defined and last_main
     );
 })->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
 
-it('creates notification when next/last_maintenance_date are not defined ', function ($frequency) {
+it('creates next_maintenance_date notification when next/last_maintenance_date are not defined ', function ($frequency) {
 
     $formData = [
         ...$this->basicAssetData,
@@ -180,7 +180,7 @@ it('creates notification when next/last_maintenance_date are not defined ', func
     );
 })->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
 
-it('updates notification when updating next_maintenance_date of the asset', function () {
+it('updates next_maintenance_date notification when updating next_maintenance_date of the asset', function () {
 
     $asset = Asset::factory()->forLocation($this->room)->create();
 
@@ -261,7 +261,7 @@ it('updates notification when updating next_maintenance_date of the asset', func
     );
 });
 
-it('does not create a notification when next_maintenance_date is today', function () {
+it('does not create a next_maintenance_date notification when next_maintenance_date is today', function () {
 
     $formData = [
         ...$this->basicAssetData,
@@ -800,7 +800,7 @@ it('creates notification when maintenance is marked as done and other notificati
     );
 })->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
 
-it('creates notification when next_maintenace_date of ONDEMAND is given', function () {
+it('creates notification when next_maintenance_date of ONDEMAND is given', function () {
     $formData = [
         ...$this->basicAssetData,
         'maintenance_manager_id' => $this->manager->id,

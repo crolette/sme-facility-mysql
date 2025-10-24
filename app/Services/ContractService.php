@@ -23,9 +23,9 @@ class ContractService
             if (isset($contractRequest['contract_duration']))
                 $contract = $this->updateContractEndDate($contract,  $contract->contract_duration);
 
-            $contract->notice_period = isset($contractRequest['notice_period']) ? $contractRequest['notice_period'] : 'default';
-
-            $contract = $this->updateNoticeDate($contract, $contract->notice_period);
+            if (isset($contractRequest['notice_period'])) {
+                $contract = $this->updateNoticeDate($contract, $contract->notice_period);
+            }
 
             $contract->provider()->associate($contractRequest['provider_id']);
             $contract->save();
@@ -61,9 +61,9 @@ class ContractService
         if (isset($request['contract_duration']))
             $contract = $this->updateContractEndDate($contract, $contract->contract_duration);
 
-        $contract->notice_period = isset($request['notice_period']) ? $request['notice_period'] : 'default';
-
-        $contract = $this->updateNoticeDate($contract, $contract->notice_period);
+        if (isset($contractRequest['notice_period'])) {
+            $contract = $this->updateNoticeDate($contract, $contract->notice_period);
+        }
 
         $contract->provider()->associate($request['provider_id']);
         $contract->save();
