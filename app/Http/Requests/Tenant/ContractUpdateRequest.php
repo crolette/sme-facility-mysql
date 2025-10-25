@@ -19,16 +19,16 @@ class ContractUpdateRequest extends FormRequest
         return true;
     }
 
-    public function prepareForValidation()
-    {
+    // public function prepareForValidation()
+    // {
 
-        $data = $this->all();
+    //     $data = $this->all();
 
-        $data['notice_period'] = !isset($data['notice_period']) ? 'default' : $data['notice_period'];
+    //     $data['notice_period'] = !isset($data['notice_period']) ? 'default' : $data['notice_period'];
 
 
-        $this->replace($data);
-    }
+    //     $this->replace($data);
+    // }
 
     /**
      * Get the validation rules that apply to the request.

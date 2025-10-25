@@ -14,17 +14,28 @@ class ContractNotificationSchedulingService
 {
     public function scheduleForContract(Contract $contract)
     {
-
+        // dump('scheduleForContract');
         $users = User::role('Admin')->get();
 
         foreach ($users as $user) {
-
             $this->createScheduleForContractEndDate($contract, $user);
             $this->createScheduleForContractNoticeDate($contract, $user);
         }
 
-        dump('contractables');
-        dump($contract->contractables);
+        // Create notifications for related assets/locations with manager
+        $contract = Contract::with(['assets', 'sites', 'rooms'])->find($contract->id);
+        $contractables = $contract->contractables();
+        // dump(count($contractables));
+        $contractables->each(function ($contractable) use ($contract) {
+            // dump('contractables');
+            if ($contractable->manager) {
+                // dump($contractable->manager);
+                $this->createScheduleForContractEndDate($contract, $contractable->manager);
+            }
+        });
+        // dump($contract->contractables()->each(function ($contractable) {
+        //     return $contractable;
+        // }));
     }
 
     public function updateScheduleForContract(Contract $contract)
@@ -33,15 +44,18 @@ class ContractNotificationSchedulingService
         // 2. reprendre les utilisateurs admin avec leur préférence
         // 3. boucler sur chaque user et actualiser avec les préférences
 
-        if ($contract->wasChanged('end_date')) {
-            $notifications = $contract->notifications()->where('notification_type', 'end_date')->get();
+        // dump('Contract Service: updateScheduleForContract');
+
+        if ($contract->wasChanged('end_date') && $contract->end_date?->toDateString() > Carbon::now()->toDateString()) {
+            // dump('Contract End Date Changed');
+            $notifications = $contract->notifications()->where('notification_type', 'end_date')->where('status', 'pending')->get();
             foreach ($notifications as $notification) {
                 $this->updateScheduleForContractEndDate($contract, $notification);
             }
         }
 
-        if ($contract->wasChanged('notice_date')) {
-            $notifications = $contract->notifications()->where('notification_type', 'notice_date')->get();
+        if ($contract->wasChanged('notice_date') && $contract->notice_date?->toDateString() > Carbon::now()->toDateString()) {
+            $notifications = $contract->notifications()->where('notification_type', 'notice_date')->where('status', 'pending')->get();
 
             foreach ($notifications as $notification) {
                 $this->updateScheduleForContractNoticeDate($contract, $notification);
@@ -54,6 +68,7 @@ class ContractNotificationSchedulingService
         // TODO check if the date is > then start_date
 
         $newDate = $contract->notice_date->subDays($notification->user->notification_preferences()->where('notification_type', 'notice_date')->first()->notification_delay_days);
+
         if ($newDate > now())
             $notification->update(['scheduled_at' => $newDate]);
     }
@@ -61,8 +76,8 @@ class ContractNotificationSchedulingService
 
     public function updateScheduleForContractEndDate(Contract $contract, ScheduledNotification $notification)
     {
-
         $newDate = $contract->end_date->subDays($notification->user->notification_preferences()->where('notification_type', 'end_date')->first()->notification_delay_days);
+
         if ($newDate > now())
             $notification->update(['scheduled_at' => $newDate]);
     }
@@ -110,7 +125,7 @@ class ContractNotificationSchedulingService
         $preference = $user->notification_preferences()->where('notification_type', 'end_date')->first();
         $delayDays = $preference->notification_delay_days;
 
-        if ($preference && $preference->enabled && $contract->end_date?->subDays($delayDays) > now()) {
+        if ($preference && $preference->enabled && $contract->end_date?->toDateString() > Carbon::now()->toDateString()) {
 
             $notification = [
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,

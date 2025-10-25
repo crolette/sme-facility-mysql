@@ -88,6 +88,8 @@ class MaintainableNotificationSchedulingService
             $this->removeScheduleForNextMaintenanceDate($maintainable);
         };
 
+        dump($maintainable->wasChanged('maintenance_manager_id'));
+
         if ($maintainable->wasChanged('maintenance_manager_id') && $maintainable->manager) {
             $this->createScheduleForUser($maintainable, $maintainable->manager);
 

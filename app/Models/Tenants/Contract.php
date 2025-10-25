@@ -48,7 +48,7 @@ class Contract extends Model
             'updated_at' => 'date:Y-m-d',
             'notice_date' => 'date:Y-m-d',
             'end_date' => 'date:Y-m-d',
-            // 'start_date' => 'date:Y-m-d',
+            'start_date' => 'date:Y-m-d',
             'notice_period' => NoticePeriodEnum::class,
             'contract_duration' => ContractDurationEnum::class,
             'renewal_type' => ContractRenewalTypesEnum::class,
@@ -102,9 +102,14 @@ class Contract extends Model
         return $this->morphToMany(Document::class, 'documentable');
     }
 
-    public function contractables(): MorphTo
+    public function contractables()
     {
-        return $this->morphTo()->withTrashed();
+        // return $this->morphTo()->withTrashed();
+        return $this->assets
+            ->concat($this->sites)
+            ->concat($this->buildings)
+            ->concat($this->floors)
+            ->concat($this->rooms);
     }
 
 

@@ -79,20 +79,19 @@ class ContractService
 
     public function update(Contract $contract, $request)
     {
-
         $contract->update([...$request]);
 
         if (isset($request['contract_duration']) && ($contract->wasChanged('contract_duration') || $contract->wasChanged('start_date')))
             $contract = $this->updateContractEndDate($contract, $contract->contract_duration);
 
-        if ($contract->wasChanged('notice_period') || $contract->wasChanged('contract_duration') || $contract->wasChanged('start_date')) {
-
-            // dump('update contract', $contract->wasChanged('notice_period'), $contract->wasChanged('contract_duration'));
+        if (isset($request['notice_period']) && ($contract->wasChanged('notice_period') || $contract->wasChanged('contract_duration') || $contract->wasChanged('start_date'))) {
             $contract = $this->updateNoticeDate($contract, $contract->notice_period);
         }
 
+        if (($contract->wasChanged('notice_period') && !isset($request['notice_period'])))
+            $contract->notice_date = null;
+
         if ($contract->provider->id !== $request['provider_id']) {
-            $contract->provider()->disassociate();
             $contract->provider()->associate($request['provider_id']);
         }
 
@@ -121,12 +120,15 @@ class ContractService
 
     public function updateContractEndDate(Contract $contract, ContractDurationEnum $contract_duration): Contract
     {
-        if ($contract->start_date)
-            $endDate = $contract_duration->addTo(Carbon::createFromFormat('Y-m-d', $contract->start_date));
-        else {
+        // dump('updateContractEndDate');
+
+        if ($contract->start_date) {
+            $endDate = $contract_duration->addTo($contract->start_date);
+        } else {
             $contract->start_date = Carbon::now();
             $endDate = $contract_duration->addTo(Carbon::now());
         }
+
 
         $contract->end_date = $endDate;
 
@@ -138,6 +140,7 @@ class ContractService
         // TODO check if the notice date is > then start_date
 
         $contract->notice_date = $notice_period->subFrom(Carbon::parse($contract->end_date));
+
         return $contract;
     }
 };

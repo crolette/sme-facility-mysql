@@ -111,8 +111,10 @@ class NotificationSchedulingService
         $scheduledNotifications = ScheduledNotification::where('recipient_email', $preference->user->email)->where('notification_type', $preference->notification_type)->where('status', 'pending')->get();
 
         foreach ($scheduledNotifications as $notification) {
-            $newDate = $notification->notifiable->end_date->subDays($preference->notification_delay_days);
-            $notification->update(['scheduled_at' => $newDate]);
+            if ($notification->notifiable->end_date->toDateString() > Carbon::now()->toDateString()) {
+                $newDate = $notification->notifiable->end_date->subDays($preference->notification_delay_days);
+                $notification->update(['scheduled_at' => $newDate]);
+            }
         }
     }
 
