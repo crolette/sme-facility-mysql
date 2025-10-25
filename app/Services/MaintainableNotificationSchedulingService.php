@@ -13,6 +13,7 @@ use App\Enums\ScheduledNotificationStatusEnum;
 use App\Models\Tenants\Maintainable;
 use App\Models\Tenants\UserNotificationPreference;
 use Illuminate\Database\Eloquent\Collection;
+use App\Services\ContractNotificationSchedulingService;
 
 class MaintainableNotificationSchedulingService
 {
@@ -88,12 +89,18 @@ class MaintainableNotificationSchedulingService
             $this->removeScheduleForNextMaintenanceDate($maintainable);
         };
 
-        dump($maintainable->wasChanged('maintenance_manager_id'));
+        // dump($maintainable->wasChanged('maintenance_manager_id'));
 
         if ($maintainable->wasChanged('maintenance_manager_id') && $maintainable->manager) {
             $this->createScheduleForUser($maintainable, $maintainable->manager);
 
             app(AssetNotificationSchedulingService::class)->createScheduleForDepreciable($maintainable->maintainable, $maintainable->manager);
+
+            $contracts = $maintainable->maintainable->contracts;
+            foreach ($contracts as $contract) {
+                app(ContractNotificationSchedulingService::class)->createScheduleForContractEndDate($contract, $maintainable->manager);
+                app(ContractNotificationSchedulingService::class)->createScheduleForContractNoticeDate($contract, $maintainable->manager);
+            }
 
             // add notifications to the manager for the interventions linked to the maintainable
             $interventions = $maintainable->maintainable->interventions;
@@ -254,6 +261,11 @@ class MaintainableNotificationSchedulingService
             foreach ($notifications as $notification) {
                 $notification->delete();
             }
+        }
+
+        $contracts = $maintainable->maintainable->contracts;
+        foreach ($contracts as $contract) {
+            app(ContractNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($contract, $maintainable->manager);
         }
 
         $interventions = $maintainable->maintainable->interventions;

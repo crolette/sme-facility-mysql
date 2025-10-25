@@ -5,9 +5,10 @@ namespace App\Services;
 use Carbon\Carbon;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Contract;
+use App\Enums\ContractStatusEnum;
 use Barryvdh\Debugbar\Facades\Debugbar;
-use App\Enums\ScheduledNotificationStatusEnum;
 use App\Models\Tenants\ScheduledNotification;
+use App\Enums\ScheduledNotificationStatusEnum;
 use App\Models\Tenants\UserNotificationPreference;
 
 class ContractNotificationSchedulingService
@@ -60,6 +61,10 @@ class ContractNotificationSchedulingService
             foreach ($notifications as $notification) {
                 $this->updateScheduleForContractNoticeDate($contract, $notification);
             }
+        }
+
+        if ($contract->wasChanged('status') && in_array($contract->status, [ContractStatusEnum::EXPIRED, ContractStatusEnum::CANCELLED])) {
+            $this->removeNotificationsForEndDate($contract);
         }
     }
 
@@ -154,5 +159,38 @@ class ContractNotificationSchedulingService
             $createdNotification->user()->associate($user);
             $createdNotification->save();
         }
+    }
+
+    public function removeNotificationsForNoticeDate(Contract $contract)
+    {
+        $notifications = $contract->notifications()->where('notification_type', 'notice_date')->where('status', 'pending')->get();
+
+        if (count($notifications)) {
+            foreach ($notifications as $notification) {
+                $notification->delete();
+            }
+        }
+    }
+
+    public function removeNotificationsForEndDate(Contract $contract)
+    {
+        $notifications = $contract->notifications()->where('notification_type', 'end_date')->where('status', 'pending')->get();
+
+        if (count($notifications)) {
+            foreach ($notifications as $notification) {
+                $notification->delete();
+            }
+        }
+    }
+
+    public function removeNotificationsForOldMaintenanceManager(Contract $contract, User $user)
+    {
+        // dump('--- removeNotificationsForOldMaintenanceManager ---');
+        $notifications = $contract->notifications()->where('user_id', $user->id)->where('status', 'pending')->get();
+
+        if (count($notifications) > 0)
+            foreach ($notifications as $notification) {
+                $notification->delete();
+            }
     }
 }

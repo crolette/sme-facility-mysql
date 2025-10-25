@@ -42,10 +42,7 @@ beforeEach(function () {
     Floor::factory()->create();
     $this->provider = Provider::factory()->create();
 
-    $this->room = Room::factory()
-        ->for(LocationType::where('level', 'room')->first())
-        ->for(Floor::first())
-        ->create();
+    $this->room = Room::factory()->create();
 
     $this->basicAssetData = [
         'name' => 'New asset',
