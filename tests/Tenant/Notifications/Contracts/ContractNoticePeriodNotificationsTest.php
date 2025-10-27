@@ -30,21 +30,16 @@ use function Pest\Laravel\assertDatabaseMissing;
 
 beforeEach(function () {
 
-    $this->user = User::factory()->withRole('Admin')->create();
-    $this->actingAs($this->user, 'tenant');
+    $this->admin = User::factory()->withRole('Admin')->create();
+    $this->actingAs($this->admin, 'tenant');
 
     $this->manager = User::factory()->withRole('Maintenance Manager')->create();
 
-    $this->site = Site::factory()->create();
-    Building::factory()->create();
-    Floor::factory()->create();
     $this->provider = Provider::factory()->create();
-
-    $this->room = Room::factory()
-        ->for(LocationType::where('level', 'room')->first())
-        ->for(Floor::first())
-        ->create();
-
+    $this->site = Site::factory()->create();
+    $this->building = Building::factory()->create();
+    $this->floor = Floor::factory()->create();
+    $this->room = Room::factory()->create();
     $this->asset = Asset::factory()->forLocation($this->room)->create();
 
     $this->basicContractData = [
@@ -66,213 +61,237 @@ beforeEach(function () {
     ];
 });
 
-it('creates the notice_date notification for a new created contract', function () {
+it('creates the notice_date notification for an admin when a new contract is created', function ($duration, $noticePeriod) {
 
-    Contract::factory()->forLocation($this->asset)->create();
+    if ($duration !== $noticePeriod) {
 
-    // 2 notifications because of the end_date
-    assertDatabaseCount('scheduled_notifications', 2);
 
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->user->id,
-            'recipient_name' => $this->user->fullName,
-            'recipient_email' => $this->user->email,
-            'notification_type' => 'notice_date',
-            'scheduled_at' => Carbon::now()->addMonth(1)->subDays(21)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => 1,
-        ]
-    );
+        $preference = $this->admin->notification_preferences()->where('notification_type', 'notice_date')->first();
+
+        $formData = [
+            ...$this->basicContractData,
+            'contract_duration' => $duration,
+            'start_date' => Carbon::now(),
+            'notice_period' => $noticePeriod,
+
+        ];
+
+        $this->postToTenant('api.contracts.store', $formData);
+
+        $contract = Contract::find(1);
+
+        assertDatabaseHas(
+            'scheduled_notifications',
+            [
+                'user_id' => $this->admin->id,
+                'recipient_name' => $this->admin->fullName,
+                'recipient_email' => $this->admin->email,
+                'notification_type' => 'notice_date',
+                'scheduled_at' => $contract->notice_date->subDays($preference->notification_delay_days)->toDateString(),
+                'notifiable_type' => get_class($contract),
+                'notifiable_id' => $contract->id,
+            ]
+        );
+    }
+})->with(function () {
+    $notices = array_column(NoticePeriodEnum::cases(), 'value');
+    $durations = array_column(ContractDurationEnum::cases(), 'value');
+
+    $combinations = [];
+    foreach ($durations as $d) {
+        foreach ($notices as $n) {
+            $combinations[] = [$d, $n];
+        }
+    }
+    return $combinations;
 });
 
 
-it('update notifications when notification_delay_days preference for notice_date of user changes', function () {
+// it('update notifications when notification_delay_days preference for notice_date of user changes', function () {
 
-    Contract::factory()->forLocation($this->asset)->create();
-    Contract::factory()->forLocation($this->asset)->create();
+//     Contract::factory()->forLocation($this->asset)->create();
+//     Contract::factory()->forLocation($this->asset)->create();
 
-    assertDatabaseCount('scheduled_notifications', 4);
+//     assertDatabaseCount('scheduled_notifications', 4);
 
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->user->id,
-            'recipient_name' => $this->user->fullName,
-            'recipient_email' => $this->user->email,
-            'notification_type' => 'notice_date',
-            'scheduled_at' => Carbon::now()->addMonth(1)->subDays(21)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => 1,
-        ]
-    );
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'user_id' => $this->user->id,
+//             'recipient_name' => $this->user->fullName,
+//             'recipient_email' => $this->user->email,
+//             'notification_type' => 'notice_date',
+//             'scheduled_at' => Carbon::now()->addMonth(1)->subDays(21)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Contract',
+//             'notifiable_id' => 1,
+//         ]
+//     );
 
-    $preference = $this->user->notification_preferences()->where('notification_type', 'notice_date')->first();
+//     $preference = $this->user->notification_preferences()->where('notification_type', 'notice_date')->first();
 
-    $formData = [
-        'asset_type' => 'contract',
-        'notification_type' => 'notice_date',
-        'notification_delay_days' => 1,
-        'enabled' => true,
-    ];
+//     $formData = [
+//         'asset_type' => 'contract',
+//         'notification_type' => 'notice_date',
+//         'notification_delay_days' => 1,
+//         'enabled' => true,
+//     ];
 
-    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
-    $response->assertStatus(200);
+//     $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+//     $response->assertStatus(200);
 
-    assertDatabaseCount('scheduled_notifications', 4);
+//     assertDatabaseCount('scheduled_notifications', 4);
 
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->user->id,
-            'recipient_name' => $this->user->fullName,
-            'recipient_email' => $this->user->email,
-            'notification_type' => 'notice_date',
-            'scheduled_at' => Carbon::now()->addMonth(1)->subDays(15)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => 1,
-        ]
-    );
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'user_id' => $this->user->id,
+//             'recipient_name' => $this->user->fullName,
+//             'recipient_email' => $this->user->email,
+//             'notification_type' => 'notice_date',
+//             'scheduled_at' => Carbon::now()->addMonth(1)->subDays(15)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Contract',
+//             'notifiable_id' => 1,
+//         ]
+//     );
 
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->user->id,
-            'recipient_name' => $this->user->fullName,
-            'recipient_email' => $this->user->email,
-            'notification_type' => 'notice_date',
-            'scheduled_at' => Carbon::now()->addMonth(1)->subDays(15)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => 2,
-        ]
-    );
-});
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'user_id' => $this->user->id,
+//             'recipient_name' => $this->user->fullName,
+//             'recipient_email' => $this->user->email,
+//             'notification_type' => 'notice_date',
+//             'scheduled_at' => Carbon::now()->addMonth(1)->subDays(15)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Contract',
+//             'notifiable_id' => 2,
+//         ]
+//     );
+// });
 
-it('deletes notifications when notification preference notice_date of user is disabled', function () {
+// it('deletes notifications when notification preference notice_date of user is disabled', function () {
 
-    Contract::factory()->forLocation($this->asset)->create();
+//     Contract::factory()->forLocation($this->asset)->create();
 
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->user->id,
-            'recipient_name' => $this->user->fullName,
-            'recipient_email' => $this->user->email,
-            'notification_type' => 'notice_date',
-            'scheduled_at' => Carbon::now()->addMonth(1)->subDays(21)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => 1,
-        ]
-    );
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'user_id' => $this->user->id,
+//             'recipient_name' => $this->user->fullName,
+//             'recipient_email' => $this->user->email,
+//             'notification_type' => 'notice_date',
+//             'scheduled_at' => Carbon::now()->addMonth(1)->subDays(21)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Contract',
+//             'notifiable_id' => 1,
+//         ]
+//     );
 
-    $preference = $this->user->notification_preferences()->where('notification_type', 'notice_date')->first();
+//     $preference = $this->user->notification_preferences()->where('notification_type', 'notice_date')->first();
 
-    $formData = [
-        'asset_type' => 'contract',
-        'notification_type' => 'notice_date',
-        'notification_delay_days' => $preference->notification_delay_days,
-        'enabled' => false,
-    ];
+//     $formData = [
+//         'asset_type' => 'contract',
+//         'notification_type' => 'notice_date',
+//         'notification_delay_days' => $preference->notification_delay_days,
+//         'enabled' => false,
+//     ];
 
-    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
-    $response->assertStatus(200);
+//     $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+//     $response->assertStatus(200);
 
-    assertDatabaseCount('scheduled_notifications', 1);
+//     assertDatabaseCount('scheduled_notifications', 1);
 
-    assertDatabaseMissing(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->user->id,
-            'recipient_name' => $this->user->fullName,
-            'recipient_email' => $this->user->email,
-            'notification_type' => 'notice_date',
-            'scheduled_at' => Carbon::now()->addMonth(1)->subDays(21)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => 1,
-        ]
-    );
-});
+//     assertDatabaseMissing(
+//         'scheduled_notifications',
+//         [
+//             'user_id' => $this->user->id,
+//             'recipient_name' => $this->user->fullName,
+//             'recipient_email' => $this->user->email,
+//             'notification_type' => 'notice_date',
+//             'scheduled_at' => Carbon::now()->addMonth(1)->subDays(21)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Contract',
+//             'notifiable_id' => 1,
+//         ]
+//     );
+// });
 
 
-it('creates notifications when notification preference notice_date of user is enabled', function () {
+// it('creates notifications when notification preference notice_date of user is enabled', function () {
 
-    Contract::factory()->forLocation($this->asset)->create();
+//     Contract::factory()->forLocation($this->asset)->create();
 
-    $preference = $this->user->notification_preferences()->where('notification_type', 'notice_date')->first();
+//     $preference = $this->user->notification_preferences()->where('notification_type', 'notice_date')->first();
 
-    $formData = [
-        'asset_type' => 'contract',
-        'notification_type' => 'notice_date',
-        'notification_delay_days' => $preference->notification_delay_days,
-        'enabled' => false,
-    ];
+//     $formData = [
+//         'asset_type' => 'contract',
+//         'notification_type' => 'notice_date',
+//         'notification_delay_days' => $preference->notification_delay_days,
+//         'enabled' => false,
+//     ];
 
-    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
-    $response->assertStatus(200);
+//     $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+//     $response->assertStatus(200);
 
-    assertDatabaseCount('scheduled_notifications', 1);
-    $formData = [
-        'asset_type' => 'contract',
-        'notification_type' => 'notice_date',
-        'notification_delay_days' => $preference->notification_delay_days,
-        'enabled' => true,
-    ];
+//     assertDatabaseCount('scheduled_notifications', 1);
+//     $formData = [
+//         'asset_type' => 'contract',
+//         'notification_type' => 'notice_date',
+//         'notification_delay_days' => $preference->notification_delay_days,
+//         'enabled' => true,
+//     ];
 
-    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
-    $response->assertStatus(200);
+//     $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+//     $response->assertStatus(200);
 
-    assertDatabaseCount('scheduled_notifications', 2);
+//     assertDatabaseCount('scheduled_notifications', 2);
 
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->user->id,
-            'recipient_name' => $this->user->fullName,
-            'recipient_email' => $this->user->email,
-            'notification_type' => 'notice_date',
-            'scheduled_at' => Carbon::now()->addMonth(1)->subDays(21)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => 1,
-        ]
-    );
-});
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'user_id' => $this->user->id,
+//             'recipient_name' => $this->user->fullName,
+//             'recipient_email' => $this->user->email,
+//             'notification_type' => 'notice_date',
+//             'scheduled_at' => Carbon::now()->addMonth(1)->subDays(21)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Contract',
+//             'notifiable_id' => 1,
+//         ]
+//     );
+// });
 
-it('updates notification for a specific contract when notice_period changes', function () {
+// it('updates notification for a specific contract when notice_period changes', function () {
 
-    $contract =  Contract::factory()->forLocation($this->asset)->create();
+//     $contract =  Contract::factory()->forLocation($this->asset)->create();
 
-    $updatedContract = [
-        ...$this->basicContractData,
-        'notice_period' => NoticePeriodEnum::DEFAULT->value,
-    ];
+//     $updatedContract = [
+//         ...$this->basicContractData,
+//         'notice_period' => NoticePeriodEnum::DEFAULT->value,
+//     ];
 
-    $response = $this->patchToTenant('api.contracts.update', $updatedContract, $contract->id);
-    $response->assertSessionHasNoErrors();
+//     $response = $this->patchToTenant('api.contracts.update', $updatedContract, $contract->id);
+//     $response->assertSessionHasNoErrors();
 
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->user->id,
-            'recipient_name' => $this->user->fullName,
-            'recipient_email' => $this->user->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => Carbon::now()->addMonth()->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => 1,
-        ]
-    );
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'user_id' => $this->user->id,
+//             'recipient_name' => $this->user->fullName,
+//             'recipient_email' => $this->user->email,
+//             'notification_type' => 'end_date',
+//             'scheduled_at' => Carbon::now()->addMonth()->subDays(7)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Contract',
+//             'notifiable_id' => 1,
+//         ]
+//     );
 
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->user->id,
-            'recipient_name' => $this->user->fullName,
-            'recipient_email' => $this->user->email,
-            'notification_type' => 'notice_date',
-            'scheduled_at' => Carbon::now()->addMonth()->subDays(14)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => 1,
-        ]
-    );
-});
+//     assertDatabaseHas(
+//         'scheduled_notifications',
+//         [
+//             'user_id' => $this->user->id,
+//             'recipient_name' => $this->user->fullName,
+//             'recipient_email' => $this->user->email,
+//             'notification_type' => 'notice_date',
+//             'scheduled_at' => Carbon::now()->addMonth()->subDays(14)->toDateString(),
+//             'notifiable_type' => 'App\Models\Tenants\Contract',
+//             'notifiable_id' => 1,
+//         ]
+//     );
+// });

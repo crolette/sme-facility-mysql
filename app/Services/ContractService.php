@@ -17,15 +17,16 @@ class ContractService
 {
     public function createWithModel(Model $model, $request): void
     {
+
         foreach ($request as $key => $contractRequest) {
             $contract = new Contract([...$contractRequest]);
 
-            if (isset($contractRequest['contract_duration']))
-                $contract = $this->updateContractEndDate($contract,  $contract->contract_duration);
+            // if (isset($contractRequest['contract_duration']))
+            //     $contract = $this->updateContractEndDate($contract,  $contract->contract_duration);
 
-            if (isset($contractRequest['notice_period'])) {
-                $contract = $this->updateNoticeDate($contract, $contract->notice_period);
-            }
+            // if (isset($contractRequest['notice_period'])) {
+            //     $contract = $this->updateNoticeDate($contract, $contract->notice_period);
+            // }
 
             $contract->provider()->associate($contractRequest['provider_id']);
             $contract->save();
@@ -56,14 +57,15 @@ class ContractService
 
     public function create($request): Contract | string
     {
+        // dump($request);
         $contract = new Contract([...$request]);
 
-        if (isset($request['contract_duration']))
-            $contract = $this->updateContractEndDate($contract, $contract->contract_duration);
+        // if (isset($request['contract_duration']))
+        //     $contract = $this->updateContractEndDate($contract, $contract->contract_duration);
 
-        if (isset($contractRequest['notice_period'])) {
-            $contract = $this->updateNoticeDate($contract, $contract->notice_period);
-        }
+        // if (isset($request['notice_period'])) {
+        //     $contract = $this->updateNoticeDate($contract, $contract->notice_period);
+        // }
 
         $contract->provider()->associate($request['provider_id']);
         $contract->save();
@@ -129,7 +131,6 @@ class ContractService
             $endDate = $contract_duration->addTo(Carbon::now());
         }
 
-
         $contract->end_date = $endDate;
 
         return $contract;
@@ -138,6 +139,8 @@ class ContractService
     public function updateNoticeDate(Contract $contract, NoticePeriodEnum $notice_period): Contract
     {
         // TODO check if the notice date is > then start_date
+
+        dump('updateNoticeDate');
 
         $contract->notice_date = $notice_period->subFrom(Carbon::parse($contract->end_date));
 

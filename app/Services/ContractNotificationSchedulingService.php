@@ -89,6 +89,9 @@ class ContractNotificationSchedulingService
 
     public function createScheduleForContractNoticeDate(Contract $contract, User $user)
     {
+        // dump('createScheduleForContractNoticeDate');
+        // dump($contract->start_date?->toDateString());
+        // dump($contract->notice_date?->toDateString());
         $preference = $user->notification_preferences()->where('notification_type', 'notice_date')->first();
         $delayDays = $preference->notification_delay_days;
 
