@@ -83,12 +83,12 @@ class ContractService
     {
         $contract->update([...$request]);
 
-        if (isset($request['contract_duration']) && ($contract->wasChanged('contract_duration') || $contract->wasChanged('start_date')))
-            $contract = $this->updateContractEndDate($contract, $contract->contract_duration);
+        // if (isset($request['contract_duration']) && ($contract->wasChanged('contract_duration') || $contract->wasChanged('start_date')))
+        //     $contract = $this->updateContractEndDate($contract, $contract->contract_duration);
 
-        if (isset($request['notice_period']) && ($contract->wasChanged('notice_period') || $contract->wasChanged('contract_duration') || $contract->wasChanged('start_date'))) {
-            $contract = $this->updateNoticeDate($contract, $contract->notice_period);
-        }
+        // if (isset($request['notice_period']) && ($contract->wasChanged('notice_period') || $contract->wasChanged('contract_duration') || $contract->wasChanged('start_date'))) {
+        //     $contract = $this->updateNoticeDate($contract, $contract->notice_period);
+        // }
 
         if (($contract->wasChanged('notice_period') && !isset($request['notice_period'])))
             $contract->notice_date = null;

@@ -2,17 +2,22 @@
 
 namespace App\Services;
 
-use App\Enums\MaintenanceFrequency;
 use Carbon\Carbon;
+use App\Models\Tenants\Room;
+use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
+use App\Models\Tenants\Floor;
+use App\Models\Tenants\Building;
 use App\Models\Tenants\Contract;
+use App\Enums\MaintenanceFrequency;
+use App\Models\Tenants\Maintainable;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use App\Models\Tenants\ScheduledNotification;
 use App\Enums\ScheduledNotificationStatusEnum;
-use App\Models\Tenants\Maintainable;
 use App\Models\Tenants\UserNotificationPreference;
-use Illuminate\Database\Eloquent\Collection;
 use App\Services\ContractNotificationSchedulingService;
 
 class MaintainableNotificationSchedulingService
@@ -264,8 +269,17 @@ class MaintainableNotificationSchedulingService
         }
 
         $contracts = $maintainable->maintainable->contracts;
+
         foreach ($contracts as $contract) {
-            app(ContractNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($contract, $maintainable->manager);
+
+            $contractables = $contract->contractables()->filter(function ($item) use ($user) {
+                return $item->maintainable
+                    && $item->maintainable->maintenance_manager_id === $user->id;
+            });;
+
+            if (count($contractables) === 1) {
+                app(ContractNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($contract, $maintainable->manager);
+            }
         }
 
         $interventions = $maintainable->maintainable->interventions;

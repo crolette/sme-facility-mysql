@@ -132,8 +132,8 @@ beforeEach(function () {
 //     $formData = [
 //         ...$this->basicContractData,
 //         'contract_duration' => $duration,
-//         'start_date' => Carbon::now()->subYears(2),
-//         'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now()->subYears(2))
+//         'start_date' => Carbon::now()->subYears(2)->toDateString(),
+//         // 'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now()->subYears(2))
 //     ];
 
 //     $this->postToTenant('api.contracts.store', $formData);
@@ -163,7 +163,7 @@ beforeEach(function () {
 //             'recipient_name' => $this->manager->fullName,
 //             'recipient_email' => $this->manager->email,
 //             'notification_type' => 'end_date',
-//             'scheduled_at' => $contractTwo->end_date->subDays($preference->notification_delay_days)->toDateString(),
+//             'scheduled_at' => $contractTwo->end_date?->subDays($preference->notification_delay_days)->toDateString(),
 //             'notifiable_type' => get_class($contractTwo),
 //             'notifiable_id' => $contractTwo->id,
 //         ]
@@ -174,7 +174,7 @@ beforeEach(function () {
 
 //     $contractOne = Contract::factory()->forLocation($this->asset)->create([
 //         'contract_duration' => $duration,
-//         'start_date' => Carbon::now(),
+//         'start_date' => Carbon::now()->toDateString(),
 //         'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
 //     ]);
 
@@ -193,7 +193,7 @@ beforeEach(function () {
 
 //     $updatedContract = [
 //         ...$this->basicContractData,
-//         'start_date' => Carbon::now()->addMonths(2),
+//         'start_date' => Carbon::now()->addMonths(2)->toDateString(),
 //         'contract_duration' => $duration,
 //     ];
 
@@ -244,7 +244,7 @@ beforeEach(function () {
 
 //     $updatedContract = [
 //         ...$this->basicContractData,
-//         'start_date' => Carbon::now()->addMonths(2),
+//         'start_date' => Carbon::now()->addMonths(2)->toDateString(),
 //         'contract_duration' => $duration,
 //     ];
 
@@ -272,8 +272,8 @@ beforeEach(function () {
 
 //     $contractOne = Contract::factory()->forLocation($this->asset)->create([
 //         'contract_duration' => $duration,
-//         'start_date' => Carbon::now(),
-//         'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
+//         'start_date' => Carbon::now()->toDateString(),
+//         // 'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
 //     ]);
 
 //     $formData = [
@@ -306,7 +306,7 @@ beforeEach(function () {
 //     $formData = [
 //         ...$this->basicContractData,
 //         'contract_duration' => $duration,
-//         'start_date' => Carbon::now(),
+//         'start_date' => Carbon::now()->toDateString(),
 //     ];
 
 //     $this->postToTenant('api.contracts.store', $formData);
@@ -356,7 +356,7 @@ beforeEach(function () {
 //     $formData = [
 //         ...$this->basicContractData,
 //         'contract_duration' => $duration,
-//         'start_date' => Carbon::now(),
+//         'start_date' => Carbon::now()->toDateString(),
 //     ];
 
 //     $this->postToTenant('api.contracts.store', $formData);
@@ -1050,139 +1050,139 @@ beforeEach(function () {
 //     );
 // })->with(array_column(ContractDurationEnum::cases(), 'value'));
 
-// it('updates end_date notificactions when contract duration changes', function ($firstDuration, $otherDuration) {
-//     $contractOne = Contract::factory()->forLocation($this->asset)->create([
-//         'contract_duration' => $firstDuration,
-//         'start_date' => Carbon::now(),
-//         'end_date' => ContractDurationEnum::from($firstDuration)->addTo(Carbon::now())
-//     ]);
+it('updates end_date notificactions when contract duration changes', function ($firstDuration, $otherDuration) {
+    $contractOne = Contract::factory()->forLocation($this->asset)->create([
+        'contract_duration' => $firstDuration,
+        'start_date' => Carbon::now(),
+        'end_date' => ContractDurationEnum::from($firstDuration)->addTo(Carbon::now())
+    ]);
 
-//     assertDatabaseHas(
-//         'scheduled_notifications',
-//         [
-//             'user_id' => $this->admin->id,
-//             'recipient_name' => $this->admin->fullName,
-//             'recipient_email' => $this->admin->email,
-//             'notification_type' => 'end_date',
-//             'scheduled_at' => $contractOne->end_date->subDays(7)->toDateString(),
-//             'notifiable_type' => 'App\Models\Tenants\Contract',
-//             'notifiable_id' => 1,
-//         ]
-//     );
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->admin->id,
+            'recipient_name' => $this->admin->fullName,
+            'recipient_email' => $this->admin->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contractOne->end_date->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Contract',
+            'notifiable_id' => 1,
+        ]
+    );
 
-//     $updatedContract = [
-//         ...$this->basicContractData,
-//         'start_date' => Carbon::now(),
-//         'contract_duration' => $otherDuration,
-//     ];
+    $updatedContract = [
+        ...$this->basicContractData,
+        'start_date' => Carbon::now()->toDateString(),
+        'contract_duration' => $otherDuration,
+    ];
 
-//     $this->patchToTenant('api.contracts.update', $updatedContract, $contractOne->id);
+    $this->patchToTenant('api.contracts.update', $updatedContract, $contractOne->id);
 
-//     assertDatabaseHas(
-//         'scheduled_notifications',
-//         [
-//             'user_id' => $this->admin->id,
-//             'recipient_name' => $this->admin->fullName,
-//             'recipient_email' => $this->admin->email,
-//             'notification_type' => 'end_date',
-//             'scheduled_at' => ContractDurationEnum::from($otherDuration)->addTo($contractOne->start_date)->subDays(7)->toDateString(),
-//             'notifiable_type' => get_class($contractOne),
-//             'notifiable_id' => $contractOne->id,
-//         ]
-//     );
-// })->with(function () {
-//     $values = array_column(ContractDurationEnum::cases(), 'value');
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->admin->id,
+            'recipient_name' => $this->admin->fullName,
+            'recipient_email' => $this->admin->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => ContractDurationEnum::from($otherDuration)->addTo($contractOne->start_date)->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($contractOne),
+            'notifiable_id' => $contractOne->id,
+        ]
+    );
+})->with(function () {
+    $values = array_column(ContractDurationEnum::cases(), 'value');
 
-//     $combinations = [];
-//     foreach ($values as $f) {
-//         foreach ($values as $o) {
-//             $combinations[] = [$f, $o];
-//         }
-//     }
-//     return $combinations;
-// });
+    $combinations = [];
+    foreach ($values as $f) {
+        foreach ($values as $o) {
+            $combinations[] = [$f, $o];
+        }
+    }
+    return $combinations;
+});
 
-// it('creates end_date notifications for all maintenance managers linked to the contract via asset/locations', function () {
+it('creates end_date notifications for all maintenance managers linked to the contract via asset/locations', function () {
 
-//     $managerSite = User::factory()->withRole('Maintenance Manager')->create();
-//     $managerBuilding = User::factory()->withRole('Maintenance Manager')->create();
-//     $managerFloor = User::factory()->withRole('Maintenance Manager')->create();
-//     $managerRoom = User::factory()->withRole('Maintenance Manager')->create();
-//     $managerAsset = User::factory()->withRole('Maintenance Manager')->create();
+    $managerSite = User::factory()->withRole('Maintenance Manager')->create();
+    $managerBuilding = User::factory()->withRole('Maintenance Manager')->create();
+    $managerFloor = User::factory()->withRole('Maintenance Manager')->create();
+    $managerRoom = User::factory()->withRole('Maintenance Manager')->create();
+    $managerAsset = User::factory()->withRole('Maintenance Manager')->create();
 
-//     $this->site->maintainable()->update(['maintenance_manager_id' => $managerSite->id]);
-//     $this->building->maintainable()->update(['maintenance_manager_id' => $managerBuilding->id]);
-//     $this->floor->maintainable()->update(['maintenance_manager_id' => $managerFloor->id]);
-//     $this->room->maintainable()->update(['maintenance_manager_id' => $managerRoom->id]);
-//     $this->asset->maintainable()->update(['maintenance_manager_id' => $managerAsset->id]);
+    $this->site->maintainable()->update(['maintenance_manager_id' => $managerSite->id]);
+    $this->building->maintainable()->update(['maintenance_manager_id' => $managerBuilding->id]);
+    $this->floor->maintainable()->update(['maintenance_manager_id' => $managerFloor->id]);
+    $this->room->maintainable()->update(['maintenance_manager_id' => $managerRoom->id]);
+    $this->asset->maintainable()->update(['maintenance_manager_id' => $managerAsset->id]);
 
 
-//     $formData = [
-//         ...$this->basicContractData,
-//         'contractables' =>
-//         [
-//             ['locationType' => 'asset', 'locationCode' => $this->asset->code, 'locationId' => $this->asset->id],
-//             ['locationType' => 'room', 'locationCode' => $this->room->code, 'locationId' => $this->room->id],
-//             ['locationType' => 'floor', 'locationCode' => $this->floor->code, 'locationId' => $this->floor->id],
-//             ['locationType' => 'building', 'locationCode' => $this->building->code, 'locationId' => $this->building->id],
-//             ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
-//         ]
-//     ];
+    $formData = [
+        ...$this->basicContractData,
+        'contractables' =>
+        [
+            ['locationType' => 'asset', 'locationCode' => $this->asset->code, 'locationId' => $this->asset->id],
+            ['locationType' => 'room', 'locationCode' => $this->room->code, 'locationId' => $this->room->id],
+            ['locationType' => 'floor', 'locationCode' => $this->floor->code, 'locationId' => $this->floor->id],
+            ['locationType' => 'building', 'locationCode' => $this->building->code, 'locationId' => $this->building->id],
+            ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
+        ]
+    ];
 
-//     $this->postToTenant('api.contracts.store', $formData);
+    $this->postToTenant('api.contracts.store', $formData);
 
-//     $contractOne = Contract::find(1);
+    $contractOne = Contract::find(1);
 
-//     assertDatabaseCount('scheduled_notifications', 6);
+    assertDatabaseCount('scheduled_notifications', 6);
 
-//     assertDatabaseHas(
-//         'scheduled_notifications',
-//         [
-//             'user_id' => $managerSite->id,
-//             'recipient_name' => $managerSite->fullName,
-//             'recipient_email' => $managerSite->email,
-//             'notifiable_type' => get_class($contractOne),
-//             'notifiable_id' => $contractOne->id,
-//         ]
-//     );
-//     assertDatabaseHas(
-//         'scheduled_notifications',
-//         [
-//             'user_id' => $managerBuilding->id,
-//             'recipient_name' => $managerBuilding->fullName,
-//             'recipient_email' => $managerBuilding->email,
-//             'notifiable_type' => get_class($contractOne),
-//             'notifiable_id' => $contractOne->id,
-//         ]
-//     );
-//     assertDatabaseHas(
-//         'scheduled_notifications',
-//         [
-//             'user_id' => $managerFloor->id,
-//             'recipient_name' => $managerFloor->fullName,
-//             'recipient_email' => $managerFloor->email,
-//             'notifiable_type' => get_class($contractOne),
-//             'notifiable_id' => $contractOne->id,
-//         ]
-//     );
-//     assertDatabaseHas(
-//         'scheduled_notifications',
-//         [
-//             'user_id' => $managerRoom->id,
-//             'recipient_name' => $managerRoom->fullName,
-//             'recipient_email' => $managerRoom->email,
-//             'notifiable_type' => get_class($contractOne),
-//             'notifiable_id' => $contractOne->id,
-//         ]
-//     );
-//     assertDatabaseHas(
-//         'scheduled_notifications',
-//         [
-//             'user_id' => $managerAsset->id,
-//             'recipient_name' => $managerAsset->fullName,
-//             'recipient_email' => $managerAsset->email,
-//             'notifiable_type' => get_class($contractOne),
-//             'notifiable_id' => $contractOne->id,
-//         ]
-//     );
-// })->with(array_column(ContractDurationEnum::cases(), 'value'));
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $managerSite->id,
+            'recipient_name' => $managerSite->fullName,
+            'recipient_email' => $managerSite->email,
+            'notifiable_type' => get_class($contractOne),
+            'notifiable_id' => $contractOne->id,
+        ]
+    );
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $managerBuilding->id,
+            'recipient_name' => $managerBuilding->fullName,
+            'recipient_email' => $managerBuilding->email,
+            'notifiable_type' => get_class($contractOne),
+            'notifiable_id' => $contractOne->id,
+        ]
+    );
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $managerFloor->id,
+            'recipient_name' => $managerFloor->fullName,
+            'recipient_email' => $managerFloor->email,
+            'notifiable_type' => get_class($contractOne),
+            'notifiable_id' => $contractOne->id,
+        ]
+    );
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $managerRoom->id,
+            'recipient_name' => $managerRoom->fullName,
+            'recipient_email' => $managerRoom->email,
+            'notifiable_type' => get_class($contractOne),
+            'notifiable_id' => $contractOne->id,
+        ]
+    );
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $managerAsset->id,
+            'recipient_name' => $managerAsset->fullName,
+            'recipient_email' => $managerAsset->email,
+            'notifiable_type' => get_class($contractOne),
+            'notifiable_id' => $contractOne->id,
+        ]
+    );
+})->with(array_column(ContractDurationEnum::cases(), 'value'));

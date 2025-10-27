@@ -15,6 +15,8 @@ class ContractObserver implements ShouldHandleEventsAfterCommit
 
     public function updated(Contract $contract)
     {
+        // dump('Contract updated');
+        // dump($contract->getChanges());
         app(ContractNotificationSchedulingService::class)->updateScheduleForContract($contract);
     }
 }

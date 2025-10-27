@@ -19,7 +19,6 @@ class APIContractController extends Controller
 {
     public function __construct(
         protected ContractService $contractService
-
     ) {}
 
     public function store(ContractStoreRequest $request)

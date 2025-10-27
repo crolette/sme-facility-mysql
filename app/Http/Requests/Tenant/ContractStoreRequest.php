@@ -39,7 +39,6 @@ class ContractStoreRequest extends FormRequest
             $data['notice_date']  = NoticePeriodEnum::from($data['notice_period'])->subFrom($data['end_date']);
         }
 
-
         $this->replace($data);
     }
 
