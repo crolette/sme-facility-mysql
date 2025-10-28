@@ -44,13 +44,11 @@ class ContractNotificationSchedulingService
         // 2. reprendre les utilisateurs admin avec leur préférence
         // 3. boucler sur chaque user et actualiser avec les préférences
 
-        dump('Contract Service: updateScheduleForContract');
-        dump($contract->getChanges());
+        // dump('Contract Service: updateScheduleForContract');
 
-        $contract = Contract::with(['assets', 'sites', 'rooms', 'floors', 'buildings'])->find($contract->id);
+        $contract->load(['assets', 'sites', 'rooms', 'floors', 'buildings']);
         $contractables = $contract->contractables();
         // dump(count($contractables));
-
 
         $users = User::role('Admin')->get();
 
@@ -62,16 +60,9 @@ class ContractNotificationSchedulingService
             }
         }
 
-        dump($contract->notice_date->toDateString());
-        dump($contract->wasChanged(['notice_date', 'notice_period', 'end_date']));
-        dump($contract->wasChanged('notice_period'));
-        dump($contract->notice_date?->toDateString() > Carbon::now()->toDateString());
-
-
         if ($contract->wasChanged('notice_date') && $contract->notice_date?->toDateString() > Carbon::now()->toDateString()) {
+            // dump('Contract Notice Date Changed');
             $notifications = $contract->notifications()->where('notification_type', 'notice_date')->where('status', 'pending')->get();
-
-
 
             if (count($notifications)) {
                 foreach ($notifications as $notification) {
@@ -91,10 +82,12 @@ class ContractNotificationSchedulingService
         }
 
         if ($contract->wasChanged('status') && $contract->status === ContractStatusEnum::ACTIVE) {
+            // dump('Contract Status Changed to ACTIVE');
             $this->scheduleForContract($contract);
         }
 
         if ($contract->wasChanged('status') && in_array($contract->status, [ContractStatusEnum::EXPIRED, ContractStatusEnum::CANCELLED])) {
+            // dump('Contract Status Changed to EXPIRED/CANCELLED');
             $this->removeAllPendingNotificationsForAContract($contract);
         }
     }
@@ -121,8 +114,6 @@ class ContractNotificationSchedulingService
     public function createScheduleForContractNoticeDate(Contract $contract, User $user)
     {
         // dump('createScheduleForContractNoticeDate');
-        // dump($contract->start_date?->toDateString());
-        // dump($contract->notice_date?->toDateString());
         $preference = $user->notification_preferences()->where('notification_type', 'notice_date')->first();
         $delayDays = $preference->notification_delay_days;
 

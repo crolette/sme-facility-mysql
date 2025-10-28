@@ -86,7 +86,7 @@ class User extends Authenticatable
         parent::boot();
 
         static::deleting(function ($user) {
-            $notifications = ScheduledNotification::where('recipient_email', $user->email)->where('status', 'pending')->get();
+            $notifications = $user->notifications()->where('status', 'pending')->get();
             foreach ($notifications as $notification) {
                 $notification->delete();
             }

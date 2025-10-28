@@ -26,21 +26,23 @@ class ContractWithModelStoreRequest extends FormRequest
     {
         $data = $this->all();
 
-        foreach ($data['contracts'] as $index => $contract) {
+        if (isset($data['contracts'])) {
+            foreach ($data['contracts'] as $index => $contract) {
 
-            if (isset($contract['start_date'])) {
-                $endDate = ContractDurationEnum::from($contract['contract_duration'])->addTo(Carbon::createFromFormat('Y-m-d', $contract['start_date']));
-            } else {
-                $data['contracts'][$index]['start_date'] = Carbon::now();
-                $endDate = ContractDurationEnum::from($contract['contract_duration'])->addTo(Carbon::now());
-            }
+                if (isset($contract['start_date'])) {
+                    $endDate = ContractDurationEnum::from($contract['contract_duration'])->addTo(Carbon::createFromFormat('Y-m-d', $contract['start_date']));
+                } else {
+                    $data['contracts'][$index]['start_date'] = Carbon::now();
+                    $endDate = ContractDurationEnum::from($contract['contract_duration'])->addTo(Carbon::now());
+                }
 
-            $data['contracts'][$index]['end_date'] = $endDate;
+                $data['contracts'][$index]['end_date'] = $endDate;
 
-            // dump($contract['notice_period']);
-            if (isset($contract['notice_period'])) {
-                $data['contracts'][$index]['notice_date']  = NoticePeriodEnum::from($contract['notice_period'])->subFrom($data['contracts'][$index]['end_date']);
-                // dump($contract['notice_date']);
+                // dump($contract['notice_period']);
+                if (isset($contract['notice_period'])) {
+                    $data['contracts'][$index]['notice_date']  = NoticePeriodEnum::from($contract['notice_period'])->subFrom($data['contracts'][$index]['end_date']);
+                    // dump($contract['notice_date']);
+                }
             }
         }
 
@@ -94,18 +96,20 @@ class ContractWithModelStoreRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            foreach ($this->contracts as $index => $contract) {
+            if (isset($this->contracts)) {
+                foreach ($this->contracts as $index => $contract) {
 
-                dump($contract);
-                dump($contract['notice_date']);
-                $noticeDate = Carbon::parse($contract['notice_date']);
-                $startDate = Carbon::parse($contract['start_date']);
+                    // dump($contract);
+                    // dump($contract['notice_date']);
+                    $noticeDate = Carbon::parse($contract['notice_date']);
+                    $startDate = Carbon::parse($contract['start_date']);
 
-                if ($noticeDate <= $startDate) {
-                    $validator->errors()->add(
-                        "contracts.{$index}.notice_period",
-                        'Wrong notice period : Should be smaller than contract duration.'
-                    );
+                    if ($noticeDate <= $startDate) {
+                        $validator->errors()->add(
+                            "contracts.{$index}.notice_period",
+                            'Wrong notice period : Should be smaller than contract duration.'
+                        );
+                    }
                 }
             }
         });

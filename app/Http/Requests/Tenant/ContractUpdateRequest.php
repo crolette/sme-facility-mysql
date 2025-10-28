@@ -32,6 +32,7 @@ class ContractUpdateRequest extends FormRequest
         }
 
         $data['end_date'] = $endDate;
+
         if (isset($data['notice_period'])) {
             $data['notice_date']  = NoticePeriodEnum::from($data['notice_period'])->subFrom($data['end_date']);
         }

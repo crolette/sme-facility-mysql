@@ -81,7 +81,9 @@ class ContractService
 
     public function update(Contract $contract, $request)
     {
+        // dump('update contract service');
         $contract->update([...$request]);
+
 
         // if (isset($request['contract_duration']) && ($contract->wasChanged('contract_duration') || $contract->wasChanged('start_date')))
         //     $contract = $this->updateContractEndDate($contract, $contract->contract_duration);

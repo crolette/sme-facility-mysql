@@ -47,7 +47,7 @@ class Contract extends Model
             'created_at' => 'date:Y-m-d',
             'updated_at' => 'date:Y-m-d',
             'notice_date' => 'date:Y-m-d',
-            'end_date' => 'date:Y-m-d',
+            'end_date' => 'immutable_date:Y-m-d',
             'start_date' => 'date:Y-m-d',
             'notice_period' => NoticePeriodEnum::class,
             'contract_duration' => ContractDurationEnum::class,

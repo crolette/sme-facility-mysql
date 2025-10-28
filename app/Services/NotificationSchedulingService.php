@@ -46,15 +46,26 @@ class NotificationSchedulingService
 
         if ($preference->wasChanged('enabled') && $preference->enabled === true) {
             match ($preference->notification_type) {
-                'notice_date'  => $this->createScheduleForContractNoticeDate($preference),
-                'end_date'  => $this->createScheduleForContractEndDate($preference),
-                'end_warranty_date' => $this->createScheduleForWarrantyEndDate($preference),
-                'depreciation_end_date' => $this->createScheduleForDepreciationEndDate($preference),
-                'next_maintenance_date' => $this->createScheduleForNextMaintenanceDate($preference),
-                'planned_at' => $this->createScheduleForPlannedAtDate($preference),
+                'notice_date'  => $this->createScheduleForContractNoticeDate($preference->user),
+                'end_date'  => $this->createScheduleForContractEndDate($preference->user),
+                'end_warranty_date' => $this->createScheduleForWarrantyEndDate($preference->user),
+                'depreciation_end_date' => $this->createScheduleForDepreciationEndDate($preference->user),
+                'next_maintenance_date' => $this->createScheduleForNextMaintenanceDate($preference->user),
+                'planned_at' => $this->createScheduleForPlannedAtDate($preference->user),
                 default => null
             };
         }
+    }
+
+    public function createNotificationsForNewAdmin(User $user)
+    {
+        // dump('createNotificationsForNewAdmin');
+        $this->createScheduleForContractNoticeDate($user);
+        $this->createScheduleForContractEndDate($user);
+        $this->createScheduleForWarrantyEndDate($user);
+        $this->createScheduleForDepreciationEndDate($user);
+        $this->createScheduleForNextMaintenanceDate($user);
+        $this->createScheduleForPlannedAtDate($user);
     }
 
     public function updateScheduleForNextMaintenanceDate(UserNotificationPreference $preference)
@@ -139,11 +150,11 @@ class NotificationSchedulingService
         }
     }
 
-    public function createScheduleForPlannedAtDate(UserNotificationPreference $preference)
+    public function createScheduleForPlannedAtDate(User $user)
     {
         $interventions = Intervention::where('planned_at', '>', Carbon::now())->get();
 
-        $user = $preference->user;
+        // $user = $preference->user;
 
         foreach ($interventions as $intervention) {
 
@@ -151,11 +162,11 @@ class NotificationSchedulingService
         }
     }
 
-    public function createScheduleForContractNoticeDate(UserNotificationPreference $preference)
+    public function createScheduleForContractNoticeDate(User $user)
     {
         $contracts = Contract::where('notice_date', '>', Carbon::now())->get();
 
-        $user = $preference->user;
+        // $user = $preference->user;
 
         foreach ($contracts as $contract) {
             app(ContractNotificationSchedulingService::class)->createScheduleForContractNoticeDate($contract, $user);
@@ -163,11 +174,11 @@ class NotificationSchedulingService
     }
 
 
-    public function createScheduleForContractEndDate(UserNotificationPreference $preference)
+    public function createScheduleForContractEndDate(User $user)
     {
         $contracts = Contract::where('end_date', '>', Carbon::now())->get();
 
-        $user = $preference->user;
+        // $user = $preference->user;
 
         foreach ($contracts as $contract) {
 
@@ -176,7 +187,7 @@ class NotificationSchedulingService
     }
 
 
-    public function createScheduleForWarrantyEndDate(UserNotificationPreference $preference)
+    public function createScheduleForWarrantyEndDate(User $user)
     {
         $assetsOrLocations = collect()
             ->merge($this->searchEntity(Asset::class, 'end_warranty_date'))
@@ -185,7 +196,7 @@ class NotificationSchedulingService
             ->merge($this->searchEntity(Floor::class, 'end_warranty_date'))
             ->merge($this->searchEntity(Room::class, 'end_warranty_date'));
 
-        $user = $preference->user;
+        // $user = $preference->user;
 
         foreach ($assetsOrLocations as $assetOrLocation) {
 
@@ -194,28 +205,28 @@ class NotificationSchedulingService
     }
 
 
-    public function createScheduleForDepreciationEndDate(UserNotificationPreference $preference)
+    public function createScheduleForDepreciationEndDate(User $user)
     {
         $assets = Asset::where('depreciation_end_date', '>', Carbon::now())->get();
 
         foreach ($assets as $asset) {
 
-            app(AssetNotificationSchedulingService::class)->createScheduleForDepreciable($asset, $preference->user);
+            app(AssetNotificationSchedulingService::class)->createScheduleForDepreciable($asset, $user);
         }
     }
 
-    public function createScheduleForNextMaintenanceDate(UserNotificationPreference $preference)
+    public function createScheduleForNextMaintenanceDate(User $user)
     {
         $assetsOrLocations = collect([]);
 
         $assetsOrLocations = collect()
-            ->merge($this->searchEntity(Asset::class, 'next_maintenance_date'))
+            ->merge(Asset::all())
             ->merge($this->searchEntity(Site::class, 'next_maintenance_date'))
             ->merge($this->searchEntity(Building::class, 'next_maintenance_date'))
             ->merge($this->searchEntity(Floor::class, 'next_maintenance_date'))
             ->merge($this->searchEntity(Room::class, 'next_maintenance_date'));
 
-        $user = $preference->user;
+        // $user = $preference->user;
 
         foreach ($assetsOrLocations as $assetOrLocation) {
             app(MaintainableNotificationSchedulingService::class)->createScheduleForNextMaintenanceDate($assetOrLocation->maintainable, $user);
@@ -225,5 +236,24 @@ class NotificationSchedulingService
     private function searchEntity($modelClass, $column)
     {
         return $modelClass::whereHas('maintainable', fn($query) => $query->where($column, '>', Carbon::now()))->get();
+    }
+
+
+    public function removeNotificationsForOldAdminRole(User $user)
+    {
+        dump('removeNotificationsForOldAdminRole');
+
+        $assetsOrLocations = collect()
+            ->merge(Asset::all())
+            ->merge(Site::all())
+            ->merge(Building::all())
+            ->merge(Floor::all())
+            ->merge(Room::all());
+
+
+        foreach ($assetsOrLocations as $assetOrLocation) {
+            if ($assetOrLocation->manager?->id !== $user->id)
+                app(MaintainableNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($assetOrLocation->maintainable, $user);
+        }
     }
 }

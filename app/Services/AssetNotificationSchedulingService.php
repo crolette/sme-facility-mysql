@@ -118,4 +118,17 @@ class AssetNotificationSchedulingService
                 $notification->delete();
             }
     }
+
+    public function removeDepreciableNotificationForUser(Asset $asset, User $user)
+    {
+        if ($user->hasAnyRole('Admin'))
+            return;
+
+        $notifications = $asset->notifications()->where('notification_type', 'depreciation_end_date')->where('user_id', $user->id)->where('status', 'pending')->get();
+
+        if (count($notifications) > 0)
+            foreach ($notifications as $notification) {
+                $notification->delete();
+            }
+    }
 }

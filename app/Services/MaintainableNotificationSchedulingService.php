@@ -47,6 +47,8 @@ class MaintainableNotificationSchedulingService
         }
     }
 
+
+
     public function updateScheduleOfMaintainable(Maintainable $maintainable)
     {
         // 1. il faut rechercher toutes les  scheduled_notifications avec le notification_type et le user_id ET l'asset_type
@@ -148,7 +150,7 @@ class MaintainableNotificationSchedulingService
         $preference = $user->notification_preferences()->where('notification_type', 'next_maintenance_date')->first();
 
         // if ($preference && $preference->enabled && $maintainable->maintenance_frequency != MaintenanceFrequency::ONDEMAND->value) {
-        if ($preference && $preference->enabled && $maintainable->next_maintenance_date->toDateString() > Carbon::now()->toDateString()) {
+        if ($preference && $preference->enabled && $maintainable->next_maintenance_date?->toDateString() > Carbon::now()->toDateString()) {
             $notification = [
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
                 'notification_type' => 'next_maintenance_date',
@@ -253,6 +255,7 @@ class MaintainableNotificationSchedulingService
             }
     }
 
+    // remove all notifications linked to a maintainable and user
     public function removeNotificationsForOldMaintenanceManager(Maintainable $maintainable, User $user)
     {
         // dump('--- removeNotificationsForOldMaintenanceManager');
@@ -269,16 +272,20 @@ class MaintainableNotificationSchedulingService
         }
 
         $contracts = $maintainable->maintainable->contracts;
-
+        // dump(count($contracts));
         foreach ($contracts as $contract) {
+            // dump('contracts');
 
             $contractables = $contract->contractables()->filter(function ($item) use ($user) {
                 return $item->maintainable
                     && $item->maintainable->maintenance_manager_id === $user->id;
-            });;
+            });
 
-            if (count($contractables) === 1) {
-                app(ContractNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($contract, $maintainable->manager);
+            // dump(count($contractables));
+
+            if (count($contractables) <= 1) {
+                app(ContractNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($contract, $user);
+                // app(ContractNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($contract, $maintainable->manager);
             }
         }
 

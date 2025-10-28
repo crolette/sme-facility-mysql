@@ -697,8 +697,7 @@ it('updates notification when maintenance is marked as done and notification is 
     );
 })->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
 
-
-it('creates notification when maintenance is marked as done and other notifications already sent', function ($frequency) {
+it('creates new notification when maintenance is marked as done and other notifications already sent', function ($frequency) {
 
     $formData = [
         ...$this->basicAssetData,
@@ -943,6 +942,367 @@ it('creates notification when maintenance_frequency changes from ONDEMAND to ano
             'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
             'notifiable_type' => 'App\Models\Tenants\Asset',
             'notifiable_id' => 1,
+        ]
+    );
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+
+it('creates depreciation notifications for a new created user with admin role and only for not soft deleted assets', function ($frequency) {
+
+    $assetActive = Asset::factory()->forLocation($this->room)->create();
+
+    $assetActive->maintainable()->update([
+        'maintenance_frequency' => $frequency,
+        'need_maintenance' => true,
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+        'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString(),
+    ]);
+
+    $assetSoftDeleted = Asset::factory()->forLocation($this->room)->create([
+        'deleted_at' => Carbon::now()
+    ]);
+
+    $assetSoftDeleted->maintainable()->update([
+        'maintenance_frequency' => $frequency,
+        'need_maintenance' => true,
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+        'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString(),
+    ]);
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Admin',
+        'job_position' => 'Manager',
+    ];
+
+    $this->postToTenant('api.users.store', $formData);
+
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => $assetActive->id,
+        ]
+    );
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => $assetSoftDeleted->id,
+        ]
+    );
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+
+it('creates depreciation notifications when the role of a maintenance manager changes to admin', function ($frequency) {
+
+    $assetActive = Asset::factory()->forLocation($this->room)->create();
+
+    $assetActive->maintainable()->update([
+        'maintenance_frequency' => $frequency,
+        'need_maintenance' => true,
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+        'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString(),
+    ]);
+
+    $assetSoftDeleted = Asset::factory()->forLocation($this->room)->create([
+        'deleted_at' => Carbon::now()
+    ]);
+
+    $assetSoftDeleted->maintainable()->update([
+        'maintenance_frequency' => $frequency,
+        'need_maintenance' => true,
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+        'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString(),
+    ]);
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Maintenance Manager',
+        'job_position' => 'Manager',
+    ];
+
+    $this->postToTenant('api.users.store', $formData);
+
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => $assetActive->id,
+        ]
+    );
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => $assetSoftDeleted->id,
+        ]
+    );
+
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Admin',
+        'job_position' => 'Manager',
+    ];
+
+    $this->patchToTenant('api.users.update', $formData, $createdUser->id);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => $assetActive->id,
+        ]
+    );
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => $assetSoftDeleted->id,
+        ]
+    );
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+
+it('deletes depreciation notifications when the role of an admin changes to maintenance manager', function ($frequency) {
+    $assetActive = Asset::factory()->forLocation($this->room)->create();
+
+    $assetActive->maintainable()->update([
+        'maintenance_frequency' => $frequency,
+        'need_maintenance' => true,
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+        'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString(),
+    ]);
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Admin',
+        'job_position' => 'Manager',
+    ];
+
+    $this->postToTenant('api.users.store', $formData);
+
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => $assetActive->id,
+        ]
+    );
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Maintenance Manager',
+        'job_position' => 'Manager',
+    ];
+
+    $this->patchToTenant('api.users.update', $formData, $createdUser->id);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => $assetActive->id,
+        ]
+    );
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+
+it('deletes depreciation notifications when the role of an admin changes to maintenance manager for assets only where he is not maintenance manager', function ($frequency) {
+    $assetActive = Asset::factory()->forLocation($this->room)->create();
+
+    $assetActive->maintainable()->update([
+        'maintenance_frequency' => $frequency,
+        'need_maintenance' => true,
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+        'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString(),
+    ]);
+
+    $assetWithManager = Asset::factory()->forLocation($this->room)->create();
+
+    $assetWithManager->maintainable()->update([
+        'maintenance_frequency' => $frequency,
+        'need_maintenance' => true,
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+        'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString(),
+    ]);
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Admin',
+        'job_position' => 'Manager',
+    ];
+
+    $this->postToTenant('api.users.store', $formData);
+
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => $assetActive->id,
+        ]
+    );
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => $assetWithManager->id,
+        ]
+    );
+
+    $assetWithManager->refresh();
+    $assetWithManager->maintainable()->update(['maintenance_manager_id' => $createdUser->id]);
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Maintenance Manager',
+        'job_position' => 'Manager',
+    ];
+
+    $this->patchToTenant('api.users.update', $formData, $createdUser->id);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => $assetActive->id,
+        ]
+    );
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => $assetWithManager->id,
+        ]
+    );
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+
+it('deletes depreciation notifications when a user is deleted', function ($frequency) {
+
+    $assetActive = Asset::factory()->forLocation($this->room)->create();
+
+    $assetActive->maintainable()->update([
+        'maintenance_frequency' => $frequency,
+        'need_maintenance' => true,
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+        'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString(),
+    ]);
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Admin',
+        'job_position' => 'Manager',
+    ];
+
+    $this->postToTenant('api.users.store', $formData);
+
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => $assetActive->id,
+        ]
+    );
+
+    $this->deleteFromTenant('api.users.destroy', $createdUser);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => $assetActive->id,
         ]
     );
 })->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
