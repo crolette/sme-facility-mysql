@@ -241,7 +241,7 @@ class NotificationSchedulingService
 
     public function removeNotificationsForOldAdminRole(User $user)
     {
-        dump('removeNotificationsForOldAdminRole');
+        // dump('removeNotificationsForOldAdminRole');
 
         $assetsOrLocations = collect()
             ->merge(Asset::all())
