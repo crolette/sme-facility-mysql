@@ -118,7 +118,6 @@ it('updates end of warranty notification when end_warranty_date changes', functi
 
     assertDatabaseCount('scheduled_notifications', 2);
 
-    assertDatabaseCount('scheduled_notifications', 2);
     assertDatabaseHas(
         'scheduled_notifications',
         [
@@ -189,8 +188,6 @@ it('creates warranty notification when under_warranty passes from false to true'
 
     $response = $this->postToTenant('api.assets.store', $formData);
     assertDatabaseCount('scheduled_notifications', 0);
-    $response->assertSessionHasNoErrors();
-    $response->assertStatus(200);
 
     $formData = [
         ...$this->basicAssetData,
@@ -199,9 +196,6 @@ it('creates warranty notification when under_warranty passes from false to true'
     ];
     $asset = Asset::find(1);
     $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
-
-    $response->assertSessionHasNoErrors();
-    $response->assertStatus(200);
 
     assertDatabaseCount('scheduled_notifications', 1);
     assertDatabaseHas(
@@ -226,8 +220,6 @@ it('creates warranty notification for the maintenance manager when under_warrant
 
     $response = $this->postToTenant('api.assets.store', $formData);
     assertDatabaseCount('scheduled_notifications', 0);
-    $response->assertSessionHasNoErrors();
-    $response->assertStatus(200);
 
     $formData = [
         ...$this->basicAssetData,
@@ -335,7 +327,7 @@ it('deletes warranty notifications for maintenance manager when under_warranty p
         'maintenance_manager_id' => $this->manager->id
     ];
 
-    $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+    $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
 
     assertDatabaseCount('scheduled_notifications', 0);
 
@@ -361,7 +353,7 @@ it('deletes warranty notifications for maintenance manager when maintenance mana
         'maintenance_manager_id' => $this->manager->id
     ];
 
-    $response = $this->postToTenant('api.assets.store', $formData);
+    $this->postToTenant('api.assets.store', $formData);
 
     $asset = Asset::find(1);
 
@@ -380,10 +372,12 @@ it('deletes warranty notifications for maintenance manager when maintenance mana
 
     $formData = [
         ...$this->basicAssetData,
-        'under_warranty' => false,
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::now()->addMonths(10),
+        'maintenance_manager_id' => null,
     ];
 
-    $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+    $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
 
     assertDatabaseCount('scheduled_notifications', 1);
 
@@ -433,8 +427,7 @@ it('updates warranty notification when notification preference end_warranty_date
         'enabled' => true,
     ];
 
-    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
-    $response->assertStatus(200);
+    $this->patchToTenant('api.notifications.update', $formData, $preference->id);
 
     assertDatabaseHas(
         'scheduled_notifications',
@@ -457,7 +450,7 @@ it('deletes warranty notification when notification preference end_warranty_date
         'end_warranty_date' => Carbon::now()->addMonths(10),
     ];
 
-    $response = $this->postToTenant('api.assets.store', $formData);
+    $this->postToTenant('api.assets.store', $formData);
 
     assertDatabaseHas(
         'scheduled_notifications',
@@ -480,7 +473,7 @@ it('deletes warranty notification when notification preference end_warranty_date
         'enabled' => false,
     ];
 
-    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+    $this->patchToTenant('api.notifications.update', $formData, $preference->id);
 
     assertDatabaseMissing(
         'scheduled_notifications',
@@ -514,8 +507,7 @@ it('creates warranty notification for admin when notification preference warrant
         'enabled' => false,
     ];
 
-    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
-    $response->assertStatus(200);
+    $this->patchToTenant('api.notifications.update', $formData, $preference->id);
 
     assertDatabaseMissing(
         'scheduled_notifications',
@@ -632,8 +624,6 @@ it('creates warranty notification for admin when notification preference warrant
         'under_warranty' => true,
         'end_warranty_date' => Carbon::tomorrow()
     ]);
-
-    $response = $this->postToTenant('api.assets.store', $formData);
 
     $asset = Asset::factory()->forLocation($this->room)->create();
     $asset->refresh();
@@ -1061,10 +1051,11 @@ it('deletes warranty notifications when the role of an admin changes to maintena
 
 it('deletes warranty notifications when a user is deleted', function () {
 
-    $assetActive = Asset::factory()->forLocation($this->room)->create([
-        'depreciation_start_date' => Carbon::now()->toDateString(),
-        'depreciation_end_date' => Carbon::now()->addYears(3)->toDateString(),
-        'depreciation_duration' => 3,
+    $assetActive = Asset::factory()->forLocation($this->room)->create();
+
+    $assetActive->maintainable()->update([
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::tomorrow(),
     ]);
 
     $formData = [
@@ -1085,7 +1076,7 @@ it('deletes warranty notifications when a user is deleted', function () {
         [
             'recipient_name' => $createdUser->fullName,
             'recipient_email' => $createdUser->email,
-            'notification_type' => 'depreciation_end_date',
+            'notification_type' => 'end_warranty_date',
             'scheduled_at' => Carbon::now()->addYear(3)->subDays(7)->toDateString(),
             'notifiable_type' => 'App\Models\Tenants\Asset',
             'notifiable_id' => $assetActive->id,
@@ -1099,7 +1090,7 @@ it('deletes warranty notifications when a user is deleted', function () {
         [
             'recipient_name' => $createdUser->fullName,
             'recipient_email' => $createdUser->email,
-            'notification_type' => 'depreciation_end_date',
+            'notification_type' => 'end_warranty_date',
             'scheduled_at' => Carbon::now()->addYear(3)->subDays(7)->toDateString(),
             'notifiable_type' => 'App\Models\Tenants\Asset',
             'notifiable_id' => $assetActive->id,

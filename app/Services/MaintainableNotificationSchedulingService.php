@@ -101,7 +101,10 @@ class MaintainableNotificationSchedulingService
         if ($maintainable->wasChanged('maintenance_manager_id') && $maintainable->manager) {
             $this->createScheduleForUser($maintainable, $maintainable->manager);
 
-            app(AssetNotificationSchedulingService::class)->createScheduleForDepreciable($maintainable->maintainable, $maintainable->manager);
+            if (get_class($maintainable->maintainable) === Asset::class) {
+                app(AssetNotificationSchedulingService::class)->createScheduleForDepreciable($maintainable->maintainable, $maintainable->manager);
+            }
+
 
             $contracts = $maintainable->maintainable->contracts;
             foreach ($contracts as $contract) {
