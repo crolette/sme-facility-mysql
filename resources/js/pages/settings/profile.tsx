@@ -1,21 +1,19 @@
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
 
-import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
+import ImageUploadModale from '@/components/ImageUploadModale';
 import InputError from '@/components/input-error';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import axios from 'axios';
-import { useToast } from '@/components/ToastrContext';
-import ImageUploadModale from '@/components/ImageUploadModale';
 import { Trash, Upload } from 'lucide-react';
-import { router } from '@inertiajs/core';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -43,29 +41,28 @@ export default function Profile() {
         e.preventDefault();
 
         try {
-            const response = await axios.patch(route('tenant.profile.update', auth.user.id), data)
+            const response = await axios.patch(route('tenant.profile.update', auth.user.id), data);
             if (response.data.status === 'success') {
                 showToast(response.data.message, response.data.success);
-                
             }
         } catch (error) {
             showToast(error.response.data.message, error.response.data.success);
         }
     };
 
-        const deleteProfilePicture = async () => {
-            try {
-                const response = await axios.delete(route('api.users.picture.destroy', auth.user.id));
-                if (response.data.status === 'success') {
-                    showToast(response.data.message, response.data.status);
-                    window.location.reload();
-                }
-            } catch (error) {
-                showToast(error.response.data.message, error.response.data.status);
+    const deleteProfilePicture = async () => {
+        try {
+            const response = await axios.delete(route('api.users.picture.destroy', auth.user.id));
+            if (response.data.status === 'success') {
+                showToast(response.data.message, response.data.status);
+                window.location.reload();
             }
-        };
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
+        }
+    };
 
-    console.log(auth.user)
+    console.log(auth.user);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -111,7 +108,14 @@ export default function Profile() {
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email address</Label>
 
-                            <Input id="email" type="email" className="mt-1 block w-full" disabled placeholder="Email address" />
+                            <Input
+                                id="email"
+                                type="email"
+                                className="mt-1 block w-full"
+                                disabled
+                                placeholder="Email address"
+                                value={auth.user.email}
+                            />
                         </div>
 
                         <div className="flex items-center gap-4">
@@ -149,7 +153,7 @@ export default function Profile() {
                         onClose={() => setIsModalOpen(false)}
                         uploadUrl={route('api.users.picture.store', auth.user.id)}
                         onUploadSuccess={() => {
-                             window.location.reload();;
+                            window.location.reload();
                         }}
                     />
                 </div>

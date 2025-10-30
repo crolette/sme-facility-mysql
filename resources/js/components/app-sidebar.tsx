@@ -78,7 +78,7 @@ const mainNavItems: NavItem[] = [
         icon: FileStack,
     },
     {
-        title: 'Users',
+        title: 'Contacts',
         href: '/users',
         icon: Users,
     },

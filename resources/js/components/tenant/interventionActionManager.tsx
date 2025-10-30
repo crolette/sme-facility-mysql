@@ -366,7 +366,7 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                                         }))
                                     }
                                 >
-                                    Clear planned at
+                                    Clear intervention date
                                 </Button>
                             </div>
                         </div>
@@ -428,7 +428,7 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                         </div>
                         <div className="flex gap-4">
                             <Button type="submit">Submit</Button>
-                            <Button onClick={cancelModale} type="button" variant={'outline'}>
+                            <Button onClick={cancelModale} type="button" variant={'secondary'}>
                                 Cancel
                             </Button>
                         </div>
