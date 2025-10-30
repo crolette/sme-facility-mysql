@@ -19,8 +19,6 @@ class InterventionController extends Controller
      */
     public function index(Request $request)
     {
-
-
         $validator = Validator::make($request->all(), [
             'q' => 'string|max:255|nullable',
             'sortBy' => 'in:asc,desc',
@@ -78,6 +76,8 @@ class InterventionController extends Controller
      */
     public function show(Intervention $intervention)
     {
-        return Inertia::render('tenants/tickets/interventions/ShowIntervention', ['intervention' => $intervention->load(['ticket', 'interventionable', 'pictures', 'actions.pictures'])]);
+        $statuses = array_column(InterventionStatus::cases(), 'value');
+
+        return Inertia::render('tenants/tickets/interventions/ShowIntervention', ['intervention' => $intervention->load(['ticket', 'interventionable', 'pictures', 'actions.pictures']), 'statuses' => $statuses]);
     }
 }

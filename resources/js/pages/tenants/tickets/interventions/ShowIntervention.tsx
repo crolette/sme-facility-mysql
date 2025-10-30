@@ -1,13 +1,17 @@
 import { InterventionActionManager } from '@/components/tenant/interventionActionManager';
 import { PictureManager } from '@/components/tenant/pictureManager';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
+import { useToast } from '@/components/ToastrContext';
 import Field from '@/components/ui/field';
+import { Pill } from '@/components/ui/pill';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, Intervention } from '@/types';
-import { Head } from '@inertiajs/react';
+import { cn } from '@/lib/utils';
+import { BreadcrumbItem, Intervention, InterventionStatus } from '@/types';
+import { Head, router } from '@inertiajs/react';
+import axios from 'axios';
 import { useState } from 'react';
 
-export default function ShowIntervention({ intervention }: { intervention: Intervention }) {
+export default function ShowIntervention({ intervention, statuses }: { intervention: Intervention; statuses: InterventionStatus[] }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index interventions`,
@@ -18,13 +22,43 @@ export default function ShowIntervention({ intervention }: { intervention: Inter
             href: `/interventions/${intervention}`,
         },
     ];
+    const { showToast } = useToast();
+
+    const changeInterventionStatus = async (status: string) => {
+        try {
+            const response = await axios.patch(route('api.interventions.status', intervention.id), { status: status });
+            if (response.data.status === 'success') {
+                router.visit(route('tenant.interventions.show', intervention.id));
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
 
     const [activeTab, setActiveTab] = useState('information');
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Intervention" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="flex flex-wrap items-center gap-4"></div>
+                <div className="flex flex-wrap items-center gap-4">
+                    <ul className="flex gap-2">
+                        {statuses.map((status, index) => (
+                            <li key={index} className="flex items-center gap-2">
+                                <Pill
+                                    variant={status}
+                                    onClick={() => changeInterventionStatus(status)}
+                                    className={cn(
+                                        intervention.status === status ? 'border-2 border-amber-50 font-extrabold uppercase' : '',
+                                        'cursor-pointer',
+                                    )}
+                                >
+                                    {status}
+                                </Pill>
+                                {index !== statuses.length - 1 && <span className="">{' > '}</span>}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
                 <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_6fr]">
                     <SidebarMenuAssetLocation
                         activeTab={activeTab}
