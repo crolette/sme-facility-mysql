@@ -49,6 +49,7 @@ class User extends Authenticatable
         'password',
         'avatar',
         'job_position',
+        'phone_number',
         'can_login'
 
     ];
