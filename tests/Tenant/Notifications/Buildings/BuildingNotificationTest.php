@@ -52,7 +52,6 @@ it('creates notifications (maintenance, warranty) for a new created building', f
         'need_maintenance' => true,
         'maintenance_frequency' => MaintenanceFrequency::ANNUAL->value,
         'last_maintenance_date' => Carbon::now()->toDateString(),
-        'maintenance_frequency' => MaintenanceFrequency::ANNUAL->value
     ];
 
     $response = $this->postToTenant('api.buildings.store', $formData);

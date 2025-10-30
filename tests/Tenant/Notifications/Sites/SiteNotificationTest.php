@@ -5,13 +5,6 @@ use Illuminate\Support\Str;
 use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
-use App\Models\Tenants\Asset;
-use App\Models\Tenants\Floor;
-use App\Models\Tenants\Picture;
-use App\Models\Tenants\Building;
-use App\Models\Tenants\Document;
-use App\Models\Tenants\Provider;
-use Illuminate\Http\UploadedFile;
 use App\Enums\MaintenanceFrequency;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Storage;
@@ -83,32 +76,29 @@ it('creates notifications (maintenance, warranty) for a new created site', funct
 });
 
 
-it(
-    'deletes notifications when site is deleted',
-    function () {
-        $formData = [
-            'name' => 'New site',
-            'address' => 'Rue du Buisson 22, 4000 Liège, Belgique',
-            'description' => 'Description new site',
-            'locationType' => $this->siteType->id,
-            'under_warranty' => true,
-            'end_warranty_date' => Carbon::now()->addMonths(10),
-            'need_maintenance' => true,
-            'maintenance_frequency' => MaintenanceFrequency::ANNUAL->value,
-            'last_maintenance_date' => Carbon::now()->toDateString(),
-            'maintenance_frequency' => MaintenanceFrequency::ANNUAL->value
-        ];
+it('deletes notifications when site is deleted', function () {
+    $formData = [
+        'name' => 'New site',
+        'address' => 'Rue du Buisson 22, 4000 Liège, Belgique',
+        'description' => 'Description new site',
+        'locationType' => $this->siteType->id,
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::now()->addMonths(10),
+        'need_maintenance' => true,
+        'maintenance_frequency' => MaintenanceFrequency::ANNUAL->value,
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+        'maintenance_frequency' => MaintenanceFrequency::ANNUAL->value
+    ];
 
-        $response = $this->postToTenant('api.sites.store', $formData);
-        $response->assertSessionHasNoErrors();
-        $response->assertStatus(200);
+    $response = $this->postToTenant('api.sites.store', $formData);
+    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200);
 
-        assertDatabaseCount('scheduled_notifications', 2);
+    assertDatabaseCount('scheduled_notifications', 2);
 
-        $site = Site::find(1);
+    $site = Site::find(1);
 
-        $response = $this->deleteFromTenant('api.sites.destroy', $site->reference_code);
+    $response = $this->deleteFromTenant('api.sites.destroy', $site->reference_code);
 
-        assertDatabaseEmpty('scheduled_notifications');
-    }
-);
+    assertDatabaseEmpty('scheduled_notifications');
+});

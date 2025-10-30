@@ -13,11 +13,15 @@ class UserObserver implements ShouldHandleEventsAfterCommit
         if ($user->notification_preferences()->exists()) {
             return;
         }
+
+        // dump('USER CREATED');
         app(UserNotificationPreferenceService::class)->createDefaultUserNotificationPreferences($user);
     }
 
     public function updated(User $user)
     {
+        // dump('USER UPDATED');
+        // dump($user->getChanges());
         if ($user->notification_preferences()->exists()) {
             return;
         }

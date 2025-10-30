@@ -41,17 +41,23 @@ class MaintainableService
         }
 
         if ($maintainable->manager && !isset($data['maintenance_manager_id']))
-            $maintainable->manager()->dissociate();
+            if ($maintainable->manager && !isset($data['maintenance_manager_id']))
+                $maintainable->manager()->dissociate();
 
         if (isset($data['maintenance_manager_id']) && ($maintainable->manager?->id !== $data['maintenance_manager_id'])) {
             app(MaintainableNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($maintainable, $maintainable->manager);
             $maintainable->manager()->associate($data['maintenance_manager_id'])->save();
         }
 
+
+
         if ($maintainable->wasChanged('maintenance_frequency') && $maintainable->maintenance_frequency !== MaintenanceFrequency::ONDEMAND->value)
             $maintainable->next_maintenance_date = calculateNextMaintenanceDate($data['maintenance_frequency'], $data['last_maintenance_date'] ?? null);
 
+
+
         $maintainable->save();
+
 
         return $model;
     }
@@ -73,8 +79,6 @@ class MaintainableService
 
         if ($maintainable->wasChanged('maintenance_frequency') && $maintainable->maintenance_frequency !== MaintenanceFrequency::ONDEMAND->value)
             $maintainable->next_maintenance_date = calculateNextMaintenanceDate($request->validated('maintenance_frequency'), $request->validated('last_maintenance_date') ?? null);
-
-
 
         $maintainable->save();
     }

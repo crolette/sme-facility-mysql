@@ -216,3 +216,63 @@ it('fails when end_warranty_date is before purchase_date', function () {
         'end_warranty_date' => 'The end warranty date field must be a date after purchase date.',
     ]);
 });
+
+it('fails when next_maintenance_date is before today', function () {
+    $formData = [
+        'name' => fake()->text(50),
+        'description' => fake()->text(250),
+        'locationId' => $this->site->id,
+        'locationReference' => $this->site->reference_code,
+        'locationType' => 'site',
+        'categoryId' => $this->category->id,
+        'need_maintenance' => true,
+        'maintenance_frequency' => 'annual',
+        'next_maintenance_date' => Carbon::now()->subDays(5)->toDateString(),
+        'last_maintenance_date' => Carbon::now()->subDays(5)->toDateString()
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertSessionHasErrors([
+        'next_maintenance_date' => 'The next maintenance date field must be a date after or equal to today.',
+    ]);
+});
+
+it('fails when last_maintenance_date is before today', function () {
+    $formData = [
+        'name' => fake()->text(50),
+        'description' => fake()->text(250),
+        'locationId' => $this->site->id,
+        'locationReference' => $this->site->reference_code,
+        'locationType' => 'site',
+        'categoryId' => $this->category->id,
+        'need_maintenance' => true,
+        'maintenance_frequency' => 'annual',
+        'next_maintenance_date' => Carbon::now()->addDays(5)->toDateString(),
+        'last_maintenance_date' => Carbon::now()->addDays(5)->toDateString()
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertSessionHasErrors([
+        'last_maintenance_date' => 'The last maintenance date field must be a date before or equal to today.',
+    ]);
+});
+
+it('fails when maintenance_frequency is not correct', function () {
+    $formData = [
+        'name' => fake()->text(50),
+        'description' => fake()->text(250),
+        'locationId' => $this->site->id,
+        'locationReference' => $this->site->reference_code,
+        'locationType' => 'site',
+        'categoryId' => $this->category->id,
+        'need_maintenance' => true,
+        'maintenance_frequency' => 'triannual',
+        'next_maintenance_date' => Carbon::now()->addDays(5)->toDateString(),
+        'las_maintenance_date' => Carbon::now()->addDays(5)->toDateString()
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertSessionHasErrors([
+        'maintenance_frequency' => 'The selected maintenance frequency is invalid.',
+    ]);
+});

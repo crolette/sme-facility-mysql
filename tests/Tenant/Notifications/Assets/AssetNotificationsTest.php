@@ -30,11 +30,6 @@ beforeEach(function () {
 
     $this->manager = User::factory()->withRole('Maintenance Manager')->create();
 
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    LocationType::factory()->create(['level' => 'room']);
-    CategoryType::factory()->create(['category' => 'provider']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
 
     $this->site = Site::factory()->create();
@@ -42,10 +37,7 @@ beforeEach(function () {
     Floor::factory()->create();
     $this->provider = Provider::factory()->create();
 
-    $this->room = Room::factory()
-        ->for(LocationType::where('level', 'room')->first())
-        ->for(Floor::first())
-        ->create();
+    $this->room = Room::factory()->create();
 
     $this->basicAssetData = [
         'name' => 'New asset',
@@ -155,38 +147,35 @@ it('creates all notifications (warranty, depreciable, maintenance) for a new cre
     );
 });
 
-it(
-    'deletes notifications when asset is soft deleted',
-    function () {
-        $formData = [
-            ...$this->basicAssetData,
-            'under_warranty' => true,
-            'end_warranty_date' => Carbon::now()->addMonths(10),
-            'maintenance_manager_id' => $this->manager->id,
-            'depreciable' => true,
-            'depreciation_start_date' => Carbon::now()->toDateString(),
-            'depreciation_end_date' => Carbon::now()->addYear(3)->toDateString(),
-            'depreciation_duration' => 3,
-            'residual_value' => 1250.69,
-            'maintenance_frequency' => 'annual',
-            'need_maintenance' => true,
-            'next_maintenance_date' => Carbon::now()->addYear(),
-            'last_maintenance_date' => Carbon::now()->toDateString(),
-        ];
+it('deletes notifications when asset is soft deleted', function () {
+    $formData = [
+        ...$this->basicAssetData,
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::now()->addMonths(10),
+        'maintenance_manager_id' => $this->manager->id,
+        'depreciable' => true,
+        'depreciation_start_date' => Carbon::now()->toDateString(),
+        'depreciation_end_date' => Carbon::now()->addYear(3)->toDateString(),
+        'depreciation_duration' => 3,
+        'residual_value' => 1250.69,
+        'maintenance_frequency' => 'annual',
+        'need_maintenance' => true,
+        'next_maintenance_date' => Carbon::now()->addYear(),
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+    ];
 
-        $response = $this->postToTenant('api.assets.store', $formData);
-        $response->assertSessionHasNoErrors();
-        $response->assertStatus(200);
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200);
 
-        assertDatabaseCount('scheduled_notifications', 6);
+    assertDatabaseCount('scheduled_notifications', 6);
 
-        $asset = Asset::find(1);
+    $asset = Asset::find(1);
 
-        $response = $this->deleteFromTenant('api.assets.destroy', $asset->reference_code);
+    $response = $this->deleteFromTenant('api.assets.destroy', $asset->reference_code);
 
-        assertDatabaseEmpty('scheduled_notifications');
-    }
-);
+    assertDatabaseEmpty('scheduled_notifications');
+});
 
 it('creates notifications when asset is restored', function () {
 

@@ -18,7 +18,7 @@ class ProviderFactory extends Factory
     public function definition(): array
     {
         $faker = \Faker\Factory::create('fr_BE');
-        $category = CategoryType::where('category', 'provider')->first();
+        $category = CategoryType::factory()->create(['category' => 'provider']);
 
         return [
             'name' => $faker->company(),

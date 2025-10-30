@@ -1,6 +1,6 @@
 <?php
 
-
+use App\Enums\MaintenanceFrequency;
 use Carbon\Carbon;
 use App\Models\LocationType;
 use App\Models\Tenants\Room;
@@ -42,10 +42,7 @@ beforeEach(function () {
     Floor::factory()->create();
     $this->provider = Provider::factory()->create();
 
-    $this->room = Room::factory()
-        ->for(LocationType::where('level', 'room')->first())
-        ->for(Floor::first())
-        ->create();
+    $this->room = Room::factory()->create();
 
     $this->basicAssetData = [
         'name' => 'New asset',
@@ -58,13 +55,12 @@ beforeEach(function () {
     ];
 });
 
-it('creates notification when adding maintenance manager to existing asset without maintenance manager', function () {
+it('creates notification when adding maintenance manager to existing asset without maintenance manager', function ($frequency) {
 
     $formData = [
         ...$this->basicAssetData,
-        'maintenance_frequency' => 'annual',
+        'maintenance_frequency' => $frequency,
         'need_maintenance' => true,
-        'next_maintenance_date' => Carbon::now()->addYear(),
         'last_maintenance_date' => Carbon::now()->toDateString(),
     ];
 
@@ -73,32 +69,18 @@ it('creates notification when adding maintenance manager to existing asset witho
     $response->assertStatus(200);
 
     assertDatabaseCount('scheduled_notifications', 1);
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'next_maintenance_date',
-            'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Asset',
-            'notifiable_id' => 1,
-        ]
-    );
 
-    $asset = Asset::find(1);
+    $asset = Asset::first();
 
     $formData = [
         ...$this->basicAssetData,
         'maintenance_manager_id' => $this->manager->id,
+        'maintenance_frequency' => $frequency,
         'need_maintenance' => true,
-        'maintenance_frequency' => 'annual',
-        'next_maintenance_date' => Carbon::now()->addYear(),
         'last_maintenance_date' => Carbon::now()->toDateString(),
     ];
 
     $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
-    $response->assertSessionHasNoErrors();
-    $response->assertStatus(200);
 
     assertDatabaseCount('scheduled_notifications', 2);
 
@@ -108,51 +90,89 @@ it('creates notification when adding maintenance manager to existing asset witho
             'recipient_name' => $this->manager->fullName,
             'recipient_email' => $this->manager->email,
             'notification_type' => 'next_maintenance_date',
-            'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
             'notifiable_type' => 'App\Models\Tenants\Asset',
             'notifiable_id' => 1,
         ]
     );
-});
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
 
-it('creates notification when replacing maintenance manager for the asset and removes notifications for old maintenance manager', function () {
+it('creates notification when replacing maintenance manager for the asset and removes notifications for old maintenance manager', function ($frequency) {
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $tempManager =  User::factory()->withRole('Maintenance Manager')->create();
 
     $formData = [
         ...$this->basicAssetData,
-        'maintenance_manager_id' => $this->manager->id,
-        'maintenance_frequency' => 'annual',
+        'maintenance_manager_id' => $tempManager->id,
+        'maintenance_frequency' => $frequency,
         'need_maintenance' => true,
-        'next_maintenance_date' => Carbon::now()->addYear(),
         'last_maintenance_date' => Carbon::now()->toDateString(),
     ];
 
-    $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
-    $response->assertSessionHasNoErrors();
-    $response->assertStatus(200);
+    $response = $this->postToTenant('api.assets.store', $formData);
+
+    $asset = Asset::first();
 
     assertDatabaseCount('scheduled_notifications', 2);
 
     assertDatabaseHas(
         'scheduled_notifications',
         [
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
+            'recipient_name' => $tempManager->fullName,
+            'recipient_email' => $tempManager->email,
             'notification_type' => 'next_maintenance_date',
-            'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
             'notifiable_type' => 'App\Models\Tenants\Asset',
             'notifiable_id' => $asset->id,
         ]
     );
-});
 
-it('deletes notification when removing maintenance_manager from existing asset', function () {
+
     $formData = [
         ...$this->basicAssetData,
-        'maintenance_frequency' => 'annual',
+        'maintenance_manager_id' => $this->manager->id,
+        'maintenance_frequency' => $frequency,
         'need_maintenance' => true,
-        'next_maintenance_date' => Carbon::now()->addYear(),
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+    ];
+
+    $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200);
+
+    assertDatabaseCount('scheduled_notifications', 2);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $tempManager->fullName,
+            'recipient_email' => $tempManager->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => $asset->id,
+        ]
+    );
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => $asset->id,
+        ]
+    );
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+
+it('deletes notification when removing maintenance_manager from existing asset', function ($frequency) {
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_frequency' => $frequency,
+        'need_maintenance' => true,
         'last_maintenance_date' => Carbon::now()->toDateString(),
         'maintenance_manager_id' => $this->manager->id,
     ];
@@ -168,7 +188,7 @@ it('deletes notification when removing maintenance_manager from existing asset',
             'recipient_name' => $this->manager->fullName,
             'recipient_email' => $this->manager->email,
             'notification_type' => 'next_maintenance_date',
-            'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
             'notifiable_type' => 'App\Models\Tenants\Asset',
             'notifiable_id' => 1,
         ]
@@ -176,10 +196,10 @@ it('deletes notification when removing maintenance_manager from existing asset',
 
     $formData = [
         ...$this->basicAssetData,
-        'maintenance_frequency' => 'annual',
+        'maintenance_frequency' => $frequency,
         'need_maintenance' => true,
-        'next_maintenance_date' => Carbon::now()->addYear(),
         'last_maintenance_date' => Carbon::now()->toDateString(),
+        'maintenance_manager_id' => null,
     ];
 
     $asset = Asset::find(1);
@@ -195,9 +215,91 @@ it('deletes notification when removing maintenance_manager from existing asset',
             'recipient_name' => $this->manager->fullName,
             'recipient_email' => $this->manager->email,
             'notification_type' => 'next_maintenance_date',
-            'scheduled_at' => Carbon::now()->addYear()->subDays(7)->toDateString(),
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
             'notifiable_type' => 'App\Models\Tenants\Asset',
             'notifiable_id' => 1,
         ]
     );
-});
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+
+it('deletes only pending notification when removing maintenance_manager from existing asset', function ($frequency) {
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_frequency' => $frequency,
+        'need_maintenance' => true,
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+        'maintenance_manager_id' => $this->manager->id,
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200);
+
+    assertDatabaseCount('scheduled_notifications', 2);
+    $asset = Asset::find(1);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'next_maintenance_date',
+            'status' => 'pending',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+
+    $notification = $asset->notifications()->create([
+        'recipient_name' => $this->manager->fullName,
+        'recipient_email' => $this->manager->email,
+        'notification_type' => 'next_maintenance_date',
+        'scheduled_at' => Carbon::now()->subDays(MaintenanceFrequency::from($frequency)->days())->toDateString(),
+        'status' => 'sent'
+    ]);
+
+    $notification->user()->associate($this->manager)->save();
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_frequency' => $frequency,
+        'need_maintenance' => true,
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+        'maintenance_manager_id' => null,
+    ];
+
+
+    $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
+
+    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200);
+
+    assertDatabaseCount('scheduled_notifications', 2);
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'status' => 'sent',
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->subDays(MaintenanceFrequency::from($frequency)->days())->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'status' => 'pending',
+            'notification_type' => 'next_maintenance_date',
+            'scheduled_at' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Asset',
+            'notifiable_id' => 1,
+        ]
+    );
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));

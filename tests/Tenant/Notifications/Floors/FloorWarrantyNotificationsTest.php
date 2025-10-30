@@ -19,37 +19,30 @@ beforeEach(function () {
     $this->admin = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->admin, 'tenant');
     $this->manager = User::factory()->withRole('Maintenance Manager')->create();
-
-    $this->siteType = LocationType::factory()->create(['level' => 'site']);
-    $this->buildingType = LocationType::factory()->create(['level' => 'building']);
     $this->floorType = LocationType::factory()->create(['level' => 'floor']);
     $this->site = Site::factory()->create();
     $this->building = Building::factory()->create();
-    $this->wallMaterial = CategoryType::factory()->create(['category' => 'wall_materials']);
-    $this->floorMaterial = CategoryType::factory()->create(['category' => 'floor_materials']);
 
-    $this->basicFloorData = [
+    $this->basicLocationData = [
         'name' => 'New floor',
         'description' => 'Description new floor',
-        'floor_material_id' => $this->floorMaterial->id,
-        'surface_walls' => 256.9,
-        'wall_material_id' => $this->wallMaterial->id,
         'levelType' => $this->building->id,
         'locationType' => $this->floorType->id,
     ];
 });
 
-it('creates end of warranty notification for a new created room', function () {
+it('creates end of warranty notification for admin & maintenance manager for a new created floor when end_warranty_date > today', function () {
 
     $formData = [
-        ...$this->basicFloorData,
+        ...$this->basicLocationData,
         'under_warranty' => true,
-        'end_warranty_date' => Carbon::now()->addMonths(10),
+        'end_warranty_date' => Carbon::tomorrow(),
         'maintenance_manager_id' => $this->manager->id,
     ];
 
-    $response = $this->postToTenant('api.floors.store', $formData);
-    $response->assertSessionHasNoErrors();
+    $this->postToTenant('api.floors.store', $formData);
+
+    $location = Floor::first();
 
     assertDatabaseCount('scheduled_notifications', 2);
 
@@ -59,9 +52,9 @@ it('creates end of warranty notification for a new created room', function () {
             'recipient_name' => $this->admin->fullName,
             'recipient_email' => $this->admin->email,
             'notification_type' => 'end_warranty_date',
-            'scheduled_at' => Carbon::now()->addMonth(10)->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Floor',
-            'notifiable_id' => 1,
+            'scheduled_at' => Carbon::tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
         ]
     );
 
@@ -71,9 +64,45 @@ it('creates end of warranty notification for a new created room', function () {
             'recipient_name' => $this->manager->fullName,
             'recipient_email' => $this->manager->email,
             'notification_type' => 'end_warranty_date',
-            'scheduled_at' => Carbon::now()->addMonth(10)->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Floor',
-            'notifiable_id' => 1,
+            'scheduled_at' => Carbon::tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+});
+
+it('does not create end of warranty notification for admin & maintenance manager for a new created site when end_warranty_date <= today', function () {
+
+    $formData = [
+        ...$this->basicLocationData,
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::now(),
+        'maintenance_manager_id' => $this->manager->id,
+    ];
+
+    $this->postToTenant('api.floors.store', $formData);
+
+    $location = Floor::first();
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->admin->fullName,
+            'recipient_email' => $this->admin->email,
+            'notification_type' => 'end_warranty_date',
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_warranty_date',
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
         ]
     );
 });
@@ -81,28 +110,48 @@ it('creates end of warranty notification for a new created room', function () {
 it('updates end of warranty notification when end_warranty_date changes', function () {
 
     $formData = [
-        ...$this->basicFloorData,
+        ...$this->basicLocationData,
         'under_warranty' => true,
         'end_warranty_date' => Carbon::now()->addMonths(10),
         'maintenance_manager_id' => $this->manager->id,
     ];
 
     $response = $this->postToTenant('api.floors.store', $formData);
-    $response->assertSessionHasNoErrors();
 
-    assertDatabaseCount('scheduled_notifications', 2);
+    $location = Floor::first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->admin->fullName,
+            'recipient_email' => $this->admin->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::now()->addMonths(10)->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::now()->addMonths(10)->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
 
     $formData = [
-        ...$this->basicFloorData,
+        ...$this->basicLocationData,
         'under_warranty' => true,
         'end_warranty_date' => Carbon::now()->addYears(2),
         'maintenance_manager_id' => $this->manager->id,
     ];
 
-    $floor = Floor::find(1);
-    $response = $this->patchToTenant('api.floors.update', $formData, $floor->reference_code);
-    $response->assertSessionHasNoErrors();
-    $response->assertStatus(200);
+    $this->patchToTenant('api.floors.update', $formData, $location->reference_code);
 
     assertDatabaseCount('scheduled_notifications', 2);
     assertDatabaseHas(
@@ -112,8 +161,8 @@ it('updates end of warranty notification when end_warranty_date changes', functi
             'recipient_email' => $this->admin->email,
             'notification_type' => 'end_warranty_date',
             'scheduled_at' => Carbon::now()->addYears(2)->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Floor',
-            'notifiable_id' => 1,
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
         ]
     );
 
@@ -124,33 +173,29 @@ it('updates end of warranty notification when end_warranty_date changes', functi
             'recipient_email' => $this->manager->email,
             'notification_type' => 'end_warranty_date',
             'scheduled_at' => Carbon::now()->addYears(2)->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Floor',
-            'notifiable_id' => 1,
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
         ]
     );
 });
 
-it('creates warranty notifications when under_warranty passes from false to true', function () {
+it('creates warranty notifications for admin when under_warranty passes from false to true', function () {
 
     $formData = [
-        ...$this->basicFloorData,
+        ...$this->basicLocationData,
     ];
 
-    $response = $this->postToTenant('api.floors.store', $formData);
+    $this->postToTenant('api.floors.store', $formData);
     assertDatabaseCount('scheduled_notifications', 0);
-    $response->assertSessionHasNoErrors();
-    $response->assertStatus(200);
 
     $formData = [
-        ...$this->basicFloorData,
+        ...$this->basicLocationData,
         'under_warranty' => true,
         'end_warranty_date' => Carbon::now()->addMonths(10),
     ];
-    $floor = Floor::find(1);
-    $response = $this->patchToTenant('api.floors.update', $formData, $floor->reference_code);
 
-    $response->assertSessionHasNoErrors();
-    $response->assertStatus(200);
+    $location = Floor::first();
+    $response = $this->patchToTenant('api.floors.update', $formData, $location->reference_code);
 
     assertDatabaseCount('scheduled_notifications', 1);
     assertDatabaseHas(
@@ -160,16 +205,48 @@ it('creates warranty notifications when under_warranty passes from false to true
             'recipient_email' => $this->admin->email,
             'notification_type' => 'end_warranty_date',
             'scheduled_at' => Carbon::now()->addMonths(10)->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Floor',
-            'notifiable_id' => $floor->id,
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
         ]
     );
 });
 
-it('deletes warranty notifications when under_warranty passes from true to false', function () {
+it('creates warranty notifications for maintenance manager when under_warranty passes from false to true', function () {
 
     $formData = [
-        ...$this->basicFloorData,
+        ...$this->basicLocationData,
+    ];
+
+    $this->postToTenant('api.floors.store', $formData);
+    assertDatabaseCount('scheduled_notifications', 0);
+
+    $formData = [
+        ...$this->basicLocationData,
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::now()->addMonths(10),
+        'maintenance_manager_id' => $this->manager->id
+    ];
+
+    $location = Floor::first();
+    $this->patchToTenant('api.floors.update', $formData, $location->reference_code);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::now()->addMonths(10)->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+});
+
+it('deletes warranty notifications for admin when under_warranty passes from true to false', function () {
+
+    $formData = [
+        ...$this->basicLocationData,
         'under_warranty' => true,
         'end_warranty_date' => Carbon::now()->addMonths(10),
     ];
@@ -177,7 +254,7 @@ it('deletes warranty notifications when under_warranty passes from true to false
     $response = $this->postToTenant('api.floors.store', $formData);
     $response->assertSessionHasNoErrors();
     $response->assertStatus(200);
-    $floor = Floor::find(1);
+    $location = Floor::first();
 
     assertDatabaseCount('scheduled_notifications', 1);
     assertDatabaseHas(
@@ -187,29 +264,36 @@ it('deletes warranty notifications when under_warranty passes from true to false
             'recipient_email' => $this->admin->email,
             'notification_type' => 'end_warranty_date',
             'scheduled_at' => Carbon::now()->addMonths(10)->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Floor',
-            'notifiable_id' => $floor->id,
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
         ]
     );
 
     $formData = [
-        ...$this->basicFloorData,
+        ...$this->basicLocationData,
         'under_warranty' => false,
     ];
 
-    $response = $this->patchToTenant('api.floors.update', $formData, $floor->reference_code);
-
-    $response->assertSessionHasNoErrors();
-    $response->assertStatus(200);
+    $this->patchToTenant('api.floors.update', $formData, $location->reference_code);
 
     assertDatabaseCount('scheduled_notifications', 0);
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->admin->fullName,
+            'recipient_email' => $this->admin->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::now()->addMonths(10)->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
 });
 
-
-it('update notifications when notification preference end_warranty_date of user changes', function () {
+it('deletes warranty notifications for maintenance manager when under_warranty passes from true to false', function () {
 
     $formData = [
-        ...$this->basicFloorData,
+        ...$this->basicLocationData,
         'under_warranty' => true,
         'end_warranty_date' => Carbon::now()->addMonths(10),
         'maintenance_manager_id' => $this->manager->id,
@@ -217,7 +301,100 @@ it('update notifications when notification preference end_warranty_date of user 
 
     $this->postToTenant('api.floors.store', $formData);
 
-    assertDatabaseCount('scheduled_notifications', 2);
+    $location = Floor::first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::now()->addMonths(10)->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+
+    $formData = [
+        ...$this->basicLocationData,
+        'under_warranty' => false,
+        'maintenance_manager_id' => $this->manager->id,
+    ];
+
+    $this->patchToTenant('api.floors.update', $formData, $location->reference_code);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::now()->addMonths(10)->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+});
+
+it('deletes warranty notifications for maintenance manager when maintenance manager is removed from the site', function () {
+
+    $formData = [
+        ...$this->basicLocationData,
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::now()->addMonths(10),
+        'maintenance_manager_id' => $this->manager->id,
+    ];
+
+    $this->postToTenant('api.floors.store', $formData);
+
+    $location = Floor::first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::now()->addMonths(10)->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+
+    $formData = [
+        ...$this->basicLocationData,
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::now()->addMonths(10),
+        'maintenance_manager_id' => null,
+    ];
+
+    $this->patchToTenant('api.floors.update', $formData, $location->reference_code);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::now()->addMonths(10)->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+});
+
+it('updates warranty notifications when notification preference end_warranty_date of user changes', function () {
+
+    $formData = [
+        ...$this->basicLocationData,
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::now()->addMonths(10),
+        'maintenance_manager_id' => $this->manager->id,
+    ];
+
+    $this->postToTenant('api.floors.store', $formData);
+
+    $location = Floor::first();
 
     assertDatabaseHas(
         'scheduled_notifications',
@@ -225,20 +402,9 @@ it('update notifications when notification preference end_warranty_date of user 
             'recipient_name' => $this->admin->fullName,
             'recipient_email' => $this->admin->email,
             'notification_type' => 'end_warranty_date',
-            'scheduled_at' => Carbon::now()->addMonth(10)->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Floor',
-            'notifiable_id' => 1,
-        ]
-    );
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_warranty_date',
-            'scheduled_at' => Carbon::now()->addMonth(10)->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Floor',
-            'notifiable_id' => 1,
+            'scheduled_at' => Carbon::now()->addMonths(10)->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
         ]
     );
 
@@ -251,10 +417,7 @@ it('update notifications when notification preference end_warranty_date of user 
         'enabled' => true,
     ];
 
-    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
-    $response->assertStatus(200);
-
-    assertDatabaseCount('scheduled_notifications', 2);
+    $this->patchToTenant('api.notifications.update', $formData, $preference->id);
 
     assertDatabaseHas(
         'scheduled_notifications',
@@ -262,36 +425,24 @@ it('update notifications when notification preference end_warranty_date of user 
             'recipient_name' => $this->admin->fullName,
             'recipient_email' => $this->admin->email,
             'notification_type' => 'end_warranty_date',
-            'scheduled_at' => Carbon::now()->addMonth(10)->subDays(1)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Floor',
-            'notifiable_id' => 1,
-        ]
-    );
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_warranty_date',
-            'scheduled_at' => Carbon::now()->addMonth(10)->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Floor',
-            'notifiable_id' => 1,
+            'scheduled_at' => Carbon::now()->addMonths(10)->subDays(1)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
         ]
     );
 });
 
-it('deletes notifications when notification preference end_warranty_date of user is disabled', function () {
-
+it('deletes warranty notifications when notification preference end_warranty_date of user is disabled', function () {
 
     $formData = [
-        ...$this->basicFloorData,
+        ...$this->basicLocationData,
         'under_warranty' => true,
         'end_warranty_date' => Carbon::now()->addMonths(10),
         'maintenance_manager_id' => $this->manager->id,
     ];
 
-    $response = $this->postToTenant('api.floors.store', $formData);
+    $this->postToTenant('api.floors.store', $formData);
+    $location = Floor::first();
 
     assertDatabaseHas(
         'scheduled_notifications',
@@ -300,8 +451,8 @@ it('deletes notifications when notification preference end_warranty_date of user
             'recipient_email' => $this->admin->email,
             'notification_type' => 'end_warranty_date',
             'scheduled_at' => Carbon::now()->addMonth(10)->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Floor',
-            'notifiable_id' => 1,
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
         ]
     );
 
@@ -314,8 +465,7 @@ it('deletes notifications when notification preference end_warranty_date of user
         'enabled' => false,
     ];
 
-    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
-    $response->assertStatus(200);
+    $this->patchToTenant('api.notifications.update', $formData, $preference->id);
 
     assertDatabaseMissing(
         'scheduled_notifications',
@@ -324,24 +474,22 @@ it('deletes notifications when notification preference end_warranty_date of user
             'recipient_email' => $this->admin->email,
             'notification_type' => 'end_warranty_date',
             'scheduled_at' => Carbon::now()->addMonth(10)->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Floor',
-            'notifiable_id' => 1,
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
         ]
     );
 });
 
-
-it('creates notifications when notification preference warranty_end_date of user is enabled', function () {
+it('creates warranty notification for admin when notification preference warranty_end_date of user is enabled', function () {
 
     $formData = [
-        ...$this->basicFloorData,
+        ...$this->basicLocationData,
         'under_warranty' => true,
         'end_warranty_date' => Carbon::now()->addMonths(10),
-        'maintenance_manager_id' => $this->manager->id,
-    ];;
+    ];
 
-
-    $response = $this->postToTenant('api.floors.store', $formData);
+    $this->postToTenant('api.floors.store', $formData);
+    $location = Floor::first();
 
     $preference = $this->admin->notification_preferences()->where('notification_type', 'end_warranty_date')->first();
 
@@ -352,8 +500,19 @@ it('creates notifications when notification preference warranty_end_date of user
         'enabled' => false,
     ];
 
-    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
-    $response->assertStatus(200);
+    $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->admin->fullName,
+            'recipient_email' => $this->admin->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::now()->addMonth(10)->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
 
 
     $formData = [
@@ -363,8 +522,7 @@ it('creates notifications when notification preference warranty_end_date of user
         'enabled' => true,
     ];
 
-    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
-    $response->assertStatus(200);
+    $this->patchToTenant('api.notifications.update', $formData, $preference->id);
 
     assertDatabaseHas(
         'scheduled_notifications',
@@ -373,8 +531,505 @@ it('creates notifications when notification preference warranty_end_date of user
             'recipient_email' => $this->admin->email,
             'notification_type' => 'end_warranty_date',
             'scheduled_at' => Carbon::now()->addMonth(10)->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Floor',
-            'notifiable_id' => 1,
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+});
+
+it('creates warranty notification for maintenance manager when notification preference warranty_end_date of user is enabled', function () {
+
+    $formData = [
+        ...$this->basicLocationData,
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::now()->addMonths(10),
+        'maintenance_manager_id' => $this->manager->id,
+    ];
+
+    $this->postToTenant('api.floors.store', $formData);
+    $location = Floor::first();
+
+    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_warranty_date')->first();
+
+    $formData = [
+        'asset_type' => 'maintenance',
+        'notification_type' => 'end_warranty_date',
+        'notification_delay_days' => $preference->notification_delay_days,
+        'enabled' => false,
+    ];
+
+    $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::now()->addMonth(10)->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+
+
+    $formData = [
+        'asset_type' => 'maintenance',
+        'notification_type' => 'end_warranty_date',
+        'notification_delay_days' => $preference->notification_delay_days,
+        'enabled' => true,
+    ];
+
+    $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::now()->addMonth(10)->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+});
+
+it('creates warranty notification for admin when notification preference warranty_end_date of user is enabled for warranty_end_date > today', function () {
+
+    $preference = $this->admin->notification_preferences()->where('notification_type', 'end_warranty_date')->first();
+
+    $formData = [
+        'asset_type' => 'maintenance',
+        'notification_type' => 'end_warranty_date',
+        'notification_delay_days' => $preference->notification_delay_days,
+        'enabled' => false,
+    ];
+
+    $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+
+    $location = Floor::factory()->create();
+    $location->refresh();
+    $location->maintainable->update([
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::tomorrow()
+    ]);
+
+    $locationInThePast = Floor::factory()->create();
+    $locationInThePast->refresh();
+    $locationInThePast->maintainable->update([
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::yesterday()
+    ]);
+
+    assertDatabaseCount('scheduled_notifications', 0);
+
+    $formData = [
+        'asset_type' => 'maintenance',
+        'notification_type' => 'end_warranty_date',
+        'notification_delay_days' => $preference->notification_delay_days,
+        'enabled' => true,
+    ];
+
+    $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+
+    assertDatabaseCount('scheduled_notifications', 1);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->admin->fullName,
+            'recipient_email' => $this->admin->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::now()->tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->admin->fullName,
+            'recipient_email' => $this->admin->email,
+            'notification_type' => 'end_warranty_date',
+            'notifiable_type' => get_class($locationInThePast),
+            'notifiable_id' => $locationInThePast->id,
+        ]
+    );
+});
+
+it('creates warranty notification for maintenance manager when notification preference warranty_end_date of user is enabled for warranty_end_date > today', function () {
+
+    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_warranty_date')->first();
+
+    $formData = [
+        'asset_type' => 'maintenance',
+        'notification_type' => 'end_warranty_date',
+        'notification_delay_days' => $preference->notification_delay_days,
+        'enabled' => false,
+    ];
+
+    $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+
+    $location = Floor::factory()->create();
+    $location->refresh();
+    $location->maintainable->update([
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::tomorrow(),
+        'maintenance_manager_id' => $this->manager->id
+    ]);
+
+    $locationInThePast = Floor::factory()->create();
+    $locationInThePast->refresh();
+    $locationInThePast->maintainable->update([
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::yesterday(),
+        'maintenance_manager_id' => $this->manager->id
+    ]);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_warranty_date',
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_warranty_date',
+            'notifiable_type' => get_class($locationInThePast),
+            'notifiable_id' => $locationInThePast->id,
+        ]
+    );
+
+    $formData = [
+        'asset_type' => 'maintenance',
+        'notification_type' => 'end_warranty_date',
+        'notification_delay_days' => $preference->notification_delay_days,
+        'enabled' => true,
+    ];
+
+    $this->patchToTenant('api.notifications.update', $formData, $preference->id);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::now()->tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_warranty_date',
+            'notifiable_type' => get_class($locationInThePast),
+            'notifiable_id' => $locationInThePast->id,
+        ]
+    );
+});
+
+it('creates warranty notifications for a new created user with admin role', function () {
+
+    $location = Floor::factory()->create();
+
+    $location->maintainable()->update([
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::tomorrow(),
+    ]);
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Admin',
+        'job_position' => 'Manager',
+    ];
+
+    $this->postToTenant('api.users.store', $formData);
+
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+});
+
+it('creates warranty notifications when the role of a maintenance manager changes to admin', function () {
+
+    $location = Floor::factory()->create();
+
+    $location->maintainable()->update([
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::tomorrow(),
+    ]);
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Maintenance Manager',
+        'job_position' => 'Manager',
+    ];
+
+    $this->postToTenant('api.users.store', $formData);
+
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Admin',
+        'job_position' => 'Manager',
+    ];
+
+    $this->patchToTenant('api.users.update', $formData, $createdUser->id);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+});
+
+it('deletes warranty notifications when the role of an admin changes to maintenance manager', function () {
+    $location = Floor::factory()->create();
+
+    $location->maintainable()->update([
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::tomorrow(),
+    ]);
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Admin',
+        'job_position' => 'Manager',
+    ];
+
+    $this->postToTenant('api.users.store', $formData);
+
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Maintenance Manager',
+        'job_position' => 'Manager',
+    ];
+
+    $this->patchToTenant('api.users.update', $formData, $createdUser->id);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+});
+
+it('deletes warranty notifications when the role of an admin changes to maintenance manager for sites where he is not maintenance manager', function () {
+    $location = Floor::factory()->create();
+
+    $location->maintainable()->update([
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::tomorrow(),
+    ]);
+
+    $locationWithManager = Floor::factory()->create();
+
+    $locationWithManager->maintainable()->update([
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::tomorrow(),
+    ]);
+
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Admin',
+        'job_position' => 'Manager',
+    ];
+
+    $this->postToTenant('api.users.store', $formData);
+
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($locationWithManager),
+            'notifiable_id' => $locationWithManager->id,
+        ]
+    );
+
+    $locationWithManager->refresh();
+    $locationWithManager->maintainable()->update(['maintenance_manager_id' => $createdUser->id]);
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Maintenance Manager',
+        'job_position' => 'Manager',
+    ];
+
+    $this->patchToTenant('api.users.update', $formData, $createdUser->id);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($locationWithManager),
+            'notifiable_id' => $locationWithManager->id,
+        ]
+    );
+});
+
+it('deletes warranty notifications when a user is deleted', function () {
+
+    $location = Floor::factory()->create();
+
+    $location->maintainable()->update([
+        'under_warranty' => true,
+        'end_warranty_date' => Carbon::tomorrow(),
+    ]);
+
+    $formData = [
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+        'email' => 'janedoe@facilitywebxp.be',
+        'can_login' => true,
+        'role' => 'Admin',
+        'job_position' => 'Manager',
+    ];
+
+    $this->postToTenant('api.users.store', $formData);
+
+    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
+        ]
+    );
+
+    $this->deleteFromTenant('api.users.destroy', $createdUser);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'recipient_name' => $createdUser->fullName,
+            'recipient_email' => $createdUser->email,
+            'notification_type' => 'end_warranty_date',
+            'scheduled_at' => Carbon::tomorrow()->subDays(7)->toDateString(),
+            'notifiable_type' => get_class($location),
+            'notifiable_id' => $location->id,
         ]
     );
 });

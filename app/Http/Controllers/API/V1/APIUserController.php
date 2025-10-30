@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Hash;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Password;
 use App\Http\Requests\Tenant\UserRequest;
+use App\Services\AssetNotificationSchedulingService;
+use App\Services\NotificationSchedulingService;
 
 class APIUserController extends Controller
 {
@@ -72,16 +74,25 @@ class APIUserController extends Controller
 
             DB::beginTransaction();
 
+            $previousRoles = $user->getRoleNames();
             $user->syncRoles($request->validated('role'));
+            $newRoles = $user->getRoleNames();
+
+            if ([...$previousRoles] !== [...$newRoles] && $newRoles->contains('Maintenance Manager')) {
+                app(NotificationSchedulingService::class)->removeNotificationsForOldAdminRole($user);
+            }
+
+            if ([...$previousRoles] !== [...$newRoles] && $newRoles->contains('Admin')) {
+                app(NotificationSchedulingService::class)->createNotificationsForNewAdmin($user);
+            }
 
             $user->update($request->safe()->except('avatar'));
 
-            if (!$user->can_login && $request->validated('can_login') === true) {
-                $password = Str::password(12);
-                $user->password = Hash::make($password);
+            if (!$user->can_login && $request->validated('can_login') === true && $user->hasAnyRole('Admin', 'Maintenance Manager')) {
+                Password::sendResetLink(
+                    $request->only('email')
+                );
             }
-
-
 
             if ($request->validated('provider_id'))
                 $user = $this->userService->attachProvider($user, $request->validated('provider_id'));

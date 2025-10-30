@@ -26,7 +26,7 @@ class AssetPolicy
             return true;
 
         if ($user->hasRole('Maintenance Manager'))
-            return $user->can('view assets') && $asset->maintainable->manager->id == $user->id;
+            return $user->can('view assets') && $asset->maintainable->manager?->id == $user->id;
 
         if ($user->hasRole('Provider') && $asset->providers) {
             return $user->can('view assets') && array_search($user->provider?->id, $asset->maintainable->providers?->pluck('id'));

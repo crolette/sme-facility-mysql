@@ -24,7 +24,7 @@ class SendInterventionToProviderListener
      */
     public function handle(SendInterventionToProviderEvent $event): void
     {
-        Log::info('*** SendInterventionToProviderEvent ***');
+        Log::info('*** SendInterventionToProviderEvent to : ' . $event->email .  ' ***');
         Log::info($event->intervention);
 
         if (env('APP_ENV') === "local") {

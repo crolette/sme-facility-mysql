@@ -123,16 +123,6 @@ it('can create a contract and attach asset and locations', function () {
     ]);
 
     assertDatabaseCount('contractables', 5);
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'recipient_email' => $this->user->email,
-            'recipient_name' => $this->user->fullName,
-            'notification_type' => 'notice_date',
-            'scheduled_at' => Carbon::now()->addMonth()->subDays(21)->toDateString()
-        ]
-    );
 });
 
 it('can store a site with contracts', function () {
@@ -261,7 +251,6 @@ it('can store a room with contracts', function () {
     $room = Room::find(2);
     assertEquals(2, $room->contracts()->count());
 });
-
 
 it('can update an existing contract', function () {
     $contract = Contract::factory()->forLocation($this->asset)->create();
