@@ -1077,7 +1077,7 @@ it('deletes warranty notifications when a user is deleted', function () {
             'recipient_name' => $createdUser->fullName,
             'recipient_email' => $createdUser->email,
             'notification_type' => 'end_warranty_date',
-            'scheduled_at' => Carbon::now()->addYear(3)->subDays(7)->toDateString(),
+            'scheduled_at' => Carbon::tomorrow()->subDays(7)->toDateString(),
             'notifiable_type' => 'App\Models\Tenants\Asset',
             'notifiable_id' => $assetActive->id,
         ]

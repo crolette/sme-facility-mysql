@@ -70,7 +70,7 @@ it('creates notification when adding maintenance manager to existing asset witho
 
     assertDatabaseCount('scheduled_notifications', 1);
 
-    $asset = Asset::find(1);
+    $asset = Asset::first();
 
     $formData = [
         ...$this->basicAssetData,
