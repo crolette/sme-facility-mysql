@@ -151,7 +151,7 @@ export default function CreateUpdateAsset({
         categoryId: asset?.asset_category.id ?? '',
         maintenance_manager_id: asset?.maintainable?.maintenance_manager_id ?? null,
         maintenance_manager_name: asset?.maintainable?.manager?.full_name ?? '',
-        purchase_date: asset?.maintainable.purchase_date ?? '',
+        purchase_date: asset?.maintainable.purchase_date ?? null,
         purchase_cost: asset?.maintainable.purchase_cost ?? null,
         under_warranty: asset?.maintainable.under_warranty ?? false,
         end_warranty_date: asset?.maintainable.end_warranty_date ?? '',
@@ -331,6 +331,39 @@ export default function CreateUpdateAsset({
         });
     };
 
+    useEffect(() => {
+        if (data.depreciable === true) {
+            if (data.purchase_date !== null) {
+                setData('depreciation_start_date', data.purchase_date);
+            } else {
+                const today = new Date();
+                setData('depreciation_start_date', today.toISOString().split('T')[0]);
+            }
+        } else {
+            setData('depreciation_duration', null);
+            setData('depreciation_start_date', null);
+            setData('depreciation_end_date', null);
+            setData('residual_value', null);
+        }
+    }, [data.depreciable]);
+
+    useEffect(() => {
+        if (data.depreciation_duration) {
+            if (data.depreciation_start_date !== null) {
+                console.log(data.depreciation_start_date);
+                const [year, month, day] = data.depreciation_start_date.split('-');
+                const dateObj = new Date(year, month - 1, day);
+                dateObj.setFullYear(dateObj.getFullYear() + data.depreciation_duration);
+                setData('depreciation_end_date', dateObj.toISOString().split('T')[0]);
+            } else {
+                const today = new Date();
+                setData('depreciation_start_date', today.toISOString().split('T')[0]);
+                today.setFullYear(today.getFullYear() + data.depreciation_duration);
+                setData('depreciation_end_date', today.toISOString().split('T')[0]);
+            }
+        }
+    }, [data.depreciation_duration]);
+
     const addFileModalForm = () => {
         return (
             <ModaleForm title={'Add new document'}>
@@ -424,14 +457,6 @@ export default function CreateUpdateAsset({
 
         setCountContracts((prev) => prev - 1);
     };
-
-    // useEffect(() => {
-    //     if (data.depreciation_duration && data.depreciation_duration > 0 && data.depreciation_start_date !== null) {
-    //         const date = new Date(data.depreciation_start_date); // Convertit la chaîne en objet Date
-    //         date.setFullYear(date.getFullYear() + data.depreciation_duration); // Ajoute les années
-    //         setData('depreciation_end_date', date.toISOString().split('T')[0]);
-    //     }
-    // }, [data.depreciation_duration]);
 
     const [existingContracts, setExistingContracts] = useState<Contract[]>([]);
     const [existingDocuments, setExistingDocuments] = useState<Document[]>([]);
@@ -779,6 +804,7 @@ export default function CreateUpdateAsset({
                                     <Input
                                         id="depreciation_end_date"
                                         type="date"
+                                        disabled
                                         value={data.depreciation_end_date ?? ''}
                                         onChange={(e) => setData('depreciation_end_date', e.target.value)}
                                         placeholder="Depreciation end date"
@@ -1258,7 +1284,7 @@ export default function CreateUpdateAsset({
                         </div>
                     )}
 
-                    <div className="flex justify-between">
+                    <div className="flex gap-4">
                         <Button type="submit">{asset ? 'Update' : 'Submit'}</Button>
                         <a href={asset ? route('tenant.assets.show', asset.reference_code) : route('tenant.assets.index')}>
                             <Button type="button" tabIndex={6} variant={'secondary'}>
@@ -1273,7 +1299,7 @@ export default function CreateUpdateAsset({
                         <div className="flex flex-col items-center gap-4">
                             <Loader size={48} className="animate-pulse" />
                             <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
-                            <p className="mx-auto">Asset is being created...</p>
+                            {asset ? <p className="mx-auto">Asset is being updated...</p> : <p className="mx-auto">Asset is being created...</p>}
                         </div>
                     </ModaleForm>
                 )}

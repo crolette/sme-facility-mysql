@@ -25,7 +25,12 @@ class MaintainableUpdateRequest extends FormRequest
         isset($data['under_warranty']) && ($data['under_warranty'] === 'true' || $data['under_warranty'] === true) ? $data['under_warranty'] = true : $data['under_warranty'] = false;
 
         if (isset($data['need_maintenance']) && $data['need_maintenance'] === true && !isset($data['next_maintenance_date'])) {
+            Debugbar::info('need maintenance');
+            Debugbar::info($data['maintenance_frequency']);
+            Debugbar::info(MaintenanceFrequency::ONDEMAND->value);
+            Debugbar::info($data['maintenance_frequency'] !== MaintenanceFrequency::ONDEMAND->value);
             if (isset($data['maintenance_frequency']) && $data['maintenance_frequency'] !== MaintenanceFrequency::ONDEMAND->value) {
+                dump('HELLOO');
                 $data['next_maintenance_date'] = isset($data['last_maintenance_date']) ? calculateNextMaintenanceDate($data['maintenance_frequency'], $data['last_maintenance_date']) : calculateNextMaintenanceDate($data['maintenance_frequency']);
             }
         }
@@ -52,7 +57,6 @@ class MaintainableUpdateRequest extends FormRequest
     {
 
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-        Debugbar::info($this->input('need_maintenance'));
 
         return [
             'name' => 'required|string|min:4|max:100',

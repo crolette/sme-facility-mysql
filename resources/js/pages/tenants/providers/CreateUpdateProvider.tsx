@@ -56,7 +56,7 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
                 }
             } catch (error) {
                 showToast(error.response.data.message, error.response.data.status);
-               setErrors(error.response.data.errors);
+                setErrors(error.response.data.errors);
             }
         } else {
             try {
@@ -71,9 +71,9 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
                     });
                 }
             } catch (error) {
-                console.log(error)
+                console.log(error);
                 showToast(error.response.data.message, error.response.data.status);
-                setErrors(error.response.data.errors)
+                setErrors(error.response.data.errors);
             }
         }
     };
@@ -139,15 +139,21 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
                                 // accept="image/png, image/jpeg, image/jpg"
                             />
                             <p className="text-xs">Accepted files: png, jpg - Maximum file size: 4MB</p>
-                            {errors?.pictures && (
+                            {errors?.pictures &&
                                 errors?.pictures.map((error) => {
                                     <InputError className="mt-2" message={error ?? ''} />;
-                                })
-                            )}
+                                })}
                         </>
                     )}
 
-                    <Button>Submit</Button>
+                    <div className="flex gap-4">
+                        <Button type="submit">{provider ? 'Update' : 'Submit'}</Button>
+                        <a href={provider ? route('tenant.providers.show', provider.id) : route('tenant.providers.index')}>
+                            <Button type="button" tabIndex={6} variant={'secondary'}>
+                                Cancel
+                            </Button>
+                        </a>
+                    </div>
                 </form>
             </div>
         </AppLayout>

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Tenant;
 
+use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use App\Models\Central\CategoryType;
 use Illuminate\Foundation\Http\FormRequest;

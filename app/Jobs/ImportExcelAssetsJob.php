@@ -29,8 +29,7 @@ class ImportExcelAssetsJob implements ShouldQueue
     public function __construct(
         public User $user,
         public string $path
-        )
-    {
+    ) {
         //
     }
 
@@ -59,8 +58,6 @@ class ImportExcelAssetsJob implements ShouldQueue
         Log::info('SUCCESS SENDING MAIL IMPORT');
 
         Storage::disk('tenants')->delete($this->path);
-
-
     }
 
     public function failed($exception): void

@@ -262,7 +262,6 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
                                 <h2>Providers</h2>
                                 <div className="space-y-2">
-                                    <Field label={'End contract date'} text={asset.contract_end_date} />
                                     <ul>
                                         {asset.maintainable.providers?.map((provider, index) => (
                                             <li key={index}>

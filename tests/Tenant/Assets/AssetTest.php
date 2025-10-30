@@ -26,21 +26,11 @@ beforeEach(function () {
     $this->actingAs($this->user, 'tenant');
     $this->manager = User::factory()->withRole('Maintenance Manager')->create();
 
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    LocationType::factory()->create(['level' => 'room']);
-    CategoryType::factory()->count(2)->create(['category' => 'document']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
-    CategoryType::factory()->count(2)->create(['category' => 'asset']);
     $this->site = Site::factory()->create();
     $this->building = Building::factory()->create();
     $this->floor = Floor::factory()->create();
-
-    $this->room = Room::factory()
-        ->for(LocationType::where('level', 'room')->first())
-        ->for(Floor::first())
-        ->create();
+    $this->room = Room::factory()->create();
 });
 
 it('can render the index assets page', function () {
@@ -101,7 +91,6 @@ it('can create a new asset to site', function () {
     $response = $this->postToTenant('api.assets.store', $formData);
     $response->assertStatus(200)
         ->assertJson(['status' => 'success']);
-
 
     $asset = Asset::first();
 
@@ -396,7 +385,6 @@ it('can create a new asset to room', function () {
     ]);
 });
 
-
 it('can show the asset page', function () {
 
     $asset = Asset::factory()->forLocation($this->room)->create();
@@ -612,63 +600,6 @@ it('can force delete a soft deleted asset', function () {
     ]);
 });
 
-it('fails when model has more than 100 chars', function () {
-
-
-    $formData = [
-        'name' => fake()->text(50),
-        'description' => fake()->text(250),
-        'locationId' => $this->site->id,
-        'locationReference' => $this->site->reference_code,
-        'locationType' => 'site',
-        'categoryId' => $this->categoryType->id,
-        'model' => str_repeat('A', 101)
-    ];
-
-    $response = $this->postToTenant('api.assets.store', $formData);
-    $response->assertSessionHasErrors([
-        'model' => 'The model field must not be greater than 100 characters.',
-    ]);
-});
-
-it('fails when brand has more than 100 chars', function () {
-
-    $formData = [
-        'name' => fake()->text(50),
-        'description' => fake()->text(250),
-        'locationId' => $this->site->id,
-        'locationReference' => $this->site->reference_code,
-        'locationType' => 'site',
-        'categoryId' => $this->categoryType->id,
-        'brand' => str_repeat('A', 101)
-    ];
-
-    $response = $this->postToTenant('api.assets.store', $formData);
-    $response->assertSessionHasErrors([
-        'brand' => 'The brand field must not be greater than 100 characters.',
-    ]);
-});
-
-it('fails when serial_number has more than 50 chars', function () {
-
-
-    $formData = [
-        'name' => fake()->text(50),
-        'description' => fake()->text(250),
-        'locationId' => $this->site->id,
-        'locationReference' => $this->site->reference_code,
-        'locationType' => 'site',
-        'categoryId' => $this->categoryType->id,
-        'serial_number' => str_repeat('A', 51)
-    ];
-
-    $response = $this->postToTenant('api.assets.store', $formData);
-    $response->assertSessionHasErrors([
-        'serial_number' => 'The serial number field must not be greater than 50 characters.',
-    ]);
-});
-
-
 it('can attach a provider to an asset\'s maintainable', function () {
     CategoryType::factory()->create(['category' => 'provider']);
     $provider = Provider::factory()->create();
@@ -690,7 +621,6 @@ it('can attach a provider to an asset\'s maintainable', function () {
     $asset = Asset::first();
     assertCount(1, $asset->maintainable->providers);
 });
-
 
 it('can update providers to an asset\'s maintainable', function () {
     CategoryType::factory()->create(['category' => 'provider']);

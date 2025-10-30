@@ -50,7 +50,6 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
     {
         $rowData = app(AssetExportImportService::class)->generateDataForHash($asset);
         $hash = app(AssetExportImportService::class)->calculateHash($rowData);
-        Log::info($rowData);
 
         $rowExcel = app(AssetExportImportService::class)->generateExcelDisplayData($asset);
         // Debugbar::info($asset->id, $asset->location);
