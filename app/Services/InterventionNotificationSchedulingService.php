@@ -54,9 +54,11 @@ class InterventionNotificationSchedulingService
 
     public function createScheduleForPlannedAtDate(Intervention $intervention, User $user)
     {
+        // dump('--- createScheduleForPlannedAtDate');
         $preference = $user->notification_preferences()->where('notification_type', 'planned_at')->first();
+        // dump($preference);
 
-        if ($preference && $preference->enabled && $intervention->planned_at->subDays($preference->notification_delay_days) > now()) {
+        if ($preference && $preference->enabled && $intervention->planned_at->toDateString() > Carbon::now()->toDateString()) {
 
             $notification = [
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
@@ -78,6 +80,7 @@ class InterventionNotificationSchedulingService
             $createdNotification = $intervention->notifications()->updateOrCreate(
                 [
                     'recipient_email' => $user->email,
+                    'status' => 'pending',
                     'notification_type' => 'planned_at',
                 ],
                 [
@@ -101,20 +104,19 @@ class InterventionNotificationSchedulingService
 
     public function removeScheduleForPlannedAtDate(Intervention $intervention)
     {
-        // dump('--- removeScheduleForEndWarrantyDate ---');
-        $notifications = $intervention->notifications()->where('notification_type', 'planned_at')->where('scheduled_at', '>', now())->get();
+        // dump('--- removeScheduleForPlannedAtDate ---');
+        $notifications = $intervention->notifications()->where('notification_type', 'planned_at')->where('scheduled_at', '>', now())->where('status', 'pending')->get();
 
         if (count($notifications) > 0)
             foreach ($notifications as $notification) {
-                // dump('--- DELETE NOTIF ---');
-                // dump($notification->id);
                 $notification->delete();
             }
     }
 
     public function removeNotificationsForOldMaintenanceManager(Intervention $intervention, User $user)
     {
-        $notifications = $intervention->notifications()->where('user_id', $user->id)->get();
+        // dump('--- removeNotificationsForOldMaintenanceManager ---');
+        $notifications = $intervention->notifications()->where('user_id', $user->id)->where('status', 'pending')->get();
 
         if (count($notifications) > 0)
             foreach ($notifications as $notification) {

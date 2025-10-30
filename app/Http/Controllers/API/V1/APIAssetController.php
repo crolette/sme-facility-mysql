@@ -42,13 +42,13 @@ class APIAssetController extends Controller
 
         try {
             DB::beginTransaction();
-            
+
             $asset = $this->assetService->create($assetRequest->validated());
             $asset = $this->assetService->attachLocation($asset, $assetRequest->validated('locationType'), $assetRequest->validated('locationId'));
 
             $asset->assetCategory()->associate($assetRequest->validated('categoryId'));
             $asset->save();
-            
+
             $this->maintainableService->create($asset, $maintainableRequest->validated());
 
             if ($contractRequest->validated('contracts'))
@@ -114,7 +114,7 @@ class APIAssetController extends Controller
             $asset->save();
 
             DB::commit();
-            // dump('ASSET UPDATE');
+
             return ApiResponse::success(['reference_code' => $asset->reference_code], 'Asset updated');
         } catch (Exception $e) {
             DB::rollback();

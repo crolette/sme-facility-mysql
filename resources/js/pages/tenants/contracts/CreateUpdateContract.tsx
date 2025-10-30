@@ -119,7 +119,7 @@ export default function CreateUpdateContract({
                 }
             } catch (error) {
                 showToast(error.response.data.message, error.response.data.status);
-                setError(error.response.data.errors);
+                setErrors(error.response.data.errors);
             }
         } else {
             try {
@@ -133,7 +133,7 @@ export default function CreateUpdateContract({
                 }
             } catch (error) {
                 showToast(error.response.data.message, error.response.data.status);
-                setError(error.response.data.errors);
+                setErrors(error.response.data.errors);
             }
         }
     };

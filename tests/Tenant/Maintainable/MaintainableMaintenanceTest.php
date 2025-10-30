@@ -219,7 +219,7 @@ it('can update the maintenance_next_date manually', function () {
     ]);
 });
 
-it('updates the next_maintenance_date when maintenance marked as done', function () {
+it('updates the next_maintenance_date when maintenance marked as done', function ($frequency) {
     $formData = [
         'name' => 'New asset',
         'description' => 'Description new asset',
@@ -228,7 +228,7 @@ it('updates the next_maintenance_date when maintenance marked as done', function
         'locationType' => 'site',
         'categoryId' => $this->category->id,
         'need_maintenance' => true,
-        'maintenance_frequency' => MaintenanceFrequency::ANNUAL->value,
+        'maintenance_frequency' => $frequency,
         'next_maintenance_date' => Carbon::now()->addMonths(2)->toDateString(),
     ];
 
@@ -237,7 +237,7 @@ it('updates the next_maintenance_date when maintenance marked as done', function
 
     $asset = Asset::first();
 
-    $response = $this->postToTenant('api.maintenance.done', [], $asset->maintainable);
+    $response = $this->patchToTenant('api.maintenance.done', [], $asset->maintainable);
 
     assertDatabaseHas('maintainables', [
         'maintainable_type' => get_class($asset),
@@ -246,7 +246,40 @@ it('updates the next_maintenance_date when maintenance marked as done', function
         'description' => 'Description new asset',
         'need_maintenance' => true,
         'last_maintenance_date' => Carbon::now()->toDateString(),
-        'maintenance_frequency' => 'annual',
-        'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from(MaintenanceFrequency::ANNUAL->value)->days())->toDateString(),
+        'maintenance_frequency' => $frequency,
+        'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString(),
+    ]);
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+
+
+it('clears the next_maintenance_date when maintenance marked as done and frequency ON DEMAND', function () {
+    $formData = [
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+        'locationId' => $this->site->id,
+        'locationReference' => $this->site->reference_code,
+        'locationType' => 'site',
+        'categoryId' => $this->category->id,
+        'need_maintenance' => true,
+        'maintenance_frequency' => 'on demand',
+        'next_maintenance_date' => Carbon::now()->addMonths(2)->toDateString(),
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertStatus(200);
+
+    $asset = Asset::first();
+
+    $response = $this->patchToTenant('api.maintenance.done', [], $asset->maintainable);
+
+    assertDatabaseHas('maintainables', [
+        'maintainable_type' => get_class($asset),
+        'maintainable_id' => $asset->id,
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+        'need_maintenance' => true,
+        'last_maintenance_date' => Carbon::now()->toDateString(),
+        'maintenance_frequency' => 'on demand',
+        'next_maintenance_date' => null,
     ]);
 });

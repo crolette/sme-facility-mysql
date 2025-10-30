@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Tenant;
 
+use Carbon\Carbon;
 use App\Enums\NoticePeriodEnum;
 use Illuminate\Validation\Rule;
 use App\Enums\ContractStatusEnum;
@@ -21,11 +22,20 @@ class ContractUpdateRequest extends FormRequest
 
     public function prepareForValidation()
     {
-
         $data = $this->all();
 
-        $data['notice_period'] = !isset($data['notice_period']) ? 'default' : $data['notice_period'];
+        if (isset($data['start_date'])) {
+            $endDate = ContractDurationEnum::from($data['contract_duration'])->addTo(Carbon::createFromFormat('Y-m-d', $data['start_date']));
+        } else {
+            $data['start_date'] = Carbon::now();
+            $endDate = ContractDurationEnum::from($data['contract_duration'])->addTo(Carbon::now());
+        }
 
+        $data['end_date'] = $endDate;
+
+        if (isset($data['notice_period'])) {
+            $data['notice_date']  = NoticePeriodEnum::from($data['notice_period'])->subFrom($data['end_date']);
+        }
 
         $this->replace($data);
     }
@@ -52,7 +62,11 @@ class ContractUpdateRequest extends FormRequest
             'end_date' => 'nullable|date',
 
             'notice_date' => 'nullable|date',
-            'notice_period' => ['nullable', Rule::in(array_column(NoticePeriodEnum::cases(), 'value'))],
+            'notice_period' => ['nullable', Rule::in(array_column(NoticePeriodEnum::cases(), 'value')), function ($attribute, $value, $fail) {
+                if ($this->notice_date->toDateString() <= $this->start_date) {
+                    $fail('Wrong notice period : Should be smaller than contract duration.');
+                }
+            }],
 
             'renewal_type' => ['required', Rule::in(array_column(ContractRenewalTypesEnum::cases(), 'value'))],
             'status' => ['required', Rule::in(array_column(ContractStatusEnum::cases(), 'value'))],

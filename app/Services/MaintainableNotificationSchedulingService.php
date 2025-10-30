@@ -2,17 +2,23 @@
 
 namespace App\Services;
 
-use App\Enums\MaintenanceFrequency;
 use Carbon\Carbon;
+use App\Models\Tenants\Room;
+use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
+use App\Models\Tenants\Floor;
+use App\Models\Tenants\Building;
 use App\Models\Tenants\Contract;
+use App\Enums\MaintenanceFrequency;
+use App\Models\Tenants\Maintainable;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use App\Models\Tenants\ScheduledNotification;
 use App\Enums\ScheduledNotificationStatusEnum;
-use App\Models\Tenants\Maintainable;
 use App\Models\Tenants\UserNotificationPreference;
-use Illuminate\Database\Eloquent\Collection;
+use App\Services\ContractNotificationSchedulingService;
 
 class MaintainableNotificationSchedulingService
 {
@@ -41,6 +47,8 @@ class MaintainableNotificationSchedulingService
         }
     }
 
+
+
     public function updateScheduleOfMaintainable(Maintainable $maintainable)
     {
         // 1. il faut rechercher toutes les  scheduled_notifications avec le notification_type et le user_id ET l'asset_type
@@ -68,9 +76,8 @@ class MaintainableNotificationSchedulingService
         };
 
         if ($maintainable->need_maintenance === true || ($maintainable->need_maintenance === true && $maintainable->wasChanged('next_maintenance_date'))) {
-            // if (($maintainable->wasChanged('need_maintenance') && $maintainable->need_maintenance === true) || ($maintainable->need_maintenance === true && $maintainable->wasChanged('next_maintenance_date'))) {
 
-            $notifications = $maintainable->maintainable->notifications()->where('notification_type', 'next_maintenance_date')->where('scheduled_at', '>', now())->get();
+            $notifications = $maintainable->maintainable->notifications()->where('notification_type', 'next_maintenance_date')->where('scheduled_at', '>', now())->where('status', 'pending')->get();
 
             if (count($notifications)) {
                 $this->updateScheduleForNextMaintenanceDate($maintainable, $notifications);
@@ -89,10 +96,21 @@ class MaintainableNotificationSchedulingService
             $this->removeScheduleForNextMaintenanceDate($maintainable);
         };
 
+        // dump($maintainable->wasChanged('maintenance_manager_id'));
+
         if ($maintainable->wasChanged('maintenance_manager_id') && $maintainable->manager) {
             $this->createScheduleForUser($maintainable, $maintainable->manager);
 
-            app(AssetNotificationSchedulingService::class)->scheduleForAsset($maintainable->maintainable, $maintainable->manager);
+            if (get_class($maintainable->maintainable) === Asset::class) {
+                app(AssetNotificationSchedulingService::class)->createScheduleForDepreciable($maintainable->maintainable, $maintainable->manager);
+            }
+
+
+            $contracts = $maintainable->maintainable->contracts;
+            foreach ($contracts as $contract) {
+                app(ContractNotificationSchedulingService::class)->createScheduleForContractEndDate($contract, $maintainable->manager);
+                app(ContractNotificationSchedulingService::class)->createScheduleForContractNoticeDate($contract, $maintainable->manager);
+            }
 
             // add notifications to the manager for the interventions linked to the maintainable
             $interventions = $maintainable->maintainable->interventions;
@@ -126,9 +144,6 @@ class MaintainableNotificationSchedulingService
 
             $notificationPreference = $notification->user->notification_preferences()->where('notification_type', 'next_maintenance_date')->first();
 
-            if ($maintainable->maintenance_frequency == MaintenanceFrequency::ONDEMAND->value || $maintainable->next_maintenance_date->subDays($notificationPreference->notification_delay_days) < now())
-                continue;
-
             $notification->update(['scheduled_at' => $maintainable->next_maintenance_date->subDays($notificationPreference->notification_delay_days)]);
         }
     }
@@ -137,7 +152,8 @@ class MaintainableNotificationSchedulingService
     {
         $preference = $user->notification_preferences()->where('notification_type', 'next_maintenance_date')->first();
 
-        if ($preference && $preference->enabled && $maintainable->maintenance_frequency != MaintenanceFrequency::ONDEMAND->value &&   $maintainable->next_maintenance_date->subDays($preference->notification_delay_days) > now()) {
+        // if ($preference && $preference->enabled && $maintainable->maintenance_frequency != MaintenanceFrequency::ONDEMAND->value) {
+        if ($preference && $preference->enabled && $maintainable->next_maintenance_date?->toDateString() > Carbon::now()->toDateString()) {
             $notification = [
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
                 'notification_type' => 'next_maintenance_date',
@@ -160,10 +176,10 @@ class MaintainableNotificationSchedulingService
                 ]
             ];
 
-
             $createdNotification = $maintainable->maintainable->notifications()->updateOrCreate(
                 [
                     'recipient_email' => $user->email,
+                    'status' => 'pending',
                     'notification_type' => 'next_maintenance_date',
                 ],
                 [
@@ -179,13 +195,9 @@ class MaintainableNotificationSchedulingService
 
     public function createScheduleForEndWarrantyDate(Maintainable $maintainable, User $user)
     {
-        // dump('createScheduleForEndWarrantyDate');
-        // dump('maintainable next_maintenance_date : ' . $maintainable->next_maintenance_date);
-
         $preference = $user->notification_preferences()->where('notification_type', 'end_warranty_date')->first();
-        // Debugbar::info('preference');
 
-        if ($preference && $preference->enabled  && $maintainable->end_warranty_date->subDays($preference->notification_delay_days) > now()) {
+        if ($preference && $preference->enabled  && $maintainable->end_warranty_date->toDateString() > Carbon::now()->toDateString()) {
             $delay = $preference->notification_delay_days;
 
             $notification = [
@@ -213,6 +225,7 @@ class MaintainableNotificationSchedulingService
             $createdNotification = $maintainable->maintainable->notifications()->updateOrCreate(
                 [
                     'recipient_email' => $user->email,
+                    'status' => 'pending',
                     'notification_type' => 'end_warranty_date',
                 ],
                 [
@@ -227,7 +240,7 @@ class MaintainableNotificationSchedulingService
 
     public function removeScheduleForNextMaintenanceDate(Maintainable $maintainable)
     {
-        $notifications = $maintainable->maintainable->notifications()->where('notification_type', 'next_maintenance_date')->where('scheduled_at', '>', now())->get();
+        $notifications = $maintainable->maintainable->notifications()->where('notification_type', 'next_maintenance_date')->where('status', 'pending')->get();
 
         if (count($notifications) > 0)
             foreach ($notifications as $notification) {
@@ -237,7 +250,7 @@ class MaintainableNotificationSchedulingService
 
     public function removeScheduleForEndWarrantyDate(Maintainable $maintainable)
     {
-        $notifications = $maintainable->maintainable->notifications()->where('notification_type', 'end_warranty_date')->where('scheduled_at', '>', now())->get();
+        $notifications = $maintainable->maintainable->notifications()->where('notification_type', 'end_warranty_date')->where('status', 'pending')->get();
 
         if (count($notifications) > 0)
             foreach ($notifications as $notification) {
@@ -245,19 +258,39 @@ class MaintainableNotificationSchedulingService
             }
     }
 
+    // remove all notifications linked to a maintainable and user
     public function removeNotificationsForOldMaintenanceManager(Maintainable $maintainable, User $user)
     {
+        // dump('--- removeNotificationsForOldMaintenanceManager');
         // only remove notification if the user has the maintenance manager role
         if ($user->hasAnyRole('Admin'))
             return;
 
+        $notifications = $maintainable->maintainable->notifications()->where('user_id', $user->id)->where('status', 'pending')->get();
 
-        $notifications = $maintainable->maintainable->notifications()->where('user_id', $user->id)->get();
-
-        if (count($notifications) > 0)
+        if (count($notifications) > 0) {
             foreach ($notifications as $notification) {
                 $notification->delete();
             }
+        }
+
+        $contracts = $maintainable->maintainable->contracts;
+        // dump(count($contracts));
+        foreach ($contracts as $contract) {
+            // dump('contracts');
+
+            $contractables = $contract->contractables()->filter(function ($item) use ($user) {
+                return $item->maintainable
+                    && $item->maintainable->maintenance_manager_id === $user->id;
+            });
+
+            // dump(count($contractables));
+
+            if (count($contractables) <= 1) {
+                app(ContractNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($contract, $user);
+                // app(ContractNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($contract, $maintainable->manager);
+            }
+        }
 
         $interventions = $maintainable->maintainable->interventions;
         if (count($interventions) > 0)

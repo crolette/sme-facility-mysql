@@ -24,7 +24,7 @@ class MaintainableFactory extends Factory
         return [
             'name' => fake()->text(20),
             'description' => fake()->sentence(6),
-            'maintenance_manager_id' => User::first()->id
+            // 'maintenance_manager_id' => User::first()->id
         ];
     }
 }

@@ -66,7 +66,7 @@ class MaintainableUpdateRequest extends FormRequest
             'maintenance_manager_id' => 'nullable|exists:users,id',
             'need_maintenance' => "boolean",
             'maintenance_frequency' => ['nullable', 'required_if_accepted:need_maintenance', Rule::in($frequencies)],
-            'next_maintenance_date' => ['nullable', 'date'],
+            'next_maintenance_date' => ['nullable', 'date', Rule::date()->todayOrAfter()],
             'last_maintenance_date' =>  ['nullable', 'date', Rule::date()->todayOrBefore()],
         ];
     }

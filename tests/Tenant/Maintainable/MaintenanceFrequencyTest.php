@@ -57,13 +57,42 @@ beforeEach(function () {
 });
 
 
-it('can add maintenance frequency to asset without next_maintenance_date', function () {
+it('can add maintenance frequency to asset without next_maintenance_date (and calculate automatically the next_date based on frequency and last_maintenance in the past)', function (string $frequency) {
 
     $formData = [
         ...$this->basicAssetData,
-        'maintenance_frequency' => 'monthly',
+        'maintenance_frequency' => $frequency,
         'need_maintenance' => true,
-        'last_maintenance_date' => '2025-05-05'
+        'last_maintenance_date' => Carbon::now()->subDays(7)->toDateString()
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    $nextMaintenanceDate = Carbon::now()->subDays(7)->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString();
+
+    if ($nextMaintenanceDate < now())
+        $expectedDate = Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString();
+    else
+        $expectedDate = Carbon::now()->subDays(7)->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString();
+
+
+    assertDatabaseHas('maintainables', [
+        'maintainable_type' => Asset::class,
+        'maintainable_id' => Asset::first()->id,
+        'maintenance_frequency' => $frequency,
+        'need_maintenance' => true,
+        'last_maintenance_date' => Carbon::now()->subDays(7)->toDateString(),
+        'next_maintenance_date' => $expectedDate
+    ]);
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+
+it('can create asset with need_maintenance but not next/last_maintenance_date and next_maintenance_date is calculated automatically', function ($frequency) {
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_frequency' => $frequency,
+        'need_maintenance' => true,
     ];
 
     $response = $this->postToTenant('api.assets.store', $formData);
@@ -72,18 +101,40 @@ it('can add maintenance frequency to asset without next_maintenance_date', funct
     assertDatabaseHas('maintainables', [
         'maintainable_type' => Asset::class,
         'maintainable_id' => Asset::first()->id,
-        'maintenance_frequency' => 'monthly',
+        'maintenance_frequency' => $frequency,
         'need_maintenance' => true,
-        'last_maintenance_date' => '2025-05-05',
-        'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from('monthly')->days())->toDateString()
+        'last_maintenance_date' => null,
+        'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString()
     ]);
-});
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
 
-it('can add maintenance frequency to asset with next_maintenance_date', function () {
+it('can add maintenance frequency to asset without next_maintenance_date (and calculate automatically the next_date where the next_date should be today based on frequency and last_maintenance in the past)', function (string $frequency) {
 
     $formData = [
         ...$this->basicAssetData,
-        'maintenance_frequency' => 'monthly',
+        'maintenance_frequency' => $frequency,
+        'need_maintenance' => true,
+        'last_maintenance_date' => Carbon::now()->subDays(MaintenanceFrequency::from($frequency)->days())->toDateString()
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseHas('maintainables', [
+        'maintainable_type' => Asset::class,
+        'maintainable_id' => Asset::first()->id,
+        'maintenance_frequency' => $frequency,
+        'need_maintenance' => true,
+        'last_maintenance_date' => Carbon::now()->subDays(MaintenanceFrequency::from($frequency)->days())->toDateString(),
+        'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString()
+    ]);
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+
+it('can add maintenance frequency to asset with next_maintenance_date (and does not calculate automatically based on frequency and last_maintenance_date)', function (string $frequency) {
+
+    $formData = [
+        ...$this->basicAssetData,
+        'maintenance_frequency' => $frequency,
         'need_maintenance' => true,
         'last_maintenance_date' => '2025-05-05',
         'next_maintenance_date' => Carbon::now()->addDays(2)->toDateString(),
@@ -95,23 +146,23 @@ it('can add maintenance frequency to asset with next_maintenance_date', function
     assertDatabaseHas('maintainables', [
         'maintainable_type' => Asset::class,
         'maintainable_id' => Asset::first()->id,
-        'maintenance_frequency' => 'monthly',
+        'maintenance_frequency' => $frequency,
         'need_maintenance' => true,
         'last_maintenance_date' => '2025-05-05',
         'next_maintenance_date' => Carbon::now()->addDays(2)->toDateString()
     ]);
-});
+})->with(array_column(MaintenanceFrequency::cases(), 'value'));
 
-it('can update maintenance frequency/date from asset', function () {
+it('can update maintenance frequency/date from asset', function (string $frequency) {
 
     $asset = Asset::factory()->forLocation($this->site)->create();
 
     $formData = [
         ...$this->basicAssetData,
-        'maintenance_frequency' => 'monthly',
+        'maintenance_frequency' => $frequency,
         'need_maintenance' => true,
         'last_maintenance_date' => '2025-05-05',
-        'next_maintenance_date' => '2025-10-10',
+        'next_maintenance_date' => Carbon::now()->addDays(15)->toDateString(),
     ];
 
     $response = $this->patchToTenant('api.assets.update', $formData, $asset->reference_code);
@@ -120,9 +171,9 @@ it('can update maintenance frequency/date from asset', function () {
     assertDatabaseHas('maintainables', [
         'maintainable_type' => Asset::class,
         'maintainable_id' => $asset->id,
-        'maintenance_frequency' => 'monthly',
+        'maintenance_frequency' => $frequency,
         'need_maintenance' => true,
         'last_maintenance_date' => '2025-05-05',
-        'next_maintenance_date' => '2025-10-10'
+        'next_maintenance_date' => Carbon::now()->addDays(15)->toDateString()
     ]);
-});
+})->with(array_column(MaintenanceFrequency::cases(), 'value'));

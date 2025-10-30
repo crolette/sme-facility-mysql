@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Tenant;
 
+use Carbon\Carbon;
 use App\Enums\NoticePeriodEnum;
 use Illuminate\Validation\Rule;
 use App\Models\Tenants\Document;
@@ -20,6 +21,36 @@ class ContractWithModelStoreRequest extends FormRequest
     {
         return true;
     }
+
+    public function prepareForValidation()
+    {
+        $data = $this->all();
+
+        if (isset($data['contracts'])) {
+            foreach ($data['contracts'] as $index => $contract) {
+
+                if (isset($contract['start_date'])) {
+                    $endDate = ContractDurationEnum::from($contract['contract_duration'])->addTo(Carbon::createFromFormat('Y-m-d', $contract['start_date']));
+                } else {
+                    $data['contracts'][$index]['start_date'] = Carbon::now();
+                    $endDate = ContractDurationEnum::from($contract['contract_duration'])->addTo(Carbon::now());
+                }
+
+                $data['contracts'][$index]['end_date'] = $endDate;
+
+                // dump($contract['notice_period']);
+                if (isset($contract['notice_period'])) {
+                    $data['contracts'][$index]['notice_date']  = NoticePeriodEnum::from($contract['notice_period'])->subFrom($data['contracts'][$index]['end_date']);
+                    // dump($contract['notice_date']);
+                }
+            }
+        }
+
+
+
+        $this->replace($data);
+    }
+
 
     /**
      * Get the validation rules that apply to the request.
@@ -44,6 +75,7 @@ class ContractWithModelStoreRequest extends FormRequest
             'contracts.*.end_date' => 'nullable|date',
 
             'contracts.*.notice_period' => ['nullable', Rule::in(array_column(NoticePeriodEnum::cases(), 'value'))],
+            'contracts.*.notice_date' => ['nullable', 'date'],
 
             'contracts.*.renewal_type' => ['required', Rule::in(array_column(ContractRenewalTypesEnum::cases(), 'value'))],
             'contracts.*.status' => ['required', Rule::in(array_column(ContractStatusEnum::cases(), 'value'))],
@@ -59,5 +91,27 @@ class ContractWithModelStoreRequest extends FormRequest
             'contracts.*.files.*.typeSlug' => ['required_with:files.*.name', Rule::in(CategoryType::where('category', 'document')->pluck('slug')->toArray())],
 
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            if (isset($this->contracts)) {
+                foreach ($this->contracts as $index => $contract) {
+
+                    // dump($contract);
+                    // dump($contract['notice_date']);
+                    $noticeDate = Carbon::parse($contract['notice_date']);
+                    $startDate = Carbon::parse($contract['start_date']);
+
+                    if ($noticeDate <= $startDate) {
+                        $validator->errors()->add(
+                            "contracts.{$index}.notice_period",
+                            'Wrong notice period : Should be smaller than contract duration.'
+                        );
+                    }
+                }
+            }
+        });
     }
 }
