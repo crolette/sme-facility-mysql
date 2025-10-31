@@ -9,11 +9,13 @@ use App\Services\LogoService;
 use App\Models\Tenants\Provider;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Tenant\PictureUploadRequest;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Tenant\ProviderRequest;
+use App\Http\Requests\Tenant\PictureUploadRequest;
+use App\Http\Requests\Tenant\ProviderContactPersonsRequest;
+use App\Models\Tenants\User;
 
 class APIProviderController extends Controller
 {
@@ -27,7 +29,7 @@ class APIProviderController extends Controller
     }
 
 
-    public function store(ProviderRequest $request, PictureUploadRequest $pictureRequest)
+    public function store(ProviderRequest $request, PictureUploadRequest $pictureRequest, ProviderContactPersonsRequest $contactPersonsRequest)
     {
         if (Auth::user()->cannot('create', Provider::class))
             return ApiResponse::notAuthorized();
@@ -40,6 +42,13 @@ class APIProviderController extends Controller
             $provider->providerCategory()->associate($request->validated('categoryId'));
 
             $provider->save();
+
+            if ($contactPersonsRequest->validated('users')) {
+                foreach ($contactPersonsRequest->validated('users') as $user) {
+                    $user = User::create([...$user]);
+                    $user->provider()->associate($provider)->save();
+                }
+            }
 
             if ($pictureRequest->validated('pictures')) {
                 $provider = $this->logoService->uploadAndAttachLogo($provider, $pictureRequest->validated('pictures'), $request->validated('name'));
@@ -96,7 +105,7 @@ class APIProviderController extends Controller
     {
         if (Auth::user()->cannot('delete', $provider))
             return ApiResponse::notAuthorized();
-        
+
         $provider->delete();
         return ApiResponse::successFlash('', 'Provider deleted');
     }

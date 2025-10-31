@@ -335,6 +335,7 @@ export interface User {
     username: string;
     full_name: string;
     job_position?: string;
+    phone_number: string;
     email: string;
     avatar?: string;
     provider_id?: number;

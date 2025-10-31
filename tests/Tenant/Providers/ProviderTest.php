@@ -84,10 +84,92 @@ it('can render the edit provider page', function () {
         );
 });
 
+it('can post a new provider', function () {
+
+    $formData = [
+        'name' => 'Facility Web Experience SPRL',
+        'email' => 'info@facilitywebxp.be',
+        'vat_number' => 'BE0123456789',
+        'address' => 'Rue sur le Hour 16A, 4910 La Reid, Belgique',
+        'phone_number' => '+32450987654',
+        'categoryId' => $this->categoryType->id,
+        'website' => 'www.website.com',
+    ];
+
+    $response = $this->postToTenant('api.providers.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseCount('providers', 1);
+    assertDatabaseHas('providers', [
+        'name' => 'Facility Web Experience SPRL',
+        'email' => 'info@facilitywebxp.be',
+        'vat_number' => 'BE0123456789',
+        'address' => 'Rue sur le Hour 16A, 4910 La Reid, Belgique',
+        'phone_number' => '+32450987654',
+        'website' => 'https://www.website.com',
+        'category_type_id' => $this->categoryType->id,
+    ]);
+});
+
+it('can post a new provider with contact persons', function () {
+    $formData = [
+        'name' => 'Facility Web Experience SPRL',
+        'email' => 'info@facilitywebxp.be',
+        'vat_number' => 'BE0123456789',
+        'address' => 'Rue sur le Hour 16A, 4910 La Reid, Belgique',
+        'phone_number' => '+32450987654',
+        'categoryId' => $this->categoryType->id,
+        'website' => 'www.website.com',
+        'users' => [
+            [
+                'first_name' => 'Michel',
+                'last_name' => 'Dupont',
+                'email' => 'micheldupont@email.com',
+                'phone_number' => '+32123456789',
+                'job_position' => 'Account Manager'
+            ],
+            [
+                'first_name' => 'Micheline',
+                'last_name' => 'Dupont',
+                'email' => 'michelinedupont@email.com',
+                'phone_number' => '+32123456789',
+                'job_position' => 'Account Manager'
+            ]
+        ]
+    ];
+
+    $response = $this->postToTenant('api.providers.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    $provider = Provider::first();
+
+    assertDatabaseHas('users', [
+        'first_name' => 'Michel',
+        'last_name' => 'Dupont',
+        'email' => 'micheldupont@email.com',
+        'phone_number' => '+32123456789',
+        'job_position' => 'Account Manager',
+        'provider_id' => $provider->id
+    ]);
+    assertDatabaseHas('users', [
+        'first_name' => 'Micheline',
+        'last_name' => 'Dupont',
+        'email' => 'michelinedupont@email.com',
+        'phone_number' => '+32123456789',
+        'job_position' => 'Account Manager',
+        'provider_id' => $provider->id
+    ]);
+});
+
 it('can post a new provider with logo', function () {
 
     $file1 = UploadedFile::fake()->image('logo.png')->size(1500);
-
 
     $formData = [
         'name' => 'Facility Web Experience SPRL',
@@ -193,8 +275,3 @@ it('can retrieve all locations linked to a provider', function () {
     $response = $this->getFromTenant('api.providers.locations', $provider);
     $response->assertJsonCount(2, 'data.data');
 });
-
-// it('can retrieve all contracts linked to a provider', function() {
-
-    
-// });
