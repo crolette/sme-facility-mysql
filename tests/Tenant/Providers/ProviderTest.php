@@ -86,7 +86,6 @@ it('can render the edit provider page', function () {
 
 it('can post a new provider', function () {
 
-
     $formData = [
         'name' => 'Facility Web Experience SPRL',
         'email' => 'info@facilitywebxp.be',

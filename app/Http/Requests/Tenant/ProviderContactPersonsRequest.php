@@ -49,7 +49,7 @@ class ProviderContactPersonsRequest extends FormRequest
             'users.*.email' => ['required', 'string', 'lowercase', 'email', 'max:255', new NotDisposableEmail, Rule::unique(User::class)->ignore($this->route('user'))],
             'users.*.first_name' => ['required', 'string', 'min:3', 'max:255'],
             'users.*.last_name' => ['required', 'string',  'min:3', 'max:255'],
-            'users.*.phone_number' => 'required|string|regex:/^\+\d{8,15}$/|max:16',
+            'users.*.phone_number' => 'nullable|string|regex:/^\+\d{8,15}$/|max:16',
             'users.*.job_position' => 'nullable|string|max:100',
         ];
     }
