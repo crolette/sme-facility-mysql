@@ -41,6 +41,7 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
 
     const { showToast } = useToast();
     const [errors, setErrors] = useState<TypeFormData>();
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const { data, setData } = useForm<TypeFormData>({
         name: provider?.name ?? '',
         phone_number: provider?.phone_number ?? '',
@@ -53,10 +54,9 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
         users: [],
     });
 
-    console.log(data);
-
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
         if (provider) {
             try {
                 const response = await axios.patch(route('api.providers.update', provider.id), data);
@@ -68,6 +68,7 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
             } catch (error) {
                 showToast(error.response.data.message, error.response.data.status);
                 setErrors(error.response.data.errors);
+                setIsSubmitting(false);
             }
         } else {
             try {
@@ -85,6 +86,7 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
                 console.log(error);
                 showToast(error.response.data.message, error.response.data.status);
                 setErrors(error.response.data.errors);
+                setIsSubmitting(false);
             }
         }
     };
@@ -117,7 +119,7 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <form onSubmit={submit} className="space-y-4">
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                        <h2>Company information</h2>
+                        <h2>Provider information</h2>
                         <Label>Company Name</Label>
                         <Input type="text" onChange={(e) => setData('name', e.target.value)} value={data.name} required />
                         <Label htmlFor="name">Category</Label>
@@ -178,7 +180,7 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
                                     onChange={(e) => setData('pictures', e.target.files ? [e.target.files[0]] : null)}
                                     // accept="image/png, image/jpeg, image/jpg"
                                 />
-                                <p className="text-xs">Accepted files: png, jpg - Maximum file size: 4MB</p>
+                                <p className="text-xs">Accepted files: png, jpg, jpeg - Maximum file size: 4MB</p>
                                 {errors?.pictures &&
                                     errors?.pictures.map((error) => {
                                         <InputError className="mt-2" message={error ?? ''} />;
@@ -186,116 +188,127 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
                             </>
                         )}
                     </div>
-                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                        <h2>Contact persons</h2>
-                        <p className="">
-                            Add new contact person{' '}
-                            <PlusCircleIcon className="inline-block" onClick={() => setCountContactPersons((prev) => prev + 1)} />
-                        </p>
-                        <div className="space-y-4">
-                            {countContactPersons > 0 &&
-                                [...Array(countContactPersons)].map((_, index) => (
-                                    <details key={index} className="flex flex-col rounded-md border-2 border-slate-400 p-4" open>
-                                        <summary>
-                                            <div className="flex w-fit gap-2">
-                                                <p>
-                                                    Contact {index + 1} {data.users[index]?.first_name ? `- ${data.users[index]?.first_name}` : ''}
-                                                    {data.users[index]?.last_name ? ` ${data.users[index]?.last_name}` : ''}
-                                                </p>
-                                                <MinusCircleIcon onClick={() => handleRemoveContactPerson(index)} />
-                                            </div>
-                                        </summary>
-                                        <div>
-                                            <div className="flex w-full flex-col gap-2 lg:flex-row">
-                                                <div className="w-full">
-                                                    <Label className="font-medium" htmlFor={data.users[index]?.first_name}>
-                                                        First name
-                                                    </Label>
-                                                    <Input
-                                                        id={data.users[index]?.first_name}
-                                                        type="text"
-                                                        value={data.users[index]?.first_name ?? ''}
-                                                        placeholder={`First name ${index + 1}`}
-                                                        minLength={4}
-                                                        maxLength={100}
-                                                        required
-                                                        onChange={(e) => handleChangeContactPerson(index, 'first_name', e.target.value)}
-                                                    />
-                                                    <InputError className="mt-2" message={errors?.users ? errors?.users[index]?.first_name : ''} />
+                    {!provider && (
+                        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                            <h2>Contact persons</h2>
+                            <p className="">
+                                Add new contact person{' '}
+                                <PlusCircleIcon className="inline-block" onClick={() => setCountContactPersons((prev) => prev + 1)} />
+                            </p>
+                            <div className="space-y-4">
+                                {countContactPersons > 0 &&
+                                    [...Array(countContactPersons)].map((_, index) => (
+                                        <details key={index} className="flex flex-col rounded-md border-2 border-slate-400 p-4" open>
+                                            <summary>
+                                                <div className="flex w-fit gap-4">
+                                                    <p>
+                                                        Contact {index + 1}{' '}
+                                                        {data.users[index]?.first_name ? `- ${data.users[index]?.first_name}` : ''}
+                                                        {data.users[index]?.last_name ? ` ${data.users[index]?.last_name}` : ''}
+                                                    </p>
+                                                    <MinusCircleIcon onClick={() => handleRemoveContactPerson(index)} />
                                                 </div>
-                                                <div className="w-full">
-                                                    <Label className="font-medium" htmlFor={data.users[index]?.last_name}>
-                                                        Last name
-                                                    </Label>
-                                                    <Input
-                                                        id={data.users[index]?.last_name}
-                                                        type="text"
-                                                        value={data.users[index]?.last_name ?? ''}
-                                                        placeholder={`Last name ${index + 1}`}
-                                                        minLength={4}
-                                                        maxLength={100}
-                                                        required
-                                                        onChange={(e) => handleChangeContactPerson(index, 'last_name', e.target.value)}
-                                                    />
-                                                    <InputError className="mt-2" message={errors?.users ? errors?.users[index]?.last_name : ''} />
+                                            </summary>
+                                            <div>
+                                                <div className="flex w-full flex-col gap-4 lg:flex-row">
+                                                    <div className="w-full">
+                                                        <Label className="font-medium" htmlFor={data.users[index]?.first_name}>
+                                                            First name
+                                                        </Label>
+                                                        <Input
+                                                            id={data.users[index]?.first_name}
+                                                            type="text"
+                                                            value={data.users[index]?.first_name ?? ''}
+                                                            placeholder={`First name ${index + 1}`}
+                                                            minLength={4}
+                                                            maxLength={100}
+                                                            required
+                                                            onChange={(e) => handleChangeContactPerson(index, 'first_name', e.target.value)}
+                                                        />
+                                                        <InputError
+                                                            className="mt-2"
+                                                            message={errors?.users ? errors?.users[index]?.first_name : ''}
+                                                        />
+                                                    </div>
+                                                    <div className="w-full">
+                                                        <Label className="font-medium" htmlFor={data.users[index]?.last_name}>
+                                                            Last name
+                                                        </Label>
+                                                        <Input
+                                                            id={data.users[index]?.last_name}
+                                                            type="text"
+                                                            value={data.users[index]?.last_name ?? ''}
+                                                            placeholder={`Last name ${index + 1}`}
+                                                            minLength={4}
+                                                            maxLength={100}
+                                                            required
+                                                            onChange={(e) => handleChangeContactPerson(index, 'last_name', e.target.value)}
+                                                        />
+                                                        <InputError className="mt-2" message={errors?.users ? errors?.users[index]?.last_name : ''} />
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="flex w-full flex-col gap-2 lg:flex-row">
-                                                <div className="w-full">
-                                                    <Label className="font-medium" htmlFor={data.users[index]?.email}>
-                                                        Email
-                                                    </Label>
-                                                    <Input
-                                                        id={data.users[index]?.email}
-                                                        type="text"
-                                                        value={data.users[index]?.email ?? ''}
-                                                        placeholder={`Email ${index + 1}`}
-                                                        minLength={4}
-                                                        maxLength={100}
-                                                        required
-                                                        onChange={(e) => handleChangeContactPerson(index, 'email', e.target.value)}
-                                                    />
-                                                    <InputError className="mt-2" message={errors?.users ? errors?.users[index]?.email : ''} />
+                                                <div className="flex w-full flex-col gap-2 lg:flex-row">
+                                                    <div className="w-full">
+                                                        <Label className="font-medium" htmlFor={data.users[index]?.email}>
+                                                            Email
+                                                        </Label>
+                                                        <Input
+                                                            id={data.users[index]?.email}
+                                                            type="text"
+                                                            value={data.users[index]?.email ?? ''}
+                                                            placeholder={`Email ${index + 1}`}
+                                                            minLength={4}
+                                                            maxLength={100}
+                                                            required
+                                                            onChange={(e) => handleChangeContactPerson(index, 'email', e.target.value)}
+                                                        />
+                                                        <InputError className="mt-2" message={errors?.users ? errors?.users[index]?.email : ''} />
+                                                    </div>
+                                                    <div className="w-full">
+                                                        <Label className="font-medium" htmlFor={data.users[index]?.phone_number}>
+                                                            Phone number
+                                                        </Label>
+                                                        <Input
+                                                            id={data.users[index]?.phone_number}
+                                                            type="text"
+                                                            value={data.users[index]?.phone_number ?? ''}
+                                                            placeholder={`Phone number ${index + 1} : +32123456789`}
+                                                            maxLength={16}
+                                                            onChange={(e) => handleChangeContactPerson(index, 'phone_number', e.target.value)}
+                                                        />
+                                                        <InputError
+                                                            className="mt-2"
+                                                            message={errors?.users ? errors?.users[index]?.phone_number : ''}
+                                                        />
+                                                    </div>
                                                 </div>
-                                                <div className="w-full">
-                                                    <Label className="font-medium" htmlFor={data.users[index]?.phone_number}>
-                                                        Phone number
-                                                    </Label>
-                                                    <Input
-                                                        id={data.users[index]?.phone_number}
-                                                        type="text"
-                                                        value={data.users[index]?.phone_number ?? ''}
-                                                        placeholder={`Phone number ${index + 1} : +32123456789`}
-                                                        maxLength={16}
-                                                        onChange={(e) => handleChangeContactPerson(index, 'phone_number', e.target.value)}
-                                                    />
-                                                    <InputError className="mt-2" message={errors?.users ? errors?.users[index]?.phone_number : ''} />
-                                                </div>
-                                            </div>
 
-                                            <Label className="font-medium" htmlFor={data.users[index]?.job_position}>
-                                                Job position
-                                            </Label>
-                                            <Input
-                                                id={data.users[index]?.job_position}
-                                                type="text"
-                                                value={data.users[index]?.job_position ?? ''}
-                                                placeholder={`Job position ${index + 1}`}
-                                                minLength={4}
-                                                maxLength={100}
-                                                onChange={(e) => handleChangeContactPerson(index, 'job_position', e.target.value)}
-                                            />
-                                            <InputError className="mt-2" message={errors?.users ? errors?.users[index]?.job_position : ''} />
-                                        </div>
-                                    </details>
-                                ))}
+                                                <Label className="font-medium" htmlFor={data.users[index]?.job_position}>
+                                                    Job position
+                                                </Label>
+                                                <Input
+                                                    id={data.users[index]?.job_position}
+                                                    type="text"
+                                                    value={data.users[index]?.job_position ?? ''}
+                                                    placeholder={`Job position ${index + 1}`}
+                                                    minLength={4}
+                                                    maxLength={100}
+                                                    onChange={(e) => handleChangeContactPerson(index, 'job_position', e.target.value)}
+                                                />
+                                                <InputError className="mt-2" message={errors?.users ? errors?.users[index]?.job_position : ''} />
+                                            </div>
+                                        </details>
+                                    ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     <div className="flex gap-4">
-                        <Button type="submit">{provider ? 'Update' : 'Submit'}</Button>
+                        <Button type="submit" disabled={isSubmitting}>
+                            {provider ? 'Update' : 'Submit'}
+                        </Button>
                         <a href={provider ? route('tenant.providers.show', provider.id) : route('tenant.providers.index')}>
-                            <Button type="button" tabIndex={6} variant={'secondary'}>
+                            <Button type="button" tabIndex={6} variant={'secondary'} disabled={isSubmitting}>
                                 Cancel
                             </Button>
                         </a>

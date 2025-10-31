@@ -236,7 +236,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                 <div>
                     <div className="border-accent flex flex-col gap-2 border-b-2 pb-2 sm:flex-row sm:gap-10">
                         <details className="border-border relative w-full rounded-md border-2 p-1" open={isLoading ? false : undefined}>
-                            <summary>Search</summary>
+                            <summary>Search/Filter</summary>
 
                             <div className="bg-border border-border text-background dark:text-foreground absolute top-full flex flex-col items-center gap-4 rounded-b-md border-2 p-2 lg:flex-row">
                                 <div className="flex flex-col items-center gap-2">

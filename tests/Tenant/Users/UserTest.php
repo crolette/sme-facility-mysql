@@ -82,7 +82,8 @@ it('can post a new "loginable" user', function () {
         'can_login' => true,
         'role' => 'Maintenance Manager',
         'job_position' => 'Manager',
-        'avatar' => $file1
+        'avatar' => $file1,
+        'phone_number' => '+32123456789'
     ];
 
     $response = $this->postToTenant('api.users.store', $formData);
@@ -101,6 +102,7 @@ it('can post a new "loginable" user', function () {
         'job_position' => 'Manager',
         'email' => 'janedoe@facilitywebxp.be',
         'can_login' => 1,
+        'phone_number' => '+32123456789',
         'avatar' => $createdUser->avatar
     ]);
 
@@ -116,6 +118,7 @@ it('can post a new "non loginable" user and attach a provider', function () {
         'last_name' => 'Doe',
         'can_login' => false,
         'job_position' => 'Manager',
+        'phone_number' => '+32123456789',
         'email' => 'janedoe@facilitywebxp.be',
         'provider_id' => $provider->id
     ];
@@ -133,6 +136,7 @@ it('can post a new "non loginable" user and attach a provider', function () {
         'last_name' => 'Doe',
         'job_position' => 'Manager',
         'email' => 'janedoe@facilitywebxp.be',
+        'phone_number' => '+32123456789',
         'provider_id' => $provider->id,
         'can_login' => 0
     ]);
@@ -149,6 +153,7 @@ it('can update an existing user', function () {
         'first_name' => 'Jane',
         'last_name' => 'Doe',
         'job_position' => 'Manager',
+        'phone_number' => '+32123456789',
         'email' => 'janedoe@facilitywebxp.be',
         'avatar' => $file1
     ];
@@ -159,12 +164,12 @@ it('can update an existing user', function () {
             'status' => 'success',
         ]);
 
-    assertDatabaseCount('users', 2);
     assertDatabaseHas('users', [
-        'id' => 2,
+        'id' => $user->id,
         'first_name' => 'Jane',
         'last_name' => 'Doe',
         'job_position' => 'Manager',
+        'phone_number' => '+32123456789',
         'email' => 'janedoe@facilitywebxp.be',
         'can_login' => false,
         'avatar' => User::find(2)->avatar

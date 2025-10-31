@@ -20,6 +20,7 @@ interface FormDataUser {
     avatar: File | string | null;
     provider_id: string | number;
     provider_name: string;
+    phone_number: string;
     role: string;
 }
 
@@ -35,7 +36,8 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
         },
     ];
     const { showToast } = useToast();
-    const [errors, setErrors] = useState();
+    const [errors, setErrors] = useState<FormDataUser>();
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const { data, setData, reset } = useForm<FormDataUser>({
         first_name: user?.first_name ?? '',
@@ -51,6 +53,7 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
 
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
         if (user) {
             try {
                 const response = await axios.patch(route('api.users.update', user.id), data);
@@ -62,6 +65,7 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
             } catch (error) {
                 setErrors(error.response.data.errors);
                 showToast(error.response.data.message, error.response.data.status);
+                setIsSubmitting(false);
             }
         } else {
             try {
@@ -80,6 +84,7 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
             } catch (error) {
                 setErrors(error.response.data.errors);
                 showToast(error.response.data.message, error.response.data.status);
+                setIsSubmitting(false);
             }
         }
     };
@@ -88,68 +93,104 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sites" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <form onSubmit={submit}>
-                    <Label>First name</Label>
-                    <Input type="text" onChange={(e) => setData('first_name', e.target.value)} value={data.first_name} required />
-                    <InputError message={errors?.first_name ?? ''} />
-                    <Label>Last name</Label>
-                    <Input type="text" onChange={(e) => setData('last_name', e.target.value)} value={data.last_name} required />
-                    <InputError message={errors?.last_name ?? ''} />
-                    <Label>Job position</Label>
-                    <Input type="text" onChange={(e) => setData('job_position', e.target.value)} value={data.job_position} />
-                    <InputError message={errors?.job_position ?? ''} />
-                    <Label>Email</Label>
-                    <Input type="email" onChange={(e) => setData('email', e.target.value)} value={data.email} required />
-                    <InputError message={errors?.email ?? ''} />
-                    <Label>Can login</Label>
-                    <Checkbox onClick={() => setData('can_login', !data.can_login)} checked={data.can_login ?? false} />
-                    {data.can_login && (
-                        <div>
-                            <Label>User role</Label>
-                            <select name="role" id="role" value={data.role} onChange={(e) => setData('role', e.target.value)}>
-                                <option value="">Select a role</option>
-                                {roles.map((role, index) => (
-                                    <option key={index} value={role}>
-                                        {role}
-                                    </option>
-                                ))}
-                            </select>
+                <form onSubmit={submit} className="space-y-4">
+                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                        <div className="flex w-full flex-col gap-4 lg:flex-row">
+                            <div className="w-full">
+                                <Label>First name</Label>
+                                <Input type="text" onChange={(e) => setData('first_name', e.target.value)} value={data.first_name} required />
+                                <InputError message={errors?.first_name ?? ''} />
+                            </div>
+                            <div className="w-full">
+                                <Label>Last name</Label>
+                                <Input type="text" onChange={(e) => setData('last_name', e.target.value)} value={data.last_name} required />
+                                <InputError message={errors?.last_name ?? ''} />
+                            </div>
                         </div>
-                    )}
-                    <InputError message={errors?.can_login ?? ''} />
-                    {!user && (
-                        <div>
-                            <Label>Avatar</Label>
-                            <Input
-                                type="file"
-                                name="logo"
-                                id="logo"
-                                onChange={(e) => setData('avatar', e.target.files ? e.target.files[0] : null)}
-                                accept="image/png, image/jpeg, image/jpg"
+                        <div className="mt-4 flex w-full flex-col gap-4 lg:flex-row">
+                            <div className="w-full">
+                                <Label>Email</Label>
+                                <Input type="email" onChange={(e) => setData('email', e.target.value)} value={data.email} required />
+                                <InputError message={errors?.email ?? ''} />
+                            </div>
+                            <div className="w-full">
+                                <Label>Phone number</Label>
+                                <Input type="text" onChange={(e) => setData('phone_number', e.target.value)} value={data.phone_number} />
+                                <InputError message={errors?.phone_number ?? ''} />
+                            </div>
+                        </div>
+
+                        <div className="mt-4 space-y-2">
+                            <Label>Job position</Label>
+                            <Input type="text" onChange={(e) => setData('job_position', e.target.value)} value={data.job_position} />
+                            <InputError message={errors?.job_position ?? ''} />
+                        </div>
+
+                        <div className="mt-4 space-y-2">
+                            <div className="flex items-center gap-2">
+                                <Label>Can login</Label>
+                                <Checkbox onClick={() => setData('can_login', !data.can_login)} checked={data.can_login ?? false} />
+                            </div>
+                            {data.can_login && (
+                                <div>
+                                    <Label>User role</Label>
+                                    <select
+                                        name="role"
+                                        id="role"
+                                        value={data.role}
+                                        onChange={(e) => setData('role', e.target.value)}
+                                        className="block"
+                                    >
+                                        <option value="">Select a role</option>
+                                        {roles.map((role, index) => (
+                                            <option key={index} value={role}>
+                                                {role}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <InputError message={errors?.can_login ? 'Wrong value' : ''} />
+                                </div>
+                            )}
+                        </div>
+                        {!user && (
+                            <div className="mt-4">
+                                <Label>Avatar</Label>
+                                <Input
+                                    type="file"
+                                    name="logo"
+                                    id="logo"
+                                    onChange={(e) => setData('avatar', e.target.files ? e.target.files[0] : null)}
+                                    accept="image/png, image/jpeg, image/jpg"
+                                />
+                                <p className="text-xs">Accepted files: png, jpg, jpeg - Maximum file size: 4MB</p>
+                                <InputError message={errors?.avatar ? 'Wrong picture' : ''} />
+                            </div>
+                        )}
+
+                        <div className="mt-4">
+                            <Label>Provider</Label>
+                            <SearchableInput<Provider>
+                                searchUrl={route('api.providers.search')}
+                                displayValue={data.provider_name}
+                                getDisplayText={(provider) => provider.name}
+                                getKey={(provider) => provider.id}
+                                onSelect={(provider) => {
+                                    setData('provider_id', provider.id);
+                                    setData('provider_name', provider.name);
+                                }}
+                                placeholder="Search provider"
+                                className="mb-4"
                             />
-                            <p className="text-xs">Accepted files: png, jpg - Maximum file size: 4MB</p>
-                            <InputError message={errors?.avatar ?? ''} />
                         </div>
-                    )}
-
-                    <div>
-                        <label className="mb-2 block text-sm font-medium">Providers</label>
-
-                        <SearchableInput<Provider>
-                            searchUrl={route('api.providers.search')}
-                            displayValue={data.provider_name}
-                            getDisplayText={(provider) => provider.name}
-                            getKey={(provider) => provider.id}
-                            onSelect={(provider) => {
-                                setData('provider_id', provider.id);
-                                setData('provider_name', provider.name);
-                            }}
-                            placeholder="Search provider"
-                            className="mb-4"
-                        />
                     </div>
-
-                    <Button>Submit</Button>
+                    <div className="space-x-2">
+                        <Button disabled={isSubmitting}>Submit</Button>
+                        <a href={user ? route('tenant.users.show', user.id) : route('tenant.users.index')}>
+                            <Button type="button" variant={'secondary'} disabled={isSubmitting}>
+                                Cancel
+                            </Button>
+                        </a>
+                    </div>
                 </form>
             </div>
         </AppLayout>

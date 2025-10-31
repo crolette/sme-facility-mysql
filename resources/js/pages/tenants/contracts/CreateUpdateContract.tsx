@@ -179,195 +179,252 @@ export default function CreateUpdateContract({
             <Head title="Contract" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <h1>{contract?.name ?? 'New contract'}</h1>
-                <form onSubmit={submit}>
-                    <Label>Name</Label>
-                    <Input type="text" onChange={(e) => setData('name', e.target.value)} required value={data.name} minLength={4} maxLength={100} />
-                    <InputError message={errors?.name ?? ''} />
-                    <Label>Type</Label>
-                    <Input type="text" onChange={(e) => setData('type', e.target.value)} required value={data.type} minLength={4} maxLength={100} />
-                    <InputError message={errors?.type ?? ''} />
-                    <Label>Notes</Label>
-                    <Textarea onChange={(e) => setData('notes', e.target.value)} value={data.notes} minLength={4} maxLength={250} />
-                    <InputError message={errors?.notes ?? ''} />
-                    <Label>Internal reference</Label>
-                    <Input
-                        type="text"
-                        onChange={(e) => setData('internal_reference', e.target.value)}
-                        value={data.internal_reference}
-                        maxLength={50}
-                    />
-                    <InputError message={errors?.internal_reference ?? ''} />
-                    <Label>Provider reference</Label>
-                    <Input
-                        type="text"
-                        onChange={(e) => setData('provider_reference', e.target.value)}
-                        value={data.provider_reference}
-                        maxLength={50}
-                    />
-                    <InputError message={errors?.provider_reference ?? ''} />
-                    <Label className="font-medium">Provider</Label>
-                    <SearchableInput<Provider>
-                        required
-                        multiple={false}
-                        searchUrl={route('api.providers.search')}
-                        getKey={(provider) => provider.id}
-                        displayValue={data.provider_name}
-                        onDelete={() => {
-                            setData('provider_id', '');
-                            setData('provider_name', '');
-                        }}
-                        getDisplayText={(provider) => provider.name}
-                        onSelect={(provider) => {
-                            setData('provider_id', provider.id);
-                            setData('provider_name', provider.name);
-                        }}
-                        placeholder="Search provider..."
-                        // className="mb-4"
-                    />
-                    <Label htmlFor="end_date">Linked to</Label>
-                    <SearchableInput
-                        multiple={false}
-                        searchUrl={route('api.search.all')}
-                        selectedItems={data.contractables ?? []}
-                        getDisplayText={(location) => location.name}
-                        getKey={(location) => location.reference_code}
-                        onSelect={(location) => {
-                            handleAddAssetOrLocation(location);
-                        }}
-                        placeholder="Search asset or location..."
-                    />
-                    {data.contractables && (
-                        <ul className="flex gap-2 p-2">
-                            {data.contractables.map((contractable) => (
-                                <li key={contractable.locationId} className="rounded-md bg-slate-600 px-2 py-1 text-sm">
-                                    <div className="flex items-center gap-2">
-                                        <p>{contractable.name}</p>
-                                        <XIcon
-                                            size={16}
-                                            className="cursor-pointer hover:text-red-500"
-                                            onClick={() => handleRemoveAssetOrLocation(contractable)}
-                                        />
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                    <Label htmlFor="renewal_type">Renewal type</Label>
-                    <select
-                        name="renewal_type"
-                        onChange={(e) => setData('renewal_type', e.target.value)}
-                        id=""
-                        required
-                        value={data.renewal_type}
-                        className={cn(
-                            'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                            'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                        )}
-                    >
-                        {renewalTypes && renewalTypes.length > 0 && (
-                            <>
-                                <option value="" disabled className="bg-background text-foreground">
-                                    Select an option
-                                </option>
-                                {renewalTypes?.map((type, index) => (
-                                    <option value={type} key={index} className="bg-background text-foreground">
-                                        {type}
-                                    </option>
+                <form onSubmit={submit} className="space-y-4">
+                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                        <Label>Name</Label>
+                        <Input
+                            type="text"
+                            onChange={(e) => setData('name', e.target.value)}
+                            required
+                            value={data.name}
+                            minLength={4}
+                            maxLength={100}
+                        />
+                        <InputError message={errors?.name ?? ''} />
+                        <Label>Type</Label>
+                        <Input
+                            type="text"
+                            onChange={(e) => setData('type', e.target.value)}
+                            required
+                            value={data.type}
+                            minLength={4}
+                            maxLength={100}
+                        />
+                        <InputError message={errors?.type ?? ''} />
+
+                        <div className="flex w-full flex-col gap-4 lg:flex-row">
+                            <div className="w-full">
+                                <Label>Internal reference</Label>
+                                <Input
+                                    type="text"
+                                    onChange={(e) => setData('internal_reference', e.target.value)}
+                                    value={data.internal_reference}
+                                    maxLength={50}
+                                />
+                                <InputError message={errors?.internal_reference ?? ''} />
+                            </div>
+                            <div className="w-full">
+                                <Label>Provider reference</Label>
+                                <Input
+                                    type="text"
+                                    onChange={(e) => setData('provider_reference', e.target.value)}
+                                    value={data.provider_reference}
+                                    maxLength={50}
+                                />
+                                <InputError message={errors?.provider_reference ?? ''} />
+                            </div>
+                        </div>
+
+                        <Label className="font-medium">Provider</Label>
+                        <SearchableInput<Provider>
+                            required
+                            multiple={false}
+                            searchUrl={route('api.providers.search')}
+                            getKey={(provider) => provider.id}
+                            displayValue={data.provider_name}
+                            onDelete={() => {
+                                setData('provider_id', '');
+                                setData('provider_name', '');
+                            }}
+                            getDisplayText={(provider) => provider.name}
+                            onSelect={(provider) => {
+                                setData('provider_id', provider.id);
+                                setData('provider_name', provider.name);
+                            }}
+                            placeholder="Search provider..."
+                            // className="mb-4"
+                        />
+                        <Label htmlFor="end_date">Linked to</Label>
+                        <SearchableInput
+                            multiple={false}
+                            searchUrl={route('api.search.all')}
+                            selectedItems={data.contractables ?? []}
+                            getDisplayText={(location) => location.name}
+                            getKey={(location) => location.reference_code}
+                            onSelect={(location) => {
+                                handleAddAssetOrLocation(location);
+                            }}
+                            placeholder="Search asset or location..."
+                        />
+                        {data.contractables && (
+                            <ul className="flex gap-2 p-2">
+                                {data.contractables.map((contractable) => (
+                                    <li key={contractable.locationId} className="rounded-md bg-slate-600 px-2 py-1 text-sm">
+                                        <div className="flex items-center gap-2">
+                                            <p>{contractable.name}</p>
+                                            <XIcon
+                                                size={16}
+                                                className="cursor-pointer hover:text-red-500"
+                                                onClick={() => handleRemoveAssetOrLocation(contractable)}
+                                            />
+                                        </div>
+                                    </li>
                                 ))}
-                            </>
+                            </ul>
                         )}
-                    </select>
-                    <div className="w-full">
-                        <Label htmlFor="status">Status</Label>
-                        <select
-                            name="status"
-                            value={data.status}
-                            required
-                            onChange={(e) => setData('status', e.target.value)}
-                            id=""
-                            className={cn(
-                                'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                            )}
-                        >
-                            {statuses && statuses.length > 0 && (
-                                <>
-                                    <option value="" disabled className="bg-background text-foreground">
-                                        Select an option
-                                    </option>
-                                    {statuses?.map((status, index) => (
-                                        <option value={status} key={index} className="bg-background text-foreground">
-                                            {status}
-                                        </option>
-                                    ))}
-                                </>
-                            )}
-                        </select>
-                        <Label htmlFor="start_date">Start date</Label>
-                        <Input id="start_date" type="date" value={data.start_date} onChange={(e) => setData('start_date', e.target.value)} />
-                        <InputError className="mt-2" message={errors?.start_date ?? ''} />
-                        <Label htmlFor="contract_duration">Contract duration</Label>
-                        <select
-                            name="contract_duration"
-                            onChange={(e) => setData('contract_duration', e.target.value)}
-                            id=""
-                            required
-                            value={data.contract_duration}
-                            className={cn(
-                                'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                            )}
-                        >
-                            {contractDurations && contractDurations.length > 0 && (
-                                <>
-                                    <option value="" disabled className="bg-background text-foreground">
-                                        Select a duration
-                                    </option>
-                                    {contractDurations?.map((type, index) => (
-                                        <option value={type} key={index} className="bg-background text-foreground">
-                                            {type}
-                                        </option>
-                                    ))}
-                                </>
-                            )}
-                        </select>
-                        <InputError className="mt-2" message={errors?.contract_duration ?? ''} />
-                        <Label htmlFor="notice_period">Notice period</Label>
-                        <select
-                            name="notice_period"
-                            onChange={(e) => setData('notice_period', e.target.value)}
-                            id=""
-                            defaultValue={''}
-                            value={data.notice_period}
-                            className={cn(
-                                'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                            )}
-                        >
-                            {noticePeriods && noticePeriods.length > 0 && (
-                                <>
-                                    <option value="" disabled className="bg-background text-foreground">
-                                        Select a duration
-                                    </option>
-                                    {noticePeriods?.map((type, index) => (
-                                        <option value={type} key={index} className="bg-background text-foreground">
-                                            {type}
-                                        </option>
-                                    ))}
-                                </>
-                            )}
-                        </select>
-                        <InputError className="mt-2" message={errors?.notice_period ?? ''} />
-                        <Label htmlFor="end_date">End date</Label>
-                        <Input id="end_date" type="date" value={data.end_date} onChange={(e) => setData('end_date', e.target.value)} disabled />
-                        <p className="text-sm">The end date is automatically calculated based on the contract duration.</p>
-                        <InputError className="mt-2" message={errors?.end_date ?? ''} />
+                        <div className="mt-4 flex w-full flex-col gap-4">
+                            <div className="grid gap-4 lg:grid-cols-2">
+                                <div>
+                                    <Label htmlFor="start_date">Start date</Label>
+                                    <Input
+                                        id="start_date"
+                                        type="date"
+                                        value={data.start_date}
+                                        onChange={(e) => setData('start_date', e.target.value)}
+                                    />
+                                    <InputError className="mt-2" message={errors?.start_date ?? ''} />
+                                </div>
+                                <div>
+                                    <Label htmlFor="end_date">End date</Label>
+                                    <Input
+                                        id="end_date"
+                                        type="date"
+                                        value={data.end_date}
+                                        onChange={(e) => setData('end_date', e.target.value)}
+                                        disabled
+                                    />
+                                    <p className="text-xs">The end date is automatically calculated based on the contract duration.</p>
+                                    <InputError className="mt-2" message={errors?.end_date ?? ''} />
+                                </div>
+                            </div>
+                            <div className="grid gap-4 lg:grid-cols-2">
+                                <div>
+                                    <Label htmlFor="contract_duration">Contract duration</Label>
+                                    <select
+                                        name="contract_duration"
+                                        onChange={(e) => setData('contract_duration', e.target.value)}
+                                        id=""
+                                        required
+                                        value={data.contract_duration}
+                                        className={cn(
+                                            'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                            'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                        )}
+                                    >
+                                        {contractDurations && contractDurations.length > 0 && (
+                                            <>
+                                                <option value="" disabled className="bg-background text-foreground">
+                                                    Select a duration
+                                                </option>
+                                                {contractDurations?.map((type, index) => (
+                                                    <option value={type} key={index} className="bg-background text-foreground">
+                                                        {type}
+                                                    </option>
+                                                ))}
+                                            </>
+                                        )}
+                                    </select>
+                                    <InputError className="mt-2" message={errors?.contract_duration ?? ''} />
+                                </div>
+                                <div>
+                                    <Label htmlFor="notice_period">Notice period</Label>
+                                    <select
+                                        name="notice_period"
+                                        onChange={(e) => setData('notice_period', e.target.value)}
+                                        id=""
+                                        defaultValue={''}
+                                        value={data.notice_period}
+                                        className={cn(
+                                            'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                            'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                        )}
+                                    >
+                                        {noticePeriods && noticePeriods.length > 0 && (
+                                            <>
+                                                <option value="" disabled className="bg-background text-foreground">
+                                                    Select a duration
+                                                </option>
+                                                {noticePeriods?.map((type, index) => (
+                                                    <option value={type} key={index} className="bg-background text-foreground">
+                                                        {type}
+                                                    </option>
+                                                ))}
+                                            </>
+                                        )}
+                                    </select>
+
+                                    <InputError className="mt-2" message={errors?.notice_period ?? ''} />
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mt-4 flex w-full flex-col gap-4 lg:flex-row">
+                            <div className="w-full">
+                                <Label htmlFor="renewal_type">Renewal type</Label>
+                                <select
+                                    name="renewal_type"
+                                    onChange={(e) => setData('renewal_type', e.target.value)}
+                                    id=""
+                                    required
+                                    value={data.renewal_type}
+                                    className={cn(
+                                        'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                    )}
+                                >
+                                    {renewalTypes && renewalTypes.length > 0 && (
+                                        <>
+                                            <option value="" disabled className="bg-background text-foreground">
+                                                Select an option
+                                            </option>
+                                            {renewalTypes?.map((type, index) => (
+                                                <option value={type} key={index} className="bg-background text-foreground">
+                                                    {type}
+                                                </option>
+                                            ))}
+                                        </>
+                                    )}
+                                </select>
+                            </div>
+                            <div className="w-full">
+                                <Label htmlFor="status">Status</Label>
+                                <select
+                                    name="status"
+                                    value={data.status}
+                                    required
+                                    onChange={(e) => setData('status', e.target.value)}
+                                    id=""
+                                    className={cn(
+                                        'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                    )}
+                                >
+                                    {statuses && statuses.length > 0 && (
+                                        <>
+                                            <option value="" disabled className="bg-background text-foreground">
+                                                Select an option
+                                            </option>
+                                            {statuses?.map((status, index) => (
+                                                <option value={status} key={index} className="bg-background text-foreground">
+                                                    {status}
+                                                </option>
+                                            ))}
+                                        </>
+                                    )}
+                                </select>
+                            </div>
+                        </div>
+                        <div className="mt-4">
+                            <Label>Notes</Label>
+                            <Textarea onChange={(e) => setData('notes', e.target.value)} value={data.notes} minLength={4} maxLength={250} />
+                            <InputError message={errors?.notes ?? ''} />
+                        </div>
+
                         {!contract && (
-                            <div id="files">
+                            <div id="files" className="mt-4">
                                 <Label>Documents</Label>
                                 <Button onClick={() => setShowFileModal(!showFileModal)} type="button" className="block">
                                     Add file
@@ -404,6 +461,8 @@ export default function CreateUpdateContract({
                                 )}
                             </div>
                         )}
+                    </div>
+                    <div className="flex gap-4">
                         <Button type="submit">{contract ? 'Update' : 'Submit'}</Button>
                         <Button
                             variant={'secondary'}

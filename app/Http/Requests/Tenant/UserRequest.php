@@ -63,7 +63,8 @@ class UserRequest extends FormRequest
             'job_position' => 'nullable|string|max:100',
             'can_login' => 'nullable|boolean',
             'role' => ['nullable', 'string', 'required_if_accepted:can_login', Rule::in($roles)],
-            'provider_id' => 'nullable|integer|exists:providers,id'
+            'provider_id' => 'nullable|integer|exists:providers,id',
+            'phone_number' => 'nullable|string|regex:/^\+\d{8,15}$/|max:16',
         ];
     }
 }
