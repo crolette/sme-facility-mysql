@@ -57,7 +57,7 @@ class Provider extends Model
     protected $appends = [
         'logo_path',
         'category',
-        'address'
+        'address',
         // 'country_label'
     ];
 
