@@ -32,8 +32,14 @@ Route::middleware([
             });
         }
 
+        if ($request->query('users') === 1) {
+            $query->load('users');
+        }
+
         return ApiResponse::success($query->get());
     })->name('api.providers.search');
+
+
 
     Route::get('/{provider}/contracts', function (Provider $provider) {
         if (Auth::user()->cannot('view', $provider))
