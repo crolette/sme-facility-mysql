@@ -2,8 +2,9 @@
 
 namespace App\Models\Tenants;
 
-use App\Models\CountryTranslation;
+use App\Models\Tenants\Provider;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Tenants\CountryTranslation;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -26,6 +27,11 @@ class Country extends Model
     public function translations(): HasMany
     {
         return $this->hasMany(CountryTranslation::class);
+    }
+
+    public function providers(): HasMany
+    {
+        return $this->hasMany(Provider::class);
     }
 
     public function label($locale = null): Attribute

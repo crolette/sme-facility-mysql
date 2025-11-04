@@ -5,12 +5,14 @@ namespace App\Models\Tenants;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use App\Models\Tenants\User;
+use App\Models\Tenants\Country;
 use App\Models\Central\CategoryType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -32,6 +34,10 @@ class Provider extends Model
         'email',
         'vat_number',
         'address',
+        'street',
+        'house_number',
+        'postal_code',
+        'city',
         'logo',
         'phone_number',
         'website'
@@ -52,6 +58,7 @@ class Provider extends Model
     protected $appends = [
         'logo_path',
         'category',
+        // 'country_label'
     ];
 
     public const MAX_UPLOAD_SIZE_MB = 4;
@@ -64,6 +71,11 @@ class Provider extends Model
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
     }
 
     public function contracts(): HasMany
@@ -104,6 +116,15 @@ class Provider extends Model
             get: fn() => $this->providerCategory?->translations->where('locale', $locale)->first()?->label ?? $this->providerCategory?->translations->where('locale', config('app.fallback_locale'))?->label ?? ''
         );
     }
+
+    // public function countryLabel($locale = null): Attribute
+    // {
+    //     $locale = $locale ?? app()->getLocale();
+
+    //     return Attribute::make(
+    //         get: fn() => $this->country->label
+    //     );
+    // }
 
     public function logoPath(): Attribute
     {

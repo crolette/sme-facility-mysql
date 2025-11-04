@@ -5,8 +5,10 @@ namespace App\Http\Controllers\API\V1;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 use App\Helpers\ApiResponse;
+use App\Models\Tenants\User;
 use App\Services\LogoService;
 use App\Models\Tenants\Provider;
+use App\Services\ProviderService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -15,12 +17,12 @@ use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Tenant\ProviderRequest;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\ProviderContactPersonsRequest;
-use App\Models\Tenants\User;
 
 class APIProviderController extends Controller
 {
     public function __construct(
-        protected LogoService $logoService
+        protected LogoService $logoService,
+        protected ProviderService $providerService,
     ) {}
 
     public function show(Provider $provider)
@@ -38,10 +40,7 @@ class APIProviderController extends Controller
 
             DB::beginTransaction();
 
-            $provider = new Provider($request->validated());
-            $provider->providerCategory()->associate($request->validated('categoryId'));
-
-            $provider->save();
+            $provider = $this->providerService->create($request->validated());
 
             if ($contactPersonsRequest->validated('users')) {
                 foreach ($contactPersonsRequest->validated('users') as $user) {
@@ -75,20 +74,12 @@ class APIProviderController extends Controller
 
             DB::beginTransaction();
 
-            $provider->update($request->validated());
+            $this->providerService->update($provider, $request->validated());
 
             if ($pictureRequest->validated('pictures')) {
                 $provider = $this->logoService->uploadAndAttachLogo($provider, $pictureRequest->validated('pictures'), $request->validated('name'));
                 $provider->save();
             }
-
-            $categoryId = $request->validated('categoryId') ?? null;
-            if ($categoryId && $categoryId !== $provider->providerCategory->id) {
-                $provider->providerCategory()->dissociate();
-                $provider->providerCategory()->associate($request->validated('categoryId'));
-            }
-
-            $provider->save();
 
             DB::commit();
 

@@ -7,6 +7,7 @@ use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Company;
+use App\Models\Tenants\Country;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
@@ -90,24 +91,35 @@ it('can post a new provider', function () {
         'name' => 'Facility Web Experience SPRL',
         'email' => 'info@facilitywebxp.be',
         'vat_number' => 'BE0123456789',
-        'address' => 'Rue sur le Hour 16A, 4910 La Reid, Belgique',
+        'street' => 'Rue sur le Hour',
+        'house_number' => '16A',
+        'postal_code' => '4910',
+        'city' => 'La Reid',
+        'country_code' => 'BEL',
         'phone_number' => '+32450987654',
         'categoryId' => $this->categoryType->id,
         'website' => 'www.website.com',
     ];
 
     $response = $this->postToTenant('api.providers.store', $formData);
+
     $response->assertStatus(200)
         ->assertJson([
             'status' => 'success',
         ]);
+
+    $country = Country::where('iso_code', 'BEL')->first();
 
     assertDatabaseCount('providers', 1);
     assertDatabaseHas('providers', [
         'name' => 'Facility Web Experience SPRL',
         'email' => 'info@facilitywebxp.be',
         'vat_number' => 'BE0123456789',
-        'address' => 'Rue sur le Hour 16A, 4910 La Reid, Belgique',
+        'street' => 'Rue sur le Hour',
+        'house_number' => '16A',
+        'postal_code' => '4910',
+        'city' => 'La Reid',
+        'country_id' => $country->id,
         'phone_number' => '+32450987654',
         'website' => 'https://www.website.com',
         'category_type_id' => $this->categoryType->id,
@@ -119,7 +131,11 @@ it('can post a new provider with contact persons', function () {
         'name' => 'Facility Web Experience SPRL',
         'email' => 'info@facilitywebxp.be',
         'vat_number' => 'BE0123456789',
-        'address' => 'Rue sur le Hour 16A, 4910 La Reid, Belgique',
+        'street' => 'Rue sur le Hour',
+        'house_number' => '16A',
+        'postal_code' => '4910',
+        'city' => 'La Reid',
+        'country_code' => 'BEL',
         'phone_number' => '+32450987654',
         'categoryId' => $this->categoryType->id,
         'website' => 'www.website.com',
@@ -175,7 +191,11 @@ it('can post a new provider with logo', function () {
         'name' => 'Facility Web Experience SPRL',
         'email' => 'info@facilitywebxp.be',
         'vat_number' => 'BE0123456789',
-        'address' => 'Rue sur le Hour 16A, 4910 La Reid, Belgique',
+        'street' => 'Rue sur le Hour',
+        'house_number' => '16A',
+        'postal_code' => '4910',
+        'city' => 'La Reid',
+        'country_code' => 'BEL',
         'phone_number' => '+32450987654',
         'categoryId' => $this->categoryType->id,
         'website' => 'www.website.com',
@@ -193,9 +213,6 @@ it('can post a new provider with logo', function () {
         'name' => 'Facility Web Experience SPRL',
         'email' => 'info@facilitywebxp.be',
         'vat_number' => 'BE0123456789',
-        'address' => 'Rue sur le Hour 16A, 4910 La Reid, Belgique',
-        'phone_number' => '+32450987654',
-        'website' => 'https://www.website.com',
         'category_type_id' => $this->categoryType->id,
         'logo' => Provider::first()->logo
     ]);
@@ -215,7 +232,11 @@ it('can update an existing provider', function () {
         'name' => 'Facility Web Experience SPRL',
         'email' => 'info@facilitywebxp.be',
         'vat_number' => 'BE0123456789',
-        'address' => 'Rue sur le Hour 16A, 4910 La Reid, Belgique',
+        'street' => 'Rue sur le Hour',
+        'house_number' => '16A',
+        'postal_code' => '4910',
+        'city' => 'La Reid',
+        'country_code' => 'DEU',
         'phone_number' => '+32450987654',
         'categoryId' => $newcategoryType->id,
     ];
@@ -226,13 +247,19 @@ it('can update an existing provider', function () {
             'status' => 'success',
         ]);
 
+    $country = Country::where('iso_code', 'DEU')->first();
+
     assertDatabaseCount('providers', 1);
     assertDatabaseHas('providers', [
         'id' => 1,
         'name' => 'Facility Web Experience SPRL',
         'email' => 'info@facilitywebxp.be',
         'vat_number' => 'BE0123456789',
-        'address' => 'Rue sur le Hour 16A, 4910 La Reid, Belgique',
+        'street' => 'Rue sur le Hour',
+        'house_number' => '16A',
+        'postal_code' => '4910',
+        'city' => 'La Reid',
+        'country_id' => $country->id,
         'phone_number' => '+32450987654',
         'category_type_id' => $newcategoryType->id,
     ]);

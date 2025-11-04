@@ -47,7 +47,14 @@ class ProviderRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', new NotDisposableEmail, Rule::unique(Provider::class)->ignore($this->route('provider'))],
             'name' => ['required', 'string', 'max:255'],
-            'address' => 'nullable|string',
+            // 'address' => 'nullable|string',
+
+            'street' => 'required|string|max:100',
+            'house_number' => 'nullable|string|max:10',
+            'postal_code' => 'required|string|max:6',
+            'city' => 'required|string|max:100',
+            'country_code' => ['required', 'string', 'exists:countries,iso_code'],
+
             'vat_number' => ['nullable', 'string', 'regex:/^[A-Z]{2}[0-9A-Z]{2,12}$/', 'max:14', Rule::unique(Provider::class)->ignore($this->route('provider'))],
             'phone_number' => 'required|string|regex:/^\+\d{8,15}$/|max:16',
             'website' => 'nullable|url:http,https',
