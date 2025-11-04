@@ -368,7 +368,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                             <p>Select user provider or internal user to send this intervention to</p>
 
                             <div className="flex w-full flex-col">
-                                <p className="font-semibold">Providers</p>
+                                <p className="font-semibold">Linked Providers</p>
                                 {providers ? (
                                     providers.length > 0 ? (
                                         <>
@@ -379,12 +379,15 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                                             {provider.name}
                                                         </li>
                                                         <ul>
-                                                            {provider.users &&
+                                                            {provider.users && provider.users?.length > 0 ? (
                                                                 provider.users.map((user: User) => (
                                                                     <li className="cursor-pointer" onClick={() => setProviderEmail(user)}>
                                                                         {user.full_name} -{user.email}
                                                                     </li>
-                                                                ))}
+                                                                ))
+                                                            ) : (
+                                                                <p>No users</p>
+                                                            )}
                                                         </ul>
                                                     </>
                                                 ))}
