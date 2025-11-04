@@ -33,7 +33,6 @@ class Provider extends Model
         'name',
         'email',
         'vat_number',
-        'address',
         'street',
         'house_number',
         'postal_code',
@@ -58,6 +57,7 @@ class Provider extends Model
     protected $appends = [
         'logo_path',
         'category',
+        'address'
         // 'country_label'
     ];
 
@@ -117,14 +117,12 @@ class Provider extends Model
         );
     }
 
-    // public function countryLabel($locale = null): Attribute
-    // {
-    //     $locale = $locale ?? app()->getLocale();
-
-    //     return Attribute::make(
-    //         get: fn() => $this->country->label
-    //     );
-    // }
+    public function address(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->street . ' ' . ($this->house_number ?? '') . ' - ' . $this->postal_code . ' ' . $this->city . ' - ' . $this->country->label
+        );
+    }
 
     public function logoPath(): Attribute
     {

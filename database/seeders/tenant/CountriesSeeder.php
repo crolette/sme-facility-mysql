@@ -214,7 +214,7 @@ class CountriesSeeder extends Seeder
 
         foreach ($countries as $key => $country) {
             Country::create([
-                'code' => $country['code'],
+                'iso_code' => $country['code'],
                 'name' => $country['name'],
             ]);
         }

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('house_number', 10)->nullable();
             $table->string('postal_code', 6);
             $table->string('city', 100);
-            $table->foreignId('country_id')->constrained('countries');
+            $table->foreignId('country_id')->nullable()->constrained('countries');
         });
     }
 
