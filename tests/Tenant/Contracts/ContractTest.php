@@ -11,15 +11,15 @@ use App\Enums\NoticePeriodEnum;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Contract;
 
-use App\Models\Tenants\Document;
 use App\Models\Tenants\Provider;
 use App\Enums\ContractStatusEnum;
-use Illuminate\Http\UploadedFile;
 
 use App\Enums\ContractDurationEnum;
 use App\Models\Central\CategoryType;
 
 use App\Enums\ContractRenewalTypesEnum;
+use App\Enums\ContractTypesEnum;
+
 use function PHPUnit\Framework\assertCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -44,16 +44,13 @@ beforeEach(function () {
     $this->floor = Floor::factory()->create();
     $this->provider = Provider::factory()->create();
 
-    $this->room = Room::factory()
-        ->for(LocationType::where('level', 'room')->first())
-        ->for(Floor::first())
-        ->create();
+    $this->room = Room::factory()->create();
 
     $this->asset = Asset::factory()->forLocation(Room::first())->create();
     $this->contractOneData = [
         'provider_id' => $this->provider->id,
         'name' => 'Contrat de bail',
-        'type' => 'Bail',
+        'type' => ContractTypesEnum::ALLIN->value,
         'notes' => 'Nouveau contrat de bail 2025',
         'internal_reference' => 'Bail Site 2025',
         'provider_reference' => 'Provider reference 2025',
@@ -67,7 +64,7 @@ beforeEach(function () {
     $this->contractTwoData = [
         'provider_id' => $this->provider->id,
         'name' => 'Contrat de sécurité',
-        'type' => 'Sécurité',
+        'type' => ContractTypesEnum::ALLIN->value,
         'notes' => 'Nouveau contrat de Sécurité 2025',
         'internal_reference' => 'Sécurité Site 2025',
         'provider_reference' => 'Provider reference 2025',
@@ -86,6 +83,118 @@ it('can factory a contract', function () {
     assertDatabaseCount('contractables', 1);
     assertEquals(1, $this->asset->contracts()->count());
 });
+
+it('can create a contract without type and other will be the default type', function () {
+
+    $formData = [
+        'provider_id' => $this->provider->id,
+        'name' => 'Contrat de sécurité',
+        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
+        'status' => ContractStatusEnum::ACTIVE->value,
+        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
+        'contractables' => [
+            ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
+        ]
+    ];
+
+    $response = $this->postToTenant('api.contracts.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    assertDatabaseHas('contracts', [
+        'provider_id' => $this->provider->id,
+        'name' => 'Contrat de sécurité',
+        'type' => ContractTypesEnum::OTHER->value,
+
+    ]);
+});
+
+it('can create a contract with every contract type', function ($type) {
+
+    $formData = [
+        'provider_id' => $this->provider->id,
+        'type' => $type,
+        'name' => 'Contrat de sécurité',
+        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
+        'status' => ContractStatusEnum::ACTIVE->value,
+        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
+        'contractables' => [
+            ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
+        ]
+    ];
+
+    $response = $this->postToTenant('api.contracts.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    assertDatabaseHas('contracts', [
+        'provider_id' => $this->provider->id,
+        'name' => 'Contrat de sécurité',
+        'type' => $type,
+
+    ]);
+})->with(array_column(ContractTypesEnum::cases(), 'value'));
+
+it('can create a contract with every contract status', function ($status) {
+
+    $formData = [
+        'provider_id' => $this->provider->id,
+        'name' => 'Contrat de sécurité',
+        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
+        'status' => $status,
+        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
+        'contractables' => [
+            ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
+        ]
+    ];
+
+    $response = $this->postToTenant('api.contracts.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    assertDatabaseHas('contracts', [
+        'provider_id' => $this->provider->id,
+        'name' => 'Contrat de sécurité',
+        'status' => $status,
+
+    ]);
+})->with(array_column(ContractStatusEnum::cases(), 'value'));
+
+
+it('can create a contract without contract start date and calculates automatically start and end_date based on duration', function ($duration) {
+
+    $formData = [
+        'provider_id' => $this->provider->id,
+        'name' => 'Contrat de sécurité',
+        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
+        'status' => ContractStatusEnum::ACTIVE->value,
+        'contract_duration' => $duration,
+        'contractables' => [
+            ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
+        ]
+    ];
+
+    $response = $this->postToTenant('api.contracts.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    assertDatabaseHas('contracts', [
+        'provider_id' => $this->provider->id,
+        'name' => 'Contrat de sécurité',
+        'contract_duration' => $duration,
+        'start_date' => Carbon::now()->toDateString(),
+        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())->toDateString()
+
+    ]);
+})->with(array_column(ContractDurationEnum::cases(), 'value'));
 
 it('can create a contract and attach asset and locations', function () {
 
@@ -109,7 +218,7 @@ it('can create a contract and attach asset and locations', function () {
     assertDatabaseHas('contracts', [
         'provider_id' => $this->provider->id,
         'name' => 'Contrat de bail',
-        'type' => 'Bail',
+        'type' => ContractTypesEnum::ALLIN->value,
         'notes' => 'Nouveau contrat de bail 2025',
         'internal_reference' => 'Bail Site 2025',
         'provider_reference' => 'Provider reference 2025',
@@ -260,7 +369,7 @@ it('can update an existing contract', function () {
         [
             'provider_id' => $provider->id,
             'name' => 'Contrat de bail',
-            'type' => 'Bail',
+            'type' => ContractTypesEnum::ONDEMAND->value,
             'notes' => 'Nouveau contrat de bail 2025',
             'internal_reference' => 'Bail Site 2025',
             'provider_reference' => 'Provider reference 2025',
@@ -281,7 +390,7 @@ it('can update an existing contract', function () {
             'id' => $contract->id,
             'provider_id' => $provider->id,
             'name' => 'Contrat de bail',
-            'type' => 'Bail',
+            'type' => ContractTypesEnum::ONDEMAND->value,
             'notes' => 'Nouveau contrat de bail 2025',
             'internal_reference' => 'Bail Site 2025',
             'provider_reference' => 'Provider reference 2025',

@@ -206,8 +206,8 @@ export default function IndexSites({
                             <TableHeadData>Reference code</TableHeadData>
                             <TableHeadData>Code</TableHeadData>
                             <TableHeadData>Category</TableHeadData>
-                            <TableHeadData>Name</TableHeadData>
-                            <TableHeadData>Description</TableHeadData>
+                            <TableHeadData className="max-w-72">Name</TableHeadData>
+                            <TableHeadData className="max-w-72">Description</TableHeadData>
                             <TableHeadData></TableHeadData>
                         </TableHeadRow>
                     </TableHead>
@@ -231,8 +231,16 @@ export default function IndexSites({
                                         </TableBodyData>
                                         <TableBodyData>{item.code}</TableBodyData>
                                         <TableBodyData>{item.category}</TableBodyData>
-                                        <TableBodyData>{item.name}</TableBodyData>
-                                        <TableBodyData>{item.description}</TableBodyData>
+                                        <TableBodyData>
+                                            <span className="flex max-w-72">
+                                                <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{item.name}</p>
+                                            </span>
+                                        </TableBodyData>
+                                        <TableBodyData>
+                                            <span className="flex max-w-72">
+                                                <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{item.description}</p>
+                                            </span>
+                                        </TableBodyData>
 
                                         <TableBodyData className="space-x-2">
                                             <a href={route(`tenant.${routeName}.edit`, item.reference_code)}>

@@ -8,6 +8,7 @@ use Illuminate\Validation\Rule;
 use App\Enums\ContractStatusEnum;
 use App\Enums\ContractDurationEnum;
 use App\Enums\ContractRenewalTypesEnum;
+use App\Enums\ContractTypesEnum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ContractUpdateRequest extends FormRequest
@@ -37,6 +38,10 @@ class ContractUpdateRequest extends FormRequest
             $data['notice_date']  = NoticePeriodEnum::from($data['notice_period'])->subFrom($data['end_date']);
         }
 
+        if (!isset($data['type'])) {
+            $data['type']  = ContractTypesEnum::OTHER->value;
+        }
+
         $this->replace($data);
     }
 
@@ -51,7 +56,7 @@ class ContractUpdateRequest extends FormRequest
         return [
             'provider_id' => 'required|exists:providers,id',
             'name' => 'required|string|min:4|max:100',
-            'type' => 'nullable|string|min:4|max:100',
+            'type' => ['nullable', Rule::in(array_column(ContractTypesEnum::cases(), 'value'))],
             'notes' => 'nullable|string|min:4|max:250',
 
             'internal_reference' => 'nullable|string|max:50',

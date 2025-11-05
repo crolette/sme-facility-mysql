@@ -24,12 +24,14 @@ export interface SearchParams {
 
 export default function IndexContracts({
     items,
+    contractTypes,
     filters,
     statuses,
     renewalTypes,
 }: {
     items: ContractsPaginated;
     filters: SearchParams;
+    contractTypes: string[];
     statuses: string[];
     renewalTypes: string[];
 }) {
@@ -179,6 +181,20 @@ export default function IndexContracts({
         });
     };
 
+    const setTypeSearch = (type: string | null) => {
+        if (type === query.type) {
+            type = null;
+        }
+        router.visit(route('tenant.contracts.index', { ...query, type: type }), {
+            onStart: () => {
+                setIsLoading(true);
+            },
+            onFinish: () => {
+                setIsLoading(false);
+            },
+        });
+    };
+
     const [prevQuery, setPrevQuery] = useState(query);
 
     useEffect(() => {
@@ -201,7 +217,7 @@ export default function IndexContracts({
                     <details className="border-border relative w-full cursor-pointer rounded-md border-2 p-1" open={isLoading ? false : undefined}>
                         <summary>Search/Filter</summary>
 
-                        <div className="bg-border border-border text-background dark:text-foreground absolute top-full flex flex-col items-center gap-4 rounded-b-md border-2 p-2 sm:flex-row">
+                        <div className="bg-border border-border text-background dark:text-foreground absolute top-full flex flex-col items-center gap-4 rounded-b-md border-2 p-2 lg:flex-row">
                             <div className="flex flex-col items-center gap-2">
                                 <Label htmlFor="role">Renewal type</Label>
                                 <div className="space-x-1">
@@ -213,6 +229,21 @@ export default function IndexContracts({
                                             className="cursor-pointer"
                                         >
                                             {renewalType}
+                                        </Pill>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="flex flex-col items-center gap-2">
+                                <Label htmlFor="role">Type</Label>
+                                <div className="space-x-1">
+                                    {contractTypes.map((contractType) => (
+                                        <Pill
+                                            key={contractType}
+                                            variant={query.type === contractType ? 'active' : ''}
+                                            onClick={() => setTypeSearch(contractType)}
+                                            className="cursor-pointer"
+                                        >
+                                            {contractType}
                                         </Pill>
                                     ))}
                                 </div>

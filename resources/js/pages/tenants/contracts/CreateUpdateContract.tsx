@@ -49,6 +49,7 @@ type TypeFormData = {
 export default function CreateUpdateContract({
     contract,
     statuses,
+    contractTypes,
     renewalTypes,
     objects,
     contractDurations,
@@ -56,6 +57,7 @@ export default function CreateUpdateContract({
 }: {
     contract?: Contract;
     statuses: string[];
+    contractTypes: string[];
     renewalTypes: string[];
     contractDurations: string[];
     noticePeriods: string[];
@@ -109,11 +111,9 @@ export default function CreateUpdateContract({
 
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
-        console.log(data);
         if (contract) {
             try {
                 const response = await axios.patch(route('api.contracts.update', contract.id), data);
-                console.log(response);
                 if (response.data.status === 'success') {
                     router.visit(route('tenant.contracts.show', contract.id));
                 }
@@ -181,26 +181,50 @@ export default function CreateUpdateContract({
                 <h1>{contract?.name ?? 'New contract'}</h1>
                 <form onSubmit={submit} className="space-y-4">
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                        <Label>Name</Label>
-                        <Input
-                            type="text"
-                            onChange={(e) => setData('name', e.target.value)}
-                            required
-                            value={data.name}
-                            minLength={4}
-                            maxLength={100}
-                        />
-                        <InputError message={errors?.name ?? ''} />
-                        <Label>Type</Label>
-                        <Input
-                            type="text"
-                            onChange={(e) => setData('type', e.target.value)}
-                            required
-                            value={data.type}
-                            minLength={4}
-                            maxLength={100}
-                        />
-                        <InputError message={errors?.type ?? ''} />
+                        <div className="flex w-full flex-col gap-4 lg:flex-row">
+                            <div className="w-full">
+                                <Label>Name</Label>
+                                <Input
+                                    type="text"
+                                    onChange={(e) => setData('name', e.target.value)}
+                                    required
+                                    value={data.name}
+                                    minLength={4}
+                                    maxLength={100}
+                                />
+                                <InputError message={errors?.name ?? ''} />
+                            </div>
+                            <div className="w-full">
+                                <Label htmlFor="type">Type</Label>
+                                <select
+                                    name="type"
+                                    onChange={(e) => setData('type', e.target.value)}
+                                    id=""
+                                    required
+                                    value={data.type}
+                                    className={cn(
+                                        'border-input placeholder:text-muted-foreground mt-1 flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                    )}
+                                >
+                                    {contractTypes && contractTypes.length > 0 && (
+                                        <>
+                                            <option value="" disabled className="bg-background text-foreground">
+                                                Select a type
+                                            </option>
+                                            {contractTypes?.map((type, index) => (
+                                                <option value={type} key={index} className="bg-background text-foreground">
+                                                    {type}
+                                                </option>
+                                            ))}
+                                        </>
+                                    )}
+                                </select>
+
+                                <InputError className="mt-2" message={errors?.type ?? ''} />
+                            </div>
+                        </div>
 
                         <div className="flex w-full flex-col gap-4 lg:flex-row">
                             <div className="w-full">

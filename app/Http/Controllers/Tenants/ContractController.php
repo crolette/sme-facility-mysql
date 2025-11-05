@@ -13,6 +13,7 @@ use App\Enums\ContractDurationEnum;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\ContractRenewalTypesEnum;
+use App\Enums\ContractTypesEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Validator;
 
@@ -28,6 +29,7 @@ class ContractController extends Controller
             abort(403);
 
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
+        $contractTypes = array_column(ContractTypesEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
 
         $validator = Validator::make($request->all(), [
@@ -53,6 +55,10 @@ class ContractController extends Controller
             $contracts->where('status', $validatedFields['status']);
         }
 
+        if (isset($validatedFields['type'])) {
+            $contracts->where('type', $validatedFields['type']);
+        }
+
         if (isset($validatedFields['q'])) {
             $contracts->where(function (Builder $query) use ($validatedFields) {
                 $query->where('name', 'like', '%' . $validatedFields['q'] . '%')
@@ -68,7 +74,7 @@ class ContractController extends Controller
         }
 
 
-        return Inertia::render('tenants/contracts/IndexContracts', ['items' => $contracts->orderBy($validatedFields['orderBy'] ?? 'end_date', $validatedFields['sortBy'] ?? 'asc')->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'type', 'status', 'orderBy', 'sortBy', 'provider', 'renewalType']), 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
+        return Inertia::render('tenants/contracts/IndexContracts', ['items' => $contracts->orderBy($validatedFields['orderBy'] ?? 'end_date', $validatedFields['sortBy'] ?? 'asc')->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'type', 'status', 'orderBy', 'sortBy', 'provider', 'renewalType']), 'statuses' => $statuses, 'contractTypes' => $contractTypes, 'renewalTypes' => $renewalTypes]);
     }
 
     /**
@@ -81,11 +87,12 @@ class ContractController extends Controller
             abort(403);
 
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
+        $contractTypes = array_column(ContractTypesEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
         $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
         $noticePeriods = array_column(NoticePeriodEnum::cases(), 'value');
 
-        return Inertia::render('tenants/contracts/CreateUpdateContract', ['statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
+        return Inertia::render('tenants/contracts/CreateUpdateContract', ['statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods, 'contractTypes' => $contractTypes]);
     }
 
     /**
@@ -97,11 +104,12 @@ class ContractController extends Controller
             abort(403);
 
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
+        $contractTypes = array_column(ContractTypesEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
         $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
         $noticePeriods = array_column(NoticePeriodEnum::cases(), 'value');
 
-        return Inertia::render('tenants/contracts/CreateUpdateContract', ['contract' => $contract->load('provider'), 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods, 'objects' => $contract->getObjects()]);
+        return Inertia::render('tenants/contracts/CreateUpdateContract', ['contract' => $contract->load('provider'), 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods, 'objects' => $contract->getObjects(), 'contractTypes' => $contractTypes]);
     }
 
 

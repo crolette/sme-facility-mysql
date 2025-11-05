@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\Tenants\Asset;
 use App\Enums\NoticePeriodEnum;
 use App\Models\Tenants\Company;
+use App\Enums\ContractTypesEnum;
 use App\Models\Tenants\Contract;
 use App\Models\Tenants\Provider;
 use App\Enums\ContractStatusEnum;
@@ -33,7 +34,7 @@ class ContractFactory extends Factory
         return [
             'provider_id' => Provider::first()->id,
             'name' => fake()->word(),
-            'type' => fake()->word(),
+            'type' => ContractTypesEnum::ALLIN->value,
             // 'internal_reference' => fake()->randomLetter() . fake()->randomNumber(4, true),
             // 'provider_reference' => fake()->randomLetter() . fake()->randomNumber(4, true),
             // 'start_date' => Carbon::now(),

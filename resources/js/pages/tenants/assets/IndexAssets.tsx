@@ -295,8 +295,8 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                             <TableHeadData>Reference code</TableHeadData>
                             <TableHeadData>Code</TableHeadData>
                             <TableHeadData>Category</TableHeadData>
-                            <TableHeadData>Name</TableHeadData>
-                            <TableHeadData>Description</TableHeadData>
+                            <TableHeadData className="max-w-72">Name</TableHeadData>
+                            <TableHeadData className="max-w-72">Description</TableHeadData>
                             <TableHeadData></TableHeadData>
                         </TableHeadRow>
                     </TableHead>
@@ -323,8 +323,18 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                         </TableBodyData>
                                         <TableBodyData>{asset.code}</TableBodyData>
                                         <TableBodyData>{asset.category}</TableBodyData>
-                                        <TableBodyData>{asset.maintainable.name}</TableBodyData>
-                                        <TableBodyData>{asset.maintainable.description}</TableBodyData>
+                                        <TableBodyData>
+                                            <span className="flex max-w-72">
+                                                <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{asset.maintainable.name}</p>
+                                            </span>
+                                        </TableBodyData>
+                                        <TableBodyData>
+                                            <span className="flex max-w-72">
+                                                <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">
+                                                    {asset.maintainable.description}
+                                                </p>
+                                            </span>
+                                        </TableBodyData>
 
                                         <TableBodyData className="space-x-2">
                                             {asset.deleted_at ? (

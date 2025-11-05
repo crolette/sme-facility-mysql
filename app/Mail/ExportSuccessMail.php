@@ -22,9 +22,9 @@ class ExportSuccessMail extends Mailable
      */
     public function __construct(
         public User $user,
-        public string $directory
-    )
-    {
+        public string $directory,
+        public string $dataType
+    ) {
         $locale = App::getLocale();
         App::setLocale($locale);
     }
@@ -36,7 +36,7 @@ class ExportSuccessMail extends Mailable
     {
         return new Envelope(
             from: new Address('notifications@sme-facility.com', 'SME-Facility - Notification'),
-            subject: 'Export Success Mail',
+            subject: 'Export ' . $this->dataType . ' successfully',
         );
     }
 

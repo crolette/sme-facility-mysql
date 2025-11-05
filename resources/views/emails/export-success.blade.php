@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>{{ 'Assets exported'}}</title>
+    <title>{{ $dataType }} exported</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
         .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px; }
@@ -18,15 +18,15 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="title">{{ 'Assets exported'}}</h1>
+            <h1 class="title">{{ $dataType }} exported successfully</h1>
         </div>
 
         <div class="content">
             <div class="alert">
-                        <strong>Assets exported</strong>
+                        <strong>{{ $dataType }} exported</strong>
                     </div>
                     <div class="details">
-                        <p>Assets exported - Find enclosed</p>
+                        <p>All {{ $dataType }} have been exported - You can find the file enclosed.</p>
                     </div>
         </div>
 

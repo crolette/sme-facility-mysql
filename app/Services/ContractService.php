@@ -6,12 +6,7 @@ use App\Enums\ContractDurationEnum;
 use App\Enums\NoticePeriodEnum;
 use App\Models\Tenants\Contract;
 use Carbon\Carbon;
-use Illuminate\Support\Str;
-use App\Models\Tenants\Document;
-use Illuminate\Support\Facades\Auth;
-use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class ContractService
 {
