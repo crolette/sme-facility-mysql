@@ -34,11 +34,31 @@ export default function ImportExportSettings() {
         file: null,
     });
 
-    const uploadFile: FormEventHandler = async (e) => {
+    const uploadAssetFile: FormEventHandler = async (e) => {
         e.preventDefault();
         setIsProcessing(true);
         try {
             const response = await axios.post(route('api.tenant.import.assets'), data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            if (response.data.status === 'success') {
+                showToast(response.data.message, response.data.status);
+            }
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
+        } finally {
+            reset();
+            setIsProcessing(false);
+        }
+    };
+
+    const uploadProviderFile: FormEventHandler = async (e) => {
+        e.preventDefault();
+        setIsProcessing(true);
+        try {
+            const response = await axios.post(route('api.tenant.import.providers'), data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -90,8 +110,6 @@ export default function ImportExportSettings() {
         }
     };
 
-    console.log(data);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Import/Export" />
@@ -100,16 +118,13 @@ export default function ImportExportSettings() {
                 <div className="w-full space-y-6 space-x-2">
                     <div className="relative gap-4">
                         <HeadingSmall title="Import/Export" />
-                        <Button variant={'secondary'} onClick={exportAssets} disabled={isProcessing}>
-                            <BiSolidFilePdf size={20} />
-                            Exporter les assets
-                        </Button>
-                        <Button variant={'secondary'} onClick={exportProviders} disabled={isProcessing}>
-                            <BiSolidFilePdf size={20} />
-                            Exporter les providers
-                        </Button>
                     </div>
-                    <form action="" onSubmit={uploadFile}>
+                    <h3>Assets</h3>
+                    <Button variant={'secondary'} onClick={exportAssets} disabled={isProcessing}>
+                        <BiSolidFilePdf size={20} />
+                        Exporter les assets
+                    </Button>
+                    <form action="" onSubmit={uploadAssetFile}>
                         <input
                             type="file"
                             name=""
@@ -117,7 +132,32 @@ export default function ImportExportSettings() {
                             id=""
                             onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
                         />
-                        <Button disabled={isProcessing}>
+                        <Button disabled={isProcessing || data.file === null}>
+                            {isProcessing ? (
+                                <>
+                                    <Loader className="animate-pulse" />
+                                    <span>Submitting...</span>
+                                </>
+                            ) : (
+                                <span>Submit</span>
+                            )}
+                        </Button>
+                    </form>
+                    <h3>Providers</h3>
+
+                    <Button variant={'secondary'} onClick={exportProviders} disabled={isProcessing}>
+                        <BiSolidFilePdf size={20} />
+                        Exporter les providers
+                    </Button>
+                    <form action="" onSubmit={uploadProviderFile}>
+                        <input
+                            type="file"
+                            name=""
+                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            id=""
+                            onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
+                        />
+                        <Button disabled={isProcessing || data.file === null}>
                             {isProcessing ? (
                                 <>
                                     <Loader className="animate-pulse" />

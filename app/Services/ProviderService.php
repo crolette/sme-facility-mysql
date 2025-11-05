@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Tenants\Country;
 use App\Models\Tenants\Provider;
+use Illuminate\Support\Facades\Log;
 
 class ProviderService
 {
@@ -21,8 +22,13 @@ class ProviderService
 
     public function update(Provider $provider, array $data): Provider
     {
+        Log::info('PROVIDERSERVICE UPDATE');
+        Log::info($data);
+        Log::info($provider->street);
 
         $provider->update([...$data]);
+
+        Log::info($provider->street);
 
         $provider = $this->associateCountry($provider, $data['country_code']);
         $provider =  $this->associateCategory($provider, $data['categoryId']);

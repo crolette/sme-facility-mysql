@@ -6,12 +6,13 @@ use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Imports\AssetsImport;
-use App\Imports\ProvidersImport;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Imports\ProvidersImport;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use App\Models\Central\CategoryType;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
@@ -34,17 +35,32 @@ beforeEach(function () {
         'slug' => 'provider-security'
     ]);
 
-    $this->provider = Provider::factory()->create([
+    $this->providerOne = Provider::factory()->create([
         'name' => 'Company A',
         'email' => 'companya@companya.com',
         'website' => 'https://www.companya.com',
         'vat_number' => 'BE0123456789',
         'phone_number' => '+32123456789',
-        'street' => 'Rue du Test',
-        'house_number' => '69',
-        'postal_code' => '1234',
+        'street' => 'Rue company A',
+        'house_number' => '1A',
+        'postal_code' => '4000',
         'city' => 'Test',
-        'country_id' => 17
+        'country_id' => 17,
+        'category_type_id' => 1
+    ]);
+
+    $this->providerTwo = Provider::factory()->create([
+        'name' => 'Company B',
+        'email' => 'companyb@companyb.com',
+        'website' => 'https://www.companyb.com',
+        'vat_number' => 'BE9870321654',
+        'phone_number' => '+329870321654',
+        'street' => 'Rue company B',
+        'house_number' => '1B',
+        'postal_code' => '1000',
+        'city' => 'Bruxelles',
+        'country_id' => 17,
+        'category_type_id' => 2
     ]);
 });
 
@@ -55,8 +71,6 @@ it('can import and create new providers', function () {
     $file = UploadedFile::fake()->createWithContent('providers.xlsx', file_get_contents(base_path('tests/fixtures/providers.xlsx')));
 
     Excel::import(new ProvidersImport, $file);
-
-    assertDatabaseCount('providers', 3);
 
     assertDatabaseHas(
         'providers',
@@ -71,7 +85,7 @@ it('can import and create new providers', function () {
             'postal_code' => '1234',
             'city' => 'Test',
             'country_id' => 17,
-            'category_id' => 1
+            'category_type_id' => 1
         ],
     );
 
@@ -83,12 +97,12 @@ it('can import and create new providers', function () {
             'website' => 'https://www.testsansmaison.com',
             'vat_number' => 'BE6549873210',
             'phone_number' => '+32987654321',
-            'street' => 'Rue du test complet',
+            'street' => 'Rue du test sans maison',
             'house_number' => null,
             'postal_code' => '1234',
             'city' => 'Test',
             'country_id' => 17,
-            'category_id' => 1
+            'category_type_id' => 1
         ],
     );
 
@@ -98,18 +112,119 @@ it('can import and create new providers', function () {
             'name' => 'Test sans vat',
             'email' => 'testsansvat@testsansvat.com',
             'website' => 'https://www.testsansvat.com',
-            'vat_number' => 'BE9876543210',
+            'vat_number' =>  null,
             'phone_number' => '+32321654987',
             'street' => 'Rue du test sans vat',
-            'house_number' => '69',
+            'house_number' => null,
             'postal_code' => '1234',
             'city' => 'Test',
             'country_id' => 65,
-            'category_id' => 2
+            'category_type_id' => 2
+        ],
+    );
+
+    assertDatabaseHas(
+        'providers',
+        [
+            'name' => 'Test sans website',
+            'email' => 'testsanswebsite@testsanswebsite.com',
+            'vat_number' =>  null,
+            'phone_number' => '+41321654987',
+            'street' => 'Rue de la suisse',
+            'house_number' => null,
+            'postal_code' => '6541',
+            'city' => 'Gland',
+            'country_id' => 169,
+            'category_type_id' => 2
         ],
     );
 });
 
-// it('can import and update providers', function() {
+it('does not update provider with no changes', function () {
+    assertDatabaseHas(
+        'providers',
+        [
+            'name' => 'Company B',
+            'email' => 'companyb@companyb.com',
+            'website' => 'https://www.companyb.com',
+            'vat_number' => 'BE9870321654',
+            'phone_number' => '+329870321654',
+            'street' => 'Rue company B',
+            'house_number' => '1B',
+            'postal_code' => '1000',
+            'city' => 'Bruxelles',
+            'country_id' => 17,
+            'category_type_id' => 2
+        ],
+    );
 
-// });
+    Storage::fake('local');
+
+    $file = UploadedFile::fake()->createWithContent('providers.xlsx', file_get_contents(base_path('tests/fixtures/providers.xlsx')));
+
+    Excel::import(new ProvidersImport, $file);
+
+    assertDatabaseHas(
+        'providers',
+        [
+            'id' => $this->providerTwo->id,
+            'name' => 'Company B',
+            'email' => 'companyb@companyb.com',
+            'website' => 'https://www.companyb.com',
+            'vat_number' => 'BE9870321654',
+            'phone_number' => '+329870321654',
+            'street' => 'Rue company B',
+            'house_number' => '1B',
+            'postal_code' => '1000',
+            'city' => 'Bruxelles',
+            'country_id' => 17,
+            'category_type_id' => 2,
+            'updated_at' => $this->providerTwo->updated_at
+        ],
+    );
+});
+
+it('can import and update provider', function () {
+
+    assertDatabaseHas(
+        'providers',
+        [
+            'name' => 'Company A',
+            'email' => 'companya@companya.com',
+            'website' => 'https://www.companya.com',
+            'vat_number' => 'BE0123456789',
+            'phone_number' => '+32123456789',
+            'street' => 'Rue company A',
+            'house_number' => '1A',
+            'postal_code' => '4000',
+            'city' => 'Test',
+            'country_id' => 17,
+            'category_type_id' => 1
+        ],
+    );
+
+
+    Storage::fake('local');
+
+    $file = UploadedFile::fake()->createWithContent('providers.xlsx', file_get_contents(base_path('tests/fixtures/providers.xlsx')));
+
+    Excel::import(new ProvidersImport, $file);
+
+    assertDatabaseHas(
+        'providers',
+        [
+            'name' => 'Company A edited',
+            'email' => 'companyaedited@companyaedited.com',
+            'website' => 'https://www.companyaedited.com',
+            'vat_number' => 'BE0123456798',
+            'phone_number' => '+32123456798',
+            'street' => 'Rue company A edited',
+            'house_number' => '100A',
+            'postal_code' => '4001',
+            'city' => 'Liège',
+            'country_id' => 65,
+            'category_type_id' => 2
+
+        ],
+    );
+});

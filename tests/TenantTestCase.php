@@ -26,7 +26,7 @@ abstract class TenantTestCase extends BaseTestCase
         'roles',
         'role_has_permissions',
         'countries',
-        'cuntry_translations'
+        'country_translations'
 
     ];
 

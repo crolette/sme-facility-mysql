@@ -4,19 +4,11 @@ namespace App\Http\Controllers\Tenants;
 
 use Carbon\Carbon;
 use App\Helpers\ApiResponse;
-use Illuminate\Http\Request;
-use App\Exports\AssetsExport;
-use App\Models\Tenants\Asset;
-use App\Exports\ProvidersExport;
-use App\Jobs\ExportAssetsExcelJob;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Maatwebsite\Excel\Facades\Excel;
 use App\Jobs\ExportProvidersExcelJob;
-use Barryvdh\Debugbar\Facades\Debugbar;
 
 class ProvidersExportController extends Controller
 {

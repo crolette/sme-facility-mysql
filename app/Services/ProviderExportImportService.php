@@ -20,7 +20,6 @@ class ProviderExportImportService
             "house_number" => $provider->house_number,
             "postal_code" => $provider->postal_code,
             "city" => $provider->city,
-            "country_code" => $provider->country->iso_label
         ];
     }
 
@@ -39,7 +38,6 @@ class ProviderExportImportService
             "postal_code" => $provider->postal_code,
             "city" => $provider->city,
             "country" => $provider->country->label,
-            "country_code" => $provider->country->iso_code
         ];
     }
 

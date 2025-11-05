@@ -2,36 +2,55 @@
 
 namespace App\Imports;
 
+use Error;
 use Exception;
+use Throwable;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Row;
 use App\Models\Translation;
+use Illuminate\Support\Str;
 use App\Models\Tenants\Asset;
 use App\Services\AssetService;
 use App\Services\QRCodeService;
 use Illuminate\Validation\Rule;
+use App\Models\Tenants\Provider;
+use App\Rules\NotDisposableEmail;
+use App\Services\ProviderService;
 use Illuminate\Support\Collection;
 use App\Enums\MaintenanceFrequency;
 use Illuminate\Support\Facades\Log;
 use App\Models\Central\CategoryType;
-use App\Models\Tenants\Provider;
-use App\Services\AssetExportImportService;
 use App\Services\MaintainableService;
-use App\Services\ProviderExportImportService;
-use App\Services\ProviderService;
 use Barryvdh\Debugbar\Facades\Debugbar;
-use Error;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\OnEachRow;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
+use App\Models\Tenants\CountryTranslation;
+use App\Services\AssetExportImportService;
+use Maatwebsite\Excel\Events\ImportFailed;
+use Maatwebsite\Excel\Concerns\SkipsErrors;
+use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithStartRow;
+use App\Services\ProviderExportImportService;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\Importable;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
+use Maatwebsite\Excel\Concerns\WithEvents;
 
-class ProvidersDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, WithStartRow, WithValidation
+class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow, WithValidation, WithCalculatedFormulas
 {
+    public function isEmptyWhen(array $row): bool
+    {
+        return $row['name'] === null;
+    }
+
+
 
     /**
      * @param array $row
@@ -40,53 +59,49 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRow
      */
     public function collection(Collection $rows)
     {
-        foreach ($rows as $row) {
-            $assetHash = $row['hash'];
-            $rowWithoutHash = $row;
-            unset($rowWithoutHash['hash']);
+        foreach ($rows as $index => $row) {
+            try {
+                $providerHash = $row['hash'];
+                $rowWithoutHash = $row;
+                unset($rowWithoutHash['hash']);
 
-            $calculatedHash = app(ProviderExportImportService::class)->calculateHash([...$rowWithoutHash]);
+                $calculatedHash = app(ProviderExportImportService::class)->calculateHash([...$rowWithoutHash]);
 
-            if ($assetHash !== $calculatedHash) {
-                $assetData = $this->transformRowForProviderCreation($row);
+                if ($providerHash !== $calculatedHash) {
+                    $providerData = $this->transformRowForProviderCreation($row);
+                    Log::info($providerData);
 
-                if ($row['id']) {
-                    $asset = Provider::find($row['id'])->first();
-                    app(ProviderService::class)->update($asset, $assetData);
-                } else {
-                    $asset = app(ProviderService::class)->create($assetData);
+                    if ($row['id']) {
+                        Log::info('UPDATE PROVIDER IMPORT');
+                        $provider = Provider::find($row['id'])->first();
+                        app(ProviderService::class)->update($provider, $providerData);
+                    } else {
+                        $provider = app(ProviderService::class)->create($providerData);
+                    }
                 }
-
-                $translation = Translation::where('translatable_type', (CategoryType::class))->where('label', $row['category'])->first();
-
-                if (!$translation)
-                    throw new Exception('Category type not existing');
-
-                $asset->assetCategory()->associate($translation->translatable->id);
-                $asset->save();
+            } catch (\Exception $e) {
+                Log::error("Error row " . ($index + 2), [
+                    'data' => $row->toArray(),
+                    'error' => $e->getMessage()
+                ]);
             }
         }
     }
 
     private function transformRowForProviderCreation($rowData)
     {
-
         $data = [
-            'brand' => $rowData['brand'] ?? null,
-            'model' => $rowData['model'] ?? null,
-            'serial_number' => $rowData['serial_number'] ?? null,
-            'surface' => $rowData['surface'] ?? null,
-            'is_mobile' => $rowData['is_mobile'],
-            'site' => $rowData['location_type_site'],
-            'building' => $rowData['location_type_building'],
-            'floor' => $rowData['location_type_floor'],
-            'room' => $rowData['location_type_room'],
-            'user' => $rowData['location_type_user'],
-            'depreciable' => $rowData['depreciable'],
-            'depreciation_start_date' => $rowData['depreciation_start_date'] ?? null,
-            'depreciation_end_date' => $rowData['depreciation_end_date'] ?? null,
-            'depreciation_duration' => $rowData['depreciation_duration'] ?? null,
-            'residual_value' => $rowData['residual_value'] ?? null,
+            'name' => $rowData['name'] ?? null,
+            'email' => $rowData['email'] ?? null,
+            'website' => $rowData['website'] ?? null,
+            'vat_number' => $rowData['vat_number'] ?? null,
+            'phone_number' => $rowData['phone_number'],
+            'street' => $rowData['street'],
+            'house_number' => $rowData['house_number'] ?? null,
+            'postal_code' => $rowData['postal_code'] ?? null,
+            'city' => $rowData['city'] ?? null,
+            'country_code' => $rowData['country_code'] ?? null,
+            'categoryId' => $rowData['categoryId'] ?? null,
         ];
 
         return $data;
@@ -100,52 +115,43 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRow
 
     public function prepareForValidation($data)
     {
-        isset($data['need_qr_code']) && ($data['need_qr_code'] === 'Yes') ? $data['need_qr_code'] = true : $data['need_qr_code'] = false;
-        isset($data['is_mobile']) && ($data['is_mobile'] === 'Yes') ? $data['is_mobile'] = true : $data['is_mobile'] = false;
-        isset($data['depreciable']) && ($data['depreciable'] === 'Yes') ? $data['depreciable'] = true : $data['depreciable'] = false;
-
-        if ($data['depreciable'] === false) {
-            $data['depreciation_start_date'] = null;
-            $data['depreciation_end_date'] = null;
-            $data['depreciation_duration'] = null;
-            $data['residual_value'] = null;
-        } else {
-            $startDate = Carbon::instance(Date::excelToDateTimeObject($data['depreciation_start_date']));
-            $data['depreciation_start_date'] = $startDate->format('Y-m-d');
-            $data['depreciation_end_date'] = $startDate->addYears($data['depreciation_duration'])->format('Y-m-d');
+        if (isset($data['email'])) {
+            $data['email'] = Str::lower($data['email']);
         }
 
-        isset($data['under_warranty']) && ($data['under_warranty'] === 'Yes') ? $data['under_warranty'] = true : $data['under_warranty'] = false;
-        isset($data['need_maintenance']) && ($data['need_maintenance'] === 'Yes') ? $data['need_maintenance'] = true : $data['need_maintenance'] = false;
-
-        if ($data['need_maintenance'] === true) {
-            if (!isset($data['next_maintenance_date'])) {
-
-                if (isset($data['maintenance_frequency']) && $data['maintenance_frequency'] !== MaintenanceFrequency::ONDEMAND->value) {
-
-                    $data['next_maintenance_date'] = isset($data['last_maintenance_date']) ? calculateNextMaintenanceDate($data['maintenance_frequency'], Carbon::instance(Date::excelToDateTimeObject($data['last_maintenance_date']))->toDateString()) : calculateNextMaintenanceDate($data['maintenance_frequency']);
-                }
-            } else {
-
-                $data['next_maintenance_date'] = Carbon::instance(Date::excelToDateTimeObject($data['next_maintenance_date']))->format('Y-m-d');
-            }
+        if (isset($data['website'])) {
+            $data['website'] = Str::startsWith($data['website'], ['http', 'https']) ? Str::lower($data['website']) : Str::lower('https://' . $data['website']);
         }
 
-        if (isset($data['last_maintenance_date']))
-            $data['last_maintenance_date'] = Carbon::instance(Date::excelToDateTimeObject($data['last_maintenance_date']))->format('Y-m-d');
-
-        if ($data['need_maintenance'] === false) {
-            $data['next_maintenance_date'] = null;
-            $data['last_maintenance_date'] = null;
+        if (isset($data['phone_number'])) {
+            $data['phone_number'] = Str::startsWith($data['phone_number'], ['00']) ? str_replace('00', '+', $data["phone_number"]) : $data["phone_number"];
         }
 
-        if (isset($data['purchase_date'])) {
-
-            $data['purchase_date'] = Carbon::instance(Date::excelToDateTimeObject($data['purchase_date']))->format('Y-m-d');
+        if (isset($data['house_number'])) {
+            $data['house_number'] = strval($data['house_number']);
         }
 
-        if (isset($data['end_warranty_date']))
-            $data['end_warranty_date'] = Carbon::instance(Date::excelToDateTimeObject($data['end_warranty_date']))->format('Y-m-d');
+        if (isset($data['postal_code'])) {
+            $data['postal_code'] = strval($data['postal_code']);
+        }
+
+        $translation = Translation::where('translatable_type', CategoryType::class)
+            ->where('label', $data['category'])
+            ->whereHasMorph('translatable', [CategoryType::class], function (Builder $query) {
+                $query->where('category', 'provider');
+            })
+            ->first();
+
+        if ($translation !== null) {
+            $data['categoryId'] = $translation->translatable_id;
+        }
+
+        $countryTranslation = CountryTranslation::where('label', $data['country'])->first();
+
+        if ($countryTranslation !== null) {
+            $data['country_code'] = $countryTranslation->country->iso_code;
+        }
+
 
         return $data;
     }
@@ -154,33 +160,21 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRow
 
     public function rules(): array
     {
-        $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-
         return [
-            'reference_code' => ['nullable'],
-            'code' => ['nullable'],
-            'model' => ['nullable', 'string', 'max:100'],
-            'brand' => ['nullable', 'string', 'max:100'],
-            'serial_number' => ['nullable', 'string', 'max:50'],
-            'depreciable' => "boolean",
-            "depreciation_start_date" => 'nullable|date|required_if_accepted:depreciable',
-            "depreciation_end_date" => 'nullable|date',
-            "depreciation_duration" => 'nullable|required_with:depreciation_start_date|numeric|gt:0',
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', new NotDisposableEmail],
+            'name' => ['required', 'string', 'max:255'],
 
-            'name' => 'required|string|min:4|max:100',
-            'description' => 'nullable|string|min:10|max:255',
-            'purchase_date' => ['nullable', 'date', Rule::date()->todayOrBefore()],
-            'purchase_cost' => 'nullable|numeric|gt:0|decimal:0,2',
-            'under_warranty' => "boolean",
-            'end_warranty_date' => [
-                'nullable',
-                'date',
-                'required_if_accepted:under_warranty',
-            ],
-            'need_maintenance' => "boolean",
-            'maintenance_frequency' => ['nullable', 'required_if_accepted:need_maintenance', Rule::in($frequencies)],
-            'next_maintenance_date' => ['nullable', 'date', Rule::date()->todayOrAfter()],
-            'last_maintenance_date' =>  ['nullable', 'date', Rule::date()->todayOrBefore()],
+            'street' => 'required|string|max:100',
+            'house_number' => 'nullable|string|max:10',
+            'postal_code' => 'required|string|max:8',
+            'city' => 'required|string|max:100',
+            'country_code' => ['required', 'string', 'exists:countries,iso_code'],
+
+            'vat_number' => ['nullable', 'string', 'regex:/^[A-Z]{2}[0-9A-Z]{2,12}$/', 'max:14'],
+            'phone_number' => 'required|string|regex:/^\+\d{8,15}$/|max:16',
+            'website' => 'nullable|url:http,https',
+            'logo' => 'nullable|file|mimes:png,jpg,jpeg|max:' . Provider::maxUploadSizeKB(),
+            'categoryId' => ['required', Rule::in(CategoryType::where('category', 'provider')->pluck('id')->toArray())],
         ];
     }
 
@@ -188,13 +182,29 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRow
     {
         $validator->after(function ($validator) {
             // dump($validator);
-            // $data = $validator->getData();
-            // dump($data);
-            if ('*.under_warranty' === true && '*.under_warranty_date' <= now())
-                $validator->errors()->add('under_warranty_date', 'End of warranty date must be in the future.');
+            $data = $validator->getData();
 
-            if (!empty('*.purchase_date') && '*.under_warranty_date' <= '*.purchase_date')
-                $validator->errors()->add('under_warranty_date', 'End of warranty date must be after purchase date.');
+            if (isset($data['id'])) {
+                $exists = Provider::where('email', $data['email'])->where('id', '<>', $data['id'])->exists();
+
+                if ($exists) {
+                    $validator->errors()->add('email', 'DOUBLE EMAIL');
+                }
+
+                $exists = Provider::where('vat_number', $data['vat_number'])->where('id', '<>', $data['id'])->exists();
+
+                if ($exists) {
+                    $validator->errors()->add('vat_number', 'DOUBLE vat_number');
+                }
+            }
+
+            if (isset($data['vat_number'])) {
+                $exists = Provider::where('vat_number', $data['vat_number'])->exists();
+
+                if ($exists) {
+                    $validator->errors()->add('vat_number', 'DOUBLE vat_number');
+                }
+            }
         });
     }
 }

@@ -18,7 +18,6 @@ class CountryTranslationsSeeder extends Seeder
         $translations = include('countries_translations.php');
 
         foreach ($translations as $isoCode => $locales) {
-            dump($isoCode);
             $country = Country::where('iso_code', $isoCode)->first();
 
             if ($country) {

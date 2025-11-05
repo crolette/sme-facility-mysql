@@ -62,6 +62,9 @@ class ProviderDataSheet implements FromCollection, WithHeadings, ShouldAutoSize,
         $dataSheet = $spreadsheet->getSheetByName('Datas');
         // \Log::info($dataSheet);
 
+
+
+
         // Syntaxe alternative plus explicite
         $countriesLabels = new \PhpOffice\PhpSpreadsheet\NamedRange(
             'countriesLabels',
@@ -86,5 +89,6 @@ class ProviderDataSheet implements FromCollection, WithHeadings, ShouldAutoSize,
         );
 
         $spreadsheet->addNamedRange($categories);
+        $dataSheet->setSheetState(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::SHEETSTATE_HIDDEN);
     }
 }
