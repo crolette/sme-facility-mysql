@@ -50,12 +50,12 @@ class ExportProvidersExcelJob implements ShouldQueue
             Log::info('SENDING MAIL EXPORT SUCCESS');
             if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
-                    new \App\Mail\ExportSuccessMail($this->user, $directory)
+                    new \App\Mail\ExportSuccessMail($this->user, $directory, 'providers')
                 );
                 Log::info("Mail sent to : crolweb@gmail.com");
             } else {
                 Mail::to($this->user->email)->send(
-                    new \App\Mail\ExportSuccessMail($this->user, $directory)
+                    new \App\Mail\ExportSuccessMail($this->user, $directory, 'providers')
                 );
                 Log::info("Mail sent to : {$this->user->email}");
             }

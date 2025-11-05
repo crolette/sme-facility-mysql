@@ -26,7 +26,6 @@ class ProviderFactory extends Factory
             'name' => $faker->company(),
             'email' => fake()->safeEmail(),
             'vat_number' => $faker->vat,
-            'address' => $faker->address(),
 
             'street' => $faker->streetName(),
             'house_number' => $faker->buildingNumber(),

@@ -136,8 +136,6 @@ export default function CreateUpdateProvider({
         setData('country_code', selectedCountry);
     }, [selectedCountry]);
 
-    console.log(data);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sites" />
@@ -145,64 +143,99 @@ export default function CreateUpdateProvider({
                 <form onSubmit={submit} className="space-y-4">
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                         <h2>Provider information</h2>
-                        <Label>Company Name</Label>
-                        <Input type="text" onChange={(e) => setData('name', e.target.value)} value={data.name} required />
-                        <Label htmlFor="name">Category</Label>
-                        <select
-                            name="level"
-                            required
-                            value={data.categoryId === '' ? 0 : data.categoryId}
-                            onChange={(e) => setData('categoryId', e.target.value)}
-                            id=""
-                            className={cn(
-                                'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                            )}
-                        >
-                            {providerCategories && providerCategories.length > 0 && (
-                                <>
-                                    <option value="0" disabled className="bg-background text-foreground">
-                                        Select an option
-                                    </option>
-                                    {providerCategories?.map((category) => (
-                                        <option value={category.id} key={category.id} className="bg-background text-foreground">
-                                            {category.label}
-                                        </option>
-                                    ))}
-                                </>
-                            )}
-                        </select>
-                        <Label>Email</Label>
-                        <Input type="email" onChange={(e) => setData('email', e.target.value)} value={data.email} required />
-                        <InputError className="mt-2" message={errors?.email ?? ''} />
-                        <Label>Website</Label>
-                        <Input type="text" onChange={(e) => setData('website', e.target.value)} value={data.website} />
-                        <InputError className="mt-2" message={errors?.website ?? ''} />
-                        <div className="flex gap-4">
-                            <div>
+                        <div className="flex w-full flex-col gap-4 lg:flex-row">
+                            <div className="w-full">
+                                <Label>Company Name</Label>
+                                <Input type="text" onChange={(e) => setData('name', e.target.value)} value={data.name} required />
+                                <InputError className="mt-2" message={errors?.name ?? ''} />
+                            </div>
+                            <div className="w-full">
+                                <Label htmlFor="name">Category</Label>
+                                <select
+                                    name="category"
+                                    required
+                                    value={data.categoryId === '' ? 0 : data.categoryId}
+                                    onChange={(e) => setData('categoryId', e.target.value)}
+                                    id=""
+                                    className={cn(
+                                        'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                    )}
+                                >
+                                    {providerCategories && providerCategories.length > 0 && (
+                                        <>
+                                            <option value="0" disabled className="bg-background text-foreground">
+                                                Select an option
+                                            </option>
+                                            {providerCategories?.map((category) => (
+                                                <option value={category.id} key={category.id} className="bg-background text-foreground">
+                                                    {category.label}
+                                                </option>
+                                            ))}
+                                        </>
+                                    )}
+                                </select>
+                                <InputError className="mt-2" message={errors?.categoryId ?? ''} />
+                            </div>
+                        </div>
+                        <div className="flex w-full flex-col gap-4 lg:flex-row">
+                            <div className="w-full">
+                                <Label>Email</Label>
+                                <Input type="email" onChange={(e) => setData('email', e.target.value)} value={data.email} required />
+                                <InputError className="mt-2" message={errors?.email ?? ''} />
+                            </div>
+                            <div className="w-full">
+                                <Label>Phone number</Label>
+                                <Input
+                                    type="text"
+                                    onChange={(e) => setData('phone_number', e.target.value)}
+                                    value={data.phone_number}
+                                    required
+                                    maxLength={16}
+                                    placeholder={`Phone number : +32123456789`}
+                                />
+                                <InputError className="mt-2" message={errors?.phone_number ?? ''} />
+                            </div>
+                        </div>
+                        <div className="flex w-full flex-col gap-4 lg:flex-row">
+                            <div className="w-full">
+                                <Label>VAT</Label>
+                                <Input type="text" onChange={(e) => setData('vat_number', e.target.value)} value={data.vat_number} />
+                                <InputError className="mt-2" message={errors?.vat_number ?? ''} />
+                            </div>
+                            <div className="w-full">
+                                <Label>Website</Label>
+                                <Input type="text" onChange={(e) => setData('website', e.target.value)} value={data.website} />
+                                <InputError className="mt-2" message={errors?.website ?? ''} />
+                            </div>
+                        </div>
+
+                        <h5>Address</h5>
+                        <div className="flex w-full flex-col gap-4 lg:flex-row">
+                            <div className="w-full">
                                 <Label>Street</Label>
                                 <Input type="text" onChange={(e) => setData('street', e.target.value)} value={data.street} required />
                                 <InputError className="mt-2" message={errors?.street ?? ''} />
                             </div>
-                            <div>
+                            <div className="w-full">
                                 <Label>House nr.</Label>
                                 <Input type="text" onChange={(e) => setData('house_number', e.target.value)} value={data.house_number} />
                                 <InputError className="mt-2" message={errors?.house_number ?? ''} />
                             </div>
-                            <div>
+                            <div className="w-full">
                                 <Label>Postal Code</Label>
                                 <Input type="text" onChange={(e) => setData('postal_code', e.target.value)} value={data.postal_code} required />
                                 <InputError className="mt-2" message={errors?.postal_code ?? ''} />
                             </div>
-                            <div>
+                            <div className="w-full">
                                 <Label>City</Label>
                                 <Input type="text" onChange={(e) => setData('city', e.target.value)} value={data.city} required />
                                 <InputError className="mt-2" message={errors?.city ?? ''} />
                             </div>
-                            <div>
+                            <div className="w-full">
                                 <Label>Country</Label>
-                                <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                                <Select value={selectedCountry} onValueChange={setSelectedCountry} required>
                                     <SelectTrigger className="w-[180px]">
                                         <SelectValue placeholder="Select a country" />
                                     </SelectTrigger>
@@ -216,19 +249,7 @@ export default function CreateUpdateProvider({
                                 </Select>
                             </div>
                         </div>
-                        <Label>VAT</Label>
-                        <Input type="text" onChange={(e) => setData('vat_number', e.target.value)} value={data.vat_number} />
-                        <InputError className="mt-2" message={errors?.vat_number ?? ''} />
-                        <Label>Phone number</Label>
-                        <Input
-                            type="text"
-                            onChange={(e) => setData('phone_number', e.target.value)}
-                            value={data.phone_number}
-                            required
-                            maxLength={16}
-                            placeholder={`Phone number : +32123456789`}
-                        />
-                        <InputError className="mt-2" message={errors?.phone_number ?? ''} />
+
                         {!provider && (
                             <>
                                 <Label>Logo</Label>

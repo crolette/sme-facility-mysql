@@ -11,6 +11,7 @@ use App\Enums\ContractStatusEnum;
 use App\Enums\ContractDurationEnum;
 use App\Observers\ContractObserver;
 use App\Enums\ContractRenewalTypesEnum;
+use App\Enums\ContractTypesEnum;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Tenants\ScheduledNotification;
@@ -50,6 +51,7 @@ class Contract extends Model
             'end_date' => 'immutable_date:Y-m-d',
             'start_date' => 'date:Y-m-d',
             'notice_period' => NoticePeriodEnum::class,
+            'type' => ContractTypesEnum::class,
             'contract_duration' => ContractDurationEnum::class,
             'renewal_type' => ContractRenewalTypesEnum::class,
             'status' => ContractStatusEnum::class
