@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Log;
 class AssetService
 {
 
-    public function create(array $data) : Asset
+    public function create(array $data): Asset
     {
 
         $asset = new Asset([
@@ -30,12 +30,17 @@ class AssetService
 
     public function update(Asset $asset, array $data)
     {
-        $asset->update(
+        Log::info('ASSET UPDATE SERVICE');
+        Log::info($data);
+        $updated = $asset->update(
             [
                 ...$data
-            ], 
+            ],
         );
 
+        Log::info('ASSET UPDATED : ' . $updated);
+
+        return $asset;
     }
 
     public function attachLocation(Asset $asset, $locationType, $locationId): Asset | bool
@@ -80,16 +85,12 @@ class AssetService
     public function attachLocationFromImport($asset, $assetData)
     {
         // will be the reference code of the location or email of the user
-        $locationCode = null ;
+        $locationCode = null;
 
-        $locationType = $assetData['is_mobile'] === true ? 'user' : 
-            (isset($assetData['room']) ? 'room' : 
-                (isset($assetData['floor']) ? 'floor' : 
-                    (isset($assetData['building']) ? 'building' : 
-                        'site')));
+        $locationType = $assetData['is_mobile'] === true ? 'user' : (isset($assetData['room']) ? 'room' : (isset($assetData['floor']) ? 'floor' : (isset($assetData['building']) ? 'building' :
+            'site')));
 
-                        
-        if($locationType === 'user') {
+        if ($locationType === 'user') {
             $locationCode = Str::after($assetData['user'], ' - ');
         } else {
             $locationCode = match ($locationType) {
@@ -108,12 +109,13 @@ class AssetService
             'room' => Room::where('reference_code', $locationCode)->first(),
         };
 
-        if (!$location)
+        if (!$location) {
+            Log::error("No location found during import ", $assetData);
             throw new Exception("No location found");
+        }
 
-
-        if($asset->location_type === get_class($location) && $asset->location_id === $location->id)
-            return;
+        if ($asset->location_type === get_class($location) && $asset->location_id === $location->id)
+            return $asset;
 
 
         if (!$asset->code) {
@@ -125,6 +127,8 @@ class AssetService
         $asset->location()->associate($location);
 
         $asset->reference_code = $referenceCode;
+
+        $asset->save();
 
         return $asset;
     }

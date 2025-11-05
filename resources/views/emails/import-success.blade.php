@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>{{ 'Assets imported'}}</title>
+    <title>{{ $dataType}} 'imported' </title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,15 +73,15 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="title">{{ 'Assets imported'}}</h1>
+            <h1 class="title">{{ $dataType}} imported</h1>
         </div>
 
         <div class="content">
             <div class="alert">
-                <strong>Assets imported</strong>
+                <strong>{{ $dataType }} imported</strong>
             </div>
             <div class="details">
-                <p>Assets imported - Success</p>
+                <p>{{ $dataType  }} imported - Success</p>
             </div>
         </div>
 

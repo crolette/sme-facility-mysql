@@ -2,46 +2,24 @@
 
 namespace App\Imports;
 
-use Error;
 use Exception;
-use Throwable;
-use Carbon\Carbon;
-use Maatwebsite\Excel\Row;
 use App\Models\Translation;
 use Illuminate\Support\Str;
-use App\Models\Tenants\Asset;
-use App\Services\AssetService;
-use App\Services\QRCodeService;
 use Illuminate\Validation\Rule;
 use App\Models\Tenants\Provider;
 use App\Rules\NotDisposableEmail;
 use App\Services\ProviderService;
 use Illuminate\Support\Collection;
-use App\Enums\MaintenanceFrequency;
 use Illuminate\Support\Facades\Log;
 use App\Models\Central\CategoryType;
-use App\Services\MaintainableService;
-use Barryvdh\Debugbar\Facades\Debugbar;
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\OnEachRow;
-use PhpOffice\PhpSpreadsheet\Shared\Date;
 use App\Models\Tenants\CountryTranslation;
-use App\Services\AssetExportImportService;
-use Maatwebsite\Excel\Events\ImportFailed;
-use Maatwebsite\Excel\Concerns\SkipsErrors;
-use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use App\Services\ProviderExportImportService;
 use Illuminate\Contracts\Database\Eloquent\Builder;
-use Maatwebsite\Excel\Concerns\Importable;
-use Maatwebsite\Excel\Concerns\SkipsFailures;
-use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
-use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
-use Maatwebsite\Excel\Concerns\WithEvents;
 
 class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow, WithValidation, WithCalculatedFormulas
 {
@@ -50,8 +28,6 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
         return $row['name'] === null;
     }
 
-
-
     /**
      * @param array $row
      *
@@ -59,7 +35,9 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
      */
     public function collection(Collection $rows)
     {
+        Log::info('collection');
         foreach ($rows as $index => $row) {
+            Log::info('row');
             try {
                 $providerHash = $row['hash'];
 
@@ -70,6 +48,7 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
 
                 if ($providerHash !== $calculatedHash) {
                     $providerData = $this->transformRowForProviderCreation($row);
+                    Log::info('providerHash !== $calculatedHash');
 
                     if ($row['id']) {
                         $provider = Provider::find($row['id']);
@@ -152,7 +131,6 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
             $data['country_code'] = $countryTranslation->country->iso_code;
         }
 
-
         return $data;
     }
 
@@ -162,7 +140,7 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
     {
         return [
             'id' => 'nullable|exists:providers,id',
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', new NotDisposableEmail],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', new NotDisposableEmail,],
             'name' => ['required', 'string', 'max:255'],
 
             'street' => 'required|string|max:100',
@@ -171,7 +149,7 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
             'city' => 'required|string|max:100',
             'country_code' => ['required', 'string', 'exists:countries,iso_code'],
 
-            'vat_number' => ['nullable', 'string', 'regex:/^[A-Z]{2}[0-9A-Z]{2,12}$/', 'max:14'],
+            'vat_number' => ['nullable', 'string', 'regex:/^[A-Z]{2}[0-9A-Z]{2,12}$/', 'max:14',],
             'phone_number' => 'required|string|regex:/^\+\d{8,15}$/|max:16',
             'website' => 'nullable|url:http,https',
             'logo' => 'nullable|file|mimes:png,jpg,jpeg|max:' . Provider::maxUploadSizeKB(),
@@ -182,28 +160,25 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            // dump($validator);
-            $data = $validator->getData();
+            foreach ($validator->getData() as $index => $row) {
+                if (isset($row['email'])) {
+                    $exists = Provider::where('email', $row['email'])
+                        ->when($row['id'] ?? null, fn($q) => $q->where('id', '!=', $row['id']))
+                        ->exists();
 
-            if (isset($data['id'])) {
-                $exists = Provider::where('email', $data['email'])->where('id', '<>', $data['id'])->exists();
-
-                if ($exists) {
-                    $validator->errors()->add('email', 'DOUBLE EMAIL');
+                    if ($exists) {
+                        $validator->errors()->add($index . '.email', 'Cet email existe déjà.');
+                    }
                 }
 
-                $exists = Provider::where('vat_number', $data['vat_number'])->where('id', '<>', $data['id'])->exists();
+                if (isset($row['vat_number'])) {
+                    $exists = Provider::where('vat_number', $row['vat_number'])
+                        ->when($row['id'] ?? null, fn($q) => $q->where('id', '!=', $row['id']))
+                        ->exists();
 
-                if ($exists) {
-                    $validator->errors()->add('vat_number', 'DOUBLE vat_number');
-                }
-            }
-
-            if (isset($data['vat_number'])) {
-                $exists = Provider::where('vat_number', $data['vat_number'])->exists();
-
-                if ($exists) {
-                    $validator->errors()->add('vat_number', 'DOUBLE vat_number');
+                    if ($exists) {
+                        $validator->errors()->add($index . '.vat_number', 'Cet vat_number existe déjà.');
+                    }
                 }
             }
         });

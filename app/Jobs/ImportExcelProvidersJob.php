@@ -50,12 +50,12 @@ class ImportExcelProvidersJob implements ShouldQueue
             Log::info('SENDING MAIL IMPORT PROVIDERS SUCCESS');
             if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
-                    new ImportSuccessMail($this->user)
+                    new ImportSuccessMail($this->user, 'providers')
                 );
                 Log::info("Mail sent to : crolweb@gmail.com");
             } else {
                 Mail::to($this->user->email)->send(
-                    new ImportSuccessMail($this->user)
+                    new ImportSuccessMail($this->user, 'providers')
                 );
                 Log::info("Mail sent to : {$this->user->email}");
             }
@@ -73,12 +73,12 @@ class ImportExcelProvidersJob implements ShouldQueue
 
             if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
-                    new ImportErrorMail($failures)
+                    new ImportErrorMail($failures, 'providers')
                 );
                 Log::info("Mail sent to : crolweb@gmail.com");
             } else {
                 Mail::to($this->user->email)->send(
-                    new ImportErrorMail($failures)
+                    new ImportErrorMail($failures, 'providers')
                 );
             }
         }

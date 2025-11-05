@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>{{ 'Error import'}}</title>
+    <title>Error during import of {{ $dataType }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,7 +73,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="title">{{ 'Error import'}}</h1>
+            <h1 class="title">Error during import of {{ $dataType }}</h1>
         </div>
 
         <div class="content">

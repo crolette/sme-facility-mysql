@@ -38,7 +38,7 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
      */
     public function collection(Collection $rows)
     {
-        foreach ($rows as $row) {
+        foreach ($rows as $index => $row) {
             $assetHash = $row['hash'];
             $rowWithoutHash = $row;
             unset($rowWithoutHash['hash']);
@@ -68,7 +68,8 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
                 if (!$translation)
                     throw new Exception('Category type not existing');
 
-                $asset->assetCategory()->associate($translation->translatable->id);
+
+                $asset->assetCategory()->associate($translation->translatable_id);
                 $asset->save();
 
                 app(MaintainableService::class)->updateOrCreate($asset, $maintainableData);
@@ -83,6 +84,8 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
     {
 
         $data = [
+            'reference_code' => $rowData['reference_code'] ?? null,
+            'code' => $rowData['code'] ?? null,
             'brand' => $rowData['brand'] ?? null,
             'model' => $rowData['model'] ?? null,
             'serial_number' => $rowData['serial_number'] ?? null,
@@ -192,7 +195,7 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
 
         return [
             'reference_code' => ['nullable'],
-            'code' => ['nullable'],
+            'code' => ['nullable', 'exists:assets,code'],
             'model' => ['nullable', 'string', 'max:100'],
             'brand' => ['nullable', 'string', 'max:100'],
             'serial_number' => ['nullable', 'string', 'max:50'],
@@ -221,9 +224,6 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            // dump($validator);
-            // $data = $validator->getData();
-            // dump($data);
             if ('*.under_warranty' === true && '*.under_warranty_date' <= now())
                 $validator->errors()->add('under_warranty_date', 'End of warranty date must be in the future.');
 

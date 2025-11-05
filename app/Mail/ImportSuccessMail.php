@@ -19,7 +19,7 @@ class ImportSuccessMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public User $user,)
+    public function __construct(public User $user, public string $dataType)
     {
         $locale = App::getLocale();
         App::setLocale($locale);

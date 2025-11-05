@@ -20,7 +20,7 @@ class ImportErrorMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public $failures)
+    public function __construct(public $failures, public $dataType)
     {
         $locale = App::getLocale();
         App::setLocale($locale);

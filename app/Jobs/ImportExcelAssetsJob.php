@@ -49,12 +49,12 @@ class ImportExcelAssetsJob implements ShouldQueue
             Log::info('SENDING MAIL IMPORT SUCCESS');
             if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
-                    new ImportSuccessMail($this->user)
+                    new ImportSuccessMail($this->user, 'assets')
                 );
                 Log::info("Mail sent to : crolweb@gmail.com");
             } else {
                 Mail::to($this->user->email)->send(
-                    new ImportSuccessMail($this->user)
+                    new ImportSuccessMail($this->user, 'assets')
                 );
                 Log::info("Mail sent to : {$this->user->email}");
             }
@@ -72,14 +72,17 @@ class ImportExcelAssetsJob implements ShouldQueue
 
             if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
-                    new ImportErrorMail($failures)
+                    new ImportErrorMail($failures, 'assets')
                 );
                 Log::info("Mail sent to : crolweb@gmail.com");
             } else {
                 Mail::to($this->user->email)->send(
-                    new ImportErrorMail($failures)
+                    new ImportErrorMail($failures, 'assets')
                 );
             }
+        } catch (\Exception $e) {
+            Log::error('ERROR EXCEPTION');
+            Log::error($e->getMessage());
         }
         Storage::disk('tenants')->delete($this->path);
     }

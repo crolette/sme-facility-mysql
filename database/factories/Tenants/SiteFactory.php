@@ -24,7 +24,7 @@ class SiteFactory extends Factory
     public function definition(): array
     {
 
-        $location = LocationType::factory()->create(['level' => 'site']);
+        $location = LocationType::factory()->create(['level' => 'site', 'prefix' => 'S']);
 
         return [
             'location_type_id' => $location->id,
