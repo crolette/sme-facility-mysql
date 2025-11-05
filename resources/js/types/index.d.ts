@@ -312,12 +312,25 @@ export interface AssetCategory {
     translations: Translation[];
 }
 
+export interface Country {
+    id: number;
+    iso_code: string;
+    name: string;
+    label: string;
+}
+
 export interface Provider {
     id: number;
     name: string;
     email: string;
     website: string;
-    address: string;
+    street: string;
+    house_number?: string;
+    postal_code: string;
+    city: string;
+    country_code: string;
+    country_id: number;
+    country: Country;
     vat_number: string;
     phone_number: string;
     logo?: string;

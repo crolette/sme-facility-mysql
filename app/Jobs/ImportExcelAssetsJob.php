@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Tenants\User;
 use App\Imports\AssetsImport;
+use App\Mail\ImportErrorMail;
 use App\Mail\ImportSuccessMail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -39,24 +40,50 @@ class ImportExcelAssetsJob implements ShouldQueue
     public function handle(): void
     {
         Log::info('BEGIN IMPORT ASSETS EXCEL JOB : ' . $this->user->email);
-        Excel::import(new AssetsImport, $this->path, 'tenants');
 
-        Log::info('IMPORT ASSETS EXCEL JOB DONE');
+        try {
+            Excel::import(new AssetsImport, $this->path, 'tenants');
 
-        Log::info('SENDING MAIL IMPORT SUCCESS');
-        if (env('APP_ENV') === 'local') {
-            Mail::to('crolweb@gmail.com')->send(
-                new ImportSuccessMail($this->user)
-            );
-            Log::info("Mail sent to : crolweb@gmail.com");
-        } else {
-            Mail::to($this->user->email)->send(
-                new ImportSuccessMail($this->user)
-            );
-            Log::info("Mail sent to : {$this->user->email}");
+            Log::info('IMPORT ASSETS EXCEL JOB DONE');
+
+            Log::info('SENDING MAIL IMPORT SUCCESS');
+            if (env('APP_ENV') === 'local') {
+                Mail::to('crolweb@gmail.com')->send(
+                    new ImportSuccessMail($this->user, 'assets')
+                );
+                Log::info("Mail sent to : crolweb@gmail.com");
+            } else {
+                Mail::to($this->user->email)->send(
+                    new ImportSuccessMail($this->user, 'assets')
+                );
+                Log::info("Mail sent to : {$this->user->email}");
+            }
+            Log::info('SUCCESS SENDING MAIL IMPORT');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+
+            foreach ($failures as $failure) {
+                Log::error('Row validation failed', [
+                    'row' => $failure->row(),
+                    'attribute' => $failure->attribute(),
+                    'errors' => $failure->errors(),
+                ]);
+            }
+
+            if (env('APP_ENV') === 'local') {
+                Mail::to('crolweb@gmail.com')->send(
+                    new ImportErrorMail('assets', $failures)
+                );
+                Log::info("Mail sent to : crolweb@gmail.com");
+            } else {
+                Mail::to($this->user->email)->send(
+                    new ImportErrorMail('assets', $failures)
+                );
+            }
+        } catch (\Exception $e) {
+            Log::error('ERROR EXCEPTION');
+            Log::error($e->getMessage());
         }
-        Log::info('SUCCESS SENDING MAIL IMPORT');
-
         Storage::disk('tenants')->delete($this->path);
     }
 

@@ -142,8 +142,6 @@ class ContractService
     {
         // TODO check if the notice date is > then start_date
 
-        dump('updateNoticeDate');
-
         $contract->notice_date = $notice_period->subFrom(Carbon::parse($contract->end_date));
 
         return $contract;

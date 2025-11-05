@@ -1,15 +1,14 @@
-import { type BreadcrumbItem,  Company } from '@/types';
-import { Head, useForm,} from '@inertiajs/react';
 import HeadingSmall from '@/components/heading-small';
+import { useToast } from '@/components/ToastrContext';
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { FormEventHandler, useState } from 'react';
-import ImageUploadModale from '@/components/ImageUploadModale';
-import { Button } from '@/components/ui/button';
-import { Loader, Trash2, Upload } from 'lucide-react';
-import { BiSolidFilePdf } from 'react-icons/bi';
-import { useToast } from '@/components/ToastrContext';
+import { type BreadcrumbItem } from '@/types';
+import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
+import { Loader } from 'lucide-react';
+import { FormEventHandler, useState } from 'react';
+import { BiSolidFilePdf } from 'react-icons/bi';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -30,20 +29,19 @@ export default function ImportExportSettings() {
     // const [isModalOpen, setIsModalOpen] = useState(false);
     const { showToast } = useToast();
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
-    
-    const { data, setData, reset} = useForm<TypeFormData>({
-        file: null
-    })
-    
 
-    const uploadFile: FormEventHandler = async (e) => {
-        e.preventDefault()
+    const { data, setData, reset } = useForm<TypeFormData>({
+        file: null,
+    });
+
+    const uploadAssetFile: FormEventHandler = async (e) => {
+        e.preventDefault();
         setIsProcessing(true);
         try {
-             const response = await axios.post(route('api.tenant.import.assets'), data, {
+            const response = await axios.post(route('api.tenant.import.assets'), data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
-                }
+                },
             });
             if (response.data.status === 'success') {
                 showToast(response.data.message, response.data.status);
@@ -52,9 +50,31 @@ export default function ImportExportSettings() {
             showToast(error.response.data.message, error.response.data.status);
         } finally {
             reset();
+            setData('file', null);
             setIsProcessing(false);
         }
-    }
+    };
+
+    const uploadProviderFile: FormEventHandler = async (e) => {
+        e.preventDefault();
+        setIsProcessing(true);
+        try {
+            const response = await axios.post(route('api.tenant.import.providers'), data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            if (response.data.status === 'success') {
+                showToast(response.data.message, response.data.status);
+            }
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
+        } finally {
+            reset();
+            setData('file', null);
+            setIsProcessing(false);
+        }
+    };
 
     const exportAssets: FormEventHandler = async (e) => {
         e.preventDefault();
@@ -74,22 +94,40 @@ export default function ImportExportSettings() {
         }
     };
 
-    console.log(data);
+    const exportProviders: FormEventHandler = async (e) => {
+        e.preventDefault();
+        setIsProcessing(true);
+
+        try {
+            const response = await axios.get(route('tenant.providers.export'));
+            console.log(response.data);
+            if (response.data.status === 'success') {
+                showToast(response.data.message, response.data.status);
+            }
+        } catch (error) {
+            console.log(error);
+            showToast(error.response.data.message, error.response.data.status);
+        } finally {
+            reset();
+            setIsProcessing(false);
+        }
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Company" />
+            <Head title="Import/Export" />
 
             <SettingsLayout>
                 <div className="w-full space-y-6 space-x-2">
                     <div className="relative gap-4">
                         <HeadingSmall title="Import/Export" />
-                        <Button variant={'secondary'} onClick={exportAssets} disabled={isProcessing}>
-                            <BiSolidFilePdf size={20} />
-                            Exporter les assets
-                        </Button>
                     </div>
-                    <form action="" onSubmit={uploadFile}>
+                    <h3>Assets</h3>
+                    <Button variant={'secondary'} onClick={exportAssets} disabled={isProcessing}>
+                        <BiSolidFilePdf size={20} />
+                        Exporter les assets
+                    </Button>
+                    <form action="" onSubmit={uploadAssetFile}>
                         <input
                             type="file"
                             name=""
@@ -97,7 +135,32 @@ export default function ImportExportSettings() {
                             id=""
                             onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
                         />
-                        <Button disabled={isProcessing}>
+                        <Button disabled={isProcessing || data.file === null}>
+                            {isProcessing ? (
+                                <>
+                                    <Loader className="animate-pulse" />
+                                    <span>Submitting...</span>
+                                </>
+                            ) : (
+                                <span>Submit</span>
+                            )}
+                        </Button>
+                    </form>
+                    <h3>Providers</h3>
+
+                    <Button variant={'secondary'} onClick={exportProviders} disabled={isProcessing}>
+                        <BiSolidFilePdf size={20} />
+                        Exporter les providers
+                    </Button>
+                    <form action="" onSubmit={uploadProviderFile}>
+                        <input
+                            type="file"
+                            name=""
+                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            id=""
+                            onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
+                        />
+                        <Button disabled={isProcessing || data.file === null}>
                             {isProcessing ? (
                                 <>
                                     <Loader className="animate-pulse" />

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Tenants;
 
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use App\Models\Tenants\Country;
 use App\Models\Tenants\Provider;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
@@ -40,8 +41,6 @@ class ProviderController extends Controller
             $providers->where('name', 'like', '%' . $validator['q'] . '%');
         }
 
-
-
         $categories = CategoryType::where('category', 'provider')->get();
 
         return Inertia::render('tenants/providers/IndexProviders', ['items' => $providers->paginate()->withQueryString(), 'categories' => $categories, 'filters' => $request->only(['q', 'category'])]);
@@ -56,7 +55,8 @@ class ProviderController extends Controller
             abort(403);
 
         $categories = CategoryType::where('category', 'provider')->get();
-        return Inertia::render('tenants/providers/CreateUpdateProvider', ['providerCategories' => $categories]);
+        $countries = Country::all();
+        return Inertia::render('tenants/providers/CreateUpdateProvider', ['providerCategories' => $categories, 'countries' => $countries]);
     }
 
     /**
@@ -68,7 +68,8 @@ class ProviderController extends Controller
             abort(403);
 
         $categories = CategoryType::where('category', 'provider')->get();
-        return Inertia::render('tenants/providers/CreateUpdateProvider', ['provider' => $provider, 'providerCategories' => $categories]);
+        $countries = Country::all();
+        return Inertia::render('tenants/providers/CreateUpdateProvider', ['provider' => $provider->load('country'), 'providerCategories' => $categories, 'countries' => $countries]);
     }
 
 

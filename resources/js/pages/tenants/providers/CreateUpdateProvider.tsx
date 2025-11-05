@@ -3,13 +3,14 @@ import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { BreadcrumbItem, CentralType, Provider } from '@/types';
+import { BreadcrumbItem, CentralType, Country, Provider } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
-import { FormEventHandler, useState } from 'react';
+import { FormEventHandler, useEffect, useState } from 'react';
 
 type ContactPerson = {
     first_name: string;
@@ -25,13 +26,25 @@ type TypeFormData = {
     email: string;
     website: string;
     vat_number: string;
-    address: string;
+    street: string;
+    house_number?: string;
+    postal_code: string;
+    city: string;
+    country_code: string;
     categoryId: number | string;
     pictures: File[] | null;
     users: ContactPerson[];
 };
 
-export default function CreateUpdateProvider({ provider, providerCategories }: { provider?: Provider; providerCategories: CentralType[] }) {
+export default function CreateUpdateProvider({
+    provider,
+    providerCategories,
+    countries,
+}: {
+    provider?: Provider;
+    providerCategories: CentralType[];
+    countries: Country[];
+}) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Create/Update providers`,
@@ -48,7 +61,11 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
         email: provider?.email ?? '',
         website: provider?.website ?? '',
         vat_number: provider?.vat_number ?? '',
-        address: provider?.address ?? '',
+        street: provider?.street ?? '',
+        house_number: provider?.house_number ?? '',
+        postal_code: provider?.postal_code ?? '',
+        city: provider?.city ?? '',
+        country_code: provider?.country.iso_code ?? '',
         categoryId: provider?.category_type_id ?? '',
         pictures: [],
         users: [],
@@ -113,6 +130,14 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
         });
     };
 
+    const [selectedCountry, setSelectedCountry] = useState(data.country_code ?? '');
+
+    useEffect(() => {
+        setData('country_code', selectedCountry);
+    }, [selectedCountry]);
+
+    console.log(data);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Sites" />
@@ -154,9 +179,43 @@ export default function CreateUpdateProvider({ provider, providerCategories }: {
                         <Label>Website</Label>
                         <Input type="text" onChange={(e) => setData('website', e.target.value)} value={data.website} />
                         <InputError className="mt-2" message={errors?.website ?? ''} />
-                        <Label>Address</Label>
-                        <Input type="text" onChange={(e) => setData('address', e.target.value)} value={data.address} />
-                        <InputError className="mt-2" message={errors?.address ?? ''} />
+                        <div className="flex gap-4">
+                            <div>
+                                <Label>Street</Label>
+                                <Input type="text" onChange={(e) => setData('street', e.target.value)} value={data.street} required />
+                                <InputError className="mt-2" message={errors?.street ?? ''} />
+                            </div>
+                            <div>
+                                <Label>House nr.</Label>
+                                <Input type="text" onChange={(e) => setData('house_number', e.target.value)} value={data.house_number} />
+                                <InputError className="mt-2" message={errors?.house_number ?? ''} />
+                            </div>
+                            <div>
+                                <Label>Postal Code</Label>
+                                <Input type="text" onChange={(e) => setData('postal_code', e.target.value)} value={data.postal_code} required />
+                                <InputError className="mt-2" message={errors?.postal_code ?? ''} />
+                            </div>
+                            <div>
+                                <Label>City</Label>
+                                <Input type="text" onChange={(e) => setData('city', e.target.value)} value={data.city} required />
+                                <InputError className="mt-2" message={errors?.city ?? ''} />
+                            </div>
+                            <div>
+                                <Label>Country</Label>
+                                <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                                    <SelectTrigger className="w-[180px]">
+                                        <SelectValue placeholder="Select a country" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {countries.map((country: Country) => (
+                                            <SelectItem key={country.iso_code} value={country.iso_code}>
+                                                {country.label}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
                         <Label>VAT</Label>
                         <Input type="text" onChange={(e) => setData('vat_number', e.target.value)} value={data.vat_number} />
                         <InputError className="mt-2" message={errors?.vat_number ?? ''} />

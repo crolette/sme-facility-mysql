@@ -2,9 +2,11 @@
 
 namespace App\Jobs;
 
-use Carbon\Carbon;
 use App\Models\Tenants\User;
-use App\Exports\AssetsExport;
+use App\Imports\AssetsImport;
+use App\Mail\ImportErrorMail;
+use App\Mail\ImportSuccessMail;
+use App\Imports\ProvidersImport;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
@@ -15,7 +17,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class ExportAssetsExcelJob implements ShouldQueue
+class ImportExcelProvidersJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -26,8 +28,10 @@ class ExportAssetsExcelJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public User $user)
-    {
+    public function __construct(
+        public User $user,
+        public string $path
+    ) {
         //
     }
 
@@ -36,54 +40,55 @@ class ExportAssetsExcelJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info('BEGIN EXPORT ASSETS EXCEL JOB : ' . $this->user->email);
+        Log::info('BEGIN IMPORT PROVIDERS EXCEL JOB : ' . $this->user->email);
 
-        $directory = tenancy()->tenant->id . '/exports/' . Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_assets.xlsx';
         try {
+            Excel::import(new ProvidersImport, $this->path, 'tenants');
 
-            Excel::store(new AssetsExport(), $directory, 'tenants');
+            Log::info('IMPORT PROVIDERS EXCEL JOB DONE');
 
-            Log::info('EXPORT ASSETS EXCEL JOB DONE');
-
-            // Mail
-            Log::info('SENDING MAIL EXPORT SUCCESS');
+            Log::info('SENDING MAIL IMPORT PROVIDERS SUCCESS');
             if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
-                    new \App\Mail\ExportSuccessMail($this->user, $directory)
+                    new ImportSuccessMail($this->user, 'providers')
                 );
                 Log::info("Mail sent to : crolweb@gmail.com");
             } else {
                 Mail::to($this->user->email)->send(
-                    new \App\Mail\ExportSuccessMail($this->user, $directory)
+                    new ImportSuccessMail($this->user, 'providers')
                 );
                 Log::info("Mail sent to : {$this->user->email}");
             }
-            Log::info('SUCCESS SENDING MAIL EXPORT');
-        } catch (\Exception $e) {
-            Log::error('Error during export');
-            Log::error($e->getMessage());
+            Log::info('SUCCESS SENDING MAIL PROVIDERS IMPORT');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+
+            foreach ($failures as $failure) {
+                Log::error('Row validation failed', [
+                    'row' => $failure->row(),
+                    'attribute' => $failure->attribute(),
+                    'errors' => $failure->errors(),
+                ]);
+            }
 
             if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
-                    new \App\Mail\ExportErrorMail('assets')
+                    new ImportErrorMail('providers', $failures)
                 );
                 Log::info("Mail sent to : crolweb@gmail.com");
             } else {
                 Mail::to($this->user->email)->send(
-                    new \App\Mail\ExportErrorMail('assets')
+                    new ImportErrorMail('providers', $failures)
                 );
-                Log::info("Mail sent to : {$this->user->email}");
             }
         }
 
-
-
-        Storage::disk('tenants')->delete($directory);
+        Storage::disk('tenants')->delete($this->path);
     }
 
     public function failed($exception): void
     {
-        Log::error('!!! FAILED EXPORT ASSETS EXCEL');
+        Log::error('!!! FAILED IMPORT PROVIDERS EXCEL');
         Log::error($exception);
     }
 }

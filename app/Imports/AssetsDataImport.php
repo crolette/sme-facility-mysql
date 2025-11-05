@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use Error;
 use Exception;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Row;
@@ -14,13 +15,13 @@ use Illuminate\Support\Collection;
 use App\Enums\MaintenanceFrequency;
 use Illuminate\Support\Facades\Log;
 use App\Models\Central\CategoryType;
-use App\Services\AssetExportImportService;
 use App\Services\MaintainableService;
 use Barryvdh\Debugbar\Facades\Debugbar;
-use Error;
 use Maatwebsite\Excel\Concerns\ToModel;
+use Illuminate\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\OnEachRow;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
+use App\Services\AssetExportImportService;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithStartRow;
 use Maatwebsite\Excel\Concerns\SkipsEmptyRows;
@@ -29,55 +30,62 @@ use Maatwebsite\Excel\Concerns\WithValidation;
 
 class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, WithStartRow, WithValidation
 {
- 
+
     /**
-    * @param array $row
-    *
-    * @return \Illuminate\Database\Eloquent\Model|null
-    */
+     * @param array $row
+     *
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
     public function collection(Collection $rows)
     {
-        foreach($rows as $row) {
+        foreach ($rows as $index => $row) {
             $assetHash = $row['hash'];
             $rowWithoutHash = $row;
             unset($rowWithoutHash['hash']);
 
             $calculatedHash = app(AssetExportImportService::class)->calculateHash([...$rowWithoutHash]);
 
-            if($assetHash !== $calculatedHash) {
+            if ($assetHash !== $calculatedHash) {
                 $assetData = $this->transformRowForAssetCreation($row);
                 $maintainableData = $this->transformRowForMaintainableCreation($row);
 
-                if($row['reference_code']) {
+                if ($row['reference_code']) {
                     $asset = Asset::where('code', $row['code'])->first();
                     app(AssetService::class)->update($asset, $assetData);
                 } else {
                     $asset = app(AssetService::class)->create($assetData);
                 }
-                
+
                 $asset = app(AssetService::class)->attachLocationFromImport($asset, $assetData);
 
-                $translation = Translation::where('translatable_type', (CategoryType::class))->where('label', $row['category'])->first();
+                $translation = Translation::where('translatable_type', CategoryType::class)
+                    ->where('label', $row['category'])
+                    ->whereHasMorph('translatable', [CategoryType::class], function (Builder $query) {
+                        $query->where('category', 'asset');
+                    })
+                    ->first();
 
-                if(!$translation)
+                if (!$translation)
                     throw new Exception('Category type not existing');
 
-                $asset->assetCategory()->associate($translation->translatable->id);
-                $asset->save();             
+
+                $asset->assetCategory()->associate($translation->translatable_id);
+                $asset->save();
 
                 app(MaintainableService::class)->updateOrCreate($asset, $maintainableData);
 
                 if ($row['need_qr_code'] === true)
                     app(QRCodeService::class)->createAndAttachQR($asset);
             }
-
         }
-        
     }
 
-    private function transformRowForAssetCreation($rowData) {
+    private function transformRowForAssetCreation($rowData)
+    {
 
         $data = [
+            'reference_code' => $rowData['reference_code'] ?? null,
+            'code' => $rowData['code'] ?? null,
             'brand' => $rowData['brand'] ?? null,
             'model' => $rowData['model'] ?? null,
             'serial_number' => $rowData['serial_number'] ?? null,
@@ -98,7 +106,7 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
         return $data;
     }
 
-    private function transformRowForMaintainableCreation($rowData) 
+    private function transformRowForMaintainableCreation($rowData)
     {
         $data = [
             'name' => $rowData['name'],
@@ -114,7 +122,7 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
         ];
 
 
-   
+
         return $data;
     }
 
@@ -129,13 +137,16 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
         isset($data['is_mobile']) && ($data['is_mobile'] === 'Yes') ? $data['is_mobile'] = true : $data['is_mobile'] = false;
         isset($data['depreciable']) && ($data['depreciable'] === 'Yes') ? $data['depreciable'] = true : $data['depreciable'] = false;
 
+        if (isset($data['serial_number'])) {
+            $data['serial_number'] = strval($data['serial_number']);
+        }
+
         if ($data['depreciable'] === false) {
             $data['depreciation_start_date'] = null;
             $data['depreciation_end_date'] = null;
             $data['depreciation_duration'] = null;
             $data['residual_value'] = null;
-        } 
-        else {
+        } else {
             $startDate = Carbon::instance(Date::excelToDateTimeObject($data['depreciation_start_date']));
             $data['depreciation_start_date'] = $startDate->format('Y-m-d');
             $data['depreciation_end_date'] = $startDate->addYears($data['depreciation_duration'])->format('Y-m-d');
@@ -144,20 +155,20 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
         isset($data['under_warranty']) && ($data['under_warranty'] === 'Yes') ? $data['under_warranty'] = true : $data['under_warranty'] = false;
         isset($data['need_maintenance']) && ($data['need_maintenance'] === 'Yes') ? $data['need_maintenance'] = true : $data['need_maintenance'] = false;
 
-        if($data['need_maintenance'] === true) {
-            if(!isset($data['next_maintenance_date'])) {
+        if ($data['need_maintenance'] === true) {
+            if (!isset($data['next_maintenance_date'])) {
 
                 if (isset($data['maintenance_frequency']) && $data['maintenance_frequency'] !== MaintenanceFrequency::ONDEMAND->value) {
 
                     $data['next_maintenance_date'] = isset($data['last_maintenance_date']) ? calculateNextMaintenanceDate($data['maintenance_frequency'], Carbon::instance(Date::excelToDateTimeObject($data['last_maintenance_date']))->toDateString()) : calculateNextMaintenanceDate($data['maintenance_frequency']);
                 }
             } else {
-               
+
                 $data['next_maintenance_date'] = Carbon::instance(Date::excelToDateTimeObject($data['next_maintenance_date']))->format('Y-m-d');
             }
         }
 
-        if(isset($data['last_maintenance_date']))
+        if (isset($data['last_maintenance_date']))
             $data['last_maintenance_date'] = Carbon::instance(Date::excelToDateTimeObject($data['last_maintenance_date']))->format('Y-m-d');
 
         if ($data['need_maintenance'] === false) {
@@ -165,27 +176,26 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
             $data['last_maintenance_date'] = null;
         }
 
-        if(isset($data['purchase_date'])) {
+        if (isset($data['purchase_date'])) {
 
             $data['purchase_date'] = Carbon::instance(Date::excelToDateTimeObject($data['purchase_date']))->format('Y-m-d');
-
         }
 
-        if(isset($data['end_warranty_date']))
+        if (isset($data['end_warranty_date']))
             $data['end_warranty_date'] = Carbon::instance(Date::excelToDateTimeObject($data['end_warranty_date']))->format('Y-m-d');
 
         return $data;
     }
 
- 
+
 
     public function rules(): array
     {
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-        
+
         return [
             'reference_code' => ['nullable'],
-            'code' => ['nullable'],
+            'code' => ['nullable', 'exists:assets,code'],
             'model' => ['nullable', 'string', 'max:100'],
             'brand' => ['nullable', 'string', 'max:100'],
             'serial_number' => ['nullable', 'string', 'max:50'],
@@ -211,18 +221,14 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
         ];
     }
 
-    public function withValidator($validator) 
+    public function withValidator($validator)
     {
-        $validator->after(function($validator) {
-            // dump($validator);
-            // $data = $validator->getData();
-            // dump($data);
+        $validator->after(function ($validator) {
             if ('*.under_warranty' === true && '*.under_warranty_date' <= now())
-                $validator->errors()->add('under_warranty_date','End of warranty date must be in the future.');
+                $validator->errors()->add('under_warranty_date', 'End of warranty date must be in the future.');
 
             if (!empty('*.purchase_date') && '*.under_warranty_date' <= '*.purchase_date')
                 $validator->errors()->add('under_warranty_date', 'End of warranty date must be after purchase date.');
-
         });
     }
 }

@@ -5,6 +5,7 @@ namespace App\Jobs;
 use Carbon\Carbon;
 use App\Models\Tenants\User;
 use App\Exports\AssetsExport;
+use App\Exports\ProvidersExport;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Maatwebsite\Excel\Facades\Excel;
@@ -15,7 +16,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class ExportAssetsExcelJob implements ShouldQueue
+class ExportProvidersExcelJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -36,14 +37,14 @@ class ExportAssetsExcelJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info('BEGIN EXPORT ASSETS EXCEL JOB : ' . $this->user->email);
+        Log::info('BEGIN EXPORT PROVIDERS EXCEL JOB : ' . $this->user->email);
 
-        $directory = tenancy()->tenant->id . '/exports/' . Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_assets.xlsx';
+        $directory = tenancy()->tenant->id . '/exports/' . Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_providers.xlsx';
         try {
 
-            Excel::store(new AssetsExport(), $directory, 'tenants');
+            Excel::store(new ProvidersExport(), $directory, 'tenants');
 
-            Log::info('EXPORT ASSETS EXCEL JOB DONE');
+            Log::info('EXPORT PROVIDERS EXCEL JOB DONE');
 
             // Mail
             Log::info('SENDING MAIL EXPORT SUCCESS');
@@ -65,12 +66,12 @@ class ExportAssetsExcelJob implements ShouldQueue
 
             if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
-                    new \App\Mail\ExportErrorMail('assets')
+                    new \App\Mail\ExportErrorMail('providers')
                 );
                 Log::info("Mail sent to : crolweb@gmail.com");
             } else {
                 Mail::to($this->user->email)->send(
-                    new \App\Mail\ExportErrorMail('assets')
+                    new \App\Mail\ExportErrorMail('providers')
                 );
                 Log::info("Mail sent to : {$this->user->email}");
             }
@@ -83,7 +84,7 @@ class ExportAssetsExcelJob implements ShouldQueue
 
     public function failed($exception): void
     {
-        Log::error('!!! FAILED EXPORT ASSETS EXCEL');
+        Log::error('!!! FAILED EXPORT PROVIDERS EXCEL');
         Log::error($exception);
     }
 }

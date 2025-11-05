@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>{{ $dataType}} 'imported' </title>
+    <title>Error during export of {{ $dataType }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,15 +73,32 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="title">{{ $dataType}} imported</h1>
+            <h1 class="title">Error during export of {{ $dataType }}</h1>
         </div>
 
         <div class="content">
             <div class="alert">
-                <strong>{{ $dataType }} imported</strong>
+                <strong>Error export</strong>
             </div>
             <div class="details">
-                <p>{{ $dataType  }} imported - Success</p>
+              <h2>Erreurs d'exportation</h2>
+
+              <p>Il y a eu une erreur lors de l'exportation. Réessayez ou contactez votre administrateur ou le support de SME-Facility.</p>
+                {{-- @php
+                    $groupedByRow = collect($failures)->groupBy(fn($f) => $f->row());
+                @endphp
+
+                @foreach($groupedByRow as $row => $rowFailures)
+                    <h3>Ligne {{ $row }}</h3>
+                    <ul>
+                        @foreach($rowFailures as $failure)
+                            <li>
+                                <strong>{{ $failure->attribute() }}</strong>: 
+                                {{ implode(', ', $failure->errors()) }}
+                            </li>
+                        @endforeach
+                    </ul>
+                @endforeach --}}
             </div>
         </div>
 

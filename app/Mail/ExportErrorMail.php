@@ -10,17 +10,19 @@ use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class ImportSuccessMail extends Mailable
+class ExportErrorMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(public User $user, public string $dataType)
-    {
+    public function __construct(
+        public string $dataType,
+    ) {
         $locale = App::getLocale();
         App::setLocale($locale);
     }
@@ -32,7 +34,7 @@ class ImportSuccessMail extends Mailable
     {
         return new Envelope(
             from: new Address('notifications@sme-facility.com', 'SME-Facility - Notification'),
-            subject: 'Import Success Mail',
+            subject: 'Export Error Mail',
         );
     }
 
@@ -42,7 +44,7 @@ class ImportSuccessMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.import-success',
+            view: 'emails.export-error',
         );
     }
 
