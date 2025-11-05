@@ -87,7 +87,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
 
     const markMaintenanceDone = async () => {
         try {
-            const response = await axios.post(route('api.maintenance.done', asset.maintainable.id));
+            const response = await axios.patch(route('api.maintenance.done', asset.maintainable.id));
             if (response.data.status === 'success') {
                 fetchAsset();
                 showToast(response.data.message, response.data.status);

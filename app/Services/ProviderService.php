@@ -35,6 +35,9 @@ class ProviderService
 
         $provider->save();
 
+        Log::info('PROVIDER SAVED');
+        Log::info($provider->street);
+
         return $provider;
     }
 

@@ -120,7 +120,7 @@ class Provider extends Model
     public function address(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->street . ' ' . ($this->house_number ?? '') . ' - ' . $this->postal_code . ' ' . $this->city . ' - ' . $this->country->label
+            get: fn() => $this->street . ' ' . ($this->house_number ?? '') . ' - ' . $this->postal_code . ' ' . $this->city . ' - ' . ($this->country->label ?? '')
         );
     }
 
