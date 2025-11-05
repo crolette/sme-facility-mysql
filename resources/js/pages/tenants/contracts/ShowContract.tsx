@@ -19,7 +19,7 @@ export default function ShowContract({ item, objects }: { item: Contract; object
             href: `/contracts`,
         },
         {
-            title: `${contract.name} (${contract.provider.name})`,
+            title: `${contract.name} (${contract.provider ? contract.provider?.name : ''})`,
             href: `/contract/${contract.id}`,
         },
     ];
@@ -59,9 +59,9 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                             name: contract.name,
                             code: contract.internal_reference,
                             status: contract.status,
-                            reference: contract.type ?? contract.provider?.category,
-                            levelPath: route('tenant.providers.show', contract.provider_id),
-                            levelName: contract.provider.name,
+                            reference: contract.type ?? contract.provider?.category ?? 'NC',
+                            levelPath: contract.provider ? route('tenant.providers.show', contract.provider_id) : '',
+                            levelName: contract.provider?.name ?? 'NC',
                         }}
                     />
                     <div className="overflow-hidden">

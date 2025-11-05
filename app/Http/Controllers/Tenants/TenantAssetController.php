@@ -61,7 +61,7 @@ class TenantAssetController extends Controller
         };
 
         if (isset($validatedFields['q'])) {
-            $assets->whereHas('maintainable', function (Builder $query) use ($validatedFields) {
+            $assets->where('code', 'like', '%' . $validatedFields['q'] . '%')->orWhereHas('maintainable', function (Builder $query) use ($validatedFields) {
                 $query->where('name', 'like', '%' . $validatedFields['q'] . '%');
             });
         }

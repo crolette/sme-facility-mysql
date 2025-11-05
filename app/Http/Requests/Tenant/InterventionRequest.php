@@ -42,7 +42,7 @@ class InterventionRequest extends FormRequest
             'priority' => ['required', 'string', Rule::in(array_column(PriorityLevel::cases(), 'value'))],
 
             'planned_at' => ['nullable', 'date', Rule::date()->afterOrEqual(today())],
-            'description' => ['nullable', 'string'],
+            'description' => ['required', 'string'],
             'repair_delay' => ['nullable', 'date', Rule::date()->afterOrEqual(today())],
             'total_costs' => ['nullable', 'numeric', 'decimal:0,2'],
             // 

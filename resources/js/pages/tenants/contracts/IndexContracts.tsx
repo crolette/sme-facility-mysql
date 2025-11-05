@@ -318,7 +318,11 @@ export default function IndexContracts({
                                         <TableBodyData>{contract.provider_reference}</TableBodyData>
                                         <TableBodyData>{contract.renewal_type}</TableBodyData>
                                         <TableBodyData>
-                                            <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>
+                                            {contract.provider ? (
+                                                <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>
+                                            ) : (
+                                                <p>NC</p>
+                                            )}
                                         </TableBodyData>
                                         <TableBodyData>{contract.end_date}</TableBodyData>
 
