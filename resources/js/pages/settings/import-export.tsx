@@ -50,6 +50,7 @@ export default function ImportExportSettings() {
             showToast(error.response.data.message, error.response.data.status);
         } finally {
             reset();
+            setData('file', null);
             setIsProcessing(false);
         }
     };
@@ -70,6 +71,7 @@ export default function ImportExportSettings() {
             showToast(error.response.data.message, error.response.data.status);
         } finally {
             reset();
+            setData('file', null);
             setIsProcessing(false);
         }
     };
@@ -106,6 +108,7 @@ export default function ImportExportSettings() {
             console.log(error);
             showToast(error.response.data.message, error.response.data.status);
         } finally {
+            reset();
             setIsProcessing(false);
         }
     };

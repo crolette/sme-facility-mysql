@@ -22,21 +22,12 @@ class ProviderService
 
     public function update(Provider $provider, array $data): Provider
     {
-        Log::info('PROVIDERSERVICE UPDATE');
-        Log::info($data);
-        Log::info($provider->street);
-
         $provider->update([...$data]);
-
-        Log::info($provider->street);
 
         $provider = $this->associateCountry($provider, $data['country_code']);
         $provider =  $this->associateCategory($provider, $data['categoryId']);
 
         $provider->save();
-
-        Log::info('PROVIDER SAVED');
-        Log::info($provider->street);
 
         return $provider;
     }

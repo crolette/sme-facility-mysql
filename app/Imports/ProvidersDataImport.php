@@ -62,6 +62,7 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
         foreach ($rows as $index => $row) {
             try {
                 $providerHash = $row['hash'];
+
                 $rowWithoutHash = $row;
                 unset($rowWithoutHash['hash']);
 
@@ -69,11 +70,9 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
 
                 if ($providerHash !== $calculatedHash) {
                     $providerData = $this->transformRowForProviderCreation($row);
-                    Log::info($providerData);
 
                     if ($row['id']) {
-                        Log::info('UPDATE PROVIDER IMPORT');
-                        $provider = Provider::find($row['id'])->first();
+                        $provider = Provider::find($row['id']);
                         app(ProviderService::class)->update($provider, $providerData);
                     } else {
                         $provider = app(ProviderService::class)->create($providerData);
@@ -91,6 +90,7 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
     private function transformRowForProviderCreation($rowData)
     {
         $data = [
+            'id' => $rowData['id'] ?? null,
             'name' => $rowData['name'] ?? null,
             'email' => $rowData['email'] ?? null,
             'website' => $rowData['website'] ?? null,
@@ -161,6 +161,7 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
     public function rules(): array
     {
         return [
+            'id' => 'nullable|exists:providers,id',
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', new NotDisposableEmail],
             'name' => ['required', 'string', 'max:255'],
 
