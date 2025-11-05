@@ -72,12 +72,12 @@ class ImportExcelAssetsJob implements ShouldQueue
 
             if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
-                    new ImportErrorMail($failures, 'assets')
+                    new ImportErrorMail('assets', $failures)
                 );
                 Log::info("Mail sent to : crolweb@gmail.com");
             } else {
                 Mail::to($this->user->email)->send(
-                    new ImportErrorMail($failures, 'assets')
+                    new ImportErrorMail('assets', $failures)
                 );
             }
         } catch (\Exception $e) {

@@ -40,25 +40,44 @@ class ExportProvidersExcelJob implements ShouldQueue
         Log::info('BEGIN EXPORT PROVIDERS EXCEL JOB : ' . $this->user->email);
 
         $directory = tenancy()->tenant->id . '/exports/' . Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_providers.xlsx';
+        try {
 
-        Excel::store(new ProvidersExport(), $directory, 'tenants');
+            Excel::store(new ProvidersExport(), $directory, 'tenants');
 
-        Log::info('EXPORT PROVIDERS EXCEL JOB DONE');
+            Log::info('EXPORT PROVIDERS EXCEL JOB DONE');
 
-        // Mail
-        Log::info('SENDING MAIL EXPORT SUCCESS');
-        if (env('APP_ENV') === 'local') {
-            Mail::to('crolweb@gmail.com')->send(
-                new \App\Mail\ExportSuccessMail($this->user, $directory)
-            );
-            Log::info("Mail sent to : crolweb@gmail.com");
-        } else {
-            Mail::to($this->user->email)->send(
-                new \App\Mail\ExportSuccessMail($this->user, $directory)
-            );
-            Log::info("Mail sent to : {$this->user->email}");
+            // Mail
+            Log::info('SENDING MAIL EXPORT SUCCESS');
+            if (env('APP_ENV') === 'local') {
+                Mail::to('crolweb@gmail.com')->send(
+                    new \App\Mail\ExportSuccessMail($this->user, $directory)
+                );
+                Log::info("Mail sent to : crolweb@gmail.com");
+            } else {
+                Mail::to($this->user->email)->send(
+                    new \App\Mail\ExportSuccessMail($this->user, $directory)
+                );
+                Log::info("Mail sent to : {$this->user->email}");
+            }
+            Log::info('SUCCESS SENDING MAIL EXPORT');
+        } catch (\Exception $e) {
+            Log::error('Error during export');
+            Log::error($e->getMessage());
+
+            if (env('APP_ENV') === 'local') {
+                Mail::to('crolweb@gmail.com')->send(
+                    new \App\Mail\ExportErrorMail('providers')
+                );
+                Log::info("Mail sent to : crolweb@gmail.com");
+            } else {
+                Mail::to($this->user->email)->send(
+                    new \App\Mail\ExportErrorMail('providers')
+                );
+                Log::info("Mail sent to : {$this->user->email}");
+            }
         }
-        Log::info('SUCCESS SENDING MAIL EXPORT');
+
+
 
         Storage::disk('tenants')->delete($directory);
     }

@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Error during import of {{ $dataType }}</title>
+    <title>Error during export of {{ $dataType }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,38 +73,32 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="title">Error during import of {{ $dataType }}</h1>
+            <h1 class="title">Error during export of {{ $dataType }}</h1>
         </div>
 
         <div class="content">
             <div class="alert">
-                <strong>Error import</strong>
+                <strong>Error export</strong>
             </div>
             <div class="details">
-                @if ($failures)
-                    <h2>Erreurs d'importation ({{ count($failures) }} erreurs)</h2>
-                    @php
-                        $groupedByRow = collect($failures)->groupBy(fn($f) => $f->row());
-                    @endphp
+              <h2>Erreurs d'exportation</h2>
 
-                    @foreach($groupedByRow as $row => $rowFailures)
-                        <h3>Ligne {{ $row }}</h3>
-                        <ul>
-                            @foreach($rowFailures as $failure)
-                                <li>
-                                    <strong>{{ $failure->attribute() }}</strong>: 
-                                    {{ implode(', ', $failure->errors()) }}
-                                </li>
-                            @endforeach
-                        </ul>
-                    @endforeach
-                @else
-                    <h2>Erreurs d'importation erreurs)</h2>
-                     <p>Il y a eu une erreur lors de l'importation. Réessayez ou contactez votre administrateur ou le support de SME-Facility.</p>
-                @endif
-                @if ($failures)
-                    
-                @endif
+              <p>Il y a eu une erreur lors de l'exportation. Réessayez ou contactez votre administrateur ou le support de SME-Facility.</p>
+                {{-- @php
+                    $groupedByRow = collect($failures)->groupBy(fn($f) => $f->row());
+                @endphp
+
+                @foreach($groupedByRow as $row => $rowFailures)
+                    <h3>Ligne {{ $row }}</h3>
+                    <ul>
+                        @foreach($rowFailures as $failure)
+                            <li>
+                                <strong>{{ $failure->attribute() }}</strong>: 
+                                {{ implode(', ', $failure->errors()) }}
+                            </li>
+                        @endforeach
+                    </ul>
+                @endforeach --}}
             </div>
         </div>
 

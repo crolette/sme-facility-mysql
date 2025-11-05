@@ -6,22 +6,23 @@ use App\Models\Tenants\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class ImportErrorMail extends Mailable
+class ExportErrorMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(public $dataType, public $failures = null)
-    {
+    public function __construct(
+        public string $dataType,
+    ) {
         $locale = App::getLocale();
         App::setLocale($locale);
     }
@@ -33,7 +34,7 @@ class ImportErrorMail extends Mailable
     {
         return new Envelope(
             from: new Address('notifications@sme-facility.com', 'SME-Facility - Notification'),
-            subject: 'Import Error Mail',
+            subject: 'Export Error Mail',
         );
     }
 
@@ -43,7 +44,7 @@ class ImportErrorMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.import-error',
+            view: 'emails.export-error',
         );
     }
 
