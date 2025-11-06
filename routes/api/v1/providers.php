@@ -24,7 +24,9 @@ Route::middleware([
         if (Auth::user()->cannot('viewAny', Provider::class))
             return ApiResponse::notAuthorized();
 
-        $query  = Provider::select('id', 'name', 'category_type_id');
+        $query  = Provider::select('id', 'name', 'category_type_id', 'email');
+
+        Debugbar::info($request->query('users'));
 
         if ($request->query('q')) {
             $query->where(function ($subquery) use ($request) {
@@ -32,8 +34,9 @@ Route::middleware([
             });
         }
 
-        if ($request->query('users') === 1) {
-            $query->load('users');
+        if ($request->query('users') === '1' || $request->query('users') === 1) {
+            Debugbar::info('QUERY USERS PROVIDERS');
+            $query->with('users');
         }
 
         return ApiResponse::success($query->get());

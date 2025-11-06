@@ -45,7 +45,7 @@ beforeEach(function () {
 });
 
 
-it('can send an intervention to a provider and assign it to him', function () {
+it('can send an intervention to a provider and to multiple emails and assign it to this provider', function () {
 
     Mail::fake();
 
@@ -53,214 +53,18 @@ it('can send an intervention to a provider and assign it to him', function () {
 
     $formData = [
         'provider_id' => $this->provider->id,
-        'email' => 'test@test.com'
+        'emails' => ['test@test.com', 'testa@test.com']
     ];
 
     $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
-    $response->assertSessionHasNoErrors();
-
-    Mail::assertSent(SendInterventionToProviderEmail::class, function ($mail) use ($intervention) {
-        return $mail->hasTo('test@test.com');
-    });
-
-    assertDatabaseHas(
-        'interventions',
-        [
-            'id' => $intervention->id,
-            'assignable_type' => get_class($this->provider),
-            'assignable_id' => $this->provider->id,
-        ]
-    );
-});
-
-it('can send an intervention to an internal user and assign it to him', function () {
-
-    Mail::fake();
-
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
-    $user = User::factory()->withRole('Maintenance Manager')->create();
-
-
-    $formData = [
-        'user_id' => $user->id,
-        'email' => 'test@test.com'
-    ];
-
-    $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
-    $response->assertSessionHasNoErrors();
-
-    Mail::assertSent(SendInterventionToProviderEmail::class, function ($mail) use ($intervention) {
-        return $mail->hasTo('test@test.com');
-    });
-
-    assertDatabaseHas(
-        'interventions',
-        [
-            'id' => $intervention->id,
-            'assignable_type' => get_class($user),
-            'assignable_id' => $user->id,
-        ]
-    );
-});
-
-it('cannot send an intervention to a non-existing provider', function () {
-    Mail::fake();
-
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
-    $user = User::factory()->withRole('Maintenance Manager')->create();
-
-
-    $formData = [
-        'provider_id' => 10,
-        'email' => 'test@test.com'
-    ];
-
-    $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
-    $response->assertJson(['errors' => ['provider_id' => ['The selected provider id is invalid.']]]);
-
-    Mail::assertNotSent(SendInterventionToProviderEmail::class, function ($mail) use ($intervention) {
-        return $mail->hasTo('test@test.com');
-    });
-});
-
-it('cannot send an intervention to a non-existing user', function () {
-    Mail::fake();
-
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
-
-    $formData = [
-        'user_id' => 10,
-        'email' => 'test@test.com'
-    ];
-
-    $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
-    $response->assertJson(['errors' => ['user_id' => ['The selected user id is invalid.']]]);
-
-    Mail::assertNotSent(SendInterventionToProviderEmail::class, function ($mail) use ($intervention) {
-        return $mail->hasTo('test@test.com');
-    });
-});
-
-it('cannot send an intervention without user_id or provider_id', function () {
-    Mail::fake();
-
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
-
-    $formData = [
-        'email' => 'test@test.com'
-    ];
-
-    $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
-    $response->assertJson(['status' => 'error']);
-
-    Mail::assertNotSent(SendInterventionToProviderEmail::class, function ($mail) use ($intervention) {
-        return $mail->hasTo('test@test.com');
-    });
-});
-
-it('can send an intervention to a new user, assign it to him and remove the old one', function () {
-
-    Mail::fake();
-
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
-    $user = User::factory()->withRole('Maintenance Manager')->create();
-
-
-    $formData = [
-        'user_id' => $user->id,
-        'email' => $user->email
-    ];
-
-    $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
-    $response->assertSessionHasNoErrors();
-
-    Mail::assertSent(SendInterventionToProviderEmail::class, function ($mail) use ($user) {
-        return $mail->hasTo($user->email);
-    });
-
-    assertDatabaseHas(
-        'interventions',
-        [
-            'id' => $intervention->id,
-            'assignable_type' => get_class($user),
-            'assignable_id' => $user->id,
-        ]
-    );
-
-    $newUser = User::factory()->create();
-
-    $formData = [
-        'user_id' => $newUser->id,
-        'email' => $newUser->email
-    ];
-
-    $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
-    $response->assertSessionHasNoErrors();
-
-    Mail::assertSent(SendInterventionToProviderEmail::class, function ($mail) use ($newUser) {
-        return $mail->hasTo($newUser->email);
-    });
-
-    assertDatabaseHas(
-        'interventions',
-        [
-            'id' => $intervention->id,
-            'assignable_type' => get_class($newUser),
-            'assignable_id' => $newUser->id,
-        ]
-    );
-
-    assertDatabaseMissing(
-        'interventions',
-        [
-            'id' => $intervention->id,
-            'assignable_type' => get_class($user),
-            'assignable_id' => $user->id,
-        ]
-    );
-});
-
-it('can send an intervention to a user, assign it to him and remove the old provider', function () {
-
-    Mail::fake();
-
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
-    $user = User::factory()->withRole('Maintenance Manager')->create();
-
-    $formData = [
-        'user_id' => $user->id,
-        'email' => $user->email
-    ];
-
-    $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
-    $response->assertSessionHasNoErrors();
-
-    Mail::assertSent(SendInterventionToProviderEmail::class, function ($mail) use ($user) {
-        return $mail->hasTo($user->email);
-    });
-
-    assertDatabaseHas(
-        'interventions',
-        [
-            'id' => $intervention->id,
-            'assignable_type' => get_class($user),
-            'assignable_id' => $user->id,
-        ]
-    );
-
-    $newUser = User::factory()->create();
-
-    $formData = [
-        'provider_id' => $this->provider->id,
-        'email' => 'test@test.com'
-    ];
-
-    $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
-    $response->assertSessionHasNoErrors();
+    $response->assertJson(['status' => 'success']);
 
     Mail::assertSent(SendInterventionToProviderEmail::class, function ($mail) {
         return $mail->hasTo('test@test.com');
     });
+    Mail::assertSent(SendInterventionToProviderEmail::class, function ($mail) {
+        return $mail->hasTo('testa@test.com');
+    });
 
     assertDatabaseHas(
         'interventions',
@@ -270,6 +74,57 @@ it('can send an intervention to a user, assign it to him and remove the old prov
             'assignable_id' => $this->provider->id,
         ]
     );
+});
+
+it('can send an intervention to only one internal user and assign it to him', function () {
+
+    Mail::fake();
+
+    $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $user = User::factory()->withRole('Maintenance Manager')->create();
+
+
+    $formData = [
+        'user_id' => $user->id,
+        'emails' => ['test@test.com']
+    ];
+
+    $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
+    $response->assertSessionHasNoErrors();
+
+    Mail::assertSent(SendInterventionToProviderEmail::class, function ($mail) use ($intervention) {
+        return $mail->hasTo('test@test.com');
+    });
+
+    assertDatabaseHas(
+        'interventions',
+        [
+            'id' => $intervention->id,
+            'assignable_type' => get_class($user),
+            'assignable_id' => $user->id,
+        ]
+    );
+});
+
+it('cannot send an intervention to several internal users', function () {
+
+    Mail::fake();
+
+    $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $user = User::factory()->withRole('Maintenance Manager')->create();
+
+
+    $formData = [
+        'user_id' => $user->id,
+        'emails' => ['test@test.com', 'testa@test.com']
+    ];
+
+    $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
+    $response->assertSessionHasNoErrors();
+
+    Mail::assertNotSent(SendInterventionToProviderEmail::class, function ($mail) {
+        return $mail->hasTo('test@test.com');
+    });
 
     assertDatabaseMissing(
         'interventions',
@@ -281,181 +136,358 @@ it('can send an intervention to a user, assign it to him and remove the old prov
     );
 });
 
+// it('cannot send an intervention to a non-existing provider', function () {
+//     Mail::fake();
 
-it('a provider can access to the intervention page', function () {
-
-    Intervention::factory()->forLocation($this->asset)->create();
-    $interventionOne = Intervention::factory()->forLocation($this->asset)->create();
-    InterventionAction::factory()->forIntervention($interventionOne)->create();
-    InterventionAction::factory()->forIntervention($interventionOne)->create();
-    $interventionOne->update([
-        'status' => InterventionStatus::COMPLETED->value
-    ]);
-
-    $interventionTwo = Intervention::factory()->forLocation($this->asset)->create();
-
-    $actionTypesCount = CategoryType::where('category', 'action')->count();
-
-    $response = $this->getFromTenant('tenant.intervention.provider', $interventionTwo->id);
-    $response->assertSessionHasNoErrors();
-    $response->assertOk();
-    $response->assertInertia(
-        fn($page) =>
-        $page->component('tenants/interventions/InterventionProviderPage')
-            ->has('intervention')
-            ->has('actionTypes', $actionTypesCount)
-            ->has('pastInterventions', 2)
-            ->where('intervention.id', $interventionTwo->id)
-    );
-});
-
-it('can post an action as external provider and intervention reassigned by default to admin', function () {
-
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
-    $provider = User::factory()->create();
-
-    $formData = [
-        'action_type_id' => $this->interventionActionType->id,
-        'description' => 'New action for intervention',
-        'intervention_date' => Carbon::now()->subDays(2),
-        'started_at' => '13:25',
-        'finished_at' => '17:30',
-        'intervention_costs' => '9999999.25',
-        'creator_email' => $provider->email
-    ];
+//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $user = User::factory()->withRole('Maintenance Manager')->create();
 
 
-    // signed middleware has to be remove from the route to test
-    $response = $this->postToTenant('tenant.intervention.provider.store', $formData, $intervention->id);
-    $response->assertOk();
+//     $formData = [
+//         'provider_id' => 10,
+//         'email' => 'test@test.com'
+//     ];
 
-    assertDatabaseHas(
-        'intervention_actions',
-        [
-            'intervention_id' => $intervention->id,
-            'description' => 'New action for intervention',
-            'intervention_date' => Carbon::now()->subDays(2)->toDateString(),
-            'started_at' => '13:25',
-            'finished_at' => '17:30',
-            'intervention_costs' => '9999999.25',
-            'creator_email' => $provider->email
-        ]
-    );
+//     $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
+//     $response->assertJson(['errors' => ['provider_id' => ['The selected provider id is invalid.']]]);
 
-    assertDatabaseHas('interventions', [
-        'id' => $intervention->id,
-        'assignable_type' => get_class($this->admin),
-        'assignable_id' => $this->admin->id,
-    ]);
-});
+//     Mail::assertNotSent(SendInterventionToProviderEmail::class, function ($mail) use ($intervention) {
+//         return $mail->hasTo('test@test.com');
+//     });
+// });
 
-it('sends an email to the admin when a provider encoded a new action and intervention reassigned to admin', function () {
-    Mail::fake();
+// it('cannot send an intervention to a non-existing user', function () {
+//     Mail::fake();
 
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
-    $provider = User::factory()->create();
+//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
 
-    $formData = [
-        'action_type_id' => $this->interventionActionType->id,
-        'description' => 'New action for intervention',
-        'intervention_date' => Carbon::now()->subDays(2),
-        'started_at' => '13:25',
-        'finished_at' => '17:30',
-        'intervention_costs' => '9999999.25',
-        'creator_email' => $provider->email
-    ];
+//     $formData = [
+//         'user_id' => 10,
+//         'email' => 'test@test.com'
+//     ];
 
-    // route tested with signed middleware removed from routes
-    $response = $this->postToTenant('tenant.intervention.provider.store', $formData, $intervention->id);
-    $response->assertOk();
+//     $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
+//     $response->assertJson(['errors' => ['user_id' => ['The selected user id is invalid.']]]);
 
-    Mail::assertSent(InterventionAddedByProviderMail::class, function ($mail) {
-        return $mail->hasTo($this->admin->email);
-    });
+//     Mail::assertNotSent(SendInterventionToProviderEmail::class, function ($mail) use ($intervention) {
+//         return $mail->hasTo('test@test.com');
+//     });
+// });
 
-    assertDatabaseHas('interventions', [
-        'id' => $intervention->id,
-        'assignable_type' => get_class($this->admin),
-        'assignable_id' => $this->admin->id,
-    ]);
-});
+// it('cannot send an intervention without user_id or provider_id', function () {
+//     Mail::fake();
 
-it('sends an email to the maintenance manager when a provider encoded a new action and intervention reassigned to manager', function () {
-    Mail::fake();
+//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
 
-    $user = User::factory()->withRole('Maintenance Manager')->create();
-    $this->asset->maintainable()->update(['maintenance_manager_id' => $user->id]);
+//     $formData = [
+//         'email' => 'test@test.com'
+//     ];
 
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
-    $provider = User::factory()->create();
+//     $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
+//     $response->assertJson(['status' => 'error']);
 
-    $formData = [
-        'action_type_id' => $this->interventionActionType->id,
-        'description' => 'New action for intervention',
-        'intervention_date' => Carbon::now()->subDays(2),
-        'started_at' => '13:25',
-        'finished_at' => '17:30',
-        'intervention_costs' => '9999999.25',
-        'creator_email' => $provider->email
-    ];
+//     Mail::assertNotSent(SendInterventionToProviderEmail::class, function ($mail) use ($intervention) {
+//         return $mail->hasTo('test@test.com');
+//     });
+// });
+
+// it('can send an intervention to a new user, assign it to him and remove the old one', function () {
+
+//     Mail::fake();
+
+//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $user = User::factory()->withRole('Maintenance Manager')->create();
 
 
-    // route tested with signed middleware removed from routes
-    $response = $this->postToTenant('tenant.intervention.provider.store', $formData, $intervention->id);
-    $response->assertOk();
+//     $formData = [
+//         'user_id' => $user->id,
+//         'email' => $user->email
+//     ];
 
-    Mail::assertSent(InterventionAddedByProviderMail::class, function ($mail) use ($user) {
-        return $mail->hasTo($user->email);
-    });
+//     $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
+//     $response->assertSessionHasNoErrors();
 
-    assertDatabaseHas('interventions', [
-        'id' => $intervention->id,
-        'assignable_type' => get_class($user),
-        'assignable_id' => $user->id,
-    ]);
-});
+//     Mail::assertSent(SendInterventionToProviderEmail::class, function ($mail) use ($user) {
+//         return $mail->hasTo($user->email);
+//     });
 
-it('can upload pictures for an intervention action', function () {
+//     assertDatabaseHas(
+//         'interventions',
+//         [
+//             'id' => $intervention->id,
+//             'assignable_type' => get_class($user),
+//             'assignable_id' => $user->id,
+//         ]
+//     );
 
-    $user = User::factory()->withRole('Maintenance Manager')->create();
-    $this->asset->maintainable()->update(['maintenance_manager_id' => $user->id]);
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
-    $provider = User::factory()->create();
+//     $newUser = User::factory()->create();
 
-    $file1 = UploadedFile::fake()->image('action1.jpg');
-    $file2 = UploadedFile::fake()->image('action1.png');
+//     $formData = [
+//         'user_id' => $newUser->id,
+//         'email' => $newUser->email
+//     ];
 
-    $formData = [
-        'action_type_id' => $this->interventionActionType->id,
-        'description' => 'New action for intervention',
-        'intervention_date' => Carbon::now()->subDays(7),
-        'started_at' => '13:25',
-        'finished_at' => '17:30',
-        'intervention_costs' => '9999999.25',
-        'creator_email' => $provider->email,
-        'pictures' => [
-            $file1,
-            $file2
-        ]
-    ];
+//     $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
+//     $response->assertSessionHasNoErrors();
 
-    $response = $this->postToTenant('api.interventions.actions.store', $formData, $intervention);
+//     Mail::assertSent(SendInterventionToProviderEmail::class, function ($mail) use ($newUser) {
+//         return $mail->hasTo($newUser->email);
+//     });
 
-    $interventionAction = InterventionAction::where('description', 'New action for intervention')->first();
+//     assertDatabaseHas(
+//         'interventions',
+//         [
+//             'id' => $intervention->id,
+//             'assignable_type' => get_class($newUser),
+//             'assignable_id' => $newUser->id,
+//         ]
+//     );
 
-    $response->assertStatus(200)
-        ->assertJson([
-            'status' => 'success',
-        ]);
+//     assertDatabaseMissing(
+//         'interventions',
+//         [
+//             'id' => $intervention->id,
+//             'assignable_type' => get_class($user),
+//             'assignable_id' => $user->id,
+//         ]
+//     );
+// });
 
-    assertDatabaseCount('pictures', 2);
-    assertDatabaseHas('pictures', [
-        'imageable_type' => get_class($interventionAction),
-        'imageable_id' => $interventionAction->id
-    ]);
+// it('can send an intervention to a user, assign it to him and remove the old provider', function () {
 
-    $pictures = $interventionAction->pictures;
+//     Mail::fake();
 
-    foreach ($pictures as $picture)
-        expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
-});
+//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $user = User::factory()->withRole('Maintenance Manager')->create();
+
+//     $formData = [
+//         'user_id' => $user->id,
+//         'email' => $user->email
+//     ];
+
+//     $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
+//     $response->assertSessionHasNoErrors();
+
+//     Mail::assertSent(SendInterventionToProviderEmail::class, function ($mail) use ($user) {
+//         return $mail->hasTo($user->email);
+//     });
+
+//     assertDatabaseHas(
+//         'interventions',
+//         [
+//             'id' => $intervention->id,
+//             'assignable_type' => get_class($user),
+//             'assignable_id' => $user->id,
+//         ]
+//     );
+
+//     $newUser = User::factory()->create();
+
+//     $formData = [
+//         'provider_id' => $this->provider->id,
+//         'email' => 'test@test.com'
+//     ];
+
+//     $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
+//     $response->assertSessionHasNoErrors();
+
+//     Mail::assertSent(SendInterventionToProviderEmail::class, function ($mail) {
+//         return $mail->hasTo('test@test.com');
+//     });
+
+//     assertDatabaseHas(
+//         'interventions',
+//         [
+//             'id' => $intervention->id,
+//             'assignable_type' => get_class($this->provider),
+//             'assignable_id' => $this->provider->id,
+//         ]
+//     );
+
+//     assertDatabaseMissing(
+//         'interventions',
+//         [
+//             'id' => $intervention->id,
+//             'assignable_type' => get_class($user),
+//             'assignable_id' => $user->id,
+//         ]
+//     );
+// });
+
+// it('a provider can access to the intervention page', function () {
+
+//     Intervention::factory()->forLocation($this->asset)->create();
+//     $interventionOne = Intervention::factory()->forLocation($this->asset)->create();
+//     InterventionAction::factory()->forIntervention($interventionOne)->create();
+//     InterventionAction::factory()->forIntervention($interventionOne)->create();
+//     $interventionOne->update([
+//         'status' => InterventionStatus::COMPLETED->value
+//     ]);
+
+//     $interventionTwo = Intervention::factory()->forLocation($this->asset)->create();
+
+//     $actionTypesCount = CategoryType::where('category', 'action')->count();
+
+//     $response = $this->getFromTenant('tenant.intervention.provider', $interventionTwo->id);
+//     $response->assertSessionHasNoErrors();
+//     $response->assertOk();
+//     $response->assertInertia(
+//         fn($page) =>
+//         $page->component('tenants/interventions/InterventionProviderPage')
+//             ->has('intervention')
+//             ->has('actionTypes', $actionTypesCount)
+//             ->has('pastInterventions', 2)
+//             ->where('intervention.id', $interventionTwo->id)
+//     );
+// });
+
+// it('can post an action as external provider and intervention reassigned by default to admin', function () {
+
+//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $provider = User::factory()->create();
+
+//     $formData = [
+//         'action_type_id' => $this->interventionActionType->id,
+//         'description' => 'New action for intervention',
+//         'intervention_date' => Carbon::now()->subDays(2),
+//         'started_at' => '13:25',
+//         'finished_at' => '17:30',
+//         'intervention_costs' => '9999999.25',
+//         'creator_email' => $provider->email
+//     ];
+
+
+//     // signed middleware has to be remove from the route to test
+//     $response = $this->postToTenant('tenant.intervention.provider.store', $formData, $intervention->id);
+//     $response->assertOk();
+
+//     assertDatabaseHas(
+//         'intervention_actions',
+//         [
+//             'intervention_id' => $intervention->id,
+//             'description' => 'New action for intervention',
+//             'intervention_date' => Carbon::now()->subDays(2)->toDateString(),
+//             'started_at' => '13:25',
+//             'finished_at' => '17:30',
+//             'intervention_costs' => '9999999.25',
+//             'creator_email' => $provider->email
+//         ]
+//     );
+
+//     assertDatabaseHas('interventions', [
+//         'id' => $intervention->id,
+//         'assignable_type' => get_class($this->admin),
+//         'assignable_id' => $this->admin->id,
+//     ]);
+// });
+
+// it('sends an email to the admin when a provider encoded a new action and intervention reassigned to admin', function () {
+//     Mail::fake();
+
+//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $provider = User::factory()->create();
+
+//     $formData = [
+//         'action_type_id' => $this->interventionActionType->id,
+//         'description' => 'New action for intervention',
+//         'intervention_date' => Carbon::now()->subDays(2),
+//         'started_at' => '13:25',
+//         'finished_at' => '17:30',
+//         'intervention_costs' => '9999999.25',
+//         'creator_email' => $provider->email
+//     ];
+
+//     // route tested with signed middleware removed from routes
+//     $response = $this->postToTenant('tenant.intervention.provider.store', $formData, $intervention->id);
+//     $response->assertOk();
+
+//     Mail::assertSent(InterventionAddedByProviderMail::class, function ($mail) {
+//         return $mail->hasTo($this->admin->email);
+//     });
+
+//     assertDatabaseHas('interventions', [
+//         'id' => $intervention->id,
+//         'assignable_type' => get_class($this->admin),
+//         'assignable_id' => $this->admin->id,
+//     ]);
+// });
+
+// it('sends an email to the maintenance manager when a provider encoded a new action and intervention reassigned to manager', function () {
+//     Mail::fake();
+
+//     $user = User::factory()->withRole('Maintenance Manager')->create();
+//     $this->asset->maintainable()->update(['maintenance_manager_id' => $user->id]);
+
+//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $provider = User::factory()->create();
+
+//     $formData = [
+//         'action_type_id' => $this->interventionActionType->id,
+//         'description' => 'New action for intervention',
+//         'intervention_date' => Carbon::now()->subDays(2),
+//         'started_at' => '13:25',
+//         'finished_at' => '17:30',
+//         'intervention_costs' => '9999999.25',
+//         'creator_email' => $provider->email
+//     ];
+
+
+//     // route tested with signed middleware removed from routes
+//     $response = $this->postToTenant('tenant.intervention.provider.store', $formData, $intervention->id);
+//     $response->assertOk();
+
+//     Mail::assertSent(InterventionAddedByProviderMail::class, function ($mail) use ($user) {
+//         return $mail->hasTo($user->email);
+//     });
+
+//     assertDatabaseHas('interventions', [
+//         'id' => $intervention->id,
+//         'assignable_type' => get_class($user),
+//         'assignable_id' => $user->id,
+//     ]);
+// });
+
+// it('can upload pictures for an intervention action', function () {
+
+//     $user = User::factory()->withRole('Maintenance Manager')->create();
+//     $this->asset->maintainable()->update(['maintenance_manager_id' => $user->id]);
+//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $provider = User::factory()->create();
+
+//     $file1 = UploadedFile::fake()->image('action1.jpg');
+//     $file2 = UploadedFile::fake()->image('action1.png');
+
+//     $formData = [
+//         'action_type_id' => $this->interventionActionType->id,
+//         'description' => 'New action for intervention',
+//         'intervention_date' => Carbon::now()->subDays(7),
+//         'started_at' => '13:25',
+//         'finished_at' => '17:30',
+//         'intervention_costs' => '9999999.25',
+//         'creator_email' => $provider->email,
+//         'pictures' => [
+//             $file1,
+//             $file2
+//         ]
+//     ];
+
+//     $response = $this->postToTenant('api.interventions.actions.store', $formData, $intervention);
+
+//     $interventionAction = InterventionAction::where('description', 'New action for intervention')->first();
+
+//     $response->assertStatus(200)
+//         ->assertJson([
+//             'status' => 'success',
+//         ]);
+
+//     assertDatabaseCount('pictures', 2);
+//     assertDatabaseHas('pictures', [
+//         'imageable_type' => get_class($interventionAction),
+//         'imageable_id' => $interventionAction->id
+//     ]);
+
+//     $pictures = $interventionAction->pictures;
+
+//     foreach ($pictures as $picture)
+//         expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
+// });

@@ -216,7 +216,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
     const [providers, setProviders] = useState<Provider[] | null>(null);
-    const [interventionAssignee, setInterventionAssignee] = useState<User | null>(null);
+    const [interventionAssignees, setInterventionAssignees] = useState<Provider[] | User[]>([]);
     const [provider, setProvider] = useState<number | null>(null);
     const [user, setUser] = useState<number | null>(null);
 
@@ -238,14 +238,34 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         }
     };
 
+    const [externalProviders, setExternalProviders] = useState<Provider[] | null>(null);
+    const [externalProvidersQuery, setExternalProvidersQuery] = useState<string | null>(null);
+    const fetchExternalProviders: FormEventHandler = async (e) => {
+        e.preventDefault();
+        if (externalProvidersQuery)
+            try {
+                const response = await axios.get(route('api.providers.search', { q: externalProvidersQuery, users: 1 }));
+                if (response.data.status === 'success') {
+                    setExternalProviders(response.data.data);
+                }
+            } catch (error) {
+                console.log(error);
+                showToast(error.response.data.message, error.response.data.status);
+            }
+    };
+
     const sendInterventionMail = async () => {
-        if (!interventionToSend || !interventionAssignee || (!provider && !user)) return;
+        if (!interventionToSend || !interventionAssignees || (!provider && !user)) return;
 
         setIsProcessing(true);
 
+        const emails = interventionAssignees.map((assignee) => {
+            return assignee.email;
+        });
+
         try {
             const response = await axios.post(route('api.interventions.send-provider', interventionToSend), {
-                email: interventionAssignee.email,
+                emails: emails,
                 provider_id: provider,
                 user_id: user,
             });
@@ -261,7 +281,9 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
 
     const closeSendInterventionToProviderModale = () => {
         setSendInterventionToProviderModale(false);
-        setInterventionAssignee(null);
+        setExternalProvidersQuery(null);
+        setExternalProviders(null);
+        setInterventionAssignees([]);
         setProviders(null);
         setProvider(null);
         setUser(null);
@@ -273,7 +295,38 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
     console.log(interventions);
     console.log(user);
     console.log(provider);
-    console.log(interventionAssignee);
+    console.log(interventionAssignees);
+
+    const addAssignee = (assignee: User | Provider, provider_id?: number) => {
+        if (provider_id) {
+            if (provider_id === provider && interventionAssignees[0].name) {
+                // cela veut dire que c'est le provider qui est assigné
+                setInterventionAssignees([assignee]);
+            } else if (provider_id === provider) {
+                // cela veut dire que c'est un user du même provider
+                const newAssignees = user ? [] : interventionAssignees;
+                newAssignees.push(assignee);
+                setInterventionAssignees(newAssignees);
+            } else {
+                // cela veut dire que c'est un nouveau user d'un nouveau provider
+                setProvider(provider_id);
+                setInterventionAssignees([assignee]);
+            }
+        }
+    };
+
+    const removeAssignee = (assignee: User) => {
+        const newAssignees = interventionAssignees.filter((x) => {
+            if (x.id !== assignee.id) return x;
+        });
+
+        setInterventionAssignees(newAssignees);
+
+        if (newAssignees.length === 0 && provider !== null) {
+            setProvider(null);
+            setUser(null);
+        }
+    };
 
     return (
         <div className="border-sidebar-border bg-sidebar font rounded-md border p-4 shadow-xl">
@@ -418,18 +471,28 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                             <ul>
                                                 {providers.map((provider) => (
                                                     <>
-                                                        <li key={provider.id} className="font-bold">
-                                                            {provider.name}
+                                                        <li
+                                                            key={provider.id}
+                                                            className="mt-2 cursor-pointer font-bold"
+                                                            onClick={() => {
+                                                                setInterventionAssignees([provider]);
+                                                                setProvider(provider.id);
+                                                                setUser(null);
+                                                            }}
+                                                        >
+                                                            <p>
+                                                                {provider.name}
+                                                                <span className="ml-2 text-sm">({provider.email})</span>
+                                                            </p>
                                                         </li>
-                                                        <ul>
+                                                        <ul className="mt-1">
                                                             {provider.users && provider.users?.length > 0 ? (
                                                                 provider.users.map((user: User) => (
                                                                     <li
                                                                         className="cursor-pointer"
                                                                         onClick={() => {
-                                                                            setInterventionAssignee(user);
-                                                                            setProvider(provider.id);
                                                                             setUser(null);
+                                                                            addAssignee(user, provider.id);
                                                                         }}
                                                                     >
                                                                         {user.full_name} -{user.email}
@@ -450,6 +513,56 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     <p className="animate-pulse">Loading providers...</p>
                                 )}
                             </div>
+                            <div>
+                                <p className="font-semibold">Search other providers</p>
+
+                                <form onSubmit={fetchExternalProviders}>
+                                    <Label htmlFor="">Search</Label>
+                                    <div className="flex items-center gap-4">
+                                        <Input
+                                            type="text"
+                                            value={externalProvidersQuery ?? ''}
+                                            onChange={(e) => setExternalProvidersQuery(e.target.value)}
+                                        />
+                                        <Button type="submit">Search</Button>
+                                    </div>
+                                </form>
+                                {externalProviders &&
+                                    externalProviders.length > 0 &&
+                                    externalProviders?.map((provider, i) => (
+                                        <ul>
+                                            <li
+                                                key={i}
+                                                className="mt-2 cursor-pointer font-bold"
+                                                onClick={() => {
+                                                    setInterventionAssignees([provider]);
+                                                    setProvider(provider.id);
+                                                    setUser(null);
+                                                }}
+                                            >
+                                                <p>
+                                                    {provider.name}
+                                                    <span className="ml-2 text-sm">({provider.email})</span>
+                                                </p>
+                                            </li>
+                                            {provider.users && provider.users.length > 0 && (
+                                                <ul className="mt-1">
+                                                    {provider.users.map((user) => (
+                                                        <li
+                                                            className="cursor-pointer"
+                                                            onClick={() => {
+                                                                setUser(null);
+                                                                addAssignee(user, provider.id);
+                                                            }}
+                                                        >
+                                                            {user.full_name} - {user.email}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                        </ul>
+                                    ))}
+                            </div>
                             <div className="flex w-full flex-col">
                                 <p className="font-semibold">Internal users</p>
                                 <SearchableInput<User>
@@ -458,9 +571,13 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     displayValue={''}
                                     getDisplayText={(user) => user.full_name}
                                     getKey={(user) => user.id}
-                                    onDelete={() => setInterventionAssignee(null)}
+                                    onDelete={() => {
+                                        setInterventionAssignees([]);
+                                        setProvider(null);
+                                        setUser(null);
+                                    }}
                                     onSelect={(user) => {
-                                        setInterventionAssignee(user);
+                                        setInterventionAssignees([user]);
                                         setProvider(null);
                                         setUser(user.id);
                                     }}
@@ -469,26 +586,29 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                 />
                             </div>
 
-                            {interventionAssignee && (
-                                <div>
+                            {interventionAssignees && (
+                                <div className="">
                                     <p className="text-center">Send email to :</p>
-                                    <div className="flex">
-                                        <p>
-                                            {interventionAssignee.full_name} - {interventionAssignee.email}
-                                        </p>
-                                        <X
-                                            onClick={() => {
-                                                setInterventionAssignee(null);
-                                                setProvider(null);
-                                                setUser(null);
-                                            }}
-                                        />
-                                    </div>
+                                    <ul className="flex flex-col gap-2">
+                                        {interventionAssignees.length > 0 &&
+                                            interventionAssignees.map((assignee, index) => (
+                                                <li key={index} className="flex items-center">
+                                                    <p>
+                                                        {assignee.name ? assignee.name : assignee.full_name} - {assignee.email}
+                                                    </p>
+                                                    <X
+                                                        onClick={() => {
+                                                            removeAssignee(assignee);
+                                                        }}
+                                                    />
+                                                </li>
+                                            ))}
+                                    </ul>
                                 </div>
                             )}
 
                             <div className="flex w-full justify-between">
-                                <Button onClick={sendInterventionMail} disabled={!interventionToSend || !interventionAssignee}>
+                                <Button onClick={sendInterventionMail} disabled={!interventionToSend || !interventionAssignees}>
                                     Send
                                 </Button>
 

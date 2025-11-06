@@ -77,7 +77,8 @@ class InterventionController extends Controller
     public function show(Intervention $intervention)
     {
         $statuses = array_column(InterventionStatus::cases(), 'value');
+        $types = CategoryType::where('category', 'intervention')->get();
 
-        return Inertia::render('tenants/tickets/interventions/ShowIntervention', ['intervention' => $intervention->load(['ticket', 'interventionable', 'pictures', 'actions.pictures']), 'statuses' => $statuses]);
+        return Inertia::render('tenants/tickets/interventions/ShowIntervention', ['intervention' => $intervention->load(['ticket', 'interventionable', 'pictures', 'actions.pictures']), 'statuses' => $statuses, 'types' => $types]);
     }
 }

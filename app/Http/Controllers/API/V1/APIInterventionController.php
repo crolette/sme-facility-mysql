@@ -26,21 +26,7 @@ class APIInterventionController extends Controller
 {
 
     public function __construct(protected PictureService $pictureService) {}
-    // public function index(Request $request)
-    // {
-    //     $status = $request->query('status');
-    //     if ($status != null) {
-    //         $tickets = Ticket::where('status', $status)->get()->load('pictures');
-    //     } else {
-    //         $tickets = Ticket::all()->load('pictures');
-    //     }
-    //     return ApiResponse::success($tickets, 'Ticket created');
-    // }
 
-    // public function show(Ticket $ticket)
-    // {
-    //     return ApiResponse::success($ticket->load('pictures'), 'Ticket');
-    // }
 
     public function show(Intervention $intervention)
     {

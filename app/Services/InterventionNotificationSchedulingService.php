@@ -43,6 +43,10 @@ class InterventionNotificationSchedulingService
             foreach ($notifications as $notification) {
                 $this->updateScheduleForPlannedAtDate($intervention, $notification);
             }
+
+            if (isset($intervention->planned_at) && count($notifications) === 0) {
+                $this->scheduleForIntervention($intervention);
+            }
         }
 
         if ($intervention->wasChanged('status')) {
