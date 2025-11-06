@@ -34,6 +34,7 @@
                         <strong>Planned at :</strong> {{ $intervention->planned_at }}<br>
                          <a href={{ $url }} class="button">View problem</a>
                     </div>
+                    <strong>You have 7 days to act !!!</strong>
         </div>
 
         <div class="footer">

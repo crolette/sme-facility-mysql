@@ -284,6 +284,9 @@ export interface Intervention {
     type: string;
     created_at: string;
     updated_at: string;
+    assignable: Provider | User;
+    assignable_id?: number;
+    assignable_type?: string;
     interventionable_type: string;
     interventionable: TenantSite | TenantBuilding | TenantFloor | TenantRoom | Asset;
 }
@@ -338,6 +341,7 @@ export interface Provider {
     category: string;
     category_type_id: number;
     users?: User[];
+    assigned_interventions?: Intervention[];
     contracts?: Contract[];
 }
 
@@ -359,6 +363,7 @@ export interface User {
     updated_at: string;
     roles: [];
     assets?: Asset[];
+    assigned_interventions?: Intervention[];
     [key: string]: unknown;
 }
 

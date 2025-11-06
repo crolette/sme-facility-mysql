@@ -35,7 +35,7 @@ class Intervention extends Model
     ];
 
     protected $with = [
-        // 'interventionType:id',
+        'assignable',
         'actions'
     ];
 

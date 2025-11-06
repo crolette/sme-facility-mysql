@@ -209,7 +209,7 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                     )}
                 </div>
                 {interventionActions && interventionActions.length > 0 && (
-                    <Table>
+                    <Table className="">
                         <TableHead>
                             <TableHeadRow>
                                 <TableHeadData className="">Description</TableHeadData>

@@ -83,7 +83,7 @@ function TableBodyData({ className, children, ...props }: React.ComponentProps<"
   return (
     <td
       data-slot="table-body-row"
-      className={cn("p-2", className)}
+      className={cn("p-2 relative", className)}
       {...props}
     >
       {children}

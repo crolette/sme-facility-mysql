@@ -376,6 +376,7 @@ export default function IndexInterventions({
                                             <a href={route('tenant.interventions.show', item.id)} className="flex w-40">
                                                 <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{item.description}</p>
                                             </a>
+                                            <p className="tooltip tooltip-bottom">{item.description}</p>
                                         </TableBodyData>
                                         <TableBodyData>{item.type}</TableBodyData>
                                         <TableBodyData>
@@ -390,7 +391,15 @@ export default function IndexInterventions({
                                             <Pill variant={item.status}>{item.status}</Pill>
                                         </TableBodyData>
                                         <TableBodyData>
-                                            <p>ASSIGNED TO</p>
+                                            {item.assignable ? (
+                                                item.assignable.full_name ? (
+                                                    <a href={route('tenant.users.show', item.assignable.id)}>{item.assignable.full_name}</a>
+                                                ) : (
+                                                    <a href={route('tenant.providers.show', item.assignable.id)}>{item.assignable.name}</a>
+                                                )
+                                            ) : (
+                                                'not assigned'
+                                            )}
                                         </TableBodyData>
                                         <TableBodyData>{item.planned_at ?? 'Not planned'}</TableBodyData>
                                         <TableBodyData>{item.repair_delay ?? 'No repair delay'}</TableBodyData>

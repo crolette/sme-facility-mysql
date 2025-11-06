@@ -134,7 +134,7 @@ class User extends Authenticatable
 
     public function assignedInterventions(): MorphMany
     {
-        return $this->morphMany(Intervention::class, 'assignable')->withTimestamps();
+        return $this->morphMany(Intervention::class, 'assignable');
     }
 
     public function locationRoute(): Attribute

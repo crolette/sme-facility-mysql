@@ -88,7 +88,6 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
     };
 
     const [interventionDataForm, setInterventionDataForm] = useState<InterventionFormData>(interventionData);
-    console.log(interventionDataForm);
 
     const openModale = () => {
         setSubmitType('new');
@@ -217,7 +216,9 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
     const [providers, setProviders] = useState<Provider[] | null>(null);
-    const [providerEmail, setProviderEmail] = useState<User | null>();
+    const [interventionAssignee, setInterventionAssignee] = useState<User | null>(null);
+    const [provider, setProvider] = useState<number | null>(null);
+    const [user, setUser] = useState<number | null>(null);
 
     const sendIntervention = (id: number) => {
         fetchProviders(id);
@@ -232,17 +233,22 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                 setProviders(response.data.data);
             }
         } catch (error) {
+            console.log(error);
             showToast(error.response.data.message, error.response.data.status);
         }
     };
 
     const sendInterventionMail = async () => {
-        if (!interventionToSend || !providerEmail) return;
+        if (!interventionToSend || !interventionAssignee || (!provider && !user)) return;
 
         setIsProcessing(true);
 
         try {
-            const response = await axios.post(route('api.interventions.send-provider', interventionToSend), providerEmail);
+            const response = await axios.post(route('api.interventions.send-provider', interventionToSend), {
+                email: interventionAssignee.email,
+                provider_id: provider,
+                user_id: user,
+            });
             if (response.data.status === 'success') {
                 closeSendInterventionToProviderModale();
                 showToast(response.data.message, response.data.status);
@@ -255,11 +261,19 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
 
     const closeSendInterventionToProviderModale = () => {
         setSendInterventionToProviderModale(false);
-        setProviderEmail(null);
+        setInterventionAssignee(null);
         setProviders(null);
+        setProvider(null);
+        setUser(null);
         setInterventionToSend(null);
         setIsProcessing(false);
+        fetchInterventions();
     };
+
+    console.log(interventions);
+    console.log(user);
+    console.log(provider);
+    console.log(interventionAssignee);
 
     return (
         <div className="border-sidebar-border bg-sidebar font rounded-md border p-4 shadow-xl">
@@ -275,70 +289,99 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
             {interventions &&
                 interventions.length > 0 &&
                 interventions.map((intervention, index) => (
-                    <Table key={intervention.id} className="table-fixed">
-                        <TableHead>
-                            <TableHeadRow>
-                                <TableHeadData>Type</TableHeadData>
-                                <TableHeadData className="w-32">Description</TableHeadData>
-                                <TableHeadData>Priority</TableHeadData>
-                                <TableHeadData>Status</TableHeadData>
-                                <TableHeadData>Planned at</TableHeadData>
-                                <TableHeadData>Repair delay</TableHeadData>
-                                <TableHeadData>Total costs</TableHeadData>
-                                <TableHeadData>
-                                    <Button onClick={() => sendIntervention(intervention.id)} variant={'secondary'}>
-                                        Send to provider
-                                    </Button>
-                                </TableHeadData>
-                            </TableHeadRow>
-                        </TableHead>
+                    <>
+                        <Table key={intervention.id} className="table-fixed">
+                            <TableHead>
+                                <TableHeadRow>
+                                    <TableHeadData className="">Description</TableHeadData>
+                                    <TableHeadData>Type</TableHeadData>
+                                    <TableHeadData>Priority</TableHeadData>
+                                    <TableHeadData>Status</TableHeadData>
+                                    <TableHeadData>Assigned to</TableHeadData>
+                                    <TableHeadData>Planned at</TableHeadData>
+                                    <TableHeadData>Repair delay</TableHeadData>
+                                    <TableHeadData>Total costs</TableHeadData>
+                                    <TableHeadData>
+                                        <Button onClick={() => sendIntervention(intervention.id)} variant={'cta'}>
+                                            Assign To
+                                        </Button>
+                                    </TableHeadData>
+                                </TableHeadRow>
+                            </TableHead>
 
-                        <TableBody>
-                            <TableBodyRow className="">
-                                <TableBodyData>
-                                    <a href={route('tenant.interventions.show', intervention.id)}>{intervention.type}</a>
-                                </TableBodyData>
-                                <TableBodyData className="overflow-ellipsis">{intervention.description}</TableBodyData>
-                                <TableBodyData>
-                                    <Pill variant={intervention.priority}>{intervention.priority}</Pill>
-                                </TableBodyData>
-                                <TableBodyData>{intervention.status}</TableBodyData>
-                                <TableBodyData>{intervention.planned_at ?? 'Not planned'}</TableBodyData>
-                                <TableBodyData>{intervention.repair_delay ?? 'No repair delay'}</TableBodyData>
-                                <TableBodyData>{intervention.total_costs ? `${intervention.total_costs} €` : '-'}</TableBodyData>
-                                <TableBodyData className="flex space-x-2">
-                                    {!closed && (
-                                        <>
-                                            <Button onClick={() => editIntervention(intervention.id)}>
-                                                <Pencil />
-                                            </Button>
-                                            <Button
-                                                type="button"
-                                                variant="destructive"
-                                                onClick={() => {
-                                                    setInterventionToDelete(intervention);
-                                                    setShowDeleteInterventionModale(true);
-                                                }}
-                                            >
-                                                <Trash2 />
-                                            </Button>
-                                        </>
-                                    )}
-                                </TableBodyData>
-                            </TableBodyRow>
-                            <TableBodyRow key={`action-${index}`}>
-                                <TableBodyData colSpan={8}>
-                                    <InterventionActionManager
-                                        interventionId={intervention.id}
-                                        actionsChanged={setActionsChanged}
-                                        closed={
-                                            closed ? true : intervention.status === 'completed' || intervention.status === 'cancelled' ? true : false
-                                        }
-                                    />
-                                </TableBodyData>
-                            </TableBodyRow>
-                        </TableBody>
-                    </Table>
+                            <TableBody>
+                                <TableBodyRow className="">
+                                    <TableBodyData className="flex max-w-72">
+                                        <a
+                                            className="overflow-hidden overflow-ellipsis whitespace-nowrap"
+                                            href={route('tenant.interventions.show', intervention.id)}
+                                        >
+                                            {intervention.description}
+                                        </a>
+                                        <p className="tooltip tooltip-bottom">{intervention.description}</p>
+                                    </TableBodyData>
+                                    <TableBodyData>{intervention.type}</TableBodyData>
+                                    <TableBodyData>
+                                        <Pill variant={intervention.priority}>{intervention.priority}</Pill>
+                                    </TableBodyData>
+                                    <TableBodyData>{intervention.status}</TableBodyData>
+                                    <TableBodyData>
+                                        {intervention.assignable ? (
+                                            intervention.assignable.full_name ? (
+                                                <a href={route('tenant.users.show', intervention.assignable.id)}>
+                                                    {intervention.assignable.full_name}
+                                                </a>
+                                            ) : (
+                                                <a href={route('tenant.providers.show', intervention.assignable.id)}>
+                                                    {intervention.assignable.name}
+                                                </a>
+                                            )
+                                        ) : (
+                                            'not assigned'
+                                        )}
+                                    </TableBodyData>
+                                    <TableBodyData>{intervention.planned_at ?? 'Not planned'}</TableBodyData>
+                                    <TableBodyData>{intervention.repair_delay ?? 'No repair delay'}</TableBodyData>
+                                    <TableBodyData>{intervention.total_costs ? `${intervention.total_costs} €` : '-'}</TableBodyData>
+                                    <TableBodyData className="flex space-x-2">
+                                        {!closed && (
+                                            <>
+                                                <Button onClick={() => editIntervention(intervention.id)}>
+                                                    <Pencil />
+                                                </Button>
+                                                <Button
+                                                    type="button"
+                                                    variant="destructive"
+                                                    onClick={() => {
+                                                        setInterventionToDelete(intervention);
+                                                        setShowDeleteInterventionModale(true);
+                                                    }}
+                                                >
+                                                    <Trash2 />
+                                                </Button>
+                                            </>
+                                        )}
+                                    </TableBodyData>
+                                </TableBodyRow>
+                                <TableBodyRow key={`action-${index}`}>
+                                    <TableBodyData colSpan={9}>
+                                        <InterventionActionManager
+                                            interventionId={intervention.id}
+                                            actionsChanged={setActionsChanged}
+                                            closed={
+                                                closed
+                                                    ? true
+                                                    : intervention.status === 'completed' || intervention.status === 'cancelled'
+                                                      ? true
+                                                      : false
+                                            }
+                                        />
+                                    </TableBodyData>
+                                </TableBodyRow>
+                            </TableBody>
+                        </Table>
+                        <hr className="border-foreground border" />
+                    </>
                 ))}
 
             <Modale
@@ -355,7 +398,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
             />
 
             {sendInterventionToProviderModale && (
-                <ModaleForm title="Send intervention to provider">
+                <ModaleForm title="Assign intervention to provider/user">
                     {isProcessing && (
                         <div className="flex flex-col items-center gap-4">
                             <Loader size={48} className="animate-pulse" />
@@ -365,7 +408,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                     )}
                     {!isProcessing && (
                         <div className="flex flex-col gap-4">
-                            <p>Select user provider or internal user to send this intervention to</p>
+                            <p>Select user provider or internal user to assign this intervention to</p>
 
                             <div className="flex w-full flex-col">
                                 <p className="font-semibold">Linked Providers</p>
@@ -381,7 +424,14 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                                         <ul>
                                                             {provider.users && provider.users?.length > 0 ? (
                                                                 provider.users.map((user: User) => (
-                                                                    <li className="cursor-pointer" onClick={() => setProviderEmail(user)}>
+                                                                    <li
+                                                                        className="cursor-pointer"
+                                                                        onClick={() => {
+                                                                            setInterventionAssignee(user);
+                                                                            setProvider(provider.id);
+                                                                            setUser(null);
+                                                                        }}
+                                                                    >
                                                                         {user.full_name} -{user.email}
                                                                     </li>
                                                                 ))
@@ -408,29 +458,39 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     displayValue={''}
                                     getDisplayText={(user) => user.full_name}
                                     getKey={(user) => user.id}
-                                    onDelete={() => setProviderEmail(null)}
+                                    onDelete={() => setInterventionAssignee(null)}
                                     onSelect={(user) => {
-                                        setProviderEmail(user);
+                                        setInterventionAssignee(user);
+                                        setProvider(null);
+                                        setUser(user.id);
                                     }}
                                     placeholder="Search internal user..."
                                     className="mb-4"
                                 />
                             </div>
 
-                            {providerEmail && (
+                            {interventionAssignee && (
                                 <div>
                                     <p className="text-center">Send email to :</p>
                                     <div className="flex">
                                         <p>
-                                            {providerEmail.full_name} - {providerEmail.email}
+                                            {interventionAssignee.full_name} - {interventionAssignee.email}
                                         </p>
-                                        <X onClick={() => setProviderEmail(null)} />
+                                        <X
+                                            onClick={() => {
+                                                setInterventionAssignee(null);
+                                                setProvider(null);
+                                                setUser(null);
+                                            }}
+                                        />
                                     </div>
                                 </div>
                             )}
 
                             <div className="flex w-full justify-between">
-                                <Button onClick={sendInterventionMail}>Send</Button>
+                                <Button onClick={sendInterventionMail} disabled={!interventionToSend || !interventionAssignee}>
+                                    Send
+                                </Button>
 
                                 <Button onClick={closeSendInterventionToProviderModale} variant="secondary">
                                     Cancel

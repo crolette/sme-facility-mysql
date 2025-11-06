@@ -10,16 +10,32 @@ use App\Models\Tenants\Intervention;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Events\SendInterventionToProviderEvent;
+use App\Models\Tenants\Provider;
+use App\Models\Tenants\User;
+use Illuminate\Support\Facades\Validator;
 
 class SendInterventionController extends Controller
 {
     public function store(Intervention $intervention, Request $request)
     {
-        $validated = $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'required|email',
+            'provider_id' => 'nullable|exists:providers,id|required_without:user_id',
+            'user_id' => 'nullable|exists:users,id|required_without:provider_id'
         ]);
 
-        Debugbar::info('SendInterventionController', $validated, $request->all());
+        if ($validator->fails()) {
+            return ApiResponse::error('Missing infos', $validator->errors());
+        }
+
+        $validated = $validator->validated();
+
+        if (isset($validated['provider_id'])) {
+            $intervention->assignable()->associate(Provider::find($validated['provider_id']))->save();
+        }
+        if (isset($validated['user_id'])) {
+            $intervention->assignable()->associate(User::find($validated['user_id']))->save();
+        }
 
         $url = URL::temporarySignedRoute(
             'tenant.intervention.provider',
@@ -31,5 +47,4 @@ class SendInterventionController extends Controller
 
         return ApiResponse::success([], 'Email sent');
     }
-
 }
