@@ -41,6 +41,10 @@ const MENUS = {
             tabDisplay: 'Information',
         },
         {
+            tabName: 'interventions',
+            tabDisplay: 'interventions',
+        },
+        {
             tabName: 'assets',
             tabDisplay: 'assets',
         },
@@ -91,6 +95,10 @@ const MENUS = {
         {
             tabName: 'contracts',
             tabDisplay: 'contracts',
+        },
+        {
+            tabName: 'interventions',
+            tabDisplay: 'interventions',
         },
         {
             tabName: 'users',

@@ -84,6 +84,6 @@ class ProviderController extends Controller
         // dd(basename(Storage::disk('tenants')->path($provider->logo)));
 
 
-        return Inertia::render('tenants/providers/ShowProvider', ['item' => $provider->load('users', 'contracts', 'contracts.provider')]);
+        return Inertia::render('tenants/providers/ShowProvider', ['item' => $provider->load('users', 'contracts', 'contracts.provider', 'assignedInterventions')]);
     }
 }

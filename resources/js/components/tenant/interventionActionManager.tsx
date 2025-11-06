@@ -209,15 +209,15 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                     )}
                 </div>
                 {interventionActions && interventionActions.length > 0 && (
-                    <Table>
+                    <Table className="">
                         <TableHead>
                             <TableHeadRow>
-                                <TableHeadData>Description</TableHeadData>
-                                <TableHeadData>Action</TableHeadData>
-                                <TableHeadData>Date</TableHeadData>
-                                <TableHeadData>Started at</TableHeadData>
-                                <TableHeadData>Finished at</TableHeadData>
-                                <TableHeadData>Costs</TableHeadData>
+                                <TableHeadData className="">Description</TableHeadData>
+                                <TableHeadData className="w-32">Action</TableHeadData>
+                                <TableHeadData className="w-32">Date</TableHeadData>
+                                <TableHeadData className="w-32">Started at</TableHeadData>
+                                <TableHeadData className="w-32">Finished at</TableHeadData>
+                                <TableHeadData className="w-32">Costs</TableHeadData>
                                 <TableHeadData></TableHeadData>
                             </TableHeadRow>
                         </TableHead>
@@ -225,12 +225,16 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                         <TableBody>
                             {interventionActions.map((action, index) => (
                                 <TableBodyRow key={index}>
-                                    <TableBodyData>{action.description}</TableBodyData>
-                                    <TableBodyData>{action.action_type.label}</TableBodyData>
-                                    <TableBodyData>{action.intervention_date}</TableBodyData>
-                                    <TableBodyData>{action.started_at}</TableBodyData>
-                                    <TableBodyData>{action.finished_at}</TableBodyData>
-                                    <TableBodyData>{action.intervention_costs ? `${action.intervention_costs} €` : '-'} </TableBodyData>
+                                    <TableBodyData className="max-w-72">
+                                        <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{action.description}</p>
+                                    </TableBodyData>
+                                    <TableBodyData className="w-32">{action.action_type.label}</TableBodyData>
+                                    <TableBodyData className="w-32">{action.intervention_date}</TableBodyData>
+                                    <TableBodyData className="w-32">{action.started_at}</TableBodyData>
+                                    <TableBodyData className="w-32">{action.finished_at}</TableBodyData>
+                                    <TableBodyData className="w-32">
+                                        {action.intervention_costs ? `${action.intervention_costs} €` : '-'}{' '}
+                                    </TableBodyData>
 
                                     <TableBodyData className="space-x-2">
                                         {!closed && (

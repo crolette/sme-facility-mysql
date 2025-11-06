@@ -96,9 +96,9 @@ export default function IndexInterventions({
             intervention_type_id: intervention?.intervention_type_id ?? null,
             status: intervention?.status ?? null,
             priority: intervention?.priority ?? null,
-            planned_at: intervention?.planned_at ? formatDateForInput(intervention?.planned_at) : null,
+            planned_at: intervention?.planned_at ?? null,
             description: intervention?.description ?? null,
-            repair_delay: intervention?.repair_delay ? formatDateForInput(intervention?.repair_delay) : null,
+            repair_delay: intervention?.repair_delay ?? null,
             total_costs: intervention?.total_costs ?? null,
             ticket_id: intervention?.ticket_id ?? null,
             locationType: intervention?.ticket_id ? null : intervention?.interventionable_type,
@@ -106,11 +106,6 @@ export default function IndexInterventions({
         }));
         setAddIntervention(true);
     };
-
-    function formatDateForInput(dateStr: string) {
-        const [day, month, year] = dateStr.split('-');
-        return `${year}-${month}-${day}`;
-    }
 
     const submitEditIntervention: FormEventHandler = async (e) => {
         e.preventDefault();
@@ -323,6 +318,7 @@ export default function IndexInterventions({
                             <TableHeadData>Asset</TableHeadData>
                             <TableHeadData>Priority</TableHeadData>
                             <TableHeadData>Status</TableHeadData>
+                            <TableHeadData>Assigned to</TableHeadData>
                             <TableHeadData>
                                 <div className="flex items-center gap-2">
                                     <ArrowDownNarrowWide
@@ -330,7 +326,7 @@ export default function IndexInterventions({
                                         className="cursor-pointer"
                                         onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'planned_at', sortBy: 'asc' }))}
                                     />
-                                    Planned at
+                                    <p>Planned at</p>
                                     <ArrowDownWideNarrow
                                         size={16}
                                         className="cursor-pointer"
@@ -345,7 +341,7 @@ export default function IndexInterventions({
                                         className="cursor-pointer"
                                         onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'repair_delay', sortBy: 'asc' }))}
                                     />
-                                    Repair delay
+                                    <p>Repair delay</p>
                                     <ArrowDownWideNarrow
                                         size={16}
                                         className="cursor-pointer"
@@ -375,6 +371,7 @@ export default function IndexInterventions({
                                             <a href={route('tenant.interventions.show', item.id)} className="flex w-40">
                                                 <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{item.description}</p>
                                             </a>
+                                            <p className="tooltip tooltip-bottom">{item.description}</p>
                                         </TableBodyData>
                                         <TableBodyData>{item.type}</TableBodyData>
                                         <TableBodyData>
@@ -387,6 +384,17 @@ export default function IndexInterventions({
                                         </TableBodyData>
                                         <TableBodyData>
                                             <Pill variant={item.status}>{item.status}</Pill>
+                                        </TableBodyData>
+                                        <TableBodyData>
+                                            {item.assignable ? (
+                                                item.assignable.full_name ? (
+                                                    <a href={route('tenant.users.show', item.assignable.id)}>{item.assignable.full_name}</a>
+                                                ) : (
+                                                    <a href={route('tenant.providers.show', item.assignable.id)}>{item.assignable.name}</a>
+                                                )
+                                            ) : (
+                                                'not assigned'
+                                            )}
                                         </TableBodyData>
                                         <TableBodyData>{item.planned_at ?? 'Not planned'}</TableBodyData>
                                         <TableBodyData>{item.repair_delay ?? 'No repair delay'}</TableBodyData>
@@ -517,22 +525,6 @@ export default function IndexInterventions({
                                     }))
                                 }
                             ></Textarea>
-                            {/* {!closed && (
-                                        <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                            <h5>Pictures</h5>
-                                            <Input
-                                                type="file"
-                                                multiple
-                                                onChange={(e) =>
-                                                    setInterventionDataForm((prev) => ({
-                                                        ...prev,
-                                                        pictures: e.target.files,
-                                                    }))
-                                                }
-                                                accept="image/png, image/jpeg, image/jpg"
-                                            />
-                                        </div>
-                                    )} */}
                             <Label>Planned at</Label>
                             <div className="flex gap-2">
                                 <Input

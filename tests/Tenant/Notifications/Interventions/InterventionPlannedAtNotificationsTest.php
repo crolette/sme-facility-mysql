@@ -799,6 +799,54 @@ it('updates notification when planned_at changes for an intervention', function 
     );
 })->with(array_values(array_diff(array_column(InterventionStatus::cases(), 'value'), ['draft', 'completed', 'cancelled'])));
 
+it('creates planned_at notification when planned_at is added for an existing intervention', function ($status) {
+
+    Intervention::factory()->forLocation($this->asset)->create(['planned_at' => null]);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'notification_type' => 'planned_at',
+            'notifiable_type' => 'App\Models\Tenants\Intervention',
+            'notifiable_id' => 1,
+        ]
+    );
+
+    $formData = [
+        'intervention_type_id' => $this->interventionType->id,
+        'priority' => 'medium',
+        'status' => $status,
+        'planned_at' => Carbon::now()->addWeeks(2),
+        'description' => fake()->paragraph(),
+        'locationId' => $this->asset->reference_code,
+        'locationType' => get_class($this->asset)
+    ];
+
+    $intervention = Intervention::first();
+
+    $response = $this->patchToTenant('api.interventions.update', $formData, $intervention->id);
+    $response->assertSessionHasNoErrors();
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseCount('scheduled_notifications', 1);
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->admin->id,
+            'recipient_name' => $this->admin->fullName,
+            'recipient_email' => $this->admin->email,
+            'notification_type' => 'planned_at',
+            'scheduled_at' => Carbon::now()->addWeeks(2)->subDays(7)->toDateString(),
+            'notifiable_type' => 'App\Models\Tenants\Intervention',
+            'notifiable_id' => 1,
+        ]
+    );
+})->with(array_values(array_diff(array_column(InterventionStatus::cases(), 'value'), ['draft', 'completed', 'cancelled'])));
+
 it('deletes planned_at notification when intervention status changes to completed/cancelled and status is pending', function ($status) {
 
     $intervention = Intervention::factory()->forLocation($this->asset)->create();

@@ -46,13 +46,15 @@ export default function InterventionProviderPage({
         intervention_id: intervention.id,
         action_type_id: null,
         description: null,
-        intervention_date: Date.now().toString(),
+        intervention_date: new Date().toISOString().split('T')[0],
         started_at: null,
         finished_at: null,
         intervention_costs: null,
         creator_email: email,
         pictures: [],
     });
+
+    console.log(Date.now().toLocaleString());
 
     const submitInterventionAction: FormEventHandler = async (e) => {
         e.preventDefault();

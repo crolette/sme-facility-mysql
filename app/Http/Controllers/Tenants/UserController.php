@@ -94,6 +94,7 @@ class UserController extends Controller
         if (Auth::user()->cannot('view', $user)) {
             abort(403);
         }
-        return Inertia::render('tenants/users/ShowUser', ['item' => $user->load('assets', 'roles:id,name', 'provider:id,name')]);
+
+        return Inertia::render('tenants/users/ShowUser', ['item' => $user->load('assets', 'roles:id,name', 'provider:id,name', 'assignedInterventions')]);
     }
 }

@@ -25,7 +25,13 @@ class InterventionAddedByProviderListener
      */
     public function handle(InterventionAddedByProviderEvent $event): void
     {
-        Debugbar::info($event->intervention, $event->intervention->load('interventionable'));
+        // reassign the intervention to admin or manager
+        if ($event->intervention->interventionable->manager) {
+            $event->intervention->assignable()->associate($event->intervention->interventionable->manager)->save();
+        } else {
+            $event->intervention->assignable()->associate(User::role(['Admin'])->first())->save();
+        }
+
         if (env('APP_ENV') === "local") {
             Mail::to('crolweb@gmail.com')
                 ->send(new InterventionAddedByProviderMail($event->intervention, $event->interventionAction));
@@ -39,13 +45,12 @@ class InterventionAddedByProviderListener
                     ->send(new InterventionAddedByProviderMail($event->intervention, $event->interventionAction));
             }
 
-            
+
             if ($event->intervention->interventionable->manager) {
                 Mail::to($event->intervention->maintainable->manager->email)
                     ->locale($user->preferred_locale ?? config('app.locale'))
                     ->send(new InterventionAddedByProviderMail($event->intervention, $event->interventionAction));
             }
-
         }
     }
 }

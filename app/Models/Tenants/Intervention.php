@@ -35,7 +35,7 @@ class Intervention extends Model
     ];
 
     protected $with = [
-        // 'interventionType:id',
+        'assignable',
         'actions'
     ];
 
@@ -107,6 +107,11 @@ class Intervention extends Model
     public function pictures(): MorphMany
     {
         return $this->morphMany(Picture::class, 'imageable');
+    }
+
+    public function assignable(): MorphTo
+    {
+        return $this->morphTo();
     }
 
 

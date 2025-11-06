@@ -25,22 +25,12 @@ use function Pest\Laravel\assertDatabaseMissing;
 beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    LocationType::factory()->create(['level' => 'room']);
-    CategoryType::factory()->create(['category' => 'asset']);
     $this->interventionType = CategoryType::factory()->create(['category' => 'intervention']);
     $this->interventionActionType = CategoryType::factory()->create(['category' => 'action']);
     $this->site = Site::factory()->create();
     $this->building = Building::factory()->create();
     $this->floor = Floor::factory()->create();
-
-    $this->room = Room::factory()
-        ->for(LocationType::where('level', 'room')->first())
-        ->for(Floor::first())
-        ->create();
-
+    $this->room = Room::factory()->create();
     $this->asset =  Asset::factory()->forLocation($this->room)->create();
 
     $this->ticket = Ticket::factory()->forLocation($this->asset)->create();
@@ -161,8 +151,8 @@ it('sums intervention costs of intervention when action with intervention_costs 
     ]);
 });
 
-it('updates intervention costs of intervention when action with intervention_costs is updated', function() {
-    
+it('updates intervention costs of intervention when action with intervention_costs is updated', function () {
+
     $interventionAction = $this->intervention->actions->first();
 
     $formData = [
@@ -182,7 +172,6 @@ it('updates intervention costs of intervention when action with intervention_cos
         'id' => $this->intervention->id,
         'total_costs' => '0',
     ]);
-
 });
 
 it('updates intervention costs of intervention when action with intervention_costs is deleted', function () {
@@ -203,7 +192,7 @@ it('updates intervention costs of intervention when action with intervention_cos
     ]);
 });
 
-it('can upload pictures for an intervention action', function() {
+it('can upload pictures for an intervention action', function () {
 
     $file1 = UploadedFile::fake()->image('action1.jpg');
     $file2 = UploadedFile::fake()->image('action1.png');
@@ -239,6 +228,6 @@ it('can upload pictures for an intervention action', function() {
 
     $pictures = $interventionAction->pictures;
 
-    foreach($pictures as $picture)
+    foreach ($pictures as $picture)
         expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
 });

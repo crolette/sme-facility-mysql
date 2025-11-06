@@ -21,11 +21,6 @@ use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
 
 beforeEach(function () {
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    LocationType::factory()->create(['level' => 'room']);
-    CategoryType::factory()->create(['category' => 'asset']);
 
     $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
@@ -35,10 +30,7 @@ beforeEach(function () {
     $this->building = Building::factory()->create();
     $this->floor = Floor::factory()->create();
 
-    $this->room = Room::factory()
-        ->for(LocationType::where('level', 'room')->first())
-        ->for(Floor::first())
-        ->create();
+    $this->room = Room::factory()->create();
 
     $this->asset =  Asset::factory()->forLocation($this->room)->create();
     $this->asset->refresh();
@@ -349,6 +341,6 @@ it('can upload pictures when creating an intervention', function () {
         expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
 });
 
-// it('can upload a picture to an existing intervention', function() {
+// it('can create a new intervention not linked to asset/location', function() {
 
 // });
