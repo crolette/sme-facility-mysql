@@ -323,6 +323,7 @@ export default function IndexInterventions({
                             <TableHeadData>Asset</TableHeadData>
                             <TableHeadData>Priority</TableHeadData>
                             <TableHeadData>Status</TableHeadData>
+                            <TableHeadData>Assigned to</TableHeadData>
                             <TableHeadData>
                                 <div className="flex items-center gap-2">
                                     <ArrowDownNarrowWide
@@ -387,6 +388,9 @@ export default function IndexInterventions({
                                         </TableBodyData>
                                         <TableBodyData>
                                             <Pill variant={item.status}>{item.status}</Pill>
+                                        </TableBodyData>
+                                        <TableBodyData>
+                                            <p>ASSIGNED TO</p>
                                         </TableBodyData>
                                         <TableBodyData>{item.planned_at ?? 'Not planned'}</TableBodyData>
                                         <TableBodyData>{item.repair_delay ?? 'No repair delay'}</TableBodyData>

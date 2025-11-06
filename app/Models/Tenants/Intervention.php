@@ -109,6 +109,11 @@ class Intervention extends Model
         return $this->morphMany(Picture::class, 'imageable');
     }
 
+    public function assignable(): MorphTo
+    {
+        return $this->morphTo();
+    }
+
 
     public function updateTotalCosts(): void
     {

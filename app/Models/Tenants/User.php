@@ -7,6 +7,7 @@ namespace App\Models\Tenants;
 use App\Models\Tenants\Asset;
 use App\Observers\UserObserver;
 use App\Models\Tenants\Provider;
+use App\Models\Tenants\Intervention;
 use Spatie\Permission\Traits\HasRoles;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Notifications\Notifiable;
@@ -129,6 +130,11 @@ class User extends Authenticatable
     public function notifications(): HasMany
     {
         return $this->hasMany(ScheduledNotification::class);
+    }
+
+    public function assignedInterventions(): MorphMany
+    {
+        return $this->morphMany(Intervention::class, 'assignable')->withTimestamps();
     }
 
     public function locationRoute(): Attribute
