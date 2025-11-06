@@ -25,19 +25,19 @@ class InterventionAddedByProviderListener
      */
     public function handle(InterventionAddedByProviderEvent $event): void
     {
+        // reassign the intervention to admin or manager
+        if ($event->intervention->interventionable->manager) {
+            $event->intervention->assignable()->associate($event->intervention->interventionable->manager)->save();
+        } else {
+            $event->intervention->assignable()->associate(User::role(['Admin'])->first())->save();
+        }
+
         if (env('APP_ENV') === "local") {
             Mail::to('crolweb@gmail.com')
                 ->send(new InterventionAddedByProviderMail($event->intervention, $event->interventionAction));
         } else {
 
             $users = User::role(['Admin'])->get();
-
-            // reassign the intervetnion to admin or manager
-            if ($event->intervention->interventionable->manager) {
-                $event->intervention->assignable()->associate($event->intervention->interventionable->manager)->save();
-            } else {
-                $event->intervention->assignable()->associate(User::role(['Admin'])->first())->save();
-            }
 
             foreach ($users as $user) {
                 Mail::to($user->email)
