@@ -216,7 +216,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
     const [providers, setProviders] = useState<Provider[] | null>(null);
-    const [interventionAssignees, setInterventionAssignees] = useState<Provider[] | User[]>([]);
+    const [interventionAssignees, setInterventionAssignees] = useState<(Provider | User)[]>([]);
     const [provider, setProvider] = useState<number | null>(null);
     const [user, setUser] = useState<number | null>(null);
 
@@ -304,9 +304,11 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                 setInterventionAssignees([assignee]);
             } else if (provider_id === provider) {
                 // cela veut dire que c'est un user du même provider
-                const newAssignees = user ? [] : interventionAssignees;
-                newAssignees.push(assignee);
-                setInterventionAssignees(newAssignees);
+                if (!interventionAssignees.find((elem) => elem.id === assignee.id)) {
+                    const newAssignees = user ? [] : [...interventionAssignees];
+                    newAssignees.push(assignee);
+                    setInterventionAssignees(newAssignees);
+                }
             } else {
                 // cela veut dire que c'est un nouveau user d'un nouveau provider
                 setProvider(provider_id);
@@ -473,35 +475,35 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                                     <>
                                                         <li
                                                             key={provider.id}
-                                                            className="mt-2 cursor-pointer font-bold"
+                                                            className="border-foreground mt-2 cursor-pointer border-t font-bold last:border-b"
                                                             onClick={() => {
                                                                 setInterventionAssignees([provider]);
                                                                 setProvider(provider.id);
                                                                 setUser(null);
                                                             }}
                                                         >
-                                                            <p>
+                                                            <p className="hover:bg-accent bg-sidebar-border text-background dark:text-foreground px-2 py-1">
                                                                 {provider.name}
                                                                 <span className="ml-2 text-sm">({provider.email})</span>
                                                             </p>
+                                                            <ul className="mt-1 font-normal">
+                                                                {provider.users && provider.users?.length > 0 ? (
+                                                                    provider.users.map((user: User) => (
+                                                                        <li
+                                                                            className="odd:bg-sidebar hover:bg-accent cursor-pointer px-4 py-1"
+                                                                            onClick={() => {
+                                                                                setUser(null);
+                                                                                addAssignee(user, provider.id);
+                                                                            }}
+                                                                        >
+                                                                            {user.full_name} -{user.email}
+                                                                        </li>
+                                                                    ))
+                                                                ) : (
+                                                                    <p>No users</p>
+                                                                )}
+                                                            </ul>
                                                         </li>
-                                                        <ul className="mt-1">
-                                                            {provider.users && provider.users?.length > 0 ? (
-                                                                provider.users.map((user: User) => (
-                                                                    <li
-                                                                        className="cursor-pointer"
-                                                                        onClick={() => {
-                                                                            setUser(null);
-                                                                            addAssignee(user, provider.id);
-                                                                        }}
-                                                                    >
-                                                                        {user.full_name} -{user.email}
-                                                                    </li>
-                                                                ))
-                                                            ) : (
-                                                                <p>No users</p>
-                                                            )}
-                                                        </ul>
                                                     </>
                                                 ))}
                                             </ul>
@@ -608,7 +610,10 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                             )}
 
                             <div className="flex w-full justify-between">
-                                <Button onClick={sendInterventionMail} disabled={!interventionToSend || !interventionAssignees}>
+                                <Button
+                                    onClick={sendInterventionMail}
+                                    disabled={isProcessing || !interventionToSend || interventionAssignees.length === 0}
+                                >
                                     Send
                                 </Button>
 

@@ -9,7 +9,7 @@ const pillVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-sidebar-accent",
+        default: "bg-sidebar-accent text-foreground hover:bg-sidebar dark:hover:bg-ring",
         draft: "bg-sidebar-accent",
 
         'waiting for parts':"bg-chart-3 text-background ",

@@ -9,6 +9,7 @@ import { Pill } from '@/components/ui/pill';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Intervention, InterventionStatus, PaginatedData, PriorityLevel } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
@@ -245,7 +246,7 @@ export default function IndexInterventions({
                     <details className="border-border relative w-full cursor-pointer rounded-md border-2 p-2" open={isLoading ? false : undefined}>
                         <summary>Search/Filter</summary>
 
-                        <div className="bg-border border-border text-background dark:text-foreground absolute top-full flex flex-col items-center gap-4 rounded-b-md border-2 p-2 sm:flex-row">
+                        <div className="bg-border border-border text-background dark:text-foreground absolute top-full z-10 flex flex-col items-center gap-4 rounded-b-md border-2 p-2 sm:flex-row">
                             <div className="flex flex-col items-center gap-2">
                                 <Label htmlFor="status">Type</Label>
                                 <select
@@ -279,11 +280,11 @@ export default function IndexInterventions({
                             </div>
                             <div className="flex flex-col items-center gap-2">
                                 <Label htmlFor="canLogin">Priority</Label>
-                                <div className="space-x-1">
+                                <div className="space-x-1 text-center">
                                     {priorities.map((priority) => (
                                         <Pill
                                             key={priority}
-                                            size={'sm'}
+                                            // size={'sm'}
                                             className="cursor-pointer"
                                             variant={query.priority === priority ? 'active' : 'default'}
                                             onClick={() => setPrioritySearch(priority)}
@@ -316,21 +317,48 @@ export default function IndexInterventions({
                             <TableHeadData className="w-52">Description</TableHeadData>
                             <TableHeadData>Type</TableHeadData>
                             <TableHeadData>Asset</TableHeadData>
-                            <TableHeadData>Priority</TableHeadData>
+                            <TableHeadData>
+                                <div className="flex flex-nowrap items-center gap-2">
+                                    <ArrowDownNarrowWide
+                                        size={16}
+                                        className={cn(
+                                            'cursor-pointer',
+                                            query.sortBy === 'priority' && query.orderBy === 'asc' ? 'text-amber-300' : '',
+                                        )}
+                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'priority', orderBy: 'asc' }))}
+                                    />
+                                    <p>Priority</p>
+                                    <ArrowDownWideNarrow
+                                        size={16}
+                                        className={cn(
+                                            'cursor-pointer',
+                                            query.sortBy === 'priority' && query.orderBy === 'desc' ? 'text-amber-300' : '',
+                                        )}
+                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'priority', orderBy: 'desc' }))}
+                                    />
+                                </div>
+                            </TableHeadData>
                             <TableHeadData>Status</TableHeadData>
                             <TableHeadData>Assigned to</TableHeadData>
                             <TableHeadData>
                                 <div className="flex items-center gap-2">
                                     <ArrowDownNarrowWide
                                         size={16}
-                                        className="cursor-pointer"
-                                        onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'planned_at', sortBy: 'asc' }))}
+                                        className={cn(
+                                            'cursor-pointer',
+                                            query.sortBy === 'planned_at' && query.orderBy === 'asc' ? 'text-amber-300' : '',
+                                            !query.sortBy && !query.orderBy ? 'text-amber-300' : '',
+                                        )}
+                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'planned_at', orderBy: 'asc' }))}
                                     />
                                     <p>Planned at</p>
                                     <ArrowDownWideNarrow
                                         size={16}
-                                        className="cursor-pointer"
-                                        onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'planned_at', sortBy: 'desc' }))}
+                                        className={cn(
+                                            'cursor-pointer',
+                                            query.sortBy === 'planned_at' && query.orderBy === 'desc' ? 'text-amber-300' : '',
+                                        )}
+                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'planned_at', orderBy: 'desc' }))}
                                     />
                                 </div>
                             </TableHeadData>
@@ -338,14 +366,20 @@ export default function IndexInterventions({
                                 <div className="flex items-center gap-2">
                                     <ArrowDownNarrowWide
                                         size={16}
-                                        className="cursor-pointer"
-                                        onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'repair_delay', sortBy: 'asc' }))}
+                                        className={cn(
+                                            'cursor-pointer',
+                                            query.sortBy === 'repair_delay' && query.orderBy === 'asc' ? 'text-amber-300' : '',
+                                        )}
+                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'repair_delay', orderBy: 'asc' }))}
                                     />
                                     <p>Repair delay</p>
                                     <ArrowDownWideNarrow
                                         size={16}
-                                        className="cursor-pointer"
-                                        onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'repair_delay', sortBy: 'desc' }))}
+                                        className={cn(
+                                            'cursor-pointer',
+                                            query.sortBy === 'repair_delay' && query.orderBy === 'desc' ? 'text-amber-300' : '',
+                                        )}
+                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'repair_delay', orderBy: 'desc' }))}
                                     />
                                 </div>
                             </TableHeadData>

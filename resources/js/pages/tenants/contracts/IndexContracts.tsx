@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Pill } from '@/components/ui/pill';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { cn } from '@/lib/utils';
 import { BreadcrumbItem, Contract, ContractsPaginated } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
@@ -217,10 +218,10 @@ export default function IndexContracts({
                     <details className="border-border relative w-full cursor-pointer rounded-md border-2 p-1" open={isLoading ? false : undefined}>
                         <summary>Search/Filter</summary>
 
-                        <div className="bg-border border-border text-background dark:text-foreground absolute top-full flex flex-col items-center gap-4 rounded-b-md border-2 p-2 lg:flex-row">
+                        <div className="bg-border border-border text-background dark:text-foreground absolute top-full z-10 flex flex-col items-center gap-4 rounded-b-md border-2 p-2 lg:flex-row">
                             <div className="flex flex-col items-center gap-2">
                                 <Label htmlFor="role">Renewal type</Label>
-                                <div className="space-x-1">
+                                <div className="space-x-1 text-center">
                                     {renewalTypes.map((renewalType) => (
                                         <Pill
                                             key={renewalType}
@@ -235,7 +236,7 @@ export default function IndexContracts({
                             </div>
                             <div className="flex flex-col items-center gap-2">
                                 <Label htmlFor="role">Type</Label>
-                                <div className="space-x-1">
+                                <div className="space-x-1 text-center">
                                     {contractTypes.map((contractType) => (
                                         <Pill
                                             key={contractType}
@@ -250,7 +251,7 @@ export default function IndexContracts({
                             </div>
                             <div className="flex flex-col items-center gap-2">
                                 <Label htmlFor="canLogin">Status</Label>
-                                <div className="space-x-1">
+                                <div className="space-x-1 text-center">
                                     {statuses.map((status) => (
                                         <Pill
                                             key={status}
@@ -310,14 +311,21 @@ export default function IndexContracts({
                                 <div className="flex items-center gap-2">
                                     <ArrowDownNarrowWide
                                         size={16}
-                                        className="cursor-pointer"
-                                        onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'end_date', sortBy: 'asc' }))}
+                                        className={cn(
+                                            'cursor-pointer',
+                                            query.sortBy === 'end_date' && query.orderBy === 'asc' ? 'text-amber-300' : '',
+                                            !query.sortBy && !query.orderBy ? 'text-amber-300' : '',
+                                        )}
+                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'end_date', orderBy: 'asc' }))}
                                     />
                                     End date
                                     <ArrowDownWideNarrow
                                         size={16}
-                                        className="cursor-pointer"
-                                        onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'end_date', sortBy: 'desc' }))}
+                                        className={cn(
+                                            'cursor-pointer',
+                                            query.sortBy === 'end_date' && query.orderBy === 'desc' ? 'text-amber-300' : '',
+                                        )}
+                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'end_date', orderBy: 'desc' }))}
                                     />
                                 </div>
                             </TableHeadData>

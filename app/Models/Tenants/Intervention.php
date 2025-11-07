@@ -130,4 +130,18 @@ class Intervention extends Model
             get: fn() => $this->interventionType->translations->where('locale', $locale)->first()?->label ?? $this->interventionType->translations->where('locale', config('app.fallback_locale'))?->label
         );
     }
+
+    public function scopeOrderByPriority($query, $direction = 'asc')
+    {
+        $order = $direction === 'asc'
+            ? PriorityLevel::cases()
+            : array_reverse(PriorityLevel::cases());
+
+        $cases = collect($order)->map(
+            fn($priority, $index) =>
+            "WHEN priority = '{$priority->value}' THEN " . ($index + 1)
+        )->join(' ');
+
+        return $query->orderByRaw("CASE {$cases} END");
+    }
 }

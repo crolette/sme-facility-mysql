@@ -20,7 +20,6 @@ class TenantAuthenticatedSessionController extends Controller
     public function create(Request $request): Response
     {
 
-        // dd(tenancy()->tenant);
         return Inertia::render('tenants/auth/login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => $request->session()->get('status'),

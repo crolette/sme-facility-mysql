@@ -200,14 +200,21 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                     <div className="flex items-center gap-2">
                                         <ArrowDownNarrowWide
                                             size={16}
-                                            className="cursor-pointer"
-                                            onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'created_at', sortBy: 'asc' }))}
+                                            className={cn(
+                                                'cursor-pointer',
+                                                query.sortBy === 'created_at' && query.orderBy === 'asc' ? 'text-amber-300' : '',
+                                                !query.sortBy && !query.orderBy ? 'text-amber-300' : '',
+                                            )}
+                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'created_at', orderBy: 'asc' }))}
                                         />
                                         Created at
                                         <ArrowDownWideNarrow
                                             size={16}
-                                            className="cursor-pointer"
-                                            onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'created_at', sortBy: 'desc' }))}
+                                            className={cn(
+                                                'cursor-pointer',
+                                                query.sortBy === 'created_at' && query.orderBy === 'desc' ? 'text-amber-300' : '',
+                                            )}
+                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'created_at', orderBy: 'desc' }))}
                                         />
                                     </div>
                                 </TableHeadData>
@@ -215,14 +222,20 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                     <div className="flex items-center gap-2">
                                         <ArrowDownNarrowWide
                                             size={16}
-                                            className="cursor-pointer"
-                                            onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'updated_at', sortBy: 'asc' }))}
+                                            className={cn(
+                                                'cursor-pointer',
+                                                query.sortBy === 'updated_at' && query.orderBy === 'asc' ? 'text-amber-300' : '',
+                                            )}
+                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'updated_at', orderBy: 'asc' }))}
                                         />
                                         Updated at
                                         <ArrowDownWideNarrow
                                             size={16}
-                                            className="cursor-pointer"
-                                            onClick={() => setQuery((prev) => ({ ...prev, orderBy: 'updated_at', sortBy: 'desc' }))}
+                                            className={cn(
+                                                'cursor-pointer',
+                                                query.sortBy === 'updated_at' && query.orderBy === 'desc' ? 'text-amber-300' : '',
+                                            )}
+                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'updated_at', orderBy: 'desc' }))}
                                         />
                                     </div>
                                 </TableHeadData>

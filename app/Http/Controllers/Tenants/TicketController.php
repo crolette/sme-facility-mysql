@@ -22,8 +22,8 @@ class TicketController extends Controller
         $validator = Validator::make($request->all(), [
             'q' => 'string|max:255|nullable',
             'status' => 'string|nullable',
-            'sortBy' => 'nullable|in:asc,desc',
-            'orderBy' => 'string|nullable',
+            'orderBy' => 'nullable|in:asc,desc',
+            'sortBy' => 'string|nullable',
         ]);
 
         $validatedFields = $validator->validated();
@@ -40,7 +40,7 @@ class TicketController extends Controller
             $tickets->where('status', $validatedFields['status']);
         }
 
-        return Inertia::render('tenants/tickets/IndexTickets', ['items' => $tickets->orderBy($validatedFields['orderBy'] ?? 'created_at', $validatedFields['sortBy'] ?? 'asc')->paginate()->withQueryString(),  'filters' =>  $validator->safe()->only(['q', 'sortBy', 'status', 'orderBy']), 'statuses' => $statuses]);
+        return Inertia::render('tenants/tickets/IndexTickets', ['items' => $tickets->orderBy($validatedFields['sortBy'] ?? 'created_at', $validatedFields['orderBy'] ?? 'asc')->paginate()->withQueryString(),  'filters' =>  $validator->safe()->only(['q', 'sortBy', 'status', 'orderBy']), 'statuses' => $statuses]);
     }
 
 

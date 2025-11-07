@@ -10,7 +10,10 @@ use App\Enums\InterventionStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Validator;
+
+use function PHPSTORM_META\type;
 
 class InterventionController extends Controller
 {
@@ -19,10 +22,11 @@ class InterventionController extends Controller
      */
     public function index(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'q' => 'string|max:255|nullable',
-            'sortBy' => 'in:asc,desc',
-            'orderBy' => 'string|nullable',
+            'orderBy' => 'in:asc,desc',
+            'sortBy' => 'string|nullable',
             'status' => 'string|nullable',
             'priority' => 'string|nullable',
             'type' => 'nullable|integer|gt:0'
@@ -47,11 +51,20 @@ class InterventionController extends Controller
             $interventions->where('description', 'like', '%' . $validatedFields['q'] . '%');
         }
 
+        if (isset($validatedFields['sortBy']) && $validatedFields['sortBy'] === 'priority') {
+            $interventions = $interventions->orderByPriority($validatedFields['orderBy']);
+        } else {
+
+            $interventions->orderBy($validatedFields['sortBy'] ?? 'planned_at', $validatedFields['orderBy'] ?? 'asc');
+        }
+
+        Debugbar::info(($validatedFields));
+
         $priorities = array_column(PriorityLevel::cases(), 'value');
         $statuses = array_column(InterventionStatus::cases(), 'value');
         $types = CategoryType::where('category', 'intervention')->get();
 
-        return Inertia::render('tenants/interventions/IndexInterventions', ['items' => $interventions->orderBy($validatedFields['orderBy'] ?? 'planned_at', $validatedFields['sortBy'] ?? 'asc')->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'sortBy', 'status', 'orderBy', 'type', 'priority']), 'priorities' => $priorities, 'types' => $types, 'statuses' => $statuses]);
+        return Inertia::render('tenants/interventions/IndexInterventions', ['items' => $interventions->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'sortBy', 'status', 'orderBy', 'type', 'priority']), 'priorities' => $priorities, 'types' => $types, 'statuses' => $statuses]);
     }
 
     /**

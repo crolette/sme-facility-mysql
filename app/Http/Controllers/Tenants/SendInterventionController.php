@@ -33,6 +33,9 @@ class SendInterventionController extends Controller
 
         $validated = $validator->validated();
 
+        $emails = collect($validated['emails']);
+        $emails = $emails->unique();
+
         if (isset($validated['provider_id'])) {
             $intervention->assignable()->associate(Provider::find($validated['provider_id']))->save();
         }
@@ -40,7 +43,7 @@ class SendInterventionController extends Controller
             $intervention->assignable()->associate(User::find($validated['user_id']))->save();
         }
 
-        foreach ($validated['emails'] as $email) {
+        foreach ($emails as $email) {
             $url = URL::temporarySignedRoute(
                 'tenant.intervention.provider',
                 now()->addDays(7),

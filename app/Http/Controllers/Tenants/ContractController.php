@@ -35,8 +35,8 @@ class ContractController extends Controller
         $validator = Validator::make($request->all(), [
             'q' => 'string|max:255|nullable',
             'category' => 'integer|nullable|gt:0',
-            'sortBy' => 'in:asc,desc',
-            'orderBy' => 'string|nullable',
+            'orderBy' => 'in:asc,desc',
+            'sortBy' => 'string|nullable',
             'type' => 'string|nullable',
             'status' => 'string|nullable',
             'provider' => 'string|nullable',
@@ -74,7 +74,7 @@ class ContractController extends Controller
         }
 
 
-        return Inertia::render('tenants/contracts/IndexContracts', ['items' => $contracts->orderBy($validatedFields['orderBy'] ?? 'end_date', $validatedFields['sortBy'] ?? 'asc')->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'type', 'status', 'orderBy', 'sortBy', 'provider', 'renewalType']), 'statuses' => $statuses, 'contractTypes' => $contractTypes, 'renewalTypes' => $renewalTypes]);
+        return Inertia::render('tenants/contracts/IndexContracts', ['items' => $contracts->orderBy($validatedFields['sortBy'] ?? 'end_date', $validatedFields['orderBy'] ?? 'asc')->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'type', 'status', 'orderBy', 'sortBy', 'provider', 'renewalType']), 'statuses' => $statuses, 'contractTypes' => $contractTypes, 'renewalTypes' => $renewalTypes]);
     }
 
     /**
