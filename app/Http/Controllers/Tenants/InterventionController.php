@@ -58,8 +58,6 @@ class InterventionController extends Controller
             $interventions->orderBy($validatedFields['sortBy'] ?? 'planned_at', $validatedFields['orderBy'] ?? 'asc');
         }
 
-        Debugbar::info(($validatedFields));
-
         $priorities = array_column(PriorityLevel::cases(), 'value');
         $statuses = array_column(InterventionStatus::cases(), 'value');
         $types = CategoryType::where('category', 'intervention')->get();
