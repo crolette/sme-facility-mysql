@@ -7,6 +7,7 @@ use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
 use App\Exports\AssetsExport;
+use App\Exports\UsersExport;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Company;
@@ -37,6 +38,7 @@ use App\Http\Controllers\Tenants\InterventionProviderController;
 use App\Http\Controllers\Tenants\CreateTicketFromQRCodeController;
 use App\Http\Controllers\Tenants\DocumentsController;
 use App\Http\Controllers\Tenants\ProvidersExportController;
+use App\Http\Controllers\Tenants\UsersExportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -110,6 +112,7 @@ Route::middleware([
         Route::get('/', [ImportExportController::class, 'show'])->name('tenant.import-export');
         Route::get('/assets/export', [AssetsExportController::class, 'index'])->name('tenant.assets.export');
         Route::get('/providers/export', [ProvidersExportController::class, 'index'])->name('tenant.providers.export');
+        Route::get('/users/export', [UsersExportController::class, 'index'])->name('tenant.users.export');
     });
 
     Route::resource('sites', TenantSiteController::class)->parameters(['sites' => 'site'])->only('index', 'show', 'create', 'edit')->names('tenant.sites');

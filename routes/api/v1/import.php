@@ -7,6 +7,7 @@ use App\Models\Tenants\Maintainable;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\V1\ApiImportController;
 use App\Http\Controllers\API\V1\ApiImportProvidersController;
+use App\Http\Controllers\API\V1\ApiImportUsersController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 
 Route::middleware([
@@ -20,5 +21,6 @@ Route::middleware([
 
         Route::post('/assets', [ApiImportController::class, 'store'])->name('api.tenant.import.assets');
         Route::post('/providers', [ApiImportProvidersController::class, 'store'])->name('api.tenant.import.providers');
+        Route::post('/users', [ApiImportUsersController::class, 'store'])->name('api.tenant.import.users');
     }
 );

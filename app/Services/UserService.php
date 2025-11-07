@@ -32,6 +32,7 @@ class UserService
             if (isset($request['avatar']))
                 $user = $this->uploadAndAttachAvatar($user, $request['avatar'], $request['first_name'] . ' ' . $request['last_name']);
 
+
             if (isset($request['provider_id']))
                 $user = $this->attachProvider($user, $request['provider_id']);
 
@@ -47,9 +48,30 @@ class UserService
             return $e;
         }
     }
+
+    public function update(User $user, $data)
+    {
+        Log::info($data, [$user->id]);
+        $user->update([...$data]);
+
+        if ($user->provider && !isset($data['provider_id'])) {
+            Log::info('remove provider', [$user->id]);
+            $user = $this->detachProvider($user, $data['provider_id']);
+        }
+
+        if (isset($data['provider_id'])) {
+            Log::info('add provider', [$user->id]);
+            $user = $this->attachProvider($user, $data['provider_id']);
+        }
+
+        $user->save();
+
+        return $user;
+    }
+
+
     public function uploadAndAttachAvatar(User $user, $file, string $name): User
     {
-        // dump($file);
         if (is_array($file))
             $file = $file[0];
 
@@ -78,8 +100,6 @@ class UserService
 
     public function compressAvatar(User $user)
     {
-        Log::info('--- START COMPRESSING USER AVATAR : ' . $user->id . ' - ' . $user->avatar);
-
         $path = $user->avatar;
 
         Company::decrementDiskSize(Storage::disk('tenants')->size($user->avatar));
@@ -127,11 +147,6 @@ class UserService
         if ($user->provider_id === $providerId)
             return $user;
 
-        if ($user->provider_id !== $providerId) {
-            $user = $this->detachProvider($user);
-        }
-
-
         $provider = Provider::find($providerId);
         $user->provider()->associate($provider);
 
@@ -140,7 +155,9 @@ class UserService
 
     public function detachProvider(User $user): User
     {
+        Log::info('detachProvider');
         $user->provider()->disassociate()->save();
+
         return $user;
     }
 };

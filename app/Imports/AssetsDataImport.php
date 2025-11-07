@@ -39,7 +39,7 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
     public function collection(Collection $rows)
     {
         foreach ($rows as $index => $row) {
-            $assetHash = $row['hash'];
+            $assetHash = $row['hash'] ?? null;
             $rowWithoutHash = $row;
             unset($rowWithoutHash['hash']);
 

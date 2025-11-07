@@ -39,7 +39,7 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
         foreach ($rows as $index => $row) {
             Log::info('row');
             try {
-                $providerHash = $row['hash'];
+                $providerHash = $row['hash'] ?? null;
 
                 $rowWithoutHash = $row;
                 unset($rowWithoutHash['hash']);
@@ -152,7 +152,6 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
             'vat_number' => ['nullable', 'string', 'regex:/^[A-Z]{2}[0-9A-Z]{2,12}$/', 'max:14',],
             'phone_number' => 'required|string|regex:/^\+\d{8,15}$/|max:16',
             'website' => 'nullable|url:http,https',
-            'logo' => 'nullable|file|mimes:png,jpg,jpeg|max:' . Provider::maxUploadSizeKB(),
             'categoryId' => ['required', Rule::in(CategoryType::where('category', 'provider')->pluck('id')->toArray())],
         ];
     }

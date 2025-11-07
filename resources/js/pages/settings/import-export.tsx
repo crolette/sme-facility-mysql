@@ -76,6 +76,27 @@ export default function ImportExportSettings() {
         }
     };
 
+    const uploadUserFile: FormEventHandler = async (e) => {
+        e.preventDefault();
+        setIsProcessing(true);
+        try {
+            const response = await axios.post(route('api.tenant.import.users'), data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            if (response.data.status === 'success') {
+                showToast(response.data.message, response.data.status);
+            }
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
+        } finally {
+            reset();
+            setData('file', null);
+            setIsProcessing(false);
+        }
+    };
+
     const exportAssets: FormEventHandler = async (e) => {
         e.preventDefault();
         setIsProcessing(true);
@@ -100,6 +121,25 @@ export default function ImportExportSettings() {
 
         try {
             const response = await axios.get(route('tenant.providers.export'));
+            console.log(response.data);
+            if (response.data.status === 'success') {
+                showToast(response.data.message, response.data.status);
+            }
+        } catch (error) {
+            console.log(error);
+            showToast(error.response.data.message, error.response.data.status);
+        } finally {
+            reset();
+            setIsProcessing(false);
+        }
+    };
+
+    const exportUsers: FormEventHandler = async (e) => {
+        e.preventDefault();
+        setIsProcessing(true);
+
+        try {
+            const response = await axios.get(route('tenant.users.export'));
             console.log(response.data);
             if (response.data.status === 'success') {
                 showToast(response.data.message, response.data.status);
@@ -153,6 +193,32 @@ export default function ImportExportSettings() {
                         Exporter les providers
                     </Button>
                     <form action="" onSubmit={uploadProviderFile}>
+                        <input
+                            type="file"
+                            name=""
+                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            id=""
+                            onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
+                        />
+                        <Button disabled={isProcessing || data.file === null}>
+                            {isProcessing ? (
+                                <>
+                                    <Loader className="animate-pulse" />
+                                    <span>Submitting...</span>
+                                </>
+                            ) : (
+                                <span>Submit</span>
+                            )}
+                        </Button>
+                    </form>
+
+                    <h3>Users</h3>
+
+                    <Button variant={'secondary'} onClick={exportUsers} disabled={isProcessing}>
+                        <BiSolidFilePdf size={20} />
+                        Exporter les providers
+                    </Button>
+                    <form action="" onSubmit={uploadUserFile}>
                         <input
                             type="file"
                             name=""
