@@ -76,36 +76,37 @@ export default function ImportExportSettings() {
         }
     };
 
-    const exportAssets: FormEventHandler = async (e) => {
+    const uploadUserFile: FormEventHandler = async (e) => {
         e.preventDefault();
         setIsProcessing(true);
-
         try {
-            const response = await axios.get(route('tenant.assets.export'));
-            console.log(response.data);
+            const response = await axios.post(route('api.tenant.import.users'), data, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
             if (response.data.status === 'success') {
                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.log(error);
             showToast(error.response.data.message, error.response.data.status);
         } finally {
+            reset();
+            setData('file', null);
             setIsProcessing(false);
         }
     };
 
-    const exportProviders: FormEventHandler = async (e) => {
-        e.preventDefault();
-        setIsProcessing(true);
+    const [itemsToBeExported, setItemsToBeExported] = useState<string | null>(null);
 
+    const exportItems = async () => {
+        setIsProcessing(true);
         try {
-            const response = await axios.get(route('tenant.providers.export'));
-            console.log(response.data);
+            const response = await axios.get(route(`tenant.${itemsToBeExported}.export`));
             if (response.data.status === 'success') {
                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.log(error);
             showToast(error.response.data.message, error.response.data.status);
         } finally {
             reset();
@@ -122,11 +123,22 @@ export default function ImportExportSettings() {
                     <div className="relative gap-4">
                         <HeadingSmall title="Import/Export" />
                     </div>
+
+                    <div className="flex w-fit flex-col gap-4">
+                        <select name="" id="" defaultValue={''} onChange={(e) => setItemsToBeExported(e.target.value)}>
+                            <option value="" disabled>
+                                -- Select items to export --
+                            </option>
+                            <option value="assets">Assets</option>
+                            <option value="providers">Providers</option>
+                            <option value="users">Users</option>
+                        </select>
+                        <Button variant={'secondary'} onClick={exportItems} disabled={isProcessing || !itemsToBeExported}>
+                            <BiSolidFilePdf size={20} />
+                            Export
+                        </Button>
+                    </div>
                     <h3>Assets</h3>
-                    <Button variant={'secondary'} onClick={exportAssets} disabled={isProcessing}>
-                        <BiSolidFilePdf size={20} />
-                        Exporter les assets
-                    </Button>
                     <form action="" onSubmit={uploadAssetFile}>
                         <input
                             type="file"
@@ -148,10 +160,6 @@ export default function ImportExportSettings() {
                     </form>
                     <h3>Providers</h3>
 
-                    <Button variant={'secondary'} onClick={exportProviders} disabled={isProcessing}>
-                        <BiSolidFilePdf size={20} />
-                        Exporter les providers
-                    </Button>
                     <form action="" onSubmit={uploadProviderFile}>
                         <input
                             type="file"
@@ -172,12 +180,26 @@ export default function ImportExportSettings() {
                         </Button>
                     </form>
 
-                    {/* <ImageUploadModale
-                        isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)}
-                        uploadUrl={route('api.company.logo.store')}
-                        onUploadSuccess={fetchCompany}
-                    /> */}
+                    <h3>Users</h3>
+                    <form action="" onSubmit={uploadUserFile}>
+                        <input
+                            type="file"
+                            name=""
+                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            id=""
+                            onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
+                        />
+                        <Button disabled={isProcessing || data.file === null}>
+                            {isProcessing ? (
+                                <>
+                                    <Loader className="animate-pulse" />
+                                    <span>Submitting...</span>
+                                </>
+                            ) : (
+                                <span>Submit</span>
+                            )}
+                        </Button>
+                    </form>
                 </div>
             </SettingsLayout>
         </AppLayout>

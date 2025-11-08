@@ -17,21 +17,23 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
-use App\Jobs\ImportExcelProvidersJob;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Tenant\ProviderRequest;
 use App\Http\Requests\Tenant\ImportFileRequest;
 
-class ApiImportProvidersController extends Controller
+class ApiImportAssetsController extends Controller
 {
+    public function __construct(
+        protected LogoService $logoService
+    ) {}
 
     public function store(ImportFileRequest $request)
     {
         $validated = $request->validated();
 
-        if (!str_contains($validated['file']->getClientOriginalName(), 'providers')) {
-            return ApiResponse::error('Wrong file. The file name should include providers');
+        if (!str_contains($validated['file']->getClientOriginalName(), 'assets')) {
+            return ApiResponse::error('Wrong file. The file name should include assets');
         }
 
         if (!Gate::allows('import-excel')) {
@@ -39,7 +41,7 @@ class ApiImportProvidersController extends Controller
             return redirect()->back();
         }
 
-        if (Auth::user()->cannot('create', Provider::class)) {
+        if (Auth::user()->cannot('create', Asset::class)) {
             ApiResponse::notAuthorized();
             return redirect()->back();
         }
@@ -51,9 +53,9 @@ class ApiImportProvidersController extends Controller
             Storage::disk('tenants')->putFileAs($directory, $validated['file'], $fileName);
 
             Log::info('DISPATCH IMPORT EXCEL JOB : ' . $directory . $fileName);
-            ImportExcelProvidersJob::dispatch(Auth::user(), $directory . $fileName);
+            ImportExcelAssetsJob::dispatch(Auth::user(), $directory . $fileName);
 
-            return ApiResponse::success('', 'Providers will be imported, you will receive an email when it\'s done.');
+            return ApiResponse::success('', 'Assets will be imported, you will receive an email when it\'s done.');
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
 
@@ -66,7 +68,7 @@ class ApiImportProvidersController extends Controller
             }
             Log::info($failures);
 
-            return ApiResponse::error('Error during providers import');
+            return ApiResponse::error('Error during import');
         }
     }
 };

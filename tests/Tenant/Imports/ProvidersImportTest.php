@@ -140,6 +140,20 @@ it('can import and create new providers', function () {
     );
 });
 
+it('fails when the name of the file does not contain users', function () {
+
+    Storage::fake('local');
+
+    $file = UploadedFile::fake()->createWithContent('users.xlsx', file_get_contents(base_path('tests/fixtures/users.xlsx')));
+
+    $formData = ['file' => $file];
+
+    $response = $this->postToTenant('api.tenant.import.providers', $formData, [], [
+        'Content-Type' => 'multipart/form-data'
+    ]);
+    $response->assertJson(['status' => 'error', 'message' => 'Wrong file. The file name should include providers']);
+});
+
 it('does not update provider with no changes', function () {
     assertDatabaseHas(
         'providers',

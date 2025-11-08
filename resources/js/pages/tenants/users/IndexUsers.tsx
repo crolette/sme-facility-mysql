@@ -22,7 +22,7 @@ export interface SearchParams {
 export default function IndexUsers({ items, filters }: { items: PaginatedData; filters: SearchParams }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Index users`,
+            title: `Contacts`,
             href: `/users`,
         },
     ];
@@ -146,7 +146,7 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Sites" />
+            <Head title="Contacts" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex w-full justify-between">
                     <details className="border-border relative w-full cursor-pointer rounded-md border-2 p-1" open={isLoading ? false : undefined}>
