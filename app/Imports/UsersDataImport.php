@@ -3,25 +3,18 @@
 namespace App\Imports;
 
 use Exception;
-use App\Models\Translation;
 use Illuminate\Support\Str;
 use App\Models\Tenants\User;
 use App\Services\UserService;
-use Illuminate\Validation\Rule;
 use App\Models\Tenants\Provider;
 use App\Rules\NotDisposableEmail;
-use App\Services\ProviderService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use App\Models\Central\CategoryType;
 use App\Services\UserExportImportService;
-use App\Models\Tenants\CountryTranslation;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithStartRow;
-use App\Services\ProviderExportImportService;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
 
 class UsersDataImport implements ToCollection, WithHeadingRow, WithStartRow, WithValidation, WithCalculatedFormulas
@@ -40,24 +33,17 @@ class UsersDataImport implements ToCollection, WithHeadingRow, WithStartRow, Wit
     {
         foreach ($rows as $index => $row) {
 
-            Log::info('GOGOGO', [$row]);
             try {
                 $userHash = $row['hash'];
 
                 $rowWithoutHash = $row;
                 unset($rowWithoutHash['hash'], $rowWithoutHash['provider']);
 
-                Log::info('rowWithoutHash', [$rowWithoutHash]);
-
                 $calculatedHash = app(UserExportImportService::class)->calculateHash([...$rowWithoutHash]);
-                Log::info('calculatedHash', [$index, $userHash, $calculatedHash]);
                 if ($userHash !== $calculatedHash) {
-                    Log::info('transformRowForProviderCreation before ');
                     $userData = $this->transformRowForProviderCreation($row);
-                    Log::info('transformRowForProviderCreation after', [$userData]);
 
                     if ($row['id']) {
-                        Log::info('CHANGE USER', [$row['id']]);
                         $provider = User::find($row['id']);
                         app(UserService::class)->update($provider, $userData);
                     } else {
@@ -111,6 +97,8 @@ class UsersDataImport implements ToCollection, WithHeadingRow, WithStartRow, Wit
             if ($provider !== null) {
                 $data = [...$data, 'provider_id' => $provider->id];
             }
+        } else {
+            $data = [...$data, 'provider_id' => null];
         }
 
         return $data;

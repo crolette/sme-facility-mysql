@@ -10,6 +10,7 @@ use App\Imports\AssetsImport;
 use App\Models\Tenants\Asset;
 use App\Services\LogoService;
 use App\Models\Tenants\Provider;
+use App\Jobs\ImportExcelUsersJob;
 use App\Jobs\ImportExcelAssetsJob;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,30 +21,38 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Jobs\ImportExcelProvidersJob;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Tenant\ProviderRequest;
-use App\Jobs\ImportExcelUsersJob;
+use App\Http\Requests\Tenant\ImportFileRequest;
+use App\Models\Tenants\User;
 
 class ApiImportUsersController extends Controller
 {
 
-    public function store(Request $request)
+    public function store(ImportFileRequest $request)
     {
+        $validated = $request->validated();
+
+        if (!str_contains($validated['file']->getClientOriginalName(), 'users')) {
+            return ApiResponse::error('Wrong file. The file name should include users');
+        }
 
         if (!Gate::allows('import-excel')) {
             ApiResponse::notAuthorized();
             return redirect()->back();
         }
 
-        if (Auth::user()->cannot('create', Provider::class)) {
+        if (Auth::user()->cannot('create', User::class)) {
             ApiResponse::notAuthorized();
             return redirect()->back();
         }
 
+
         try {
 
             $directory = tenancy()->tenant->id . "/imports/";
-            $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . $request->file->getClientOriginalName();
-            Storage::disk('tenants')->putFileAs($directory, $request->file, $fileName);
+            $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . $validated['file']->getClientOriginalName();
+            Storage::disk('tenants')->putFileAs($directory, $validated['file'], $fileName);
 
             Log::info('DISPATCH IMPORT USERS EXCEL JOB : ' . $directory . $fileName);
             ImportExcelUsersJob::dispatch(Auth::user(), $directory . $fileName);

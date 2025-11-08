@@ -51,16 +51,13 @@ class UserService
 
     public function update(User $user, $data)
     {
-        Log::info($data, [$user->id]);
         $user->update([...$data]);
 
         if ($user->provider && !isset($data['provider_id'])) {
-            Log::info('remove provider', [$user->id]);
             $user = $this->detachProvider($user, $data['provider_id']);
         }
 
         if (isset($data['provider_id'])) {
-            Log::info('add provider', [$user->id]);
             $user = $this->attachProvider($user, $data['provider_id']);
         }
 
@@ -155,7 +152,6 @@ class UserService
 
     public function detachProvider(User $user): User
     {
-        Log::info('detachProvider');
         $user->provider()->disassociate()->save();
 
         return $user;

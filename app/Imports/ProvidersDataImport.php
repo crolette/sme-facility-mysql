@@ -35,9 +35,7 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
      */
     public function collection(Collection $rows)
     {
-        Log::info('collection');
         foreach ($rows as $index => $row) {
-            Log::info('row');
             try {
                 $providerHash = $row['hash'] ?? null;
 
@@ -48,7 +46,6 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
 
                 if ($providerHash !== $calculatedHash) {
                     $providerData = $this->transformRowForProviderCreation($row);
-                    Log::info('providerHash !== $calculatedHash');
 
                     if ($row['id']) {
                         $provider = Provider::find($row['id']);

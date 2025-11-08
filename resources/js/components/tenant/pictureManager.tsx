@@ -1,10 +1,10 @@
 import { Picture } from '@/types';
 import axios from 'axios';
-import { FormEventHandler, useEffect, useState } from 'react';
-import { Button } from '../ui/button';
-import { useToast } from '../ToastrContext';
 import { PlusCircle, Trash2 } from 'lucide-react';
+import { FormEventHandler, useEffect, useState } from 'react';
 import ImageUploadModale from '../ImageUploadModale';
+import { useToast } from '../ToastrContext';
+import { Button } from '../ui/button';
 
 interface PictureManagerProps {
     itemCodeId: number | string;
@@ -102,41 +102,6 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
                 uploadUrl={route(uploadRoute, itemCodeId)}
                 onUploadSuccess={fetchPictures}
             />
-
-            {/* {addPictures && (
-                <div className="bg-background/50 absolute inset-0 z-50">
-                    <div className="bg-background/20 flex h-dvh items-center justify-center">
-                        <div className="bg-background flex flex-col items-center justify-center gap-4 p-4">
-                            <p className="font-semibold">Add new pictures</p>
-                            <form onSubmit={postNewPictures} className="flex flex-col gap-4">
-                                <input
-                                    type="file"
-                                    multiple
-                                    onChange={(e) => {
-                                        if (e.target.files) {
-                                            setNewPictures({ pictures: Array.from(e.target.files) });
-                                        }
-                                    }}
-                                    accept="image/png, image/jpeg, image/jpg"
-                                />
-                                <div className="flex justify-between space-x-4">
-                                    <Button disabled={newPictures == null}>Add new pictures</Button>
-                                    <Button
-                                        onClick={() => {
-                                            setNewPictures(null);
-                                            setAddPictures(false);
-                                        }}
-                                        type="button"
-                                        variant={'secondary'}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            )} */}
         </div>
     );
 };

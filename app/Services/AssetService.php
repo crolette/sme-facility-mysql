@@ -30,15 +30,11 @@ class AssetService
 
     public function update(Asset $asset, array $data)
     {
-        Log::info('ASSET UPDATE SERVICE');
-        Log::info($data);
-        $updated = $asset->update(
+        $asset->update(
             [
                 ...$data
             ],
         );
-
-        Log::info('ASSET UPDATED : ' . $updated);
 
         return $asset;
     }
@@ -127,8 +123,6 @@ class AssetService
         $asset->location()->associate($location);
 
         $asset->reference_code = $referenceCode;
-
-        $asset->save();
 
         return $asset;
     }

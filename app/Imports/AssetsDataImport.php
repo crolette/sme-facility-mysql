@@ -39,7 +39,7 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
     public function collection(Collection $rows)
     {
         foreach ($rows as $index => $row) {
-            $assetHash = $row['hash'] ?? null;
+            $assetHash = $row['hash'];
             $rowWithoutHash = $row;
             unset($rowWithoutHash['hash']);
 
@@ -48,7 +48,6 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
             if ($assetHash !== $calculatedHash) {
                 $assetData = $this->transformRowForAssetCreation($row);
                 $maintainableData = $this->transformRowForMaintainableCreation($row);
-
                 if ($row['reference_code']) {
                     $asset = Asset::where('code', $row['code'])->first();
                     app(AssetService::class)->update($asset, $assetData);

@@ -2,18 +2,9 @@
 
 use Carbon\Carbon;
 use App\Imports\UsersImport;
-use App\Models\LocationType;
-use App\Models\Tenants\Room;
-use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
-use App\Imports\AssetsImport;
-use App\Models\Tenants\Asset;
-use App\Models\Tenants\Floor;
-use App\Imports\ProvidersImport;
-use App\Models\Tenants\Building;
 use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Log;
 use App\Models\Central\CategoryType;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Storage;
@@ -98,6 +89,20 @@ it('can import and create new users', function () {
     );
 });
 
+it('fails when the name of the file does not contain users', function () {
+
+    Storage::fake('local');
+
+    $file = UploadedFile::fake()->createWithContent('providers.xlsx', file_get_contents(base_path('tests/fixtures/providers.xlsx')));
+
+    $formData = ['file' => $file];
+
+    $response = $this->postToTenant('api.tenant.import.users', $formData, [], [
+        'Content-Type' => 'multipart/form-data'
+    ]);
+    $response->assertJson(['status' => 'error', 'message' => 'Wrong file. The file name should include users']);
+});
+
 it('does not update user with no changes', function () {
     assertDatabaseHas(
         'users',
@@ -112,9 +117,9 @@ it('does not update user with no changes', function () {
 
     Storage::fake('local');
 
-    $file = UploadedFile::fake()->createWithContent('providers.xlsx', file_get_contents(base_path('tests/fixtures/providers.xlsx')));
+    $file = UploadedFile::fake()->createWithContent('users.xlsx', file_get_contents(base_path('tests/fixtures/users.xlsx')));
 
-    Excel::import(new ProvidersImport, $file);
+    Excel::import(new UsersImport, $file);
 
     assertDatabaseHas(
         'users',

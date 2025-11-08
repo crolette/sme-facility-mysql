@@ -5,10 +5,10 @@ use App\Helpers\ApiResponse;
 use App\Enums\MaintenanceFrequency;
 use App\Models\Tenants\Maintainable;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\V1\ApiImportController;
-use App\Http\Controllers\API\V1\ApiImportProvidersController;
 use App\Http\Controllers\API\V1\ApiImportUsersController;
+use App\Http\Controllers\API\V1\ApiImportAssetsController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
+use App\Http\Controllers\API\V1\ApiImportProvidersController;
 
 Route::middleware([
     'web',
@@ -19,7 +19,7 @@ Route::middleware([
 ])->prefix('/v1/import')->group(
     function () {
 
-        Route::post('/assets', [ApiImportController::class, 'store'])->name('api.tenant.import.assets');
+        Route::post('/assets', [ApiImportAssetsController::class, 'store'])->name('api.tenant.import.assets');
         Route::post('/providers', [ApiImportProvidersController::class, 'store'])->name('api.tenant.import.providers');
         Route::post('/users', [ApiImportUsersController::class, 'store'])->name('api.tenant.import.users');
     }

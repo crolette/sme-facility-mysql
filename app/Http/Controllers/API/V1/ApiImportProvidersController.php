@@ -21,12 +21,18 @@ use App\Jobs\ImportExcelProvidersJob;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Tenant\ProviderRequest;
+use App\Http\Requests\Tenant\ImportFileRequest;
 
 class ApiImportProvidersController extends Controller
 {
 
-    public function store(Request $request)
+    public function store(ImportFileRequest $request)
     {
+        $validated = $request->validated();
+
+        if (!str_contains($validated['file']->getClientOriginalName(), 'providers')) {
+            return ApiResponse::error('Wrong file. The file name should include providers');
+        }
 
         if (!Gate::allows('import-excel')) {
             ApiResponse::notAuthorized();
@@ -41,8 +47,8 @@ class ApiImportProvidersController extends Controller
         try {
 
             $directory = tenancy()->tenant->id . "/imports/"; // e.g., "webxp/tickets/1/pictures"
-            $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . $request->file->getClientOriginalName();
-            Storage::disk('tenants')->putFileAs($directory, $request->file, $fileName);
+            $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . $validated['file']->getClientOriginalName();
+            Storage::disk('tenants')->putFileAs($directory, $validated['file'], $fileName);
 
             Log::info('DISPATCH IMPORT EXCEL JOB : ' . $directory . $fileName);
             ImportExcelProvidersJob::dispatch(Auth::user(), $directory . $fileName);

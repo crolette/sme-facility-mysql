@@ -1,9 +1,9 @@
+import { useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { ImageIcon, Upload, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { Button } from './ui/button';
 import { useToast } from './ToastrContext';
-import { useForm } from '@inertiajs/react';
+import { Button } from './ui/button';
 
 // Props pour ImageUploadModal
 interface ImageUploadModalProps {
@@ -11,7 +11,7 @@ interface ImageUploadModalProps {
     onClose: () => void;
     uploadUrl: string;
     title?: string;
-    onUploadSuccess?: (result: any) => void; 
+    onUploadSuccess?: (result: any) => void;
 }
 
 // Props pour Modal
@@ -20,11 +20,11 @@ interface ModaleProps {
     onClose: () => void;
     title: string;
     children: React.ReactNode;
-    uploading?: boolean
+    uploading?: boolean;
 }
 
 interface TypeFormData {
-    pictures: FileList | null
+    pictures: FileList | null;
 }
 
 const __MAXFILESIZE = 6;
@@ -56,34 +56,31 @@ const Modale = ({ isOpen, onClose, children, title, uploading }: ModaleProps) =>
 };
 
 export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUploadSuccess, title = 'Upload image' }: ImageUploadModalProps) {
-    const [previews, setPreviews] = useState<{ url: string, name: string}[] | null>(null);
+    const [previews, setPreviews] = useState<{ url: string; name: string }[] | null>(null);
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const { showToast } = useToast();
     const fileInputRef = useRef(null);
     const { data, setData } = useForm<TypeFormData>({
-        pictures: []
-    })
+        pictures: [],
+    });
 
     const handleFileSelect = (files: FileList | null) => {
-
-        if (!files)
-            return;
+        if (!files) return;
 
         if (files?.length > 3) {
             setData('pictures', null);
             return setError('Max 3 files');
-
         }
 
         if (files?.length > 0) {
             setData('pictures', files);
-setError(null);
-             const urls = Array.from(files).map((file) => ({url: URL.createObjectURL(file), name: file.name}));
-             setPreviews(urls);
+            setError(null);
+            const urls = Array.from(files).map((file) => ({ url: URL.createObjectURL(file), name: file.name }));
+            setPreviews(urls);
 
-             // Nettoyage
-             return () => urls.forEach((url) => URL.revokeObjectURL(url));
+            // Nettoyage
+            return () => urls.forEach((url) => URL.revokeObjectURL(url));
         }
     };
 
@@ -116,7 +113,7 @@ setError(null);
             // Réinitialiser et fermer
             handleClose();
         } catch (err) {
-              showToast(err.response.data.message, err.response.data.status);
+            showToast(err.response.data.message, err.response.data.status);
             //   throw new Error(`Erreur d'upload: ${response.status}`);
             setError(err.message || "Erreur lors de l'upload");
         } finally {
@@ -146,9 +143,9 @@ setError(null);
         const handleDrop = (e: DragEvent) => {
             e.preventDefault();
             const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    handleFileSelect(files);
-                }
+            if (files.length > 0) {
+                handleFileSelect(files);
+            }
         };
 
         element.addEventListener('dragover', handleDragOver);
@@ -164,13 +161,10 @@ setError(null);
         <Modale isOpen={isOpen} onClose={handleClose} title={title} uploading={uploading}>
             <div className="space-y-4">
                 {/* Zone de drop/sélection */}
-                
 
                 <div
                     className="hover:border-foreground border-foreground/30 cursor-pointer rounded-lg border-2 border-dashed p-2 text-center transition-colors"
                     onClick={() => fileInputRef.current?.click()}
-                    // onDragOver={handleDragOver}
-                    // onDrop={handleDrop}
                     ref={dropZoneRef}
                 >
                     {previews ? (

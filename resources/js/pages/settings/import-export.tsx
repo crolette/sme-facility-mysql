@@ -103,12 +103,10 @@ export default function ImportExportSettings() {
 
         try {
             const response = await axios.get(route('tenant.assets.export'));
-            console.log(response.data);
             if (response.data.status === 'success') {
                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.log(error);
             showToast(error.response.data.message, error.response.data.status);
         } finally {
             setIsProcessing(false);
@@ -121,12 +119,10 @@ export default function ImportExportSettings() {
 
         try {
             const response = await axios.get(route('tenant.providers.export'));
-            console.log(response.data);
             if (response.data.status === 'success') {
                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.log(error);
             showToast(error.response.data.message, error.response.data.status);
         } finally {
             reset();
@@ -140,12 +136,10 @@ export default function ImportExportSettings() {
 
         try {
             const response = await axios.get(route('tenant.users.export'));
-            console.log(response.data);
             if (response.data.status === 'success') {
                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.log(error);
             showToast(error.response.data.message, error.response.data.status);
         } finally {
             reset();
@@ -237,13 +231,6 @@ export default function ImportExportSettings() {
                             )}
                         </Button>
                     </form>
-
-                    {/* <ImageUploadModale
-                        isOpen={isModalOpen}
-                        onClose={() => setIsModalOpen(false)}
-                        uploadUrl={route('api.company.logo.store')}
-                        onUploadSuccess={fetchCompany}
-                    /> */}
                 </div>
             </SettingsLayout>
         </AppLayout>

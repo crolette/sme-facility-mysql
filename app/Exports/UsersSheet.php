@@ -2,9 +2,11 @@
 
 namespace App\Exports;
 
-use App\Models\Tenants\Provider;
 use App\Models\Tenants\User;
+use App\Models\Tenants\Provider;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Events\AfterSheet;
+use App\Services\UserExportImportService;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\Exportable;
@@ -14,7 +16,6 @@ use Maatwebsite\Excel\Concerns\WithMapping;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use App\Services\ProviderExportImportService;
-use App\Services\UserExportImportService;
 use Illuminate\Contracts\Support\Responsable;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -35,7 +36,6 @@ class UsersSheet implements FromQuery, WithMapping, Responsable, WithEvents, Wit
     public function query()
     {
         return User::query();
-        // return Asset::query()->whereIn('id', [37, 49]);
     }
 
     public function map($provider): array
@@ -83,16 +83,16 @@ class UsersSheet implements FromQuery, WithMapping, Responsable, WithEvents, Wit
 
     public function styles(Worksheet $sheet)
     {
-        // $protection = $sheet->getProtection();
-        // $protection->setPassword('');
-        // $protection->setSheet(true);
+        $protection = $sheet->getProtection();
+        $protection->setPassword('');
+        $protection->setSheet(true);
         $sheet->protectCells('1:1', '');
         $sheet->protectCells('1:2', '');
         $sheet->protectCells('A:A', '');
         $sheet->protectCells('B:H', '');
         $sheet->getRowDimension('1')->setRowHeight(0);
-        // $sheet->getColumnDimension('A')->setVisible(false);
-        // $sheet->getColumnDimension('H')->setVisible(false);
+        $sheet->getColumnDimension('A')->setVisible(false);
+        $sheet->getColumnDimension('H')->setVisible(false);
         $sheet->freezePane('D3');
 
 
