@@ -7,7 +7,7 @@ import { Pill } from '@/components/ui/pill';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { BreadcrumbItem, Contract, ContractsPaginated } from '@/types';
+import { BreadcrumbItem, CentralType, Contract, ContractsPaginated } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { ArrowDownNarrowWide, ArrowDownWideNarrow, Loader, Pencil, PlusCircle, Trash2, X } from 'lucide-react';
@@ -19,7 +19,7 @@ export interface SearchParams {
     orderBy: string | null;
     type: string | null;
     status: string | null;
-    provider: string | null;
+    provider_category_id: number | null;
     renewalType: string | null;
 }
 
@@ -29,12 +29,14 @@ export default function IndexContracts({
     filters,
     statuses,
     renewalTypes,
+    providerCategories,
 }: {
     items: ContractsPaginated;
     filters: SearchParams;
     contractTypes: string[];
     statuses: string[];
     renewalTypes: string[];
+    providerCategories: CentralType[];
 }) {
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -60,20 +62,20 @@ export default function IndexContracts({
         }
     };
 
-    const removeContract = async (contract_id: number) => {
-        if (!contractableReference) return;
+    // const removeContract = async (contract_id: number) => {
+    //     if (!contractableReference) return;
 
-        try {
-            const response = await axios.delete(route(`api.${routeName}.contracts.delete`, contractableReference), {
-                data: { contract_id: contract_id },
-            });
-            if (response.data.status === 'success') {
-                router.visit(route('tenant.contracts.index'));
-            }
-        } catch {
-            // console.log(error);
-        }
-    };
+    //     try {
+    //         const response = await axios.delete(route(`api.${routeName}.contracts.delete`, contractableReference), {
+    //             data: { contract_id: contract_id },
+    //         });
+    //         if (response.data.status === 'success') {
+    //             router.visit(route('tenant.contracts.index'));
+    //         }
+    //     } catch {
+    //         // console.log(error);
+    //     }
+    // };
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -83,7 +85,7 @@ export default function IndexContracts({
         orderBy: filters.orderBy ?? null,
         status: filters.status ?? null,
         type: filters.type ?? null,
-        provider: filters.provider ?? null,
+        provider_category_id: filters.provider_category_id ?? null,
         renewalType: filters.renewalType ?? null,
     });
 
@@ -114,34 +116,6 @@ export default function IndexContracts({
             });
         }
     }, [debouncedSearch]);
-
-    const [providerSearch, setProviderSearch] = useState(query.provider);
-    const [debouncedProviderSearch, setDebouncedProviderSearch] = useState<string>('');
-
-    useEffect(() => {
-        if (!providerSearch) return;
-
-        const handler = setTimeout(() => {
-            setDebouncedProviderSearch(providerSearch);
-        }, 500);
-
-        return () => {
-            clearTimeout(handler);
-        };
-    }, [providerSearch]);
-
-    useEffect(() => {
-        if (query.provider !== debouncedProviderSearch && debouncedProviderSearch?.length > 2) {
-            router.visit(route('tenant.contracts.index', { ...query, provider: debouncedProviderSearch }), {
-                onStart: () => {
-                    setIsLoading(true);
-                },
-                onFinish: () => {
-                    setIsLoading(false);
-                },
-            });
-        }
-    }, [debouncedProviderSearch]);
 
     const clearSearch = () => {
         router.visit(route('tenant.contracts.index'), {
@@ -234,6 +208,7 @@ export default function IndexContracts({
                                     ))}
                                 </div>
                             </div>
+                            <div className="border-foreground block h-10 w-0.5 border"></div>
                             <div className="flex flex-col items-center gap-2">
                                 <Label htmlFor="role">Type</Label>
                                 <div className="space-x-1 text-center">
@@ -249,8 +224,26 @@ export default function IndexContracts({
                                     ))}
                                 </div>
                             </div>
+                            <div className="border-foreground block h-10 w-0.5 border"></div>
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="canLogin">Status</Label>
+                                <Label htmlFor="provider_category">Category</Label>
+                                <div className="space-x-1 text-center">
+                                    <select
+                                        name="provider_category"
+                                        id="provider_category"
+                                        value={query.provider_category_id ?? ''}
+                                        onChange={(e) => setQuery((prev) => ({ ...prev, provider_category_id: e.target.value }))}
+                                    >
+                                        <option value="">Select a category</option>
+                                        {providerCategories.map((category) => (
+                                            <option value={category.id}>{category.label}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                            <div className="border-foreground block h-10 w-0.5 border"></div>
+                            <div className="flex flex-col items-center gap-2">
+                                <Label htmlFor="status">Status</Label>
                                 <div className="space-x-1 text-center">
                                     {statuses.map((status) => (
                                         <Pill
@@ -264,6 +257,7 @@ export default function IndexContracts({
                                     ))}
                                 </div>
                             </div>
+                            <div className="border-foreground block h-10 w-0.5 border"></div>
                             <div className="flex flex-col items-center gap-2">
                                 <Label htmlFor="category">Search</Label>
                                 <div className="relative text-black dark:text-white">
@@ -274,21 +268,13 @@ export default function IndexContracts({
                                     />
                                 </div>
                             </div>
-                            <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="category">Provider Search</Label>
-                                <div className="relative text-black dark:text-white">
-                                    <Input type="text" value={providerSearch ?? ''} onChange={(e) => setProviderSearch(e.target.value)} />
-                                    <X
-                                        onClick={() => setQuery((prev) => ({ ...prev, provider: null }))}
-                                        className={'absolute top-1/2 right-0 -translate-1/2'}
-                                    />
-                                </div>
-                            </div>
+                            <div className="border-foreground block h-10 w-0.5 border"></div>
                             <Button onClick={clearSearch} size={'sm'}>
                                 Clear Search
                             </Button>
                         </div>
                     </details>
+
                     <a href={route('tenant.contracts.create')}>
                         <Button>
                             <PlusCircle />
@@ -302,6 +288,7 @@ export default function IndexContracts({
                         <TableHeadRow>
                             <TableHeadData>Name</TableHeadData>
                             <TableHeadData>Type</TableHeadData>
+                            <TableHeadData>Category</TableHeadData>
                             <TableHeadData>Status</TableHeadData>
                             <TableHeadData>Internal #</TableHeadData>
                             <TableHeadData>Provider #</TableHeadData>
@@ -350,6 +337,7 @@ export default function IndexContracts({
                                             <a href={route(`tenant.contracts.show`, contract.id)}> {contract.name} </a>
                                         </TableBodyData>
                                         <TableBodyData>{contract.type}</TableBodyData>
+                                        <TableBodyData>{contract.provider?.category}</TableBodyData>
                                         <TableBodyData>
                                             <Pill variant={contract.status}>{contract.status}</Pill>
                                         </TableBodyData>
@@ -357,10 +345,8 @@ export default function IndexContracts({
                                         <TableBodyData>{contract.provider_reference}</TableBodyData>
                                         <TableBodyData>{contract.renewal_type}</TableBodyData>
                                         <TableBodyData>
-                                            {contract.provider ? (
+                                            {contract.provider && (
                                                 <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>
-                                            ) : (
-                                                <p>NC</p>
                                             )}
                                         </TableBodyData>
                                         <TableBodyData>{contract.end_date}</TableBodyData>
