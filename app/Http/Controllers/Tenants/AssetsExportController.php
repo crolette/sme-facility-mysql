@@ -30,7 +30,7 @@ class AssetsExportController extends Controller
         Log::info('DISPATCH EXPORT ASSETS EXCEL JOB');
         ExportAssetsExcelJob::dispatch(Auth::user())->onQueue('default');;
 
-        return ApiResponse::success([], 'Excel will be exported, you will receive an e-mail when it\'s done');
+        return ApiResponse::success([], 'Assets will be exported, you will receive an e-mail when it\'s done');
         // return new AssetsExport();
     }
 

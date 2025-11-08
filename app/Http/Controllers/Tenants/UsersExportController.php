@@ -26,6 +26,6 @@ class UsersExportController extends Controller
         Log::info('DISPATCH EXPORT PROVIDERS EXCEL JOB');
         ExportUsersExcelJob::dispatch(Auth::user())->onQueue('default');
 
-        return ApiResponse::success([], 'Excel will be exported, you will receive an e-mail when it\'s done');
+        return ApiResponse::success([], 'Users will be exported, you will receive an e-mail when it\'s done');
     }
 }

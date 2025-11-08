@@ -97,45 +97,12 @@ export default function ImportExportSettings() {
         }
     };
 
-    const exportAssets: FormEventHandler = async (e) => {
-        e.preventDefault();
+    const [itemsToBeExported, setItemsToBeExported] = useState<string | null>(null);
+
+    const exportItems = async () => {
         setIsProcessing(true);
-
         try {
-            const response = await axios.get(route('tenant.assets.export'));
-            if (response.data.status === 'success') {
-                showToast(response.data.message, response.data.status);
-            }
-        } catch (error) {
-            showToast(error.response.data.message, error.response.data.status);
-        } finally {
-            setIsProcessing(false);
-        }
-    };
-
-    const exportProviders: FormEventHandler = async (e) => {
-        e.preventDefault();
-        setIsProcessing(true);
-
-        try {
-            const response = await axios.get(route('tenant.providers.export'));
-            if (response.data.status === 'success') {
-                showToast(response.data.message, response.data.status);
-            }
-        } catch (error) {
-            showToast(error.response.data.message, error.response.data.status);
-        } finally {
-            reset();
-            setIsProcessing(false);
-        }
-    };
-
-    const exportUsers: FormEventHandler = async (e) => {
-        e.preventDefault();
-        setIsProcessing(true);
-
-        try {
-            const response = await axios.get(route('tenant.users.export'));
+            const response = await axios.get(route(`tenant.${itemsToBeExported}.export`));
             if (response.data.status === 'success') {
                 showToast(response.data.message, response.data.status);
             }
@@ -156,11 +123,22 @@ export default function ImportExportSettings() {
                     <div className="relative gap-4">
                         <HeadingSmall title="Import/Export" />
                     </div>
+
+                    <div className="flex w-fit flex-col gap-4">
+                        <select name="" id="" defaultValue={''} onChange={(e) => setItemsToBeExported(e.target.value)}>
+                            <option value="" disabled>
+                                -- Select items to export --
+                            </option>
+                            <option value="assets">Assets</option>
+                            <option value="providers">Providers</option>
+                            <option value="users">Users</option>
+                        </select>
+                        <Button variant={'secondary'} onClick={exportItems} disabled={isProcessing || !itemsToBeExported}>
+                            <BiSolidFilePdf size={20} />
+                            Export
+                        </Button>
+                    </div>
                     <h3>Assets</h3>
-                    <Button variant={'secondary'} onClick={exportAssets} disabled={isProcessing}>
-                        <BiSolidFilePdf size={20} />
-                        Exporter les assets
-                    </Button>
                     <form action="" onSubmit={uploadAssetFile}>
                         <input
                             type="file"
@@ -182,10 +160,6 @@ export default function ImportExportSettings() {
                     </form>
                     <h3>Providers</h3>
 
-                    <Button variant={'secondary'} onClick={exportProviders} disabled={isProcessing}>
-                        <BiSolidFilePdf size={20} />
-                        Exporter les providers
-                    </Button>
                     <form action="" onSubmit={uploadProviderFile}>
                         <input
                             type="file"
@@ -207,11 +181,6 @@ export default function ImportExportSettings() {
                     </form>
 
                     <h3>Users</h3>
-
-                    <Button variant={'secondary'} onClick={exportUsers} disabled={isProcessing}>
-                        <BiSolidFilePdf size={20} />
-                        Exporter les providers
-                    </Button>
                     <form action="" onSubmit={uploadUserFile}>
                         <input
                             type="file"
