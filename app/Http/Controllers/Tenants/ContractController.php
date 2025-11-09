@@ -14,6 +14,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\ContractRenewalTypesEnum;
 use App\Enums\ContractTypesEnum;
+use App\Models\Central\CategoryType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Validator;
 
@@ -31,6 +32,9 @@ class ContractController extends Controller
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $contractTypes = array_column(ContractTypesEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
+        $providerCategories = CategoryType::where('category', 'provider')->get();
+
+        // dd($providerCategories);
 
         $validator = Validator::make($request->all(), [
             'q' => 'string|max:255|nullable',
@@ -39,7 +43,7 @@ class ContractController extends Controller
             'sortBy' => 'string|nullable',
             'type' => 'string|nullable',
             'status' => 'string|nullable',
-            'provider' => 'string|nullable',
+            'provider_category_id' => 'integer|exists:central.category_types,id',
             'renewalType' => 'string|nullable',
         ]);
 
@@ -64,17 +68,19 @@ class ContractController extends Controller
                 $query->where('name', 'like', '%' . $validatedFields['q'] . '%')
                     ->orWhere('internal_reference', 'like', '%' . $validatedFields['q'] . '%')
                     ->orWhere('provider_reference', 'like', '%' . $validatedFields['q'] . '%');
-            });
-        }
-
-        if (isset($validatedFields['provider'])) {
-            $contracts->whereHas('provider', function (Builder $query) use ($validatedFields) {
+            })->orWhereHas('provider', function (Builder $query) use ($validatedFields) {
                 $query->where('name', 'like', '%' . $validatedFields['provider'] . '%');
             });
         }
 
+        if (isset($validatedFields['provider_category_id'])) {
+            $contracts->whereHas('provider', function (Builder $query) use ($validatedFields) {
+                $query->where('category_type_id', $validatedFields['provider_category_id']);
+            });
+        }
 
-        return Inertia::render('tenants/contracts/IndexContracts', ['items' => $contracts->orderBy($validatedFields['sortBy'] ?? 'end_date', $validatedFields['orderBy'] ?? 'asc')->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'type', 'status', 'orderBy', 'sortBy', 'provider', 'renewalType']), 'statuses' => $statuses, 'contractTypes' => $contractTypes, 'renewalTypes' => $renewalTypes]);
+
+        return Inertia::render('tenants/contracts/IndexContracts', ['items' => $contracts->orderBy($validatedFields['sortBy'] ?? 'end_date', $validatedFields['orderBy'] ?? 'asc')->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'type', 'status', 'orderBy', 'sortBy', 'provider_category_id', 'renewalType']), 'statuses' => $statuses, 'contractTypes' => $contractTypes, 'renewalTypes' => $renewalTypes, 'providerCategories' => $providerCategories]);
     }
 
     /**

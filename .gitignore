@@ -7,6 +7,7 @@
 /storage/*.key
 /storage/pail
 /vendor
+/release_notes
 .env
 .env.testing
 .env.local

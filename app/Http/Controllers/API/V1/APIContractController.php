@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API\V1;
 
 use Exception;
 use App\Helpers\ApiResponse;
-use App\Models\Tenants\Asset;
 use App\Models\Tenants\Contract;
 use App\Services\ContractService;
 use Illuminate\Support\Facades\DB;
