@@ -36,8 +36,6 @@ class DocumentService
             'mime_type' => $file['file']->getMimeType(),
         ]);
 
-        Company::incrementDiskSize($file['file']->getSize());
-
         $document->documentCategory()->associate($file['typeId']);
         $document->uploader()->associate(Auth::guard('tenant')->user());
         $document->save();

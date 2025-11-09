@@ -38,7 +38,7 @@ class DocumentFactory extends Factory
         $fakeName = $this->faker->words(3, true);
         $extension = 'pdf';
 
-        $categoryType = CategoryType::where('category', 'document')->first();
+        $categoryType = CategoryType::factory()->create(['category' => 'document']);
 
         $user = $this->customAttributes['user'];
         // $directoryName = $this->customAttributes['directoryName'];

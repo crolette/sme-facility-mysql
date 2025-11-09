@@ -14,6 +14,7 @@ use App\Models\Tenants\Document;
 use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use function PHPUnit\Framework\assertCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -29,7 +30,8 @@ beforeEach(function () {
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
 });
 
-it('can add pictures to a site', function () {
+it('can add pictures to a site and increments disk size', function () {
+    Queue::fake();
     $site = Site::factory()->create();
     $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
     $file2 = UploadedFile::fake()->image('test.jpg')->size(1200);
@@ -54,26 +56,8 @@ it('can add pictures to a site', function () {
         'imageable_type' => 'App\Models\Tenants\Site',
         'imageable_id' => 1
     ]);
+    assertEquals(round(Company::first()->disk_size / 1024), 2200);
 });
-
-// it('increments disk size in company table when picture are added to a site', function () {
-//     $site = Site::factory()->create();
-//     $file1 = UploadedFile::fake()->image('avatar.png')->size(6144);
-//     $file2 = UploadedFile::fake()->image('test.jpg')->size(6144);
-
-//     $formData = [
-//         'pictures' => [
-//             $file1,
-//             $file2
-//         ]
-//     ];
-
-//     $response = $this->postToTenant('api.sites.pictures.post', $formData, $site);
-//     $response->assertSessionHasNoErrors();
-
-//     $company = Company::first();
-//     assertEquals(round($company->disk_size / 1024), Picture::find(1)->size + Picture::find(2)->size);
-// });
 
 it('can retrieve all pictures from a site', function () {
     $site = Site::factory()->create();
@@ -88,10 +72,11 @@ it('can retrieve all pictures from a site', function () {
 });
 
 
-it('can delete a picture from a site', function () {
+it('can delete a picture from a site and decrement disk size', function () {
+    Queue::fake();
     $site = Site::factory()->create();
-    $file1 = UploadedFile::fake()->image('avatar.png');
-    $file2 = UploadedFile::fake()->image('test.jpg');
+    $file1 = UploadedFile::fake()->image('avatar.png')->size(1100);
+    $file2 = UploadedFile::fake()->image('test.jpg')->size(1100);
 
     $formData = [
         'pictures' => [
@@ -117,6 +102,7 @@ it('can delete a picture from a site', function () {
 
     $picture = Picture::first();
     expect(Storage::disk('tenants')->exists($picture->directory))->toBeTrue();
+    assertEquals(round(Company::first()->disk_size / 1024), 2200);
 
     $response = $this->deleteFromTenant('api.pictures.delete', $picture);
     assertDatabaseCount('pictures', 1);
@@ -132,38 +118,13 @@ it('can delete a picture from a site', function () {
     ]);
 
     expect(Storage::disk('tenants')->exists($picture->path))->toBeFalse();
+    assertEquals(round(Company::first()->disk_size / 1024), 1100);
 });
-
-// it('decrements disk size in company table when picture are added to a site', function () {
-//     $site = Site::factory()->create();
-//     $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
-//     $file2 = UploadedFile::fake()->image('test.jpg')->size(1200);
-
-//     $formData = [
-//         'pictures' => [
-//             $file1,
-//             $file2
-//         ]
-//     ];
-
-//     $response = $this->postToTenant('api.sites.pictures.post', $formData, $site);
-//     $response->assertSessionHasNoErrors();
-
-
-//     $company = Company::first();
-//     assertEquals(round($company->disk_size / 1024), Picture::find(1)->size + Picture::find(2)->size);
-
-//     $picture = Picture::first();
-
-//     $response = $this->deleteFromTenant('api.pictures.delete', $picture);
-
-//     assertEquals(round($company->disk_size / 1024), 1200);
-// });
 
 it('deletes picture directory if directory is empty', function () {
 
     $site = Site::factory()->create();
-    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
 
     $formData = [
         'pictures' => [
@@ -195,7 +156,7 @@ it('deletes picture directory if directory is empty', function () {
 });
 
 it('does not delete picture directory if directory is not empty', function () {
-
+    Queue::fake();
     $site = Site::factory()->create();
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->image('test.jpg');
@@ -233,4 +194,5 @@ it('does not delete picture directory if directory is not empty', function () {
     ]);
 
     expect(Storage::disk('tenants')->exists($picture->directory))->toBeTrue();
+    assertEquals(round(Company::first()->disk_size / 1024), 1);
 });

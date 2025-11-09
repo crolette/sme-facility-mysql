@@ -7,11 +7,13 @@ use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
-use App\Models\Tenants\Building;
+use App\Models\Tenants\Company;
 
+use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -23,27 +25,15 @@ beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
 
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    LocationType::factory()->create(['level' => 'room']);
-    CategoryType::factory()->count(2)->create(['category' => 'document']);
+    CategoryType::factory()->create(['category' => 'document']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
     CategoryType::factory()->count(2)->create(['category' => 'asset']);
-
-
 
     // on créée les différentes "locations" possibles pour attacher un asset
     $this->site = Site::factory()->create();
     $this->building = Building::factory()->create();
     $this->floor = Floor::factory()->create();
-    $this->room = Room::factory()
-        ->for(LocationType::where('level', 'room')->first())
-        ->for(Floor::first())
-        ->create();
-
-    // on créé un asset qu'on attache à une room
-    // $this->asset = Asset::factory()->forLocation($this->room)->create();
+    $this->room = Room::factory()->create();
 });
 
 it('can attach existing documents to asset', function () {
@@ -85,7 +75,7 @@ it('can attach existing documents to asset', function () {
 
 it('can upload several files to asset', function () {
 
-    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
     $categoryType = CategoryType::where('category', 'document')->first();
 
@@ -130,6 +120,51 @@ it('can upload several files to asset', function () {
     ]);
 
     Storage::disk('tenants')->assertExists(Document::first()->path);
+});
+
+it('can upload several files to asset and increment disk space accordingly (before compressing picture)', function () {
+
+    Queue::fake();
+
+    $file1 = UploadedFile::fake()->image('avatar.png')->size(4000);
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 2000, 'application/pdf');
+    $categoryType = CategoryType::where('category', 'document')->first();
+
+    $formData = [
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+        'locationId' => $this->room->id,
+        'locationReference' => $this->room->reference_code,
+        'locationType' => 'room',
+        'categoryId' => $this->categoryType->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $categoryType->id,
+                'typeSlug' => $categoryType->slug
+            ]
+        ]
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertSessionHasNoErrors();
+
+    // Queue::assertPushed(CompressPictureJob::class, function ($job) {
+    //     $job->handle(); // Exécute manuellement
+    //     return true;
+    // });
+
+    $company = Company::first();
+    assertEquals(round($company->disk_size / 1024), 6000);
 });
 
 
@@ -357,7 +392,6 @@ it('can upload a document to an asset', function () {
 
     expect(Storage::disk('tenants')->exists($document->directory))->toBeTrue();
 });
-
 
 it('deletes the documents directory if it is empty', function () {
 

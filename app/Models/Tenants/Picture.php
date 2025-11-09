@@ -3,6 +3,7 @@
 namespace App\Models\Tenants;
 
 use App\Models\Tenants\User;
+use App\Models\Tenants\Company;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -26,6 +27,19 @@ class Picture extends Model
         'fullPath',
         'sizeMo'
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($picture) {
+            Company::incrementDiskSize($picture->size);
+        });
+
+        static::deleted(function ($picture) {
+            Company::decrementDiskSize($picture->size);
+        });
+    }
 
     public const MAX_UPLOAD_SIZE_MB = 6;
 

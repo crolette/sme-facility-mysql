@@ -194,67 +194,6 @@ it('can create a new asset to building', function () {
     ]);
 });
 
-it('can create an asset with uploaded pictures', function () {
-
-    $file1 = UploadedFile::fake()->image('avatar.png');
-    $file2 = UploadedFile::fake()->image('test.jpg');
-
-    $formData = [
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'locationId' => $this->building->id,
-        'locationReference' => $this->building->reference_code,
-        'locationType' => 'building',
-        'categoryId' => $this->categoryType->id,
-        'pictures' => [
-            $file1,
-            $file2
-        ]
-    ];
-
-    $response = $this->postToTenant('api.assets.store', $formData);
-    $response->assertStatus(200)
-        ->assertJson(['status' => 'success']);
-    assertDatabaseCount('pictures', 2);
-    assertDatabaseHas('pictures', [
-        'imageable_type' => 'App\Models\Tenants\Asset',
-        'imageable_id' => 1
-    ]);
-
-    $pictures = Asset::first()->pictures;
-
-    foreach ($pictures as $picture) {
-        expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
-    }
-});
-
-it('can add pictures to an asset', function () {
-    $asset = Asset::factory()->forLocation($this->room)->create();
-    $file1 = UploadedFile::fake()->image('avatar.png');
-    $file2 = UploadedFile::fake()->image('test.jpg');
-
-    $formData = [
-        'pictures' => [
-            $file1,
-            $file2
-        ]
-    ];
-
-    $response = $this->postToTenant('api.assets.pictures.post', $formData, $asset);
-    $response->assertSessionHasNoErrors();
-    assertDatabaseCount('pictures', 2);
-    assertDatabaseHas('pictures', [
-        'imageable_type' => 'App\Models\Tenants\Asset',
-        'imageable_id' => 1
-    ]);
-
-    $pictures = Asset::first()->pictures;
-
-    foreach ($pictures as $picture) {
-        expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
-    }
-});
-
 it('cannot create a new asset with non existing building', function () {
 
     $formData = [

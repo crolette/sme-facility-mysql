@@ -6,12 +6,13 @@ use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Models\Tenants\Company;
 use App\Models\Central\CategoryType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Document extends Model
 {
@@ -40,6 +41,19 @@ class Document extends Model
             'created_at' => 'date:Y-m-d',
             'updated_at' => 'date:Y-m-ds',
         ];
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($document) {
+            Company::incrementDiskSize($document->size);
+        });
+
+        static::deleted(function ($document) {
+            Company::decrementDiskSize($document->size);
+        });
     }
 
     public const MAX_UPLOAD_SIZE_MB = 4;

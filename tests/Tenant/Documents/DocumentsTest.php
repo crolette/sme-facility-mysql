@@ -145,8 +145,6 @@ it('increments the disk size in the company table', function () {
         'typeSlug' => $categoryType->slug
     ];
 
-
-
     $response = $this->postToTenant('api.documents.store', $formData);
     $response->assertSessionHasNoErrors();
 
@@ -154,7 +152,7 @@ it('increments the disk size in the company table', function () {
     assertEquals(round($company->disk_size / 1024), 2000);
 });
 
-it('decrements the disk size in the company table', function () {
+it('decrements the disk size when a document is deleted', function () {
 
     $file = UploadedFile::fake()->create('nomdufichier.pdf', 150, 'application/pdf');
     $categoryType = CategoryType::where('category', 'document')->first();
@@ -167,14 +165,11 @@ it('decrements the disk size in the company table', function () {
         'typeSlug' => $categoryType->slug
     ];
 
-
-
     $response = $this->postToTenant('api.documents.store', $formData);
     $response->assertSessionHasNoErrors();
 
     $company = Company::first();
     assertEquals(round($company->disk_size / 1024), 150);
-
 
     $document = Document::first();
 

@@ -34,7 +34,7 @@ class PictureService
 
                 $path = Storage::disk('tenants')->putFileAs($directory, $file, $fileName);
 
-                Company::incrementDiskSize($file->getSize());
+                // Company::incrementDiskSize($file->getSize());
 
                 $picture = new Picture([
                     'path' => $directory . '/' . $fileName,

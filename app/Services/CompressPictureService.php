@@ -27,6 +27,7 @@ class CompressPictureService
     {
         Log::info('--- START COMPRESSING PICTURE : ' . $picture->filename);
 
+
         Company::decrementDiskSize($picture->size);
 
         $path = $picture->path;

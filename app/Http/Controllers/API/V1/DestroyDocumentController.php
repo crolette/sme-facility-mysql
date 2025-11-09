@@ -34,7 +34,7 @@ class DestroyDocumentController extends Controller
 
             $document->delete();
 
-            Company::decrementDiskSize($document->size);
+            // Company::decrementDiskSize($document->size);
 
             return ApiResponse::success(null, 'Document deleted');
         } catch (Exception $e) {
