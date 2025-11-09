@@ -2,10 +2,11 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Jobs\ProcessTenantNotifications;
-use Illuminate\Support\Facades\Log;
 use App\Models\Tenant;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
+use App\Jobs\ProcessExpiredContractsJob;
+use App\Jobs\ProcessTenantNotifications;
 
 
 class DispatchTenantNotifications extends Command
@@ -26,7 +27,7 @@ class DispatchTenantNotifications extends Command
 
     /**
      * Execute the console command.
-     */	
+     */
     public function handle()
     {
         // $redis = app('redis')->connection('queue');
@@ -42,12 +43,11 @@ class DispatchTenantNotifications extends Command
         tenancy()->runForMultiple($tenants, function ($tenant) {
 
             ProcessTenantNotifications::dispatch($tenant)->onQueue('default');
+            ProcessExpiredContractsJob::dispatch($tenant)->onQueue('default');
 
             Log::info("Dispatched notification command job for tenant: {$tenant->id}");
         });
-        // foreach ($tenants as $tenant) {
-        //     // Dispatche un job pour chaque tenant
-        // }
+
 
         Log::info('Tenant notifications dispatch completed');
     }

@@ -71,7 +71,6 @@ export default function CreateUpdateContract({
     ];
     const { showToast } = useToast();
 
-    // const [contractables, setContractables] = useState<Contractable[]>([]);
     useEffect(() => {
         const updatedContractables: Contractable[] = [];
         if (objects?.length > 0) {
@@ -173,6 +172,30 @@ export default function CreateUpdateContract({
     };
 
     const [showFileModal, setShowFileModal] = useState(false);
+
+    useEffect(() => {
+        console.log(data.contract_duration);
+        console.log(data.start_date);
+        const date = new Date(data.start_date);
+
+        if (data.contract_duration) {
+            switch (data.contract_duration) {
+                case '1_month':
+                    date.setMonth(date.getMonth() + 1);
+                    break;
+                case '6_months':
+                    date.setMonth(date.getMonth() + 6);
+                    break;
+                case '1_year':
+                    date.setMonth(date.getMonth() + 12);
+                    break;
+                case '2_years':
+                    date.setMonth(date.getMonth() + 24);
+                    break;
+            }
+            setData('end_date', date.toISOString().split('T')[0]);
+        }
+    }, [data.contract_duration, data.start_date]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

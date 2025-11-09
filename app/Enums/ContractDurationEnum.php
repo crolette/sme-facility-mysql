@@ -11,6 +11,16 @@ enum ContractDurationEnum: string
     case ONE_YEAR = "1_year";
     case TWO_YEARS = "2_years";
 
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::ONE_MONTH => '1 month',
+            self::SIX_MONTHS => '6 months',
+            self::ONE_YEAR => '1 year',
+            self::TWO_YEARS => '2 years',
+        };
+    }
     /**
      * Ajoute la durée de contrat à une date donnée.
      */
