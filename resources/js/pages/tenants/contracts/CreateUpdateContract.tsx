@@ -174,8 +174,6 @@ export default function CreateUpdateContract({
     const [showFileModal, setShowFileModal] = useState(false);
 
     useEffect(() => {
-        console.log(data.contract_duration);
-        console.log(data.start_date);
         const date = new Date(data.start_date);
 
         if (data.contract_duration) {
