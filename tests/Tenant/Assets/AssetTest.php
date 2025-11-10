@@ -27,6 +27,7 @@ beforeEach(function () {
     $this->manager = User::factory()->withRole('Maintenance Manager')->create();
 
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
+    CategoryType::factory()->count(2)->create(['category' => 'asset']);
     $this->site = Site::factory()->create();
     $this->building = Building::factory()->create();
     $this->floor = Floor::factory()->create();
@@ -219,7 +220,7 @@ it('cannot create a new asset with unrelated asset category type', function () {
         'locationId' => $this->building->id,
         'locationReference' => $this->building->reference_code,
         'locationType' => 'building',
-        'categoryId' => 2,
+        'categoryId' => 10,
     ];
 
     $response = $this->postToTenant('api.assets.store', $formData);
@@ -326,7 +327,7 @@ it('can create a new asset to room', function () {
 
 it('can show the asset page', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->forLocation($this->room)->create(['category_type_id' => $this->categoryType->id]);
 
     $asset = Asset::find($asset->id);
 

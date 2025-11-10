@@ -15,6 +15,7 @@ return [
 
     'name' => env('APP_NAME', 'SME Facility'),
     'logo' => env('APP_LOGO', null),
+    'version' => env('APP_VERSION', null),
 
     /*
     |--------------------------------------------------------------------------

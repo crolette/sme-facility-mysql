@@ -17,6 +17,8 @@ use Illuminate\Http\UploadedFile;
 use App\Enums\ContractDurationEnum;
 use App\Models\Central\CategoryType;
 use App\Enums\ContractRenewalTypesEnum;
+use App\Enums\ContractTypesEnum;
+
 use function PHPUnit\Framework\assertCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -54,7 +56,7 @@ beforeEach(function () {
     $this->contractOneData = [
         'provider_id' => $this->provider->id,
         'name' => 'Contrat de bail',
-        'type' => 'Bail',
+        'type' => ContractTypesEnum::ALLIN->value,
         'notes' => 'Nouveau contrat de bail 2025',
         'internal_reference' => 'Bail Site 2025',
         'provider_reference' => 'Provider reference 2025',
@@ -68,7 +70,7 @@ beforeEach(function () {
     $this->contractTwoData = [
         'provider_id' => $this->provider->id,
         'name' => 'Contrat de sécurité',
-        'type' => 'Sécurité',
+        'type' => ContractTypesEnum::MAINTENANCE->value,
         'notes' => 'Nouveau contrat de Sécurité 2025',
         'internal_reference' => 'Sécurité Site 2025',
         'provider_reference' => 'Provider reference 2025',
@@ -210,7 +212,7 @@ it('can store an asset with contracts and documents', function () {
 
 
 
-it('can add an existing contract when creating an asset', function() {
+it('can add an existing contract when creating an asset', function () {
 
     $contract =  Contract::factory()->create();
 
@@ -224,24 +226,24 @@ it('can add an existing contract when creating an asset', function() {
 
         'existing_contracts' => [
             $contract->id,
-            
-            ]
-        ];
 
-        $response = $this->postToTenant('api.assets.store', $formData);
-        $response->assertStatus(200)
+        ]
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+    $response->assertStatus(200)
         ->assertJson(['status' => 'success']);
 
-        $asset = Asset::find(2);
+    $asset = Asset::find(2);
 
-        assertDatabaseHas('contractables',
+    assertDatabaseHas(
+        'contractables',
         [
             'contract_id' => $contract->id,
             'contractable_type' => get_class($asset),
             'contractable_id' => $asset->id
-        ]);
-        
-    
+        ]
+    );
 });
 
 it('can add multiple existing contracts when creating an asset', function () {
@@ -322,10 +324,9 @@ it('can add existing contracts to an existing asset', function () {
             'contractable_id' => $this->asset->id
         ]
     );
-
 });
 
-it('can remove a contract from an asset', function() {
+it('can remove a contract from an asset', function () {
 
     $contractOne =  Contract::factory()->create();
     $contractTwo =  Contract::factory()->create();
@@ -368,5 +369,4 @@ it('can remove a contract from an asset', function() {
             'contractable_id' => $this->asset->id
         ]
     );
-
 });

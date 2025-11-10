@@ -8,6 +8,7 @@
 /storage/pail
 /vendor
 /release_notes
+/.changelogs
 .env
 .env.testing
 .env.local
