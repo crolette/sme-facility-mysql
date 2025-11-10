@@ -24,10 +24,12 @@ use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
 use App\Http\Requests\Tenant\MaintainableUpdateRequest;
+use App\Services\RoomService;
 
 class APIRoomController extends Controller
 {
     public function __construct(
+        protected RoomService $roomService,
         protected QRCodeService $qrCodeService,
         protected MaintainableService $maintainableService,
         protected ContractService $contractService
@@ -69,7 +71,7 @@ class APIRoomController extends Controller
             $room->save();
 
             $this->maintainableService->create($room, $maintainableRequest->validated());
-            
+
             if ($contractRequest->validated('contracts'))
                 $this->contractService->createWithModel($room, $contractRequest->validated('contracts'));
 
@@ -152,15 +154,14 @@ class APIRoomController extends Controller
         if (Auth::user()->cannot('delete', $room))
             abort(403);
 
-        Debugbar::info('DESTROY');
         if (count($room->assets) > 0) {
             Debugbar::info('Cannot delete');
             // return ApiResponse::success('', 'Room deleted');
             return ApiResponse::error('Room cannot be deleted ! Assets are linked to this room', [], 409);
         }
 
+        $response = $this->roomService->deleteRoom($room);
 
-        $room->delete();
-        return ApiResponse::success('', 'Room deleted');
+        return $response === true ? ApiResponse::success('', 'Room deleted') : ApiResponse::error('', 'Error during room deletion');
     }
 }

@@ -55,7 +55,7 @@ class Room extends Model
         'description',
         'category',
         'location_route'
-        
+
     ];
 
     // Ensure route model binding use the slug instead of ID
@@ -195,6 +195,16 @@ class Room extends Model
         );
     }
 
+    public function directory(): Attribute
+    {
+        $tenantId = tenancy()->tenant->id;
+        $directory = "$tenantId/rooms/" . $this->id . "/";
+
+        return Attribute::make(
+            get: fn() => $directory
+        );
+    }
+
     public function manager(): Attribute
     {
         return Attribute::make(
@@ -202,7 +212,7 @@ class Room extends Model
         );
     }
 
-   
+
 
     public function qrCodePath(): Attribute
     {

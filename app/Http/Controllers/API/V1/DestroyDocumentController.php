@@ -17,9 +17,12 @@ use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\Tenant\DocumentUpdateRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
+use App\Services\DocumentService;
 
 class DestroyDocumentController extends Controller
 {
+
+    public function __construct(protected DocumentService $documentService) {}
 
     public function destroy(Document $document)
     {
@@ -28,13 +31,7 @@ class DestroyDocumentController extends Controller
 
         try {
 
-            Storage::disk('tenants')->delete($document->path);
-            if (count(Storage::disk('tenants')->files($document->directory)) === 0)
-                Storage::disk('tenants')->deleteDirectory($document->directory);
-
-            $document->delete();
-
-            // Company::decrementDiskSize($document->size);
+            $this->documentService->deleteDocumentFromStorage($document);
 
             return ApiResponse::success(null, 'Document deleted');
         } catch (Exception $e) {

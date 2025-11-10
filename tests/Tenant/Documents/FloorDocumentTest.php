@@ -7,8 +7,9 @@ use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
-use App\Models\Tenants\Building;
+use App\Models\Tenants\Company;
 
+use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
@@ -112,6 +113,39 @@ it('can upload several files to floor', function () {
     Storage::disk('tenants')->assertExists(Document::first()->directory);
 });
 
+it('can upload several files to floor and increase disk size accordingly', function () {
+    Queue::fake();
+    $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 2000, 'application/pdf');
+
+    $formData = [
+        'name' => 'New floor',
+        'description' => 'Description new floor',
+        'levelType' => $this->building->id,
+        'locationType' => $this->locationType->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ]
+        ]
+    ];
+
+    $this->postToTenant('api.floors.store', $formData);
+    $company = Company::first();
+    assertEquals(round($company->disk_size / 1024), 3000);
+});
+
 it('can upload documents to an existing floor', function () {
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
@@ -203,7 +237,6 @@ it('can remove/detach a document from a site', function () {
 
     expect(Storage::disk('tenants')->exists($document->path))->toBeTrue();
 });
-
 
 it('can delete a document from a floor', function () {
 
@@ -374,51 +407,271 @@ it('deletes the documents directory if it is empty', function () {
     expect(Storage::disk('tenants')->exists($document->path))->toBeFalse();
 });
 
-// it('does not delete the documents directory if it is not empty', function () {
-//     $file1 = UploadedFile::fake()->image('avatar.png');
-//     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
+it('deletes the document if a floor is deleted and document is not linked to another asset/location', function () {
+    $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 2000, 'application/pdf');
 
-//     $formData = [
+    $formData = [
+        'name' => 'New floor',
+        'description' => 'Description new floor',
+        'levelType' => $this->building->id,
+        'locationType' => $this->locationType->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ]
+        ]
+    ];
 
-//         'files' => [
-//             [
-//                 'file' => $file1,
-//                 'name' => 'FILE 1 - First file',
-//                 'description' => 'descriptionIMG',
-//                 'typeId' => $this->documentCategory->id,
-//                 'typeSlug' => $this->documentCategory->slug
-//             ],
-//             [
-//                 'file' => $file2,
-//                 'name' => 'FILE 2 - Second file',
-//                 'description' => 'descriptionIMG',
-//                 'typeId' => $this->documentCategory->id,
-//                 'typeSlug' => $this->documentCategory->slug
-//             ],
+    $response = $this->postToTenant('api.floors.store', $formData);
+    $location = Floor::find(2);
+    $response->assertSessionHasNoErrors();
 
-//         ]
-//     ];
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => get_class($location),
+        'documentable_id' => $location->id
+    ]);
+    assertDatabaseHas('documentables', [
+        'document_id' => 2,
+        'documentable_type' => get_class($location),
+        'documentable_id' => $location->id
+    ]);
 
-//     $response = $this->postToTenant('api.floors.documents.post', $formData, $this->location->reference_code);
-//     $response->assertSessionHasNoErrors();
+    $firstDocumentPath = Document::first()->path;
+    Storage::disk('tenants')->assertExists($firstDocumentPath);
+    $secondDocumentPath = Document::find(2)->path;
+    Storage::disk('tenants')->assertExists($secondDocumentPath);
 
-//     $document = $this->location->documents()->first();
+    $response = $this->deleteFromTenant('api.floors.destroy', $location->reference_code);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    assertDatabaseMissing('documentables', [
+        'document_id' => 1,
+        'documentable_type' => get_class($location),
+        'documentable_id' => $location->id
+    ]);
+    assertDatabaseMissing('documentables', [
+        'document_id' => 2,
+        'documentable_type' => get_class($location),
+        'documentable_id' => $location->id
+    ]);
+
+    assertDatabaseCount('documents', 0);
+
+    Storage::disk('tenants')->assertMissing($firstDocumentPath);
+    Storage::disk('tenants')->assertMissing($secondDocumentPath);
+});
+
+it('deletes the document if a floor is deleted and document is not linked to another asset/location and decrease disk size accordingly', function () {
+    Queue::fake();
+    $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 2000, 'application/pdf');
+
+    $formData = [
+        'name' => 'New floor',
+        'description' => 'Description new floor',
+        'levelType' => $this->building->id,
+        'locationType' => $this->locationType->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ]
+        ]
+    ];
+
+    $this->postToTenant('api.floors.store', $formData);
+    $location = Floor::find(2);
+
+    $company = Company::first();
+    assertEquals(round($company->disk_size / 1024), 3000);
 
 
-//     $response = $this->deleteFromTenant('api.documents.delete', $document->id);
-//     $response->assertOk();
+    $this->deleteFromTenant('api.floors.destroy', $location->reference_code);
 
-//     $this->assertDatabaseMissing('documents', [
-//         'id' => $document->id,
-//         'filename' => $document->filename
-//     ]);
+    $company->refresh();
+    assertEquals(round($company->disk_size / 1024), 0);
+});
 
-//     $this->assertDatabaseMissing('documentables', [
-//         'document_id' => $document->id,
-//         'documentable_id' => $this->location->id,
-//         'documentable_type' => get_class($this->location)
-//     ]);
+it('deletes only document if the document is not linked to another asset/location', function () {
+    $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
 
-//     expect(Storage::disk('tenants')->exists($document->directory))->toBeTrue();
-//     assertEquals(1, count(Storage::disk('tenants')->files($document->directory)));
-// });
+    $formData = [
+        'name' => 'New floor',
+        'description' => 'Description new floor',
+        'levelType' => $this->building->id,
+        'locationType' => $this->locationType->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ]
+        ]
+    ];
+
+    $response = $this->postToTenant('api.floors.store', $formData);
+    $location = Floor::find(2);
+    $response->assertSessionHasNoErrors();
+
+    $document = Document::first();
+
+    $categoryType = CategoryType::factory()->create(['category' => 'asset']);
+
+    $formData = [
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+        'locationId' => $this->building->id,
+        'locationReference' => $this->building->reference_code,
+        'locationType' => 'floor',
+        'categoryId' => $categoryType->id,
+        'existing_documents' => [$document->id]
+
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+
+    $asset = Asset::first();
+
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => get_class($location),
+        'documentable_id' => $location->id
+    ]);
+    assertDatabaseHas('documentables', [
+        'document_id' => 2,
+        'documentable_type' => get_class($location),
+        'documentable_id' => $location->id
+    ]);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => get_class($asset),
+        'documentable_id' => $asset->id
+    ]);
+
+    $firstDocumentPath = Document::first()->path;
+    Storage::disk('tenants')->assertExists($firstDocumentPath);
+    $secondDocumentPath = Document::find(2)->path;
+    Storage::disk('tenants')->assertExists($secondDocumentPath);
+
+    $response = $this->deleteFromTenant('api.floors.destroy', $location->reference_code);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    assertDatabaseMissing('documentables', [
+        'document_id' => 1,
+        'documentable_type' => get_class($location),
+        'documentable_id' => $location->id
+    ]);
+    assertDatabaseMissing('documentables', [
+        'document_id' => 2,
+        'documentable_type' => get_class($location),
+        'documentable_id' => $location->id
+    ]);
+
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => get_class($asset),
+        'documentable_id' => $asset->id
+    ]);
+
+    assertDatabaseCount('documents', 1);
+
+    Storage::disk('tenants')->assertExists($firstDocumentPath);
+    Storage::disk('tenants')->assertMissing($secondDocumentPath);
+});
+
+it('deletes only document if the document is not linked to another asset/location and decrease disk size accordingly', function () {
+    Queue::fake();
+
+    $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 2000, 'application/pdf');
+
+    $formData = [
+        'name' => 'New floor',
+        'description' => 'Description new floor',
+        'levelType' => $this->building->id,
+        'locationType' => $this->locationType->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ]
+        ]
+    ];
+
+    $response = $this->postToTenant('api.floors.store', $formData);
+    $location = Floor::find(2);
+
+    $company = Company::first();
+    assertEquals(round($company->disk_size / 1024), 3000);
+
+    $document = Document::first();
+
+    $categoryType = CategoryType::factory()->create(['category' => 'asset']);
+
+    $formData = [
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+        'locationId' => $this->building->id,
+        'locationReference' => $this->building->reference_code,
+        'locationType' => 'floor',
+        'categoryId' => $categoryType->id,
+        'existing_documents' => [$document->id]
+
+    ];
+
+    $this->postToTenant('api.assets.store', $formData);
+
+
+    $this->deleteFromTenant('api.floors.destroy', $location->reference_code);
+
+
+    $company->refresh();
+    assertEquals(round($company->disk_size / 1024), 1000);
+});

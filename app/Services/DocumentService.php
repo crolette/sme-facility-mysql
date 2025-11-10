@@ -75,4 +75,25 @@ class DocumentService
             }
         }
     }
+
+    public function verifyRelatedDocuments(Document $document)
+    {
+        if (count($document->getDocumentablesFlat()) === 0) {
+            $this->deleteDocumentFromStorage($document);
+        };
+    }
+
+    public function deleteDocumentFromStorage(Document $document)
+    {
+        Storage::disk('tenants')->delete($document->path);
+
+        $this->deleteDirectoryFromStorage($document->directory);
+        $document->delete();
+    }
+
+    public function deleteDirectoryFromStorage(string $directory)
+    {
+        if (count(Storage::disk('tenants')->files($directory)) === 0)
+            Storage::disk('tenants')->deleteDirectory($directory);
+    }
 };

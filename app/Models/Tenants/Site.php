@@ -137,7 +137,7 @@ class Site extends Model
         return $this->morphMany(Ticket::class, 'ticketable');
     }
 
-   
+
 
     public function category($locale = null): Attribute
     {
@@ -191,6 +191,16 @@ class Site extends Model
     {
         return Attribute::make(
             get: fn() => route('tenant.sites.show', $this->reference_code)
+        );
+    }
+
+    public function directory(): Attribute
+    {
+        $tenantId = tenancy()->tenant->id;
+        $directory = "$tenantId/sites/" . $this->id . "/";
+
+        return Attribute::make(
+            get: fn() => $directory
         );
     }
 

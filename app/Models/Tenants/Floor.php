@@ -167,7 +167,7 @@ class Floor extends Model
         );
     }
 
-    
+
 
     public function wallMaterial($locale = null): Attribute
     {
@@ -206,6 +206,16 @@ class Floor extends Model
         );
     }
 
+    public function directory(): Attribute
+    {
+        $tenantId = tenancy()->tenant->id;
+        $directory = "$tenantId/floors/" . $this->id . "/";
+
+        return Attribute::make(
+            get: fn() => $directory
+        );
+    }
+
     public function manager(): Attribute
     {
         return Attribute::make(
@@ -221,12 +231,11 @@ class Floor extends Model
                 get: fn() => ''
             );
         }
-        
+
         $imageData = Storage::disk('tenants')->get($this->qr_code);
         $mimeType = Storage::disk('tenants')->mimeType($this->qr_code);
         return Attribute::make(
             get: fn() => 'data:' . $mimeType . ';base64,' . base64_encode($imageData)
         );
     }
-
 }

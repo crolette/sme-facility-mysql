@@ -121,7 +121,8 @@ class APIBuildingController extends Controller
             return ApiResponse::error('Building cannot be deleted ! Assets and/or floors are linked to this building', [], 409);
         }
 
-        $building->delete();
-        return ApiResponse::success('', 'Building deleted');
+        $response = $this->buildingService->deleteBuilding($building);
+
+        return $response === true ? ApiResponse::success('', 'Building deleted') : ApiResponse::error('', 'Error during building deletion');
     }
 }

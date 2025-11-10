@@ -2,6 +2,7 @@
 
 namespace App\Models\Tenants;
 
+use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
@@ -97,6 +98,16 @@ class Document extends Model
     public function rooms()
     {
         return $this->morphedByMany(Room::class, 'documentable');
+    }
+
+    public function getDocumentablesFlat()
+    {
+        return collect()
+            ->merge($this->assets)
+            ->merge($this->sites)
+            ->merge($this->buildings)
+            ->merge($this->floors)
+            ->merge($this->rooms);
     }
 
 

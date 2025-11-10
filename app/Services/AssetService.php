@@ -12,11 +12,15 @@ use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Company;
 use App\Models\Tenants\Building;
+use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class AssetService
 {
+
+    public function __construct(protected DocumentService $documentService) {}
 
     public function create(array $data): Asset
     {
@@ -143,6 +147,35 @@ class AssetService
             DB::commit();
             return $deleted;
         } catch (Exception $e) {
+            DB::rollBack();
+            return false;
+        }
+
+        return false;
+    }
+
+    public function forceDeleteAsset(Asset $asset): bool
+    {
+        try {
+            DB::beginTransaction();
+            $deleted = $asset->forceDelete();
+
+            $documents = $asset->documents;
+
+            foreach ($documents as $document) {
+                $this->documentService->detachDocumentFromModel($asset, $document->id);
+                $this->documentService->verifyRelatedDocuments($document);
+            };
+
+            $tenantId = tenancy()->tenant->id;
+            $directory = "$tenantId/assets/$asset->id/";
+
+            Storage::disk('tenants')->deleteDirectory($directory);
+
+            DB::commit();
+            return $deleted;
+        } catch (Exception $e) {
+            Log::info('Error during asset force deletion', ['asset' => $asset, 'error' => $e->getMessage()]);
             DB::rollBack();
             return false;
         }

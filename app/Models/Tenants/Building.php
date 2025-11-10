@@ -226,6 +226,17 @@ class Building extends Model
         );
     }
 
+    public function directory(): Attribute
+    {
+        $tenantId = tenancy()->tenant->id;
+        $directory = "$tenantId/directory/" . $this->id . "/";
+
+        return Attribute::make(
+            get: fn() => $directory
+        );
+    }
+
+
 
     public function manager(): Attribute
     {

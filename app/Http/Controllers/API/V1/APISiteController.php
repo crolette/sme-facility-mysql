@@ -20,10 +20,12 @@ use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Requests\Tenant\MaintainableUpdateRequest;
 use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
+use App\Services\SiteService;
 
 class APISiteController extends Controller
 {
     public function __construct(
+        protected SiteService $siteService,
         protected QRCodeService $qrCodeService,
         protected MaintainableService $maintainableService,
         protected ContractService $contractService
@@ -71,7 +73,7 @@ class APISiteController extends Controller
 
             if ($contractRequest->validated('existing_contracts'))
                 $this->contractService->attachExistingContractsToModel($site, $contractRequest->validated('existing_contracts'));
-            
+
 
             if ($siteRequest->validated('need_qr_code') === true)
                 $this->qrCodeService->createAndAttachQR($site);
@@ -140,7 +142,8 @@ class APISiteController extends Controller
             return ApiResponse::error('Site cannot be deleted ! Assets and/or buildings are linked to this site', [], 409);
         }
 
-        $site->delete();
-        return ApiResponse::success('', 'Site deleted');
+        $response = $this->siteService->deleteSite($site);
+
+        return $response === true ? ApiResponse::success('', 'Site deleted') : ApiResponse::error('', 'Error during Site deletion');
     }
 }

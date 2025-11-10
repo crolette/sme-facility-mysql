@@ -21,10 +21,12 @@ use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Requests\Tenant\MaintainableUpdateRequest;
 use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
+use App\Services\FloorService;
 
 class APIFloorController extends Controller
 {
     public function __construct(
+        protected FloorService $floorService,
         protected QRCodeService $qrCodeService,
         protected MaintainableService $maintainableService,
         protected ContractService $contractService
@@ -153,7 +155,8 @@ class APIFloorController extends Controller
             return ApiResponse::error('Floor cannot be deleted ! Assets and/or rooms are linked to this floor', [], 409);
         }
 
-        $floor->delete();
-        return ApiResponse::success('', 'Floor deleted');
+        $response = $this->floorService->deleteRoom($floor);
+
+        return $response === true ? ApiResponse::success('', 'Floor deleted') : ApiResponse::error('', 'Error during Floor deletion');
     }
 }

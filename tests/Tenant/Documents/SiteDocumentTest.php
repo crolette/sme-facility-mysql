@@ -7,11 +7,13 @@ use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
-use App\Models\Tenants\Building;
+use App\Models\Tenants\Company;
 
+use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Queue;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
@@ -19,13 +21,15 @@ use function Pest\Laravel\assertDatabaseEmpty;
 use function Pest\Laravel\assertDatabaseMissing;
 
 beforeEach(function () {
-    $this->siteType = LocationType::factory()->create(['level' => 'site']);
     $this->documentCategory = CategoryType::factory()->create(['category' => 'document']);
 
     $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
 
     $this->location = Site::factory()->create();
+    $this->building = Building::factory()->create();
+    $this->floor = Floor::factory()->create();
+    $this->room = Room::factory()->create();
 });
 
 it('can attach existing documents to floor', function () {
@@ -39,7 +43,7 @@ it('can attach existing documents to floor', function () {
     $formData = [
         'name' => 'New site',
         'description' => 'Description new site',
-        'locationType' => $this->siteType->id,
+        'locationType' => LocationType::where('level', 'site')->first()->id,
         'existing_documents' => [...$documents->pluck('id')]
 
     ];
@@ -68,7 +72,7 @@ it('can upload several files when site is created', function () {
     $formData = [
         'name' => 'New site',
         'description' => 'Description new site',
-        'locationType' => $this->siteType->id,
+        'locationType' => LocationType::where('level', 'site')->first()->id,
         'files' => [
             [
                 'file' => $file1,
@@ -103,6 +107,41 @@ it('can upload several files when site is created', function () {
     ]);
 
     Storage::disk('tenants')->assertExists(Document::first()->path);
+});
+
+it('can upload several files when site is created  and increment disk space accordingly (before compressing picture)', function () {
+
+    Queue::fake();
+
+    $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
+
+    $formData = [
+        'name' => 'New site',
+        'description' => 'Description new site',
+        'locationType' => LocationType::where('level', 'site')->first()->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ]
+        ]
+    ];
+
+    $this->postToTenant('api.sites.store', $formData);
+
+    $company = Company::first();
+    assertEquals(round($company->disk_size / 1024), 1200);
 });
 
 it('can upload documents to an existing site', function () {
@@ -244,7 +283,7 @@ it('fails when upload wrong image mime (ie. webp)', function () {
     $formData = [
         'name' => 'New site',
         'description' => 'Description new site',
-        'locationType' => $this->siteType->id,
+        'locationType' => LocationType::where('level', 'site')->first()->id,
         'files' => [
             [
                 'file' => $file1,
@@ -277,7 +316,7 @@ it('fails when upload exceeding document size : ' . Document::maxUploadSizeKB() 
     $formData = [
         'name' => 'New site',
         'description' => 'Description new site',
-        'locationType' => $this->siteType->id,
+        'locationType' => LocationType::where('level', 'site')->first()->id,
         'files' => [
             [
                 'file' => $file1,
@@ -294,7 +333,6 @@ it('fails when upload exceeding document size : ' . Document::maxUploadSizeKB() 
         'files.0.file' => "The files.0.file field must not be greater than " . Document::maxUploadSizeKB() . " kilobytes.",
     ]);
 });
-
 
 it('can update name and description a document from a site ', function () {
 
@@ -326,8 +364,6 @@ it('deletes the documents directory if it is empty', function () {
 
     $file1 = UploadedFile::fake()->image('avatar.png');
 
-    $site = Site::factory()->create();
-
     $formData = [
 
         'files' => [
@@ -342,10 +378,10 @@ it('deletes the documents directory if it is empty', function () {
         ]
     ];
 
-    $response = $this->postToTenant('api.sites.documents.post', $formData, $site->reference_code);
+    $response = $this->postToTenant('api.sites.documents.post', $formData, $this->location->reference_code);
     $response->assertSessionHasNoErrors();
 
-    $document = $site->documents()->first();
+    $document = $this->location->documents()->first();
 
     expect(Storage::disk('tenants')->exists($document->directory))->toBeTrue();
 
@@ -358,69 +394,282 @@ it('deletes the documents directory if it is empty', function () {
     ]);
 
     $this->assertDatabaseMissing('documentables', [
-        'documentable_id' => $site->id,
-        'documentable_type' => Site::class
+        'documentable_id' => $this->location->id,
+        'documentable_type' => get_class($this->location)
     ]);
 
     expect(Storage::disk('tenants')->exists($document->directory))->toBeFalse();
 });
 
-// it('does not delete the documents directory if it is not empty', function () {
-//     $file1 = UploadedFile::fake()->image('avatar.png');
+it('deletes the document if a site is deleted and document is not linked to another asset/location', function () {
+    $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
 
-//     $site = Site::factory()->create();
+    $formData = [
+        'name' => 'New site',
+        'description' => 'Description new site',
+        'locationType' => LocationType::where('level', 'site')->first()->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ]
+        ]
+    ];
 
-//     $formData = [
+    $response = $this->postToTenant('api.sites.store', $formData);
+    $location = Site::find(2);
+    $response->assertSessionHasNoErrors();
 
-//         'files' => [
-//             [
-//                 'file' => $file1,
-//                 'name' => 'FILE 1 - First file',
-//                 'description' => 'descriptionIMG',
-//                 'typeId' => $this->documentCategory->id,
-//                 'typeSlug' => $this->documentCategory->slug
-//             ],
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => get_class($location),
+        'documentable_id' => $location->id
+    ]);
+    assertDatabaseHas('documentables', [
+        'document_id' => 2,
+        'documentable_type' => get_class($location),
+        'documentable_id' => $location->id
+    ]);
 
-//         ]
-//     ];
+    $firstDocumentPath = Document::first()->path;
+    Storage::disk('tenants')->assertExists($firstDocumentPath);
+    $secondDocumentPath = Document::find(2)->path;
+    Storage::disk('tenants')->assertExists($secondDocumentPath);
 
-//     $response = $this->postToTenant('api.sites.documents.post', $formData, $site->reference_code);
-//     $response->assertSessionHasNoErrors();
-//     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
-//     $formData = [
-
-//         'files' => [
-//             [
-//                 'file' => $file2,
-//                 'name' => 'FILE 2 - Second file',
-//                 'description' => 'descriptionIMG',
-//                 'typeId' => $this->documentCategory->id,
-//                 'typeSlug' => $this->documentCategory->slug
-//             ],
-
-//         ]
-//     ];
-
-//     $response = $this->postToTenant('api.sites.documents.post', $formData, $site->reference_code);
-//     $response->assertSessionHasNoErrors();
-
-//     $document = $site->documents()->first();
+    $response = $this->deleteFromTenant('api.sites.destroy', $location->reference_code);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
 
-//     $response = $this->deleteFromTenant('api.documents.delete', $document->id);
-//     $response->assertOk();
+    assertDatabaseMissing('documentables', [
+        'document_id' => 1,
+        'documentable_type' => get_class($location),
+        'documentable_id' => $location->id
+    ]);
+    assertDatabaseMissing('documentables', [
+        'document_id' => 2,
+        'documentable_type' => get_class($location),
+        'documentable_id' => $location->id
+    ]);
 
-//     $this->assertDatabaseMissing('documents', [
-//         'id' => $document->id,
-//         'filename' => $document->filename
-//     ]);
+    assertDatabaseCount('documents', 0);
 
-//     $this->assertDatabaseMissing('documentables', [
-//         'document_id' => $document->id,
-//         'documentable_id' => $site->id,
-//         'documentable_type' => Site::class
-//     ]);
+    Storage::disk('tenants')->assertMissing($firstDocumentPath);
+    Storage::disk('tenants')->assertMissing($secondDocumentPath);
+});
 
-//     expect(Storage::disk('tenants')->exists($document->directory))->toBeTrue();
-//     assertEquals(1, count(Storage::disk('tenants')->files($document->directory)));
-// });
+it('deletes the document if a site is deleted and document is not linked to another asset/location and decrease disk size accordingly', function () {
+    // ajout queue pour ne pas créer le job de compression d'image
+    Queue::fake();
+
+    $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
+
+    $formData = [
+        'name' => 'New site',
+        'description' => 'Description new site',
+        'locationType' => LocationType::where('level', 'site')->first()->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ]
+        ]
+    ];
+
+    $this->postToTenant('api.sites.store', $formData);
+
+    $location = Site::find(2);
+    $company = Company::first();
+    assertEquals(round($company->disk_size / 1024), 1200);
+
+
+    $this->deleteFromTenant('api.sites.destroy', $location->reference_code);
+
+    $company->refresh();
+    assertEquals(round($company->disk_size / 1024), 0);
+});
+
+it('deletes only document if the document is not linked to another asset/location', function () {
+    $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
+
+    $formData = [
+        'name' => 'New site',
+        'description' => 'Description new site',
+        'locationType' => LocationType::where('level', 'site')->first()->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ]
+        ]
+    ];
+
+    $response = $this->postToTenant('api.sites.store', $formData);
+    $location = Site::find(2);
+
+    $response->assertSessionHasNoErrors();
+
+    $document = Document::first();
+
+    $categoryType = CategoryType::factory()->create(['category' => 'asset']);
+
+    $formData = [
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+        'locationId' => $this->room->id,
+        'locationReference' => $this->room->reference_code,
+        'locationType' => 'room',
+        'categoryId' => $categoryType->id,
+        'existing_documents' => [$document->id]
+
+    ];
+
+    $response = $this->postToTenant('api.assets.store', $formData);
+
+    $asset = Asset::first();
+
+    assertDatabaseCount('documents', 2);
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => get_class($location),
+        'documentable_id' => $location->id
+    ]);
+
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => get_class($asset),
+        'documentable_id' => $asset->id
+    ]);
+
+    assertDatabaseHas('documentables', [
+        'document_id' => 2,
+        'documentable_type' => get_class($location),
+        'documentable_id' => $location->id
+    ]);
+
+    $firstDocumentPath = Document::first()->path;
+    $secondDocumentPath = Document::find(2)->path;
+    Storage::disk('tenants')->assertExists($firstDocumentPath);
+
+    $response = $this->deleteFromTenant('api.sites.destroy', $location->reference_code);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+
+    assertDatabaseMissing('documentables', [
+        'document_id' => 1,
+        'documentable_type' => get_class($location),
+        'documentable_id' => $location->id
+    ]);
+
+    assertDatabaseHas('documentables', [
+        'document_id' => 1,
+        'documentable_type' => get_class($asset),
+        'documentable_id' => $asset->id
+    ]);
+
+    assertDatabaseMissing('documentables', [
+        'document_id' => 2,
+        'documentable_type' => get_class($location),
+        'documentable_id' => $location->id
+    ]);
+
+    assertDatabaseCount('documents', 1);
+
+    Storage::disk('tenants')->assertExists($firstDocumentPath);
+    Storage::disk('tenants')->assertMissing($secondDocumentPath);
+});
+
+it('deletes only document if the document is not linked to another asset/location and decrease disk size accordingly', function () {
+    // ajout queue pour ne pas créer le job de compression d'image
+    Queue::fake();
+
+
+    $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
+    $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
+
+    $formData = [
+        'name' => 'New site',
+        'description' => 'Description new site',
+        'locationType' => LocationType::where('level', 'site')->first()->id,
+        'files' => [
+            [
+                'file' => $file1,
+                'name' => 'FILE 1 - Long name of more than 10 chars',
+                'description' => 'descriptionIMG',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ],
+            [
+                'file' => $file2,
+                'name' => 'FILE 2 - Long name of more than 10 chars',
+                'description' => 'descriptionPDF',
+                'typeId' => $this->documentCategory->id,
+                'typeSlug' => $this->documentCategory->slug
+            ]
+        ]
+    ];
+
+    $this->postToTenant('api.sites.store', $formData);
+    $location = Site::find(2);
+
+
+    $document = Document::first();
+
+    $categoryType = CategoryType::factory()->create(['category' => 'asset']);
+
+    $formData = [
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+        'locationId' => $this->room->id,
+        'locationReference' => $this->room->reference_code,
+        'locationType' => 'room',
+        'categoryId' => $categoryType->id,
+        'existing_documents' => [$document->id]
+
+    ];
+
+    $this->postToTenant('api.assets.store', $formData);
+
+    $company = Company::first();
+    assertEquals(round($company->disk_size / 1024), 1200);
+
+    $this->deleteFromTenant('api.sites.destroy', $location->reference_code);
+
+    $company->refresh();
+    assertEquals(round($company->disk_size / 1024), 1000);
+});

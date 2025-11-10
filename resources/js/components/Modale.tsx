@@ -13,7 +13,7 @@ export default function Modale({
     title: string;
     message: string;
     isOpen: boolean;
-    isProcessing: boolean;
+    isProcessing?: boolean;
     isUpdating?: boolean;
     onConfirm: () => void;
     onCancel: () => void;
