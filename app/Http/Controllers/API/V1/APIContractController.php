@@ -75,7 +75,8 @@ class APIContractController extends Controller
         if (Auth::user()->cannot('delete', $contract))
             return ApiResponse::notAuthorized();
 
-        $contract->delete();
-        return ApiResponse::successFlash('', 'Contract deleted');
+        $response = $this->contractService->delete($contract);
+
+        return $response === true ? ApiResponse::success('', 'Contract deleted') : ApiResponse::error('', 'Error during Contract deletion');
     }
 }

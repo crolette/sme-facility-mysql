@@ -36,7 +36,7 @@ class Picture extends Model
             Company::incrementDiskSize($picture->size);
         });
 
-        static::deleted(function ($picture) {
+        static::deleting(function ($picture) {
             Company::decrementDiskSize($picture->size);
         });
     }

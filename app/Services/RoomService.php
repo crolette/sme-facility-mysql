@@ -140,7 +140,7 @@ class RoomService
     {
         try {
             DB::beginTransaction();
-            $deleted = $room->delete();
+
 
             $documents = $room->documents;
 
@@ -149,9 +149,14 @@ class RoomService
                 $this->documentService->verifyRelatedDocuments($document);
             };
 
-            $directory = $room->directory;
+            $pictures = $room->pictures;
+            foreach ($pictures as $picture) {
+                $this->pictureService->deletePictureFromStorage($picture);
+            };
 
-            Storage::disk('tenants')->deleteDirectory($directory);
+            Storage::disk('tenants')->deleteDirectory($room->directory);
+
+            $deleted = $room->delete();
 
             DB::commit();
             return $deleted;

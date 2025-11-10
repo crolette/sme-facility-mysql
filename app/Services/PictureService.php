@@ -89,4 +89,25 @@ class PictureService
 
     //     Log::info('--- END COMPRESSING PICTURE : ' . $picture->filename);
     // }
+
+
+    // public function verifyRelatedPictures(Picture $picture)
+    // {
+    //     if (count($document->getDocumentablesFlat()) === 0) {
+    //         $this->deleteDocumentFromStorage($document);
+    //     };
+    // }
+
+    public function deletePictureFromStorage(Picture $picture)
+    {
+        Storage::disk('tenants')->delete($picture->path);
+        // $this->deleteDirectoryFromStorage($picture->directory);
+        $picture->delete();
+    }
+
+    public function deleteDirectoryFromStorage(string $directory)
+    {
+        if (count(Storage::disk('tenants')->files($directory)) === 0)
+            Storage::disk('tenants')->deleteDirectory($directory);
+    }
 };

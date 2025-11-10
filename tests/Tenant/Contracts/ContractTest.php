@@ -8,18 +8,19 @@ use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Enums\NoticePeriodEnum;
-use App\Models\Tenants\Building;
-use App\Models\Tenants\Contract;
-
-use App\Models\Tenants\Provider;
-use App\Enums\ContractStatusEnum;
-
-use App\Enums\ContractDurationEnum;
-use App\Models\Central\CategoryType;
-
-use App\Enums\ContractRenewalTypesEnum;
 use App\Enums\ContractTypesEnum;
+use App\Models\Tenants\Building;
 
+use App\Models\Tenants\Contract;
+use App\Models\Tenants\Provider;
+
+use App\Enums\ContractStatusEnum;
+use App\Enums\ContractDurationEnum;
+
+use App\Models\Central\CategoryType;
+use App\Enums\ContractRenewalTypesEnum;
+
+use Illuminate\Support\Facades\Storage;
 use function PHPUnit\Framework\assertCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -405,7 +406,7 @@ it('can update an existing contract', function () {
     );
 });
 
-it('can delete a contract', function () {
+it('can delete a contract and delete contract\'s directory', function () {
 
     $contract = Contract::factory()->forLocation($this->asset)->create();
 
@@ -414,6 +415,7 @@ it('can delete a contract', function () {
 
     assertDatabaseEmpty('contracts');
     assertDatabaseEmpty('contractables');
+    Storage::disk('tenants')->assertMissing($contract->directory);
 });
 
 it('can render the index page with all contracts', function () {

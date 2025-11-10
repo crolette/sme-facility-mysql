@@ -71,6 +71,38 @@ it('can retrieve all pictures from a site', function () {
     $this->assertCount(2, $data);
 });
 
+it('deletes directory and pictures if a site is deleted', function () {
+
+    Queue::fake();
+    $location = Site::factory()->create();
+    $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
+    $file2 = UploadedFile::fake()->image('test.jpg')->size(1200);
+
+    $formData = [
+        'pictures' => [
+            $file1,
+            $file2
+        ]
+    ];
+
+    $this->postToTenant('api.sites.pictures.post', $formData, $location);
+
+    $pictures = $location->pictures;
+    foreach ($pictures as $picture) {
+        expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
+    }
+
+    assertDatabaseCount('pictures', 2);
+    Storage::disk('tenants')->assertExists($location->directory);
+
+    $this->deleteFromTenant('api.sites.destroy', $location->reference_code);
+    assertDatabaseCount('pictures', 0);
+
+    Storage::disk('tenants')->assertMissing($location->directory);
+    foreach ($pictures as $picture) {
+        expect(Storage::disk('tenants')->exists($picture->path))->toBeFalse();
+    }
+});
 
 it('can delete a picture from a site and decrement disk size', function () {
     Queue::fake();

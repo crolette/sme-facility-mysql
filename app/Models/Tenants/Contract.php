@@ -6,15 +6,16 @@ use App\Models\Tenants\Site;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Enums\NoticePeriodEnum;
+use App\Enums\ContractTypesEnum;
 use App\Models\Tenants\Document;
 use App\Enums\ContractStatusEnum;
 use App\Enums\ContractDurationEnum;
 use App\Observers\ContractObserver;
 use App\Enums\ContractRenewalTypesEnum;
-use App\Enums\ContractTypesEnum;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Tenants\ScheduledNotification;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -119,6 +120,17 @@ class Contract extends Model
     {
         return $this->morphMany(ScheduledNotification::class, 'notifiable');
     }
+
+    public function directory(): Attribute
+    {
+        $tenantId = tenancy()->tenant->id;
+        $directory = "$tenantId/contracts/" . $this->id . "/";
+
+        return Attribute::make(
+            get: fn() => $directory
+        );
+    }
+
 
 
 

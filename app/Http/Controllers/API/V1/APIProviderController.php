@@ -97,7 +97,8 @@ class APIProviderController extends Controller
         if (Auth::user()->cannot('delete', $provider))
             return ApiResponse::notAuthorized();
 
-        $provider->delete();
-        return ApiResponse::successFlash('', 'Provider deleted');
+        $response = $this->providerService->delete($provider);
+
+        return $response === true ? ApiResponse::success('', 'Provider deleted') : ApiResponse::error('', 'Error during Provider deletion');
     }
 };

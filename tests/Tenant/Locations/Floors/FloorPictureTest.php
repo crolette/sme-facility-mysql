@@ -48,7 +48,6 @@ it('can add pictures to a floor', function () {
     $response = $this->postToTenant('api.floors.pictures.post', $formData, $this->location);
     $response->assertSessionHasNoErrors();
 
-
     $picture = Picture::first();
     expect(Storage::disk('tenants')->exists($picture->directory))->toBeTrue();
     expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
@@ -70,6 +69,36 @@ it('can retrieve all pictures from a floor', function () {
     $this->assertCount(2, $data);
 });
 
+it('deletes directory and pictures if a site is deleted', function () {
+    Queue::fake();
+    $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
+    $file2 = UploadedFile::fake()->image('test.jpg')->size(1200);
+
+    $formData = [
+        'pictures' => [
+            $file1,
+            $file2
+        ]
+    ];
+
+    $this->postToTenant('api.floors.pictures.post', $formData, $this->location);
+
+    $pictures = $this->location->pictures;
+    foreach ($pictures as $picture) {
+        expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
+    }
+
+    assertDatabaseCount('pictures', 2);
+    Storage::disk('tenants')->assertExists($this->location->directory);
+
+    $this->deleteFromTenant('api.floors.destroy', $this->location->reference_code);
+    assertDatabaseCount('pictures', 0);
+
+    Storage::disk('tenants')->assertMissing($this->location->directory);
+    foreach ($pictures as $picture) {
+        expect(Storage::disk('tenants')->exists($picture->path))->toBeFalse();
+    }
+});
 
 it('can delete a picture from a floor', function () {
     $file1 = UploadedFile::fake()->image('avatar.png');

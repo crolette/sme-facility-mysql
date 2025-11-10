@@ -12,6 +12,7 @@ use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Company;
 use App\Models\Tenants\Building;
+use App\Services\PictureService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,7 +21,7 @@ use Illuminate\Support\Facades\Storage;
 class AssetService
 {
 
-    public function __construct(protected DocumentService $documentService) {}
+    public function __construct(protected DocumentService $documentService, protected PictureService $pictureService) {}
 
     public function create(array $data): Asset
     {
@@ -158,7 +159,7 @@ class AssetService
     {
         try {
             DB::beginTransaction();
-            $deleted = $asset->forceDelete();
+
 
             $documents = $asset->documents;
 
@@ -167,10 +168,14 @@ class AssetService
                 $this->documentService->verifyRelatedDocuments($document);
             };
 
-            $tenantId = tenancy()->tenant->id;
-            $directory = "$tenantId/assets/$asset->id/";
+            $pictures = $asset->pictures;
+            foreach ($pictures as $picture) {
+                $this->pictureService->deletePictureFromStorage($picture);
+            };
 
-            Storage::disk('tenants')->deleteDirectory($directory);
+            Storage::disk('tenants')->deleteDirectory($asset->directory);
+
+            $deleted = $asset->forceDelete();
 
             DB::commit();
             return $deleted;

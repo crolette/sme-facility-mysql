@@ -104,7 +104,7 @@ it('can add pictures to an asset', function () {
     assertEquals(round(Company::first()->disk_size / 1024), 2000);
 });
 
-it('does not delete pictures when asset is deleted', function () {
+it('does not delete pictures when asset is soft deleted', function () {
     $asset = Asset::factory()->forLocation($this->room)->create();
     $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
     $file2 = UploadedFile::fake()->image('test.jpg')->size(1000);
@@ -137,7 +137,7 @@ it('does not delete pictures when asset is deleted', function () {
     }
 });
 
-it('deletes pictures when asset is force deleted', function () {
+it('deletes pictures and directory when asset is force deleted', function () {
     Queue::fake();
     $asset = Asset::factory()->forLocation($this->room)->create();
     $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
@@ -166,9 +166,22 @@ it('deletes pictures when asset is force deleted', function () {
 
     $response = $this->deleteFromTenant('api.assets.force', $asset->reference_code);
 
+    assertDatabaseCount('pictures', 0);
+    assertDatabaseMissing('pictures', [
+        'imageable_type' => 'App\Models\Tenants\Asset',
+        'imageable_id' => 1
+    ]);
+
+    assertDatabaseMissing('pictures', [
+        'imageable_type' => 'App\Models\Tenants\Asset',
+        'imageable_id' => 2
+    ]);
+
     foreach ($pictures as $picture) {
         expect(Storage::disk('tenants')->exists($picture->path))->toBeFalse();
     }
 
-    assertEquals(round(Company::first()->disk_size / 1024), 2000);
+    assertEquals(round(Company::first()->disk_size / 1024), 0);
+
+    Storage::disk('tenants')->assertMissing($asset->directory);
 });

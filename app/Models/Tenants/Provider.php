@@ -63,6 +63,7 @@ class Provider extends Model
         // 'country_label'
     ];
 
+
     public const MAX_UPLOAD_SIZE_MB = 4;
 
     public static function maxUploadSizeKB(): int
@@ -135,6 +136,16 @@ class Provider extends Model
     {
         return Attribute::make(
             get: fn() => Storage::disk('tenants')->url($this->logo) ?? null
+        );
+    }
+
+    public function directory(): Attribute
+    {
+        $tenantId = tenancy()->tenant->id;
+        $directory = "$tenantId/providers/" . $this->id . "/";
+
+        return Attribute::make(
+            get: fn() => $directory
         );
     }
 }

@@ -2,14 +2,20 @@
 
 namespace App\Services;
 
-use App\Enums\ContractDurationEnum;
+use Exception;
+use Carbon\Carbon;
 use App\Enums\NoticePeriodEnum;
 use App\Models\Tenants\Contract;
-use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use App\Enums\ContractDurationEnum;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class ContractService
 {
+    public function __construct(protected DocumentService $documentService) {}
+
     public function createWithModel(Model $model, $request): void
     {
 
@@ -79,14 +85,6 @@ class ContractService
         // dump('update contract service');
         $contract->update([...$request]);
 
-
-        // if (isset($request['contract_duration']) && ($contract->wasChanged('contract_duration') || $contract->wasChanged('start_date')))
-        //     $contract = $this->updateContractEndDate($contract, $contract->contract_duration);
-
-        // if (isset($request['notice_period']) && ($contract->wasChanged('notice_period') || $contract->wasChanged('contract_duration') || $contract->wasChanged('start_date'))) {
-        //     $contract = $this->updateNoticeDate($contract, $contract->notice_period);
-        // }
-
         if (($contract->wasChanged('notice_period') && !isset($request['notice_period'])))
             $contract->notice_date = null;
 
@@ -140,5 +138,31 @@ class ContractService
         $contract->notice_date = $notice_period->subFrom(Carbon::parse($contract->end_date));
 
         return $contract;
+    }
+
+    public function delete(Contract $contract): bool
+    {
+
+        try {
+            DB::beginTransaction();
+            $deleted = $contract->delete();
+
+            $documents = $contract->documents;
+            foreach ($documents as $document) {
+                $this->documentService->detachDocumentFromModel($contract, $document->id);
+                $this->documentService->verifyRelatedDocuments($document);
+            };
+
+            Storage::disk('tenants')->deleteDirectory($contract->directory);
+
+            DB::commit();
+            return $deleted;
+        } catch (Exception $e) {
+            Log::info('Error during building deletion', ['site' => $contract, 'error' => $e->getMessage()]);
+            DB::rollBack();
+            return false;
+        }
+
+        return false;
     }
 };

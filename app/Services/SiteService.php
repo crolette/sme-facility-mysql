@@ -12,6 +12,7 @@ use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Company;
 use App\Models\Tenants\Building;
+use App\Services\PictureService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,7 +21,7 @@ use Illuminate\Support\Facades\Storage;
 class SiteService
 {
 
-    public function __construct(protected DocumentService $documentService) {}
+    public function __construct(protected DocumentService $documentService, protected PictureService $pictureService) {}
 
     // public function create(array $data): Site
     // {
@@ -47,7 +48,6 @@ class SiteService
     {
         try {
             DB::beginTransaction();
-            $deleted = $site->delete();
 
             $documents = $site->documents;
 
@@ -56,9 +56,14 @@ class SiteService
                 $this->documentService->verifyRelatedDocuments($document);
             };
 
-            $directory = $site->directory;
+            $pictures = $site->pictures;
+            foreach ($pictures as $picture) {
+                $this->pictureService->deletePictureFromStorage($picture);
+            };
 
-            Storage::disk('tenants')->deleteDirectory($directory);
+            Storage::disk('tenants')->deleteDirectory($site->directory);
+
+            $deleted = $site->delete();
 
             DB::commit();
             return $deleted;

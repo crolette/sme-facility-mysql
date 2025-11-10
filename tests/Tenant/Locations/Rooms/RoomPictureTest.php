@@ -73,8 +73,37 @@ it('can retrieve all pictures from a room', function () {
     $this->assertCount(2, $data);
 });
 
+it('deletes directory and pictures if a room is deleted', function () {
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->image('test.jpg');
 
-it('can delete a picture from a floor', function () {
+    $formData = [
+        'pictures' => [
+            $file1,
+            $file2
+        ]
+    ];
+
+    $this->postToTenant('api.rooms.pictures.post', $formData, $this->location);
+
+    $pictures = $this->location->pictures;
+    foreach ($pictures as $picture) {
+        expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
+    }
+
+    assertDatabaseCount('pictures', 2);
+    Storage::disk('tenants')->assertExists($this->location->directory);
+
+    $this->deleteFromTenant('api.sites.destroy', $this->location->reference_code);
+    assertDatabaseCount('pictures', 0);
+
+    Storage::disk('tenants')->assertMissing($this->location->directory);
+    foreach ($pictures as $picture) {
+        expect(Storage::disk('tenants')->exists($picture->path))->toBeFalse();
+    }
+});
+
+it('can delete a picture from a room', function () {
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->image('test.jpg');
 

@@ -36,7 +36,6 @@ export default function ShowProvider({ item }: { item: Provider }) {
     const deleteProvider = async () => {
         try {
             const response = await axios.delete(route('api.providers.destroy', provider.id));
-            console.log(response);
             if (response.data.status === 'success') {
                 router.get(route('tenant.providers.index'));
             }

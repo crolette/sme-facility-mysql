@@ -58,6 +58,39 @@ it('can add pictures to a building', function () {
     ]);
 });
 
+it('deletes directory and pictures if a building is deleted', function () {
+
+    $file1 = UploadedFile::fake()->image('avatar.png');
+    $file2 = UploadedFile::fake()->image('test.jpg');
+
+    $formData = [
+        'pictures' => [
+            $file1,
+            $file2
+        ]
+    ];
+
+    $response = $this->postToTenant('api.buildings.pictures.post', $formData, $this->location);
+
+    $response->assertSessionHasNoErrors();
+
+    $pictures = $this->location->pictures;
+    foreach ($pictures as $picture) {
+        expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
+    }
+
+    assertDatabaseCount('pictures', 2);
+    Storage::disk('tenants')->assertExists($this->location->directory);
+
+    $this->deleteFromTenant('api.buildings.destroy', $this->location->reference_code);
+    assertDatabaseCount('pictures', 0);
+
+    Storage::disk('tenants')->assertMissing($this->location->directory);
+    foreach ($pictures as $picture) {
+        expect(Storage::disk('tenants')->exists($picture->path))->toBeFalse();
+    }
+});
+
 it('can retrieve all pictures from a building', function () {
     Picture::factory()->forModelAndUser($this->location, $this->user, 'buildings')->create();
     Picture::factory()->forModelAndUser($this->location, $this->user, 'buildings')->create();

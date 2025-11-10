@@ -194,6 +194,17 @@ class Asset extends Model
         );
     }
 
+    public function directory(): Attribute
+    {
+        $tenantId = tenancy()->tenant->id;
+        $directory = "$tenantId/assets/" . $this->id . "/";
+
+        return Attribute::make(
+            get: fn() => $directory
+        );
+    }
+
+
     public function ownInterventions(): HasMany
     {
         return $this->interventions()->where('ticket_id', null);

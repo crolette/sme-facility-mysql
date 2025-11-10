@@ -99,12 +99,7 @@ class TenantAssetController extends Controller
         if (Auth::user()->cannot('view', $asset))
             abort(403);
 
-        $document = $asset->documents()->first();
-        dd($document->id, $document->getDocumentablesFlat());
-        // dd($asset->documents()->with('documentable')->get());
-
         $asset = Asset::where('reference_code', $asset->reference_code)->with(['maintainable.manager:id,first_name,last_name', 'contracts:id,name,type,provider_id,status,renewal_type,end_date,internal_reference,provider_reference', 'contracts.provider:id,name,logo', 'maintainable.providers:id,name'])->first();
-        // dd($asset);
         return Inertia::render('tenants/assets/ShowAsset', ['item' => $asset->append('level_path')]);
     }
 

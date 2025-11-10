@@ -137,7 +137,6 @@ it('can create a new site with other matherials', function () {
     ]);
 });
 
-
 it('can render the show site page', function () {
     $site = Site::factory()->create();
 
@@ -232,7 +231,7 @@ it('cannot update a site type of an existing site', function () {
         ->assertJson(['status' => 'error']);
 });
 
-it('can delete a site', function () {
+it('can delete a site and deletes directory', function () {
     $site = Site::factory()->create();
 
     $response = $this->deleteFromTenant('api.sites.destroy', $site->reference_code);
@@ -245,6 +244,8 @@ it('can delete a site', function () {
     assertDatabaseMissing('maintainables', [
         'maintainable_id' => $site->id
     ]);
+
+    Storage::disk('tenants')->assertMissing($site->directory);
 });
 
 it('cannot delete a site which has buildings', function () {

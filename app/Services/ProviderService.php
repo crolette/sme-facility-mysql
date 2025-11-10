@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
+use Exception;
+use App\Models\Tenants\Company;
 use App\Models\Tenants\Country;
 use App\Models\Tenants\Provider;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class ProviderService
 {
@@ -43,5 +46,29 @@ class ProviderService
     {
         $provider->providerCategory()->associate($categoryId);
         return $provider;
+    }
+
+    public function delete(Provider $provider): bool
+    {
+        try {
+
+
+            $files = Storage::disk('tenants')->allFiles($provider->directory);
+            $directorySize = 0;
+            foreach ($files as $file) {
+                $directorySize += Storage::disk('tenants')->size($file);
+            }
+
+            Company::decrementDiskSize($directorySize);
+
+            Storage::disk('tenants')->deleteDirectory($provider->directory);
+
+            $provider->delete();
+            return true;
+        } catch (Exception $e) {
+            Log::info('Error during provider deletion', ['provider' => $provider, 'error' => $e->getMessage()]);
+            return false;
+        }
+        return false;
     }
 }

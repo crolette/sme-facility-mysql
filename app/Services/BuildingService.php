@@ -3,16 +3,10 @@
 namespace App\Services;
 
 use Exception;
-use Carbon\Carbon;
-use Illuminate\Support\Str;
 use App\Models\LocationType;
-use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
-use App\Models\Tenants\User;
-use App\Models\Tenants\Asset;
-use App\Models\Tenants\Floor;
-use App\Models\Tenants\Company;
 use App\Models\Tenants\Building;
+use App\Services\PictureService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -21,7 +15,7 @@ use Illuminate\Support\Facades\Storage;
 class BuildingService
 {
 
-    public function __construct(protected DocumentService $documentService) {}
+    public function __construct(protected DocumentService $documentService, protected PictureService $pictureService) {}
 
     public function create(array $data): Building
     {
@@ -140,7 +134,6 @@ class BuildingService
     {
         try {
             DB::beginTransaction();
-            $deleted = $building->delete();
 
             $documents = $building->documents;
 
@@ -149,9 +142,14 @@ class BuildingService
                 $this->documentService->verifyRelatedDocuments($document);
             };
 
-            $directory = $building->directory;
+            $pictures = $building->pictures;
+            foreach ($pictures as $picture) {
+                $this->pictureService->deletePictureFromStorage($picture);
+            };
 
-            Storage::disk('tenants')->deleteDirectory($directory);
+            Storage::disk('tenants')->deleteDirectory($building->directory);
+
+            $deleted = $building->delete();
 
             DB::commit();
             return $deleted;

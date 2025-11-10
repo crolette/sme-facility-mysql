@@ -407,7 +407,7 @@ it('deletes the documents directory if it is empty', function () {
     expect(Storage::disk('tenants')->exists($document->path))->toBeFalse();
 });
 
-it('deletes the document if a floor is deleted and document is not linked to another asset/location', function () {
+it('deletes the documents if a floor is deleted and document is not linked to another asset/location', function () {
     $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 2000, 'application/pdf');
 
@@ -476,7 +476,7 @@ it('deletes the document if a floor is deleted and document is not linked to ano
     Storage::disk('tenants')->assertMissing($secondDocumentPath);
 });
 
-it('deletes the document if a floor is deleted and document is not linked to another asset/location and decrease disk size accordingly', function () {
+it('deletes the documents if a floor is deleted and document is not linked to another asset/location and decrease disk size accordingly', function () {
     Queue::fake();
     $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 2000, 'application/pdf');

@@ -50,6 +50,7 @@ class CalculateDiskSize extends Command
             $output = shell_exec("du -sb {$path}");
             $size = (int) explode("\t", $output)[0];
 
+            // TODO : le vat number pourrait changer et donc à l'update, on retrouve pas la bonne société, il faudrait mettre sur le domain du tenant car lui ne peut pas changer
             Company::updateOrCreate(
                 ['vat_number' => $tenant->vat_number],
                 [

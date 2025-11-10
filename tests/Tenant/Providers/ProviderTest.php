@@ -12,6 +12,7 @@ use App\Models\Tenants\Building;
 use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -275,6 +276,60 @@ it('can delete an existing provider', function () {
         ]);
 
     assertDatabaseEmpty('providers');
+});
+
+it('can delete an existing provider and deletes the provider directory', function () {
+    Queue::fake();
+    $file1 = UploadedFile::fake()->image('logo.png')->size(1500);
+
+    $formData = [
+        'name' => 'Facility Web Experience SPRL',
+        'email' => 'info@facilitywebxp.be',
+        'vat_number' => 'BE0123456789',
+        'street' => 'Rue sur le Hour',
+        'house_number' => '16A',
+        'postal_code' => '4910',
+        'city' => 'La Reid',
+        'country_code' => 'BEL',
+        'phone_number' => '+32450987654',
+        'categoryId' => $this->categoryType->id,
+        'website' => 'www.website.com',
+        'pictures' => [$file1]
+    ];
+
+    $response = $this->postToTenant('api.providers.store', $formData);
+    $provider = Provider::first();
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseCount('providers', 1);
+    assertDatabaseHas('providers', [
+        'name' => 'Facility Web Experience SPRL',
+        'email' => 'info@facilitywebxp.be',
+        'vat_number' => 'BE0123456789',
+        'category_type_id' => $this->categoryType->id,
+        'logo' => Provider::first()->logo
+    ]);
+
+    $company = Company::first();
+    assertEquals(round($company->disk_size / 1024), 1500);
+
+    Storage::disk('tenants')->assertExists($provider->logo);
+
+    $response = $this->deleteFromTenant('api.providers.destroy', $provider);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseEmpty('providers');
+
+    $company->refresh();
+
+    Storage::disk('tenants')->assertMissing($provider->directory);
+    Storage::disk('tenants')->assertMissing($provider->logo);
 });
 
 it('can retrieve all assets linked to a provider', function () {

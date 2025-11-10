@@ -537,6 +537,8 @@ it('can force delete a soft deleted asset', function () {
         'description' => $assetDescription,
         'maintainable_id' => $assetId
     ]);
+
+    Storage::disk('tenants')->assertMissing($asset->directory);
 });
 
 it('can attach a provider to an asset\'s maintainable', function () {
