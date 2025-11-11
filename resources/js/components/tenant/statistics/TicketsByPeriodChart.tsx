@@ -10,7 +10,7 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 export const TicketsByPeriodChart = ({ ticketsByPeriod }: { ticketsByPeriod: [] }) => {
     const [type, setType] = useState<string>('bar');
     const { dateFrom, dateTo } = useDashboardFilters();
-    const [period, setPeriod] = useState<string | null>(null);
+    const [period, setPeriod] = useState<string | null>('week');
     const [labels, setLabels] = useState<string[]>(
         Object.entries(ticketsByPeriod).map((item) => {
             return 'Week ' + item[0];

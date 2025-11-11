@@ -76,7 +76,7 @@ export const InterventionsByTypeChart = ({ interventionsByType }: { intervention
         plugins: {
             legend: {
                 display: false,
-                position: 'top' as const,
+                position: 'bottom' as const,
             },
             title: {
                 display: true,
