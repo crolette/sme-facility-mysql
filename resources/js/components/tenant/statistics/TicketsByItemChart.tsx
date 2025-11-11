@@ -5,28 +5,27 @@ import { Bar, Doughnut } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-export const InterventionsByAssigneeChart = ({ interventionsByAssignee }: { interventionsByAssignee: [] }) => {
+export const TicketsByItemChart = ({ ticketsByAssetOrLocations }: { ticketsByAssetOrLocations: [] }) => {
     const [type, setType] = useState<string>('bar');
 
-    const labels = interventionsByAssignee.map((item) => {
-        return item.name;
+    const labels = Object.entries(ticketsByAssetOrLocations).map(([index, item]) => {
+        return item.reference_code;
     });
 
-    const dataCount = interventionsByAssignee.map((item) => {
+    const dataCount = Object.entries(ticketsByAssetOrLocations).map(([index, item]) => {
         return item.count;
     });
 
     const options = {
-        indexAxis: 'y' as const,
         responsive: true,
         plugins: {
             legend: {
                 display: false,
-                position: 'top' as const,
+                position: 'bottom' as const,
             },
             title: {
                 display: true,
-                text: 'InterventionsByAssignee',
+                text: 'ticketsByAssetOrLocations',
             },
         },
     };
@@ -35,6 +34,7 @@ export const InterventionsByAssigneeChart = ({ interventionsByAssignee }: { inte
         labels: labels,
         datasets: [
             {
+                label: 'ticketsByAssetOrLocations',
                 data: dataCount,
                 backgroundColor: [
                     'oklch(45.633% 0.13478 263.563)',

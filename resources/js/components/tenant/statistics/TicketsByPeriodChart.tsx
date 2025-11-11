@@ -1,23 +1,52 @@
+import axios from 'axios';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js';
 import { ChartColumn, ChartPie } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Bar, Doughnut } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-export const InterventionsByAssigneeChart = ({ interventionsByAssignee }: { interventionsByAssignee: [] }) => {
+export const TicketsByPeriodChart = ({ ticketsByPeriod }: { ticketsByPeriod: [] }) => {
     const [type, setType] = useState<string>('bar');
+    const [period, setPeriod] = useState('week');
+    const [labels, setLabels] = useState(
+        Object.entries(ticketsByPeriod).map((item) => {
+            return 'Week ' + item[0];
+        }),
+    );
+    const [dataCount, setDataCount] = useState(
+        Object.entries(ticketsByPeriod).map((item) => {
+            return item[1];
+        }),
+    );
 
-    const labels = interventionsByAssignee.map((item) => {
-        return item.name;
-    });
+    const fetchTicketsByPeriod = async () => {
+        console.log('fetchTicketsByPeriod');
+        try {
+            const response = await axios.get(route('api.statistics.tickets.by-period', { period: period }));
+            console.log(response.data);
 
-    const dataCount = interventionsByAssignee.map((item) => {
-        return item.count;
-    });
+            setLabels(
+                Object.entries(response.data.data).map((item) => {
+                    return period === 'week' ? 'Week ' + item[0] : item[0];
+                }),
+            );
+
+            setDataCount(
+                Object.entries(response.data.data).map((item) => {
+                    return item[1];
+                }),
+            );
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchTicketsByPeriod();
+    }, [period]);
 
     const options = {
-        indexAxis: 'y' as const,
         responsive: true,
         plugins: {
             legend: {
@@ -26,7 +55,7 @@ export const InterventionsByAssigneeChart = ({ interventionsByAssignee }: { inte
             },
             title: {
                 display: true,
-                text: 'InterventionsByAssignee',
+                text: 'TicketsByPeriod',
             },
         },
     };
@@ -35,6 +64,7 @@ export const InterventionsByAssigneeChart = ({ interventionsByAssignee }: { inte
         labels: labels,
         datasets: [
             {
+                label: 'TicketsByPeriod',
                 data: dataCount,
                 backgroundColor: [
                     'oklch(45.633% 0.13478 263.563)',
@@ -54,6 +84,10 @@ export const InterventionsByAssigneeChart = ({ interventionsByAssignee }: { inte
                 <div>
                     <ChartColumn onClick={() => setType('bar')} />
                     <ChartPie onClick={() => setType('doughnut')} />
+                </div>
+                <div>
+                    <p onClick={() => setPeriod('week')}>Week</p>
+                    <p onClick={() => setPeriod('month')}>Month</p>
                 </div>
                 {type === 'bar' && (
                     <p>

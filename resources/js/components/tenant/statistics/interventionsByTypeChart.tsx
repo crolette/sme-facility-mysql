@@ -7,22 +7,27 @@ ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarEle
 
 export const InterventionsByTypeChart = ({ interventionsByType }: { interventionsByType: [] }) => {
     const [type, setType] = useState<string>('bar');
-    const labels = Object.entries(interventionsByType).map(([item, count]) => {
-        return item;
+    const labels = Object.entries(interventionsByType).map((item) => {
+        return item[0];
     });
 
-    const dataCount = Object.entries(interventionsByType).map(([item, count]) => {
-        return count;
+    const dataCount = Object.entries(interventionsByType).map((item) => {
+        return item[1];
     });
 
     const data = {
         labels: labels,
         datasets: [
             {
-                label: 'My First Dataset',
+                label: 'InterventionsByTypeChart',
                 data: dataCount,
-                barThickness: 5,
-                backgroundColor: ['rgb(255, 99, 132)', 'rgb(255, 99, 132)', 'rgb(255, 27, 132)', 'rgb(54, 162, 235)', 'rgb(255, 9, 86)'],
+                backgroundColor: [
+                    'oklch(45.633% 0.13478 263.563)',
+                    'oklch(56.627% 0.09703 258.464)',
+                    'oklch(42.935% 0.11812 258.322)',
+                    'oklch(54.636% 0.08264 263.21)',
+                    'oklch(56.983% 0.15547 258.607)',
+                ],
                 hoverOffset: 4,
             },
         ],
@@ -34,6 +39,7 @@ export const InterventionsByTypeChart = ({ interventionsByType }: { intervention
         responsive: true,
         plugins: {
             legend: {
+                display: false,
                 position: 'top' as const,
             },
             title: {
