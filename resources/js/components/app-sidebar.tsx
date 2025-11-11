@@ -8,15 +8,16 @@ import {
     BrickWall,
     Building,
     Building2,
+    ChartLine,
     Cuboid,
     FileStack,
     Handshake,
     LayoutDashboard,
     LayoutGrid,
     ScrollText,
-    Settings,
     Ticket,
     Users,
+    Wrench,
 } from 'lucide-react';
 import AppLogo from './app-logo';
 
@@ -60,7 +61,7 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Interventions',
         href: '/interventions',
-        icon: Settings,
+        icon: Wrench,
     },
     {
         title: 'Providers',
@@ -81,6 +82,11 @@ const mainNavItems: NavItem[] = [
         title: 'Contacts',
         href: '/users',
         icon: Users,
+    },
+    {
+        title: 'Statistics',
+        href: '/statistics',
+        icon: ChartLine,
     },
 ];
 

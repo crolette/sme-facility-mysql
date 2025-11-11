@@ -26,6 +26,7 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
             href: `/users`,
         },
     ];
+
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const [query, setQuery] = useState<SearchParams>({
