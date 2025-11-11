@@ -1,31 +1,37 @@
+import { useDashboardFilters } from '@/pages/tenants/statistics/IndexStatistics';
 import axios from 'axios';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js';
-import { ChartColumn, ChartPie } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Bar, Doughnut } from 'react-chartjs-2';
+import ButtonsChart from './buttonsChart';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export const TicketsByPeriodChart = ({ ticketsByPeriod }: { ticketsByPeriod: [] }) => {
     const [type, setType] = useState<string>('bar');
-    const [period, setPeriod] = useState('week');
-    const [labels, setLabels] = useState(
+    const { dateFrom, dateTo } = useDashboardFilters();
+    const [period, setPeriod] = useState<string | null>(null);
+    const [labels, setLabels] = useState<string[]>(
         Object.entries(ticketsByPeriod).map((item) => {
             return 'Week ' + item[0];
         }),
     );
-    const [dataCount, setDataCount] = useState(
+
+    const [dataCount, setDataCount] = useState<string[]>(
         Object.entries(ticketsByPeriod).map((item) => {
             return item[1];
         }),
     );
 
     const fetchTicketsByPeriod = async () => {
-        console.log('fetchTicketsByPeriod');
         try {
-            const response = await axios.get(route('api.statistics.tickets.by-period', { period: period }));
-            console.log(response.data);
-
+            const response = await axios.get(
+                route('api.statistics.tickets.by-period', {
+                    period: period,
+                    date_from: dateFrom,
+                    date_to: dateTo,
+                }),
+            );
             setLabels(
                 Object.entries(response.data.data).map((item) => {
                     return period === 'week' ? 'Week ' + item[0] : item[0];
@@ -44,7 +50,7 @@ export const TicketsByPeriodChart = ({ ticketsByPeriod }: { ticketsByPeriod: [] 
 
     useEffect(() => {
         fetchTicketsByPeriod();
-    }, [period]);
+    }, [period, dateFrom, dateTo]);
 
     const options = {
         responsive: true,
@@ -81,13 +87,14 @@ export const TicketsByPeriodChart = ({ ticketsByPeriod }: { ticketsByPeriod: [] 
     return (
         <>
             <div>
-                <div>
-                    <ChartColumn onClick={() => setType('bar')} />
-                    <ChartPie onClick={() => setType('doughnut')} />
-                </div>
-                <div>
-                    <p onClick={() => setPeriod('week')}>Week</p>
-                    <p onClick={() => setPeriod('month')}>Month</p>
+                <ButtonsChart setType={setType} />
+                <div className="flex gap-2">
+                    <p className={'cursor-pointer'} onClick={() => setPeriod('week')}>
+                        By Week
+                    </p>
+                    <p className={'cursor-pointer'} onClick={() => setPeriod('month')}>
+                        By Month
+                    </p>
                 </div>
                 {type === 'bar' && (
                     <p>

@@ -1,20 +1,55 @@
+import { useDashboardFilters } from '@/pages/tenants/statistics/IndexStatistics';
+import axios from 'axios';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js';
-import { ChartColumn, ChartPie } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Bar, Doughnut } from 'react-chartjs-2';
+import ButtonsChart from './buttonsChart';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export const TicketsByItemChart = ({ ticketsByAssetOrLocations }: { ticketsByAssetOrLocations: [] }) => {
     const [type, setType] = useState<string>('bar');
+    const { dateFrom, dateTo } = useDashboardFilters();
 
-    const labels = Object.entries(ticketsByAssetOrLocations).map(([index, item]) => {
-        return item.reference_code;
-    });
+    const [labels, setLabels] = useState<string[]>(
+        Object.entries(ticketsByAssetOrLocations).map(([index, item]) => {
+            return item.reference_code;
+        }),
+    );
 
-    const dataCount = Object.entries(ticketsByAssetOrLocations).map(([index, item]) => {
-        return item.count;
-    });
+    const [dataCount, setDataCount] = useState<string[]>(
+        Object.entries(ticketsByAssetOrLocations).map(([index, item]) => {
+            return item.count;
+        }),
+    );
+
+    const fetchTicketsByItem = async () => {
+        try {
+            const response = await axios.get(
+                route('api.statistics.tickets.by-items', {
+                    date_from: dateFrom,
+                    date_to: dateTo,
+                }),
+            );
+            setLabels(
+                Object.entries(response.data.data).map(([index, item]) => {
+                    return item.reference_code;
+                }),
+            );
+
+            setDataCount(
+                Object.entries(response.data.data).map(([index, item]) => {
+                    return item.count;
+                }),
+            );
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchTicketsByItem();
+    }, [dateFrom, dateTo]);
 
     const options = {
         responsive: true,
@@ -51,10 +86,7 @@ export const TicketsByItemChart = ({ ticketsByAssetOrLocations }: { ticketsByAss
     return (
         <>
             <div>
-                <div>
-                    <ChartColumn onClick={() => setType('bar')} />
-                    <ChartPie onClick={() => setType('doughnut')} />
-                </div>
+                <ButtonsChart setType={setType} />
                 {type === 'bar' && (
                     <p>
                         <Bar options={options} data={data} />

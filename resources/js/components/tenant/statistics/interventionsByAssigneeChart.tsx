@@ -1,20 +1,56 @@
+import { useDashboardFilters } from '@/pages/tenants/statistics/IndexStatistics';
+import axios from 'axios';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js';
-import { ChartColumn, ChartPie } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Bar, Doughnut } from 'react-chartjs-2';
+import ButtonsChart from './buttonsChart';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 export const InterventionsByAssigneeChart = ({ interventionsByAssignee }: { interventionsByAssignee: [] }) => {
     const [type, setType] = useState<string>('bar');
+    const { dateFrom, dateTo } = useDashboardFilters();
 
-    const labels = interventionsByAssignee.map((item) => {
-        return item.name;
-    });
+    const [labels, setLabels] = useState<string[]>(
+        interventionsByAssignee.map((item) => {
+            return item.name;
+        }),
+    );
 
-    const dataCount = interventionsByAssignee.map((item) => {
-        return item.count;
-    });
+    const [dataCount, setDataCount] = useState<string[]>(
+        interventionsByAssignee.map((item) => {
+            return item.count;
+        }),
+    );
+
+    const fetchInterventionsByType = async () => {
+        try {
+            const response = await axios.get(
+                route('api.statistics.interventions.by-assignee', {
+                    date_from: dateFrom,
+                    date_to: dateTo,
+                }),
+            );
+
+            setLabels(
+                Object.entries(response.data.data).map((item) => {
+                    return item[1].name;
+                }),
+            );
+
+            setDataCount(
+                Object.entries(response.data.data).map((item) => {
+                    return item[1].count;
+                }),
+            );
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    useEffect(() => {
+        fetchInterventionsByType();
+    }, [dateFrom, dateTo]);
 
     const options = {
         indexAxis: 'y' as const,
@@ -51,10 +87,7 @@ export const InterventionsByAssigneeChart = ({ interventionsByAssignee }: { inte
     return (
         <>
             <div>
-                <div>
-                    <ChartColumn onClick={() => setType('bar')} />
-                    <ChartPie onClick={() => setType('doughnut')} />
-                </div>
+                <ButtonsChart setType={setType} />
                 {type === 'bar' && (
                     <p>
                         <Bar options={options} data={data} />
