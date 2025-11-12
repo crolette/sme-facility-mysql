@@ -1,4 +1,5 @@
 import { Pagination } from '@/components/pagination';
+import { useGridTableLayoutContext } from '@/components/tenant/gridTableLayoutContext';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { BreadcrumbItem, PaginatedData, TicketStatus } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
-import { ArrowDownNarrowWide, ArrowDownWideNarrow, Loader, X } from 'lucide-react';
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, LayoutGrid, Loader, TableIcon, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export interface SearchParams {
@@ -110,6 +111,8 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
             });
     }, [query]);
 
+    const { layout, setLayout } = useGridTableLayoutContext();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Tickets" />
@@ -188,116 +191,142 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
 
                 <div className="">
                     <h3 className="inline">Tickets {!isLoading && `(${items.total ?? 0})`}</h3>
-                    <Table>
-                        <TableHead>
-                            <TableHeadRow>
-                                <TableHeadData>Code</TableHeadData>
-                                <TableHeadData>Related to</TableHeadData>
-                                <TableHeadData>Status</TableHeadData>
-                                <TableHeadData>Reporter</TableHeadData>
-                                <TableHeadData>Description</TableHeadData>
-                                <TableHeadData>
-                                    <div className="flex items-center gap-2">
-                                        <ArrowDownNarrowWide
-                                            size={16}
-                                            className={cn(
-                                                'cursor-pointer',
-                                                query.sortBy === 'created_at' && query.orderBy === 'asc' ? 'text-amber-300' : '',
-                                                !query.sortBy && !query.orderBy ? 'text-amber-300' : '',
-                                            )}
-                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'created_at', orderBy: 'asc' }))}
-                                        />
-                                        Created at
-                                        <ArrowDownWideNarrow
-                                            size={16}
-                                            className={cn(
-                                                'cursor-pointer',
-                                                query.sortBy === 'created_at' && query.orderBy === 'desc' ? 'text-amber-300' : '',
-                                            )}
-                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'created_at', orderBy: 'desc' }))}
-                                        />
-                                    </div>
-                                </TableHeadData>
-                                <TableHeadData>
-                                    <div className="flex items-center gap-2">
-                                        <ArrowDownNarrowWide
-                                            size={16}
-                                            className={cn(
-                                                'cursor-pointer',
-                                                query.sortBy === 'updated_at' && query.orderBy === 'asc' ? 'text-amber-300' : '',
-                                            )}
-                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'updated_at', orderBy: 'asc' }))}
-                                        />
-                                        Updated at
-                                        <ArrowDownWideNarrow
-                                            size={16}
-                                            className={cn(
-                                                'cursor-pointer',
-                                                query.sortBy === 'updated_at' && query.orderBy === 'desc' ? 'text-amber-300' : '',
-                                            )}
-                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'updated_at', orderBy: 'desc' }))}
-                                        />
-                                    </div>
-                                </TableHeadData>
-                                <TableHeadData></TableHeadData>
-                            </TableHeadRow>
-                        </TableHead>
-                        <TableBody>
-                            {isLoading ? (
-                                <TableBodyRow>
-                                    <TableBodyData>
-                                        <p className="flex animate-pulse gap-2">
-                                            <Loader />
-                                            Loading...
-                                        </p>
-                                    </TableBodyData>
-                                </TableBodyRow>
-                            ) : (
-                                items?.data?.map((ticket, index) => (
-                                    <TableBodyRow key={index}>
+                    <div className="flex gap-4">
+                        <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('grid')}>
+                            <LayoutGrid size={20} />
+                        </div>
+                        <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('table')}>
+                            <TableIcon size={20} />
+                        </div>
+                    </div>
+                    {layout === 'grid' ? (
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
+                            {items.data.map((ticket, index) => (
+                                <div key={index} className="border-accent bg-sidebar flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4">
+                                    <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
+                                    <p className="text-xs">
+                                        <a href={ticket.ticketable.location_route}>{ticket.asset_code}</a>
+                                    </p>
+                                    <Pill variant={ticket.status}>{ticket.status}</Pill>
+                                    <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">
+                                        {ticket.reporter?.full_name ?? ticket.reporter_email}
+                                    </p>
+                                    <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">{ticket.description}</p>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <Table>
+                            <TableHead>
+                                <TableHeadRow>
+                                    <TableHeadData>Code</TableHeadData>
+                                    <TableHeadData>Related to</TableHeadData>
+                                    <TableHeadData>Status</TableHeadData>
+                                    <TableHeadData>Reporter</TableHeadData>
+                                    <TableHeadData>Description</TableHeadData>
+                                    <TableHeadData>
+                                        <div className="flex items-center gap-2">
+                                            <ArrowDownNarrowWide
+                                                size={16}
+                                                className={cn(
+                                                    'cursor-pointer',
+                                                    query.sortBy === 'created_at' && query.orderBy === 'asc' ? 'text-amber-300' : '',
+                                                    !query.sortBy && !query.orderBy ? 'text-amber-300' : '',
+                                                )}
+                                                onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'created_at', orderBy: 'asc' }))}
+                                            />
+                                            Created at
+                                            <ArrowDownWideNarrow
+                                                size={16}
+                                                className={cn(
+                                                    'cursor-pointer',
+                                                    query.sortBy === 'created_at' && query.orderBy === 'desc' ? 'text-amber-300' : '',
+                                                )}
+                                                onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'created_at', orderBy: 'desc' }))}
+                                            />
+                                        </div>
+                                    </TableHeadData>
+                                    <TableHeadData>
+                                        <div className="flex items-center gap-2">
+                                            <ArrowDownNarrowWide
+                                                size={16}
+                                                className={cn(
+                                                    'cursor-pointer',
+                                                    query.sortBy === 'updated_at' && query.orderBy === 'asc' ? 'text-amber-300' : '',
+                                                )}
+                                                onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'updated_at', orderBy: 'asc' }))}
+                                            />
+                                            Updated at
+                                            <ArrowDownWideNarrow
+                                                size={16}
+                                                className={cn(
+                                                    'cursor-pointer',
+                                                    query.sortBy === 'updated_at' && query.orderBy === 'desc' ? 'text-amber-300' : '',
+                                                )}
+                                                onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'updated_at', orderBy: 'desc' }))}
+                                            />
+                                        </div>
+                                    </TableHeadData>
+                                    <TableHeadData></TableHeadData>
+                                </TableHeadRow>
+                            </TableHead>
+                            <TableBody>
+                                {isLoading ? (
+                                    <TableBodyRow>
                                         <TableBodyData>
-                                            <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
-                                        </TableBodyData>
-                                        <TableBodyData>
-                                            <a href={ticket.ticketable.location_route}>{ticket.asset_code}</a>
-                                        </TableBodyData>
-                                        <TableBodyData>
-                                            <Pill variant={ticket.status}>{ticket.status}</Pill>
-                                        </TableBodyData>
-                                        <TableBodyData>{ticket.reporter?.full_name ?? ticket.reporter_email}</TableBodyData>
-                                        <TableBodyData className="my-auto flex h-full w-40">
-                                            <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{ticket.description}</p>
-                                        </TableBodyData>
-                                        <TableBodyData>{ticket.created_at}</TableBodyData>
-                                        <TableBodyData>{ticket.updated_at}</TableBodyData>
-
-                                        <TableBodyData className="space-x-2">
-                                            {ticket.status == 'open' && (
-                                                <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'ongoing')}>
-                                                    Ongoing
-                                                </Button>
-                                            )}
-                                            {ticket.status !== 'closed' && (
-                                                <>
-                                                    <Button variant={'destructive'} onClick={() => changeStatusTicket(ticket.id, 'closed')}>
-                                                        Close
-                                                    </Button>
-                                                    {/* <a href={route('tenant.tickets.show', ticket.id)}>
-                                                    <Button type="button">Show</Button>
-                                                </a> */}
-                                                </>
-                                            )}
-                                            {ticket.status === 'closed' && (
-                                                <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'open')}>
-                                                    Re-open
-                                                </Button>
-                                            )}
+                                            <p className="flex animate-pulse gap-2">
+                                                <Loader />
+                                                Loading...
+                                            </p>
                                         </TableBodyData>
                                     </TableBodyRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
+                                ) : (
+                                    items?.data?.map((ticket, index) => (
+                                        <TableBodyRow key={index}>
+                                            <TableBodyData>
+                                                <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
+                                            </TableBodyData>
+                                            <TableBodyData>
+                                                <a href={ticket.ticketable.location_route}>{ticket.asset_code}</a>
+                                            </TableBodyData>
+                                            <TableBodyData>
+                                                <Pill variant={ticket.status}>{ticket.status}</Pill>
+                                            </TableBodyData>
+                                            <TableBodyData>{ticket.reporter?.full_name ?? ticket.reporter_email}</TableBodyData>
+                                            <TableBodyData className="my-auto flex h-full w-40">
+                                                <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{ticket.description}</p>
+                                            </TableBodyData>
+                                            <TableBodyData>{ticket.created_at}</TableBodyData>
+                                            <TableBodyData>{ticket.updated_at}</TableBodyData>
+
+                                            <TableBodyData className="space-x-2">
+                                                {ticket.status == 'open' && (
+                                                    <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'ongoing')}>
+                                                        Ongoing
+                                                    </Button>
+                                                )}
+                                                {ticket.status !== 'closed' && (
+                                                    <>
+                                                        <Button variant={'destructive'} onClick={() => changeStatusTicket(ticket.id, 'closed')}>
+                                                            Close
+                                                        </Button>
+                                                        {/* <a href={route('tenant.tickets.show', ticket.id)}>
+                                                    <Button type="button">Show</Button>
+                                                </a> */}
+                                                    </>
+                                                )}
+                                                {ticket.status === 'closed' && (
+                                                    <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'open')}>
+                                                        Re-open
+                                                    </Button>
+                                                )}
+                                            </TableBodyData>
+                                        </TableBodyRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    )}
                     <Pagination items={items} />
                 </div>
             </div>

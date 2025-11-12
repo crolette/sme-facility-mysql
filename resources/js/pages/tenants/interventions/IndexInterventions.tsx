@@ -1,6 +1,7 @@
 import Modale from '@/components/Modale';
 import ModaleForm from '@/components/ModaleForm';
 import { Pagination } from '@/components/pagination';
+import { useGridTableLayoutContext } from '@/components/tenant/gridTableLayoutContext';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,7 +14,7 @@ import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Intervention, InterventionStatus, PaginatedData, PriorityLevel } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
-import { ArrowDownNarrowWide, ArrowDownWideNarrow, Loader, Pencil, Trash2, X } from 'lucide-react';
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, LayoutGrid, Loader, Pencil, TableIcon, Trash2, X } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 
 export interface SearchParams {
@@ -238,6 +239,9 @@ export default function IndexInterventions({
         }
     };
 
+    // const [listStyle, setListStyle] = useState<'grid' | 'table'>('table');
+    const { layout, setLayout } = useGridTableLayoutContext();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Index interventions" />
@@ -311,157 +315,222 @@ export default function IndexInterventions({
                         </div>
                     </details>
                 </div>
-                <Table>
-                    <TableHead>
-                        <TableHeadRow>
-                            <TableHeadData className="w-52">Description</TableHeadData>
-                            <TableHeadData>Type</TableHeadData>
-                            <TableHeadData>Asset</TableHeadData>
-                            <TableHeadData>
-                                <div className="flex flex-nowrap items-center gap-2">
-                                    <ArrowDownNarrowWide
-                                        size={16}
-                                        className={cn(
-                                            'cursor-pointer',
-                                            query.sortBy === 'priority' && query.orderBy === 'asc' ? 'text-amber-300' : '',
-                                        )}
-                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'priority', orderBy: 'asc' }))}
-                                    />
-                                    <p>Priority</p>
-                                    <ArrowDownWideNarrow
-                                        size={16}
-                                        className={cn(
-                                            'cursor-pointer',
-                                            query.sortBy === 'priority' && query.orderBy === 'desc' ? 'text-amber-300' : '',
-                                        )}
-                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'priority', orderBy: 'desc' }))}
-                                    />
+                <div className="flex gap-4">
+                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('grid')}>
+                        <LayoutGrid size={20} />
+                    </div>
+                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('table')}>
+                        <TableIcon size={20} />
+                    </div>
+                </div>
+                {layout === 'grid' ? (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
+                        {items.data.map((item, index) => (
+                            <div
+                                key={index}
+                                className="border-accent bg-sidebar relative flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4"
+                            >
+                                <div>
+                                    <a href={route('tenant.interventions.show', item.id)} className="flex w-full">
+                                        <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{item.description}</p>
+                                    </a>
+                                    <p className="tooltip tooltip-bottom">{item.description}</p>
                                 </div>
-                            </TableHeadData>
-                            <TableHeadData>Status</TableHeadData>
-                            <TableHeadData>Assigned to</TableHeadData>
-                            <TableHeadData>
-                                <div className="flex items-center gap-2">
-                                    <ArrowDownNarrowWide
-                                        size={16}
-                                        className={cn(
-                                            'cursor-pointer',
-                                            query.sortBy === 'planned_at' && query.orderBy === 'asc' ? 'text-amber-300' : '',
-                                            !query.sortBy && !query.orderBy ? 'text-amber-300' : '',
-                                        )}
-                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'planned_at', orderBy: 'asc' }))}
-                                    />
-                                    <p>Planned at</p>
-                                    <ArrowDownWideNarrow
-                                        size={16}
-                                        className={cn(
-                                            'cursor-pointer',
-                                            query.sortBy === 'planned_at' && query.orderBy === 'desc' ? 'text-amber-300' : '',
-                                        )}
-                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'planned_at', orderBy: 'desc' }))}
-                                    />
+                                <p className="text-xs">{item.type ?? ''}</p>
+                                <a className="text-xs" href={item.interventionable?.location_route ?? ''}>
+                                    {item.interventionable?.reference_code ?? 'NULL'}
+                                </a>
+                                <div className="flex gap-2">
+                                    <Pill variant={item.priority}>{item.priority}</Pill>
+                                    <Pill variant={item.status}>{item.status}</Pill>
                                 </div>
-                            </TableHeadData>
-                            <TableHeadData>
-                                <div className="flex items-center gap-2">
-                                    <ArrowDownNarrowWide
-                                        size={16}
-                                        className={cn(
-                                            'cursor-pointer',
-                                            query.sortBy === 'repair_delay' && query.orderBy === 'asc' ? 'text-amber-300' : '',
-                                        )}
-                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'repair_delay', orderBy: 'asc' }))}
-                                    />
-                                    <p>Repair delay</p>
-                                    <ArrowDownWideNarrow
-                                        size={16}
-                                        className={cn(
-                                            'cursor-pointer',
-                                            query.sortBy === 'repair_delay' && query.orderBy === 'desc' ? 'text-amber-300' : '',
-                                        )}
-                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'repair_delay', orderBy: 'desc' }))}
-                                    />
-                                </div>
-                            </TableHeadData>
-                            <TableHeadData>Total costs</TableHeadData>
-                            <TableHeadData></TableHeadData>
-                        </TableHeadRow>
-                    </TableHead>
-                    <TableBody>
-                        {isLoading ? (
-                            <TableBodyRow>
-                                <TableBodyData>
-                                    <p className="flex animate-pulse gap-2">
-                                        <Loader />
-                                        Searching...
-                                    </p>
-                                </TableBodyData>
-                            </TableBodyRow>
-                        ) : items.data.length > 0 ? (
-                            items.data.map((item, index) => {
-                                return (
-                                    <TableBodyRow key={index}>
-                                        <TableBodyData className="">
-                                            <a href={route('tenant.interventions.show', item.id)} className="flex w-40">
-                                                <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{item.description}</p>
-                                            </a>
-                                            <p className="tooltip tooltip-bottom">{item.description}</p>
-                                        </TableBodyData>
-                                        <TableBodyData>{item.type}</TableBodyData>
-                                        <TableBodyData>
-                                            <a href={item.interventionable?.location_route ?? ''}>
-                                                {item.interventionable?.reference_code ?? 'NULL'}
-                                            </a>
-                                        </TableBodyData>
-                                        <TableBodyData>
-                                            <Pill variant={item.priority}>{item.priority}</Pill>
-                                        </TableBodyData>
-                                        <TableBodyData>
-                                            <Pill variant={item.status}>{item.status}</Pill>
-                                        </TableBodyData>
-                                        <TableBodyData>
-                                            {item.assignable ? (
-                                                item.assignable.full_name ? (
-                                                    <a href={route('tenant.users.show', item.assignable.id)}>{item.assignable.full_name}</a>
+                                <p className="text-xs">
+                                    {' '}
+                                    {item.assignable ? (
+                                        item.assignable.full_name ? (
+                                            <a href={route('tenant.users.show', item.assignable.id)}>{item.assignable.full_name}</a>
+                                        ) : (
+                                            <a href={route('tenant.providers.show', item.assignable.id)}>{item.assignable.name}</a>
+                                        )
+                                    ) : (
+                                        'not assigned'
+                                    )}
+                                </p>
+                                <p className="text-xs">Planned at : {item.planned_at ?? 'Not planned'}</p>
+                                <p className="text-xs">Repair delay : {item.repair_delay ?? 'No repair delay'}</p>
+                                {!closed && (
+                                    <div className="flex gap-2">
+                                        <Button onClick={() => editIntervention(item.id)}>
+                                            <Pencil />
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            onClick={() => {
+                                                setInterventionToDelete(item);
+                                                setShowDeleteInterventionModale(true);
+                                            }}
+                                        >
+                                            <Trash2 />
+                                        </Button>
+                                    </div>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <Table>
+                        <TableHead>
+                            <TableHeadRow>
+                                <TableHeadData className="w-52">Description</TableHeadData>
+                                <TableHeadData>Type</TableHeadData>
+                                <TableHeadData>Asset</TableHeadData>
+                                <TableHeadData>
+                                    <div className="flex flex-nowrap items-center gap-2">
+                                        <ArrowDownNarrowWide
+                                            size={16}
+                                            className={cn(
+                                                'cursor-pointer',
+                                                query.sortBy === 'priority' && query.orderBy === 'asc' ? 'text-amber-300' : '',
+                                            )}
+                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'priority', orderBy: 'asc' }))}
+                                        />
+                                        <p>Priority</p>
+                                        <ArrowDownWideNarrow
+                                            size={16}
+                                            className={cn(
+                                                'cursor-pointer',
+                                                query.sortBy === 'priority' && query.orderBy === 'desc' ? 'text-amber-300' : '',
+                                            )}
+                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'priority', orderBy: 'desc' }))}
+                                        />
+                                    </div>
+                                </TableHeadData>
+                                <TableHeadData>Status</TableHeadData>
+                                <TableHeadData>Assigned to</TableHeadData>
+                                <TableHeadData>
+                                    <div className="flex items-center gap-2">
+                                        <ArrowDownNarrowWide
+                                            size={16}
+                                            className={cn(
+                                                'cursor-pointer',
+                                                query.sortBy === 'planned_at' && query.orderBy === 'asc' ? 'text-amber-300' : '',
+                                                !query.sortBy && !query.orderBy ? 'text-amber-300' : '',
+                                            )}
+                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'planned_at', orderBy: 'asc' }))}
+                                        />
+                                        <p>Planned at</p>
+                                        <ArrowDownWideNarrow
+                                            size={16}
+                                            className={cn(
+                                                'cursor-pointer',
+                                                query.sortBy === 'planned_at' && query.orderBy === 'desc' ? 'text-amber-300' : '',
+                                            )}
+                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'planned_at', orderBy: 'desc' }))}
+                                        />
+                                    </div>
+                                </TableHeadData>
+                                <TableHeadData>
+                                    <div className="flex items-center gap-2">
+                                        <ArrowDownNarrowWide
+                                            size={16}
+                                            className={cn(
+                                                'cursor-pointer',
+                                                query.sortBy === 'repair_delay' && query.orderBy === 'asc' ? 'text-amber-300' : '',
+                                            )}
+                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'repair_delay', orderBy: 'asc' }))}
+                                        />
+                                        <p>Repair delay</p>
+                                        <ArrowDownWideNarrow
+                                            size={16}
+                                            className={cn(
+                                                'cursor-pointer',
+                                                query.sortBy === 'repair_delay' && query.orderBy === 'desc' ? 'text-amber-300' : '',
+                                            )}
+                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'repair_delay', orderBy: 'desc' }))}
+                                        />
+                                    </div>
+                                </TableHeadData>
+                                <TableHeadData>Total costs</TableHeadData>
+                                <TableHeadData></TableHeadData>
+                            </TableHeadRow>
+                        </TableHead>
+                        <TableBody>
+                            {isLoading ? (
+                                <TableBodyRow>
+                                    <TableBodyData>
+                                        <p className="flex animate-pulse gap-2">
+                                            <Loader />
+                                            Searching...
+                                        </p>
+                                    </TableBodyData>
+                                </TableBodyRow>
+                            ) : items.data.length > 0 ? (
+                                items.data.map((item, index) => {
+                                    return (
+                                        <TableBodyRow key={index}>
+                                            <TableBodyData className="">
+                                                <a href={route('tenant.interventions.show', item.id)} className="flex w-40">
+                                                    <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{item.description}</p>
+                                                </a>
+                                                <p className="tooltip tooltip-bottom">{item.description}</p>
+                                            </TableBodyData>
+                                            <TableBodyData>{item.type}</TableBodyData>
+                                            <TableBodyData>
+                                                <a href={item.interventionable?.location_route ?? ''}>
+                                                    {item.interventionable?.reference_code ?? 'NULL'}
+                                                </a>
+                                            </TableBodyData>
+                                            <TableBodyData>
+                                                <Pill variant={item.priority}>{item.priority}</Pill>
+                                            </TableBodyData>
+                                            <TableBodyData>
+                                                <Pill variant={item.status}>{item.status}</Pill>
+                                            </TableBodyData>
+                                            <TableBodyData>
+                                                {item.assignable ? (
+                                                    item.assignable.full_name ? (
+                                                        <a href={route('tenant.users.show', item.assignable.id)}>{item.assignable.full_name}</a>
+                                                    ) : (
+                                                        <a href={route('tenant.providers.show', item.assignable.id)}>{item.assignable.name}</a>
+                                                    )
                                                 ) : (
-                                                    <a href={route('tenant.providers.show', item.assignable.id)}>{item.assignable.name}</a>
-                                                )
-                                            ) : (
-                                                'not assigned'
-                                            )}
-                                        </TableBodyData>
-                                        <TableBodyData>{item.planned_at ?? 'Not planned'}</TableBodyData>
-                                        <TableBodyData>{item.repair_delay ?? 'No repair delay'}</TableBodyData>
-                                        <TableBodyData>{item.total_costs ? `${item.total_costs} €` : '-'}</TableBodyData>
-                                        <TableBodyData className="flex space-x-2">
-                                            {!closed && (
-                                                <>
-                                                    <Button onClick={() => editIntervention(item.id)}>
-                                                        <Pencil />
-                                                    </Button>
-                                                    <Button
-                                                        type="button"
-                                                        variant="destructive"
-                                                        onClick={() => {
-                                                            setInterventionToDelete(item);
-                                                            setShowDeleteInterventionModale(true);
-                                                        }}
-                                                    >
-                                                        <Trash2 />
-                                                    </Button>
-                                                </>
-                                            )}
-                                        </TableBodyData>
-                                    </TableBodyRow>
-                                );
-                            })
-                        ) : (
-                            <TableBodyRow key={0}>
-                                <TableBodyData>No results...</TableBodyData>
-                            </TableBodyRow>
-                        )}
-                    </TableBody>
-                </Table>
+                                                    'not assigned'
+                                                )}
+                                            </TableBodyData>
+                                            <TableBodyData>{item.planned_at ?? 'Not planned'}</TableBodyData>
+                                            <TableBodyData>{item.repair_delay ?? 'No repair delay'}</TableBodyData>
+                                            <TableBodyData>{item.total_costs ? `${item.total_costs} €` : '-'}</TableBodyData>
+                                            <TableBodyData className="flex space-x-2">
+                                                {!closed && (
+                                                    <>
+                                                        <Button onClick={() => editIntervention(item.id)}>
+                                                            <Pencil />
+                                                        </Button>
+                                                        <Button
+                                                            type="button"
+                                                            variant="destructive"
+                                                            onClick={() => {
+                                                                setInterventionToDelete(item);
+                                                                setShowDeleteInterventionModale(true);
+                                                            }}
+                                                        >
+                                                            <Trash2 />
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            </TableBodyData>
+                                        </TableBodyRow>
+                                    );
+                                })
+                            ) : (
+                                <TableBodyRow key={0}>
+                                    <TableBodyData>No results...</TableBodyData>
+                                </TableBodyRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                )}
                 <Pagination items={items} />
             </div>
             <Modale

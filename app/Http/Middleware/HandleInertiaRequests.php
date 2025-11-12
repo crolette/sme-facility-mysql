@@ -82,6 +82,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'openTicketsCount' => tenancy()->tenant ? Ticket::where('status', 'open')->orWhere('status', 'ongoing')->count() : '',
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'indexLayout' => ! $request->hasCookie('index_layout') || $request->cookie('index_layout') === 'table',
         ];
     }
 }
