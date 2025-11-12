@@ -86,6 +86,8 @@ export const TicketsByAvgDurationChart = ({ ticketsAvgDuration }: { ticketsAvgDu
                 </div>
                 {isFetching ? (
                     <p className="animate-pulse">Fetching datas...</p>
+                ) : ticketsAvgDuration.length === 0 ? (
+                    <p>No datas</p>
                 ) : (
                     <>
                         {(type === 'horizontalBar' || type === 'verticalBar') && (

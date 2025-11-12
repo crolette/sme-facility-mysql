@@ -86,6 +86,8 @@ export const TicketsByAvgHandlingDurationChart = ({ ticketsByAvgHandlingDuration
                 </div>
                 {isFetching ? (
                     <p className="animate-pulse">Fetching datas...</p>
+                ) : ticketsByAvgHandlingDuration.length === 0 ? (
+                    <p>No datas</p>
                 ) : (
                     <>
                         {(type === 'horizontalBar' || type === 'verticalBar') && (

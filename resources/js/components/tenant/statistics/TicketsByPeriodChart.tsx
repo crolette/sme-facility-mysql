@@ -86,6 +86,8 @@ export const TicketsByPeriodChart = ({ ticketsByPeriod }: { ticketsByPeriod: [] 
                 </div>
                 {isFetching ? (
                     <p className="animate-pulse">Fetching datas...</p>
+                ) : ticketsByPeriod.length === 0 ? (
+                    <p>No datas</p>
                 ) : (
                     <>
                         {(type === 'horizontalBar' || type === 'verticalBar') && (

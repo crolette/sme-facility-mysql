@@ -75,6 +75,8 @@ export const InterventionsByTypeChart = ({ interventionsByType }: { intervention
                 <ButtonsChart setType={setType} types={['horizontalBar', 'verticalBar', 'doughnut']} />
                 {isFetching ? (
                     <p className="animate-pulse">Fetching datas...</p>
+                ) : interventionsByType.length === 0 ? (
+                    <p>No datas</p>
                 ) : (
                     <>
                         {(type === 'horizontalBar' || type === 'verticalBar') && (

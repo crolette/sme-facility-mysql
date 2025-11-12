@@ -75,6 +75,8 @@ export const TicketsByItemChart = ({ ticketsByAssetOrLocations }: { ticketsByAss
                 <ButtonsChart setType={setType} types={['horizontalBar', 'verticalBar', 'line']} />
                 {isFetching ? (
                     <p className="animate-pulse">Fetching datas...</p>
+                ) : ticketsByAssetOrLocations.length === 0 ? (
+                    <p>No datas</p>
                 ) : (
                     <>
                         {(type === 'horizontalBar' || type === 'verticalBar') && (
