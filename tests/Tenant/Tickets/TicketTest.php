@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use App\Enums\TicketStatus;
 use App\Models\LocationType;
 use App\Models\Tenants\Room;
@@ -7,8 +8,8 @@ use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
-use App\Models\Tenants\Ticket;
 
+use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Building;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
@@ -22,26 +23,16 @@ use function Pest\Laravel\assertDatabaseMissing;
 beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    LocationType::factory()->create(['level' => 'room']);
-    CategoryType::factory()->create(['category' => 'document']);
-    $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
-    CategoryType::factory()->create(['category' => 'asset']);
-    CategoryType::factory()->create(['category' => 'intervention']);
+    $this->interventionType = CategoryType::factory()->create(['category' => 'intervention']);
     CategoryType::factory()->create(['category' => 'action']);
+    $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
     $this->site = Site::factory()->create();
     $this->building = Building::factory()->create();
     $this->floor = Floor::factory()->create();
 
-    $this->room = Room::factory()
-        ->for(LocationType::where('level', 'room')->first())
-        ->for(Floor::first())
-        ->create();
+    $this->room = Room::factory()->create();
 
     $this->asset =  Asset::factory()->forLocation($this->room)->create();
-    
 });
 
 it('can render the index tickets page', function () {
@@ -287,6 +278,33 @@ it('can create a new ticket to a SITE', function () {
     ]);
 });
 
+it('updates status to  and handled_at columns when intervention is created for a ticket', function () {
+
+    $ticket = Ticket::factory()->forLocation($this->asset)->create();
+
+    $formData = [
+        'intervention_type_id' => $this->interventionType->id,
+        'priority' => 'medium',
+        'status' => 'planned',
+        'planned_at' => Carbon::now()->add('day', 7),
+        'description' => fake()->paragraph(),
+        'repair_delay' => Carbon::now()->add('month', 1),
+        'ticket_id' => $ticket->id,
+    ];
+
+    $response = $this->postToTenant('api.interventions.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseHas('tickets', [
+        'id' => $ticket->id,
+        'status' => 'ongoing',
+        'handled_at' => Carbon::now()->toDateString(),
+    ]);
+});
+
 it('can update an existing ticket', function () {
 
     $ticket = Ticket::factory()->forLocation($this->asset)->create(['reported_by' => $this->user->id]);
@@ -337,6 +355,7 @@ it('can close an existing ticket', function () {
         'id' => $ticket->id,
         'status' => 'closed',
         'closed_by' => $this->user->id,
+        'handled_at' => Carbon::now()->toDateString()
     ]);
     $this->assertNotNull($ticket->fresh()->closed_at);
 });
@@ -349,5 +368,4 @@ it('can delete an existing ticket', function () {
     $response->assertSessionHasNoErrors();
 
     assertDatabaseEmpty('tickets');
-
 });

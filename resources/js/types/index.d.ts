@@ -416,6 +416,7 @@ export interface Address {
 
 export interface SharedData {
     name: string;
+    version: string;
     tenant: { name: string; logo: string };
     auth: Auth;
     flash: Flash;

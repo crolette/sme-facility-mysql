@@ -27,6 +27,7 @@ class Ticket extends Model
         'reporter_email',
         'being_notified',
         'closed_at',
+        'handled_at'
     ];
 
     protected $appends = [
@@ -52,6 +53,7 @@ class Ticket extends Model
             'closed_at' => 'date:Y-m-d',
             'created_at' => 'date:Y-m-d',
             'updated_at' => 'date:Y-m-d',
+            'handled_at' => 'date:Y-m-d',
             'being_notified' => 'boolean',
             'status' => TicketStatus::class
         ];
@@ -100,6 +102,9 @@ class Ticket extends Model
     {
         $this->closer()->associate(Auth::guard('tenant')->user()->id);
 
+        if (!$this->handled_at)
+            $this->handled_at = Carbon::now()->toDateString();
+
         $this->status = TicketStatus::CLOSED->value;
         $this->closed_at = now();
 
@@ -122,7 +127,7 @@ class Ticket extends Model
 
     public function changeStatusToOngoing(): void
     {
-        Debugbar::info('changeStatusToOngoing');
+        $this->handled_at = Carbon::now()->toDateString();
         $this->status = TicketStatus::ONGOING->value;
         $this->save();
     }

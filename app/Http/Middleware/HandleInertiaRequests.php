@@ -55,9 +55,9 @@ class HandleInertiaRequests extends Middleware
     {
         // dd(Company::first()->logo_path);
 
-        
-        if(session()->missing('tenantName') || session()->missing('tenantLogo')){
-            if(tenancy()->tenant) {
+
+        if (session()->missing('tenantName') || session()->missing('tenantLogo')) {
+            if (tenancy()->tenant) {
                 $company = Company::first();
                 session(['tenantName' => $company->name ?? config('app.name')]);
                 session(['tenantLogo' => $company->logo ?? env('APP_LOGO')]);
@@ -67,8 +67,9 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            'version' => env('APP_VERSION'),
             'tenant' => [
-                'name' => session('tenantName') ?? config('app.name'), 
+                'name' => session('tenantName') ?? config('app.name'),
                 'logo' => session('tenantLogo')
             ],
             'auth' => [

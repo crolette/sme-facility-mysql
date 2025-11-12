@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
+use Inertia\Inertia;
+use App\Exports\UsersExport;
 use App\Helpers\ApiResponse;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
 use App\Exports\AssetsExport;
-use App\Exports\UsersExport;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Company;
@@ -22,23 +23,24 @@ use App\Http\Controllers\API\V1\APITicketController;
 use App\Http\Controllers\Tenants\ContractController;
 use App\Http\Controllers\Tenants\ProviderController;
 use App\Http\Controllers\Tenants\DashboardController;
+use App\Http\Controllers\Tenants\DocumentsController;
+use App\Http\Controllers\Tenants\StatisticsController;
 use App\Http\Controllers\Tenants\TenantRoomController;
 use App\Http\Controllers\Tenants\TenantSiteController;
 use App\Http\Controllers\Tenants\TenantAssetController;
 use App\Http\Controllers\Tenants\TenantFloorController;
+use App\Http\Controllers\Tenants\UsersExportController;
 use App\Http\Controllers\Tenants\AssetsExportController;
 use App\Http\Controllers\Tenants\ImportExportController;
 use App\Http\Controllers\Tenants\InterventionController;
 use App\Http\Controllers\API\V1\APICompanyLogoController;
 use App\Http\Controllers\Tenants\TenantBuildingController;
+use App\Http\Controllers\Tenants\ProvidersExportController;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\Tenants\InterventionActionController;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Tenants\InterventionProviderController;
 use App\Http\Controllers\Tenants\CreateTicketFromQRCodeController;
-use App\Http\Controllers\Tenants\DocumentsController;
-use App\Http\Controllers\Tenants\ProvidersExportController;
-use App\Http\Controllers\Tenants\UsersExportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -117,6 +119,10 @@ Route::middleware([
 
     Route::prefix('/documents')->group(function () {
         Route::get('/', [DocumentsController::class, 'index'])->name('tenant.documents.index');
+    });
+
+    Route::prefix('/statistics')->group(function () {
+        Route::get('/', [StatisticsController::class, 'index'])->name('tenant.statistics');
     });
 
 
