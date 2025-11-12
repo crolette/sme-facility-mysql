@@ -34,12 +34,24 @@ Route::middleware([
 
         Route::get('/by-items', function (StatisticsRequest $request) {
 
-
             $ticketsByAssetOrLocations = app(StatisticTicketsService::class)->getByAssetOrLocations($request->validated());
-
-
 
             return ApiResponse::success($ticketsByAssetOrLocations);
         })->name('api.statistics.tickets.by-items');
+
+
+        Route::get('/by-duration', function (StatisticsRequest $request) {
+
+            $ticketsAvgDuration = app(StatisticTicketsService::class)->getByAvgDuration($request->validated());
+
+            return ApiResponse::success($ticketsAvgDuration);
+        })->name('api.statistics.tickets.by-duration');
+
+        Route::get('/by-handling-duration', function (StatisticsRequest $request) {
+
+            $ticketsByAvgHandlingDuration = app(StatisticTicketsService::class)->getByAvgHandlingDuration($request->validated());
+
+            return ApiResponse::success($ticketsByAvgHandlingDuration);
+        })->name('api.statistics.tickets.by-handling-duration');
     }
 );

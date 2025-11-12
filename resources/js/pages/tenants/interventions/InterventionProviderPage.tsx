@@ -213,8 +213,8 @@ export default function InterventionProviderPage({
             {showSuccessModale && (
                 <ModaleForm>
                     <div className="flex flex-col items-center gap-4">
-                        <BadgeCheck size={48} className="text-chart-2" />
-                        <p className="text-chart-2 mx-auto text-3xl font-bold">Thank you</p>
+                        <BadgeCheck size={48} className="text-success" />
+                        <p className="text-success mx-auto text-3xl font-bold">Thank you</p>
                         <p className="mx-auto">Intervention submitted</p>
                         <p className="mx-auto">You can now close this window.</p>
                         <div className="mx-auto flex gap-4"></div>

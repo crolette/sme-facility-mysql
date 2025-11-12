@@ -8,35 +8,36 @@ import ButtonsChart from './buttonsChart';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
-export const InterventionsByStatusChart = ({ interventionsByStatus }: { interventionsByStatus: [] }) => {
-    const [type, setType] = useState<'doughnut' | 'horizontalBar' | 'verticalBar' | 'line'>('verticalBar');
+export const TicketsByAvgHandlingDurationChart = ({ ticketsByAvgHandlingDuration }: { ticketsByAvgHandlingDuration: [] }) => {
+    const [type, setType] = useState<'doughnut' | 'horizontalBar' | 'verticalBar' | 'line'>('line');
     const [isFetching, setIsFetching] = useState(false);
     const { dateFrom, dateTo } = useDashboardFilters();
-
+    const [period, setPeriod] = useState<string | null>(null);
     const [labels, setLabels] = useState<string[]>(
-        Object.entries(interventionsByStatus).map((item) => {
-            return item[0];
+        Object.entries(ticketsByAvgHandlingDuration).map((item) => {
+            return 'Week ' + item[0];
         }),
     );
 
     const [dataCount, setDataCount] = useState<string[]>(
-        Object.entries(interventionsByStatus).map((item) => {
+        Object.entries(ticketsByAvgHandlingDuration).map((item) => {
             return item[1];
         }),
     );
 
-    const fetchInterventionsByStatus = async () => {
+    const fetchTicketsByAvgHandlingDuration = async () => {
         setIsFetching(true);
         try {
             const response = await axios.get(
-                route('api.statistics.interventions.by-status', {
+                route('api.statistics.tickets.by-handling-duration', {
+                    period: period,
                     date_from: dateFrom,
                     date_to: dateTo,
                 }),
             );
             setLabels(
                 Object.entries(response.data.data).map((item) => {
-                    return item[0];
+                    return period === 'week' ? 'Week ' + item[0] : item[0];
                 }),
             );
 
@@ -51,16 +52,18 @@ export const InterventionsByStatusChart = ({ interventionsByStatus }: { interven
             setIsFetching(false);
         }
     };
-    useEffect(() => {
-        if (dateFrom || dateTo) fetchInterventionsByStatus();
-    }, [dateFrom, dateTo]);
 
-    const { datasetStyle, baseOptions } = useChartOptions('InterventionsbyStatus', type);
+    useEffect(() => {
+        if (period || dateFrom || dateTo) fetchTicketsByAvgHandlingDuration();
+    }, [period, dateFrom, dateTo]);
+
+    const { datasetStyle, baseOptions } = useChartOptions('ticketsByAvgHandlingDuration', type);
 
     const data = {
         labels: labels,
         datasets: [
             {
+                label: 'ticketsByAvgHandlingDuration',
                 data: dataCount,
                 ...datasetStyle,
             },
@@ -70,7 +73,17 @@ export const InterventionsByStatusChart = ({ interventionsByStatus }: { interven
     return (
         <>
             <div>
-                <ButtonsChart setType={setType} types={['horizontalBar', 'verticalBar', 'doughnut']} />
+                <div className="flex justify-between">
+                    <ButtonsChart setType={setType} types={['horizontalBar', 'verticalBar', 'line']} />
+                    <div className="flex gap-2">
+                        <p className={'cursor-pointer'} onClick={() => setPeriod('week')}>
+                            By Week
+                        </p>
+                        <p className={'cursor-pointer'} onClick={() => setPeriod('month')}>
+                            By Month
+                        </p>
+                    </div>
+                </div>
                 {isFetching ? (
                     <p className="animate-pulse">Fetching datas...</p>
                 ) : (

@@ -79,4 +79,60 @@ class StatisticTicketsService
 
         return $interventionsByStatus;
     }
+
+    public function getByAvgHandlingDuration($filters = [])
+    {
+        if ($filters['period'] === 'week') {
+
+            $ticketsByAvgHandlingDuration = Ticket::query()
+                ->where('status', '<>', TicketStatus::OPEN)
+                ->where('created_at', '>', $filters['date_from'])->where('created_at', '<', $filters['date_to'])
+                ->selectRaw('WEEK(created_at, 1) AS week')
+                ->selectRaw('AVG(DATEDIFF(handled_at, created_at)) AS avg_duration')
+                ->groupBy('week')
+                ->orderBy('week')
+                ->pluck('avg_duration', 'week');
+        } else {
+            $ticketsByAvgHandlingDuration = Ticket::query()
+                ->where('status', '<>', TicketStatus::OPEN)
+                ->where('created_at', '>', $filters['date_from'])->where('created_at', '<', $filters['date_to'])
+                ->selectRaw('DATE_FORMAT(closed_at, \'%m-%Y\') AS month')
+                ->selectRaw('AVG(DATEDIFF(handled_at, created_at)) AS avg_duration')
+                ->groupBy('month')
+                ->orderBy('month')
+                ->pluck('avg_duration', 'month');
+        }
+
+
+        return $ticketsByAvgHandlingDuration;
+    }
+
+    public function getByAvgDuration($filters = [])
+    {
+
+        if ($filters['period'] === 'week') {
+
+            $ticketsAvgDuration = Ticket::query()
+                ->where('status', TicketStatus::CLOSED)
+                ->whereNotNull('closed_at')
+                ->where('created_at', '>', $filters['date_from'])->where('created_at', '<', $filters['date_to'])
+                ->selectRaw('WEEK(closed_at, 1) AS week')
+                ->selectRaw('AVG(DATEDIFF(closed_at, created_at)) AS avg_duration')
+                ->groupBy('week')
+                ->orderBy('week')
+                ->pluck('avg_duration', 'week');
+        } else {
+            $ticketsAvgDuration = Ticket::query()
+                ->where('status', TicketStatus::CLOSED)
+                ->whereNotNull('closed_at')
+                ->where('created_at', '>', $filters['date_from'])->where('created_at', '<', $filters['date_to'])
+                ->selectRaw('DATE_FORMAT(closed_at, \'%m-%Y\') AS month')
+                ->selectRaw('AVG(DATEDIFF(closed_at, created_at)) AS avg_duration')
+                ->groupBy('month')
+                ->orderBy('month')
+                ->pluck('avg_duration', 'month');
+        }
+
+        return $ticketsAvgDuration;
+    }
 }

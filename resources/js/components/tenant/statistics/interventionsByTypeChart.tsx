@@ -1,14 +1,16 @@
+import { useChartOptions } from '@/hooks/useChartOptions';
 import { useDashboardFilters } from '@/pages/tenants/statistics/IndexStatistics';
 import axios from 'axios';
-import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js';
+import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LineElement, LinearScale, PointElement, Title, Tooltip } from 'chart.js';
 import { useEffect, useState } from 'react';
-import { Bar, Doughnut } from 'react-chartjs-2';
+import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import ButtonsChart from './buttonsChart';
 
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
 export const InterventionsByTypeChart = ({ interventionsByType }: { interventionsByType: [] }) => {
-    const [type, setType] = useState<string>('bar');
+    const [type, setType] = useState<'doughnut' | 'horizontalBar' | 'verticalBar' | 'line'>('verticalBar');
+    const [isFetching, setIsFetching] = useState(false);
     const { dateFrom, dateTo } = useDashboardFilters();
 
     const [labels, setLabels] = useState<string[]>(
@@ -24,6 +26,7 @@ export const InterventionsByTypeChart = ({ interventionsByType }: { intervention
     );
 
     const fetchInterventionsByType = async () => {
+        setIsFetching(true);
         try {
             const response = await axios.get(
                 route('api.statistics.interventions.by-type', {
@@ -44,6 +47,8 @@ export const InterventionsByTypeChart = ({ interventionsByType }: { intervention
             );
         } catch (error) {
             console.log(error);
+        } finally {
+            setIsFetching(false);
         }
     };
 
@@ -51,50 +56,36 @@ export const InterventionsByTypeChart = ({ interventionsByType }: { intervention
         if (dateFrom || dateTo) fetchInterventionsByType();
     }, [dateFrom, dateTo]);
 
+    const { datasetStyle, baseOptions } = useChartOptions('InterventionsByType', type);
+
     const data = {
         labels: labels,
         datasets: [
             {
                 label: 'InterventionsByTypeChart',
                 data: dataCount,
-                backgroundColor: [
-                    'oklch(45.633% 0.13478 263.563)',
-                    'oklch(56.627% 0.09703 258.464)',
-                    'oklch(42.935% 0.11812 258.322)',
-                    'oklch(54.636% 0.08264 263.21)',
-                    'oklch(56.983% 0.15547 258.607)',
-                ],
-                hoverOffset: 4,
+                ...datasetStyle,
             },
         ],
-    };
-
-    const options = {
-        indexAxis: 'y' as const,
-
-        responsive: true,
-        plugins: {
-            legend: {
-                display: false,
-                position: 'bottom' as const,
-            },
-            title: {
-                display: true,
-                text: 'InterventionsByType',
-            },
-        },
     };
 
     return (
         <>
             <div className="">
-                <ButtonsChart setType={setType} />
-                {type === 'bar' && (
-                    <p>
-                        <Bar options={options} data={data} />
-                    </p>
+                <ButtonsChart setType={setType} types={['horizontalBar', 'verticalBar', 'doughnut']} />
+                {isFetching ? (
+                    <p className="animate-pulse">Fetching datas...</p>
+                ) : (
+                    <>
+                        {(type === 'horizontalBar' || type === 'verticalBar') && (
+                            <p>
+                                <Bar options={baseOptions} data={data} />
+                            </p>
+                        )}
+                        {type === 'line' && <Line options={baseOptions} data={data} />}
+                        {type === 'doughnut' && <Doughnut options={baseOptions} data={data} />}
+                    </>
                 )}
-                {type === 'doughnut' && <Doughnut options={options} data={data} />}
             </div>
         </>
     );

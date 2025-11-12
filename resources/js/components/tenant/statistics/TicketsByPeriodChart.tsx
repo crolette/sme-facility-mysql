@@ -1,16 +1,18 @@
+import { useChartOptions } from '@/hooks/useChartOptions';
 import { useDashboardFilters } from '@/pages/tenants/statistics/IndexStatistics';
 import axios from 'axios';
-import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LinearScale, Title, Tooltip } from 'chart.js';
+import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LineElement, LinearScale, PointElement, Title, Tooltip } from 'chart.js';
 import { useEffect, useState } from 'react';
-import { Bar, Doughnut } from 'react-chartjs-2';
+import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import ButtonsChart from './buttonsChart';
 
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
 export const TicketsByPeriodChart = ({ ticketsByPeriod }: { ticketsByPeriod: [] }) => {
-    const [type, setType] = useState<string>('bar');
+    const [type, setType] = useState<'doughnut' | 'horizontalBar' | 'verticalBar' | 'line'>('line');
+    const [isFetching, setIsFetching] = useState(false);
     const { dateFrom, dateTo } = useDashboardFilters();
-    const [period, setPeriod] = useState<string | null>('week');
+    const [period, setPeriod] = useState<string | null>(null);
     const [labels, setLabels] = useState<string[]>(
         Object.entries(ticketsByPeriod).map((item) => {
             return 'Week ' + item[0];
@@ -24,6 +26,7 @@ export const TicketsByPeriodChart = ({ ticketsByPeriod }: { ticketsByPeriod: [] 
     );
 
     const fetchTicketsByPeriod = async () => {
+        setIsFetching(true);
         try {
             const response = await axios.get(
                 route('api.statistics.tickets.by-period', {
@@ -45,26 +48,16 @@ export const TicketsByPeriodChart = ({ ticketsByPeriod }: { ticketsByPeriod: [] 
             );
         } catch (error) {
             console.log(error);
+        } finally {
+            setIsFetching(false);
         }
     };
 
     useEffect(() => {
-        fetchTicketsByPeriod();
+        if (period || dateFrom || dateTo) fetchTicketsByPeriod();
     }, [period, dateFrom, dateTo]);
 
-    const options = {
-        responsive: true,
-        plugins: {
-            legend: {
-                display: false,
-                position: 'top' as const,
-            },
-            title: {
-                display: true,
-                text: 'TicketsByPeriod',
-            },
-        },
-    };
+    const { datasetStyle, baseOptions } = useChartOptions('TicketsByPeriod', type);
 
     const data = {
         labels: labels,
@@ -72,14 +65,7 @@ export const TicketsByPeriodChart = ({ ticketsByPeriod }: { ticketsByPeriod: [] 
             {
                 label: 'TicketsByPeriod',
                 data: dataCount,
-                backgroundColor: [
-                    'oklch(45.633% 0.13478 263.563)',
-                    'oklch(56.627% 0.09703 258.464)',
-                    'oklch(42.935% 0.11812 258.322)',
-                    'oklch(54.636% 0.08264 263.21)',
-                    'oklch(56.983% 0.15547 258.607)',
-                ],
-                hoverOffset: 4,
+                ...datasetStyle,
             },
         ],
     };
@@ -87,21 +73,30 @@ export const TicketsByPeriodChart = ({ ticketsByPeriod }: { ticketsByPeriod: [] 
     return (
         <>
             <div>
-                <ButtonsChart setType={setType} />
-                <div className="flex gap-2">
-                    <p className={'cursor-pointer'} onClick={() => setPeriod('week')}>
-                        By Week
-                    </p>
-                    <p className={'cursor-pointer'} onClick={() => setPeriod('month')}>
-                        By Month
-                    </p>
+                <div className="flex justify-between">
+                    <ButtonsChart setType={setType} types={['horizontalBar', 'verticalBar', 'line']} />
+                    <div className="flex gap-2">
+                        <p className={'cursor-pointer'} onClick={() => setPeriod('week')}>
+                            By Week
+                        </p>
+                        <p className={'cursor-pointer'} onClick={() => setPeriod('month')}>
+                            By Month
+                        </p>
+                    </div>
                 </div>
-                {type === 'bar' && (
-                    <p>
-                        <Bar options={options} data={data} />
-                    </p>
+                {isFetching ? (
+                    <p className="animate-pulse">Fetching datas...</p>
+                ) : (
+                    <>
+                        {(type === 'horizontalBar' || type === 'verticalBar') && (
+                            <p>
+                                <Bar options={baseOptions} data={data} />
+                            </p>
+                        )}
+                        {type === 'line' && <Line options={baseOptions} data={data} />}
+                        {type === 'doughnut' && <Doughnut options={baseOptions} data={data} />}
+                    </>
                 )}
-                {type === 'doughnut' && <Doughnut options={options} data={data} />}
             </div>
         </>
     );
