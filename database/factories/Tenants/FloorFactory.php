@@ -20,13 +20,17 @@ class FloorFactory extends Factory
      */
     public function definition(): array
     {
-        $location = LocationType::factory()->create(['level' => 'floor', 'prefix' => 'L']);
+        $locationType = LocationType::where('level', 'floor')->where('prefix', 'L')->first();
+
+        if (!$locationType)
+            $locationType = LocationType::factory()->create(['level' => 'floor', 'prefix' => 'L']);
+
         $building = Building::first();
 
         return [
             'surface_floor' => fake()->numberBetween(100, 3000),
             'surface_walls' => fake()->numberBetween(100, 3000),
-            'location_type_id' => $location->id,
+            'location_type_id' => $locationType->id,
             'level_id' => $building->id
         ];
     }

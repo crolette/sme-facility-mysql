@@ -23,11 +23,13 @@ class SiteFactory extends Factory
      */
     public function definition(): array
     {
+        $locationType = LocationType::where('level', 'site')->where('prefix', 'S')->first();
+        if (!$locationType)
+            $locationType = LocationType::factory()->create(['level' => 'site', 'prefix' => 'S']);
 
-        $location = LocationType::factory()->create(['level' => 'site', 'prefix' => 'S']);
 
         return [
-            'location_type_id' => $location->id,
+            'location_type_id' => $locationType->id,
             'surface_floor' => fake()->numberBetween(100, 3000),
             'surface_walls' => fake()->numberBetween(100, 3000)
         ];

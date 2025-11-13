@@ -750,7 +750,7 @@ export default function CreateUpdateAsset({
                                     id="end_warranty_date"
                                     type="date"
                                     value={data.end_warranty_date}
-                                    min={minEndDateWarranty}
+                                    min={asset ? '' : minEndDateWarranty}
                                     onChange={(e) => setData('end_warranty_date', e.target.value)}
                                     placeholder="Date end of warranty"
                                 />
@@ -893,7 +893,7 @@ export default function CreateUpdateAsset({
                                             id="next_maintenance_date"
                                             type="date"
                                             value={data.next_maintenance_date ?? ''}
-                                            min={minEndDateWarranty}
+                                            min={asset ? '' : minEndDateWarranty}
                                             onChange={(e) => setData('next_maintenance_date', e.target.value)}
                                             placeholder="Date last maintenance"
                                         />
