@@ -18,13 +18,13 @@ class QRCodeService
         $tenantId = tenancy()->tenant->id;
         $modelType = Str::plural(Str::lower(class_basename($model))); // e.g., "assets", "sites", "buildings"
         $modelId = $model->id;
-        
+
         $directory = "$tenantId/$modelType/$modelId/qrcode/";
 
         $qr_hash = generateQRCodeHash($model);
 
         $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDhhmm')  . '.png';
-        
+
         $route = route('tenant.' . $modelType . '.tickets.create', $qr_hash);
 
         $files = Storage::disk('tenants')->files($directory);
@@ -32,11 +32,18 @@ class QRCodeService
         if (count($files) > 0) {
             $this->deleteExistingQR($files);
         }
-        
+
         $qr = Quar::format('png')
             ->size(300)
             ->margin(2)
             ->gradient(34, 78, 143, 37, 39, 41,  'vertical')
+            ->withText('SME-Facility')
+            ->configureText(function ($text) {
+                $text->setTextColor('#000000')
+                    ->setFontSize(16)
+                    ->setPadding(12)
+                    ->setBackgroundOpacity(0);
+            })
             ->generate($route);
 
         Storage::disk('tenants')->put($directory . $fileName, $qr);
