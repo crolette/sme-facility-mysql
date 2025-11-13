@@ -74,9 +74,7 @@ Route::middleware([
 
         if (in_array($locale, array_keys(config('laravellocalization.supportedLocales')))) {
             // If valid, store the locale in the session
-            if (Auth::user())
-                Auth::user()->setLocale($locale);
-
+            Auth::user()->setLocale($locale);
             Session::put('locale', $locale);
             App::setLocale($locale);
         }

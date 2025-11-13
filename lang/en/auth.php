@@ -13,7 +13,8 @@ return [
     'password_confirm' => 'Confirm password',
     'profile_info' => 'Profile information',
     'delete_account' => 'Delete my account',
-    'login' => 'login',
+    'login' => 'ogin',
+    'logout' => 'Log out',
     'password_forgot' => 'Forgot password?',
     'remember_me' => 'Remember me',
 ];

@@ -1,16 +1,9 @@
-import LocaleChange from '@/components/tenant/LocaleChange';
 import { Pill } from '@/components/ui/pill';
 import AppLayout from '@/layouts/app-layout';
 import { Intervention, Maintainable, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Cuboid, HardDrive, Ticket, Wrench } from 'lucide-react';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-    },
-];
 
 export default function TenantDashboard({
     counts,
@@ -27,10 +20,16 @@ export default function TenantDashboard({
     overdueInterventions: Intervention[];
     diskSizes: { mb: number; gb: number; percent: number };
 }) {
+    const { t } = useLaravelReactI18n();
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: `${t('common.dashboard')}`,
+            href: '/dashboard',
+        },
+    ];
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
-            <LocaleChange />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="grid grid-cols-4 gap-4">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex items-center justify-center overflow-hidden rounded-xl border p-4">

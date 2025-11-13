@@ -3,7 +3,16 @@
 
 return [
     'language' => 'Language',
-    'settings' => 'Settings',
+    'dashboard' => 'Dashboard',
+    'version' => 'Version',
+
+
+    // Documents
+    'documents' => 'Document|Documents',
+
+
+
+    'statistics' => 'Statistics',
 
 
     // Person fields
