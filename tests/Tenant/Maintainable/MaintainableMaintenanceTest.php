@@ -249,7 +249,7 @@ it('updates the next_maintenance_date when maintenance marked as done', function
         'maintenance_frequency' => $frequency,
         'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString(),
     ]);
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 
 it('clears the next_maintenance_date when maintenance marked as done and frequency ON DEMAND', function () {
@@ -261,7 +261,7 @@ it('clears the next_maintenance_date when maintenance marked as done and frequen
         'locationType' => 'site',
         'categoryId' => $this->category->id,
         'need_maintenance' => true,
-        'maintenance_frequency' => 'on demand',
+        'maintenance_frequency' => 'on_demand',
         'next_maintenance_date' => Carbon::now()->addMonths(2)->toDateString(),
     ];
 
@@ -279,7 +279,7 @@ it('clears the next_maintenance_date when maintenance marked as done and frequen
         'description' => 'Description new asset',
         'need_maintenance' => true,
         'last_maintenance_date' => Carbon::now()->toDateString(),
-        'maintenance_frequency' => 'on demand',
+        'maintenance_frequency' => 'on_demand',
         'next_maintenance_date' => null,
     ]);
 });

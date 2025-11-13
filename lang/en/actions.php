@@ -14,10 +14,15 @@ return [
     // View actions
     'see-details' => 'See details',
     'see-all' => 'See all',
+    'select-type' => 'Select :type',
+
+    // Search
     'search-type' => 'Search :type',
+    'search-clear' => 'Clear search',
 
     // Form actions
     'save' => 'Save',
+    'search' => 'Search',
     'create' => 'Create',
     'update' => 'Update',
     'upload' => 'Upload',
@@ -41,7 +46,10 @@ return [
     'sent' => 'Sent',
 
 
+
     // Processing actions
+    'loading' => 'Loading...',
+    'searching' => 'Searching...',
     'processing' => 'Processing...',
     'type-being-created' => ':type is being created...',
     'type-being-updated' => ':type is being updated...',

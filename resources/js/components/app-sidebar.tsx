@@ -36,7 +36,7 @@ export function AppSidebar() {
 
     const mainNavItems: NavItem[] = [
         {
-            title: `${t('common.dashboard')}`,
+            title: `${t('dashboard.title')}`,
             href: '/dashboard',
             icon: LayoutDashboard,
         },

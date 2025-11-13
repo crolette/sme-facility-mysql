@@ -91,7 +91,7 @@ it('creates next_maintenance_date notification (for admin & manager) based on fr
             'notifiable_id' => 1,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('creates next_maintenance_date notification when next_maintenance_date is not defined and last_maintenance_date is defined', function ($frequency) {
 
@@ -139,7 +139,7 @@ it('creates next_maintenance_date notification when next_maintenance_date is not
             'notifiable_id' => 1,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('creates next_maintenance_date notification when next/last_maintenance_date are not defined ', function ($frequency) {
 
@@ -178,7 +178,7 @@ it('creates next_maintenance_date notification when next/last_maintenance_date a
             'notifiable_id' => 1,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('updates next_maintenance_date notification when updating next_maintenance_date of the asset', function ($frequency) {
 
@@ -259,7 +259,7 @@ it('updates next_maintenance_date notification when updating next_maintenance_da
             'notifiable_id' => $asset->id,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('does not create a next_maintenance_date notification when next_maintenance_date is today', function ($frequency) {
 
@@ -275,7 +275,7 @@ it('does not create a next_maintenance_date notification when next_maintenance_d
     $this->postToTenant('api.assets.store', $formData);
 
     assertDatabaseCount('scheduled_notifications', 0);
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('creates a notification if next_maintenance_date is > today even if the scheduled_at is in the past', function ($frequency) {
 
@@ -316,7 +316,7 @@ it('creates a notification if next_maintenance_date is > today even if the sched
             'notifiable_id' => $asset->id,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('updates notification when updating next_maintenance_date of the asset and scheduled_at will be in the past', function ($frequency) {
 
@@ -373,7 +373,7 @@ it('updates notification when updating next_maintenance_date of the asset and sc
             'notifiable_id' => $asset->id,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('creates notification when the scheduled_at notification was previously in the past', function () {
 
@@ -473,7 +473,7 @@ it('creates notification when need_maintenance passes from false to true', funct
             'notifiable_id' => 1,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('deletes notification when need_maintenance passes from true to false', function ($frequency) {
 
@@ -504,7 +504,7 @@ it('deletes notification when need_maintenance passes from true to false', funct
     $response->assertStatus(200);
 
     assertDatabaseCount('scheduled_notifications', 0);
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('update notifications when notification preference next_maintenance_date of user changes', function ($frequency) {
 
@@ -554,7 +554,7 @@ it('update notifications when notification preference next_maintenance_date of u
             'notifiable_id' => 1,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('deletes notifications when notification preference next_maintenance_date of user changes from enabled to disabled', function () {
 
@@ -657,7 +657,7 @@ it('creates notifications when notification preference next_maintenance_date of 
             'notifiable_id' => 1,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('updates notification when maintenance is marked as done and notification is not sent', function ($frequency) {
 
@@ -705,7 +705,7 @@ it('updates notification when maintenance is marked as done and notification is 
             'notifiable_id' => 1,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('creates new notification when maintenance is marked as done and other notifications already sent', function ($frequency) {
 
@@ -807,13 +807,13 @@ it('creates new notification when maintenance is marked as done and other notifi
             'notifiable_id' => 1,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('creates notification when next_maintenance_date of ONDEMAND is given', function () {
     $formData = [
         ...$this->basicAssetData,
         'maintenance_manager_id' => $this->manager->id,
-        'maintenance_frequency' => 'on demand',
+        'maintenance_frequency' => 'on_demand',
         'need_maintenance' => true,
         'next_maintenance_date' => Carbon::now()->addDays(14)->toDateString(),
         'last_maintenance_date' => Carbon::now()->toDateString(),
@@ -853,7 +853,7 @@ it('updates notification when next_maintenance_date of ONDEMAND is changed', fun
     $formData = [
         ...$this->basicAssetData,
         'maintenance_manager_id' => $this->manager->id,
-        'maintenance_frequency' => 'on demand',
+        'maintenance_frequency' => 'on_demand',
         'need_maintenance' => true,
         'next_maintenance_date' => Carbon::now()->addDays(14)->toDateString(),
         'last_maintenance_date' => Carbon::now()->toDateString(),
@@ -866,7 +866,7 @@ it('updates notification when next_maintenance_date of ONDEMAND is changed', fun
     $formData = [
         ...$this->basicAssetData,
         'maintenance_manager_id' => $this->manager->id,
-        'maintenance_frequency' => 'on demand',
+        'maintenance_frequency' => 'on_demand',
         'need_maintenance' => true,
         'next_maintenance_date' => Carbon::now()->addMonth(),
         'last_maintenance_date' => Carbon::now()->toDateString(),
@@ -907,7 +907,7 @@ it('creates notification when maintenance_frequency changes from ONDEMAND to ano
     $formData = [
         ...$this->basicAssetData,
         'maintenance_manager_id' => $this->manager->id,
-        'maintenance_frequency' => 'on demand',
+        'maintenance_frequency' => 'on_demand',
         'need_maintenance' => true,
         'last_maintenance_date' => Carbon::now()->toDateString(),
     ];
@@ -954,7 +954,7 @@ it('creates notification when maintenance_frequency changes from ONDEMAND to ano
             'notifiable_id' => 1,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('creates next_maintenance_date notifications for a new created user with admin role and only for not soft deleted assets', function ($frequency) {
 
@@ -1014,7 +1014,7 @@ it('creates next_maintenance_date notifications for a new created user with admi
             'notifiable_id' => $assetSoftDeleted->id,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('creates next_maintenance_date notifications when the role of a maintenance manager changes to admin', function ($frequency) {
 
@@ -1110,7 +1110,7 @@ it('creates next_maintenance_date notifications when the role of a maintenance m
             'notifiable_id' => $assetSoftDeleted->id,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('deletes next_maintenance_date notifications when the role of an admin changes to maintenance manager', function ($frequency) {
     $assetActive = Asset::factory()->forLocation($this->room)->create();
@@ -1169,7 +1169,7 @@ it('deletes next_maintenance_date notifications when the role of an admin change
             'notifiable_id' => $assetActive->id,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('deletes next_maintenance_date notifications when the role of an admin changes to maintenance manager for assets only where he is not maintenance manager', function ($frequency) {
     $assetActive = Asset::factory()->forLocation($this->room)->create();
@@ -1264,7 +1264,7 @@ it('deletes next_maintenance_date notifications when the role of an admin change
             'notifiable_id' => $assetWithManager->id,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('deletes next_maintenance_date notifications when a user is deleted', function ($frequency) {
 
@@ -1315,4 +1315,4 @@ it('deletes next_maintenance_date notifications when a user is deleted', functio
             'notifiable_id' => $assetActive->id,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));

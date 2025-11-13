@@ -7,10 +7,19 @@ return [
     'version' => 'Version',
 
 
+    // Search / Filter
+    'search_filter' => 'Search/Filter',
+    'category' => 'Category',
+
+
+    // 
+    'reference_code' => 'Reference code',
+    'code' => 'Code',
+    'description' => 'Description',
+
+
     // Documents
     'documents' => 'Document|Documents',
-
-
 
     'statistics' => 'Statistics',
 
@@ -44,10 +53,17 @@ return [
     'updated_at' => 'Updated at',
 
     // Generic terms
+    'all' => 'All',
     'yes' => 'Yes',
     'no' => 'No',
+    'type' => 'Type',
     'active' => 'Active',
     'inactive' => 'Inactive',
     'optional' => 'Optional',
     'required' => 'Required',
+
+
+    // Pagination
+    'next' => 'Next',
+    'previous' => 'Previous'
 ];

@@ -13,6 +13,7 @@ import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Intervention, InterventionStatus, PaginatedData, PriorityLevel } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArrowDownNarrowWide, ArrowDownWideNarrow, Loader, Pencil, Trash2, X } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 
@@ -53,9 +54,10 @@ export default function IndexInterventions({
     priorities: PriorityLevel;
     types: CentralType[];
 }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Index interventions`,
+            title: `Index ${tChoice('interventions.title', 2)}`,
             href: `/interventions`,
         },
     ];
@@ -240,11 +242,11 @@ export default function IndexInterventions({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Index interventions" />
+            <Head title={tChoice('interventions.title', 2)} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex w-full justify-between">
                     <details className="border-border relative w-full cursor-pointer rounded-md border-2 p-2" open={isLoading ? false : undefined}>
-                        <summary>Search/Filter</summary>
+                        <summary>{t('common.search_filter')}</summary>
 
                         <div className="bg-border border-border text-background dark:text-foreground absolute top-full z-10 flex flex-col items-center gap-4 rounded-b-md border-2 p-2 sm:flex-row">
                             <div className="flex flex-col items-center gap-2">
@@ -256,7 +258,7 @@ export default function IndexInterventions({
                                     onChange={(e) => setQuery((prev) => ({ ...prev, type: e.target.value }))}
                                 >
                                     <option value={''} aria-readonly>
-                                        Select a type
+                                        {t('actions.select-type', { type: t('common.type') })}
                                     </option>
                                     {types.map((type) => (
                                         <option key={type.id} value={type.id}>
@@ -266,20 +268,20 @@ export default function IndexInterventions({
                                 </select>
                             </div>
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="status">Status</Label>
+                                <Label htmlFor="status">{t('interventions.status')}</Label>
                                 <select name="status" id="status" value={query.status ?? ''} onChange={(e) => setStatusSearch(e.target.value)}>
                                     <option value={''} aria-readonly>
-                                        Select a status
+                                        {t('actions.select-type', { type: t('interventions.status') })}
                                     </option>
                                     {statuses.map((status) => (
                                         <option key={status} value={status}>
-                                            {status}
+                                            {t(`interventions.priority.${status}`)}
                                         </option>
                                     ))}
                                 </select>
                             </div>
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="canLogin">Priority</Label>
+                                <Label htmlFor="canLogin">{t('interventions.priority')}</Label>
                                 <div className="space-x-1 text-center">
                                     {priorities.map((priority) => (
                                         <Pill
@@ -289,7 +291,7 @@ export default function IndexInterventions({
                                             variant={query.priority === priority ? 'active' : 'default'}
                                             onClick={() => setPrioritySearch(priority)}
                                         >
-                                            {priority}
+                                            {t(`interventions.priority.${priority}`)}
                                         </Pill>
                                     ))}
                                 </div>
@@ -306,7 +308,7 @@ export default function IndexInterventions({
                             </div>
 
                             <Button onClick={clearSearch} size={'sm'}>
-                                Clear Search
+                                {t('actions.search-clear')}
                             </Button>
                         </div>
                     </details>
@@ -314,9 +316,9 @@ export default function IndexInterventions({
                 <Table>
                     <TableHead>
                         <TableHeadRow>
-                            <TableHeadData className="w-52">Description</TableHeadData>
-                            <TableHeadData>Type</TableHeadData>
-                            <TableHeadData>Asset</TableHeadData>
+                            <TableHeadData className="w-52">{t('common.description')}</TableHeadData>
+                            <TableHeadData>{t('common.type')}</TableHeadData>
+                            <TableHeadData>{t('tickets.related_to')}</TableHeadData>
                             <TableHeadData>
                                 <div className="flex flex-nowrap items-center gap-2">
                                     <ArrowDownNarrowWide
@@ -327,7 +329,7 @@ export default function IndexInterventions({
                                         )}
                                         onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'priority', orderBy: 'asc' }))}
                                     />
-                                    <p>Priority</p>
+                                    <p>{t('interventions.priority')}</p>
                                     <ArrowDownWideNarrow
                                         size={16}
                                         className={cn(
@@ -338,8 +340,8 @@ export default function IndexInterventions({
                                     />
                                 </div>
                             </TableHeadData>
-                            <TableHeadData>Status</TableHeadData>
-                            <TableHeadData>Assigned to</TableHeadData>
+                            <TableHeadData>{t('interventions.status')}</TableHeadData>
+                            <TableHeadData>{t('interventions.assigned_to')}</TableHeadData>
                             <TableHeadData>
                                 <div className="flex items-center gap-2">
                                     <ArrowDownNarrowWide
@@ -351,7 +353,7 @@ export default function IndexInterventions({
                                         )}
                                         onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'planned_at', orderBy: 'asc' }))}
                                     />
-                                    <p>Planned at</p>
+                                    <p>{t('interventions.planned_at')}</p>
                                     <ArrowDownWideNarrow
                                         size={16}
                                         className={cn(
@@ -372,7 +374,7 @@ export default function IndexInterventions({
                                         )}
                                         onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'repair_delay', orderBy: 'asc' }))}
                                     />
-                                    <p>Repair delay</p>
+                                    <p>{t('interventions.repair_delay')}</p>
                                     <ArrowDownWideNarrow
                                         size={16}
                                         className={cn(
@@ -383,7 +385,7 @@ export default function IndexInterventions({
                                     />
                                 </div>
                             </TableHeadData>
-                            <TableHeadData>Total costs</TableHeadData>
+                            <TableHeadData>{t('interventions.total_costs')}</TableHeadData>
                             <TableHeadData></TableHeadData>
                         </TableHeadRow>
                     </TableHead>
@@ -393,7 +395,7 @@ export default function IndexInterventions({
                                 <TableBodyData>
                                     <p className="flex animate-pulse gap-2">
                                         <Loader />
-                                        Searching...
+                                        {t('actions.searching')}
                                     </p>
                                 </TableBodyData>
                             </TableBodyRow>
@@ -414,10 +416,10 @@ export default function IndexInterventions({
                                             </a>
                                         </TableBodyData>
                                         <TableBodyData>
-                                            <Pill variant={item.priority}>{item.priority}</Pill>
+                                            <Pill variant={item.priority}>{t(`interventions.priority.${item.priority}`)}</Pill>
                                         </TableBodyData>
                                         <TableBodyData>
-                                            <Pill variant={item.status}>{item.status}</Pill>
+                                            <Pill variant={item.status}>{t(`interventions.status.${item.status}`)}</Pill>
                                         </TableBodyData>
                                         <TableBodyData>
                                             {item.assignable ? (
@@ -427,11 +429,11 @@ export default function IndexInterventions({
                                                     <a href={route('tenant.providers.show', item.assignable.id)}>{item.assignable.name}</a>
                                                 )
                                             ) : (
-                                                'not assigned'
+                                                t('interventions.assigned_not')
                                             )}
                                         </TableBodyData>
-                                        <TableBodyData>{item.planned_at ?? 'Not planned'}</TableBodyData>
-                                        <TableBodyData>{item.repair_delay ?? 'No repair delay'}</TableBodyData>
+                                        <TableBodyData>{item.planned_at ?? t('interventions.planned_at_no')}</TableBodyData>
+                                        <TableBodyData>{item.repair_delay ?? t('interventions.repair_delay_no')}</TableBodyData>
                                         <TableBodyData>{item.total_costs ? `${item.total_costs} €` : '-'}</TableBodyData>
                                         <TableBodyData className="flex space-x-2">
                                             {!closed && (
@@ -508,7 +510,7 @@ export default function IndexInterventions({
                                     </option>
                                 ))}
                             </select>
-                            <Label>Status</Label>
+                            <Label>{t('interventions.status')}</Label>
                             <select
                                 name=""
                                 id=""

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\API\V1;
 
-use App\Events\TicketClosed;
-use App\Events\TicketCreated;
 use Exception;
+use Carbon\Carbon;
+use App\Events\TicketClosed;
 use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
+use App\Events\TicketCreated;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Company;
@@ -70,19 +71,19 @@ class APITicketController extends Controller
             $ticket->ticketable()->associate($location);
             $ticket->save();
 
-           
+
 
             // TODO Send email to admin / maintenance manager if not the one who created the ticket
 
             $files = $pictureUploadRequest->validated('pictures');
-            
+
             if ($files) {
                 $pictureService->uploadAndAttachPictures($ticket, $files, $request->validated('reporter_email') ?? null);
             }
 
-            
+
             DB::commit();
-            
+
             event(new TicketCreated($ticket, $location));
 
             return ApiResponse::success(null, 'Ticket created');
@@ -146,6 +147,12 @@ class APITicketController extends Controller
 
                 return ApiResponse::success(null, 'Ticket closed');
             }
+
+            // TODO Check if ok with tests
+            if ($request->status === 'ongoing' && !$ticket->handled_at) {
+                $ticket->update(['handled_at' => Carbon::now()->toDateString()]);
+            }
+
             $ticket->update(['status' => $request->status]);
             return ApiResponse::success(null, 'Ticket updated');
         }
@@ -159,11 +166,11 @@ class APITicketController extends Controller
             return ApiResponse::notAuthorized();
 
         try {
-                     $ticket->delete();
-                    return ApiResponse::success(null, 'Ticket deleted');
-                } catch (Exception $e) {
-                    return ApiResponse::error('Error during Ticket deletion', [$e->getMessage()]);
-                }
+            $ticket->delete();
+            return ApiResponse::success(null, 'Ticket deleted');
+        } catch (Exception $e) {
+            return ApiResponse::error('Error during Ticket deletion', [$e->getMessage()]);
+        }
 
         return ApiResponse::error('Error during Ticket deletion');
     }

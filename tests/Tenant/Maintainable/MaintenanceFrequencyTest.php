@@ -85,7 +85,7 @@ it('can add maintenance frequency to asset without next_maintenance_date (and ca
         'last_maintenance_date' => Carbon::now()->subDays(7)->toDateString(),
         'next_maintenance_date' => $expectedDate
     ]);
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('can create asset with need_maintenance but not next/last_maintenance_date and next_maintenance_date is calculated automatically', function ($frequency) {
 
@@ -106,7 +106,7 @@ it('can create asset with need_maintenance but not next/last_maintenance_date an
         'last_maintenance_date' => null,
         'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString()
     ]);
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('can add maintenance frequency to asset without next_maintenance_date (and calculate automatically the next_date where the next_date should be today based on frequency and last_maintenance in the past)', function (string $frequency) {
 
@@ -128,7 +128,7 @@ it('can add maintenance frequency to asset without next_maintenance_date (and ca
         'last_maintenance_date' => Carbon::now()->subDays(MaintenanceFrequency::from($frequency)->days())->toDateString(),
         'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString()
     ]);
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('can add maintenance frequency to asset with next_maintenance_date (and does not calculate automatically based on frequency and last_maintenance_date)', function (string $frequency) {
 
