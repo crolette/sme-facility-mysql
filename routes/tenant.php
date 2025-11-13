@@ -14,9 +14,13 @@ use App\Models\Tenants\Floor;
 use App\Models\Tenants\Company;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Tenants\Building;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Session;
 use Stancl\Tenancy\Middleware\ScopeSessions;
+use App\Http\Middleware\TenantLocaleMiddleware;
 use App\Http\Controllers\Tenants\UserController;
 use App\Http\Controllers\Tenants\TicketController;
 use App\Http\Controllers\API\V1\APITicketController;
@@ -59,8 +63,28 @@ Route::middleware([
     InitializeTenancyBySubdomain::class,
     ScopeSessions::class,
     PreventAccessFromCentralDomains::class,
+    TenantLocaleMiddleware::class,
+    // 'localizationRedirect',
     'auth:tenant'
 ])->group(function () {
+
+    Route::get('locale/{locale}', function (Request $request, $locale) {
+
+        // Check if the passed locale is available in our configuration
+
+        if (in_array($locale, array_keys(config('laravellocalization.supportedLocales')))) {
+            // If valid, store the locale in the session
+            if (Auth::user())
+                Auth::user()->setLocale($locale);
+
+            Session::put('locale', $locale);
+            App::setLocale($locale);
+        }
+
+        // Redirect back to the previous page
+        // return redirect(LaravelLocalization::getLocalizedURL($locale, url()->previous()));
+        return redirect()->back();
+    })->name('tenant.locale');
 
     Route::get('dashboard', [DashboardController::class, 'show'])->name('tenant.dashboard');
 

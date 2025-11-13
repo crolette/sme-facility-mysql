@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { Asset, AssetCategory, CentralType, Provider, TenantBuilding, TenantFloor, TenantRoom, TenantSite, User, type BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Loader, MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
@@ -119,6 +120,7 @@ export default function CreateUpdateAsset({
     contractDurations?: string[];
     noticePeriods: string[];
 }) {
+    const { t } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index assets`,
@@ -1288,7 +1290,7 @@ export default function CreateUpdateAsset({
                         <Button type="submit">{asset ? 'Update' : 'Submit'}</Button>
                         <a href={asset ? route('tenant.assets.show', asset.reference_code) : route('tenant.assets.index')}>
                             <Button type="button" tabIndex={6} variant={'secondary'}>
-                                Cancel
+                                {t('actions.submit')}
                             </Button>
                         </a>
                     </div>

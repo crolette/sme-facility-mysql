@@ -1,3 +1,4 @@
+import LocaleChange from '@/components/tenant/LocaleChange';
 import { Pill } from '@/components/ui/pill';
 import AppLayout from '@/layouts/app-layout';
 import { Intervention, Maintainable, type BreadcrumbItem } from '@/types';
@@ -29,6 +30,7 @@ export default function TenantDashboard({
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
+            <LocaleChange />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="grid grid-cols-4 gap-4">
                     <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex items-center justify-center overflow-hidden rounded-xl border p-4">

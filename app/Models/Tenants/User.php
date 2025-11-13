@@ -51,7 +51,8 @@ class User extends Authenticatable
         'avatar',
         'job_position',
         'phone_number',
-        'can_login'
+        'can_login',
+        'preferred_locale'
 
     ];
 
@@ -154,5 +155,12 @@ class User extends Authenticatable
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new CustomResetPassword($token));
+    }
+
+    public function setLocale(string $locale)
+    {
+        $this->update([
+            'preferred_locale' => $locale,
+        ]);
     }
 }
