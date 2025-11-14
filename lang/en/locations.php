@@ -10,7 +10,9 @@ return [
     'rooms' => 'Room|Rooms',
     'level' => 'Level',
     'redefine_room' => 'Redefine room',
-    'material_floor' => 'Floor',
-    'material_wall' => 'Wall',
+    'surface_floor' => 'Floor surface',
+    'surface_wall' => 'Wall surface',
+    'material_floor' => 'Floor material',
+    'material_wall' => 'Wall material',
     'material_outdoor' => 'Outdoor material'
 ];

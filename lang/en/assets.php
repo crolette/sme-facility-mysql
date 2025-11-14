@@ -6,6 +6,8 @@ return [
     'mobile_asset_user' => 'User of the mobile asset',
     'asset_linked_to' => 'Asset linked to',
     'search_navigate_hierarchy' => 'Search or navigate through your hierarchy',
+    'selected_location' => 'Selected location',
+    'selected_location_none' => 'No location selected',
     'need_qr_code' => 'Need QR Code',
     'trashed' => 'Trashed',
     'brand' => 'Brand',

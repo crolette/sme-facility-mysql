@@ -68,6 +68,7 @@ return [
     'information' => 'Information',
     'from' => 'From',
     'to' => 'To',
+    'other' => 'Other',
     'all' => 'All',
     'yes' => 'Yes',
     'no' => 'No',
