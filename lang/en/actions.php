@@ -26,6 +26,8 @@ return [
     'edit' => 'Edit',
     'save' => 'Save',
     'remove' => 'Remove',
+    'restore' => 'Restore',
+    'delete_definitely' => 'Delete definitely',
     'search' => 'Search',
     'create' => 'Create',
     'update' => 'Update',
@@ -50,6 +52,7 @@ return [
     'sent' => 'Sent',
 
 
+    'search-type' => 'Search :type...',
 
     // Processing actions
     'loading' => 'Loading...',

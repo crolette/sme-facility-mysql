@@ -120,7 +120,7 @@ export default function CreateUpdateAsset({
     contractDurations?: string[];
     noticePeriods: string[];
 }) {
-    const { t } = useLaravelReactI18n();
+    const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index assets`,
@@ -472,22 +472,28 @@ export default function CreateUpdateAsset({
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 {asset && (
                     <div>
-                        <p>Asset Reference: {asset.reference_code}</p>
-                        <p>Asset Code: {asset.code} </p>
+                        <p>
+                            {t('common.reference_code')}: {asset.reference_code}
+                        </p>
+                        <p>
+                            {t('common.code')}: {asset.code}{' '}
+                        </p>
                         {asset?.is_mobile ? (
-                            <p>Asset attached to : {asset.location.full_name}</p>
+                            <p>
+                                {t('asset_linked_to')} : {asset.location.full_name}
+                            </p>
                         ) : (
                             <p>
-                                Asset attached to : {asset.location.maintainable.name} - {asset.location.location_type.label}
+                                {t('asset_linked_to')} : {asset.location.maintainable.name} - {asset.location.location_type.label}
                             </p>
                         )}
                     </div>
                 )}
                 <form onSubmit={submit} className="flex flex-col gap-4">
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                        <h5>Location</h5>
+                        <h5>{tChoice('locations.title', 1)}</h5>
                         <div className="flex items-center gap-2">
-                            <Label htmlFor="is_mobile">Mobile asset ?</Label>
+                            <Label htmlFor="is_mobile">{t('asset.mobile_asset')}</Label>
                             <Checkbox
                                 id="is_mobile"
                                 name="is_mobile"
@@ -527,7 +533,7 @@ export default function CreateUpdateAsset({
                             </>
                         ) : (
                             <>
-                                <Label>Search or navigate through your hierarchy</Label>
+                                <Label>{t('assets.search_navigate_hierarchy')}</Label>
 
                                 {/* <Label htmlFor="search">Search</Label> */}
                                 <div className="relative mb-2">
@@ -540,7 +546,7 @@ export default function CreateUpdateAsset({
                                     <ul className="bg-background absolute z-10 flex w-full flex-col" aria-autocomplete="list" role="listbox">
                                         {isSearching && (
                                             <li value="0" key="" className="">
-                                                Searching...
+                                                {t('actions.searching')}
                                             </li>
                                         )}
                                         {listIsOpen &&
@@ -569,13 +575,17 @@ export default function CreateUpdateAsset({
                                 <SearchLocationForAsset onSelect={setSelectedLocation} />
                                 {/* {data.locationName && ( */}
                                 <>
-                                    <Label htmlFor="locationType">Selected Level</Label>
+                                    <Label htmlFor="locationType">{t('assets.selected_location')}</Label>
                                     <Input
                                         required
                                         type="text"
                                         disabled
                                         className="font-bold"
-                                        value={data.locationName ? data.locationName + ' - ' + data.locationReference : 'No location selected'}
+                                        value={
+                                            data.locationName
+                                                ? data.locationName + ' - ' + data.locationReference
+                                                : t('assets.selected_location_none')
+                                        }
                                     />
                                     <InputError className="mt-2" message={errors?.locationType ?? ''} />
                                 </>
@@ -584,9 +594,9 @@ export default function CreateUpdateAsset({
                         )}
                     </div>
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                        <h5>Information</h5>
+                        <h5>{t('common.information')}</h5>
                         <div>
-                            <Label htmlFor="name">Name</Label>
+                            <Label htmlFor="name">{t('common.name')}</Label>
                             <Input
                                 id="name"
                                 type="text"
@@ -602,7 +612,7 @@ export default function CreateUpdateAsset({
 
                         {!asset && (
                             <div className="flex items-center gap-2">
-                                <Label htmlFor="need_qr_code">Need QR Code ?</Label>
+                                <Label htmlFor="need_qr_code">{t('assets.need_qr_code')} ?</Label>
                                 <Checkbox
                                     id="need_qr_code"
                                     name="need_qr_code"
@@ -613,7 +623,7 @@ export default function CreateUpdateAsset({
                             </div>
                         )}
 
-                        <Label htmlFor="category">Category</Label>
+                        <Label htmlFor="category">{t('common.category')}</Label>
                         <select
                             name="category"
                             required
@@ -629,7 +639,7 @@ export default function CreateUpdateAsset({
                             {categories && categories.length > 0 && (
                                 <>
                                     <option value="0" disabled className="bg-background text-foreground">
-                                        Select an option
+                                        {t('actions.select-type', { type: t('common.category') })}
                                     </option>
                                     {categories?.map((category) => (
                                         <option value={category.id} key={category.id} className="bg-background text-foreground3">
@@ -641,7 +651,7 @@ export default function CreateUpdateAsset({
                         </select>
                         <InputError className="mt-2" message={errors?.categoryId ?? ''} />
 
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">{t('common.description')}</Label>
                         <Input
                             id="description"
                             type="text"
@@ -649,11 +659,11 @@ export default function CreateUpdateAsset({
                             required
                             value={data.description}
                             onChange={(e) => setData('description', e.target.value)}
-                            placeholder="Asset description"
+                            placeholder={t('common.description_placeholder')}
                         />
                         <InputError className="mt-2" message={errors?.description ?? ''} />
 
-                        <Label htmlFor="surface">Surface</Label>
+                        <Label htmlFor="surface">{t('common.surface')}</Label>
                         <Input
                             id="surface"
                             type="number"
@@ -666,7 +676,7 @@ export default function CreateUpdateAsset({
                         <InputError className="mt-2" message={errors?.surface ?? ''} />
                         <div className="flex flex-col gap-4 md:flex-row">
                             <div className="w-full">
-                                <Label htmlFor="brand">Brand</Label>
+                                <Label htmlFor="brand">{t('assets.brand')}</Label>
                                 <Input
                                     id="brand"
                                     type="text"
@@ -678,7 +688,7 @@ export default function CreateUpdateAsset({
                                 <InputError className="mt-2" message={errors?.brand ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label htmlFor="model">Model</Label>
+                                <Label htmlFor="model">{t('assets.model')}</Label>
                                 <Input
                                     id="model"
                                     type="text"
@@ -690,14 +700,14 @@ export default function CreateUpdateAsset({
                                 <InputError className="mt-2" message={errors?.model ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label htmlFor="serial_number">Serial number</Label>
+                                <Label htmlFor="serial_number">{t('assets.serial_number')}</Label>
                                 <Input
                                     id="serial_number"
                                     type="text"
                                     maxLength={50}
                                     value={data.serial_number}
                                     onChange={(e) => setData('serial_number', e.target.value)}
-                                    placeholder="Asset serial number"
+                                    placeholder="A25x-69F"
                                 />
                                 <InputError className="mt-2" message={errors?.serial_number ?? ''} />
                             </div>
@@ -705,22 +715,22 @@ export default function CreateUpdateAsset({
                     </div>
 
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                        <h5>Purchase/Warranty</h5>
+                        <h5>{t('assets.purchase_warranty')}</h5>
                         <div className="flex flex-col gap-4 md:flex-row">
                             <div className="w-full">
-                                <Label htmlFor="purchase_date">Date of purchase</Label>
+                                <Label htmlFor="purchase_date">{t('assets.purchase_date')}</Label>
                                 <Input
                                     id="purchase_date"
                                     type="date"
                                     value={data.purchase_date}
                                     max={minEndDateWarranty}
                                     onChange={(e) => setData('purchase_date', e.target.value)}
-                                    placeholder="Date of purchase"
+                                    placeholder={t('assets.purchase_date_placeholder')}
                                 />
                                 <InputError className="mt-2" message={errors?.purchase_date ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label htmlFor="purchase_cost">Purchase cost</Label>
+                                <Label htmlFor="purchase_cost">{t('assets.purchase_cost')}</Label>
                                 <Input
                                     id="purchase_cost"
                                     type="number"
@@ -728,14 +738,14 @@ export default function CreateUpdateAsset({
                                     step="0.01"
                                     value={data.purchase_cost ?? ''}
                                     onChange={(e) => setData('purchase_cost', parseFloat(e.target.value))}
-                                    placeholder="Purchase cost (max. 2 decimals) : 4236.36"
+                                    placeholder={t('assets.purchase_cost_placeholder')}
                                 />
                                 <InputError className="mt-2" message={errors?.purchase_cost ?? ''} />
                             </div>
                         </div>
                         {/* Warranty */}
                         <div className="flex items-center gap-2">
-                            <Label htmlFor="under_warranty">Still under warranty ?</Label>
+                            <Label htmlFor="under_warranty">{t('assets.still_under_warranty')} ?</Label>
                             <Checkbox
                                 id="under_warranty"
                                 name="under_warranty"
@@ -747,7 +757,7 @@ export default function CreateUpdateAsset({
 
                         {data.under_warranty && (
                             <div>
-                                <Label htmlFor="end_warranty_date">Date end of warranty</Label>
+                                <Label htmlFor="end_warranty_date">{t('assets.warranty_end_date')}</Label>
                                 <Input
                                     id="end_warranty_date"
                                     type="date"
@@ -763,10 +773,10 @@ export default function CreateUpdateAsset({
 
                     {/* Depreciation */}
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                        <h5>Depreciation</h5>
+                        <h5>{t('assets.depreciation')}</h5>
 
                         <div className="flex items-center gap-2">
-                            <Label htmlFor="depreciable">depreciable ?</Label>
+                            <Label htmlFor="depreciable">{t('assets.depreciable')} ?</Label>
                             <Checkbox
                                 id="depreciable"
                                 name="depreciable"
@@ -778,7 +788,7 @@ export default function CreateUpdateAsset({
                         {data.depreciable && (
                             <div className="flex flex-col gap-4 md:flex-row">
                                 <div className="w-full">
-                                    <Label htmlFor="depreciation_start_date">Depreciation start date</Label>
+                                    <Label htmlFor="depreciation_start_date">{t('assets.depreciation_start_date')}</Label>
                                     <Input
                                         id="depreciation_start_date"
                                         type="date"
@@ -789,20 +799,20 @@ export default function CreateUpdateAsset({
                                     <InputError className="mt-2" message={errors?.depreciation_start_date ?? ''} />
                                 </div>
                                 <div className="w-full">
-                                    <Label htmlFor="depreciation_duration">Depreciation duration (in years)</Label>
+                                    <Label htmlFor="depreciation_duration">{t('assets.depreciation_duration')}</Label>
                                     <Input
                                         id="depreciation_duration"
                                         type="number"
                                         min={1}
                                         step="1"
                                         value={data.depreciation_duration ?? ''}
-                                        placeholder="Asset depreciation_duration"
+                                        placeholder={t('assets.depreciation_duration_placeholder')}
                                         onChange={(e) => setData('depreciation_duration', parseFloat(e.target.value))}
                                     />
                                     <InputError className="mt-2" message={errors?.depreciation_start_date ?? ''} />
                                 </div>
                                 <div className="w-full">
-                                    <Label htmlFor="depreciation_end_date">Depreciation end date</Label>
+                                    <Label htmlFor="depreciation_end_date">{t('assets.depreciation_end_date')}</Label>
                                     <Input
                                         id="depreciation_end_date"
                                         type="date"
@@ -814,7 +824,7 @@ export default function CreateUpdateAsset({
                                     <InputError className="mt-2" message={errors?.depreciation_end_date ?? ''} />
                                 </div>
                                 <div className="w-full">
-                                    <Label htmlFor="residual_value">Residual value</Label>
+                                    <Label htmlFor="residual_value">{t('assets.residual_value')}</Label>
                                     <Input
                                         id="residual_value"
                                         type="number"
@@ -822,7 +832,7 @@ export default function CreateUpdateAsset({
                                         step="0.01"
                                         value={data.residual_value ?? ''}
                                         onChange={(e) => setData('residual_value', parseFloat(e.target.value))}
-                                        placeholder="Purchase cost (max. 2 decimals) : 4236.36"
+                                        placeholder={t('assets.residual_value_placeholder')}
                                     />
                                     <InputError className="mt-2" message={errors?.residual_value ?? ''} />
                                 </div>
@@ -830,10 +840,10 @@ export default function CreateUpdateAsset({
                         )}
                     </div>
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                        <h5>Maintenance</h5>
+                        <h5>{tChoice('maintenances.title', 1)}</h5>
 
                         <div className="flex items-center gap-2">
-                            <Label htmlFor="need_maintenance">Need maintenance ?</Label>
+                            <Label htmlFor="need_maintenance">{t('maintenances.need_maintenance')} ?</Label>
                             <Checkbox
                                 id="need_maintenance"
                                 name="need_maintenance"
@@ -847,7 +857,7 @@ export default function CreateUpdateAsset({
                             <>
                                 <div className="flex flex-col gap-4 md:flex-row">
                                     <div className="w-full">
-                                        <Label htmlFor="maintenance_frequency">Maintenance frequency</Label>
+                                        <Label htmlFor="maintenance_frequency">{t('maintenances.frequency')}</Label>
                                         <select
                                             name="maintenance_frequency"
                                             value={data.maintenance_frequency ?? ''}
@@ -863,11 +873,11 @@ export default function CreateUpdateAsset({
                                             {frequencies && frequencies.length > 0 && (
                                                 <>
                                                     <option value="" disabled className="bg-background text-foreground">
-                                                        Select an option
+                                                        {t('actions.select-type', { type: t('maintenances.frequency') })}
                                                     </option>
                                                     {frequencies?.map((frequency, index) => (
                                                         <option value={frequency} key={index} className="bg-background text-foreground">
-                                                            {frequency}
+                                                            {t(`maintenances.frequency.${frequency}`)}
                                                         </option>
                                                     ))}
                                                 </>
@@ -878,7 +888,7 @@ export default function CreateUpdateAsset({
                                     </div>
 
                                     <div className="w-full">
-                                        <Label htmlFor="last_maintenance_date">Date last maintenance</Label>
+                                        <Label htmlFor="last_maintenance_date">{t('maintenances.last_maintenance_date')}</Label>
                                         <Input
                                             id="last_maintenance_date"
                                             type="date"
@@ -890,14 +900,13 @@ export default function CreateUpdateAsset({
                                         <InputError className="mt-2" message={errors?.last_maintenance_date ?? ''} />
                                     </div>
                                     <div className="w-full">
-                                        <Label htmlFor="next_maintenance_date">Date next maintenance</Label>
+                                        <Label htmlFor="next_maintenance_date">{t('maintenances.next_maintenance_date')}</Label>
                                         <Input
                                             id="next_maintenance_date"
                                             type="date"
                                             value={data.next_maintenance_date ?? ''}
                                             min={asset ? '' : minEndDateWarranty}
                                             onChange={(e) => setData('next_maintenance_date', e.target.value)}
-                                            placeholder="Date last maintenance"
                                         />
                                         <InputError className="mt-2" message={errors?.next_maintenance_date ?? ''} />
                                     </div>
@@ -905,7 +914,7 @@ export default function CreateUpdateAsset({
                             </>
                         )}
                         <div>
-                            <label className="mb-2 block text-sm font-medium">Maintenance manager</label>
+                            <label className="mb-2 block text-sm font-medium">{t('maintenances.maintenance_manager')}</label>
                             <SearchableInput<User>
                                 searchUrl={route('api.users.maintenance')}
                                 // searchParams={{ interns: 1 }}
@@ -920,14 +929,14 @@ export default function CreateUpdateAsset({
                                     setData('maintenance_manager_id', null);
                                     setData('maintenance_manager_name', null);
                                 }}
-                                placeholder="Search maintenance manager..."
+                                placeholder={t('actions.search-type', { type: t('maintenances.maintenance_manager') })}
                                 className="mb-4"
                             />
                         </div>
                     </div>
 
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                        <h5>Providers</h5>
+                        <h5>{tChoice('providers.title', 2)}</h5>
                         <SearchableInput<Provider>
                             multiple={true}
                             searchUrl={route('api.providers.search')}
@@ -937,7 +946,7 @@ export default function CreateUpdateAsset({
                             onSelect={(providers) => {
                                 setData('providers', providers);
                             }}
-                            placeholder="Search providers..."
+                            placeholder={t('actions.search-type', { type: tChoice('providers.title', 2) })}
                         />
                     </div>
 
@@ -945,9 +954,10 @@ export default function CreateUpdateAsset({
                         <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                             {/* Contracts */}
                             <div className="flex items-center gap-2">
-                                <h5>Contract</h5>
+                                <h5>{tChoice('contracts.title', 1)}</h5>
                                 <p className="">
-                                    Add new contract <PlusCircleIcon className="inline-block" onClick={() => setCountContracts((prev) => prev + 1)} />
+                                    {t('contracts.add_new_contract')}{' '}
+                                    <PlusCircleIcon className="inline-block" onClick={() => setCountContracts((prev) => prev + 1)} />
                                 </p>
                             </div>
                             <SearchableInput<Contract>
@@ -963,7 +973,7 @@ export default function CreateUpdateAsset({
                                         contracts.map((elem) => elem.id),
                                     );
                                 }}
-                                placeholder="Add existing contracts..."
+                                placeholder={t('contracts.add_existing_contract')}
                             />
 
                             {countContracts > 0 &&
@@ -972,13 +982,14 @@ export default function CreateUpdateAsset({
                                         <summary>
                                             <div className="flex w-fit gap-2">
                                                 <p>
-                                                    Contract {index + 1} {data.contracts[index]?.name ? `- ${data.contracts[index]?.name}` : ''}
+                                                    {tChoice('contracts.title', 1)} {index + 1}{' '}
+                                                    {data.contracts[index]?.name ? `- ${data.contracts[index]?.name}` : ''}
                                                 </p>
                                                 <MinusCircleIcon onClick={() => handleRemoveContract(index)} />
                                             </div>
                                         </summary>
                                         <div>
-                                            <Label className="font-medium">Name</Label>
+                                            <Label className="font-medium">{t('common.name')}</Label>
                                             <Input
                                                 type="text"
                                                 value={data.contracts[index]?.name ?? ''}
@@ -989,7 +1000,7 @@ export default function CreateUpdateAsset({
                                                 onChange={(e) => handleChangeContracts(index, 'name', e.target.value)}
                                             />
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.name : ''} />
-                                            <Label className="font-medium">Type</Label>
+                                            <Label className="font-medium">{t('common.type')}</Label>
                                             <Input
                                                 type="text"
                                                 // value={data.contracts[index].name ?? ''}
@@ -1001,7 +1012,7 @@ export default function CreateUpdateAsset({
                                             />
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.type : ''} />
 
-                                            <Label className="font-medium">Provider</Label>
+                                            <Label className="font-medium">{tChoice('providers.title', 2)}</Label>
                                             <SearchableInput<Provider>
                                                 searchUrl={route('api.providers.search')}
                                                 getKey={(provider) => provider.id}
@@ -1012,10 +1023,10 @@ export default function CreateUpdateAsset({
                                                     handleChangeContracts(index, 'provider_id', provider.id);
                                                     handleChangeContracts(index, 'provider_name', provider.name);
                                                 }}
-                                                placeholder="Search provider..."
+                                                placeholder={t('actions.search-type', { type: tChoice('providers.title', 1) })}
                                             />
 
-                                            <Label htmlFor="start_date">Start date</Label>
+                                            <Label htmlFor="start_date">{t('contracts.start_date')}</Label>
                                             <Input
                                                 id="start_date"
                                                 type="date"
@@ -1023,7 +1034,7 @@ export default function CreateUpdateAsset({
                                                 onChange={(e) => handleChangeContracts(index, 'start_date', e.target.value)}
                                             />
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.start_date : ''} />
-                                            <Label htmlFor="contract_duration">Contract duration</Label>
+                                            <Label htmlFor="contract_duration">{t('contracts.duration_contract')}</Label>
                                             <select
                                                 name="contract_duration"
                                                 onChange={(e) => handleChangeContracts(index, 'contract_duration', e.target.value)}
@@ -1040,7 +1051,7 @@ export default function CreateUpdateAsset({
                                                 {contractDurations && contractDurations.length > 0 && (
                                                     <>
                                                         <option value="" disabled className="bg-background text-foreground">
-                                                            Select a duration
+                                                            {t('actions.select-type', { type: t('contracts.duration_contract') })}
                                                         </option>
                                                         {contractDurations?.map((type, index) => (
                                                             <option value={type} key={index} className="bg-background text-foreground">
@@ -1062,7 +1073,7 @@ export default function CreateUpdateAsset({
                                                 maxLength={250}
                                             />
                                             <InputError message={errors?.contracts ? errors?.contracts[index]?.notes : ''} />
-                                            <Label>Internal reference</Label>
+                                            <Label>{t('contracts.internal_ref')}</Label>
                                             <Input
                                                 type="text"
                                                 onChange={(e) => handleChangeContracts(index, 'internal_reference', e.target.value)}
@@ -1070,7 +1081,7 @@ export default function CreateUpdateAsset({
                                                 maxLength={50}
                                             />
                                             <InputError message={errors?.contracts ? errors?.contracts[index]?.internal_reference : ''} />
-                                            <Label>Provider reference</Label>
+                                            <Label>{t('contracts.provider_ref')}</Label>
                                             <Input
                                                 type="text"
                                                 onChange={(e) => handleChangeContracts(index, 'provider_reference', e.target.value)}
@@ -1078,7 +1089,7 @@ export default function CreateUpdateAsset({
                                                 maxLength={50}
                                             />
                                             <InputError message={errors?.contracts ? errors?.contracts[index]?.provider_reference : ''} />
-                                            <Label htmlFor="notice_period">Notice period</Label>
+                                            <Label htmlFor="notice_period">{t('contracts.notice_period')}</Label>
                                             <select
                                                 name="notice_period"
                                                 onChange={(e) => handleChangeContracts(index, 'notice_period', e.target.value)}
@@ -1095,7 +1106,7 @@ export default function CreateUpdateAsset({
                                                 {noticePeriods && noticePeriods.length > 0 && (
                                                     <>
                                                         <option value="" disabled className="bg-background text-foreground">
-                                                            Select a duration
+                                                            {t('actions.select-type', { type: t('contracts.duration_notice') })}
                                                         </option>
                                                         {noticePeriods?.map((type, index) => (
                                                             <option value={type} key={index} className="bg-background text-foreground">
@@ -1106,7 +1117,7 @@ export default function CreateUpdateAsset({
                                                 )}
                                             </select>
                                             <InputError className="mt-2" message={errors?.notice_period ?? ''} />
-                                            <Label htmlFor="renewal_type">Renewal type</Label>
+                                            <Label htmlFor="renewal_type">{t('contracts.renewal_type')}</Label>
                                             <select
                                                 name="renewal_type"
                                                 // value={data.renewal_type ?? ''}
@@ -1123,18 +1134,18 @@ export default function CreateUpdateAsset({
                                                 {renewalTypes && renewalTypes.length > 0 && (
                                                     <>
                                                         <option value="" disabled className="bg-background text-foreground">
-                                                            Select an option
+                                                            {t('actions.select-type', { type: t('contracts.renewal_type') })}
                                                         </option>
                                                         {renewalTypes?.map((type, index) => (
                                                             <option value={type} key={index} className="bg-background text-foreground">
-                                                                {type}
+                                                                {t(`contracts.renewal_type.${type}`)}
                                                             </option>
                                                         ))}
                                                     </>
                                                 )}
                                             </select>
                                             <div className="w-full">
-                                                <Label htmlFor="status">Status</Label>
+                                                <Label htmlFor="status">{t('common.status')} </Label>
                                                 <select
                                                     name="status"
                                                     // value={data.status ?? ''}
@@ -1152,17 +1163,17 @@ export default function CreateUpdateAsset({
                                                     {statuses && statuses.length > 0 && (
                                                         <>
                                                             <option value="" disabled className="bg-background text-foreground">
-                                                                Select an option
+                                                                {t('actions.select-type', { type: t('common.status') })}
                                                             </option>
                                                             {statuses?.map((status, index) => (
                                                                 <option value={status} key={index} className="bg-background text-foreground">
-                                                                    {status}
+                                                                    {t(`contracts.status.${status}`)}
                                                                 </option>
                                                             ))}
                                                         </>
                                                     )}
                                                 </select>
-                                                <h5>Documents</h5>
+                                                <h5>{tChoice('documents.title', 2)}</h5>
                                                 <Button
                                                     onClick={() => {
                                                         setIndexContractForFiles(index);
@@ -1171,7 +1182,7 @@ export default function CreateUpdateAsset({
                                                     type="button"
                                                     className="block"
                                                 >
-                                                    Add file
+                                                    {t('actions.add-type', { type: t('documents.file') })}
                                                 </Button>
 
                                                 {data.contracts[index]?.files?.length > 0 && (
@@ -1209,7 +1220,7 @@ export default function CreateUpdateAsset({
                                                                         className=""
                                                                         onClick={() => removeContractDocument(index, indexFile)}
                                                                     >
-                                                                        Remove
+                                                                        {t('actions.remove')}
                                                                     </Button>
                                                                 </li>
                                                             );
@@ -1225,7 +1236,7 @@ export default function CreateUpdateAsset({
 
                     {!asset && (
                         <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                            <h5>Pictures</h5>
+                            <h5>{tChoice('common.pictures', 2)}</h5>
                             <Input
                                 type="file"
                                 multiple
@@ -1236,7 +1247,7 @@ export default function CreateUpdateAsset({
                     )}
                     {!asset && (
                         <div id="files" className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                            <h5>Documents</h5>
+                            <h5>{tChoice('documents.title', 2)}</h5>
                             <SearchableInput<Document>
                                 multiple={true}
                                 searchUrl={route('api.documents.search')}
@@ -1276,7 +1287,7 @@ export default function CreateUpdateAsset({
 
                                                 <p>{document.description}</p>
                                                 <Button type="button" variant="destructive" className="" onClick={() => removeDocument(index)}>
-                                                    Remove
+                                                    {t('actions.remove')}
                                                 </Button>
                                             </li>
                                         );
@@ -1287,10 +1298,10 @@ export default function CreateUpdateAsset({
                     )}
 
                     <div className="flex gap-4">
-                        <Button type="submit">{asset ? 'Update' : 'Submit'}</Button>
+                        <Button type="submit">{asset ? t('actions.update') : t('actions.submit')}</Button>
                         <a href={asset ? route('tenant.assets.show', asset.reference_code) : route('tenant.assets.index')}>
                             <Button type="button" tabIndex={6} variant={'secondary'}>
-                                {t('actions.submit')}
+                                {t('actions.cancel')}
                             </Button>
                         </a>
                     </div>
@@ -1300,8 +1311,12 @@ export default function CreateUpdateAsset({
                     <ModaleForm>
                         <div className="flex flex-col items-center gap-4">
                             <Loader size={48} className="animate-pulse" />
-                            <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
-                            {asset ? <p className="mx-auto">Asset is being updated...</p> : <p className="mx-auto">Asset is being created...</p>}
+                            <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.processing')}</p>
+                            <p className="mx-auto">
+                                {location
+                                    ? t('actions.type-being-updated', { type: tChoice('assets.title', 2) })
+                                    : t('actions.type-being-created', { type: tChoice('assets.title', 2) })}
+                            </p>
                         </div>
                     </ModaleForm>
                 )}

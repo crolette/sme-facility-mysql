@@ -41,7 +41,7 @@ return [
     'first_name_placeholder' => 'Jane',
     'last_name_placeholder' => 'Doe',
     'email_placeholder' => 'jane.doe@youremail.com',
-    'description_placeholder' => 'Description',
+    'description_placeholder' => 'Add a description',
     'name' => 'Name',
 
     // Warranty
@@ -52,6 +52,7 @@ return [
     'code' => 'Code',
     'description' => 'Description',
     'status' => 'Status',
+    'surface' => 'Surface',
     'type' => 'Type',
     'date' => 'Date',
     'logo' => 'Logo',

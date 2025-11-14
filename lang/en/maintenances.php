@@ -13,6 +13,7 @@ return [
     'frequency.annual' => 'Annual',
     'frequency.biennial' => 'Biennial',
     'frequency.on_demand' => 'On demand',
+    'need_maintenance' => 'Need maintenance',
     'mark_done' => 'Mark maintenance as done',
     'next_maintenance_date' => 'Next maintenance date',
     'last_maintenance_date' => 'Last maintenance date',

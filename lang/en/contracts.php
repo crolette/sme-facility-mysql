@@ -21,9 +21,11 @@ return [
     'internal_ref' => 'Internal #',
     'provider_ref' => 'Provider #',
 
+    'duration_contract' => 'Contract duration',
+    'duration_notice' => 'Notice period duration',
     'end_date' => 'End date',
     'start_date' => 'Start date',
-    'notice_delay' => 'Notice delay',
+    'notice_period' => 'Notice period',
 
     'delete_description' => 'Are you sure to delete this contract \':name\' ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.',
 

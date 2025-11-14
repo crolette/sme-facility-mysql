@@ -111,11 +111,11 @@ export default function ShowAsset({ item }: { item: Asset }) {
                         <>
                             <Button onClick={() => restoreAsset(asset)} variant={'green'}>
                                 <ArchiveRestore />
-                                Restore
+                                {t('actions.restore')}
                             </Button>
                             <Button onClick={() => deleteDefinitelyAsset(asset)} variant={'destructive'}>
                                 <Shredder />
-                                Delete definitely
+                                {t('actions.delete_definitely')}
                             </Button>
                         </>
                     ) : (
@@ -123,24 +123,24 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             <a href={route(`tenant.assets.edit`, asset.reference_code)}>
                                 <Button>
                                     <Pencil />
-                                    Edit
+                                    {t('actions.edit')}
                                 </Button>
                             </a>
                             <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
                                 <Trash2 />
-                                Delete
+                                {t('actions.delete')}
                             </Button>
                             {asset.maintainable.need_maintenance && (
                                 <Button onClick={() => markMaintenanceDone()} variant={'green'}>
                                     <CircleCheckBig />
-                                    Mark maintenance as done
+                                    {t('maintenances.mark_as_done')}
                                 </Button>
                             )}
                         </>
                     )}
                     <Button onClick={generateQR} variant={'secondary'}>
                         <QrCode />
-                        Generate new QR
+                        {t('actions.generate_qr')}
                     </Button>
                 </div>
 
@@ -167,11 +167,11 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                         <Field label={t('common.category')} text={asset.category} />
                                         <Field label={t('common.description')} text={asset.description} />
                                         <div className="flex flex-wrap gap-4">
-                                            {asset.brand && <Field label={'Brand'} text={asset.brand} />}
-                                            {asset.model && <Field label={'model'} text={asset.model} />}
-                                            {asset.serial_number && <Field label={'Serial number'} text={asset.serial_number} />}
+                                            {asset.brand && <Field label={t('assets.brand')} text={asset.brand} />}
+                                            {asset.model && <Field label={t('assets.model')} text={asset.model} />}
+                                            {asset.serial_number && <Field label={t('assets.serial_number')} text={asset.serial_number} />}
                                         </div>
-                                        {asset.surface && <Field label={'Surface'} text={asset.surface} />}
+                                        {asset.surface && <Field label={t('common.surface')} text={asset.surface + ' m²'} />}
                                     </div>
                                     <div className="shrink-1">
                                         {asset.qr_code && (
@@ -227,12 +227,15 @@ export default function ShowAsset({ item }: { item: Asset }) {
 
                                 {asset.depreciable && (
                                     <div className="border-sidebar-border bg-sidebar mt-4 rounded-md border p-4">
-                                        <h2>Depreciation</h2>
+                                        <h2>{t('actions.depreciation')}</h2>
                                         <div className="space-y-2">
-                                            <Field label={'Depreciation duration'} text={asset.depreciation_duration} />
-                                            <Field label={'Depreciation start date'} date text={asset.depreciation_start_date} />
-                                            <Field label={'Depreciation end date'} date text={asset.depreciation_end_date} />
-                                            <Field label={'Residual value'} text={asset.residual_value} />
+                                            <Field label={t('actions.depreciation_duration')} text={asset.depreciation_duration} />
+                                            <Field label={t('actions.depreciation_start_date')} date text={asset.depreciation_start_date} />
+                                            <Field label={t('actions.depreciation_end_date')} date text={asset.depreciation_end_date} />
+                                            <Field
+                                                label={t('actions.residual_value')}
+                                                text={asset.residual_value ? asset.residual_value + ' €' : 'NC'}
+                                            />
                                         </div>
                                     </div>
                                 )}
@@ -241,12 +244,15 @@ export default function ShowAsset({ item }: { item: Asset }) {
 
                         {activeTab === 'warranty' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
-                                <h2>Purchase/Warranty</h2>
+                                <h2>{t('assets.purchase_warranty')}</h2>
                                 <div className="space-y-2">
-                                    <Field label={'Purchase date'} date text={asset.maintainable.purchase_date} />
-                                    <Field label={'Purchase cost'} text={asset.maintainable.purchase_cost} />
+                                    <Field label={t('assets.purchase_date')} date text={asset.maintainable.purchase_date} />
+                                    <Field
+                                        label={t('assets.purchase_cost')}
+                                        text={asset.maintainable.purchase_cost ? asset.maintainable.purchase_cost + ' €' : 'NC'}
+                                    />
                                     {asset.maintainable.under_warranty && (
-                                        <Field label={'End warranty date'} date text={asset.maintainable.end_warranty_date} />
+                                        <Field label={t('assets.warranty_end_date')} date text={asset.maintainable.end_warranty_date} />
                                     )}
                                 </div>
                             </div>

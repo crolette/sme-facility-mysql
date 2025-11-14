@@ -8,8 +8,9 @@ return [
     'buildings' => 'Building|Buildings',
     'floors' => 'Floor|Floors',
     'rooms' => 'Room|Rooms',
+    'level' => 'Level',
     'redefine_room' => 'Redefine room',
     'material_floor' => 'Floor',
     'material_wall' => 'Wall',
-    'material_outdoor' => 'Surface'
+    'material_outdoor' => 'Outdoor material'
 ];
