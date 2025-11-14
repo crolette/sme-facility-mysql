@@ -52,6 +52,9 @@ return [
     'created_at' => 'Created at',
     'updated_at' => 'Updated at',
 
+    // Pictures
+    'pictures' => 'Picture|Pictures',
+
     // Generic terms
     'all' => 'All',
     'yes' => 'Yes',

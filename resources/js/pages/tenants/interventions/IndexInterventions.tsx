@@ -81,7 +81,7 @@ export default function IndexInterventions({
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [interventionDataForm, setInterventionDataForm] = useState<InterventionFormData>(interventionData);
     const [addIntervention, setAddIntervention] = useState<boolean>(false);
-
+    const [interventionTypes, setInterventionTypes] = useState<CentralType[]>([]);
     const closeModale = () => {
         setInterventionDataForm(interventionData);
         setAddIntervention(false);
@@ -250,7 +250,7 @@ export default function IndexInterventions({
 
                         <div className="bg-border border-border text-background dark:text-foreground absolute top-full z-10 flex flex-col items-center gap-4 rounded-b-md border-2 p-2 sm:flex-row">
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="status">Type</Label>
+                                <Label htmlFor="status">{t('common.type')}</Label>
                                 <select
                                     name="type"
                                     id="type"
@@ -467,10 +467,8 @@ export default function IndexInterventions({
                 <Pagination items={items} />
             </div>
             <Modale
-                title={'Delete intervention'}
-                message={
-                    'Are you sure to delete this intervention ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.'
-                }
+                title={t('actions.delete-type', { type: tChoice('interventions.title', 1) })}
+                message={t('interventions.delete_description')}
                 isOpen={showDeleteInterventionModale}
                 onConfirm={deleteIntervention}
                 onCancel={() => {
@@ -484,13 +482,13 @@ export default function IndexInterventions({
                     {isProcessing && (
                         <div className="flex flex-col items-center gap-4">
                             <Loader size={48} className="animate-pulse" />
-                            <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
-                            <p className="mx-auto">Intervention is being added...</p>
+                            <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.processing')}</p>
+                            <p className="mx-auto">{t('actions.type-being-created', { type: tChoice('interventions.title', 1) })}</p>
                         </div>
                     )}
                     {!isProcessing && (
                         <form onSubmit={submitEditIntervention} className="flex w-full flex-col space-y-4">
-                            <Label>Intervention Type</Label>
+                            <Label>{t('common.type')}</Label>
                             <select
                                 name="intervention_type"
                                 id="intervention_type"
@@ -503,7 +501,7 @@ export default function IndexInterventions({
                                     }))
                                 }
                             >
-                                <option value="">Select intervention type</option>
+                                <option value="">{t('actions.select-type', { type: t('common.type') })}</option>
                                 {types?.map((interventionType) => (
                                     <option key={interventionType.id} value={interventionType.id}>
                                         {interventionType.label}
@@ -523,15 +521,16 @@ export default function IndexInterventions({
                                     }))
                                 }
                             >
-                                <option value="">Select status</option>
-                                <option value="draft">draft</option>
-                                <option value="planned">planned</option>
-                                <option value="in progress">in progress</option>
-                                <option value="waiting for parts">waiting for parts</option>
-                                <option value="completed">completed</option>
-                                <option value="cancelled">cancelled</option>
+                                <option value="">{t('actions.select-type', { type: t('common.status') })}</option>
+
+                                <option value="draft">{t('interventions.status.draft')}</option>
+                                <option value="planned">{t('interventions.status.planned')}</option>
+                                <option value="in_progress">{t('interventions.status.in_progress')}</option>
+                                <option value="waiting_parts">{t('interventions.status.waiting_parts')}</option>
+                                <option value="completed">{t('interventions.status.completed')}</option>
+                                <option value="cancelled">{t('interventions.status.cancelled')}</option>
                             </select>
-                            <Label>Priority</Label>
+                            <Label>{t('interventions.priority')}</Label>
                             <select
                                 name=""
                                 id=""
@@ -544,13 +543,13 @@ export default function IndexInterventions({
                                     }))
                                 }
                             >
-                                <option value="">Select priority</option>
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
-                                <option value="urgent">Urgent</option>
+                                <option value="">{t('actions.select-type', { type: t('interventions.priority') })}</option>
+                                <option value="low">{t('interventions.priority.low')}</option>
+                                <option value="medium">{t('interventions.priority.medium')}</option>
+                                <option value="high">{t('interventions.priority.high')}</option>
+                                <option value="urgent">{t('interventions.priority.urgent')}</option>
                             </select>
-                            <Label>Description</Label>
+                            <Label>{t('common.description')}</Label>
                             <Textarea
                                 placeholder="description"
                                 value={interventionDataForm.description ?? ''}
@@ -561,7 +560,7 @@ export default function IndexInterventions({
                                     }))
                                 }
                             ></Textarea>
-                            <Label>Planned at</Label>
+                            <Label>{t('interventions.planned_at')}</Label>
                             <div className="flex gap-2">
                                 <Input
                                     type="date"
@@ -583,10 +582,10 @@ export default function IndexInterventions({
                                         }))
                                     }
                                 >
-                                    Clear planned at
+                                    {t('actions.clear-type', { type: t('interventions.planned_at') })}
                                 </Button>
                             </div>
-                            <Label>Repair delay</Label>
+                            <Label>{t('interventions.repair_delay')}</Label>
                             <div className="flex gap-2">
                                 <Input
                                     type="date"
@@ -608,12 +607,14 @@ export default function IndexInterventions({
                                         }))
                                     }
                                 >
-                                    Clear Repair delay
+                                    {t('actions.clear-type', { type: t('interventions.repair_delay') })}
                                 </Button>
                             </div>
-                            <Button type="submit">Submit</Button>
+                            <Button type="submit">
+                                <Label>{t('actions.submit')}</Label>
+                            </Button>
                             <Button onClick={closeModale} type="button" variant={'secondary'}>
-                                Cancel
+                                <Label>{t('actions.cancel')}</Label>
                             </Button>
                         </form>
                     )}

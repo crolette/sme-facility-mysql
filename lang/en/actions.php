@@ -10,6 +10,7 @@ return [
     'update-type' => 'Update :type',
     'delete-type' => 'Delete :type',
     'add-type' => 'Add :type',
+    'clear-type' => 'Clear :type',
 
     // View actions
     'see-details' => 'See details',
@@ -52,6 +53,7 @@ return [
     'searching' => 'Searching...',
     'processing' => 'Processing...',
     'type-being-created' => ':type is being created...',
+    'type-being-sent' => ':type is being sent...',
     'type-being-updated' => ':type is being updated...',
     'type-being-deleted' => ':type is being deleted...',
 

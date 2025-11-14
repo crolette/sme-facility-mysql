@@ -1,6 +1,7 @@
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import { CentralType, Intervention, Provider, User } from '@/types';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Loader, Pencil, PlusCircle, Trash2, X } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import Modale from '../Modale';
@@ -41,6 +42,7 @@ type InterventionFormData = {
 };
 
 export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, closed = false }: InterventionManagerProps) => {
+    const { t, tChoice } = useLaravelReactI18n();
     const [interventions, setInterventions] = useState<Intervention[]>([]);
     const { showToast } = useToast();
 
@@ -292,11 +294,6 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         fetchInterventions();
     };
 
-    console.log(interventions);
-    console.log(user);
-    console.log(provider);
-    console.log(interventionAssignees);
-
     const addAssignee = (assignee: User | Provider, provider_id?: number) => {
         if (provider_id) {
             if (provider_id === provider && interventionAssignees[0].name) {
@@ -348,17 +345,17 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                         <Table key={intervention.id} className="table-fixed">
                             <TableHead>
                                 <TableHeadRow>
-                                    <TableHeadData className="">Description</TableHeadData>
-                                    <TableHeadData>Type</TableHeadData>
-                                    <TableHeadData>Priority</TableHeadData>
-                                    <TableHeadData>Status</TableHeadData>
-                                    <TableHeadData>Assigned to</TableHeadData>
-                                    <TableHeadData>Planned at</TableHeadData>
-                                    <TableHeadData>Repair delay</TableHeadData>
-                                    <TableHeadData>Total costs</TableHeadData>
+                                    <TableHeadData className="w-52">{t('common.description')}</TableHeadData>
+                                    <TableHeadData>{t('common.type')}</TableHeadData>
+                                    <TableHeadData>{t('interventions.priority')}</TableHeadData>
+                                    <TableHeadData>{t('interventions.status')}</TableHeadData>
+                                    <TableHeadData>{t('interventions.assigned_to')}</TableHeadData>
+                                    <TableHeadData>{t('interventions.planned_at')}</TableHeadData>
+                                    <TableHeadData>{t('interventions.repair_delay')}</TableHeadData>
+                                    <TableHeadData>{t('interventions.total_costs')}</TableHeadData>
                                     <TableHeadData>
                                         <Button onClick={() => sendIntervention(intervention.id)} variant={'cta'}>
-                                            Assign To
+                                            {t('interventions.assign_to')}
                                         </Button>
                                     </TableHeadData>
                                 </TableHeadRow>
@@ -377,9 +374,9 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     </TableBodyData>
                                     <TableBodyData>{intervention.type}</TableBodyData>
                                     <TableBodyData>
-                                        <Pill variant={intervention.priority}>{intervention.priority}</Pill>
+                                        <Pill variant={intervention.priority}>{t(`interventions.priority.${intervention.priority}`)}</Pill>
                                     </TableBodyData>
-                                    <TableBodyData>{intervention.status}</TableBodyData>
+                                    <TableBodyData>{t(`interventions.status.${intervention.status}`)}</TableBodyData>
                                     <TableBodyData>
                                         {intervention.assignable ? (
                                             intervention.assignable.full_name ? (
@@ -392,11 +389,11 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                                 </a>
                                             )
                                         ) : (
-                                            'not assigned'
+                                            t('interventions.assigned_not')
                                         )}
                                     </TableBodyData>
-                                    <TableBodyData>{intervention.planned_at ?? 'Not planned'}</TableBodyData>
-                                    <TableBodyData>{intervention.repair_delay ?? 'No repair delay'}</TableBodyData>
+                                    <TableBodyData>{intervention.planned_at ?? t('interventions.planned_at_no')}</TableBodyData>
+                                    <TableBodyData>{intervention.repair_delay ?? t('interventions.repair_delay_no')}</TableBodyData>
                                     <TableBodyData>{intervention.total_costs ? `${intervention.total_costs} €` : '-'}</TableBodyData>
                                     <TableBodyData className="flex space-x-2">
                                         {!closed && (
@@ -440,10 +437,8 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                 ))}
 
             <Modale
-                title={'Delete intervention'}
-                message={
-                    'Are you sure to delete this intervention ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.'
-                }
+                title={t('actions.delete-type', { type: tChoice('interventions.title', 1) })}
+                message={t('interventions.delete_description')}
                 isOpen={showDeleteInterventionModale}
                 onConfirm={deleteIntervention}
                 onCancel={() => {
@@ -457,16 +452,16 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                     {isProcessing && (
                         <div className="flex flex-col items-center gap-4">
                             <Loader size={48} className="animate-pulse" />
-                            <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
-                            <p className="mx-auto">Intervention is being sent...</p>
+                            <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.processing')}</p>
+                            <p className="mx-auto">{t('actions.type-being-sent', { type: tChoice('interventions.title', 1) })}</p>
                         </div>
                     )}
                     {!isProcessing && (
                         <div className="flex flex-col gap-4">
-                            <p>Select user provider or internal user to assign this intervention to</p>
+                            <p>{t('interventions.assign_to_description')}</p>
 
                             <div className="flex w-full flex-col">
-                                <p className="font-semibold">Linked Providers</p>
+                                <p className="font-semibold">{t('providers.linked')}</p>
                                 {providers ? (
                                     providers.length > 0 ? (
                                         <>
@@ -500,7 +495,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                                                         </li>
                                                                     ))
                                                                 ) : (
-                                                                    <p>No users</p>
+                                                                    <p>{t('contacts.none')}</p>
                                                                 )}
                                                             </ul>
                                                         </li>
@@ -509,24 +504,24 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                             </ul>
                                         </>
                                     ) : (
-                                        <p>No providers</p>
+                                        <p>{t('providers.none')}</p>
                                     )
                                 ) : (
-                                    <p className="animate-pulse">Loading providers...</p>
+                                    <p className="animate-pulse">{t('actions.loading')}</p>
                                 )}
                             </div>
                             <div>
-                                <p className="font-semibold">Search other providers</p>
+                                <p className="font-semibold">{t('actions.search-type', { type: tChoice('providers.title', 2) })}</p>
 
                                 <form onSubmit={fetchExternalProviders}>
-                                    <Label htmlFor="">Search</Label>
+                                    <Label htmlFor="">{t('actions.search')}</Label>
                                     <div className="flex items-center gap-4">
                                         <Input
                                             type="text"
                                             value={externalProvidersQuery ?? ''}
                                             onChange={(e) => setExternalProvidersQuery(e.target.value)}
                                         />
-                                        <Button type="submit">Search</Button>
+                                        <Button type="submit">{t('actions.search')}</Button>
                                     </div>
                                 </form>
                                 {externalProviders &&
@@ -566,7 +561,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     ))}
                             </div>
                             <div className="flex w-full flex-col">
-                                <p className="font-semibold">Internal users</p>
+                                <p className="font-semibold">{tChoice('contacts.title', 2)}</p>
                                 <SearchableInput<User>
                                     searchUrl={route('api.users.search')}
                                     searchParams={{ interns: 1 }}
@@ -583,14 +578,14 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                         setProvider(null);
                                         setUser(user.id);
                                     }}
-                                    placeholder="Search internal user..."
+                                    placeholder={t('actions.search-type', { type: tChoice('contacts.title', 2) })}
                                     className="mb-4"
                                 />
                             </div>
 
                             {interventionAssignees && (
                                 <div className="">
-                                    <p className="text-center">Send email to :</p>
+                                    <p className="text-center">{t('interventions.assign_to')}</p>
                                     <ul className="flex flex-col gap-2">
                                         {interventionAssignees.length > 0 &&
                                             interventionAssignees.map((assignee, index) => (
@@ -614,11 +609,11 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     onClick={sendInterventionMail}
                                     disabled={isProcessing || !interventionToSend || interventionAssignees.length === 0}
                                 >
-                                    Send
+                                    {t('actions.send')}
                                 </Button>
 
                                 <Button onClick={closeSendInterventionToProviderModale} variant="secondary">
-                                    Cancel
+                                    {t('actions.cancel')}
                                 </Button>
                             </div>
                         </div>
@@ -631,8 +626,8 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                     {isProcessing && (
                         <div className="flex flex-col items-center gap-4">
                             <Loader size={48} className="animate-pulse" />
-                            <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
-                            <p className="mx-auto">Intervention is being added...</p>
+                            <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.processing')}</p>
+                            <p className="mx-auto">{t('actions.type-being-created', { type: tChoice('interventions.title', 1) })}</p>
                         </div>
                     )}
                     {!isProcessing && (
@@ -640,7 +635,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                             onSubmit={submitType === 'new' ? submitIntervention : submitEditIntervention}
                             className="flex w-full flex-col space-y-4"
                         >
-                            <Label>Intervention Type</Label>
+                            <Label>{t('common.type')}</Label>
                             <select
                                 name="intervention_type"
                                 id="intervention_type"
@@ -653,14 +648,14 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     }))
                                 }
                             >
-                                <option value="">Select intervention type</option>
+                                <option value="">{t('actions.select-type', { type: t('common.type') })}</option>
                                 {interventionTypes?.map((interventionType) => (
                                     <option key={interventionType.id} value={interventionType.id}>
                                         {interventionType.label}
                                     </option>
                                 ))}
                             </select>
-                            <Label>Status</Label>
+                            <Label>{t('common.status')}</Label>
                             <select
                                 name=""
                                 id=""
@@ -673,15 +668,15 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     }))
                                 }
                             >
-                                <option value="">Select status</option>
-                                <option value="draft">draft</option>
-                                <option value="planned">planned</option>
-                                <option value="in progress">in progress</option>
-                                <option value="waiting for parts">waiting for parts</option>
-                                <option value="completed">completed</option>
-                                <option value="cancelled">cancelled</option>
+                                <option value="">{t('actions.select-type', { type: t('common.status') })}</option>
+                                <option value="draft">{t('interventions.status.draft')}</option>
+                                <option value="planned">{t('interventions.status.planned')}</option>
+                                <option value="in_progress">{t('interventions.status.in_progress')}</option>
+                                <option value="waiting_parts">{t('interventions.status.waiting_parts')}</option>
+                                <option value="completed">{t('interventions.status.completed')}</option>
+                                <option value="cancelled">{t('interventions.status.cancelled')}</option>
                             </select>
-                            <Label>Priority</Label>
+                            <Label>{t('interventions.priority')}</Label>
                             <select
                                 name=""
                                 id=""
@@ -694,13 +689,13 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     }))
                                 }
                             >
-                                <option value="">Select priority</option>
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
-                                <option value="urgent">Urgent</option>
+                                <option value="">{t('actions.select-type', { type: t('interventions.priority') })}</option>
+                                <option value="low">{t('interventions.priority.low')}</option>
+                                <option value="medium">{t('interventions.priority.medium')}</option>
+                                <option value="high">{t('interventions.priority.high')}</option>
+                                <option value="urgent">{t('interventions.priority.urgent')}</option>
                             </select>
-                            <Label>Description</Label>
+                            <Label>{t('common.description')}</Label>
                             <Textarea
                                 placeholder="description"
                                 value={interventionDataForm.description ?? ''}
@@ -713,7 +708,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                             ></Textarea>
                             {!closed && (
                                 <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                    <h5>Pictures</h5>
+                                    <h5>{tChoice('common.pictures', 2)}</h5>
                                     <Input
                                         type="file"
                                         multiple
@@ -727,7 +722,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     />
                                 </div>
                             )}
-                            <Label>Planned at</Label>
+                            <Label>{t('interventions.planned_at')}</Label>
                             <div className="flex gap-2">
                                 <Input
                                     type="date"
@@ -749,10 +744,10 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                         }))
                                     }
                                 >
-                                    Clear planned at
+                                    {t('actions.clear-type', { type: t('interventions.planned_at') })}
                                 </Button>
                             </div>
-                            <Label>Repair delay</Label>
+                            <Label>{t('interventions.repair_delay')}</Label>
                             <div className="flex gap-2">
                                 <Input
                                     type="date"
@@ -774,12 +769,14 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                         }))
                                     }
                                 >
-                                    Clear Repair delay
+                                    {t('actions.clear-type', { type: t('interventions.repair_delay') })}
                                 </Button>
                             </div>
-                            <Button type="submit">Submit</Button>
+                            <Button type="submit">
+                                <Label>{t('actions.submit')}</Label>
+                            </Button>
                             <Button onClick={closeModale} type="button" variant={'secondary'}>
-                                Cancel
+                                <Label>{t('actions.cancel')}</Label>
                             </Button>
                         </form>
                     )}
