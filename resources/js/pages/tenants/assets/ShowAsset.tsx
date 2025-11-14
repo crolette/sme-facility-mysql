@@ -12,10 +12,12 @@ import { Asset, Contract, type BreadcrumbItem } from '@/types';
 import { router } from '@inertiajs/core';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArchiveRestore, CircleCheckBig, Pencil, QrCode, Shredder, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ShowAsset({ item }: { item: Asset }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index assets`,
@@ -163,7 +165,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                     <div className="space-y-2">
                                         <Field label={t('common.name')} text={asset.name} />
                                         <Field label={t('common.category')} text={asset.category} />
-                                        <Field label={t('common.description') text={asset.description} />
+                                        <Field label={t('common.description')} text={asset.description} />
                                         <div className="flex flex-wrap gap-4">
                                             {asset.brand && <Field label={'Brand'} text={asset.brand} />}
                                             {asset.model && <Field label={'model'} text={asset.model} />}

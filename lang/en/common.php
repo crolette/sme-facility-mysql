@@ -49,6 +49,7 @@ return [
 
     // Generic fields
     'name' => 'Name',
+    'code' => 'Code',
     'description' => 'Description',
     'status' => 'Status',
     'type' => 'Type',

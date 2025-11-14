@@ -25,6 +25,7 @@ return [
     'add' => 'Add',
     'edit' => 'Edit',
     'save' => 'Save',
+    'remove' => 'Remove',
     'search' => 'Search',
     'create' => 'Create',
     'update' => 'Update',

@@ -392,7 +392,7 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
                                         required
                                         accept="image/png, image/jpeg, image/jpg, .pdf"
                                     />
-                                    <p className="text-xs">Accepted files: png, jpg, pdf. - Maximum file size: 4MB</p>
+                                    <p className="text-xs">{t('documents.accepted_files_with_size', { size: 4 })}</p>
                                 </>
                             )}
 
