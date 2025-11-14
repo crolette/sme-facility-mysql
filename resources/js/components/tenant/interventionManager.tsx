@@ -330,11 +330,13 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
     return (
         <div className="border-sidebar-border bg-sidebar font rounded-md border p-4 shadow-xl">
             <div className="flex items-center justify-between">
-                <h2 className="inline">Interventions ({interventions?.length ?? 0})</h2>
+                <h2 className="inline">
+                    {tChoice('interventions.title', 2)} ({interventions?.length ?? 0})
+                </h2>
                 {!closed && (
                     <Button onClick={openModale}>
                         <PlusCircle />
-                        Add intervention
+                        {t('actions.add-type', { type: tChoice('interventions.title', 1) })}
                     </Button>
                 )}
             </div>

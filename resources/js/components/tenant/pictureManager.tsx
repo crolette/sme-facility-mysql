@@ -1,5 +1,6 @@
 import { Picture } from '@/types';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { PlusCircle, Trash2 } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import ImageUploadModale from '../ImageUploadModale';
@@ -16,6 +17,7 @@ interface PictureManagerProps {
 }
 
 export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, deleteRoute, showRoute, canAdd = true }: PictureManagerProps) => {
+    const { t, tChoice } = useLaravelReactI18n();
     const { showToast } = useToast();
     const [pictures, setPictures] = useState<Picture[]>([]);
     const [newPictures, setNewPictures] = useState<{ pictures: File[] } | null>(null);
@@ -68,11 +70,13 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
     return (
         <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
             <div className="flex items-center justify-between">
-                <h2 className="inline">Pictures ({pictures?.length})</h2>
+                <h2 className="inline">
+                    {tChoice('pictures.title', 2)} ({pictures?.length})
+                </h2>
                 {canAdd && (
                     <Button onClick={() => setAddPictures(!addPictures)} type="button">
                         <PlusCircle />
-                        Add pictures
+                        {t('actions.add-type', { type: tChoice('common.pictures', 1) })}
                     </Button>
                 )}
             </div>

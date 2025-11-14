@@ -161,9 +161,9 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                 <h2>Asset information</h2>
                                 <div className="grid grid-cols-[1fr_160px] gap-4">
                                     <div className="space-y-2">
-                                        <Field label={'Name'} text={asset.name} />
-                                        <Field label={'category'} text={asset.category} />
-                                        <Field label={'Description'} text={asset.description} />
+                                        <Field label={t('common.name')} text={asset.name} />
+                                        <Field label={t('common.category')} text={asset.category} />
+                                        <Field label={t('common.description') text={asset.description} />
                                         <div className="flex flex-wrap gap-4">
                                             {asset.brand && <Field label={'Brand'} text={asset.brand} />}
                                             {asset.model && <Field label={'model'} text={asset.model} />}
@@ -190,10 +190,10 @@ export default function ShowAsset({ item }: { item: Asset }) {
                         {activeTab === 'maintenance' && (
                             <>
                                 <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
-                                    <h2>Maintenance</h2>
+                                    <h2>{tChoice('maintenances.title', 1)}</h2>
                                     <div className="space-y-2">
                                         <Field
-                                            label={'Maintenance manager'}
+                                            label={t('maintenances.maintenance_manager')}
                                             text={
                                                 asset.maintainable.manager ? (
                                                     <a href={route('tenant.users.show', asset.maintainable.manager.id)}>
@@ -201,19 +201,23 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                                         {asset.maintainable.manager.full_name}
                                                     </a>
                                                 ) : (
-                                                    'No manager'
+                                                    t('maintenances.no_manager')
                                                 )
                                             }
                                         />
                                         {asset.maintainable.need_maintenance && (
                                             <>
-                                                <Field label={'Maintenance frequency'} text={asset.maintainable.maintenance_frequency} />
+                                                <Field label={t('maintenances.frequency')} text={asset.maintainable.maintenance_frequency} />
                                                 <Field
-                                                    label={'Next maintenance date'}
+                                                    label={t('maintenances.next_maintenance_date')}
                                                     date
                                                     text={asset.maintainable.next_maintenance_date ?? 'Not planned'}
                                                 />
-                                                <Field label={'Last maintenance date'} date text={asset.maintainable.last_maintenance_date} />
+                                                <Field
+                                                    label={t('maintenances.last_maintenance_date')}
+                                                    date
+                                                    text={asset.maintainable.last_maintenance_date}
+                                                />
                                             </>
                                         )}
                                     </div>
@@ -260,13 +264,13 @@ export default function ShowAsset({ item }: { item: Asset }) {
 
                         {activeTab === 'providers' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
-                                <h2>Providers</h2>
+                                <h2>{tChoice('providers.title', 2)}</h2>
                                 <div className="space-y-2">
                                     <ul>
                                         {asset.maintainable.providers?.map((provider, index) => (
                                             <li key={index}>
                                                 <Field
-                                                    label={'Providers'}
+                                                    label={tChoice('providers.title', 1)}
                                                     text={<a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>}
                                                 />
                                             </li>

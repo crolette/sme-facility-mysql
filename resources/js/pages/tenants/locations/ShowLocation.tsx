@@ -16,15 +16,17 @@ import AppLayout from '@/layouts/app-layout';
 import { Contract, TenantBuilding, TenantFloor, TenantRoom, TenantSite, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { CircleCheckBig, Move, Pencil, QrCode } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ShowLocation({ item, routeName }: { item: TenantSite | TenantBuilding | TenantFloor | TenantRoom; routeName: string }) {
     const { showToast } = useToast();
     const [location, setLocation] = useState(item);
+    const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Index ${routeName}`,
+            title: `Index ${tChoice(`locations.${routeName}`, 2)}`,
             href: `/${routeName}`,
         },
         {
@@ -106,29 +108,29 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Tenants" />
+            <Head title={tChoice(`locations.${routeName}`, 2)} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex flex-wrap gap-2">
                     <a href={route(`tenant.${routeName}.edit`, location.reference_code)}>
                         <Button>
                             <Pencil />
-                            Edit
+                            {t('actions.edit')}
                         </Button>
                     </a>
 
                     {location.maintainable.need_maintenance && (
                         <Button onClick={() => markMaintenanceDone()} variant={'green'}>
                             <CircleCheckBig />
-                            Mark maintenance as done
+                            {t('maintenances.mark_done')}
                         </Button>
                     )}
                     <Button onClick={generateQR} variant={'secondary'}>
-                        <QrCode /> Generate new QR
+                        <QrCode /> {t('actions.generate_qr')}
                     </Button>
                     {routeName === 'rooms' && (
                         <Button variant={'secondary'} onClick={() => setShowModaleRelocateRoom(!showModaleRelocateRoom)}>
                             <Move />
-                            Redefine room
+                            {t('locations.redefine_room')}
                         </Button>
                     )}
                 </div>
@@ -152,27 +154,30 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h2>Information</h2>
+                                <h2>{t('common.information')}</h2>
                                 <div className="grid gap-4 sm:grid-cols-[1fr_160px]">
                                     <div className="space-y-2">
-                                        <Field label={'Name'} text={location.name} />
-                                        <Field label={'Category'} text={location.category} />
-                                        {location.address && <Field label={'Address'} text={location.address} />}
-                                        <Field label={'Description'} text={location.description} />
+                                        <Field label={t('common.name')} text={location.name} />
+                                        <Field label={t('common.category')} text={location.category} />
+                                        {location.address && <Field label={t('common.address')} text={location.address} />}
+                                        <Field label={t('common.description')} text={location.description} />
 
                                         {location.location_type.slug === 'outdoor' ? (
                                             <>
                                                 <p>
-                                                    <Field label={'Outdoor'} text={`${location.surface_outdoor} - ${location.outdoor_material}`} />
+                                                    <Field
+                                                        label={t('location.outdoor')}
+                                                        text={`${location.surface_outdoor} m² - ${location.outdoor_material}`}
+                                                    />
                                                 </p>
                                             </>
                                         ) : (
                                             <>
                                                 {location.surface_floor && (
-                                                    <Field label={'Floor'} text={`${location.surface_floor} - ${location.floor_material}`} />
+                                                    <Field label={'Floor'} text={`${location.surface_floor} m² - ${location.floor_material}`} />
                                                 )}
                                                 {location.wall_material && (
-                                                    <Field label={'Walls'} text={`${location.surface_walls} - ${location.wall_material}`} />
+                                                    <Field label={'Walls'} text={`${location.surface_walls} m² - ${location.wall_material}`} />
                                                 )}
                                             </>
                                         )}
@@ -188,7 +193,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                                                     key={location.qr_code}
                                                     src={route('api.image.show', { path: location.qr_code })}
                                                     alt=""
-                                                    className="h-40 w-40 object-cover"
+                                                    className="aspect-square h-32 w-auto"
                                                 />
                                             </a>
                                         )}
@@ -199,10 +204,10 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
 
                         {activeTab === 'maintenance' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h2>Maintenance</h2>
+                                <h2>{tChoice('maintenances.title', 1)}</h2>
                                 <div>
                                     <Field
-                                        label={'Maintenance manager'}
+                                        label={t('maintenances.maintenance_manager')}
                                         text={
                                             location.maintainable.manager ? (
                                                 <a href={route('tenant.users.show', location.maintainable.manager.id)}>
@@ -210,20 +215,24 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                                                     {location.maintainable.manager.full_name}
                                                 </a>
                                             ) : (
-                                                'No manager'
+                                                t('maintenances.no_manager')
                                             )
                                         }
                                     />
 
                                     {location.maintainable.need_maintenance && (
                                         <>
-                                            <Field label={'Maintenance frequency'} text={location.maintainable.maintenance_frequency} />
+                                            <Field label={t('maintenances.frequency')} text={location.maintainable.maintenance_frequency} />
                                             <Field
-                                                label={'Next maintenance date'}
+                                                label={t('maintenances.next_maintenance_date')}
                                                 date
-                                                text={location.maintainable.next_maintenance_date ?? 'Not planned'}
+                                                text={location.maintainable.next_maintenance_date ?? t('maintenances.planned_not')}
                                             />
-                                            <Field label={'Last maintenance date'} date text={location.maintainable.last_maintenance_date} />
+                                            <Field
+                                                label={t('maintenances.last_maintenance_date')}
+                                                date
+                                                text={location.maintainable.last_maintenance_date}
+                                            />
                                         </>
                                     )}
                                 </div>
@@ -232,13 +241,13 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
 
                         {activeTab === 'providers' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h2>Providers</h2>
+                                <h2>{tChoice('providers.title', 2)}</h2>
                                 {location.maintainable.providers && location.maintainable.providers.length > 0 && (
                                     <ul>
                                         {location.maintainable.providers.map((provider, index) => (
                                             <li key={index}>
                                                 <Field
-                                                    label={'Providers'}
+                                                    label={tChoice('providers.title', 1)}
                                                     text={<a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>}
                                                 />
                                             </li>

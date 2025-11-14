@@ -246,7 +246,7 @@ export default function IndexContracts({
                             </div>
                             <div className="border-foreground hidden h-10 w-0.5 border lg:block"></div>
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="category">Search</Label>
+                                <Label htmlFor="category">{t('actions.search')}</Label>
                                 <div className="relative text-black dark:text-white">
                                     <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} />
                                     <X
@@ -365,7 +365,6 @@ export default function IndexContracts({
                     </TableBody>
                 </Table>
                 <Pagination items={items} />
-                {/* <ContractsList getUrl={'api.contracts.index'} items={items} editable isLoading={isLoading} /> */}
             </div>
             <Modale
                 title={t('actions.delete-type', { type: tChoice('contracts.title', 1) })}

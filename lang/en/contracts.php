@@ -25,6 +25,9 @@ return [
     'start_date' => 'Start date',
     'notice_delay' => 'Notice delay',
 
-    'delete_description' => 'Are you sure to delete this contract \':name\' ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.'
+    'delete_description' => 'Are you sure to delete this contract \':name\' ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.',
+
+    'add_existing_contract' => 'Add existing contract',
+    'add_new_contract' => 'Add new contract',
 
 ];

@@ -2,6 +2,7 @@ import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData
 import { Ticket } from '@/types';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Loader } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import ModaleForm from '../ModaleForm';
@@ -32,6 +33,7 @@ type FormDataTicket = {
 };
 
 export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = true }: TicketManagerProps) => {
+    const { t, tChoice } = useLaravelReactI18n();
     const auth = usePage().props.auth.user;
     const { showToast } = useToast();
 
@@ -147,7 +149,9 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
     return (
         <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
             <div className="flex justify-between">
-                <h2 className="inline">Tickets ({tickets?.length ?? 0})</h2>
+                <h2 className="inline">
+                    {tChoice('tickets.title', 2)} ({tickets?.length ?? 0})
+                </h2>
                 {canAdd && (
                     <Button
                         className=""
@@ -156,7 +160,7 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                             setAddTicketModal(!addTicketModal);
                         }}
                     >
-                        Add new ticket
+                        {t('actions.create-type', { type: tChoice('tickets.title', 1) })}
                     </Button>
                 )}
             </div>
@@ -165,12 +169,12 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                 <Table>
                     <TableHead>
                         <TableHeadRow>
-                            <TableHeadData>Code</TableHeadData>
-                            <TableHeadData>Status</TableHeadData>
-                            <TableHeadData>Reporter</TableHeadData>
-                            <TableHeadData>Description</TableHeadData>
-                            <TableHeadData>Created at</TableHeadData>
-                            <TableHeadData>Updated at</TableHeadData>
+                            <TableHeadData>{t('common.code')}</TableHeadData>
+                            <TableHeadData>{t('common.status')}</TableHeadData>
+                            <TableHeadData>{t('tickets.reporter')}</TableHeadData>
+                            <TableHeadData>{t('common.description')}</TableHeadData>
+                            <TableHeadData>{t('common.created_at')}</TableHeadData>
+                            <TableHeadData>{t('common.updated_at')}</TableHeadData>
                             <TableHeadData></TableHeadData>
                         </TableHeadRow>
                     </TableHead>
@@ -182,7 +186,7 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                                         <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
                                     </TableBodyData>
                                     <TableBodyData>
-                                        <Pill variant={ticket.status}>{ticket.status}</Pill>
+                                        <Pill variant={ticket.status}>{t(`tickets.status.${ticket.status}`)}</Pill>
                                     </TableBodyData>
                                     <TableBodyData>{ticket.reporter_email ?? ticket.reporter?.email}</TableBodyData>
                                     <TableBodyData>{ticket.description}</TableBodyData>
@@ -193,7 +197,7 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                                         {ticket.status !== 'closed' && (
                                             <>
                                                 <Button variant={'destructive'} onClick={() => closeTicket(ticket.id)}>
-                                                    Close
+                                                    {t('actions.close')}
                                                 </Button>
 
                                                 {/* <Button onClick={() => editTicket(ticket.id)}>Edit</Button> */}
@@ -215,15 +219,22 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                     {isProcessing && (
                         <div className="flex flex-col items-center gap-4">
                             <Loader size={48} className="animate-pulse" />
-                            <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
-                            <p className="mx-auto">Ticket is being created...</p>
+                            <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.processing')}</p>
+                            <p className="mx-auto">{t('actions.type-being-created', { type: tChoice('tickets.title', 1) })}</p>
                         </div>
                     )}
                     {!isProcessing && (
                         <form onSubmit={submitTypeTicket === 'edit' ? submitEditTicket : submitNewTicket} className="flex flex-col gap-4">
-                            <Label>E-mail</Label>
-                            <Input type="text" name="email" value={newTicketData.reporter_email} required disabled placeholder="Reporter email" />
-                            <Label>Description</Label>
+                            <Label>{t('common.email')}</Label>
+                            <Input
+                                type="text"
+                                name="email"
+                                value={newTicketData.reporter_email}
+                                required
+                                disabled
+                                placeholder={t('common.email_placeholder')}
+                            />
+                            <Label>{t('common.description')}</Label>
                             <Textarea
                                 name="description"
                                 id="description"
@@ -241,14 +252,13 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                             />
                             {submitTypeTicket === 'new' && (
                                 <>
-                                    <Label>Pictures</Label>
+                                    <Label>{tChoice('pictures.title', 2)}</Label>
                                     <Input
                                         type="file"
                                         multiple
                                         max={3}
                                         accept="image/png, image/jpeg, image/jpg"
                                         onChange={(e) => {
-                                            // const pictures = { pictures: };
                                             setNewTicketData((prev) => ({
                                                 ...prev,
                                                 pictures: e.target.files,
@@ -258,8 +268,8 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
 
                                     <div className="flex items-center gap-4">
                                         <div>
-                                            <Label htmlFor="notified">Do you want to be notified of changes ? </Label>
-                                            <p className="text-xs">You will receive an e-mail when the ticket is closed.</p>
+                                            <Label htmlFor="notified">{t('tickets.notified')} </Label>
+                                            <p className="text-xs">{t('tickets.notified_description')}</p>
                                         </div>
                                         <Checkbox
                                             id="notified"
@@ -275,13 +285,13 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                                 </>
                             )}
                             {submitTypeTicket === 'new' ? (
-                                <Button disabled={isProcessing}>Add new ticket</Button>
+                                <Button disabled={isProcessing}>{t('actions.add-type', { type: tChoice('tickets.title', 1) })}</Button>
                             ) : (
-                                <Button disabled={isProcessing}>Edit ticket</Button>
+                                <Button disabled={isProcessing}>{t('actions.update-type', { type: tChoice('tickets.title', 1) })}</Button>
                             )}
 
                             <Button onClick={closeModalTicket} type="button" variant={'secondary'}>
-                                Cancel
+                                {t('actions.cancel')}
                             </Button>
                         </form>
                     )}

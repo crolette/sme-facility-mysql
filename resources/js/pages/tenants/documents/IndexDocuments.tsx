@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, PaginatedData } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Loader, Pencil, PlusCircle, Trash2, X } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
@@ -31,6 +32,7 @@ type DocumentFormData = {
 };
 
 export default function IndexDocuments({ items, filters, types }: { items: PaginatedData; filters: SearchParams; types: CentralType[] }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index documents`,
@@ -208,12 +210,15 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
             <Head title="Index documents" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex w-full justify-between">
-                    <details className="border-border relative w-full cursor-pointer rounded-md border-2 p-2" open={isLoading ? false : undefined}>
-                        <summary>Search/Filter</summary>
+                    <details
+                        className="border-border relative z-10 w-full cursor-pointer rounded-md border-2 p-2"
+                        open={isLoading ? false : undefined}
+                    >
+                        <summary>{t('common.search_filter')}</summary>
 
                         <div className="bg-border border-border text-background dark:text-foreground absolute top-full flex flex-col items-center gap-4 rounded-b-md border-2 p-2 sm:flex-row">
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="status">Type</Label>
+                                <Label htmlFor="status">{t('common.type')}</Label>
                                 <select
                                     name="type"
                                     id="type"
@@ -231,7 +236,7 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
                                 </select>
                             </div>
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="category">Search</Label>
+                                <Label htmlFor="category">{t('actions.search')}</Label>
                                 <div className="relative text-black dark:text-white">
                                     <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} />
                                     <X
@@ -242,25 +247,25 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
                             </div>
 
                             <Button onClick={clearSearch} size={'sm'}>
-                                Clear Search
+                                {t('actions.search-clear')}
                             </Button>
                         </div>
                     </details>
                     <Button onClick={() => addNewFile()}>
                         {' '}
                         <PlusCircle />
-                        Add new file
+                        {t('actions.add-type', { type: tChoice('documents.title', 1) })}
                     </Button>
                 </div>
                 <Table>
                     <TableHead>
                         <TableHeadRow>
-                            <TableHeadData>File</TableHeadData>
-                            <TableHeadData>Size</TableHeadData>
-                            <TableHeadData>Name</TableHeadData>
-                            <TableHeadData>Description</TableHeadData>
-                            <TableHeadData>Category</TableHeadData>
-                            <TableHeadData>Created at</TableHeadData>
+                            <TableHeadData>{t(`documents.file`)}</TableHeadData>
+                            <TableHeadData>{t(`documents.size`)}</TableHeadData>
+                            <TableHeadData>{t(`common.name`)}</TableHeadData>
+                            <TableHeadData>{t(`common.description`)}</TableHeadData>
+                            <TableHeadData>{t(`common.category`)}</TableHeadData>
+                            <TableHeadData>{t(`common.created_at`)}</TableHeadData>
                             <TableHeadData></TableHeadData>
                         </TableHeadRow>
                     </TableHead>
@@ -270,7 +275,7 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
                                 <TableBodyData>
                                     <p className="flex animate-pulse gap-2">
                                         <Loader />
-                                        Searching...
+                                        {t(`actions.searching`)}
                                     </p>
                                 </TableBodyData>
                             </TableBodyRow>
@@ -324,7 +329,7 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
                 <Pagination items={items} />
             </div>
             <Modale
-                title={'Delete document'}
+                title={t('actions.delete-type', { type: tChoice('documents.title', 1) })}
                 message={`Are you sure you want to delete this document ?`}
                 isOpen={showDeleteModale}
                 isUpdating={isUpdating}
@@ -338,7 +343,7 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
                     <div className="flex flex-col gap-2">
                         <form onSubmit={submitType === 'edit' ? submitEditFile : submitNewFile} className="space-y-4">
                             <div>
-                                <Label>Document category</Label>
+                                <Label>{t(`common.category`)}</Label>
                                 <select
                                     name="documentType"
                                     required
@@ -359,7 +364,7 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
                                     {types && types.length > 0 && (
                                         <>
                                             <option value={0} disabled className="bg-background text-foreground">
-                                                Select an option
+                                                {t(`actions.select-type`, { type: t(`common.category`) })}
                                             </option>
                                             {types?.map((documentType) => (
                                                 <option value={documentType.id} key={documentType.id} className="bg-background text-foreground">
@@ -373,7 +378,7 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
 
                             {submitType === 'new' && (
                                 <>
-                                    <Label>File</Label>
+                                    <Label>{t(`documents.file`)}</Label>
                                     <Input
                                         type="file"
                                         name=""
@@ -391,7 +396,7 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
                                 </>
                             )}
 
-                            <Label>Document name</Label>
+                            <Label>{t(`common.name`)}</Label>
                             <Input
                                 type="text"
                                 name="name"
@@ -399,7 +404,7 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
                                 required
                                 minLength={10}
                                 maxLength={255}
-                                placeholder="Document name"
+                                placeholder={t(`documents.name_placeholder`)}
                                 onChange={(e) =>
                                     setNewFileData((prev) => ({
                                         ...prev,
@@ -407,14 +412,14 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
                                     }))
                                 }
                             />
-                            <Label>Document description</Label>
+                            <Label>{t(`common.description`)}</Label>
                             <Input
                                 type="text"
                                 name="description"
                                 id="description"
                                 value={newFileData.description}
                                 maxLength={250}
-                                placeholder="Document description"
+                                placeholder={t(`documents.description_placeholder`)}
                                 onChange={(e) =>
                                     setNewFileData((prev) => ({
                                         ...prev,
@@ -423,9 +428,9 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
                                 }
                             />
                             <div className="flex justify-between">
-                                <Button>Submit</Button>
+                                <Button>{t('actions.submit')}</Button>
                                 <Button type="button" onClick={closeFileModal} variant={'outline'}>
-                                    Cancel
+                                    {t('actions.cancel')}
                                 </Button>
                             </div>
                         </form>

@@ -2,13 +2,16 @@ import { useChartOptions } from '@/hooks/useChartOptions';
 import { useDashboardFilters } from '@/pages/tenants/statistics/IndexStatistics';
 import axios from 'axios';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LineElement, LinearScale, PointElement, Title, Tooltip } from 'chart.js';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useEffect, useState } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import ButtonsChart from './buttonsChart';
+import ButtonsPeriod from './buttonsPeriod';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
 export const TicketsByAvgDurationChart = ({ ticketsAvgDuration }: { ticketsAvgDuration: [] }) => {
+    const { t, tChoice } = useLaravelReactI18n();
     const [type, setType] = useState<'doughnut' | 'horizontalBar' | 'verticalBar' | 'line'>('line');
     const [isFetching, setIsFetching] = useState(false);
     const { dateFrom, dateTo } = useDashboardFilters();
@@ -72,22 +75,15 @@ export const TicketsByAvgDurationChart = ({ ticketsAvgDuration }: { ticketsAvgDu
 
     return (
         <>
-            <div>
+            <div className="min-h-80">
                 <div className="flex justify-between">
                     <ButtonsChart setType={setType} types={['horizontalBar', 'verticalBar', 'line']} />
-                    <div className="flex gap-2">
-                        <p className={'cursor-pointer'} onClick={() => setPeriod('week')}>
-                            By Week
-                        </p>
-                        <p className={'cursor-pointer'} onClick={() => setPeriod('month')}>
-                            By Month
-                        </p>
-                    </div>
+                    <ButtonsPeriod setPeriod={setPeriod} />
                 </div>
                 {isFetching ? (
-                    <p className="animate-pulse">Fetching datas...</p>
+                    <p className="animate-pulse">{t('statistics.fetching_datas')}</p>
                 ) : ticketsAvgDuration.length === 0 ? (
-                    <p>No datas</p>
+                    <p>{t('statistics.no_datas')}</p>
                 ) : (
                     <>
                         {(type === 'horizontalBar' || type === 'verticalBar') && (

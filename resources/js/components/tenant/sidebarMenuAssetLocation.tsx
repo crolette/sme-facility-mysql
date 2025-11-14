@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { Pill } from '../ui/pill';
@@ -15,180 +16,182 @@ interface InfosProps {
 interface SideBarMenuProps {
     activeTab: string;
     setActiveTab: (tab: string) => void;
-    menu?: keyof typeof MENUS;
+    menu?: string;
     infos: InfosProps;
 }
 
-const MENUS = {
-    interventions: [
-        {
-            tabName: 'information',
-            tabDisplay: 'Information',
-        },
-        {
-            tabName: 'pictures',
-            tabDisplay: 'pictures',
-        },
-
-        // {
-        //     tabName: 'actions',
-        //     tabDisplay: 'actions',
-        // },
-    ],
-    user: [
-        {
-            tabName: 'information',
-            tabDisplay: 'Information',
-        },
-        {
-            tabName: 'interventions',
-            tabDisplay: 'interventions',
-        },
-        {
-            tabName: 'assets',
-            tabDisplay: 'assets',
-        },
-    ],
-    asset: [
-        {
-            tabName: 'information',
-            tabDisplay: 'Information',
-        },
-        {
-            tabName: 'maintenance',
-            tabDisplay: 'Maintenance',
-        },
-        {
-            tabName: 'providers',
-            tabDisplay: 'providers',
-        },
-        {
-            tabName: 'warranty',
-            tabDisplay: 'warranty',
-        },
-        {
-            tabName: 'pictures',
-            tabDisplay: 'pictures',
-        },
-        {
-            tabName: 'contracts',
-            tabDisplay: 'contracts',
-        },
-        {
-            tabName: 'documents',
-            tabDisplay: 'documents',
-        },
-        {
-            tabName: 'tickets',
-            tabDisplay: 'tickets',
-        },
-        {
-            tabName: 'interventions',
-            tabDisplay: 'interventions',
-        },
-    ],
-    provider: [
-        {
-            tabName: 'information',
-            tabDisplay: 'Information',
-        },
-        {
-            tabName: 'contracts',
-            tabDisplay: 'contracts',
-        },
-        {
-            tabName: 'interventions',
-            tabDisplay: 'interventions',
-        },
-        {
-            tabName: 'users',
-            tabDisplay: 'users',
-        },
-        {
-            tabName: 'assets',
-            tabDisplay: 'assets',
-        },
-        {
-            tabName: 'locations',
-            tabDisplay: 'locations',
-        },
-    ],
-    ticket: [
-        {
-            tabName: 'information',
-            tabDisplay: 'Information',
-        },
-        // {
-        //     tabName: 'pictures',
-        //     tabDisplay: 'pictures',
-        // },
-        // {
-        //     tabName: 'interventions',
-        //     tabDisplay: 'interventions',
-        // },
-    ],
-    contract: [
-        {
-            tabName: 'information',
-            tabDisplay: 'Information',
-        },
-        {
-            tabName: 'assets',
-            tabDisplay: 'assets',
-        },
-        {
-            tabName: 'documents',
-            tabDisplay: 'documents',
-        },
-    ],
-    location: [
-        {
-            tabName: 'information',
-            tabDisplay: 'Information',
-        },
-        {
-            tabName: 'maintenance',
-            tabDisplay: 'Maintenance',
-        },
-        {
-            tabName: 'providers',
-            tabDisplay: 'providers',
-        },
-        {
-            tabName: 'warranty',
-            tabDisplay: 'warranty',
-        },
-        {
-            tabName: 'pictures',
-            tabDisplay: 'pictures',
-        },
-        {
-            tabName: 'contracts',
-            tabDisplay: 'contracts',
-        },
-        {
-            tabName: 'documents',
-            tabDisplay: 'documents',
-        },
-        {
-            tabName: 'tickets',
-            tabDisplay: 'tickets',
-        },
-        {
-            tabName: 'interventions',
-            tabDisplay: 'interventions',
-        },
-        {
-            tabName: 'assets',
-            tabDisplay: 'assets',
-        },
-    ],
-};
-
 export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu = 'asset', infos }: SideBarMenuProps) {
+    const { t, tChoice } = useLaravelReactI18n();
+    const [showMobileMenu, setShowMobileMenu] = useState(false);
+    const [activeTabDisplay, setActiveTabDisplay] = useState(t('common.information'));
+
+    const MENUS = {
+        interventions: [
+            {
+                tabName: 'information',
+                tabDisplay: t('common.information'),
+            },
+            {
+                tabName: 'pictures',
+                tabDisplay: tChoice('common.pictures', 2),
+            },
+
+            // {
+            //     tabName: 'actions',
+            //     tabDisplay: 'actions',
+            // },
+        ],
+        user: [
+            {
+                tabName: 'information',
+                tabDisplay: t('common.information'),
+            },
+            {
+                tabName: 'interventions',
+                tabDisplay: tChoice('interventions.title', 2),
+            },
+            {
+                tabName: 'assets',
+                tabDisplay: tChoice('assets.title', 2),
+            },
+        ],
+        asset: [
+            {
+                tabName: 'information',
+                tabDisplay: t('common.information'),
+            },
+            {
+                tabName: 'maintenance',
+                tabDisplay: tChoice('maintenances.title', 2),
+            },
+            {
+                tabName: 'providers',
+                tabDisplay: tChoice('providers.title', 2),
+            },
+            {
+                tabName: 'warranty',
+                tabDisplay: t('common.warranty'),
+            },
+            {
+                tabName: 'pictures',
+                tabDisplay: tChoice('common.pictures', 2),
+            },
+            {
+                tabName: 'contracts',
+                tabDisplay: tChoice('contracts.title', 2),
+            },
+            {
+                tabName: 'documents',
+                tabDisplay: tChoice('documents.title', 2),
+            },
+            {
+                tabName: 'tickets',
+                tabDisplay: tChoice('tickets.title', 2),
+            },
+            {
+                tabName: 'interventions',
+                tabDisplay: tChoice('interventions.title', 2),
+            },
+        ],
+        provider: [
+            {
+                tabName: 'information',
+                tabDisplay: t('common.information'),
+            },
+            {
+                tabName: 'contracts',
+                tabDisplay: tChoice('contracts.title', 2),
+            },
+            {
+                tabName: 'interventions',
+                tabDisplay: tChoice('interventions.title', 2),
+            },
+            {
+                tabName: 'users',
+                tabDisplay: tChoice('contacts.title', 2),
+            },
+            {
+                tabName: 'assets',
+                tabDisplay: tChoice('assets.title', 2),
+            },
+            {
+                tabName: 'locations',
+                tabDisplay: tChoice('locations.title', 2),
+            },
+        ],
+        ticket: [
+            {
+                tabName: 'information',
+                tabDisplay: t('common.information'),
+            },
+            // {
+            //     tabName: 'pictures',
+            //     tabDisplay: 'pictures',
+            // },
+            // {
+            //     tabName: 'interventions',
+            //     tabDisplay: tChoice('interventions.title',2),
+            // },
+        ],
+        contract: [
+            {
+                tabName: 'information',
+                tabDisplay: t('common.information'),
+            },
+            {
+                tabName: 'assets',
+                tabDisplay: tChoice('assets.title', 2),
+            },
+            {
+                tabName: 'documents',
+                tabDisplay: tChoice('documents.title', 2),
+            },
+        ],
+        location: [
+            {
+                tabName: 'information',
+                tabDisplay: t('common.information'),
+            },
+            {
+                tabName: 'maintenance',
+                tabDisplay: tChoice('maintenances.title', 2),
+            },
+            {
+                tabName: 'providers',
+                tabDisplay: tChoice('providers.title', 2),
+            },
+            {
+                tabName: 'warranty',
+                tabDisplay: t('common.warranty'),
+            },
+            {
+                tabName: 'pictures',
+                tabDisplay: tChoice('common.pictures', 2),
+            },
+            {
+                tabName: 'contracts',
+                tabDisplay: tChoice('contracts.title', 2),
+            },
+            {
+                tabName: 'documents',
+                tabDisplay: tChoice('documents.title', 2),
+            },
+            {
+                tabName: 'tickets',
+                tabDisplay: tChoice('tickets.title', 2),
+            },
+            {
+                tabName: 'interventions',
+                tabDisplay: tChoice('interventions.title', 2),
+            },
+            {
+                tabName: 'assets',
+                tabDisplay: tChoice('assets.title', 2),
+            },
+        ],
+    };
     const navSidebar = MENUS[menu];
 
-    const [showMobileMenu, setShowMobileMenu] = useState(false);
     return (
         <div className="bg-sidebar border-sidebar-border z-50 flex h-fit flex-col gap-2 rounded-md shadow-xl">
             <div className="flex flex-col items-center gap-1 px-4 py-2 text-center">
@@ -212,7 +215,7 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
                     className="bg-sidebar-accent flex cursor-pointer justify-between p-2 first-letter:uppercase"
                     onClick={() => setShowMobileMenu(!showMobileMenu)}
                 >
-                    {activeTab}
+                    {activeTabDisplay}
                     <ChevronDown />
                 </li>
                 {showMobileMenu && (
@@ -223,6 +226,7 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
                                     <li
                                         key={index}
                                         onClick={() => {
+                                            setActiveTabDisplay(nav.tabDisplay);
                                             setActiveTab(nav.tabName);
                                             setShowMobileMenu(false);
                                         }}
@@ -240,7 +244,10 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
                 {navSidebar.map((nav, index) => (
                     <li
                         key={index}
-                        onClick={() => setActiveTab(nav.tabName)}
+                        onClick={() => {
+                            setActiveTabDisplay(nav.tabDisplay);
+                            setActiveTab(nav.tabName);
+                        }}
                         className={cn(
                             activeTab === nav.tabName ? 'bg-accent first-letter:uppercase' : '',
                             'cursor-pointer p-2 first-letter:uppercase',

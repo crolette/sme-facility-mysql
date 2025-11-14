@@ -24,8 +24,15 @@ return [
     'planned_at_no' => 'Not planned',
     'repair_delay' => 'Repair delay',
     'repair_delay_no' => 'No repair delay',
+    'costs' => 'Costs',
+
     'total_costs' => 'Total costs',
 
-    'delete_description' => 'Are you sure to delete this intervention ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.'
+    'started_at' => 'Started at',
+    'finished_at' => 'Finished at',
+
+    'delete_description' => 'Are you sure to delete this intervention ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.',
+
+    'actions' => 'Action|Actions',
 
 ];

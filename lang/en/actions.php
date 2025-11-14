@@ -2,15 +2,15 @@
 
 return [
     // Generic CRUD
+    'add-type' => 'Add :type',
     'create-type' => 'Create :type',
+    'clear-type' => 'Clear :type',
+    'delete-type' => 'Delete :type',
+    'download-type' => 'Download :type',
     'edit-type' => 'Edit :type',
     'save-type' => 'Save :type',
     'upload-type' => 'Upload :type',
-    'download-type' => 'Download :type',
     'update-type' => 'Update :type',
-    'delete-type' => 'Delete :type',
-    'add-type' => 'Add :type',
-    'clear-type' => 'Clear :type',
 
     // View actions
     'see-details' => 'See details',
@@ -22,6 +22,8 @@ return [
     'search-clear' => 'Clear search',
 
     // Form actions
+    'add' => 'Add',
+    'edit' => 'Edit',
     'save' => 'Save',
     'search' => 'Search',
     'create' => 'Create',
@@ -71,4 +73,5 @@ return [
     // Other
     'actions' => 'Actions',
     'edit-profile' => 'Edit profile',
+    'generate_qr' => 'Generate new QR'
 ];
