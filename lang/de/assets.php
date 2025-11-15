@@ -1,0 +1,34 @@
+<?php
+
+return [
+    'title' => 'Vermögenswert|Vermögenswerte',
+    'mobile_asset' => 'Mobiler Vermögenswert',
+    'mobile_asset_user' => 'Benutzer des mobilen Vermögenswerts',
+    'asset_linked_to' => 'Vermögenswert verknüpft mit',
+    'search_navigate_hierarchy' => 'Durchsuchen oder navigieren Sie durch Ihre Hierarchie',
+    'selected_location' => 'Ausgewählter Standort',
+    'selected_location_none' => 'Kein Standort ausgewählt',
+    'need_qr_code' => 'QR-Code benötigt',
+    'trashed' => 'Gelöscht',
+    'brand' => 'Marke',
+    'model' => 'Modell',
+    'serial_number' => 'Seriennummer',
+
+    'depreciation' => 'Abschreibung',
+    'depreciable' => 'Abschreibbar',
+    'depreciation_duration' => 'Abschreibungsdauer',
+    'depreciation_duration_placeholder' => 'Jahre',
+    'depreciation_start_date' => 'Startdatum der Abschreibung',
+    'depreciation_end_date' => 'Enddatum der Abschreibung',
+    'residual_value' => 'Restwert',
+    'residual_value_placeholder' => 'Restwert nach Ende der Abschreibung (max. 2 Dezimalstellen) : 4236.36',
+
+    'still_under_warranty' => 'Noch unter Garantie',
+    'purchase_warranty' => 'Kauf/Garantie',
+    'purchase_date' => 'Kaufdatum',
+    'purchase_date_placeholder' => 'Datum des Kaufs',
+    'purchase_cost' => 'Kaufkosten',
+    'purchase_cost_placeholder' => 'Kaufkosten (max. 2 Dezimalstellen) : 4236.36',
+    'warranty_end_date' => 'Enddatum der Garantie',
+
+];

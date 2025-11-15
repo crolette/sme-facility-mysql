@@ -27,6 +27,7 @@ return [
     'save' => 'Save',
     'remove' => 'Remove',
     'restore' => 'Restore',
+    'delete' => 'Delete',
     'delete_definitely' => 'Delete definitely',
     'search' => 'Search',
     'create' => 'Create',
@@ -36,6 +37,7 @@ return [
     'submit' => 'Submit',
     'confirm' => 'Confirm',
     'send' => 'Send',
+    'close' => 'Close',
 
     'export' => 'Export',
     'export-type' => 'Export :type',
@@ -51,7 +53,6 @@ return [
     'confirmed' => 'Confirmed',
     'sent' => 'Sent',
 
-
     'search-type' => 'Search :type...',
 
     // Processing actions
@@ -60,6 +61,7 @@ return [
     'processing' => 'Processing...',
     'type-being-created' => ':type is being created...',
     'type-being-sent' => ':type is being sent...',
+    'type-being-submitted' => ':type is being submitted...',
     'type-being-updated' => ':type is being updated...',
     'type-being-deleted' => ':type is being deleted...',
 

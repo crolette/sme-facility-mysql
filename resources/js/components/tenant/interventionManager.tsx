@@ -587,7 +587,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
 
                             {interventionAssignees && (
                                 <div className="">
-                                    <p className="text-center">{t('interventions.assign_to')}</p>
+                                    <p className="text-center">{t('interventions.assign_to')} :</p>
                                     <ul className="flex flex-col gap-2">
                                         {interventionAssignees.length > 0 &&
                                             interventionAssignees.map((assignee, index) => (
@@ -624,7 +624,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
             )}
 
             {addIntervention && (
-                <ModaleForm title="Add intervention">
+                <ModaleForm title={t('actions.add-type', { type: tChoice('interventions.titel', 1) })}>
                     {isProcessing && (
                         <div className="flex flex-col items-center gap-4">
                             <Loader size={48} className="animate-pulse" />
@@ -657,10 +657,10 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     </option>
                                 ))}
                             </select>
-                            <Label>{t('common.status')}</Label>
+                            <Label htmlFor="status">{t('common.status')}</Label>
                             <select
-                                name=""
-                                id=""
+                                name="status"
+                                id="status"
                                 required
                                 value={interventionDataForm.status ?? ''}
                                 onChange={(e) =>

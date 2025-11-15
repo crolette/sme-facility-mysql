@@ -35,4 +35,9 @@ return [
 
     'actions' => 'Action|Actions',
 
+    'last_update' => 'Last update',
+    'past_interventions' => 'Past interventions',
+    'past_actions' => 'Past actions',
+
+
 ];

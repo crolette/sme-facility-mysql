@@ -123,11 +123,11 @@ export default function CreateUpdateAsset({
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Index assets`,
+            title: `Index ${tChoice('assets.title', 2)}`,
             href: '/assets',
         },
         {
-            title: asset ? `Update asset ${asset.name}` : `Create asset`,
+            title: asset ? `Update ${tChoice('assets.title', 1)} ${asset.name}` : `Create ${tChoice('assets.title', 1)}`,
             href: '/assets/create',
         },
     ];

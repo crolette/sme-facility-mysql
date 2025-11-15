@@ -4,13 +4,14 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useEffect, useState } from 'react';
 
 interface AssetManagerProps {
+    items?: Asset[] | undefined;
     itemCode: string | number;
     type: string;
 }
 
-export const AssetManager = ({ itemCode, type }: AssetManagerProps) => {
+export const AssetManager = ({ items = [], itemCode, type }: AssetManagerProps) => {
     const { t, tChoice } = useLaravelReactI18n();
-    const [assets, setAssets] = useState<Asset[]>();
+    const [assets, setAssets] = useState<Asset[]>(items);
 
     const fetchAssets = async () => {
         try {
@@ -22,7 +23,7 @@ export const AssetManager = ({ itemCode, type }: AssetManagerProps) => {
     };
 
     useEffect(() => {
-        fetchAssets();
+        if (assets.length === 0) fetchAssets();
     }, []);
 
     return (
@@ -32,8 +33,8 @@ export const AssetManager = ({ itemCode, type }: AssetManagerProps) => {
                 {assets &&
                     assets.map((asset, index) => (
                         <li key={index}>
-                            <a href={route('tenant.assets.show', asset.reference_code ?? asset.maintainable_id)}>
-                                {asset.code} - {asset.maintainable.name}
+                            <a href={route('tenant.assets.show', asset.reference_code ?? asset.maintainable)}>
+                                {asset.code ?? asset.maintainable.code} - {asset.name}
                             </a>
                         </li>
                     ))}

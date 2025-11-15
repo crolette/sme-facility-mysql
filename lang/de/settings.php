@@ -1,0 +1,39 @@
+<?php
+
+return [
+    'title' => 'Einstellungen',
+    'settings' => 'Profileinstellungen',
+    'settings_description' => 'Verwalten Sie Ihre Profil- und Kontoeinstellungen',
+
+
+    'profile' => 'Profil',
+    'profile_title' => 'Profilinformationen',
+    'profile_description' => 'Aktualisieren Sie Ihren Namen und Ihre E-Mail-Adresse',
+
+    'update_picture' => 'Profilbild aktualisieren',
+    'update_information' => 'Profilinformationen aktualisieren',
+    'update_password' => 'Passwort aktualisieren',
+
+    'notifications' => 'Benachrichtigungen',
+    'notifications_title' => 'Benachrichtigungseinstellungen',
+    'notifications_description' => 'Ändern Sie Ihre Benachrichtigungseinstellungen. Wie viele Tage vor dem Datum möchten Sie eine E-Mail erhalten?',
+
+    'picture' => 'Profilbild',
+    'picture_description' => 'Aktualisieren Sie Ihr Profilbild',
+
+    'appearance' => 'Erscheinungsbild',
+    'appearance_title' => 'Erscheinungseinstellungen',
+    'appearance_description' => 'Aktualisieren Sie die Erscheinungseinstellungen Ihres Kontos',
+
+    'import_export' => 'Import/Export',
+    'import_export_title' => '',
+    'import_export_description' => 'Verwalten Sie Ihren Import und Export',
+
+    'company' => 'Unternehmen',
+    'company_title' => 'Unternehmensinformationen',
+    'company_description' => 'Aktualisieren Sie Unternehmensinformationen. Wenn Sie die Adresse oder den Namen ändern möchten, wenden Sie sich bitte an den SME-Facility Support.',
+
+
+    'password_title' => 'Passwort aktualisieren',
+    'password_description' => 'Stellen Sie sicher, dass Ihr Konto ein langes, zufälliges Passwort verwendet, um sicher zu bleiben',
+];

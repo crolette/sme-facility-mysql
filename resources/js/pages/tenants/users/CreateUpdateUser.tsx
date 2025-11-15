@@ -9,6 +9,7 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Provider, User } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { FormEventHandler, useState } from 'react';
 
 interface FormDataUser {
@@ -25,13 +26,14 @@ interface FormDataUser {
 }
 
 export default function CreateUpdateUser({ user, roles }: { user?: User; roles: [] }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Indes User`,
+            title: `Indes ${tChoice('contacts.title', 2)}`,
             href: `/users`,
         },
         {
-            title: `Create/Update user`,
+            title: user ? `Update ${tChoice('contacts.title', 1)} ${user.full_name}` : `Create ${tChoice('contacts.title', 1)}`,
             href: `/users/create`,
         },
     ];
@@ -91,49 +93,82 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Sites" />
+            <Head title={user ? `Update ${tChoice('contacts.title', 1)} ${user.full_name}` : `Create ${tChoice('contacts.title', 1)}`} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <form onSubmit={submit} className="space-y-4">
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                         <div className="flex w-full flex-col gap-4 lg:flex-row">
                             <div className="w-full">
-                                <Label>First name</Label>
-                                <Input type="text" onChange={(e) => setData('first_name', e.target.value)} value={data.first_name} required />
+                                <Label htmlFor="first_name">{t('common.first_name')}</Label>
+                                <Input
+                                    id="first_name"
+                                    type="text"
+                                    onChange={(e) => setData('first_name', e.target.value)}
+                                    value={data.first_name}
+                                    required
+                                    placeholder={t('common.first_name_placeholder')}
+                                />
                                 <InputError message={errors?.first_name ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label>Last name</Label>
-                                <Input type="text" onChange={(e) => setData('last_name', e.target.value)} value={data.last_name} required />
+                                <Label htmlFor="last_name">{t('common.last_name')}</Label>
+                                <Input
+                                    id="last_name"
+                                    type="text"
+                                    onChange={(e) => setData('last_name', e.target.value)}
+                                    value={data.last_name}
+                                    required
+                                    placeholder={t('common.last_name_placeholder')}
+                                />
                                 <InputError message={errors?.last_name ?? ''} />
                             </div>
                         </div>
                         <div className="mt-4 flex w-full flex-col gap-4 lg:flex-row">
                             <div className="w-full">
-                                <Label>Email</Label>
-                                <Input type="email" onChange={(e) => setData('email', e.target.value)} value={data.email} required />
+                                <Label htmlFor="email">{t('common.email')}</Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    value={data.email}
+                                    required
+                                    placeholder={t('common.email_placeholder')}
+                                />
                                 <InputError message={errors?.email ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label>Phone number</Label>
-                                <Input type="text" onChange={(e) => setData('phone_number', e.target.value)} value={data.phone_number} />
+                                <Label htmlFor="phone">{t('common.phone')}</Label>
+                                <Input
+                                    id="phone"
+                                    type="text"
+                                    onChange={(e) => setData('phone_number', e.target.value)}
+                                    value={data.phone_number}
+                                    placeholder={t('common.phone_placeholder')}
+                                />
                                 <InputError message={errors?.phone_number ?? ''} />
                             </div>
                         </div>
 
                         <div className="mt-4 space-y-2">
-                            <Label>Job position</Label>
-                            <Input type="text" onChange={(e) => setData('job_position', e.target.value)} value={data.job_position} />
+                            <Label htmlFor="job_position">{t('contacts.job_position')}</Label>
+                            <Input
+                                id="job_position"
+                                type="text"
+                                onChange={(e) => setData('job_position', e.target.value)}
+                                value={data.job_position}
+                                placeholder={t('contacts.job_position_placeholder')}
+                            />
                             <InputError message={errors?.job_position ?? ''} />
                         </div>
 
                         <div className="mt-4 space-y-2">
                             <div className="flex items-center gap-2">
-                                <Label>Can login</Label>
-                                <Checkbox onClick={() => setData('can_login', !data.can_login)} checked={data.can_login ?? false} />
+                                <Label htmlFor="can_login">{t('contacts.can_login')}</Label>
+                                <Checkbox id="can_login" onClick={() => setData('can_login', !data.can_login)} checked={data.can_login ?? false} />
                             </div>
                             {data.can_login && (
                                 <div>
-                                    <Label>User role</Label>
+                                    <Label htmlFor="role">{t('contacts.role')}</Label>
                                     <select
                                         name="role"
                                         id="role"
@@ -141,7 +176,7 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
                                         onChange={(e) => setData('role', e.target.value)}
                                         className="block"
                                     >
-                                        <option value="">Select a role</option>
+                                        <option value="">{t('actions.select-type', { type: t('contacts.role') })}</option>
                                         {roles.map((role, index) => (
                                             <option key={index} value={role}>
                                                 {role}
@@ -154,7 +189,7 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
                         </div>
                         {!user && (
                             <div className="mt-4">
-                                <Label>Avatar</Label>
+                                <Label>{t('contacts.profile_picture')}</Label>
                                 <Input
                                     type="file"
                                     name="logo"
@@ -162,13 +197,13 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
                                     onChange={(e) => setData('avatar', e.target.files ? e.target.files[0] : null)}
                                     accept="image/png, image/jpeg, image/jpg"
                                 />
-                                <p className="text-xs">Accepted files: png, jpg, jpeg - Maximum file size: 4MB</p>
+                                <p className="text-xs">{t('common.pictures_restriction_description')}</p>
                                 <InputError message={errors?.avatar ? 'Wrong picture' : ''} />
                             </div>
                         )}
 
                         <div className="mt-4">
-                            <Label>Provider</Label>
+                            <Label>{tChoice('providers.title', 1)}</Label>
                             <SearchableInput<Provider>
                                 searchUrl={route('api.providers.search')}
                                 displayValue={data.provider_name}
@@ -178,16 +213,16 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
                                     setData('provider_id', provider.id);
                                     setData('provider_name', provider.name);
                                 }}
-                                placeholder="Search provider"
+                                placeholder={t('actions.search-type', { type: tChoice('providers.title', 1) })}
                                 className="mb-4"
                             />
                         </div>
                     </div>
                     <div className="space-x-2">
-                        <Button disabled={isSubmitting}>Submit</Button>
+                        <Button disabled={isSubmitting}>{t('actions.submit')}</Button>
                         <a href={user ? route('tenant.users.show', user.id) : route('tenant.users.index')}>
                             <Button type="button" variant={'secondary'} disabled={isSubmitting}>
-                                Cancel
+                                {t('actions.cancel')}
                             </Button>
                         </a>
                     </div>

@@ -65,7 +65,6 @@ export default function IndexSites({
                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {
-            console.log(error);
             setShowDeleteModale(false);
             showToast(error.response.data.message, error.response.data.status);
         }

@@ -71,7 +71,7 @@ export const PictureManager = ({ itemCodeId, getPicturesUrl, uploadRoute, delete
         <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
             <div className="flex items-center justify-between">
                 <h2 className="inline">
-                    {tChoice('pictures.title', 2)} ({pictures?.length})
+                    {tChoice('common.pictures', 2)} ({pictures?.length})
                 </h2>
                 {canAdd && (
                     <Button onClick={() => setAddPictures(!addPictures)} type="button">

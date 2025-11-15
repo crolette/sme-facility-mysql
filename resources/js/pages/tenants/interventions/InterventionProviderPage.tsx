@@ -7,6 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { CentralType, Intervention, InterventionAction } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { BadgeAlert, BadgeCheck, Loader } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
@@ -36,6 +37,7 @@ export default function InterventionProviderPage({
     query: string;
     pastInterventions: Intervention[];
 }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const [errors, setErrors] = useState<{ [key: string]: string }>();
     const [isProcessing, setIsProcessing] = useState(false);
     const [showSuccessModale, setShowSuccessModale] = useState<boolean>(false);
@@ -54,8 +56,6 @@ export default function InterventionProviderPage({
         pictures: [],
     });
 
-    console.log(Date.now().toLocaleString());
-
     const submitInterventionAction: FormEventHandler = async (e) => {
         e.preventDefault();
         setIsProcessing(true);
@@ -68,19 +68,15 @@ export default function InterventionProviderPage({
                 },
             });
             if (response.data.status === 'success') {
-                //    closeModale();
-                console.log(response);
                 setIsProcessing(false);
                 setShowSuccessModale(true);
             }
         } catch (error) {
-            console.error(error);
             setErrors(error.response.data.errors);
             setIsProcessing(false);
             setShowErrorModale(true);
         }
     };
-    console.log(data);
 
     return (
         <>
@@ -95,12 +91,14 @@ export default function InterventionProviderPage({
                                 </h3>
                                 <p>{intervention.interventionable.description}</p>
 
-                                <h4>Intervention Information</h4>
+                                <h4>{t('common.information')}</h4>
                                 <p>{intervention.intervention_type.label}</p>
-                                <p>Last update: {intervention.updated_at}</p>
+                                <p>
+                                    {t('interventions.last_update')}: {intervention.updated_at}
+                                </p>
                                 <p>{intervention.description}</p>
                                 <ul className="bg-accent flex flex-col gap-3 rounded-md p-2">
-                                    <h4>Past actions</h4>
+                                    <h4>{t('interventions.past_actions')}</h4>
                                     <ul className="bg-secondary pl-5">
                                         {intervention.actions?.map((interventionAction: InterventionAction) => (
                                             <li key={interventionAction.id}>
@@ -114,9 +112,9 @@ export default function InterventionProviderPage({
                             </div>
                         </div>
                         <div className="border-sidebar-border bg-sidebar flex w-full flex-col rounded-md border p-4 shadow-xl">
-                            <h3>Intervention</h3>
+                            <h3>{tChoice('interventions.title', 1)}</h3>
                             <form onSubmit={submitInterventionAction} className="flex flex-col gap-4">
-                                <Label>E-mail</Label>
+                                <Label>{t('common.email')}</Label>
                                 <Input
                                     type="email"
                                     required
@@ -124,7 +122,7 @@ export default function InterventionProviderPage({
                                     onChange={(e) => setData('creator_email', e.target.value)}
                                 />
                                 <InputError message={errors?.creator_email ?? ''} />
-                                <Label>Action Type</Label>
+                                <Label>{tChoice('interventions.actions', 1)}</Label>
                                 <select
                                     name="action_type"
                                     id="intervention_type"
@@ -132,7 +130,7 @@ export default function InterventionProviderPage({
                                     value={data.action_type_id ?? ''}
                                     onChange={(e) => setData('action_type_id', parseInt(e.target.value))}
                                 >
-                                    <option value="">Select action type</option>
+                                    <option value="">{t('actions.select-type', { type: tChoice('interventions.actions', 1) })}</option>
                                     {actionTypes?.map((interventionActionType) => (
                                         <option key={interventionActionType.id} value={interventionActionType.id}>
                                             {interventionActionType.label}
@@ -140,7 +138,7 @@ export default function InterventionProviderPage({
                                     ))}
                                 </select>
                                 <InputError message={errors?.action_type_id ?? ''} />
-                                <Label>Description</Label>
+                                <Label>{t('common.description')}</Label>
                                 <Textarea
                                     placeholder="description"
                                     value={data.description ?? ''}
@@ -148,7 +146,7 @@ export default function InterventionProviderPage({
                                     onChange={(e) => setData('description', e.target.value)}
                                 ></Textarea>
                                 <InputError message={errors?.description ?? ''} />
-                                <Label>Intervention costs</Label>
+                                <Label>{t('interventions.costs')}</Label>
                                 <Input
                                     type="number"
                                     step="0.01"
@@ -157,7 +155,7 @@ export default function InterventionProviderPage({
                                     onChange={(e) => setData('intervention_costs', parseFloat(e.target.value))}
                                 />
                                 <InputError message={errors?.intervention_costs ?? ''} />
-                                <Label>Intervention date</Label>
+                                <Label>{t('common.date')}</Label>
                                 <Input
                                     type="date"
                                     value={data.intervention_date ?? ''}
@@ -165,14 +163,14 @@ export default function InterventionProviderPage({
                                     onChange={(e) => setData('intervention_date', e.target.value)}
                                 />
                                 <InputError message={errors?.intervention_date ?? ''} />
-                                <Label>Started at</Label>
+                                <Label>{t('interventions.started_at')}</Label>
                                 <Input type="time" value={data.started_at ?? ''} onChange={(e) => setData('started_at', e.target.value)} />
                                 <InputError message={errors?.started_at ?? ''} />
-                                <Label>Finished at</Label>
+                                <Label>{t('interventions.finished_at')}</Label>
                                 <Input type="time" value={data.finished_at ?? ''} onChange={(e) => setData('finished_at', e.target.value)} />
                                 <InputError message={errors?.finished_at ?? ''} />
                                 <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                    <h5>Pictures</h5>
+                                    <h5>{tChoice('common.pictures', 2)}</h5>
                                     <Input
                                         type="file"
                                         multiple
@@ -180,18 +178,19 @@ export default function InterventionProviderPage({
                                         accept="image/png, image/jpeg, image/jpg"
                                     />
                                 </div>
-                                <Button>Add intervention</Button>
+                                <Button>{t('actions.add-type', { type: tChoice('interventions.title', 1) })}</Button>
                             </form>
                         </div>
                     </div>
-                    <div className="border-sidebar-border bg-sidebar sticky top-10 flex h-fit w-full flex-col rounded-md border p-4 shadow-xl">
-                        <h3>Past interventions</h3>
+                    <div className="border-sidebar-border bg-sidebar sticky top-10 flex h-fit flex-col rounded-md border p-4 shadow-xl">
+                        <h3>{t('interventions.past_interventions')}</h3>
                         {pastInterventions.length > 0 ? (
                             <ul className="bg-accent flex flex-col gap-3 rounded-md p-2">
                                 {pastInterventions.map((intervention: Intervention) => (
                                     <li key={intervention.id} className="">
-                                        {intervention.updated_at}
-                                        {intervention.type} -{intervention.description}
+                                        <p>
+                                            {intervention.updated_at} : {intervention.type} - {intervention.description}
+                                        </p>
                                         <ul className="bg-secondary pl-5">
                                             {intervention.actions?.map((interventionAction: InterventionAction) => (
                                                 <li key={interventionAction.id}>
@@ -214,9 +213,9 @@ export default function InterventionProviderPage({
                 <ModaleForm>
                     <div className="flex flex-col items-center gap-4">
                         <BadgeCheck size={48} className="text-success" />
-                        <p className="text-success mx-auto text-3xl font-bold">Thank you</p>
+                        <p className="text-success mx-auto text-3xl font-bold">{t('common.thank_you')}</p>
                         <p className="mx-auto">Intervention submitted</p>
-                        <p className="mx-auto">You can now close this window.</p>
+                        <p className="mx-auto">{t('common.close_window')}</p>
                         <div className="mx-auto flex gap-4"></div>
                     </div>
                 </ModaleForm>
@@ -225,11 +224,11 @@ export default function InterventionProviderPage({
                 <ModaleForm>
                     <div className="flex flex-col items-center gap-4">
                         <BadgeAlert size={48} className="text-destructive" />
-                        <p className="text-destructive mx-auto text-3xl font-bold">Error</p>
-                        <p className="mx-auto">Error while submitting. Try again</p>
+                        <p className="text-destructive mx-auto text-3xl font-bold">{t('common.error')}</p>
+                        <p className="mx-auto">{t('common.error_submitting')}</p>
                         <div className="mx-auto flex gap-4">
                             <Button variant={'secondary'} onClick={() => setShowErrorModale(false)}>
-                                Close
+                                {t('actions.close')}
                             </Button>
                         </div>
                     </div>
@@ -240,10 +239,8 @@ export default function InterventionProviderPage({
                 <ModaleForm>
                     <div className="flex flex-col items-center gap-4">
                         <Loader size={48} className="animate-pulse" />
-                        <p className="mx-auto animate-pulse text-3xl font-bold">
-                            Processing<span>...</span>
-                        </p>
-                        <p className="mx-auto">Intervention is being submitted...</p>
+                        <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.processing')}</p>
+                        <p className="mx-auto">{t('actions.type-being-submitted', { type: tChoice('interventions.title', 1) })}</p>
                     </div>
                 </ModaleForm>
             )}

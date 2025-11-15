@@ -30,10 +30,16 @@ return [
     'full_name' => 'Full name',
     'email' => 'Email',
     'phone' => 'Phone',
+    'phone_placeholder' => '+32123456789',
     'mobile' => 'Mobile',
     'address' => 'Address',
     'city' => 'City',
+    'city_placeholder' => 'Brussels',
+    'street' => 'Street',
+    'street_placeholder' => 'Common street',
+    'house_number' => 'House number',
     'postal_code' => 'Postal code',
+    'postal_code_placeholder' => '1000',
     'country' => 'Country',
 
 
@@ -49,6 +55,8 @@ return [
 
     // Generic fields
     'name' => 'Name',
+    'notes' => 'Notes',
+    'notes_placeholder' => 'Add a note/comment',
     'code' => 'Code',
     'description' => 'Description',
     'status' => 'Status',
@@ -63,6 +71,7 @@ return [
 
     // Pictures
     'pictures' => 'Picture|Pictures',
+    'pictures_restriction_description' => 'Accepted files: png, jpg, jpeg - Maximum file size: 4MB',
 
     // Generic terms
     'information' => 'Information',
@@ -77,6 +86,11 @@ return [
     'inactive' => 'Inactive',
     'optional' => 'Optional',
     'required' => 'Required',
+    'thank_you' => 'Thank you',
+    'close_window' => 'You can now close this window.',
+
+    'error' => 'Error',
+    'error_submitting' => 'Error while submitting. Try again.',
 
 
     // Pagination

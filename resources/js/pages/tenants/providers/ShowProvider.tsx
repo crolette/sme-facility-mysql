@@ -15,16 +15,18 @@ import { BreadcrumbItem, Intervention, Provider } from '@/types';
 import { router } from '@inertiajs/core';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Pencil, Trash, Trash2, Upload } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export default function ShowProvider({ item }: { item: Provider }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const { showToast } = useToast();
     const [provider, setProvider] = useState(item);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Index providers`,
+            title: `Index ${tChoice('providers.title', 2)}`,
             href: `/providers`,
         },
         {
@@ -70,7 +72,6 @@ export default function ShowProvider({ item }: { item: Provider }) {
     };
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    // const [uploadedImages, setUploadedImages] = useState([]);
 
     const handleUploadSuccess = (result) => {
         fetchProvider();
@@ -78,25 +79,6 @@ export default function ShowProvider({ item }: { item: Provider }) {
 
     const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
     const [activeTab, setActiveTab] = useState('information');
-
-    const [assets, setAssets] = useState();
-
-    const fetchAssets = async () => {
-        try {
-            const response = await axios.get(route('api.providers.assets', provider.id));
-            if (response.data.status === 'success') {
-                setAssets(response.data.data);
-            }
-        } catch (error) {
-            showToast(error.response.data.message, error.response.data.status);
-        }
-    };
-
-    useEffect(() => {
-        if (activeTab === 'assets') fetchAssets();
-    }, [activeTab]);
-
-    console.log(assets);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -106,16 +88,16 @@ export default function ShowProvider({ item }: { item: Provider }) {
                     <a href={route(`tenant.providers.edit`, provider.id)}>
                         <Button>
                             <Pencil />
-                            Edit
+                            {t('actions.edit')}
                         </Button>
                     </a>
                     <Button onClick={() => setShowDeleteModale(!showDeleteModale)} variant={'destructive'}>
                         <Trash2 />
-                        Delete
+                        {t('actions.delete')}
                     </Button>
                     <Button onClick={() => setIsModalOpen(true)} variant={'secondary'}>
                         <Upload size={20} />
-                        Uploader un logo
+                        {t('actions.upload-type', { type: t('common.logo') })}
                     </Button>
                 </div>
                 <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_4fr]">
@@ -133,14 +115,14 @@ export default function ShowProvider({ item }: { item: Provider }) {
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h2>Provider information</h2>
+                                <h2>{t('common.information')}</h2>
                                 <div className="grid gap-4 sm:grid-cols-[1fr_160px]">
                                     <div className="space-y-2">
-                                        <Field label={'Name'} text={provider.name} />
-                                        <Field label={'Address'} text={provider.address} />
-                                        <Field label={'Phone number'} text={provider.phone_number} />
-                                        <Field label={'VAT Number'} text={provider.vat_number} />
-                                        <Field label={'Email'} text={<a href={`mailto:${provider.email}`}>{provider.email}</a>} />
+                                        <Field label={t('common.name')} text={provider.name} />
+                                        <Field label={t('common.address')} text={provider.address} />
+                                        <Field label={t('common.phone')} text={provider.phone_number} />
+                                        <Field label={t('providers.vat_number')} text={provider.vat_number} />
+                                        <Field label={t('common.email')} text={<a href={`mailto:${provider.email}`}>{provider.email}</a>} />
                                     </div>
                                     <div className="shrink-1">
                                         {provider.logo && (
@@ -162,7 +144,7 @@ export default function ShowProvider({ item }: { item: Provider }) {
 
                         {activeTab === 'interventions' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h3>Interventions</h3>
+                                <h3>{tChoice('interventions.title', 2)}</h3>
 
                                 {item.assigned_interventions ? (
                                     <div>
@@ -171,14 +153,14 @@ export default function ShowProvider({ item }: { item: Provider }) {
                                                 <Table key={intervention.id} className="table-fixed">
                                                     <TableHead>
                                                         <TableHeadRow>
-                                                            <TableHeadData className="">Description</TableHeadData>
-                                                            <TableHeadData>Type</TableHeadData>
-                                                            <TableHeadData>Priority</TableHeadData>
-                                                            <TableHeadData>Status</TableHeadData>
-                                                            <TableHeadData>Assigned to</TableHeadData>
-                                                            <TableHeadData>Planned at</TableHeadData>
-                                                            <TableHeadData>Repair delay</TableHeadData>
-                                                            <TableHeadData>Total costs</TableHeadData>
+                                                            <TableHeadData className="">{t('common.description')}</TableHeadData>
+                                                            <TableHeadData>{t('common.type')}</TableHeadData>
+                                                            <TableHeadData>{t('interventions.priority')}</TableHeadData>
+                                                            <TableHeadData>{t('common.status')}</TableHeadData>
+                                                            <TableHeadData>{t('interventions.assigned_to')}</TableHeadData>
+                                                            <TableHeadData>{t('interventions.planned_at')}</TableHeadData>
+                                                            <TableHeadData>{t('interventions.repair_delay')}</TableHeadData>
+                                                            <TableHeadData>{t('interventions.total_costs')}</TableHeadData>
                                                         </TableHeadRow>
                                                     </TableHead>
 
@@ -195,9 +177,11 @@ export default function ShowProvider({ item }: { item: Provider }) {
                                                             </TableBodyData>
                                                             <TableBodyData>{intervention.type}</TableBodyData>
                                                             <TableBodyData>
-                                                                <Pill variant={intervention.priority}>{intervention.priority}</Pill>
+                                                                <Pill variant={intervention.priority}>
+                                                                    {t(`interventions.priority.${intervention.priority}`)}
+                                                                </Pill>
                                                             </TableBodyData>
-                                                            <TableBodyData>{intervention.status}</TableBodyData>
+                                                            <TableBodyData>{t(`interventions.status.${intervention.status}`)}</TableBodyData>
                                                             <TableBodyData>
                                                                 {intervention.assignable ? (
                                                                     intervention.assignable.full_name ? (
@@ -210,11 +194,13 @@ export default function ShowProvider({ item }: { item: Provider }) {
                                                                         </a>
                                                                     )
                                                                 ) : (
-                                                                    'not assigned'
+                                                                    t(`interventions.assigned_not`)
                                                                 )}
                                                             </TableBodyData>
-                                                            <TableBodyData>{intervention.planned_at ?? 'Not planned'}</TableBodyData>
-                                                            <TableBodyData>{intervention.repair_delay ?? 'No repair delay'}</TableBodyData>
+                                                            <TableBodyData>{intervention.planned_at ?? t(`interventions.planned_not`)}</TableBodyData>
+                                                            <TableBodyData>
+                                                                {intervention.repair_delay ?? t(`interventions.repair_delay_no`)}
+                                                            </TableBodyData>
                                                             <TableBodyData>
                                                                 {intervention.total_costs ? `${intervention.total_costs} €` : '-'}
                                                             </TableBodyData>
@@ -241,7 +227,7 @@ export default function ShowProvider({ item }: { item: Provider }) {
 
                         {activeTab === 'users' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h2>Users</h2>
+                                <h2>{tChoice('contacts.title', 2)}</h2>
 
                                 <UsersList items={provider.users} />
                             </div>
@@ -258,8 +244,8 @@ export default function ShowProvider({ item }: { item: Provider }) {
                 </div>
             </div>
             <Modale
-                title={'Delete provider'}
-                message={`Are you sure you want to delete this provider ${provider.name} ?`}
+                title={t('actions.delete-type', { type: tChoice('providers.title', 1) })}
+                message={t(`providers.delete_description`, { name: provider.name })}
                 isOpen={showDeleteModale}
                 onConfirm={deleteProvider}
                 onCancel={() => {
