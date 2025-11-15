@@ -10,17 +10,23 @@ import { Label } from '@/components/ui/label';
 import { Toggle } from '@/components/ui/toggle';
 import { cn } from '@/lib/utils';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Check, Pen, X } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Notification preferences',
-        href: '/settings/notification-preferences',
-    },
-];
-
 export default function NotificationPreferences({ items }: { items: NotificationPreference[] }) {
+    const { t } = useLaravelReactI18n();
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: `${t('settings.profile')}`,
+            href: '/settings/profile',
+        },
+        {
+            title: `${t('settings.notifications_title')}`,
+            href: '/settings/notification-preferences',
+        },
+    ];
+
     const [preferenceDayToChange, setPreferenceDayToChange] = useState<NotificationPreference | null>(null);
     const [preferences, setPreferences] = useState(items);
     const [errors, setErrors] = useState(null);
@@ -50,10 +56,8 @@ export default function NotificationPreferences({ items }: { items: Notification
         }
     }, [preferenceDayToChange]);
 
-    console.log(preferences);
     const submitPreference: FormEventHandler = async (e) => {
         e.preventDefault();
-        console.log('submitPreference');
         if (!preferenceDayToChange) return;
 
         try {
@@ -83,7 +87,6 @@ export default function NotificationPreferences({ items }: { items: Notification
         try {
             const response = await axios.patch(route('api.notifications.update', preference.id), { ...preference, enabled: !preference.enabled });
             if (response.data.status === 'success') {
-                console.log('updatedEnabledNotification');
                 fetchPreferences();
             }
         } catch (error) {
@@ -93,14 +96,11 @@ export default function NotificationPreferences({ items }: { items: Notification
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Notification preferences" />
+            <Head title={t('settings.notifications_title')} />
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall
-                        title="Notification preferences"
-                        description="Change your notification preferences. How many days prior to the date do you want to receive an e-mail?"
-                    />
+                    <HeadingSmall title={t('settings.notifications_title')} description={t('settings.notifications_description')} />
                     <ul>
                         {Object.keys(preferences).map((key: string) => (
                             <div key={key}>
@@ -109,7 +109,7 @@ export default function NotificationPreferences({ items }: { items: Notification
                                     {preferences[key].map((preference: NotificationPreference) => (
                                         <div key={preference.id}>
                                             <li className="grid w-full grid-cols-3 grid-rows-1 items-center gap-4">
-                                                <Label>{preference.notification_type}</Label>
+                                                <Label>{t(`notifications.${preference.notification_type}`)}</Label>
                                                 {preferenceDayToChange?.id !== preference.id ? (
                                                     <div className="inline-flex items-center gap-2">
                                                         <Label></Label> <span>{preference.notification_delay_days} days </span>
@@ -147,7 +147,7 @@ export default function NotificationPreferences({ items }: { items: Notification
                                                                 : 'cursor-pointer text-neutral-500 hover:bg-neutral-200/60 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-700/60',
                                                         )}
                                                     >
-                                                        <span className="text-sm">Yes</span>
+                                                        <span className="text-sm">{t('common.yes')}</span>
                                                     </button>
                                                     <button
                                                         key={'no'}
@@ -161,7 +161,7 @@ export default function NotificationPreferences({ items }: { items: Notification
                                                                 : 'cursor-pointer text-neutral-500 hover:bg-neutral-200/60 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-700/60',
                                                         )}
                                                     >
-                                                        <span className="text-sm">No</span>
+                                                        <span className="text-sm">{t('common.no')}</span>
                                                     </button>
                                                 </div>
                                             </li>

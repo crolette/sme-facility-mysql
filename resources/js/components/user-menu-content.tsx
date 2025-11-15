@@ -3,6 +3,7 @@ import { UserInfo } from '@/components/user-info';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { SharedData, type User } from '@/types';
 import { Link, router, usePage } from '@inertiajs/react';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { LogOut, Settings } from 'lucide-react';
 
 interface UserMenuContentProps {
@@ -10,6 +11,7 @@ interface UserMenuContentProps {
 }
 
 export function UserMenuContent({ user }: UserMenuContentProps) {
+    const { t } = useLaravelReactI18n();
     const cleanup = useMobileNavigation();
     const { version } = usePage<SharedData>().props;
     const handleLogout = () => {
@@ -29,7 +31,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                 <DropdownMenuItem asChild>
                     <Link className="block w-full" href={route('tenant.profile.edit')} as="button" prefetch onClick={cleanup}>
                         <Settings className="mr-2" />
-                        Settings
+                        {t('settings.title')}
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -37,12 +39,14 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             <DropdownMenuItem asChild>
                 <Link className="block w-full" method="post" href={route('tenant.logout')} as="button" onClick={handleLogout}>
                     <LogOut className="mr-2" />
-                    Log out
+                    {t('auth.logout')}
                 </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-                <p className="block text-xs">Version {version}</p>
+                <p className="block text-xs">
+                    {t('common.version')} {version}
+                </p>
             </DropdownMenuItem>
         </>
     );

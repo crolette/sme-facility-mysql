@@ -12,10 +12,12 @@ import { Asset, Contract, type BreadcrumbItem } from '@/types';
 import { router } from '@inertiajs/core';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArchiveRestore, CircleCheckBig, Pencil, QrCode, Shredder, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ShowAsset({ item }: { item: Asset }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index assets`,
@@ -109,11 +111,11 @@ export default function ShowAsset({ item }: { item: Asset }) {
                         <>
                             <Button onClick={() => restoreAsset(asset)} variant={'green'}>
                                 <ArchiveRestore />
-                                Restore
+                                {t('actions.restore')}
                             </Button>
                             <Button onClick={() => deleteDefinitelyAsset(asset)} variant={'destructive'}>
                                 <Shredder />
-                                Delete definitely
+                                {t('actions.delete_definitely')}
                             </Button>
                         </>
                     ) : (
@@ -121,24 +123,24 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             <a href={route(`tenant.assets.edit`, asset.reference_code)}>
                                 <Button>
                                     <Pencil />
-                                    Edit
+                                    {t('actions.edit')}
                                 </Button>
                             </a>
                             <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
                                 <Trash2 />
-                                Delete
+                                {t('actions.delete')}
                             </Button>
                             {asset.maintainable.need_maintenance && (
                                 <Button onClick={() => markMaintenanceDone()} variant={'green'}>
                                     <CircleCheckBig />
-                                    Mark maintenance as done
+                                    {t('maintenances.mark_as_done')}
                                 </Button>
                             )}
                         </>
                     )}
                     <Button onClick={generateQR} variant={'secondary'}>
                         <QrCode />
-                        Generate new QR
+                        {t('actions.generate_qr')}
                     </Button>
                 </div>
 
@@ -161,15 +163,15 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                 <h2>Asset information</h2>
                                 <div className="grid grid-cols-[1fr_160px] gap-4">
                                     <div className="space-y-2">
-                                        <Field label={'Name'} text={asset.name} />
-                                        <Field label={'category'} text={asset.category} />
-                                        <Field label={'Description'} text={asset.description} />
+                                        <Field label={t('common.name')} text={asset.name} />
+                                        <Field label={t('common.category')} text={asset.category} />
+                                        <Field label={t('common.description')} text={asset.description} />
                                         <div className="flex flex-wrap gap-4">
-                                            {asset.brand && <Field label={'Brand'} text={asset.brand} />}
-                                            {asset.model && <Field label={'model'} text={asset.model} />}
-                                            {asset.serial_number && <Field label={'Serial number'} text={asset.serial_number} />}
+                                            {asset.brand && <Field label={t('assets.brand')} text={asset.brand} />}
+                                            {asset.model && <Field label={t('assets.model')} text={asset.model} />}
+                                            {asset.serial_number && <Field label={t('assets.serial_number')} text={asset.serial_number} />}
                                         </div>
-                                        {asset.surface && <Field label={'Surface'} text={asset.surface} />}
+                                        {asset.surface && <Field label={t('common.surface')} text={asset.surface + ' m²'} />}
                                     </div>
                                     <div className="shrink-1">
                                         {asset.qr_code && (
@@ -190,10 +192,10 @@ export default function ShowAsset({ item }: { item: Asset }) {
                         {activeTab === 'maintenance' && (
                             <>
                                 <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
-                                    <h2>Maintenance</h2>
+                                    <h2>{tChoice('maintenances.title', 1)}</h2>
                                     <div className="space-y-2">
                                         <Field
-                                            label={'Maintenance manager'}
+                                            label={t('maintenances.maintenance_manager')}
                                             text={
                                                 asset.maintainable.manager ? (
                                                     <a href={route('tenant.users.show', asset.maintainable.manager.id)}>
@@ -201,19 +203,23 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                                         {asset.maintainable.manager.full_name}
                                                     </a>
                                                 ) : (
-                                                    'No manager'
+                                                    t('maintenances.no_manager')
                                                 )
                                             }
                                         />
                                         {asset.maintainable.need_maintenance && (
                                             <>
-                                                <Field label={'Maintenance frequency'} text={asset.maintainable.maintenance_frequency} />
+                                                <Field label={t('maintenances.frequency')} text={asset.maintainable.maintenance_frequency} />
                                                 <Field
-                                                    label={'Next maintenance date'}
+                                                    label={t('maintenances.next_maintenance_date')}
                                                     date
                                                     text={asset.maintainable.next_maintenance_date ?? 'Not planned'}
                                                 />
-                                                <Field label={'Last maintenance date'} date text={asset.maintainable.last_maintenance_date} />
+                                                <Field
+                                                    label={t('maintenances.last_maintenance_date')}
+                                                    date
+                                                    text={asset.maintainable.last_maintenance_date}
+                                                />
                                             </>
                                         )}
                                     </div>
@@ -221,12 +227,15 @@ export default function ShowAsset({ item }: { item: Asset }) {
 
                                 {asset.depreciable && (
                                     <div className="border-sidebar-border bg-sidebar mt-4 rounded-md border p-4">
-                                        <h2>Depreciation</h2>
+                                        <h2>{t('actions.depreciation')}</h2>
                                         <div className="space-y-2">
-                                            <Field label={'Depreciation duration'} text={asset.depreciation_duration} />
-                                            <Field label={'Depreciation start date'} date text={asset.depreciation_start_date} />
-                                            <Field label={'Depreciation end date'} date text={asset.depreciation_end_date} />
-                                            <Field label={'Residual value'} text={asset.residual_value} />
+                                            <Field label={t('actions.depreciation_duration')} text={asset.depreciation_duration} />
+                                            <Field label={t('actions.depreciation_start_date')} date text={asset.depreciation_start_date} />
+                                            <Field label={t('actions.depreciation_end_date')} date text={asset.depreciation_end_date} />
+                                            <Field
+                                                label={t('actions.residual_value')}
+                                                text={asset.residual_value ? asset.residual_value + ' €' : 'NC'}
+                                            />
                                         </div>
                                     </div>
                                 )}
@@ -235,12 +244,15 @@ export default function ShowAsset({ item }: { item: Asset }) {
 
                         {activeTab === 'warranty' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
-                                <h2>Purchase/Warranty</h2>
+                                <h2>{t('assets.purchase_warranty')}</h2>
                                 <div className="space-y-2">
-                                    <Field label={'Purchase date'} date text={asset.maintainable.purchase_date} />
-                                    <Field label={'Purchase cost'} text={asset.maintainable.purchase_cost} />
+                                    <Field label={t('assets.purchase_date')} date text={asset.maintainable.purchase_date} />
+                                    <Field
+                                        label={t('assets.purchase_cost')}
+                                        text={asset.maintainable.purchase_cost ? asset.maintainable.purchase_cost + ' €' : 'NC'}
+                                    />
                                     {asset.maintainable.under_warranty && (
-                                        <Field label={'End warranty date'} date text={asset.maintainable.end_warranty_date} />
+                                        <Field label={t('assets.warranty_end_date')} date text={asset.maintainable.end_warranty_date} />
                                     )}
                                 </div>
                             </div>
@@ -260,13 +272,13 @@ export default function ShowAsset({ item }: { item: Asset }) {
 
                         {activeTab === 'providers' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
-                                <h2>Providers</h2>
+                                <h2>{tChoice('providers.title', 2)}</h2>
                                 <div className="space-y-2">
                                     <ul>
                                         {asset.maintainable.providers?.map((provider, index) => (
                                             <li key={index}>
                                                 <Field
-                                                    label={'Providers'}
+                                                    label={tChoice('providers.title', 1)}
                                                     text={<a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>}
                                                 />
                                             </li>

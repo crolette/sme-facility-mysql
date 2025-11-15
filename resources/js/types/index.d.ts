@@ -32,6 +32,10 @@ export interface PaginatedData {
     }[];
 }
 
+export interface ProvidersPaginated extends PaginatedData {
+    data: Provider[];
+}
+
 export interface AssetsPaginated extends PaginatedData {
     data: Asset[];
 }

@@ -2,6 +2,7 @@ import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData
 import { cn } from '@/lib/utils';
 import { CentralType, Documents } from '@/types';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Loader2, Pencil, PlusCircle, Trash2, Unlink } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
@@ -42,6 +43,7 @@ export const DocumentManager = ({
     removableRoute,
     canAdd = true,
 }: DocumentManagerProps) => {
+    const { t, tChoice } = useLaravelReactI18n();
     const { showToast } = useToast();
     const [documents, setDocuments] = useState<Documents[]>();
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
@@ -123,8 +125,6 @@ export const DocumentManager = ({
         const documents = {
             existing_documents: existingDocuments.map((elem) => elem.id),
         };
-
-        console.log(documents);
 
         setIsUpdating(true);
 
@@ -237,18 +237,18 @@ export const DocumentManager = ({
     return (
         <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
             <div className="flex items-center justify-between">
-                <h2 className="inline">Documents ({documents?.length ?? 0})</h2>
+                <h2 className="inline">
+                    {tChoice('documents.title', 2)} ({documents?.length ?? 0})
+                </h2>
                 <div className="space-x-4">
                     {canAdd && (
                         <>
                             <Button onClick={() => setAddExistingDocumentsModale(true)}>
-                                {' '}
-                                <PlusCircle /> Add existing document
+                                <PlusCircle /> {t('documents.add_existing_document')}
                             </Button>
                             <Button onClick={() => addNewFile()}>
-                                {' '}
                                 <PlusCircle />
-                                Add new file
+                                {t('documents.add_new_document')}
                             </Button>
                         </>
                     )}
@@ -258,12 +258,12 @@ export const DocumentManager = ({
                 <Table>
                     <TableHead>
                         <TableHeadRow>
-                            <TableHeadData>File</TableHeadData>
-                            <TableHeadData>Size</TableHeadData>
-                            <TableHeadData>Name</TableHeadData>
-                            <TableHeadData>Description</TableHeadData>
-                            <TableHeadData>Category</TableHeadData>
-                            <TableHeadData>Created at</TableHeadData>
+                            <TableHeadData>{t('documents.file')}</TableHeadData>
+                            <TableHeadData>{t('documents.size')}</TableHeadData>
+                            <TableHeadData>{t('common.name')}</TableHeadData>
+                            <TableHeadData>{t('common.description')}</TableHeadData>
+                            <TableHeadData>{t('common.category')}</TableHeadData>
+                            <TableHeadData>{t('common.created_at')}</TableHeadData>
                             <TableHeadData></TableHeadData>
                         </TableHeadRow>
                     </TableHead>
@@ -296,7 +296,7 @@ export const DocumentManager = ({
                                             <>
                                                 <Button variant={'outline'} onClick={() => removeDocument(document.id)}>
                                                     <Unlink />
-                                                    Remove
+                                                    {t('actions.remove')}
                                                 </Button>
                                                 <Button onClick={() => editFile(document.id)}>
                                                     <Pencil />
@@ -331,7 +331,7 @@ export const DocumentManager = ({
                     <div className="flex flex-col gap-2">
                         <form onSubmit={submitType === 'edit' ? submitEditFile : submitNewFile} className="space-y-4">
                             <div>
-                                <Label>Document category</Label>
+                                <Label>{t('common.category')}</Label>
                                 <select
                                     name="documentType"
                                     required
@@ -352,7 +352,7 @@ export const DocumentManager = ({
                                     {documentTypes && documentTypes.length > 0 && (
                                         <>
                                             <option value={0} disabled className="bg-background text-foreground">
-                                                Select an option
+                                                {t(`actions.select-type`, { type: t(`common.category`) })}
                                             </option>
                                             {documentTypes?.map((documentType) => (
                                                 <option value={documentType.id} key={documentType.id} className="bg-background text-foreground">
@@ -366,7 +366,7 @@ export const DocumentManager = ({
 
                             {submitType === 'new' && (
                                 <>
-                                    <Label>File</Label>
+                                    <Label>{t(`documents.file`)}</Label>
                                     <Input
                                         type="file"
                                         name=""
@@ -380,17 +380,17 @@ export const DocumentManager = ({
                                         required
                                         accept="image/png, image/jpeg, image/jpg, .pdf"
                                     />
-                                    <p className="text-xs">Accepted files: png, jpg, pdf. - Maximum file size: 4MB</p>
+                                    <p className="text-xs">{t('documents.accepted_files_with_size', { size: 4 })}</p>
                                 </>
                             )}
 
-                            <Label>Document name</Label>
+                            <Label>{t(`common.name`)}</Label>
                             <Input
                                 type="text"
                                 name="name"
                                 value={newFileData.name}
                                 required
-                                placeholder="Document name"
+                                placeholder={t(`documents.name_placeholder`)}
                                 onChange={(e) =>
                                     setNewFileData((prev) => ({
                                         ...prev,
@@ -398,7 +398,7 @@ export const DocumentManager = ({
                                     }))
                                 }
                             />
-                            <Label>Document description</Label>
+                            <Label>{t(`common.description`)}</Label>
                             <Input
                                 type="text"
                                 name="description"
@@ -406,7 +406,7 @@ export const DocumentManager = ({
                                 value={newFileData.description}
                                 minLength={10}
                                 maxLength={250}
-                                placeholder="Document description"
+                                placeholder={t(`documents.description_placeholder`)}
                                 onChange={(e) =>
                                     setNewFileData((prev) => ({
                                         ...prev,
@@ -415,9 +415,9 @@ export const DocumentManager = ({
                                 }
                             />
                             <div className="flex justify-between">
-                                <Button>Submit</Button>
+                                <Button>{t('actions.submit')}</Button>
                                 <Button type="button" onClick={closeFileModal} variant={'outline'}>
-                                    Cancel
+                                    {t('actions.cancel')}
                                 </Button>
                             </div>
                         </form>
@@ -425,7 +425,7 @@ export const DocumentManager = ({
                 </ModaleForm>
             )}
             <Modale
-                title={'Delete document'}
+                title={t('actions.delete-type', { type: tChoice('documents.title', 1) })}
                 message={`Are you sure you want to delete this document ?`}
                 isOpen={showDeleteModale}
                 onConfirm={deleteDocument}
@@ -448,7 +448,7 @@ export const DocumentManager = ({
                             placeholder="Search documents..."
                         />
                         <div className="space-x-4">
-                            <Button onClick={addExistingDocumentsToAsset}>Add document</Button>
+                            <Button onClick={addExistingDocumentsToAsset}>{t('actions.add-type', { type: tChoice('documents.title', 1) })}</Button>
                             <Button
                                 variant="secondary"
                                 onClick={() => {
@@ -456,7 +456,7 @@ export const DocumentManager = ({
                                     setExistingDocuments([]);
                                 }}
                             >
-                                Cancel
+                                {t('actions.cancel')}
                             </Button>
                         </div>
                     </div>

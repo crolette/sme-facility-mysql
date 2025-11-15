@@ -1,0 +1,34 @@
+<?php
+
+return [
+    'title' => 'Asset|Assets',
+    'mobile_asset' => 'Mobile asset',
+    'mobile_asset_user' => 'User of the mobile asset',
+    'asset_linked_to' => 'Asset linked to',
+    'search_navigate_hierarchy' => 'Search or navigate through your hierarchy',
+    'selected_location' => 'Selected location',
+    'selected_location_none' => 'No location selected',
+    'need_qr_code' => 'Need QR Code',
+    'trashed' => 'Trashed',
+    'brand' => 'Brand',
+    'model' => 'Model',
+    'serial_number' => 'Serial number',
+
+    'depreciation' => 'Depreciation',
+    'depreciable' => 'Depreciable',
+    'depreciation_duration' => 'Depreciation duration',
+    'depreciation_duration_placeholder' => 'Years',
+    'depreciation_start_date' => 'Depreciation start date',
+    'depreciation_end_date' => 'Depreciation end date',
+    'residual_value' => 'Residual value',
+    'residual_value_placeholder' => 'Residual value after end of depreciation (max. 2 decimals) : 4236.36',
+
+    'still_under_warranty' => 'Still under warranty',
+    'purchase_warranty' => 'Purchase/Warranty',
+    'purchase_date' => 'Purchase date',
+    'purchase_date_placeholder' => 'Date of purchase',
+    'purchase_cost' => 'Purchase cost',
+    'purchase_cost_placeholder' => 'Purchase cost (max. 2 decimals) : 4236.36',
+    'warranty_end_date' => 'Warranty end date',
+
+];

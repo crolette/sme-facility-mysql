@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Asset, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from '@/types';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { BadgeAlert, BadgeCheck, Camera, Folder, Loader } from 'lucide-react';
 import { FormEventHandler, useEffect, useRef, useState } from 'react';
 
@@ -29,6 +30,7 @@ export default function CreateTicketFromQRCode({
     item: Asset | TenantSite | TenantBuilding | TenantFloor | TenantRoom;
     location_type: string;
 }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const updateTicketData = {
         website: '',
         ticket_id: null,
@@ -83,10 +85,10 @@ export default function CreateTicketFromQRCode({
 
     return (
         <>
-            <Head title="Tickets" />
+            <Head title={t('actions.create-type', { type: tChoice('tickets.title', 1) })} />
             <div className="bg-accent flex items-center justify-center">
                 <div className="border-sidebar-border bg-sidebar mx-auto flex w-10/12 flex-col rounded-md border p-4 shadow-xl md:w-1/2">
-                    <h1>Create new ticket</h1>
+                    <h1>{t('actions.create-type', { type: tChoice('tickets.title', 1) })}</h1>
                     <div className="my-4">
                         <h3>{item.name}</h3>
                         <p>{item.description}</p>
@@ -106,7 +108,7 @@ export default function CreateTicketFromQRCode({
                                 }))
                             }
                         />
-                        <Label htmlFor="reporter_email">E-mail address</Label>
+                        <Label htmlFor="reporter_email">{t('common.email')}</Label>
                         <Input
                             id="reporter_email"
                             type="email"
@@ -114,7 +116,7 @@ export default function CreateTicketFromQRCode({
                             value={newTicketData.reporter_email}
                             required
                             autoComplete="on"
-                            placeholder="Reporter email"
+                            placeholder={t('common.email_placeholder')}
                             onChange={(e) =>
                                 setNewTicketData((prev) => ({
                                     ...prev,
@@ -123,14 +125,14 @@ export default function CreateTicketFromQRCode({
                             }
                         />
                         <InputError message={errors?.reporter_email} />
-                        <Label htmlFor="description">Description of the problem</Label>
+                        <Label htmlFor="description">{t('tickets.description_problem')}</Label>
                         <Textarea
                             name="description"
                             id="description"
                             required
                             minLength={10}
                             maxLength={250}
-                            placeholder="Ticket description"
+                            placeholder={t('tickets.description_problem_placeholder')}
                             onChange={(e) =>
                                 setNewTicketData((prev) => ({
                                     ...prev,
@@ -141,14 +143,14 @@ export default function CreateTicketFromQRCode({
                         />
                         <InputError message={errors?.description} />
 
-                        <Label htmlFor="pictures">Pictures</Label>
+                        <Label htmlFor="pictures">{tChoice('common.pictures', 2)}</Label>
 
                         <div className="grid grid-cols-2 gap-4 sm:grid-cols-1">
                             <div
                                 className="bg-border space-y-3 rounded-md border-2 p-4 text-center sm:hidden"
                                 onClick={() => fileCameraRef.current?.click()}
                             >
-                                <p>Take a picture with my camera</p>
+                                <p>{t('tickets.take_picture_camera')}</p>
                                 <Camera className="mx-auto" />
                                 <Input
                                     ref={fileCameraRef}
@@ -172,9 +174,9 @@ export default function CreateTicketFromQRCode({
                                     fileInputRef.current?.click();
                                 }}
                             >
-                                <p>Upload a picture from my phone</p>
+                                <p>{t('actions.upload-type', { type: tChoice('common.pictures', 1) })}</p>
                                 <Folder className="mx-auto" />
-                                <p className="text-xs italic">Maximum 3 pictures</p>
+                                <p className="text-xs italic">{t('tickets.pictures_max', { number: 3 })}</p>
                                 <Input
                                     ref={fileInputRef}
                                     id="pictures"
@@ -208,7 +210,7 @@ export default function CreateTicketFromQRCode({
                         <InputError message={errors ? Object.getOwnPropertyDescriptor(errors, 'pictures.2')?.value : ''} />
 
                         <div className="flex items-center gap-4">
-                            <Label htmlFor="notified">Do you want to be notified when the ticket is closed ? </Label>
+                            <Label htmlFor="notified">{t('tickets.be_notified')}</Label>
                             <Checkbox
                                 id="notified"
                                 checked={newTicketData.being_notified}
@@ -220,16 +222,16 @@ export default function CreateTicketFromQRCode({
                                 }}
                             />
                         </div>
-                        <Button>Add new ticket</Button>
+                        <Button>{t('actions.add-type', { type: tChoice('tickets.title', 1) })}</Button>
                     </form>
                 </div>
                 {showSuccessModale && (
                     <ModaleForm>
                         <div className="flex flex-col items-center gap-4">
                             <BadgeCheck size={48} className="text-success" />
-                            <p className="text-success mx-auto text-3xl font-bold">Thank you</p>
-                            <p className="mx-auto">Ticket submitted</p>
-                            <p className="mx-auto">You can now close this window.</p>
+                            <p className="text-success mx-auto text-3xl font-bold">{t('common.thank_you')}</p>
+                            <p className="mx-auto">{t('type-submitted', { type: tChoice('tickets.title', 1) })}</p>
+                            <p className="mx-auto">{t('common.close_window')}</p>
                             <div className="mx-auto flex gap-4">
                                 {/* <Button variant={'secondary'} onClick={onCancel}>
                                         Close
@@ -242,11 +244,11 @@ export default function CreateTicketFromQRCode({
                     <ModaleForm>
                         <div className="flex flex-col items-center gap-4">
                             <BadgeAlert size={48} className="text-destructive" />
-                            <p className="text-destructive mx-auto text-3xl font-bold">Error</p>
-                            <p className="mx-auto">Error while submitting. Try again</p>
+                            <p className="text-destructive mx-auto text-3xl font-bold">{t('common.error')}</p>
+                            <p className="mx-auto">{t('common.error_submitting')}</p>
                             <div className="mx-auto flex gap-4">
                                 <Button variant={'secondary'} onClick={() => setShowErrorModale(false)}>
-                                    Close
+                                    {t('actions.close')}
                                 </Button>
                             </div>
                         </div>

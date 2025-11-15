@@ -1,0 +1,39 @@
+<?php
+
+return [
+    'title' => 'Instellingen',
+    'settings' => 'Profielinstellingen',
+    'settings_description' => 'Beheer uw profiel en accountinstellingen',
+
+
+    'profile' => 'Profiel',
+    'profile_title' => 'Profielinformatie',
+    'profile_description' => 'Werk uw naam en e-mailadres bij',
+
+    'update_picture' => 'Profielfoto bijwerken',
+    'update_information' => 'Profielinformatie bijwerken',
+    'update_password' => 'Wachtwoord bijwerken',
+
+    'notifications' => 'Notificaties',
+    'notifications_title' => 'Notificatievoorkeuren',
+    'notifications_description' => 'Wijzig uw notificatievoorkeuren. Hoeveel dagen voor de datum wilt u een e-mail ontvangen?',
+
+    'picture' => 'Profielfoto',
+    'picture_description' => 'Werk uw profielfoto bij',
+
+    'appearance' => 'Weergave',
+    'appearance_title' => 'Weergave-instellingen',
+    'appearance_description' => 'Werk de weergave-instellingen van uw account bij',
+
+    'import_export' => 'Import/Export',
+    'import_export_title' => '',
+    'import_export_description' => 'Beheer uw import en export',
+
+    'company' => 'Bedrijf',
+    'company_title' => 'Bedrijfsinformatie',
+    'company_description' => 'Werk bedrijfsinformatie bij. Als u het adres of de naam wilt wijzigen, neem dan contact op met SME-Facility support.',
+
+
+    'password_title' => 'Wachtwoord bijwerken',
+    'password_description' => 'Zorg ervoor dat uw account een lang, willekeurig wachtwoord gebruikt om veilig te blijven',
+];

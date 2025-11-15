@@ -52,7 +52,7 @@ Route::middleware([
             Route::get('/assets/', function (Site $site) {
                 if (Auth::user()->cannot('view', $site))
                     return ApiResponse::notAuthorized();
-                return ApiResponse::success($site->load('assets')->assets);
+                return ApiResponse::success($site->assets()->paginate());
             })->name('api.sites.assets');
 
             Route::prefix('/documents')->group(function () {

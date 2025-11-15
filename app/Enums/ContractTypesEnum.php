@@ -12,6 +12,6 @@ enum ContractTypesEnum: string
     case ALLIN = 'all-in';
     case INSURANCE = 'insurance';
     case CLEANING = 'cleaning';
-    case ONDEMAND = 'on demand';
+    case ONDEMAND = 'on_demand';
     case OTHER = 'other';
 }
