@@ -8,8 +8,6 @@ export default function LocaleChange() {
         router.visit(route('tenant.locale', locale));
     };
 
-    console.log(currentLocale());
-
     return (
         <>
             <label htmlFor="language" className="hidden">

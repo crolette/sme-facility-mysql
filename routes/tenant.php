@@ -70,18 +70,13 @@ Route::middleware([
 
     Route::get('locale/{locale}', function (Request $request, $locale) {
 
-        // Check if the passed locale is available in our configuration
-
         if (in_array($locale, array_keys(config('laravellocalization.supportedLocales')))) {
-            // If valid, store the locale in the session
             Auth::user()->setLocale($locale);
             Session::put('locale', $locale);
             App::setLocale($locale);
         }
 
-        // Redirect back to the previous page
-        // return redirect(LaravelLocalization::getLocalizedURL($locale, url()->previous()));
-        return redirect()->back();
+        return Inertia::location(url()->previous());
     })->name('tenant.locale');
 
     Route::get('dashboard', [DashboardController::class, 'show'])->name('tenant.dashboard');

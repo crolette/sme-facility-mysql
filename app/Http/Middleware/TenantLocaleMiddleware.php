@@ -16,9 +16,8 @@ class TenantLocaleMiddleware
 {
     public function handle($request, Closure $next)
     {
-
         if (Auth::user()?->preferred_locale) {
-            App::setLocale(Auth::user()->preferred_locale);
+            App::setLocale(Auth::user()?->preferred_locale);
         } else if (Session::has('locale')) {
             App::setLocale(Session::get('locale'));
         } else {
