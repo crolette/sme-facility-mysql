@@ -859,6 +859,7 @@ it('deletes planned_at notification when intervention status changes to complete
         'intervention_type_id' => $this->interventionType->id,
         'priority' => 'medium',
         'status' => $status,
+        'description' => fake()->paragraph(),
         'locationId' => $this->asset->reference_code,
         'locationType' => get_class($this->asset)
     ];
@@ -884,6 +885,7 @@ it('does not delete planned_at notification when intervention status changes to 
         'intervention_type_id' => $this->interventionType->id,
         'priority' => 'medium',
         'status' => $status,
+        'description' => fake()->paragraph(),
         'locationId' => $this->asset->reference_code,
         'locationType' => get_class($this->asset)
     ];

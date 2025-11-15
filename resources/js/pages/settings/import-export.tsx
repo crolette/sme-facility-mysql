@@ -6,20 +6,10 @@ import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Loader } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Settings',
-        href: '/settings/profile',
-    },
-    {
-        title: 'Import/Export',
-        href: '/settings/import-export',
-    },
-];
 
 interface TypeFormData {
     file: File | null;
@@ -27,6 +17,17 @@ interface TypeFormData {
 
 export default function ImportExportSettings() {
     // const [isModalOpen, setIsModalOpen] = useState(false);
+    const { t, tChoice } = useLaravelReactI18n();
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: `${t('settings.profile')}`,
+            href: '/settings/profile',
+        },
+        {
+            title: `${t('settings.import_export')}`,
+            href: '/settings/import-export',
+        },
+    ];
     const { showToast } = useToast();
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
@@ -116,12 +117,12 @@ export default function ImportExportSettings() {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Import/Export" />
+            <Head title={t('settings.import_export')} />
 
             <SettingsLayout>
                 <div className="w-full space-y-6 space-x-2">
                     <div className="relative gap-4">
-                        <HeadingSmall title="Import/Export" />
+                        <HeadingSmall title={t('settings.import_export')} description={t('settings.import_export_description')} />
                     </div>
 
                     <div className="flex w-fit flex-col gap-4">
@@ -129,16 +130,16 @@ export default function ImportExportSettings() {
                             <option value="" disabled>
                                 -- Select items to export --
                             </option>
-                            <option value="assets">Assets</option>
-                            <option value="providers">Providers</option>
-                            <option value="users">Users</option>
+                            <option value="assets">{tChoice('assets.title', 2)}</option>
+                            <option value="providers">{tChoice('providers.title', 2)}</option>
+                            <option value="users">{tChoice('contacts.title', 2)}</option>
                         </select>
                         <Button variant={'secondary'} onClick={exportItems} disabled={isProcessing || !itemsToBeExported}>
                             <BiSolidFilePdf size={20} />
-                            Export
+                            {t('actions.export')}
                         </Button>
                     </div>
-                    <h3>Assets</h3>
+                    <h3>{tChoice('assets.title', 2)}</h3>
                     <form action="" onSubmit={uploadAssetFile}>
                         <input
                             type="file"
@@ -151,14 +152,14 @@ export default function ImportExportSettings() {
                             {isProcessing ? (
                                 <>
                                     <Loader className="animate-pulse" />
-                                    <span>Submitting...</span>
+                                    <span>{t('actions.processing')}</span>
                                 </>
                             ) : (
-                                <span>Submit</span>
+                                <span>{t('actions.submit')}</span>
                             )}
                         </Button>
                     </form>
-                    <h3>Providers</h3>
+                    <h3>{tChoice('providers.title', 2)}</h3>
 
                     <form action="" onSubmit={uploadProviderFile}>
                         <input
@@ -172,15 +173,15 @@ export default function ImportExportSettings() {
                             {isProcessing ? (
                                 <>
                                     <Loader className="animate-pulse" />
-                                    <span>Submitting...</span>
+                                    <span>{t('actions.processing')}</span>
                                 </>
                             ) : (
-                                <span>Submit</span>
+                                <span>{t('actions.submit')}</span>
                             )}
                         </Button>
                     </form>
 
-                    <h3>Users</h3>
+                    <h3>{tChoice('contacts.title', 2)}</h3>
                     <form action="" onSubmit={uploadUserFile}>
                         <input
                             type="file"
@@ -193,10 +194,10 @@ export default function ImportExportSettings() {
                             {isProcessing ? (
                                 <>
                                     <Loader className="animate-pulse" />
-                                    <span>Submitting...</span>
+                                    <span>{t('actions.processing')}</span>
                                 </>
                             ) : (
-                                <span>Submit</span>
+                                <span>{t('actions.submit')}</span>
                             )}
                         </Button>
                     </form>

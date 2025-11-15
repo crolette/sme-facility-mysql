@@ -54,7 +54,7 @@ Route::middleware([
 
         // Get all assets from a floor
         Route::get('/assets/', function (Floor $floor) {
-            return ApiResponse::success($floor->load('assets')->assets);
+            return ApiResponse::success($floor->assets()->paginate());
         })->name('api.floors.assets');
 
         Route::prefix('/documents')->group(function () {

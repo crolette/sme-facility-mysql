@@ -1,6 +1,7 @@
 import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
+import { LaravelReactI18nProvider } from 'laravel-react-i18n';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { ToastProvider } from './components/ToastrContext';
@@ -16,11 +17,15 @@ createInertiaApp({
         const root = createRoot(el);
 
         root.render(
+
+        <LaravelReactI18nProvider fallbackLocale={'en'} files={import.meta.glob('/lang/*.json', { eager: true })}>
             <ToastProvider>
                 <GridTableLayoutProvider>
                     <App {...props} />
                 </GridTableLayoutProvider>
-            </ToastProvider>,
+            </ToastProvider>
+            </LaravelReactI18nProvider>,
+
         );
     },
     progress: {

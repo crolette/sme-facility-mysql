@@ -12,6 +12,8 @@ import { Asset, AssetsPaginated, BreadcrumbItem, CentralType } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { ArchiveRestore, LayoutGrid, Loader, Pencil, PlusCircle, Shredder, TableIcon, Trash2, X } from 'lucide-react';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
+
 import { useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
@@ -24,9 +26,10 @@ export interface SearchParams {
 }
 
 export default function IndexAssets({ items, filters, categories }: { items: AssetsPaginated; filters: SearchParams; categories: CentralType[] }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Index assets`,
+            title: `Index ${tChoice('assets.title', 2)}`,
             href: `/assets`,
         },
     ];
@@ -205,7 +208,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Assets" />
+            <Head title={tChoice('assets.title', 2)} />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="border-accent flex gap-10 border-b-2">
@@ -220,7 +223,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                 setTrashedAssetsTab(false);
                             }}
                         >
-                            active
+                            {t('common.active')}
                         </li>
                         <li
                             className={cn(
@@ -232,18 +235,18 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                 setTrashedAssetsTab(true);
                             }}
                         >
-                            trashed
+                            {t('assets.trashed')}
                         </li>
                     </ul>
                 </div>
                 <div>
                     <div className="border-accent flex flex-col gap-2 border-b-2 pb-2 sm:flex-row sm:gap-10">
                         <details className="border-border relative w-full rounded-md border-2 p-1" open={isLoading ? false : undefined}>
-                            <summary>Search/Filter</summary>
+                            <summary>{t('common.search_filter')}</summary>
 
                             <div className="bg-border border-border text-background dark:text-foreground absolute top-full z-10 flex flex-col items-center gap-4 rounded-b-md border-2 p-2 lg:flex-row">
                                 <div className="flex flex-col items-center gap-2">
-                                    <Label htmlFor="category">Category</Label>
+                                    <Label htmlFor="category">{t('common.category')}</Label>
                                     <select
                                         name="category"
                                         id="category"
@@ -251,7 +254,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                         onChange={(e) => setCategorySearch(parseInt(e.target.value))}
                                     >
                                         <option value={0} aria-readonly>
-                                            Select a category
+                                            {t('actions.select-type', { type: t('common.category') })}
                                         </option>
                                         {categories.map((category) => (
                                             <option key={category.label} value={category.id}>
@@ -261,7 +264,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                     </select>
                                 </div>
                                 <div className="flex flex-col items-center gap-2">
-                                    <Label htmlFor="category">Search</Label>
+                                    <Label htmlFor="category">{t('actions.search')}</Label>
                                     <div className="relative text-black dark:text-white">
                                         <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} className="" />
                                         <X
@@ -271,7 +274,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                     </div>
                                 </div>
                                 <Button onClick={clearSearch} size={'xs'}>
-                                    Clear Search
+                                    {t('actions.search-clear')}
                                 </Button>
                             </div>
                         </details>
@@ -279,117 +282,91 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                             <a href={route(`tenant.assets.create`)} className="w-fit">
                                 <Button>
                                     <PlusCircle />
-                                    Create
+                                    {t('actions.create')}
                                 </Button>
                             </a>
                             <a href={route('tenant.pdf.qr-codes', { type: 'assets' })} target="__blank">
                                 <Button variant={'secondary'}>
                                     <BiSolidFilePdf size={20} />
-                                    Download QR Codes
+                                    {t('actions.download-type', { type: tChoice('common.qr_codes', 2) })}
                                 </Button>
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <div className="flex gap-4">
-                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('grid')}>
-                        <LayoutGrid size={20} />
-                    </div>
-                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('table')}>
-                        <TableIcon size={20} />
-                    </div>
-                </div>
-                {layout === 'grid' ? (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
-                        {assets.map((asset, index) => (
-                            <div key={index} className="border-accent bg-sidebar flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4">
-                                {asset.deleted_at ? (
-                                    <a href={route(`tenant.assets.deleted`, asset.id)}> {asset.reference_code} </a>
-                                ) : (
-                                    <a href={route(`tenant.assets.show`, asset.reference_code)}> {asset.reference_code} </a>
-                                )}
-                                <p className="text-xs">{asset.code ?? ''}</p>
-                                <p className="text-xs">{asset.category ?? ''}</p>
-                                <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">{asset.maintainable.name}</p>
-                                <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">{asset.maintainable.description}</p>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <Table>
-                        <TableHead>
-                            <TableHeadRow>
-                                <TableHeadData>Reference code</TableHeadData>
-                                <TableHeadData>Code</TableHeadData>
-                                <TableHeadData>Category</TableHeadData>
-                                <TableHeadData className="max-w-72">Name</TableHeadData>
-                                <TableHeadData className="max-w-72">Description</TableHeadData>
-                                <TableHeadData></TableHeadData>
-                            </TableHeadRow>
-                        </TableHead>
-                        <TableBody>
-                            {isLoading ? (
-                                <TableBodyRow>
-                                    <TableBodyData>
-                                        <p className="flex animate-pulse gap-2">
-                                            <Loader />
-                                            Searching...
-                                        </p>
-                                    </TableBodyData>
-                                </TableBodyRow>
-                            ) : assets.length > 0 ? (
-                                assets.map((asset, index) => {
-                                    return (
-                                        <TableBodyRow key={index}>
-                                            <TableBodyData>
-                                                {asset.deleted_at ? (
-                                                    <a href={route(`tenant.assets.deleted`, asset.id)}> {asset.reference_code} </a>
-                                                ) : (
-                                                    <a href={route(`tenant.assets.show`, asset.reference_code)}> {asset.reference_code} </a>
-                                                )}
-                                            </TableBodyData>
-                                            <TableBodyData>{asset.code}</TableBodyData>
-                                            <TableBodyData>{asset.category}</TableBodyData>
-                                            <TableBodyData>
-                                                <span className="flex max-w-72">
-                                                    <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{asset.maintainable.name}</p>
-                                                </span>
-                                            </TableBodyData>
-                                            <TableBodyData>
-                                                <span className="flex max-w-72">
-                                                    <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">
-                                                        {asset.maintainable.description}
-                                                    </p>
-                                                </span>
-                                            </TableBodyData>
+                <Table>
+                    <TableHead>
+                        <TableHeadRow>
+                            <TableHeadData>{t('common.reference_code')}</TableHeadData>
+                            <TableHeadData>{t('common.code')}</TableHeadData>
+                            <TableHeadData>{t('common.category')}</TableHeadData>
+                            <TableHeadData className="max-w-72">{t('common.name')}</TableHeadData>
+                            <TableHeadData className="max-w-72">{t('common.description')}</TableHeadData>
+                            <TableHeadData></TableHeadData>
+                        </TableHeadRow>
+                    </TableHead>
+                    <TableBody>
+                        {isLoading ? (
+                            <TableBodyRow>
+                                <TableBodyData>
+                                    <p className="flex animate-pulse gap-2">
+                                        <Loader />
+                                        {t('actions.searching')}
+                                    </p>
+                                </TableBodyData>
+                            </TableBodyRow>
+                        ) : assets.length > 0 ? (
+                            assets.map((asset, index) => {
+                                return (
+                                    <TableBodyRow key={index}>
+                                        <TableBodyData>
+                                            {asset.deleted_at ? (
+                                                <a href={route(`tenant.assets.deleted`, asset.id)}> {asset.reference_code} </a>
+                                            ) : (
+                                                <a href={route(`tenant.assets.show`, asset.reference_code)}> {asset.reference_code} </a>
+                                            )}
+                                        </TableBodyData>
+                                        <TableBodyData>{asset.code}</TableBodyData>
+                                        <TableBodyData>{asset.category}</TableBodyData>
+                                        <TableBodyData>
+                                            <span className="flex max-w-72">
+                                                <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{asset.maintainable.name}</p>
+                                            </span>
+                                        </TableBodyData>
+                                        <TableBodyData>
+                                            <span className="flex max-w-72">
+                                                <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">
+                                                    {asset.maintainable.description}
+                                                </p>
+                                            </span>
+                                        </TableBodyData>
 
-                                            <TableBodyData className="space-x-2">
-                                                {asset.deleted_at ? (
-                                                    <>
-                                                        <Button onClick={() => restoreAsset(asset)} variant={'green'}>
-                                                            <ArchiveRestore />
-                                                            {/* Restore */}
+                                        <TableBodyData className="space-x-2">
+                                            {asset.deleted_at ? (
+                                                <>
+                                                    <Button onClick={() => restoreAsset(asset)} variant={'green'}>
+                                                        <ArchiveRestore />
+                                                        {/* Restore */}
+                                                    </Button>
+                                                    <Button
+                                                        onClick={() => {
+                                                            setAssetToDeleteDefinitely(asset.reference_code);
+                                                            setShowDeleteDefinitelyModale(true);
+                                                        }}
+                                                        variant={'destructive'}
+                                                    >
+                                                        <Shredder />
+                                                        {/* Delete definitely */}
+                                                    </Button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <a href={route(`tenant.assets.edit`, asset.reference_code)}>
+                                                        <Button>
+                                                            <Pencil />
                                                         </Button>
-                                                        <Button
-                                                            onClick={() => {
-                                                                setAssetToDeleteDefinitely(asset.reference_code);
-                                                                setShowDeleteDefinitelyModale(true);
-                                                            }}
-                                                            variant={'destructive'}
-                                                        >
-                                                            <Shredder />
-                                                            {/* Delete definitely */}
-                                                        </Button>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <a href={route(`tenant.assets.edit`, asset.reference_code)}>
-                                                            <Button>
-                                                                <Pencil />
-                                                            </Button>
-                                                        </a>
-                                                        <Button
+                                                       <Button
                                                             onClick={() => {
                                                                 setAssetToDelete(asset);
                                                                 setShowDeleteModale(true);
@@ -399,6 +376,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                                             <Trash2 />
                                                         </Button>
                                                     </>
+                                                ) 
                                                 )}
                                             </TableBodyData>
                                         </TableBodyRow>

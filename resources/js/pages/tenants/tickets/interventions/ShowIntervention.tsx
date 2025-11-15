@@ -16,6 +16,7 @@ import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Intervention, InterventionStatus, Provider, User } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Loader, Pencil, Trash2, X } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 
@@ -28,13 +29,14 @@ export default function ShowIntervention({
     statuses: InterventionStatus[];
     types: CentralType[];
 }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Index interventions`,
+            title: `Index ${tChoice('interventions.title', 2)}`,
             href: `/interventions/`,
         },
         {
-            title: `Show intervention`,
+            title: intervention.description,
             href: `/interventions/${intervention}`,
         },
     ];
@@ -74,7 +76,6 @@ export default function ShowIntervention({
                 setProviders(response.data.data);
             }
         } catch (error) {
-            console.log(error);
             showToast(error.response.data.message, error.response.data.status);
         }
     };
@@ -89,7 +90,6 @@ export default function ShowIntervention({
                     setExternalProviders(response.data.data);
                 }
             } catch (error) {
-                console.log(error);
                 showToast(error.response.data.message, error.response.data.status);
             }
     };
@@ -152,8 +152,6 @@ export default function ShowIntervention({
             }
         }
     };
-
-    console.log(interventionAssignees);
 
     const removeAssignee = (assignee: User) => {
         const newAssignees = interventionAssignees.filter((x) => {
@@ -250,11 +248,11 @@ export default function ShowIntervention({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Intervention" />
+            <Head title={intervention.description} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                     <ul className="flex items-center gap-2">
-                        <p>Status : </p>
+                        <p>{t('common.status')} : </p>
                         {statuses.map((status, index) => (
                             <li key={index} className="flex items-center gap-2">
                                 <Pill
@@ -265,7 +263,7 @@ export default function ShowIntervention({
                                         'cursor-pointer',
                                     )}
                                 >
-                                    {status}
+                                    {t(`interventions.status.${status}`)}
                                 </Pill>
                                 {index !== statuses.length - 1 && <span className="">{' > '}</span>}
                             </li>
@@ -273,7 +271,7 @@ export default function ShowIntervention({
                     </ul>
                     <div className="flex items-center gap-4">
                         <Button onClick={() => sendIntervention(intervention.id)} variant={'cta'}>
-                            Assign To
+                            {t('interventions.assign_to')}
                         </Button>
                         <Button onClick={() => editIntervention(intervention.id)}>
                             <Pencil />
@@ -308,19 +306,23 @@ export default function ShowIntervention({
                         {activeTab === 'information' && (
                             <>
                                 <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                    <h2>Intervention information</h2>
+                                    <h2>{t('common.information')}</h2>
                                     <div className="space-y-2">
-                                        <Field label={'intervention type'} text={intervention.type} />
-                                        {intervention.planned_at && <Field label={'Planned at'} date text={intervention.planned_at} />}
-                                        <Field label={'Description'} text={intervention.description} />
-                                        {intervention.total_costs && <Field label={'Total costs'} text={intervention.total_costs} />}
-                                        {intervention.repair_delay && <Field label={'Repair delay'} text={intervention.repair_delay} />}
+                                        <Field label={t('common.type')} text={intervention.type} />
+                                        {intervention.planned_at && (
+                                            <Field label={t('interventions.planned_at')} date text={intervention.planned_at} />
+                                        )}
+                                        <Field label={t('common.description')} text={intervention.description} />
+                                        {intervention.total_costs && <Field label={t('interventions.total_costs')} text={intervention.total_costs} />}
+                                        {intervention.repair_delay && (
+                                            <Field label={t('interventions.repair_delay')} text={intervention.repair_delay} />
+                                        )}
                                         <div className="flex flex-wrap gap-4">
-                                            <Field label={'Created at'} date text={intervention.created_at} />
-                                            <Field label={'Updated at'} date text={intervention.updated_at} />
+                                            <Field label={t('common.created_at')} date text={intervention.created_at} />
+                                            <Field label={t('common.updated_at')} date text={intervention.updated_at} />
                                         </div>
                                         <Field
-                                            label={'Assigned to'}
+                                            label={t('interventions.assigned_to')}
                                             text={
                                                 intervention.assignable ? (
                                                     intervention.assignable.full_name ? (
@@ -333,7 +335,7 @@ export default function ShowIntervention({
                                                         </a>
                                                     )
                                                 ) : (
-                                                    'not assigned'
+                                                    t('interventions.assigned_not')
                                                 )
                                             }
                                         />
@@ -359,10 +361,8 @@ export default function ShowIntervention({
                 </div>
             </div>
             <Modale
-                title={'Delete intervention'}
-                message={
-                    'Are you sure to delete this intervention ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.'
-                }
+                title={t('actions.delete-type', { type: tChoice('interventions.titel', 1) })}
+                message={t('interventions.delete_description')}
                 isOpen={showDeleteInterventionModale}
                 isProcessing={isProcessing}
                 onConfirm={deleteIntervention}
@@ -372,17 +372,17 @@ export default function ShowIntervention({
                 }}
             />
             {addIntervention && (
-                <ModaleForm title={'Edit intervention'}>
+                <ModaleForm title={t('actions.add-type', { type: tChoice('interventions.titel', 1) })}>
                     {isProcessing && (
                         <div className="flex flex-col items-center gap-4">
                             <Loader size={48} className="animate-pulse" />
-                            <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
-                            <p className="mx-auto">Intervention is being added...</p>
+                            <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.processing')}</p>
+                            <p className="mx-auto">{t('actions.being-created-type', { type: tChoice('interventions.titel', 1) })}</p>
                         </div>
                     )}
                     {!isProcessing && (
                         <form onSubmit={submitEditIntervention} className="flex w-full flex-col space-y-4">
-                            <Label>Intervention Type</Label>
+                            <Label>{t('common.type')}</Label>
                             <select
                                 name="intervention_type"
                                 id="intervention_type"
@@ -395,17 +395,17 @@ export default function ShowIntervention({
                                     }))
                                 }
                             >
-                                <option value="">Select intervention type</option>
+                                <option value="">{t('actions.select-type', { type: t('common.type') })}</option>
                                 {types?.map((interventionType) => (
                                     <option key={interventionType.id} value={interventionType.id}>
                                         {interventionType.label}
                                     </option>
                                 ))}
                             </select>
-                            <Label>Status</Label>
+                            <Label htmlFor="status">{t('common.status')}</Label>
                             <select
-                                name=""
-                                id=""
+                                name="status"
+                                id="status"
                                 required
                                 value={interventionDataForm.status ?? ''}
                                 onChange={(e) =>
@@ -415,15 +415,15 @@ export default function ShowIntervention({
                                     }))
                                 }
                             >
-                                <option value="">Select status</option>
-                                <option value="draft">draft</option>
-                                <option value="planned">planned</option>
-                                <option value="in progress">in progress</option>
-                                <option value="waiting for parts">waiting for parts</option>
-                                <option value="completed">completed</option>
-                                <option value="cancelled">cancelled</option>
+                                <option value="">{t('actions.select-type', { type: t('common.status') })}</option>
+                                <option value="draft">{t('interventions.status.draft')}</option>
+                                <option value="planned">{t('interventions.status.planned')}</option>
+                                <option value="in_progress">{t('interventions.status.in_progress')}</option>
+                                <option value="waiting_parts">{t('interventions.status.waiting_parts')}</option>
+                                <option value="completed">{t('interventions.status.completed')}</option>
+                                <option value="cancelled">{t('interventions.status.cancelled')}</option>
                             </select>
-                            <Label>Priority</Label>
+                            <Label>{t('interventions.priority')}</Label>
                             <select
                                 name=""
                                 id=""
@@ -436,13 +436,13 @@ export default function ShowIntervention({
                                     }))
                                 }
                             >
-                                <option value="">Select priority</option>
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
-                                <option value="urgent">Urgent</option>
+                                <option value="">{t('actions.select-type', { type: t('interventions.priority') })}</option>
+                                <option value="low">{t('interventions.priority.low')}</option>
+                                <option value="medium">{t('interventions.priority.medium')}</option>
+                                <option value="high">{t('interventions.priority.high')}</option>
+                                <option value="urgent">{t('interventions.priority.urgent')}</option>
                             </select>
-                            <Label>Description</Label>
+                            <Label>{t('common.description')}</Label>
                             <Textarea
                                 placeholder="description"
                                 value={interventionDataForm.description ?? ''}
@@ -453,7 +453,7 @@ export default function ShowIntervention({
                                     }))
                                 }
                             ></Textarea>
-                            <Label>Planned at</Label>
+                            <Label>{t('interventions.planned_at')}</Label>
                             <div className="flex gap-2">
                                 <Input
                                     type="date"
@@ -475,10 +475,10 @@ export default function ShowIntervention({
                                         }))
                                     }
                                 >
-                                    Clear planned at
+                                    {t('actions.clear-type', { type: t('interventions.planned_at') })}
                                 </Button>
                             </div>
-                            <Label>Repair delay</Label>
+                            <Label>{t('interventions.repair_delay')}</Label>
                             <div className="flex gap-2">
                                 <Input
                                     type="date"
@@ -500,12 +500,14 @@ export default function ShowIntervention({
                                         }))
                                     }
                                 >
-                                    Clear Repair delay
+                                    {t('actions.clear-type', { type: t('interventions.repair_delay') })}
                                 </Button>
                             </div>
-                            <Button type="submit">Submit</Button>
+                            <Button type="submit">
+                                <Label>{t('actions.submit')}</Label>
+                            </Button>
                             <Button onClick={closeModale} type="button" variant={'secondary'}>
-                                Cancel
+                                <Label>{t('actions.cancel')}</Label>
                             </Button>
                         </form>
                     )}
@@ -516,16 +518,16 @@ export default function ShowIntervention({
                     {isProcessing && (
                         <div className="flex flex-col items-center gap-4">
                             <Loader size={48} className="animate-pulse" />
-                            <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
-                            <p className="mx-auto">Intervention is being sent...</p>
+                            <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.processing')}</p>
+                            <p className="mx-auto">{t('actions.type-being-sent', { type: tChoice('interventions.title', 1) })}</p>
                         </div>
                     )}
                     {!isProcessing && (
                         <div className="flex flex-col gap-4">
-                            <p>Select user provider or internal user to assign this intervention to</p>
+                            <p>{t('interventions.assign_to_description')}</p>
 
                             <div className="flex w-full flex-col">
-                                <p className="font-semibold">Linked Providers</p>
+                                <p className="font-semibold">{t('providers.linked')}</p>
                                 {providers ? (
                                     providers.length > 0 ? (
                                         <>
@@ -559,7 +561,7 @@ export default function ShowIntervention({
                                                                         </li>
                                                                     ))
                                                                 ) : (
-                                                                    <p>No users</p>
+                                                                    <p>{t('contacts.none')}</p>
                                                                 )}
                                                             </ul>
                                                         </li>
@@ -568,24 +570,26 @@ export default function ShowIntervention({
                                             </ul>
                                         </>
                                     ) : (
-                                        <p>No providers</p>
+                                        <p>{t('providers.none')}</p>
                                     )
                                 ) : (
-                                    <p className="animate-pulse">Loading providers...</p>
+                                    <p className="animate-pulse">{t('actions.loading')}</p>
                                 )}
                             </div>
                             <div>
-                                <p className="font-semibold">Search other providers</p>
+                                <p className="font-semibold">{t('actions.search-type', { type: tChoice('providers.title', 2) })}</p>
 
                                 <form onSubmit={fetchExternalProviders}>
-                                    <Label htmlFor="">Search</Label>
+                                    <Label htmlFor="search">{t('actions.search')}</Label>
+
                                     <div className="flex items-center gap-4">
                                         <Input
+                                            id="search"
                                             type="text"
                                             value={externalProvidersQuery ?? ''}
                                             onChange={(e) => setExternalProvidersQuery(e.target.value)}
                                         />
-                                        <Button type="submit">Search</Button>
+                                        <Button type="submit">{t('actions.search')}</Button>
                                     </div>
                                 </form>
                                 {externalProviders &&
@@ -625,7 +629,7 @@ export default function ShowIntervention({
                                     ))}
                             </div>
                             <div className="flex w-full flex-col">
-                                <p className="font-semibold">Internal users</p>
+                                <p className="font-semibold">{tChoice('contacts.title', 2)}</p>
                                 <SearchableInput<User>
                                     searchUrl={route('api.users.search')}
                                     searchParams={{ interns: 1 }}
@@ -642,14 +646,14 @@ export default function ShowIntervention({
                                         setProvider(null);
                                         setUser(user.id);
                                     }}
-                                    placeholder="Search internal user..."
+                                    placeholder={t('actions.search-type', { type: tChoice('contacts.title', 2) })}
                                     className="mb-4"
                                 />
                             </div>
 
                             {interventionAssignees && (
                                 <div className="">
-                                    <p className="text-center">Send email to :</p>
+                                    <p className="text-center">{t('interventions.assign_to')} :</p>
                                     <ul className="flex flex-col gap-2">
                                         {interventionAssignees.length > 0 &&
                                             interventionAssignees.map((assignee, index) => (
@@ -673,11 +677,11 @@ export default function ShowIntervention({
                                     onClick={sendInterventionMail}
                                     disabled={isProcessing || !interventionToSend || interventionAssignees.length === 0}
                                 >
-                                    Send
+                                    {t('actions.send')}
                                 </Button>
 
                                 <Button onClick={closeSendInterventionToProviderModale} variant="secondary">
-                                    Cancel
+                                    {t('actions.cancel')}
                                 </Button>
                             </div>
                         </div>

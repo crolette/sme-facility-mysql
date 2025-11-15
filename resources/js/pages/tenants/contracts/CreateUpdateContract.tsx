@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { Asset, BreadcrumbItem, Contract, Provider, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { XIcon } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
@@ -63,6 +64,7 @@ export default function CreateUpdateContract({
     noticePeriods: string[];
     objects: [];
 }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Contract`,
@@ -197,14 +199,20 @@ export default function CreateUpdateContract({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Contract" />
+            <Head
+                title={
+                    contract
+                        ? t('actions.edit-type', { type: tChoice('contracts.title', 1) })
+                        : t('actions.create-type', { type: tChoice('contracts.title', 1) })
+                }
+            />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <h1>{contract?.name ?? 'New contract'}</h1>
                 <form onSubmit={submit} className="space-y-4">
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                         <div className="flex w-full flex-col gap-4 lg:flex-row">
                             <div className="w-full">
-                                <Label>Name</Label>
+                                <Label>{t('common.name')}</Label>
                                 <Input
                                     type="text"
                                     onChange={(e) => setData('name', e.target.value)}
@@ -216,7 +224,7 @@ export default function CreateUpdateContract({
                                 <InputError message={errors?.name ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label htmlFor="type">Type</Label>
+                                <Label htmlFor="type">{t('common.type')}</Label>
                                 <select
                                     name="type"
                                     onChange={(e) => setData('type', e.target.value)}
@@ -232,11 +240,11 @@ export default function CreateUpdateContract({
                                     {contractTypes && contractTypes.length > 0 && (
                                         <>
                                             <option value="" disabled className="bg-background text-foreground">
-                                                Select a type
+                                                {t('actions.select-type', { type: t('common.type') })}
                                             </option>
                                             {contractTypes?.map((type, index) => (
                                                 <option value={type} key={index} className="bg-background text-foreground">
-                                                    {type}
+                                                    {t(`contracts.type.${type}`)}
                                                 </option>
                                             ))}
                                         </>
@@ -249,7 +257,7 @@ export default function CreateUpdateContract({
 
                         <div className="flex w-full flex-col gap-4 lg:flex-row">
                             <div className="w-full">
-                                <Label>Internal reference</Label>
+                                <Label>{t('contracts.internal_ref')}</Label>
                                 <Input
                                     type="text"
                                     onChange={(e) => setData('internal_reference', e.target.value)}
@@ -259,7 +267,7 @@ export default function CreateUpdateContract({
                                 <InputError message={errors?.internal_reference ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label>Provider reference</Label>
+                                <Label>{t('contracts.provider_ref')}</Label>
                                 <Input
                                     type="text"
                                     onChange={(e) => setData('provider_reference', e.target.value)}
@@ -270,7 +278,7 @@ export default function CreateUpdateContract({
                             </div>
                         </div>
 
-                        <Label className="font-medium">Provider</Label>
+                        <Label className="font-medium">{tChoice('providers.title', 1)}</Label>
                         <SearchableInput<Provider>
                             required
                             multiple={false}
@@ -287,9 +295,8 @@ export default function CreateUpdateContract({
                                 setData('provider_name', provider.name);
                             }}
                             placeholder="Search provider..."
-                            // className="mb-4"
                         />
-                        <Label htmlFor="end_date">Linked to</Label>
+                        <Label htmlFor="end_date">{t('contracts.linked_to')}</Label>
                         <SearchableInput
                             multiple={false}
                             searchUrl={route('api.search.all')}
@@ -302,7 +309,7 @@ export default function CreateUpdateContract({
                             placeholder="Search asset or location..."
                         />
                         {data.contractables && (
-                            <ul className="flex gap-2 p-2">
+                            <ul className="flex flex-wrap gap-2 p-2">
                                 {data.contractables.map((contractable) => (
                                     <li key={contractable.locationId} className="rounded-md bg-slate-600 px-2 py-1 text-sm">
                                         <div className="flex items-center gap-2">
@@ -318,9 +325,9 @@ export default function CreateUpdateContract({
                             </ul>
                         )}
                         <div className="mt-4 flex w-full flex-col gap-4">
-                            <div className="grid gap-4 lg:grid-cols-2">
+                            <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <Label htmlFor="start_date">Start date</Label>
+                                    <Label htmlFor="start_date">{t('contracts.start_date')}</Label>
                                     <Input
                                         id="start_date"
                                         type="date"
@@ -330,7 +337,7 @@ export default function CreateUpdateContract({
                                     <InputError className="mt-2" message={errors?.start_date ?? ''} />
                                 </div>
                                 <div>
-                                    <Label htmlFor="end_date">End date</Label>
+                                    <Label htmlFor="end_date">{t('contracts.end_date')}</Label>
                                     <Input
                                         id="end_date"
                                         type="date"
@@ -338,13 +345,13 @@ export default function CreateUpdateContract({
                                         onChange={(e) => setData('end_date', e.target.value)}
                                         disabled
                                     />
-                                    <p className="text-xs">The end date is automatically calculated based on the contract duration.</p>
+                                    <p className="text-xs">{t('contracts.end_date_description')}</p>
                                     <InputError className="mt-2" message={errors?.end_date ?? ''} />
                                 </div>
                             </div>
                             <div className="grid gap-4 lg:grid-cols-2">
                                 <div>
-                                    <Label htmlFor="contract_duration">Contract duration</Label>
+                                    <Label htmlFor="contract_duration">{t('contracts.duration_contract')}</Label>
                                     <select
                                         name="contract_duration"
                                         onChange={(e) => setData('contract_duration', e.target.value)}
@@ -360,11 +367,11 @@ export default function CreateUpdateContract({
                                         {contractDurations && contractDurations.length > 0 && (
                                             <>
                                                 <option value="" disabled className="bg-background text-foreground">
-                                                    Select a duration
+                                                    {t('actions.select-type', { type: t('contracts.duration_contract') })}
                                                 </option>
-                                                {contractDurations?.map((type, index) => (
-                                                    <option value={type} key={index} className="bg-background text-foreground">
-                                                        {type}
+                                                {contractDurations?.map((duration, index) => (
+                                                    <option value={duration} key={index} className="bg-background text-foreground">
+                                                        {t(`contracts.duration.${duration}`)}
                                                     </option>
                                                 ))}
                                             </>
@@ -373,7 +380,7 @@ export default function CreateUpdateContract({
                                     <InputError className="mt-2" message={errors?.contract_duration ?? ''} />
                                 </div>
                                 <div>
-                                    <Label htmlFor="notice_period">Notice period</Label>
+                                    <Label htmlFor="notice_period">{t('contract.notice_period')}</Label>
                                     <select
                                         name="notice_period"
                                         onChange={(e) => setData('notice_period', e.target.value)}
@@ -389,11 +396,11 @@ export default function CreateUpdateContract({
                                         {noticePeriods && noticePeriods.length > 0 && (
                                             <>
                                                 <option value="" disabled className="bg-background text-foreground">
-                                                    Select a duration
+                                                    {t('actions.select-type', { type: t('contracts.notice_period') })}
                                                 </option>
-                                                {noticePeriods?.map((type, index) => (
-                                                    <option value={type} key={index} className="bg-background text-foreground">
-                                                        {type}
+                                                {noticePeriods?.map((noticePeriod, index) => (
+                                                    <option value={noticePeriod} key={index} className="bg-background text-foreground">
+                                                        {t(`contracts.notice_period.${noticePeriod}`)}
                                                     </option>
                                                 ))}
                                             </>
@@ -406,7 +413,7 @@ export default function CreateUpdateContract({
                         </div>
                         <div className="mt-4 flex w-full flex-col gap-4 lg:flex-row">
                             <div className="w-full">
-                                <Label htmlFor="renewal_type">Renewal type</Label>
+                                <Label htmlFor="renewal_type">{t(`contracts.renewal_type`)}</Label>
                                 <select
                                     name="renewal_type"
                                     onChange={(e) => setData('renewal_type', e.target.value)}
@@ -422,11 +429,11 @@ export default function CreateUpdateContract({
                                     {renewalTypes && renewalTypes.length > 0 && (
                                         <>
                                             <option value="" disabled className="bg-background text-foreground">
-                                                Select an option
+                                                {t('actions.select-type', { type: t('contracts.renewal_type') })}
                                             </option>
-                                            {renewalTypes?.map((type, index) => (
-                                                <option value={type} key={index} className="bg-background text-foreground">
-                                                    {type}
+                                            {renewalTypes?.map((renewalType, index) => (
+                                                <option value={renewalType} key={index} className="bg-background text-foreground">
+                                                    {t(`contracts.renewal_type.${renewalType}`)}
                                                 </option>
                                             ))}
                                         </>
@@ -434,7 +441,7 @@ export default function CreateUpdateContract({
                                 </select>
                             </div>
                             <div className="w-full">
-                                <Label htmlFor="status">Status</Label>
+                                <Label htmlFor="status">{t('common.status')}</Label>
                                 <select
                                     name="status"
                                     value={data.status}
@@ -450,11 +457,11 @@ export default function CreateUpdateContract({
                                     {statuses && statuses.length > 0 && (
                                         <>
                                             <option value="" disabled className="bg-background text-foreground">
-                                                Select an option
+                                                {t('actions.select-type', { type: t('common.status') })}
                                             </option>
                                             {statuses?.map((status, index) => (
                                                 <option value={status} key={index} className="bg-background text-foreground">
-                                                    {status}
+                                                    {t(`contracts.status.${status}`)}
                                                 </option>
                                             ))}
                                         </>
@@ -463,16 +470,22 @@ export default function CreateUpdateContract({
                             </div>
                         </div>
                         <div className="mt-4">
-                            <Label>Notes</Label>
-                            <Textarea onChange={(e) => setData('notes', e.target.value)} value={data.notes} minLength={4} maxLength={250} />
+                            <Label>{t('common.notes')}</Label>
+                            <Textarea
+                                onChange={(e) => setData('notes', e.target.value)}
+                                value={data.notes}
+                                minLength={4}
+                                maxLength={250}
+                                placeholder={t('common.notes_placeholder')}
+                            />
                             <InputError message={errors?.notes ?? ''} />
                         </div>
 
                         {!contract && (
                             <div id="files" className="mt-4">
-                                <Label>Documents</Label>
+                                <Label>{tChoice('documents.title', 2)}</Label>
                                 <Button onClick={() => setShowFileModal(!showFileModal)} type="button" className="block">
-                                    Add file
+                                    {t('actions.add-type', { type: tChoice('documents.title', 1) })}
                                 </Button>
                                 {selectedDocuments.length > 0 && (
                                     <ul className="flex gap-4">
@@ -482,13 +495,6 @@ export default function CreateUpdateContract({
                                             const fileURL = URL.createObjectURL(document.file);
                                             return (
                                                 <li key={index} className="bg-foreground/10 flex w-50 flex-col gap-2 p-6">
-                                                    {/* <p>
-                                                                            {
-                                                                                documentTypes.find((type) => {
-                                                                                    return type.id === document.type;
-                                                                                })?.label
-                                                                            }
-                                                                        </p> */}
                                                     {isImage && (
                                                         <img src={fileURL} alt="preview" className="mx-auto h-40 w-40 rounded object-cover" />
                                                     )}
@@ -497,7 +503,7 @@ export default function CreateUpdateContract({
 
                                                     <p>{document.description}</p>
                                                     <Button type="button" variant="destructive" className="" onClick={() => removeDocument(index)}>
-                                                        Remove
+                                                        {t('actions.remove')}
                                                     </Button>
                                                 </li>
                                             );
@@ -508,14 +514,14 @@ export default function CreateUpdateContract({
                         )}
                     </div>
                     <div className="flex gap-4">
-                        <Button type="submit">{contract ? 'Update' : 'Submit'}</Button>
+                        <Button type="submit">{contract ? t('actions.update') : t('actions.submit')}</Button>
                         <Button
                             variant={'secondary'}
                             onClick={() =>
                                 contract ? router.visit(route('tenant.contracts.show', contract.id)) : router.visit(route('tenant.contracts.index'))
                             }
                         >
-                            Cancel
+                            {t('actions.cancel')}
                         </Button>
                     </div>
                 </form>

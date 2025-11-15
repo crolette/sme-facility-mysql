@@ -54,7 +54,7 @@ Route::middleware([
 
         // Get all assets from a building
         Route::get('/assets/', function (Building $building) {
-            return ApiResponse::success($building->load('assets')->assets);
+            return ApiResponse::success($building->assets()->paginate());
         })->name('api.buildings.assets');
 
         Route::prefix('/documents')->group(function () {

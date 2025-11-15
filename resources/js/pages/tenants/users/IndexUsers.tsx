@@ -9,6 +9,7 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, PaginatedData } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { LayoutGrid, Loader, PlusCircle, TableIcon, X } from 'lucide-react';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useEffect, useState } from 'react';
 
 export interface SearchParams {
@@ -21,9 +22,10 @@ export interface SearchParams {
 }
 
 export default function IndexUsers({ items, filters }: { items: PaginatedData; filters: SearchParams }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Contacts`,
+            title: `Index ${tChoice('contacts.title', 2)}`,
             href: `/users`,
         },
     ];
@@ -150,25 +152,25 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Contacts" />
+            <Head title={tChoice('contacts.title', 2)} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex w-full justify-between">
                     <details className="border-border relative w-full cursor-pointer rounded-md border-2 p-1" open={isLoading ? false : undefined}>
-                        <summary>Search/Filter</summary>
+                        <summary>{t('common.search_filter')}</summary>
 
-                        <div className="bg-border border-border text-background dark:text-foreground absolute top-full z-10 flex flex-col items-center gap-4 rounded-b-md border-2 p-2 sm:flex-row">
+                        <div className="bg-border border-border text-background dark:text-foreground absolute top-full z-10 flex flex-col items-center gap-4 rounded-b-md border-2 p-2 md:flex-row">
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="role">role</Label>
+                                <Label htmlFor="role">{t('contacts.role')}</Label>
                                 <select name="role" id="role" value={query.role ?? ''} onChange={(e) => setRoleSearch(e.target.value)}>
                                     <option value={''} aria-readonly>
-                                        Select a role
+                                        {t('actions.select-type', { type: t('contacts.role') })}
                                     </option>
                                     <option value={'admin'}>Admin</option>
                                     <option value={'manager'}>Maintenance Manager</option>
                                 </select>
                             </div>
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="canLogin">canLogin</Label>
+                                <Label htmlFor="canLogin">{t('contacts.can_login')}</Label>
                                 <div className="space-x-1 text-center">
                                     <Pill variant={query.canLogin === 'yes' ? 'active' : ''} onClick={() => setCanLoginSearch('yes')}>
                                         Yes
@@ -182,7 +184,7 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
                                 </div>
                             </div>
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="category">Search</Label>
+                                <Label htmlFor="category">{t('actions.search')}</Label>
                                 <div className="relative text-black dark:text-white">
                                     <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} />
                                     <X
@@ -192,7 +194,9 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
                                 </div>
                             </div>
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="category">Provider Search</Label>
+                                <Label htmlFor="category">
+                                    {t('actions.search')} {tChoice('providers.title', 1)}
+                                </Label>
                                 <div className="relative text-black dark:text-white">
                                     <Input type="text" value={providerSearch ?? ''} onChange={(e) => setProviderSearch(e.target.value)} />
                                     <X
@@ -202,14 +206,14 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
                                 </div>
                             </div>
                             <Button onClick={clearSearch} size={'sm'}>
-                                Clear Search
+                                {t('actions.search-clear')}
                             </Button>
                         </div>
                     </details>
                     <a href={route(`tenant.users.create`)}>
                         <Button>
                             <PlusCircle />
-                            Create user
+                            {t('actions.add-type', { type: tChoice('contacts.title', 1) })}
                         </Button>
                     </a>
                 </div>
@@ -244,57 +248,58 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
                     </div>
                 ) : (
                     <Table>
-                        <TableHead>
-                            <TableHeadRow>
-                                <TableHeadData>Name</TableHeadData>
-                                <TableHeadData>Job position</TableHeadData>
-                                <TableHeadData>Email</TableHeadData>
-                                <TableHeadData>Can login</TableHeadData>
-                                <TableHeadData>Role</TableHeadData>
-                                <TableHeadData>Provider</TableHeadData>
-                            </TableHeadRow>
-                        </TableHead>
-                        <TableBody>
-                            {isLoading ? (
-                                <TableBodyRow>
-                                    <TableBodyData>
-                                        <p className="flex animate-pulse gap-2">
-                                            <Loader />
-                                            Searching...
-                                        </p>
-                                    </TableBodyData>
-                                </TableBodyRow>
-                            ) : items.data.length > 0 ? (
-                                items.data.map((item, index) => {
-                                    return (
-                                        <TableBodyRow key={index}>
-                                            <TableBodyData>
-                                                <a href={route('tenant.users.show', item.id)}>{item.full_name}</a>
-                                            </TableBodyData>
-                                            <TableBodyData>{item.job_position}</TableBodyData>
-                                            <TableBodyData>
-                                                <a href={`mailto:${item.email}`}>{item.email}</a>
-                                            </TableBodyData>
-                                            <TableBodyData>{item.can_login ? 'YES' : 'NO'}</TableBodyData>
-                                            <TableBodyData>{item.roles && item.roles.length > 0 ? item.roles[0].name : ''}</TableBodyData>
-                                            <TableBodyData>
-                                                {item.provider ? (
-                                                    <a href={route('tenant.providers.show', item.provider?.id)}>{item.provider?.name}</a>
-                                                ) : (
-                                                    <p>Internal</p>
-                                                )}
-                                            </TableBodyData>
-                                        </TableBodyRow>
-                                    );
-                                })
-                            ) : (
-                                <TableBodyRow key={0}>
-                                    <TableBodyData>No results...</TableBodyData>
-                                </TableBodyRow>
-                            )}
-                        </TableBody>
-                    </Table>
+                    <TableHead>
+                        <TableHeadRow>
+                            <TableHeadData>{t('common.full_name')}</TableHeadData>
+                            <TableHeadData>{t('contacts.job_position')}</TableHeadData>
+                            <TableHeadData>{t('common.email')}</TableHeadData>
+                            <TableHeadData>{t('contacts.can_login')}</TableHeadData>
+                            <TableHeadData>{t('contacts.role')}</TableHeadData>
+                            <TableHeadData>{tChoice('providers.title', 1)}</TableHeadData>
+                        </TableHeadRow>
+                    </TableHead>
+                    <TableBody>
+                        {isLoading ? (
+                            <TableBodyRow>
+                                <TableBodyData>
+                                    <p className="flex animate-pulse gap-2">
+                                        <Loader />
+                                        {t('actions.searching')}
+                                    </p>
+                                </TableBodyData>
+                            </TableBodyRow>
+                        ) : items.data.length > 0 ? (
+                            items.data.map((item, index) => {
+                                return (
+                                    <TableBodyRow key={index}>
+                                        <TableBodyData>
+                                            <a href={route('tenant.users.show', item.id)}>{item.full_name}</a>
+                                        </TableBodyData>
+                                        <TableBodyData>{item.job_position}</TableBodyData>
+                                        <TableBodyData>
+                                            <a href={`mailto:${item.email}`}>{item.email}</a>
+                                        </TableBodyData>
+                                        <TableBodyData>{item.can_login ? t('common.yes') : t('common.no')}</TableBodyData>
+                                        <TableBodyData>{item.roles && item.roles.length > 0 ? item.roles[0].name : ''}</TableBodyData>
+                                        <TableBodyData>
+                                            {item.provider ? (
+                                                <a href={route('tenant.providers.show', item.provider?.id)}>{item.provider?.name}</a>
+                                            ) : (
+                                                <p>{t('contacts.internal')}</p>
+                                            )}
+                                        </TableBodyData>
+                                    </TableBodyRow>
+                                );
+                            })
+                        ) : (
+                            <TableBodyRow key={0}>
+                                <TableBodyData>No results...</TableBodyData>
+                            </TableBodyRow>
+                        )}
+                    </TableBody>
+                </Table>
                 )}
+               
                 <Pagination items={items} />
             </div>
         </AppLayout>

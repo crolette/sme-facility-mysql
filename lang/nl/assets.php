@@ -1,0 +1,34 @@
+<?php
+
+return [
+    'title' => 'Actief|Activa',
+    'mobile_asset' => 'Mobiel actief',
+    'mobile_asset_user' => 'Gebruiker van het mobiele actief',
+    'asset_linked_to' => 'Actief gekoppeld aan',
+    'search_navigate_hierarchy' => 'Zoek of navigeer door uw hiërarchie',
+    'selected_location' => 'Geselecteerde locatie',
+    'selected_location_none' => 'Geen locatie geselecteerd',
+    'need_qr_code' => 'QR Code nodig',
+    'trashed' => 'Verwijderd',
+    'brand' => 'Merk',
+    'model' => 'Model',
+    'serial_number' => 'Serienummer',
+
+    'depreciation' => 'Afschrijving',
+    'depreciable' => 'Afschrijfbaar',
+    'depreciation_duration' => 'Afschrijvingsduur',
+    'depreciation_duration_placeholder' => 'Jaren',
+    'depreciation_start_date' => 'Startdatum afschrijving',
+    'depreciation_end_date' => 'Einddatum afschrijving',
+    'residual_value' => 'Restwaarde',
+    'residual_value_placeholder' => 'Restwaarde na einde afschrijving (max. 2 decimalen) : 4236.36',
+
+    'still_under_warranty' => 'Nog onder garantie',
+    'purchase_warranty' => 'Aankoop/Garantie',
+    'purchase_date' => 'Aankoopdatum',
+    'purchase_date_placeholder' => 'Datum van aankoop',
+    'purchase_cost' => 'Aankoopkosten',
+    'purchase_cost_placeholder' => 'Aankoopkosten (max. 2 decimalen) : 4236.36',
+    'warranty_end_date' => 'Einddatum garantie',
+
+];

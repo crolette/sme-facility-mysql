@@ -1,0 +1,34 @@
+<?php
+
+return [
+    'title' => 'Actif|Actifs',
+    'mobile_asset' => 'Actif mobile',
+    'mobile_asset_user' => 'Utilisateur de l\'actif mobile',
+    'asset_linked_to' => 'Actif lié à',
+    'search_navigate_hierarchy' => 'Rechercher ou naviguer dans votre hiérarchie',
+    'selected_location' => 'Emplacement sélectionné',
+    'selected_location_none' => 'Aucun emplacement sélectionné',
+    'need_qr_code' => 'Besoin d\'un QR Code',
+    'trashed' => 'Mis à la corbeille',
+    'brand' => 'Marque',
+    'model' => 'Modèle',
+    'serial_number' => 'Numéro de série',
+
+    'depreciation' => 'Amortissement',
+    'depreciable' => 'Amortissable',
+    'depreciation_duration' => 'Durée d\'amortissement',
+    'depreciation_duration_placeholder' => 'Années',
+    'depreciation_start_date' => 'Date de début d\'amortissement',
+    'depreciation_end_date' => 'Date de fin d\'amortissement',
+    'residual_value' => 'Valeur résiduelle',
+    'residual_value_placeholder' => 'Valeur résiduelle après fin d\'amortissement (max. 2 décimales) : 4236.36',
+
+    'still_under_warranty' => 'Toujours sous garantie',
+    'purchase_warranty' => 'Achat/Garantie',
+    'purchase_date' => 'Date d\'achat',
+    'purchase_date_placeholder' => 'Date d\'achat',
+    'purchase_cost' => 'Coût d\'achat',
+    'purchase_cost_placeholder' => 'Coût d\'achat (max. 2 décimales) : 4236.36',
+    'warranty_end_date' => 'Date de fin de garantie',
+
+];

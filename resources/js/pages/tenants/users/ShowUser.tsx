@@ -1,5 +1,6 @@
 import ImageUploadModale from '@/components/ImageUploadModale';
 import Modale from '@/components/Modale';
+import { AssetManager } from '@/components/tenant/assetManager';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
@@ -10,15 +11,17 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Intervention, User } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Pencil, Trash, Trash2, Upload } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ShowUser({ item }: { item: User }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const [user, setUser] = useState(item);
     const { showToast } = useToast();
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Index users`,
+            title: `Index ${tChoice('contacts.title', 2)}`,
             href: `/users`,
         },
         {
@@ -26,8 +29,6 @@ export default function ShowUser({ item }: { item: User }) {
             href: `/users/${user.id}`,
         },
     ];
-
-    console.log(item);
 
     const fetchUser = async () => {
         try {
@@ -80,16 +81,16 @@ export default function ShowUser({ item }: { item: User }) {
                     <a href={route(`tenant.users.edit`, user.id)}>
                         <Button>
                             <Pencil />
-                            Edit
+                            {t('actions.edit')}
                         </Button>
                     </a>
                     <Button onClick={() => setShowDeleteModale(!showDeleteModale)} variant={'destructive'}>
                         <Trash2 />
-                        Delete
+                        {t('actions.delete')}
                     </Button>
                     <Button onClick={() => setIsModalOpen(true)} variant={'secondary'}>
                         <Upload size={20} />
-                        Upload profile picture
+                        {t('actions.upload-type', { type: t('contacts.profile_picture') })}
                     </Button>
                 </div>
 
@@ -111,11 +112,13 @@ export default function ShowUser({ item }: { item: User }) {
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                 <div className="grid grid-cols-[1fr_160px] gap-4">
                                     <div className="space-y-2">
-                                        <Field label={'Name'} text={user.full_name} />
-                                        <Field label={'Email'} text={user.email} />
-                                        {user.job_position && <Field label={'Job position'} text={user.job_position} />}
-                                        <Field label={'Can login'} text={user.can_login ? 'YES' : 'NO'} />
-                                        {user.roles?.length > 0 && <Field label={'Role'} text={user.roles?.length > 0 ? user.roles[0].name : ''} />}
+                                        <Field label={t('common.name')} text={user.full_name} />
+                                        <Field label={t('common.email')} text={user.email} />
+                                        {user.job_position && <Field label={t('contacts.job_position')} text={user.job_position} />}
+                                        <Field label={t('contacts.can_login')} text={user.can_login ? t('common.yes') : t('common.no')} />
+                                        {user.roles?.length > 0 && (
+                                            <Field label={t('contacts.role')} text={user.roles?.length > 0 ? user.roles[0].name : ''} />
+                                        )}
                                     </div>
                                     <div className="relative w-fit">
                                         {user.avatar && (
@@ -141,7 +144,7 @@ export default function ShowUser({ item }: { item: User }) {
                         )}
                         {activeTab === 'interventions' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h3>Interventions</h3>
+                                <h3>{tChoice('interventions.title', 2)}</h3>
 
                                 {item.assigned_interventions ? (
                                     <div>
@@ -150,14 +153,14 @@ export default function ShowUser({ item }: { item: User }) {
                                                 <Table key={intervention.id} className="table-fixed">
                                                     <TableHead>
                                                         <TableHeadRow>
-                                                            <TableHeadData className="">Description</TableHeadData>
-                                                            <TableHeadData>Type</TableHeadData>
-                                                            <TableHeadData>Priority</TableHeadData>
-                                                            <TableHeadData>Status</TableHeadData>
-                                                            <TableHeadData>Assigned to</TableHeadData>
-                                                            <TableHeadData>Planned at</TableHeadData>
-                                                            <TableHeadData>Repair delay</TableHeadData>
-                                                            <TableHeadData>Total costs</TableHeadData>
+                                                            <TableHeadData className="w-52">{t('common.description')}</TableHeadData>
+                                                            <TableHeadData>{t('common.type')}</TableHeadData>
+                                                            <TableHeadData>{t('interventions.priority')}</TableHeadData>
+                                                            <TableHeadData>{t('interventions.status')}</TableHeadData>
+                                                            <TableHeadData>{t('interventions.assigned_to')}</TableHeadData>
+                                                            <TableHeadData>{t('interventions.planned_at')}</TableHeadData>
+                                                            <TableHeadData>{t('interventions.repair_delay')}</TableHeadData>
+                                                            <TableHeadData>{t('interventions.total_costs')}</TableHeadData>
                                                         </TableHeadRow>
                                                     </TableHead>
 
@@ -174,9 +177,11 @@ export default function ShowUser({ item }: { item: User }) {
                                                             </TableBodyData>
                                                             <TableBodyData>{intervention.type}</TableBodyData>
                                                             <TableBodyData>
-                                                                <Pill variant={intervention.priority}>{intervention.priority}</Pill>
+                                                                <Pill variant={intervention.priority}>
+                                                                    {t(`interventions.priority.${intervention.priority}`)}
+                                                                </Pill>
                                                             </TableBodyData>
-                                                            <TableBodyData>{intervention.status}</TableBodyData>
+                                                            <TableBodyData>{t(`interventions.status.${intervention.status}`)}</TableBodyData>
                                                             <TableBodyData>
                                                                 {intervention.assignable ? (
                                                                     intervention.assignable.full_name ? (
@@ -189,11 +194,15 @@ export default function ShowUser({ item }: { item: User }) {
                                                                         </a>
                                                                     )
                                                                 ) : (
-                                                                    'not assigned'
+                                                                    t('interventions.assigned_not')
                                                                 )}
                                                             </TableBodyData>
-                                                            <TableBodyData>{intervention.planned_at ?? 'Not planned'}</TableBodyData>
-                                                            <TableBodyData>{intervention.repair_delay ?? 'No repair delay'}</TableBodyData>
+                                                            <TableBodyData>
+                                                                {intervention.planned_at ?? t('interventions.planned_at_no')}
+                                                            </TableBodyData>
+                                                            <TableBodyData>
+                                                                {intervention.repair_delay ?? t('interventions.repair_delay_no')}
+                                                            </TableBodyData>
                                                             <TableBodyData>
                                                                 {intervention.total_costs ? `${intervention.total_costs} €` : '-'}
                                                             </TableBodyData>
@@ -208,26 +217,7 @@ export default function ShowUser({ item }: { item: User }) {
                                 )}
                             </div>
                         )}
-                        {activeTab === 'assets' && (
-                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h3>Assets</h3>
-                                {user.assets &&
-                                    user.assets.map((asset) => (
-                                        <div key={asset.id}>
-                                            <p>
-                                                Code: <a href={route('tenant.assets.show', asset.reference_code)}>{asset.code}</a>
-                                            </p>
-                                            <p>Name: {asset.name}</p>
-                                            <p>Description: {asset.description}</p>
-                                            <p>
-                                                Model: {asset.brand} - {asset.model}
-                                            </p>
-                                            <p>Last maintenance date: {asset.maintainable.last_maintenance_date}</p>
-                                            <p>Next maintenance date: {asset.maintainable.next_maintenance_date}</p>
-                                        </div>
-                                    ))}
-                            </div>
-                        )}
+                        {activeTab === 'assets' && <AssetManager items={user.assets} />}
                     </div>
                 </div>
             </div>

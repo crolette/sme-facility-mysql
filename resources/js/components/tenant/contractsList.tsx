@@ -2,6 +2,7 @@ import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData
 import { Contract } from '@/types';
 import { router } from '@inertiajs/core';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Loader, Pencil, PlusCircle, Trash2, Unlink } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import Modale from '../Modale';
@@ -35,6 +36,7 @@ export const ContractsList = ({
     parameter = '',
     // onContractsChange,
 }: ContractsList) => {
+    const { t, tChoice } = useLaravelReactI18n();
     const [items, setItems] = useState(null);
     const [isLoading, setIsLoading] = useState<boolean>();
 
@@ -118,23 +120,22 @@ export const ContractsList = ({
         }
     };
 
-    console.log(existingContracts);
-
     return (
         <>
             <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
                 <div className="flex items-center justify-between gap-2">
-                    <h2>Contracts</h2>
+                    <h2>{tChoice('contracts.title', 2)}</h2>
 
                     {canAdd && (
                         <div className="space-y-2 space-x-4 sm:space-y-0">
                             <Button onClick={() => setAddExistingContractModale(true)}>
                                 <PlusCircle />
-                                Add existing contract
+
+                                {t('contracts.add_existing_contract')}
                             </Button>
                             <Button onClick={() => router.get(route('tenant.contracts.create'))}>
                                 <PlusCircle />
-                                Add new contract
+                                {t('contracts.add_new_contract')}
                             </Button>
                         </div>
                     )}
@@ -142,14 +143,14 @@ export const ContractsList = ({
                 <Table>
                     <TableHead>
                         <TableHeadRow>
-                            <TableHeadData>Name</TableHeadData>
-                            <TableHeadData>Type</TableHeadData>
-                            <TableHeadData>Status</TableHeadData>
-                            <TableHeadData>Internal #</TableHeadData>
-                            <TableHeadData>Provider #</TableHeadData>
-                            <TableHeadData>Renewal</TableHeadData>
-                            <TableHeadData>Provider</TableHeadData>
-                            <TableHeadData>End date</TableHeadData>
+                            <TableHeadData>{t('common.name')}</TableHeadData>
+                            <TableHeadData>{t('common.type')}</TableHeadData>
+                            <TableHeadData>{t('common.status')}</TableHeadData>
+                            <TableHeadData> {t('contracts.internal_ref')}</TableHeadData>
+                            <TableHeadData> {t('contracts.provider_ref')}</TableHeadData>
+                            <TableHeadData> {t('contracts.renewal_type')}</TableHeadData>
+                            <TableHeadData>{tChoice('providers.title', 1)}</TableHeadData>
+                            <TableHeadData> {t('contracts.end_date')}</TableHeadData>
                             {(editable || removable) && <TableHeadData></TableHeadData>}
                         </TableHeadRow>
                     </TableHead>
@@ -159,7 +160,7 @@ export const ContractsList = ({
                                 <TableBodyData>
                                     <p className="flex animate-pulse gap-2">
                                         <Loader />
-                                        Loading...
+                                        {t('actions.loading')}
                                     </p>
                                 </TableBodyData>
                             </TableBodyRow>
@@ -170,13 +171,13 @@ export const ContractsList = ({
                                         <TableBodyData>
                                             <a href={route(`tenant.contracts.show`, contract.id)}> {contract.name} </a>
                                         </TableBodyData>
-                                        <TableBodyData>{contract.type}</TableBodyData>
+                                        <TableBodyData>{t(`contracts.type.${contract.type}`)}</TableBodyData>
                                         <TableBodyData>
-                                            <Pill variant={contract.status}>{contract.status}</Pill>
+                                            <Pill variant={contract.status}>{t(`contracts.status.${contract.status}`)}</Pill>
                                         </TableBodyData>
                                         <TableBodyData>{contract.internal_reference}</TableBodyData>
                                         <TableBodyData>{contract.provider_reference}</TableBodyData>
-                                        <TableBodyData>{contract.renewal_type}</TableBodyData>
+                                        <TableBodyData>{t(`contracts.renewal_type.${contract.renewal_type}`)}</TableBodyData>
                                         <TableBodyData>
                                             <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>
                                         </TableBodyData>
@@ -224,8 +225,8 @@ export const ContractsList = ({
                 {items !== null && <PaginationAPI items={items} pageToLoad={setPageToLoad} />}
 
                 <Modale
-                    title={'Delete contract'}
-                    message={`Are you sure you want to delete this contract ${contractToDelete?.name} ?`}
+                    title={t('actions.delete-type', { type: tChoice('contracts.title', 1) })}
+                    message={t(`contracts.delete_description`, { name: contractToDelete?.name ?? '' })}
                     isOpen={showDeleteModale}
                     onConfirm={deleteContract}
                     onCancel={() => {
@@ -234,7 +235,7 @@ export const ContractsList = ({
                     }}
                 />
                 {addExistingContractModale && (
-                    <ModaleForm title={'Add Existing contract'}>
+                    <ModaleForm title={t(`contracts.add_existing_contract`)}>
                         <SearchableInput<Contract>
                             multiple={true}
                             searchUrl={route('api.contracts.search')}
@@ -251,12 +252,11 @@ export const ContractsList = ({
                                 variant="secondary"
                                 onClick={() => {
                                     setAddExistingContractModale(false);
-                                    // setExistingContracts(contracts);
                                 }}
                             >
-                                Cancel
+                                {t('actions.cancel')}
                             </Button>
-                            <Button onClick={addExistingContractToAsset}>Add contract</Button>
+                            <Button onClick={addExistingContractToAsset}>{t(`actions.submit`)}</Button>
                         </div>
                     </ModaleForm>
                 )}

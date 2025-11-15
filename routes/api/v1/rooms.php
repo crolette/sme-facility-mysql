@@ -57,7 +57,7 @@ Route::middleware([
 
             // Get all documents from a room
             Route::get('/assets/', function (Room $room) {
-                return ApiResponse::success($room->load('assets')->assets);
+                return ApiResponse::success($room->assets()->paginate());
             })->name('api.rooms.assets');
 
             Route::prefix('/documents')->group(function () {

@@ -8,14 +8,16 @@ import AppLayout from '@/layouts/app-layout';
 import { Asset, BreadcrumbItem, Contract, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useState } from 'react';
 
 export default function ShowContract({ item, objects }: { item: Contract; objects: [] }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const { showToast } = useToast();
     const [contract, setContract] = useState<Contract>(item);
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Index contracts`,
+            title: `Index ${tChoice('contratcs.title', 2)}`,
             href: `/contracts`,
         },
         {
@@ -40,14 +42,14 @@ export default function ShowContract({ item, objects }: { item: Contract; object
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Contract" />
+            <Head title={tChoice('contratcs.title', 2) + ' ' + contract.name} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex gap-2">
                     <a href={route(`tenant.contracts.edit`, contract.id)}>
-                        <Button>Edit</Button>
+                        <Button>{t('actions.edit')}</Button>
                     </a>
                     <Button onClick={() => setShowDeleteModale(!showDeleteModale)} variant={'destructive'}>
-                        Delete
+                        {t('actions.delete')}
                     </Button>
                 </div>
                 <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_6fr]">
@@ -67,25 +69,27 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h2>Contract information</h2>
+                                <h2>{t('common.information')}</h2>
                                 <div className="space-y-2">
-                                    <Field label={'Name'} text={contract.name} />
+                                    <Field label={t('common.name')} text={contract.name} />
                                     <div className="flex flex-wrap gap-4">
-                                        <Field label={'Internal reference'} text={contract.internal_reference ?? 'NA'} />
-                                        {contract.provider_reference && <Field label={'Provider reference'} text={contract.provider_reference} />}
+                                        <Field label={t('contracts.internal_ref')} text={contract.internal_reference ?? 'NA'} />
+                                        {contract.provider_reference && (
+                                            <Field label={t('contracts.provider_ref')} text={contract.provider_reference} />
+                                        )}
                                     </div>
-                                    <Field label={'Renewal Type:'} text={contract.renewal_type} />
+                                    <Field label={t('contracts.renewal_type')} text={contract.renewal_type} />
                                     <div className="flex gap-4">
-                                        <Field label={'Start date:'} date text={contract.start_date} />
-                                        <Field label={'Contract duration:'} text={contract.contract_duration} />
+                                        <Field label={t('contracts.start_date')} date text={contract.start_date} />
+                                        <Field label={t('contracts.duration_contract')} text={contract.contract_duration} />
 
-                                        <Field label={'End date:'} date text={contract.end_date} />
+                                        <Field label={t('contracts.end_date')} date text={contract.end_date} />
                                     </div>
                                     <div className="flex gap-4">
-                                        <Field label={'Notice period:'} text={contract.notice_period} />
-                                        <Field label={'Notice date:'} date text={contract.notice_date} />
+                                        <Field label={t('contracts.notice_period')} text={contract.notice_period} />
+                                        <Field label={t('contracts.notice_date')} date text={contract.notice_date} />
                                     </div>
-                                    <Field label={'Notes:'} text={contract.notes} />
+                                    <Field label={t('common.notes')} text={contract.notes} />
                                 </div>
                             </div>
                         )}
@@ -104,7 +108,7 @@ export default function ShowContract({ item, objects }: { item: Contract; object
 
                         {activeTab === 'assets' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h3>Assets</h3>
+                                <h3>{tChoice('assets.title', 2)}</h3>
                                 <ul>
                                     {objects.map((object: Partial<Asset | TenantBuilding | TenantSite | TenantFloor | TenantRoom>) => (
                                         <li key={object.id}>
@@ -128,8 +132,8 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                 </div>
             </div>
             <Modale
-                title={'Delete contract'}
-                message={`Are you sure you want to delete this contract ${contract.name} ?`}
+                title={t('actions.delete-type', { type: tChoice('contracts.title', 1) })}
+                message={t('contracts.delete_description', { name: contract.name })}
                 isOpen={showDeleteModale}
                 onConfirm={deleteContract}
                 onCancel={() => {

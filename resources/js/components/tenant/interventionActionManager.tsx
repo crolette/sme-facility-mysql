@@ -2,6 +2,7 @@ import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData
 import { CentralType, InterventionAction } from '@/types';
 import { usePage } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Pencil, PlusCircle, Trash2 } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import Modale from '../Modale';
@@ -39,6 +40,7 @@ type InterventionFormData = {
 };
 
 export const InterventionActionManager = ({ interventionId, closed, actionsChanged }: InterventionActionManagerProps) => {
+    const { t, tChoice } = useLaravelReactI18n();
     const auth = usePage().props.auth;
     const { showToast } = useToast();
     const [interventionActions, setInterventionActions] = useState<InterventionAction[]>([]);
@@ -200,11 +202,13 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
         <>
             <ul className={'bg-secondary p-2'}>
                 <div className="flex items-center gap-4">
-                    <span className="font-semibold">Actions ({interventionActions.length})</span>
+                    <span className="font-semibold">
+                        {tChoice('interventions.actions', 2)} ({interventionActions.length})
+                    </span>
                     {!closed && (
                         <Button onClick={openModale} size="xs" variant={'outline'}>
                             <PlusCircle />
-                            <span>Add action</span>
+                            <span>{t('actions.add-type', { type: tChoice('interventions.actions', 1) })} </span>
                         </Button>
                     )}
                 </div>
@@ -212,12 +216,12 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                     <Table className="">
                         <TableHead>
                             <TableHeadRow>
-                                <TableHeadData className="">Description</TableHeadData>
-                                <TableHeadData className="w-32">Action</TableHeadData>
-                                <TableHeadData className="w-32">Date</TableHeadData>
-                                <TableHeadData className="w-32">Started at</TableHeadData>
-                                <TableHeadData className="w-32">Finished at</TableHeadData>
-                                <TableHeadData className="w-32">Costs</TableHeadData>
+                                <TableHeadData className="">{t('common.description')}</TableHeadData>
+                                <TableHeadData className="w-32">{tChoice('interventions.actions', 1)}</TableHeadData>
+                                <TableHeadData className="w-32">{t('common.date')}</TableHeadData>
+                                <TableHeadData className="w-32">{t('interventions.started_at')}</TableHeadData>
+                                <TableHeadData className="w-32">{t('interventions.finished_at')}</TableHeadData>
+                                <TableHeadData className="w-32">{t('interventions.costs')}</TableHeadData>
                                 <TableHeadData></TableHeadData>
                             </TableHeadRow>
                         </TableHead>
@@ -274,13 +278,15 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                 }}
             />
             {addInterventionAction && (
-                <ModaleForm title={'Add new action'}>
+                <ModaleForm title={t('actions.add-type', { type: tChoice('interventions.actions', 1) })}>
                     <form
                         onSubmit={submitType === 'new' ? submitInterventionAction : submitEditInterventionAction}
                         className="flex flex-col space-y-4"
                     >
                         <div className="flex flex-col gap-2 space-y-2">
-                            <Label>Action Type</Label>
+                            <Label>
+                                {tChoice('interventions.actions', 1)} {t('common.type')}
+                            </Label>
                             <select
                                 name="action_type"
                                 id="intervention_type"
@@ -293,7 +299,7 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                                     }))
                                 }
                             >
-                                <option value="">Select action type</option>
+                                <option value="">{t('actions.select-type', { type: t('common.type') })}</option>
                                 {interventionActionTypes?.map((interventionActionType) => (
                                     <option key={interventionActionType.id} value={interventionActionType.id}>
                                         {interventionActionType.label}
@@ -302,7 +308,7 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <Label>Description</Label>
+                            <Label>{t('common.description')}</Label>
                             <Textarea
                                 placeholder="description"
                                 value={interventionActionDataForm.description ?? ''}
@@ -316,7 +322,7 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                         </div>
                         {!closed && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h5>Pictures</h5>
+                                <h5>{tChoice('common.pictures', 2)}</h5>
                                 <Input
                                     type="file"
                                     multiple
@@ -331,7 +337,9 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                             </div>
                         )}
                         <div className="space-y-2">
-                            <Label>Intervention costs</Label>
+                            <Label>
+                                {tChoice('interventions.title', 1)} {t('interventions.costs')}
+                            </Label>
                             <Input
                                 type="number"
                                 step="0.01"
@@ -346,7 +354,9 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>Intervention date</Label>
+                            <Label>
+                                {tChoice('interventions.title', 1)} {t('common.date')}
+                            </Label>
                             <div className="flex flex-col gap-4 sm:flex-row">
                                 <Input
                                     type="date"
@@ -370,12 +380,12 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                                         }))
                                     }
                                 >
-                                    Clear intervention date
+                                    {t('actions.clear-type', { type: tChoice('interventions.title', 1) + ' ' + t('common.date') })}
                                 </Button>
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Label>Started at</Label>
+                            <Label>{t('interventions.started_at')}</Label>
                             <div className="flex flex-col gap-4 sm:flex-row">
                                 <Input
                                     type="time"
@@ -398,12 +408,12 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                                         }))
                                     }
                                 >
-                                    Clear Started at
+                                    {t('actions.clear-type', { type: t('interventions.started_at') })}
                                 </Button>
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Label>Finished at</Label>
+                            <Label>{t('interventions.finished_at')}</Label>
                             <div className="flex flex-col gap-4 sm:flex-row">
                                 <Input
                                     type="time"
@@ -426,14 +436,14 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                                         }))
                                     }
                                 >
-                                    Clear finished at
+                                    {t('actions.clear-type', { type: t('interventions.finished_at') })}
                                 </Button>
                             </div>
                         </div>
-                        <div className="flex gap-4">
-                            <Button type="submit">Submit</Button>
+                        <div className="flex justify-between gap-4">
+                            <Button type="submit">{t('actions.submit')}</Button>
                             <Button onClick={cancelModale} type="button" variant={'secondary'}>
-                                Cancel
+                                {t('actions.cancel')}
                             </Button>
                         </div>
                     </form>

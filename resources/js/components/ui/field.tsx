@@ -1,7 +1,8 @@
+import { ReactNode } from "react";
 import { Label } from "./label";
 
 
-export default function field({ label, text, date = false }: { label: string; text: string | number; date?: boolean }) {
+export default function field({ label, text, date = false }: { label: string; text: string | number | ReactNode; date?: boolean }) {
     if (date && typeof text === 'string') {
         const [d, m, y] = text.split('-');
         if(y  !== undefined)

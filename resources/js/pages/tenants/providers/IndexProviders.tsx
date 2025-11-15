@@ -5,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, CentralType, Provider } from '@/types';
+import { BreadcrumbItem, CentralType, Provider, ProvidersPaginated } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { LayoutGrid, Loader, Pencil, PlusCircle, TableIcon, X } from 'lucide-react';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useEffect, useState } from 'react';
 
 export interface SearchParams {
@@ -17,10 +18,19 @@ export interface SearchParams {
     orderBy: string | null;
 }
 
-export default function IndexProviders({ items, categories, filters }: { items: Provider[]; categories: CentralType[]; filters: SearchParams }) {
+export default function IndexProviders({
+    items,
+    categories,
+    filters,
+}: {
+    items: ProvidersPaginated;
+    categories: CentralType[];
+    filters: SearchParams;
+}) {
+    const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Index providers`,
+            title: `Index ${tChoice('providers.title', 2)}`,
             href: `/providers`,
         },
     ];
@@ -102,15 +112,14 @@ export default function IndexProviders({ items, categories, filters }: { items: 
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Index providers" />
-
+            <Head title={tChoice('providers.title', 2)} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex w-full justify-between gap-2">
                     <details className="border-border relative w-full cursor-pointer rounded-md border-2 p-1" open={isLoading ? false : undefined}>
-                        <summary>Search/Filter</summary>
+                        <summary>{t('common.search_filter')}</summary>
                         <div className="bg-border border-border text-background dark:text-foreground absolute top-full z-10 flex flex-col items-center gap-4 rounded-b-md border-2 p-2 sm:flex-row">
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="category">Category</Label>
+                                <Label htmlFor="category">{t('common.category')}</Label>
                                 <select
                                     name="category"
                                     id="category"
@@ -118,7 +127,7 @@ export default function IndexProviders({ items, categories, filters }: { items: 
                                     onChange={(e) => setCategorySearch(parseInt(e.target.value))}
                                 >
                                     <option value={0} aria-readonly>
-                                        Select a category
+                                        {t('actions.select-type', { type: t('common.category') })}
                                     </option>
                                     {categories.map((category) => (
                                         <option key={category.label} value={category.id}>
@@ -128,7 +137,7 @@ export default function IndexProviders({ items, categories, filters }: { items: 
                                 </select>
                             </div>
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="category">Search</Label>
+                                <Label htmlFor="category">{t('actions.search')}</Label>
                                 <div className="relative text-black dark:text-white">
                                     <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} />
                                     <X
@@ -138,14 +147,14 @@ export default function IndexProviders({ items, categories, filters }: { items: 
                                 </div>
                             </div>
                             <Button onClick={clearSearch} size={'xs'}>
-                                Clear Search
+                                {t('actions.search-clear')}
                             </Button>
                         </div>
                     </details>
                     <a href={route(`tenant.providers.create`)}>
                         <Button>
                             <PlusCircle />
-                            Create provider
+                            {t('actions.add-type', { type: tChoice('providers.title', 1) })}
                         </Button>
                     </a>
                 </div>
@@ -171,61 +180,55 @@ export default function IndexProviders({ items, categories, filters }: { items: 
                         ))}
                     </div>
                 ) : (
-                    <Table>
-                        <TableHead>
-                            <TableHeadRow>
-                                <TableHeadData>Company name</TableHeadData>
-                                <TableHeadData>Category</TableHeadData>
-                                <TableHeadData>Phone number</TableHeadData>
-                                <TableHeadData>Email</TableHeadData>
-                                <TableHeadData></TableHeadData>
-                            </TableHeadRow>
-                        </TableHead>
-                        <TableBody>
-                            {isLoading ? (
-                                <TableBodyRow>
-                                    <TableBodyData>
-                                        <p className="flex animate-pulse gap-2">
-                                            <Loader />
-                                            Searching...
-                                        </p>
-                                    </TableBodyData>
-                                </TableBodyRow>
-                            ) : providers.length > 0 ? (
-                                providers.map((item, index) => {
-                                    return (
-                                        <TableBodyRow key={index}>
-                                            <TableBodyData>
-                                                <a href={route('tenant.providers.show', item.id)}>{item.name}</a>
-                                            </TableBodyData>
-                                            <TableBodyData>{item.category ?? ''}</TableBodyData>
-                                            <TableBodyData>{item.phone_number}</TableBodyData>
-                                            <TableBodyData>{item.email}</TableBodyData>
 
-                                            <TableBodyData>
-                                                {/* <Button onClick={() => deleteLocation(item.reference_code)} variant={'destructive'}>
-                                                                Delete
-                                                            </Button> */}
-                                                <a href={route(`tenant.providers.edit`, item.id)}>
-                                                    <Button>
-                                                        <Pencil />
-                                                    </Button>
-                                                </a>
-                                                {/* <a href={route(`tenant.providers.show`, item.id)}>
-                                                                <Button variant={'outline'}>See</Button>
-                                                            </a> */}
-                                            </TableBodyData>
-                                        </TableBodyRow>
-                                    );
-                                })
-                            ) : (
-                                <TableBodyRow>
-                                    <TableBodyData>No results..</TableBodyData>
-                                </TableBodyRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                )}
+                <Table>
+                    <TableHead>
+                        <TableHeadRow>
+                            <TableHeadData>{t('providers.company_name')}</TableHeadData>
+                            <TableHeadData>{t('common.category')}</TableHeadData>
+                            <TableHeadData>{t('common.phone')}</TableHeadData>
+                            <TableHeadData>{t('common.email')}</TableHeadData>
+                            <TableHeadData></TableHeadData>
+                        </TableHeadRow>
+                    </TableHead>
+                    <TableBody>
+                        {isLoading ? (
+                            <TableBodyRow>
+                                <TableBodyData>
+                                    <p className="flex animate-pulse gap-2">
+                                        <Loader />
+                                        {t('actions.searching')}
+                                    </p>
+                                </TableBodyData>
+                            </TableBodyRow>
+                        ) : providers.length > 0 ? (
+                            providers.map((item, index) => {
+                                return (
+                                    <TableBodyRow key={index}>
+                                        <TableBodyData>
+                                            <a href={route('tenant.providers.show', item.id)}>{item.name}</a>
+                                        </TableBodyData>
+                                        <TableBodyData>{item.category ?? ''}</TableBodyData>
+                                        <TableBodyData>{item.phone_number}</TableBodyData>
+                                        <TableBodyData>{item.email}</TableBodyData>
+
+                                        <TableBodyData>
+                                            <a href={route(`tenant.providers.edit`, item.id)}>
+                                                <Button>
+                                                    <Pencil />
+                                                </Button>
+                                            </a>
+                                        </TableBodyData>
+                                    </TableBodyRow>
+                                );
+                            })
+                        ) : (
+                            <TableBodyRow>
+                                <TableBodyData>No results..</TableBodyData>
+                            </TableBodyRow>
+                        )}
+                    </TableBody>
+                </Table>
                 <Pagination items={items} />
             </div>
         </AppLayout>

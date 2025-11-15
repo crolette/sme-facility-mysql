@@ -71,7 +71,7 @@ it('creates notification when adding maintenance manager to existing floor witho
             'notifiable_id' => $location->id,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('creates notification when replacing maintenance manager for the site and removes notifications for old maintenance manager', function ($frequency) {
 
@@ -139,7 +139,7 @@ it('creates notification when replacing maintenance manager for the site and rem
             'notifiable_id' => $location->id,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('deletes notification when removing maintenance_manager from existing asset', function ($frequency) {
 
@@ -191,7 +191,7 @@ it('deletes notification when removing maintenance_manager from existing asset',
             'notifiable_id' => $location->id,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('deletes only pending notification when removing maintenance_manager from existing asset', function ($frequency) {
 
@@ -266,4 +266,4 @@ it('deletes only pending notification when removing maintenance_manager from exi
             'notifiable_id' => $location->id,
         ]
     );
-})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on demand'])));
+})->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));

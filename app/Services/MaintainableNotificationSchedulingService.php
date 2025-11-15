@@ -59,7 +59,9 @@ class MaintainableNotificationSchedulingService
             $notifications = $maintainable->maintainable->notifications()->where('notification_type', 'end_warranty_date')->where('scheduled_at', '>', now())->get();
 
             if (count($notifications)) {
-                $this->updateScheduleForEndWarrantyDate($maintainable, $notifications);
+                foreach ($notifications as $notification) {
+                    $this->updateScheduleForEndWarrantyDate($maintainable, $notification);
+                }
             } else {
                 if ($maintainable->manager) {
                     $this->createScheduleForEndWarrantyDate($maintainable, $maintainable->manager);
@@ -80,7 +82,9 @@ class MaintainableNotificationSchedulingService
             $notifications = $maintainable->maintainable->notifications()->where('notification_type', 'next_maintenance_date')->where('scheduled_at', '>', now())->where('status', 'pending')->get();
 
             if (count($notifications)) {
-                $this->updateScheduleForNextMaintenanceDate($maintainable, $notifications);
+                foreach ($notifications as $notification) {
+                    $this->updateScheduleForNextMaintenanceDate($maintainable, $notification);
+                }
             } else {
                 if ($maintainable->manager) {
                     $this->createScheduleForNextMaintenanceDate($maintainable, $maintainable->manager);
@@ -121,31 +125,28 @@ class MaintainableNotificationSchedulingService
         }
     }
 
-    public function updateScheduleForEndWarrantyDate(Maintainable $maintainable, Collection $notifications)
+    public function updateScheduleForEndWarrantyDate(Maintainable $maintainable, ScheduledNotification $notification)
     {
 
-        foreach ($notifications as $notification) {
-            // changer scheduled_at en fonction de la nouvelle date de maintenance et en fonction des préférences utilisateurs
-            $notificationPreference = $notification->user->notification_preferences()->where('notification_type', 'end_warranty_date')->first();
 
-            if ($maintainable->end_warranty_date->subDays($notificationPreference->notification_delay_days) < now())
-                continue;
+        // changer scheduled_at en fonction de la nouvelle date de maintenance et en fonction des préférences utilisateurs
+        $notificationPreference = $notification->user->notification_preferences()->where('notification_type', 'end_warranty_date')->first();
 
-            $notification->update(['scheduled_at' => $maintainable->end_warranty_date->subDays($notificationPreference->notification_delay_days)]);
-        }
+        if ($maintainable->end_warranty_date->subDays($notificationPreference->notification_delay_days) < now())
+            return;
+
+        $notification->update(['scheduled_at' => $maintainable->end_warranty_date->subDays($notificationPreference->notification_delay_days)]);
     }
 
 
 
-    public function updateScheduleForNextMaintenanceDate(Maintainable $maintainable, Collection $notifications)
+    public function updateScheduleForNextMaintenanceDate(Maintainable $maintainable, ScheduledNotification $notification)
     {
-        foreach ($notifications as $notification) {
-            // changer scheduled_at en fonction de la nouvelle date de maintenance et en fonction des préférences utilisateurs
+        // changer scheduled_at en fonction de la nouvelle date de maintenance et en fonction des préférences utilisateurs
 
-            $notificationPreference = $notification->user->notification_preferences()->where('notification_type', 'next_maintenance_date')->first();
+        $notificationPreference = $notification->user->notification_preferences()->where('notification_type', 'next_maintenance_date')->first();
 
-            $notification->update(['scheduled_at' => $maintainable->next_maintenance_date->subDays($notificationPreference->notification_delay_days)]);
-        }
+        $notification->update(['scheduled_at' => $maintainable->next_maintenance_date->subDays($notificationPreference->notification_delay_days)]);
     }
 
     public function createScheduleForNextMaintenanceDate(Maintainable $maintainable, User $user)
