@@ -7912,16 +7912,16 @@
         },
         {
             "name": "tuncaybahadir/quar",
-            "version": "1.5.4",
+            "version": "1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tuncaybahadir/quar.git",
-                "reference": "52833024788dbfa868d55bcf43627f9be6dfd32c"
+                "reference": "2add93af065d83fe64ec62ab54d227d3197aad3c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tuncaybahadir/quar/zipball/52833024788dbfa868d55bcf43627f9be6dfd32c",
-                "reference": "52833024788dbfa868d55bcf43627f9be6dfd32c",
+                "url": "https://api.github.com/repos/tuncaybahadir/quar/zipball/2add93af065d83fe64ec62ab54d227d3197aad3c",
+                "reference": "2add93af065d83fe64ec62ab54d227d3197aad3c",
                 "shasum": ""
             },
             "require": {
@@ -7930,7 +7930,7 @@
                 "php": ">=8.3"
             },
             "require-dev": {
-                "laravel/pint": "^1.24",
+                "laravel/pint": "^1.25",
                 "roave/security-advisories": "dev-latest"
             },
             "suggest": {
@@ -7980,9 +7980,9 @@
             ],
             "support": {
                 "issues": "https://github.com/tuncaybahadir/quar/issues",
-                "source": "https://github.com/tuncaybahadir/quar/tree/1.5.4"
+                "source": "https://github.com/tuncaybahadir/quar/tree/1.6.1"
             },
-            "time": "2025-07-24T19:08:42+00:00"
+            "time": "2025-11-10T21:17:02+00:00"
         },
         {
             "name": "vlucas/phpdotenv",

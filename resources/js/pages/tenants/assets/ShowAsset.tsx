@@ -173,14 +173,14 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                         </div>
                                         {asset.surface && <Field label={t('common.surface')} text={asset.surface + ' m²'} />}
                                     </div>
-                                    <div className="shrink-1">
+                                    <div className="mx-auto h-fit shrink-1 bg-white">
                                         {asset.qr_code && (
                                             <a href={route('api.file.download', { path: asset.qr_code })} download className="w-fit cursor-pointer">
                                                 <img
                                                     key={asset.qr_code}
                                                     src={route('api.image.show', { path: asset.qr_code })}
                                                     alt=""
-                                                    className="aspect-square h-32 w-auto"
+                                                    className="h-32 w-auto"
                                                 />
                                             </a>
                                         )}

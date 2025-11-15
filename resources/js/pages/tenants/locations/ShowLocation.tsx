@@ -188,7 +188,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                                             </>
                                         )}
                                     </div>
-                                    <div className="shrink-1">
+                                    <div className="mx-auto h-fit shrink-1 bg-white">
                                         {location.qr_code && (
                                             <a
                                                 href={route('api.file.download', { path: location.qr_code })}
@@ -199,7 +199,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                                                     key={location.qr_code}
                                                     src={route('api.image.show', { path: location.qr_code })}
                                                     alt=""
-                                                    className="aspect-square h-32 w-auto"
+                                                    className="h-32 w-auto"
                                                 />
                                             </a>
                                         )}

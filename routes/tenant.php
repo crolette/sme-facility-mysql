@@ -83,26 +83,24 @@ Route::middleware([
 
     Route::get('/pdf-qr-codes', function (Request $request) {
 
-        $collection = collect([]);
+        if ($request->query('type') !== 'all') {
+            $codes = match ($request->query('type')) {
+                'sites' => Site::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->whereNotNull('qr_code')->get(),
+                'buildings' => Building::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->whereNotNull('qr_code')->get(),
+                'floors' => Floor::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->whereNotNull('qr_code')->get(),
+                'rooms' => Room::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->whereNotNull('qr_code')->get(),
+                'assets' => Asset::select('id', 'code', 'reference_code', 'qr_code', 'category_type_id')->whereNotNull('qr_code')->get(),
+            };
+        } else {
+            $collection = collect([]);
 
-        $sites = Site::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->where('qr_code', '!=', null)->get();
-
-        $buildings = Building::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->where('qr_code', '!=', null)->get();
-
-        $floors = Floor::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->where('qr_code', '!=', null)->get();
-
-        $rooms = Room::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->where('qr_code', '!=', null)->get();
-
-        $assets = Asset::select('id', 'code', 'reference_code', 'qr_code', 'category_type_id')->where('qr_code', '!=', null)->get();
-
-        $codes = match ($request->query('type')) {
-            'sites' => $sites,
-            'buildings' => $buildings,
-            'floors' => $floors,
-            'rooms' => $rooms,
-            'assets' => $assets,
-            default => $collection->merge($sites)->merge($buildings)->merge($floors)->merge($rooms)->merge($assets)
-        };
+            $sites = Site::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->whereNotNull('qr_code')->get();
+            $buildings = Building::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->whereNotNull('qr_code')->get();
+            $floors = Floor::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->whereNotNull('qr_code')->get();
+            $rooms = Room::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->whereNotNull('qr_code')->get();
+            $assets = Asset::select('id', 'code', 'reference_code', 'qr_code', 'category_type_id')->whereNotNull('qr_code')->get();
+            $codes = $collection->merge($sites)->merge($buildings)->merge($floors)->merge($rooms)->merge($assets);
+        }
 
         $pdf = Pdf::loadView('pdf.qr-codes', ['codes' => $codes])->setPaper('a4', 'portrait');
         return $pdf->stream('qrcode.pdf');

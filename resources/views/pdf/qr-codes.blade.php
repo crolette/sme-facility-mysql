@@ -57,7 +57,7 @@
         }
 
         .qr-code img {
-            width: 20mm;
+            width: 18mm;
             height: 20mm;
         }
 
@@ -90,7 +90,7 @@
                             <tr>
                                 <td class="qr-cell">
                                     <div class="qr-code">
-                                        <img src="{{ $code->getQRCodeForPdf }}" alt="QR">
+                                        <img src="{{ $code->getQRCodeForPdf }}" alt="QR" className="w-2 h-2">
                                     </div>
                                 </td>
                                 <td class="text-cell">
