@@ -18,7 +18,7 @@ export const TicketsByAvgDurationChart = ({ ticketsAvgDuration }: { ticketsAvgDu
     const [period, setPeriod] = useState<string | null>(null);
     const [labels, setLabels] = useState<string[]>(
         Object.entries(ticketsAvgDuration).map((item) => {
-            return 'Week ' + item[0];
+            return `${t('statistics.week')}` + ' ' + item[0];
         }),
     );
 
@@ -40,7 +40,7 @@ export const TicketsByAvgDurationChart = ({ ticketsAvgDuration }: { ticketsAvgDu
             );
             setLabels(
                 Object.entries(response.data.data).map((item) => {
-                    return period === 'week' ? 'Week ' + item[0] : item[0];
+                    return period === 'week' ? `${t('statistics.week')}` + ' ' + item[0] : item[0];
                 }),
             );
 

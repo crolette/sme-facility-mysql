@@ -18,7 +18,7 @@ export const TicketsByPeriodChart = ({ ticketsByPeriod }: { ticketsByPeriod: [] 
     const [period, setPeriod] = useState<string | null>(null);
     const [labels, setLabels] = useState<string[]>(
         Object.entries(ticketsByPeriod).map((item) => {
-            return `${t('statistics.week')}` + item[0];
+            return `${t('statistics.week')}` + ' ' + item[0];
         }),
     );
 
