@@ -15,7 +15,7 @@ import { BreadcrumbItem, CentralType, Intervention, InterventionStatus, Paginate
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { ArrowDownNarrowWide, ArrowDownWideNarrow, Loader, Pencil, Trash2, X } from 'lucide-react';
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, LayoutGrid, Loader, Pencil, TableIcon, Trash2, X } from 'lucide-react';
 
 import { FormEventHandler, useEffect, useState } from 'react';
 
@@ -344,8 +344,8 @@ export default function IndexInterventions({
                                     {item.interventionable?.reference_code ?? 'NULL'}
                                 </a>
                                 <div className="flex gap-2">
-                                    <Pill variant={item.priority}>{item.priority}</Pill>
-                                    <Pill variant={item.status}>{item.status}</Pill>
+                                    <Pill variant={item.priority}>{t(`interventions.priority.${item.priority}`)}</Pill>
+                                    <Pill variant={item.status}>{t(`interventions.status.${item.status}`)}</Pill>
                                 </div>
                                 <p className="text-xs">
                                     {' '}
@@ -356,11 +356,15 @@ export default function IndexInterventions({
                                             <a href={route('tenant.providers.show', item.assignable.id)}>{item.assignable.name}</a>
                                         )
                                     ) : (
-                                        'not assigned'
+                                        t('interventions.assigned_not')
                                     )}
                                 </p>
-                                <p className="text-xs">Planned at : {item.planned_at ?? 'Not planned'}</p>
-                                <p className="text-xs">Repair delay : {item.repair_delay ?? 'No repair delay'}</p>
+                                <p className="text-xs">
+                                    {t('interventions.planned_at')} : {item.planned_at ?? t('interventions.planned_at_no')}
+                                </p>
+                                <p className="text-xs">
+                                    {t('interventions.repair_delay')} : {item.repair_delay ?? t('interventions.repair_delay_no')}
+                                </p>
                                 {!closed && (
                                     <div className="flex gap-2">
                                         <Button onClick={() => editIntervention(item.id)}>
@@ -382,149 +386,47 @@ export default function IndexInterventions({
                         ))}
                     </div>
                 ) : (
-                <Table>
-                    <TableHead>
-                        <TableHeadRow>
-                            <TableHeadData className="w-52">{t('common.description')}</TableHeadData>
-                            <TableHeadData>{t('common.type')}</TableHeadData>
-                            <TableHeadData>{t('tickets.related_to')}</TableHeadData>
-                            <TableHeadData>
-                                <div className="flex flex-nowrap items-center gap-2">
-                                    <ArrowDownNarrowWide
-                                        size={16}
-                                        className={cn(
-                                            'cursor-pointer',
-                                            query.sortBy === 'priority' && query.orderBy === 'asc' ? 'text-amber-300' : '',
-                                        )}
-                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'priority', orderBy: 'asc' }))}
-                                    />
-                                    <p>{t('interventions.priority')}</p>
-                                    <ArrowDownWideNarrow
-                                        size={16}
-                                        className={cn(
-                                            'cursor-pointer',
-                                            query.sortBy === 'priority' && query.orderBy === 'desc' ? 'text-amber-300' : '',
-                                        )}
-                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'priority', orderBy: 'desc' }))}
-                                    />
-                                </div>
-                            </TableHeadData>
-                            <TableHeadData>{t('interventions.status')}</TableHeadData>
-                            <TableHeadData>{t('interventions.assigned_to')}</TableHeadData>
-                            <TableHeadData>
-                                <div className="flex items-center gap-2">
-                                    <ArrowDownNarrowWide
-                                        size={16}
-                                        className={cn(
-                                            'cursor-pointer',
-                                            query.sortBy === 'planned_at' && query.orderBy === 'asc' ? 'text-amber-300' : '',
-                                            !query.sortBy && !query.orderBy ? 'text-amber-300' : '',
-                                        )}
-                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'planned_at', orderBy: 'asc' }))}
-                                    />
-                                    <p>{t('interventions.planned_at')}</p>
-                                    <ArrowDownWideNarrow
-                                        size={16}
-                                        className={cn(
-                                            'cursor-pointer',
-                                            query.sortBy === 'planned_at' && query.orderBy === 'desc' ? 'text-amber-300' : '',
-                                        )}
-                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'planned_at', orderBy: 'desc' }))}
-                                    />
-                                </div>
-                            </TableHeadData>
-                            <TableHeadData>
-                                <div className="flex items-center gap-2">
-                                    <ArrowDownNarrowWide
-                                        size={16}
-                                        className={cn(
-                                            'cursor-pointer',
-                                            query.sortBy === 'repair_delay' && query.orderBy === 'asc' ? 'text-amber-300' : '',
-                                        )}
-                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'repair_delay', orderBy: 'asc' }))}
-                                    />
-                                    <p>{t('interventions.repair_delay')}</p>
-                                    <ArrowDownWideNarrow
-                                        size={16}
-                                        className={cn(
-                                            'cursor-pointer',
-                                            query.sortBy === 'repair_delay' && query.orderBy === 'desc' ? 'text-amber-300' : '',
-                                        )}
-                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'repair_delay', orderBy: 'desc' }))}
-                                    />
-                                </div>
-                            </TableHeadData>
-                            <TableHeadData>{t('interventions.total_costs')}</TableHeadData>
-                            <TableHeadData></TableHeadData>
-                        </TableHeadRow>
-                    </TableHead>
-                    <TableBody>
-                        {isLoading ? (
-                            <TableBodyRow>
-                                <TableBodyData>
-                                    <p className="flex animate-pulse gap-2">
-                                        <Loader />
-                                        {t('actions.searching')}
-                                    </p>
-                                </TableBodyData>
-                            </TableBodyRow>
-                        ) : items.data.length > 0 ? (
-                            items.data.map((item, index) => {
-                                return (
-                                    <TableBodyRow key={index}>
-                                        <TableBodyData className="">
-                                            <a href={route('tenant.interventions.show', item.id)} className="flex w-40">
-                                                <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{item.description}</p>
-                                            </a>
-                                            <p className="tooltip tooltip-bottom">{item.description}</p>
-                                        </TableBodyData>
-                                        <TableBodyData>{item.type}</TableBodyData>
-                                        <TableBodyData>
-                                            <a href={item.interventionable?.location_route ?? ''}>
-                                                {item.interventionable?.reference_code ?? 'NULL'}
-                                            </a>
-                                        </TableBodyData>
-                                        <TableBodyData>
-                                            <Pill variant={item.priority}>{t(`interventions.priority.${item.priority}`)}</Pill>
-                                        </TableBodyData>
-                                        <TableBodyData>
-                                            <Pill variant={item.status}>{t(`interventions.status.${item.status}`)}</Pill>
-                                        </TableBodyData>
-                                        <TableBodyData>
-                                            {item.assignable ? (
-                                                item.assignable.full_name ? (
-                                                    <a href={route('tenant.users.show', item.assignable.id)}>{item.assignable.full_name}</a>
-                                                ) : (
-                                                    <a href={route('tenant.providers.show', item.assignable.id)}>{item.assignable.name}</a>
-                                                )
-                                            ) : (
-                                                t('interventions.assigned_not')
+                    <Table>
+                        <TableHead>
+                            <TableHeadRow>
+                                <TableHeadData className="w-52">{t('common.description')}</TableHeadData>
+                                <TableHeadData>{t('common.type')}</TableHeadData>
+                                <TableHeadData>{t('tickets.related_to')}</TableHeadData>
+                                <TableHeadData>
+                                    <div className="flex flex-nowrap items-center gap-2">
+                                        <ArrowDownNarrowWide
+                                            size={16}
+                                            className={cn(
+                                                'cursor-pointer',
+                                                query.sortBy === 'priority' && query.orderBy === 'asc' ? 'text-amber-300' : '',
                                             )}
-                                        </TableBodyData>
-                                        <TableBodyData>{item.planned_at ?? t('interventions.planned_at_no')}</TableBodyData>
-                                        <TableBodyData>{item.repair_delay ?? t('interventions.repair_delay_no')}</TableBodyData>
-                                        <TableBodyData>{item.total_costs ? `${item.total_costs} €` : '-'}</TableBodyData>
-                                        <TableBodyData className="flex space-x-2">
-                                            {!closed && (
-                                                <>
-                                                    <Button onClick={() => editIntervention(item.id)}>
-                                                        <Pencil />
-                                                    </Button>
-                                                    <Button
-                                                        type="button"
-                                                        variant="destructive"
-                                                        onClick={() => {
-                                                            setInterventionToDelete(item);
-                                                            setShowDeleteInterventionModale(true);
-                                                        }}
-                                                    >
-                                                        <Trash2 />
-                                                    </Button>
-                                                </>
+                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'priority', orderBy: 'asc' }))}
+                                        />
+                                        <p>{t('interventions.priority')}</p>
+                                        <ArrowDownWideNarrow
+                                            size={16}
+                                            className={cn(
+                                                'cursor-pointer',
+                                                query.sortBy === 'priority' && query.orderBy === 'desc' ? 'text-amber-300' : '',
+                                            )}
+                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'priority', orderBy: 'desc' }))}
+                                        />
+                                    </div>
+                                </TableHeadData>
+                                <TableHeadData>{t('interventions.status')}</TableHeadData>
+                                <TableHeadData>{t('interventions.assigned_to')}</TableHeadData>
+                                <TableHeadData>
+                                    <div className="flex items-center gap-2">
+                                        <ArrowDownNarrowWide
+                                            size={16}
+                                            className={cn(
+                                                'cursor-pointer',
+                                                query.sortBy === 'planned_at' && query.orderBy === 'asc' ? 'text-amber-300' : '',
+                                                !query.sortBy && !query.orderBy ? 'text-amber-300' : '',
                                             )}
                                             onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'planned_at', orderBy: 'asc' }))}
                                         />
-                                        <p>Planned at</p>
+                                        <p>{t('interventions.planned_at')}</p>
                                         <ArrowDownWideNarrow
                                             size={16}
                                             className={cn(
@@ -545,7 +447,7 @@ export default function IndexInterventions({
                                             )}
                                             onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'repair_delay', orderBy: 'asc' }))}
                                         />
-                                        <p>Repair delay</p>
+                                        <p>{t('interventions.repair_delay')}</p>
                                         <ArrowDownWideNarrow
                                             size={16}
                                             className={cn(
@@ -556,7 +458,7 @@ export default function IndexInterventions({
                                         />
                                     </div>
                                 </TableHeadData>
-                                <TableHeadData>Total costs</TableHeadData>
+                                <TableHeadData>{t('interventions.total_costs')}</TableHeadData>
                                 <TableHeadData></TableHeadData>
                             </TableHeadRow>
                         </TableHead>
@@ -566,7 +468,7 @@ export default function IndexInterventions({
                                     <TableBodyData>
                                         <p className="flex animate-pulse gap-2">
                                             <Loader />
-                                            Searching...
+                                            {t('actions.searching')}
                                         </p>
                                     </TableBodyData>
                                 </TableBodyRow>
@@ -587,10 +489,10 @@ export default function IndexInterventions({
                                                 </a>
                                             </TableBodyData>
                                             <TableBodyData>
-                                                <Pill variant={item.priority}>{item.priority}</Pill>
+                                                <Pill variant={item.priority}>{t(`interventions.priority.${item.priority}`)}</Pill>
                                             </TableBodyData>
                                             <TableBodyData>
-                                                <Pill variant={item.status}>{item.status}</Pill>
+                                                <Pill variant={item.status}>{t(`interventions.status.${item.status}`)}</Pill>
                                             </TableBodyData>
                                             <TableBodyData>
                                                 {item.assignable ? (
@@ -600,11 +502,11 @@ export default function IndexInterventions({
                                                         <a href={route('tenant.providers.show', item.assignable.id)}>{item.assignable.name}</a>
                                                     )
                                                 ) : (
-                                                    'not assigned'
+                                                    t('interventions.assigned_not')
                                                 )}
                                             </TableBodyData>
-                                            <TableBodyData>{item.planned_at ?? 'Not planned'}</TableBodyData>
-                                            <TableBodyData>{item.repair_delay ?? 'No repair delay'}</TableBodyData>
+                                            <TableBodyData>{item.planned_at ?? t('interventions.planned_at_no')}</TableBodyData>
+                                            <TableBodyData>{item.repair_delay ?? t('interventions.repair_delay_no')}</TableBodyData>
                                             <TableBodyData>{item.total_costs ? `${item.total_costs} €` : '-'}</TableBodyData>
                                             <TableBodyData className="flex space-x-2">
                                                 {!closed && (

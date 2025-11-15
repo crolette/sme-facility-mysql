@@ -11,8 +11,8 @@ import { cn } from '@/lib/utils';
 import { BreadcrumbItem, PaginatedData, TicketStatus } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
-import { ArrowDownNarrowWide, ArrowDownWideNarrow, LayoutGrid, Loader, TableIcon, X } from 'lucide-react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, LayoutGrid, Loader, TableIcon, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export interface SearchParams {
@@ -191,36 +191,34 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                     </details>
                 </div>
 
-                <div className="">
-                                        <h3 className="inline">
-                        {tChoice('tickets', 2)} {!isLoading && `(${items.total ?? 0})`}
-                    </h3>
-                    <div className="flex gap-4">
-                        <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('grid')}>
-                            <LayoutGrid size={20} />
-                        </div>
-                        <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('table')}>
-                            <TableIcon size={20} />
-                        </div>
+                <h3 className="inline">
+                    {tChoice('tickets', 2)} {!isLoading && `(${items.total ?? 0})`}
+                </h3>
+                <div className="flex gap-4">
+                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('grid')}>
+                        <LayoutGrid size={20} />
                     </div>
-                    {layout === 'grid' ? (
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
-                            {items.data.map((ticket, index) => (
-                                <div key={index} className="border-accent bg-sidebar flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4">
-                                    <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
-                                    <p className="text-xs">
-                                        <a href={ticket.ticketable.location_route}>{ticket.asset_code}</a>
-                                    </p>
-                                    <Pill variant={ticket.status}>{ticket.status}</Pill>
-                                    <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">
-                                        {ticket.reporter?.full_name ?? ticket.reporter_email}
-                                    </p>
-                                    <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">{ticket.description}</p>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-
+                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('table')}>
+                        <TableIcon size={20} />
+                    </div>
+                </div>
+                {layout === 'grid' ? (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
+                        {items.data.map((ticket, index) => (
+                            <div key={index} className="border-accent bg-sidebar flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4">
+                                <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
+                                <p className="text-xs">
+                                    <a href={ticket.ticketable.location_route}>{ticket.asset_code}</a>
+                                </p>
+                                <Pill variant={ticket.status}>{ticket.status}</Pill>
+                                <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">
+                                    {ticket.reporter?.full_name ?? ticket.reporter_email}
+                                </p>
+                                <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">{ticket.description}</p>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
                     <Table>
                         <TableHead>
                             <TableHeadRow>
@@ -298,33 +296,24 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                             <Pill variant={ticket.status}>{t(`tickets.status.${ticket.status}`)}</Pill>
                                         </TableBodyData>
                                         <TableBodyData>{ticket.reporter?.full_name ?? ticket.reporter_email}</TableBodyData>
-                                        <TableBodyData className="my-auto flex h-full w-40">
+                                        <TableBodyData className="flex h-full w-40 items-center">
                                             <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{ticket.description}</p>
+                                            <p className="tooltip tooltip-bottom">{ticket.description}</p>
                                         </TableBodyData>
-                                    </TableBodyRow>
-                                                                        <TableBodyData className="space-x-2">
+                                        <TableBodyData>{ticket.created_at}</TableBodyData>
+
+                                        <TableBodyData className="space-x-2">
                                             {ticket.status == 'open' && (
                                                 <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'ongoing')}>
                                                     {t('tickets.status.ongoing')}
                                                 </Button>
                                             )}
                                             {ticket.status !== 'closed' && (
-                                                <>
-                                                    <Button variant={'destructive'} onClick={() => changeStatusTicket(ticket.id, 'closed')}>
-                                                        {t('tickets.close')}
-
-                                                    </Button>
-                                                )}
-                                                {ticket.status !== 'closed' && (
-                                                    <>
-                                                        <Button variant={'destructive'} onClick={() => changeStatusTicket(ticket.id, 'closed')}>
-                                                            Close
-                                                        </Button>
-                                                        {/* <a href={route('tenant.tickets.show', ticket.id)}>
-                                                    <Button type="button">Show</Button>
-                                                </a> */}
-                                                </>
+                                                <Button variant={'destructive'} onClick={() => changeStatusTicket(ticket.id, 'closed')}>
+                                                    {t('actions.close')}
+                                                </Button>
                                             )}
+
                                             {ticket.status === 'closed' && (
                                                 <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'open')}>
                                                     {t('tickets.reopen')}
@@ -336,8 +325,8 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                             )}
                         </TableBody>
                     </Table>
-                    <Pagination items={items} />
-                </div>
+                )}
+                <Pagination items={items} />
             </div>
         </AppLayout>
     );

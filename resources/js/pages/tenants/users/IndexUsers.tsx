@@ -6,10 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Pill } from '@/components/ui/pill';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
+import { cn } from '@/lib/utils';
 import { BreadcrumbItem, PaginatedData } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { LayoutGrid, Loader, PlusCircle, TableIcon, X } from 'lucide-react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { LayoutGrid, Loader, PlusCircle, ShieldUser, TableIcon, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export interface SearchParams {
@@ -228,13 +229,19 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
                 {layout === 'grid' ? (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
                         {items.data.map((item, index) => (
-                            <div key={index} className="border-accent bg-sidebar flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4">
+                            <div
+                                key={index}
+                                className="border-accent bg-sidebar relative flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4"
+                            >
+                                <p className="text-xs">
+                                    <ShieldUser className={cn('absolute right-4', item.can_login ? 'text-green-600' : 'text-red-600')} size={16} />
+                                </p>
                                 <a href={route('tenant.users.show', item.id)}>{item.full_name}</a>
                                 <p className="text-xs">{item.job_position ?? ''}</p>
                                 <p className="text-xs">
                                     <a href={`mailto:${item.email}`}>{item.email}</a>
                                 </p>
-                                <p className="text-xs">{item.can_login ? 'YES' : 'NO'}</p>
+
                                 <p className="text-xs">{item.roles && item.roles.length > 0 ? item.roles[0].name : ''}</p>
                                 <p className="text-xs">
                                     {item.provider ? (
@@ -248,58 +255,60 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
                     </div>
                 ) : (
                     <Table>
-                    <TableHead>
-                        <TableHeadRow>
-                            <TableHeadData>{t('common.full_name')}</TableHeadData>
-                            <TableHeadData>{t('contacts.job_position')}</TableHeadData>
-                            <TableHeadData>{t('common.email')}</TableHeadData>
-                            <TableHeadData>{t('contacts.can_login')}</TableHeadData>
-                            <TableHeadData>{t('contacts.role')}</TableHeadData>
-                            <TableHeadData>{tChoice('providers.title', 1)}</TableHeadData>
-                        </TableHeadRow>
-                    </TableHead>
-                    <TableBody>
-                        {isLoading ? (
-                            <TableBodyRow>
-                                <TableBodyData>
-                                    <p className="flex animate-pulse gap-2">
-                                        <Loader />
-                                        {t('actions.searching')}
-                                    </p>
-                                </TableBodyData>
-                            </TableBodyRow>
-                        ) : items.data.length > 0 ? (
-                            items.data.map((item, index) => {
-                                return (
-                                    <TableBodyRow key={index}>
-                                        <TableBodyData>
-                                            <a href={route('tenant.users.show', item.id)}>{item.full_name}</a>
-                                        </TableBodyData>
-                                        <TableBodyData>{item.job_position}</TableBodyData>
-                                        <TableBodyData>
-                                            <a href={`mailto:${item.email}`}>{item.email}</a>
-                                        </TableBodyData>
-                                        <TableBodyData>{item.can_login ? t('common.yes') : t('common.no')}</TableBodyData>
-                                        <TableBodyData>{item.roles && item.roles.length > 0 ? item.roles[0].name : ''}</TableBodyData>
-                                        <TableBodyData>
-                                            {item.provider ? (
-                                                <a href={route('tenant.providers.show', item.provider?.id)}>{item.provider?.name}</a>
-                                            ) : (
-                                                <p>{t('contacts.internal')}</p>
-                                            )}
-                                        </TableBodyData>
-                                    </TableBodyRow>
-                                );
-                            })
-                        ) : (
-                            <TableBodyRow key={0}>
-                                <TableBodyData>No results...</TableBodyData>
-                            </TableBodyRow>
-                        )}
-                    </TableBody>
-                </Table>
+                        <TableHead>
+                            <TableHeadRow>
+                                <TableHeadData>{t('common.full_name')}</TableHeadData>
+                                <TableHeadData>{t('contacts.job_position')}</TableHeadData>
+                                <TableHeadData>{t('common.email')}</TableHeadData>
+                                <TableHeadData>{t('contacts.role')}</TableHeadData>
+                                <TableHeadData>{tChoice('providers.title', 1)}</TableHeadData>
+                            </TableHeadRow>
+                        </TableHead>
+                        <TableBody>
+                            {isLoading ? (
+                                <TableBodyRow>
+                                    <TableBodyData>
+                                        <p className="flex animate-pulse gap-2">
+                                            <Loader />
+                                            {t('actions.searching')}
+                                        </p>
+                                    </TableBodyData>
+                                </TableBodyRow>
+                            ) : items.data.length > 0 ? (
+                                items.data.map((item, index) => {
+                                    return (
+                                        <TableBodyRow key={index}>
+                                            <TableBodyData>
+                                                <a href={route('tenant.users.show', item.id)}>{item.full_name}</a>
+                                                <ShieldUser
+                                                    className={cn('ml-2 inline-block', item.can_login ? 'text-green-600' : 'text-red-600')}
+                                                    size={16}
+                                                />
+                                            </TableBodyData>
+                                            <TableBodyData>{item.job_position}</TableBodyData>
+                                            <TableBodyData>
+                                                <a href={`mailto:${item.email}`}>{item.email}</a>
+                                            </TableBodyData>
+                                            <TableBodyData>{item.roles && item.roles.length > 0 ? item.roles[0].name : ''}</TableBodyData>
+                                            <TableBodyData>
+                                                {item.provider ? (
+                                                    <a href={route('tenant.providers.show', item.provider?.id)}>{item.provider?.name}</a>
+                                                ) : (
+                                                    <p>{t('contacts.internal')}</p>
+                                                )}
+                                            </TableBodyData>
+                                        </TableBodyRow>
+                                    );
+                                })
+                            ) : (
+                                <TableBodyRow key={0}>
+                                    <TableBodyData>No results...</TableBodyData>
+                                </TableBodyRow>
+                            )}
+                        </TableBody>
+                    </Table>
                 )}
-               
+
                 <Pagination items={items} />
             </div>
         </AppLayout>

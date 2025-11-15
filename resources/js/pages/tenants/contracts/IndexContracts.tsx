@@ -11,9 +11,8 @@ import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Contract, ContractsPaginated } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
-import { ArrowDownNarrowWide, ArrowDownWideNarrow, LayoutGrid, Loader, Pencil, PlusCircle, TableIcon, Trash2, X } from 'lucide-react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { ArrowDownNarrowWide, ArrowDownWideNarrow, Loader, Pencil, PlusCircle, Trash2, X } from 'lucide-react';
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, LayoutGrid, Loader, Pencil, PlusCircle, TableIcon, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export interface SearchParams {
@@ -274,7 +273,6 @@ export default function IndexContracts({
                     </a>
                 </div>
 
-
                 <div className="flex gap-4">
                     <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('grid')}>
                         <LayoutGrid size={20} />
@@ -292,77 +290,43 @@ export default function IndexContracts({
                                 <p className="text-xs">{contract.type}</p>
                                 <p className="text-xs">{contract.provider?.category}</p>
                                 {contract.provider && <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>}
-                                <Pill variant={contract.status}>{contract.status}</Pill>
+                                <Pill variant={contract.status}>{t(`contracts.status.${contract.status}`)}</Pill>
                                 <p>{contract.internal_reference}</p>
-                                <p className="text-xs">End date : {contract.end_date}</p>
+                                <p className="text-xs">
+                                    {t('contracts.end_date')} : {contract.end_date}
+                                </p>
                             </div>
                         ))}
                     </div>
                 ) : (
-                                    <Table>
-                    <TableHead>
-                        <TableHeadRow>
-                            <TableHeadData>{t('common.name')}</TableHeadData>
-                            <TableHeadData>{t('common.type')}</TableHeadData>
-                            <TableHeadData>{t('common.category')}</TableHeadData>
-                            <TableHeadData>{t('common.status')}</TableHeadData>
-                            <TableHeadData>{t('contracts.internal_ref')}</TableHeadData>
-                            <TableHeadData>{t('contracts.provider_ref')}</TableHeadData>
-                            <TableHeadData>{t('contracts.renewal_type')}</TableHeadData>
-                            <TableHeadData>{tChoice('providers.title', 1)}</TableHeadData>
-                            <TableHeadData>
-                                <div className="flex items-center gap-2">
-                                    <ArrowDownNarrowWide
-                                        size={16}
-                                        className={cn(
-                                            'cursor-pointer',
-                                            query.sortBy === 'end_date' && query.orderBy === 'asc' ? 'text-amber-300' : '',
-                                            !query.sortBy && !query.orderBy ? 'text-amber-300' : '',
-                                        )}
-                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'end_date', orderBy: 'asc' }))}
-                                    />
-                                    {t('contract.end_date')}
-                                    <ArrowDownWideNarrow
-                                        size={16}
-                                        className={cn(
-                                            'cursor-pointer',
-                                            query.sortBy === 'end_date' && query.orderBy === 'desc' ? 'text-amber-300' : '',
-                                        )}
-                                        onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'end_date', orderBy: 'desc' }))}
-                                    />
-                                </div>
-                            </TableHeadData>
-                            <TableHeadData></TableHeadData>
-                        </TableHeadRow>
-                    </TableHead>
-                    <TableBody>
-                        {isLoading ? (
-                            <TableBodyRow>
-                                <TableBodyData>
-                                    <p className="flex animate-pulse gap-2">
-                                        <Loader />
-                                        {t('actions.searching')}
-                                    </p>
-                                </TableBodyData>
-                            </TableBodyRow>
-                        ) : items.data.length > 0 ? (
-                            items.data.map((contract) => {
-                                return (
-                                    <TableBodyRow key={contract.id}>
-                                        <TableBodyData>
-                                            <a href={route(`tenant.contracts.show`, contract.id)}> {contract.name} </a>
-                                        </TableBodyData>
-                                        <TableBodyData>{t(`contracts.type.${contract.type}`)}</TableBodyData>
-                                        <TableBodyData>{contract.provider?.category}</TableBodyData>
-                                        <TableBodyData>
-                                            <Pill variant={contract.status}>{t(`contracts.status.${contract.status}`)}</Pill>
-                                        </TableBodyData>
-                                        <TableBodyData>{contract.internal_reference}</TableBodyData>
-                                        <TableBodyData>{contract.provider_reference}</TableBodyData>
-                                        <TableBodyData>{t(`contracts.renewal_type.${contract.renewal_type}`)}</TableBodyData>
-                                        <TableBodyData>
-                                            {contract.provider && (
-                                                <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>
+                    <Table>
+                        <TableHead>
+                            <TableHeadRow>
+                                <TableHeadData>{t('common.name')}</TableHeadData>
+                                <TableHeadData>{t('common.type')}</TableHeadData>
+                                <TableHeadData>{t('common.category')}</TableHeadData>
+                                <TableHeadData>{t('common.status')}</TableHeadData>
+                                <TableHeadData>{t('contracts.internal_ref')}</TableHeadData>
+                                <TableHeadData>{t('contracts.provider_ref')}</TableHeadData>
+                                <TableHeadData>{t('contracts.renewal_type')}</TableHeadData>
+                                <TableHeadData>{tChoice('providers.title', 1)}</TableHeadData>
+                                <TableHeadData>
+                                    <div className="flex items-center gap-2">
+                                        <ArrowDownNarrowWide
+                                            size={16}
+                                            className={cn(
+                                                'cursor-pointer',
+                                                query.sortBy === 'end_date' && query.orderBy === 'asc' ? 'text-amber-300' : '',
+                                                !query.sortBy && !query.orderBy ? 'text-amber-300' : '',
+                                            )}
+                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'end_date', orderBy: 'asc' }))}
+                                        />
+                                        {t('contracts.end_date')}
+                                        <ArrowDownWideNarrow
+                                            size={16}
+                                            className={cn(
+                                                'cursor-pointer',
+                                                query.sortBy === 'end_date' && query.orderBy === 'desc' ? 'text-amber-300' : '',
                                             )}
                                             onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'end_date', orderBy: 'desc' }))}
                                         />
@@ -377,7 +341,7 @@ export default function IndexContracts({
                                     <TableBodyData>
                                         <p className="flex animate-pulse gap-2">
                                             <Loader />
-                                            Searching...
+                                            {t('actions.searching')}
                                         </p>
                                     </TableBodyData>
                                 </TableBodyRow>
@@ -388,14 +352,14 @@ export default function IndexContracts({
                                             <TableBodyData>
                                                 <a href={route(`tenant.contracts.show`, contract.id)}> {contract.name} </a>
                                             </TableBodyData>
-                                            <TableBodyData>{contract.type}</TableBodyData>
+                                            <TableBodyData>{t(`contracts.type.${contract.type}`)}</TableBodyData>
                                             <TableBodyData>{contract.provider?.category}</TableBodyData>
                                             <TableBodyData>
-                                                <Pill variant={contract.status}>{contract.status}</Pill>
+                                                <Pill variant={contract.status}>{t(`contracts.status.${contract.status}`)}</Pill>
                                             </TableBodyData>
                                             <TableBodyData>{contract.internal_reference}</TableBodyData>
                                             <TableBodyData>{contract.provider_reference}</TableBodyData>
-                                            <TableBodyData>{contract.renewal_type}</TableBodyData>
+                                            <TableBodyData>{t(`contracts.renewal_type.${contract.renewal_type}`)}</TableBodyData>
                                             <TableBodyData>
                                                 {contract.provider && (
                                                     <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>

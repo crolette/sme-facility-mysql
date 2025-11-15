@@ -12,7 +12,7 @@ import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Loader, Pencil, PlusCircle, Trash2, X } from 'lucide-react';
+import { LayoutGrid, Loader, Pencil, PlusCircle, TableIcon, Trash2, X } from 'lucide-react';
 
 import { useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
@@ -227,48 +227,47 @@ export default function IndexSites({
                         ))}
                     </div>
                 ) : (
-
-                <Table>
-                    <TableHead>
-                        <TableHeadRow>
-                            <TableHeadData>{t('common.reference_code')}</TableHeadData>
-                            <TableHeadData>{t('common.code')}</TableHeadData>
-                            <TableHeadData>{t('common.category')}</TableHeadData>
-                            <TableHeadData className="max-w-72">{t('common.name')}</TableHeadData>
-                            <TableHeadData className="max-w-72">{t('common.description')}</TableHeadData>
-                            <TableHeadData></TableHeadData>
-                        </TableHeadRow>
-                    </TableHead>
-                    <TableBody>
-                        {isLoading ? (
-                            <TableBodyRow>
-                                <TableBodyData>
-                                    <p className="flex animate-pulse gap-2">
-                                        <Loader />
-                                        {t('actions.searching')}
-                                    </p>
-                                </TableBodyData>
-                            </TableBodyRow>
-                        ) : (
-                            locations &&
-                            locations.map((item, index) => {
-                                return (
-                                    <TableBodyRow key={index}>
-                                        <TableBodyData>
-                                            <a href={route(`tenant.${routeName}.show`, item.reference_code)}> {item.reference_code} </a>
-                                        </TableBodyData>
-                                        <TableBodyData>{item.code}</TableBodyData>
-                                        <TableBodyData>{item.category}</TableBodyData>
-                                        <TableBodyData>
-                                            <span className="flex max-w-72">
-                                                <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{item.name}</p>
-                                            </span>
-                                        </TableBodyData>
-                                        <TableBodyData>
-                                            <span className="flex max-w-72">
-                                                <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{item.description}</p>
-                                            </span>
-                                        </TableBodyData>
+                    <Table>
+                        <TableHead>
+                            <TableHeadRow>
+                                <TableHeadData>{t('common.reference_code')}</TableHeadData>
+                                <TableHeadData>{t('common.code')}</TableHeadData>
+                                <TableHeadData>{t('common.category')}</TableHeadData>
+                                <TableHeadData className="max-w-72">{t('common.name')}</TableHeadData>
+                                <TableHeadData className="max-w-72">{t('common.description')}</TableHeadData>
+                                <TableHeadData></TableHeadData>
+                            </TableHeadRow>
+                        </TableHead>
+                        <TableBody>
+                            {isLoading ? (
+                                <TableBodyRow>
+                                    <TableBodyData>
+                                        <p className="flex animate-pulse gap-2">
+                                            <Loader />
+                                            {t('actions.searching')}
+                                        </p>
+                                    </TableBodyData>
+                                </TableBodyRow>
+                            ) : (
+                                locations &&
+                                locations.map((item, index) => {
+                                    return (
+                                        <TableBodyRow key={index}>
+                                            <TableBodyData>
+                                                <a href={route(`tenant.${routeName}.show`, item.reference_code)}> {item.reference_code} </a>
+                                            </TableBodyData>
+                                            <TableBodyData>{item.code}</TableBodyData>
+                                            <TableBodyData>{item.category}</TableBodyData>
+                                            <TableBodyData>
+                                                <span className="flex max-w-72">
+                                                    <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{item.name}</p>
+                                                </span>
+                                            </TableBodyData>
+                                            <TableBodyData>
+                                                <span className="flex max-w-72">
+                                                    <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{item.description}</p>
+                                                </span>
+                                            </TableBodyData>
 
                                             <TableBodyData className="space-x-2">
                                                 <a href={route(`tenant.${routeName}.edit`, item.reference_code)}>

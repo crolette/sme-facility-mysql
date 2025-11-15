@@ -7,8 +7,8 @@ import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, CentralType, Provider, ProvidersPaginated } from '@/types';
 import { Head, router } from '@inertiajs/react';
-import { LayoutGrid, Loader, Pencil, PlusCircle, TableIcon, X } from 'lucide-react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { LayoutGrid, Loader, Pencil, PlusCircle, TableIcon, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export interface SearchParams {
@@ -180,55 +180,55 @@ export default function IndexProviders({
                         ))}
                     </div>
                 ) : (
+                    <Table>
+                        <TableHead>
+                            <TableHeadRow>
+                                <TableHeadData>{t('providers.company_name')}</TableHeadData>
+                                <TableHeadData>{t('common.category')}</TableHeadData>
+                                <TableHeadData>{t('common.phone')}</TableHeadData>
+                                <TableHeadData>{t('common.email')}</TableHeadData>
+                                <TableHeadData></TableHeadData>
+                            </TableHeadRow>
+                        </TableHead>
+                        <TableBody>
+                            {isLoading ? (
+                                <TableBodyRow>
+                                    <TableBodyData>
+                                        <p className="flex animate-pulse gap-2">
+                                            <Loader />
+                                            {t('actions.searching')}
+                                        </p>
+                                    </TableBodyData>
+                                </TableBodyRow>
+                            ) : providers.length > 0 ? (
+                                providers.map((item, index) => {
+                                    return (
+                                        <TableBodyRow key={index}>
+                                            <TableBodyData>
+                                                <a href={route('tenant.providers.show', item.id)}>{item.name}</a>
+                                            </TableBodyData>
+                                            <TableBodyData>{item.category ?? ''}</TableBodyData>
+                                            <TableBodyData>{item.phone_number}</TableBodyData>
+                                            <TableBodyData>{item.email}</TableBodyData>
 
-                <Table>
-                    <TableHead>
-                        <TableHeadRow>
-                            <TableHeadData>{t('providers.company_name')}</TableHeadData>
-                            <TableHeadData>{t('common.category')}</TableHeadData>
-                            <TableHeadData>{t('common.phone')}</TableHeadData>
-                            <TableHeadData>{t('common.email')}</TableHeadData>
-                            <TableHeadData></TableHeadData>
-                        </TableHeadRow>
-                    </TableHead>
-                    <TableBody>
-                        {isLoading ? (
-                            <TableBodyRow>
-                                <TableBodyData>
-                                    <p className="flex animate-pulse gap-2">
-                                        <Loader />
-                                        {t('actions.searching')}
-                                    </p>
-                                </TableBodyData>
-                            </TableBodyRow>
-                        ) : providers.length > 0 ? (
-                            providers.map((item, index) => {
-                                return (
-                                    <TableBodyRow key={index}>
-                                        <TableBodyData>
-                                            <a href={route('tenant.providers.show', item.id)}>{item.name}</a>
-                                        </TableBodyData>
-                                        <TableBodyData>{item.category ?? ''}</TableBodyData>
-                                        <TableBodyData>{item.phone_number}</TableBodyData>
-                                        <TableBodyData>{item.email}</TableBodyData>
-
-                                        <TableBodyData>
-                                            <a href={route(`tenant.providers.edit`, item.id)}>
-                                                <Button>
-                                                    <Pencil />
-                                                </Button>
-                                            </a>
-                                        </TableBodyData>
-                                    </TableBodyRow>
-                                );
-                            })
-                        ) : (
-                            <TableBodyRow>
-                                <TableBodyData>No results..</TableBodyData>
-                            </TableBodyRow>
-                        )}
-                    </TableBody>
-                </Table>
+                                            <TableBodyData>
+                                                <a href={route(`tenant.providers.edit`, item.id)}>
+                                                    <Button>
+                                                        <Pencil />
+                                                    </Button>
+                                                </a>
+                                            </TableBodyData>
+                                        </TableBodyRow>
+                                    );
+                                })
+                            ) : (
+                                <TableBodyRow>
+                                    <TableBodyData>No results..</TableBodyData>
+                                </TableBodyRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                )}
                 <Pagination items={items} />
             </div>
         </AppLayout>
