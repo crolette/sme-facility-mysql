@@ -1,4 +1,5 @@
 import { Pagination } from '@/components/pagination';
+import { useGridTableLayoutContext } from '@/components/tenant/gridTableLayoutContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,8 +7,8 @@ import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, CentralType, Provider, ProvidersPaginated } from '@/types';
 import { Head, router } from '@inertiajs/react';
+import { LayoutGrid, Loader, Pencil, PlusCircle, TableIcon, X } from 'lucide-react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Loader, Pencil, PlusCircle, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export interface SearchParams {
@@ -107,6 +108,8 @@ export default function IndexProviders({
             });
     }, [query]);
 
+    const { layout, setLayout } = useGridTableLayoutContext();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={tChoice('providers.title', 2)} />
@@ -155,6 +158,28 @@ export default function IndexProviders({
                         </Button>
                     </a>
                 </div>
+                <div className="flex gap-4">
+                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('grid')}>
+                        <LayoutGrid size={20} />
+                    </div>
+                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('table')}>
+                        <TableIcon size={20} />
+                    </div>
+                </div>
+                {layout === 'grid' ? (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
+                        {providers.map((item, index) => (
+                            <div key={index} className="border-accent bg-sidebar flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4">
+                                <a href={route('tenant.providers.show', item.id)} className="text-sm">
+                                    {item.name}
+                                </a>
+                                <p className="text-xs">{item.category ?? ''}</p>
+                                <p className="text-xs">{item.phone_number ?? ''}</p>
+                                <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">{item.email ?? ''}</p>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
 
                 <Table>
                     <TableHead>

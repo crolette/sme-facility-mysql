@@ -1,5 +1,6 @@
 import Modale from '@/components/Modale';
 import { Pagination } from '@/components/pagination';
+import { useGridTableLayoutContext } from '@/components/tenant/gridTableLayoutContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Contract, ContractsPaginated } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, LayoutGrid, Loader, Pencil, PlusCircle, TableIcon, Trash2, X } from 'lucide-react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArrowDownNarrowWide, ArrowDownWideNarrow, Loader, Pencil, PlusCircle, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -171,6 +173,8 @@ export default function IndexContracts({
             });
     }, [query]);
 
+    const { layout, setLayout } = useGridTableLayoutContext();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={tChoice('contracts.title', 2)} />
@@ -270,7 +274,32 @@ export default function IndexContracts({
                     </a>
                 </div>
 
-                <Table>
+
+                <div className="flex gap-4">
+                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('grid')}>
+                        <LayoutGrid size={20} />
+                    </div>
+                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('table')}>
+                        <TableIcon size={20} />
+                    </div>
+                </div>
+
+                {layout === 'grid' ? (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
+                        {items.data.map((contract, index) => (
+                            <div key={index} className="border-accent bg-sidebar flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4">
+                                <a href={route(`tenant.contracts.show`, contract.id)}> {contract.name} </a>
+                                <p className="text-xs">{contract.type}</p>
+                                <p className="text-xs">{contract.provider?.category}</p>
+                                {contract.provider && <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>}
+                                <Pill variant={contract.status}>{contract.status}</Pill>
+                                <p>{contract.internal_reference}</p>
+                                <p className="text-xs">End date : {contract.end_date}</p>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                                    <Table>
                     <TableHead>
                         <TableHeadRow>
                             <TableHeadData>{t('common.name')}</TableHeadData>
@@ -335,35 +364,72 @@ export default function IndexContracts({
                                             {contract.provider && (
                                                 <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>
                                             )}
-                                        </TableBodyData>
-                                        <TableBodyData>{contract.end_date}</TableBodyData>
+                                            onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'end_date', orderBy: 'desc' }))}
+                                        />
+                                    </div>
+                                </TableHeadData>
+                                <TableHeadData></TableHeadData>
+                            </TableHeadRow>
+                        </TableHead>
+                        <TableBody>
+                            {isLoading ? (
+                                <TableBodyRow>
+                                    <TableBodyData>
+                                        <p className="flex animate-pulse gap-2">
+                                            <Loader />
+                                            Searching...
+                                        </p>
+                                    </TableBodyData>
+                                </TableBodyRow>
+                            ) : items.data.length > 0 ? (
+                                items.data.map((contract) => {
+                                    return (
+                                        <TableBodyRow key={contract.id}>
+                                            <TableBodyData>
+                                                <a href={route(`tenant.contracts.show`, contract.id)}> {contract.name} </a>
+                                            </TableBodyData>
+                                            <TableBodyData>{contract.type}</TableBodyData>
+                                            <TableBodyData>{contract.provider?.category}</TableBodyData>
+                                            <TableBodyData>
+                                                <Pill variant={contract.status}>{contract.status}</Pill>
+                                            </TableBodyData>
+                                            <TableBodyData>{contract.internal_reference}</TableBodyData>
+                                            <TableBodyData>{contract.provider_reference}</TableBodyData>
+                                            <TableBodyData>{contract.renewal_type}</TableBodyData>
+                                            <TableBodyData>
+                                                {contract.provider && (
+                                                    <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>
+                                                )}
+                                            </TableBodyData>
+                                            <TableBodyData>{contract.end_date}</TableBodyData>
 
-                                        <TableBodyData className="flex space-x-2">
-                                            <a href={route(`tenant.contracts.edit`, contract.id)}>
-                                                <Button>
-                                                    <Pencil />
+                                            <TableBodyData className="flex space-x-2">
+                                                <a href={route(`tenant.contracts.edit`, contract.id)}>
+                                                    <Button>
+                                                        <Pencil />
+                                                    </Button>
+                                                </a>
+                                                <Button
+                                                    onClick={() => {
+                                                        setContractToDelete(contract);
+                                                        setShowDeleteModale(true);
+                                                    }}
+                                                    variant={'destructive'}
+                                                >
+                                                    <Trash2 />
                                                 </Button>
-                                            </a>
-                                            <Button
-                                                onClick={() => {
-                                                    setContractToDelete(contract);
-                                                    setShowDeleteModale(true);
-                                                }}
-                                                variant={'destructive'}
-                                            >
-                                                <Trash2 />
-                                            </Button>
-                                        </TableBodyData>
-                                    </TableBodyRow>
-                                );
-                            })
-                        ) : (
-                            <TableBodyRow key={0}>
-                                <TableBodyData>No results...</TableBodyData>
-                            </TableBodyRow>
-                        )}
-                    </TableBody>
-                </Table>
+                                            </TableBodyData>
+                                        </TableBodyRow>
+                                    );
+                                })
+                            ) : (
+                                <TableBodyRow key={0}>
+                                    <TableBodyData>No results...</TableBodyData>
+                                </TableBodyRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                )}
                 <Pagination items={items} />
             </div>
             <Modale

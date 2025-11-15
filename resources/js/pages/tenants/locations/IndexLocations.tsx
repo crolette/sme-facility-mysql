@@ -1,5 +1,6 @@
 import Modale from '@/components/Modale';
 import { Pagination } from '@/components/pagination';
+import { useGridTableLayoutContext } from '@/components/tenant/gridTableLayoutContext';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,8 +10,10 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, CentralType, PaginatedData, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
+
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Loader, Pencil, PlusCircle, Trash2, X } from 'lucide-react';
+
 import { useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
@@ -143,6 +146,8 @@ export default function IndexSites({
             });
     }, [query]);
 
+    const { layout, setLayout } = useGridTableLayoutContext();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={tChoice(`locations.${routeName}`, 2)} />
@@ -201,6 +206,28 @@ export default function IndexSites({
                         </a>
                     </div>
                 </div>
+
+                <div className="flex gap-4">
+                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('grid')}>
+                        <LayoutGrid size={20} />
+                    </div>
+                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('table')}>
+                        <TableIcon size={20} />
+                    </div>
+                </div>
+                {layout === 'grid' ? (
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
+                        {locations.map((item, index) => (
+                            <div key={index} className="border-accent bg-sidebar flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4">
+                                <a href={route(`tenant.${routeName}.show`, item.reference_code)}> {item.reference_code} </a>
+                                <p className="text-xs">{item.category ?? ''}</p>
+                                <p className="text-xs">{item.code ?? ''}</p>
+                                <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">{item.description ?? ''}</p>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+
                 <Table>
                     <TableHead>
                         <TableHeadRow>
@@ -243,28 +270,29 @@ export default function IndexSites({
                                             </span>
                                         </TableBodyData>
 
-                                        <TableBodyData className="space-x-2">
-                                            <a href={route(`tenant.${routeName}.edit`, item.reference_code)}>
-                                                <Button>
-                                                    <Pencil />
+                                            <TableBodyData className="space-x-2">
+                                                <a href={route(`tenant.${routeName}.edit`, item.reference_code)}>
+                                                    <Button>
+                                                        <Pencil />
+                                                    </Button>
+                                                </a>
+                                                <Button
+                                                    onClick={() => {
+                                                        setShowDeleteModale(true);
+                                                        setLocationToDelete(item);
+                                                    }}
+                                                    variant={'destructive'}
+                                                >
+                                                    <Trash2 />
                                                 </Button>
-                                            </a>
-                                            <Button
-                                                onClick={() => {
-                                                    setShowDeleteModale(true);
-                                                    setLocationToDelete(item);
-                                                }}
-                                                variant={'destructive'}
-                                            >
-                                                <Trash2 />
-                                            </Button>
-                                        </TableBodyData>
-                                    </TableBodyRow>
-                                );
-                            })
-                        )}
-                    </TableBody>
-                </Table>
+                                            </TableBodyData>
+                                        </TableBodyRow>
+                                    );
+                                })
+                            )}
+                        </TableBody>
+                    </Table>
+                )}
                 <Pagination items={items} />
             </div>
             <Modale

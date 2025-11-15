@@ -5,6 +5,7 @@ import { LaravelReactI18nProvider } from 'laravel-react-i18n';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { ToastProvider } from './components/ToastrContext';
+import { GridTableLayoutProvider } from './components/tenant/gridTableLayoutContext';
 import { initializeTheme } from './hooks/use-appearance';
 
 const appName = import.meta.env.VITE_APP_NAME;
@@ -16,11 +17,15 @@ createInertiaApp({
         const root = createRoot(el);
 
         root.render(
-            <LaravelReactI18nProvider fallbackLocale={'en'} files={import.meta.glob('/lang/*.json', { eager: true })}>
-                <ToastProvider>
+
+        <LaravelReactI18nProvider fallbackLocale={'en'} files={import.meta.glob('/lang/*.json', { eager: true })}>
+            <ToastProvider>
+                <GridTableLayoutProvider>
                     <App {...props} />
-                </ToastProvider>
+                </GridTableLayoutProvider>
+            </ToastProvider>
             </LaravelReactI18nProvider>,
+
         );
     },
     progress: {

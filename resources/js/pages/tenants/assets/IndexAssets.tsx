@@ -1,5 +1,6 @@
 import Modale from '@/components/Modale';
 import { Pagination } from '@/components/pagination';
+import { useGridTableLayoutContext } from '@/components/tenant/gridTableLayoutContext';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,8 +11,9 @@ import { cn } from '@/lib/utils';
 import { Asset, AssetsPaginated, BreadcrumbItem, CentralType } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
+import { ArchiveRestore, LayoutGrid, Loader, Pencil, PlusCircle, Shredder, TableIcon, Trash2, X } from 'lucide-react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { ArchiveRestore, Loader, Pencil, PlusCircle, Shredder, Trash2, X } from 'lucide-react';
+
 import { useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
@@ -202,6 +204,8 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
             });
     }, [query]);
 
+    const { layout, setLayout } = useGridTableLayoutContext();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={tChoice('assets.title', 2)} />
@@ -362,29 +366,30 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                                         <Button>
                                                             <Pencil />
                                                         </Button>
-                                                    </a>
-                                                    <Button
-                                                        onClick={() => {
-                                                            setAssetToDelete(asset);
-                                                            setShowDeleteModale(true);
-                                                        }}
-                                                        variant={'destructive'}
-                                                    >
-                                                        <Trash2 />
-                                                    </Button>
-                                                </>
-                                            )}
-                                        </TableBodyData>
-                                    </TableBodyRow>
-                                );
-                            })
-                        ) : (
-                            <TableBodyRow key={0}>
-                                <TableBodyData>No results...</TableBodyData>
-                            </TableBodyRow>
-                        )}
-                    </TableBody>
-                </Table>
+                                                       <Button
+                                                            onClick={() => {
+                                                                setAssetToDelete(asset);
+                                                                setShowDeleteModale(true);
+                                                            }}
+                                                            variant={'destructive'}
+                                                        >
+                                                            <Trash2 />
+                                                        </Button>
+                                                    </>
+                                                ) 
+                                                )}
+                                            </TableBodyData>
+                                        </TableBodyRow>
+                                    );
+                                })
+                            ) : (
+                                <TableBodyRow key={0}>
+                                    <TableBodyData>No results...</TableBodyData>
+                                </TableBodyRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                )}
 
                 {/* pagination */}
                 <Pagination items={items} />
