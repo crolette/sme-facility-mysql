@@ -1,10 +1,11 @@
 import '../css/app.css';
 
 import { createInertiaApp } from '@inertiajs/react';
+import { LaravelReactI18nProvider } from 'laravel-react-i18n';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
-import { initializeTheme } from './hooks/use-appearance';
 import { ToastProvider } from './components/ToastrContext';
+import { initializeTheme } from './hooks/use-appearance';
 
 const appName = import.meta.env.VITE_APP_NAME;
 
@@ -15,9 +16,11 @@ createInertiaApp({
         const root = createRoot(el);
 
         root.render(
-            <ToastProvider>
-                <App {...props} />
-            </ToastProvider>,
+            <LaravelReactI18nProvider fallbackLocale={'en'} files={import.meta.glob('/lang/*.json', { eager: true })}>
+                <ToastProvider>
+                    <App {...props} />
+                </ToastProvider>
+            </LaravelReactI18nProvider>,
         );
     },
     progress: {

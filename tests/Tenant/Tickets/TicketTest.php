@@ -278,7 +278,7 @@ it('can create a new ticket to a SITE', function () {
     ]);
 });
 
-it('updates status to  and handled_at columns when intervention is created for a ticket', function () {
+it('updates status to and handled_at columns when intervention is created for a ticket', function () {
 
     $ticket = Ticket::factory()->forLocation($this->asset)->create();
 
@@ -344,7 +344,7 @@ it('can update the status of an existing ticket', function () {
     ]);
 });
 
-it('can close an existing ticket', function () {
+it('can close an existing ticket and update handled_at', function () {
 
     $ticket = Ticket::factory()->forLocation($this->asset)->create(['reported_by' => $this->user->id]);
 

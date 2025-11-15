@@ -16,7 +16,7 @@ const pillVariants = cva(
         open: "bg-destructive",
         ongoing: "bg-emerald-500",
         planned: "bg-ring",
-        'in progress': "bg-emerald-300 dark:text-background",
+        in_progress: "bg-emerald-300 dark:text-background",
         closed: "bg-green-900",
         completed: "bg-green-900 text-background dark:text-foreground",
         active:
@@ -60,7 +60,7 @@ function Pill({
   return (
     <Comp
       data-slot="button"
-      className={cn(pillVariants({ variant, size, className }))}
+      className={cn('lowercase', pillVariants({ variant, size, className }))}
       {...props}
     />
   )

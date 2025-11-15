@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { CentralType, LocationType, TenantBuilding, TenantFloor, TenantRoom, TenantSite, User, type BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Loader, MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
@@ -232,77 +233,73 @@ export default function CreateUpdateLocation({
 
     const addFileModalForm = () => {
         return (
-            <div className="bg-background/50 absolute inset-0 z-50">
-                <div className="bg-background/20 flex h-dvh items-center justify-center">
-                    <div className="bg-background flex items-center justify-center p-4">
-                        <div className="flex flex-col gap-2">
-                            <form onSubmit={addFile} className="space-y-2">
-                                <p className="text-center">Add new document</p>
-                                <select
-                                    name="documentType"
-                                    required
-                                    value={newDocumentType ?? ''}
-                                    onChange={(e) => setNewDocumentType(parseInt(e.target.value))}
-                                    id=""
-                                    className={cn(
-                                        'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-                                        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-                                        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-                                    )}
-                                >
-                                    {documentTypes && documentTypes.length > 0 && (
-                                        <>
-                                            <option value="" disabled className="bg-background text-foreground">
-                                                Select an option
-                                            </option>
-                                            {documentTypes?.map((documentType) => (
-                                                <option value={documentType.id} key={documentType.id} className="bg-background text-foreground">
-                                                    {documentType.label}
-                                                </option>
-                                            ))}
-                                        </>
-                                    )}
-                                </select>
-                                <Input
-                                    type="file"
-                                    name=""
-                                    id=""
-                                    onChange={(e) => setNewFile(e.target.files ? e.target.files[0] : null)}
-                                    required
-                                    accept="image/png, image/jpeg, image/jpg, .pdf"
-                                />
+            <ModaleForm title={'Add new document'}>
+                <div className="flex flex-col gap-2">
+                    <form onSubmit={addFile} className="space-y-2">
+                        <p className="text-center">Add new document</p>
+                        <select
+                            name="documentType"
+                            required
+                            value={newDocumentType ?? ''}
+                            onChange={(e) => setNewDocumentType(parseInt(e.target.value))}
+                            id=""
+                            className={cn(
+                                'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                            )}
+                        >
+                            {documentTypes && documentTypes.length > 0 && (
+                                <>
+                                    <option value="" disabled className="bg-background text-foreground">
+                                        Select an option
+                                    </option>
+                                    {documentTypes?.map((documentType) => (
+                                        <option value={documentType.id} key={documentType.id} className="bg-background text-foreground">
+                                            {documentType.label}
+                                        </option>
+                                    ))}
+                                </>
+                            )}
+                        </select>
+                        <Input
+                            type="file"
+                            name=""
+                            id=""
+                            onChange={(e) => setNewFile(e.target.files ? e.target.files[0] : null)}
+                            required
+                            accept="image/png, image/jpeg, image/jpg, .pdf"
+                        />
 
-                                <Input
-                                    type="text"
-                                    name="name"
-                                    required
-                                    minLength={4}
-                                    maxLength={100}
-                                    placeholder="Document name"
-                                    onChange={(e) => setNewFileName(e.target.value)}
-                                />
-                                <p className="text-border text-xs">Servira à la sauvegarde du nom du fichier</p>
-                                <Input
-                                    type="text"
-                                    name="description"
-                                    id="description"
-                                    required
-                                    minLength={10}
-                                    maxLength={250}
-                                    placeholder="Document description"
-                                    onChange={(e) => setNewFileDescription(e.target.value)}
-                                />
-                                <div className="flex justify-between">
-                                    <Button>Submit</Button>
-                                    <Button type="button" onClick={closeFileModal} variant={'outline'}>
-                                        Cancel
-                                    </Button>
-                                </div>
-                            </form>
+                        <Input
+                            type="text"
+                            name="name"
+                            required
+                            minLength={4}
+                            maxLength={100}
+                            placeholder="Document name"
+                            onChange={(e) => setNewFileName(e.target.value)}
+                        />
+                        <p className="text-border text-xs">Servira à la sauvegarde du nom du fichier</p>
+                        <Input
+                            type="text"
+                            name="description"
+                            id="description"
+                            required
+                            minLength={10}
+                            maxLength={250}
+                            placeholder="Document description"
+                            onChange={(e) => setNewFileDescription(e.target.value)}
+                        />
+                        <div className="flex justify-between">
+                            <Button>Submit</Button>
+                            <Button type="button" onClick={closeFileModal} variant={'outline'}>
+                                Cancel
+                            </Button>
                         </div>
-                    </div>
+                    </form>
                 </div>
-            </div>
+            </ModaleForm>
         );
     };
 
@@ -355,22 +352,28 @@ export default function CreateUpdateLocation({
         setCountContracts((prev) => prev - 1);
     };
 
+    const { t, tChoice } = useLaravelReactI18n();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Create location type`} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 {location && (
                     <div>
-                        <p>Location Reference: {location.reference_code}</p>
-                        <p>Location Code: {location.code} </p>
+                        <p>
+                            {t('common.reference_code')}: {location.reference_code}
+                        </p>
+                        <p>
+                            {t('common.code')}: {location.code}{' '}
+                        </p>
                     </div>
                 )}
                 <form onSubmit={submit} className="flex flex-col gap-4">
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                        <h5>Location</h5>
+                        <h5>{tChoice('locations.location', 1)}</h5>
                         {levelTypes && (
                             <div>
-                                <Label htmlFor="level">Level</Label>
+                                <Label htmlFor="level">{t('locations.level')}</Label>
                                 <select
                                     name="level"
                                     required
@@ -385,7 +388,7 @@ export default function CreateUpdateLocation({
                                     )}
                                 >
                                     <option value="" disabled>
-                                        -- Select a level --
+                                        {t('actions.select-type', { type: t('locations.level') })}
                                     </option>
                                     {levelTypes?.map((type) => (
                                         <option value={type.id} key={type.id}>
@@ -398,7 +401,7 @@ export default function CreateUpdateLocation({
                         )}
                         {locationTypes && (
                             <>
-                                <Label htmlFor="location-type">Location type</Label>
+                                <Label htmlFor="location-type">{t('common.type')}</Label>
                                 <select
                                     name="location-type"
                                     required
@@ -416,7 +419,7 @@ export default function CreateUpdateLocation({
                                     )}
                                 >
                                     <option value="" disabled>
-                                        -- Select a location type --
+                                        {t('actions.select-type', { type: t('common.type') })}
                                     </option>
                                     {locationTypes.map((type) => (
                                         <option value={type.id} key={type.id}>
@@ -429,9 +432,9 @@ export default function CreateUpdateLocation({
                         )}
                     </div>
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                        <h5>Information</h5>
+                        <h5>{t('common.information')}</h5>
 
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="name">{t('common.name')}</Label>
                         <Input
                             id="name"
                             type="text"
@@ -444,7 +447,7 @@ export default function CreateUpdateLocation({
                         />
                         <InputError className="mt-2" message={errors.name ?? ''} />
 
-                        <Label htmlFor="name">Description</Label>
+                        <Label htmlFor="name">{t('common.description')}</Label>
                         <Input
                             id="description"
                             type="text"
@@ -459,7 +462,7 @@ export default function CreateUpdateLocation({
 
                         {!location && (
                             <div>
-                                <Label htmlFor="need_qr_code">Need QR Code ?</Label>
+                                <Label htmlFor="need_qr_code">{t('assets.need_qr_code')}</Label>
                                 <Checkbox
                                     id="need_qr_code"
                                     name="need_qr_code"
@@ -472,7 +475,7 @@ export default function CreateUpdateLocation({
 
                         {routeName === 'sites' && (
                             <>
-                                <Label htmlFor="address">Address</Label>
+                                <Label htmlFor="address">{t('common.address')}</Label>
                                 <Input
                                     id="address"
                                     type="text"
@@ -490,7 +493,7 @@ export default function CreateUpdateLocation({
                         {data.locationTypeName === 'outdoor' && (
                             <div className="flex">
                                 <div className="w-full">
-                                    <Label htmlFor="surface_floor">Surface outdoor</Label>
+                                    <Label htmlFor="surface_floor">{t('common.surface')}</Label>
                                     <Input
                                         id="surface_outdoor"
                                         type="number"
@@ -504,7 +507,7 @@ export default function CreateUpdateLocation({
                                 </div>
                                 {outdoorMaterials && (
                                     <div className="w-full">
-                                        <Label htmlFor="outdoor_material_id">outdoor material</Label>
+                                        <Label htmlFor="outdoor_material_id">{t('locations.material_outdoor')}</Label>
                                         <select
                                             name="outdoor_material_id-type"
                                             value={data.outdoor_material_id ?? ''}
@@ -522,7 +525,7 @@ export default function CreateUpdateLocation({
                                             )}
                                         >
                                             <option value="" disabled>
-                                                -- Select a outdoor material --
+                                                {t('actions.select-type', { type: t('locations.material_outdoor') })}
                                             </option>
 
                                             {outdoorMaterials.map((type) => (
@@ -530,7 +533,7 @@ export default function CreateUpdateLocation({
                                                     {type.label}
                                                 </option>
                                             ))}
-                                            <option value="other">Other</option>
+                                            <option value="other">{t('common.other')}</option>
                                         </select>
                                         <InputError className="mt-2" message={errors.locationType ?? ''} />
                                         {data.outdoor_material_id === 'other' && (
@@ -552,7 +555,7 @@ export default function CreateUpdateLocation({
                             <>
                                 <div className="flex">
                                     <div className="w-full">
-                                        <Label htmlFor="surface_floor">Surface floor</Label>
+                                        <Label htmlFor="surface_floor">{t('locations.surface_floor')}</Label>
                                         <Input
                                             id="surface_floor"
                                             type="number"
@@ -566,7 +569,7 @@ export default function CreateUpdateLocation({
                                     </div>
                                     {floorMaterials && (
                                         <div className="w-full">
-                                            <Label htmlFor="floor_material_id">floor material</Label>
+                                            <Label htmlFor="floor_material_id">{t('locations.floor_material')}</Label>
                                             <select
                                                 name="floor_material_id-type"
                                                 value={data.floor_material_id ?? ''}
@@ -584,7 +587,7 @@ export default function CreateUpdateLocation({
                                                 )}
                                             >
                                                 <option value="" disabled>
-                                                    -- Select a floor material --
+                                                    {t('actions.select-type', { type: t('locations.floor_material') })}
                                                 </option>
 
                                                 {floorMaterials.map((type) => (
@@ -592,7 +595,7 @@ export default function CreateUpdateLocation({
                                                         {type.label}
                                                     </option>
                                                 ))}
-                                                <option value="other">Other</option>
+                                                <option value="other">{t('common.other')}</option>
                                             </select>
                                             <InputError className="mt-2" message={errors.locationType ?? ''} />
                                             {data.floor_material_id === 'other' && (
@@ -610,7 +613,7 @@ export default function CreateUpdateLocation({
                                 </div>
                                 <div className="flex">
                                     <div className="w-full">
-                                        <Label htmlFor="surface_walls">Surface walls</Label>
+                                        <Label htmlFor="surface_walls">{t('locations.surface_wall')}</Label>
                                         <Input
                                             id="surface_walls"
                                             type="number"
@@ -624,7 +627,7 @@ export default function CreateUpdateLocation({
                                     </div>
                                     {wallMaterials && (
                                         <div className="w-full">
-                                            <Label htmlFor="wall_material_id">Wall material</Label>
+                                            <Label htmlFor="wall_material_id">{t('locations.wall_material')}</Label>
                                             <select
                                                 name="wall_material_id"
                                                 value={data.wall_material_id ?? ''}
@@ -642,7 +645,7 @@ export default function CreateUpdateLocation({
                                                 )}
                                             >
                                                 <option value="" disabled>
-                                                    -- Select a wall material --
+                                                    {t('actions.select-type', { type: t('locations.wall_material') })}
                                                 </option>
 
                                                 {wallMaterials.map((type) => (
@@ -650,7 +653,7 @@ export default function CreateUpdateLocation({
                                                         {type.label}
                                                     </option>
                                                 ))}
-                                                <option value="other">Other</option>
+                                                <option value="other">{t('common.other')}</option>
                                             </select>
                                             <InputError className="mt-2" message={errors.locationType ?? ''} />
                                             {data.wall_material_id === 'other' && (
@@ -671,10 +674,10 @@ export default function CreateUpdateLocation({
                     </div>
 
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                        <h5>Maintenance</h5>
+                        <h5>{tChoice('maintenances.title', 1)}</h5>
 
                         <div>
-                            <Label htmlFor="need_maintenance">Need maintenance ?</Label>
+                            <Label htmlFor="need_maintenance">{t('maintenances.need_maintenance')} ?</Label>
                             <Checkbox
                                 id="need_maintenance"
                                 name="need_maintenance"
@@ -688,7 +691,7 @@ export default function CreateUpdateLocation({
                             <>
                                 <div className="flex flex-col gap-4 md:flex-row">
                                     <div className="w-full">
-                                        <Label htmlFor="maintenance_frequency">Maintenance frequency</Label>
+                                        <Label htmlFor="maintenance_frequency">{t('maintenances.frequency')}</Label>
                                         <select
                                             name="maintenance_frequency"
                                             value={data.maintenance_frequency ?? ''}
@@ -704,49 +707,48 @@ export default function CreateUpdateLocation({
                                             {frequencies && frequencies.length > 0 && (
                                                 <>
                                                     <option value="" disabled className="bg-background text-foreground">
-                                                        Select an option
+                                                        {t('actions.select-type', { type: t('maintenances.frequency') })}
                                                     </option>
                                                     {frequencies?.map((frequency, index) => (
                                                         <option value={frequency} key={index} className="bg-background text-foreground">
-                                                            {frequency}
+                                                            {t(`maintenances.frequency.${frequency}`)}
                                                         </option>
                                                     ))}
                                                 </>
                                             )}
                                         </select>
 
-                                        <InputError className="mt-2" message={errors.maintenance_frequency ?? ''} />
+                                        <InputError className="mt-2" message={errors?.maintenance_frequency ?? ''} />
                                     </div>
 
                                     <div className="w-full">
-                                        <Label htmlFor="last_maintenance_date">Date last maintenance</Label>
+                                        <Label htmlFor="last_maintenance_date">{t('maintenances.last_maintenance_date')}</Label>
                                         <Input
                                             id="last_maintenance_date"
                                             type="date"
                                             value={data.last_maintenance_date ?? ''}
-                                            max={todayDate}
+                                            max={minEndDateWarranty}
                                             onChange={(e) => setData('last_maintenance_date', e.target.value)}
                                             placeholder="Date last maintenance"
                                         />
-                                        <InputError className="mt-2" message={errors.last_maintenance_date ?? ''} />
+                                        <InputError className="mt-2" message={errors?.last_maintenance_date ?? ''} />
                                     </div>
                                     <div className="w-full">
-                                        <Label htmlFor="next_maintenance_date">Date next maintenance</Label>
+                                        <Label htmlFor="next_maintenance_date">{t('maintenances.next_maintenance_date')}</Label>
                                         <Input
                                             id="next_maintenance_date"
                                             type="date"
                                             value={data.next_maintenance_date ?? ''}
-                                            min={todayDate}
+                                            min={asset ? '' : minEndDateWarranty}
                                             onChange={(e) => setData('next_maintenance_date', e.target.value)}
-                                            placeholder="Date last maintenance"
                                         />
-                                        <InputError className="mt-2" message={errors.next_maintenance_date ?? ''} />
+                                        <InputError className="mt-2" message={errors?.next_maintenance_date ?? ''} />
                                     </div>
                                 </div>
                             </>
                         )}
                         <div>
-                            <label className="mb-2 block text-sm font-medium">Maintenance manager</label>
+                            <Label className="mb-2 block text-sm font-medium">{t('maintenances.maintenance_manager')}</Label>
                             <SearchableInput<User>
                                 searchUrl={route('api.users.search')}
                                 displayValue={data.maintenance_manager_name}
@@ -756,15 +758,14 @@ export default function CreateUpdateLocation({
                                     setData('maintenance_manager_id', user.id);
                                     setData('maintenance_manager_name', user.full_name);
                                 }}
-                                placeholder="Rechercher un manager..."
+                                placeholder={t('actions.search-type', { type: t('maintenances.maintenance_manager') })}
                                 className="mb-4"
                             />
                         </div>
                     </div>
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                        <h5>Providers</h5>
+                        <h5>{tChoice('providers.title', 2)}</h5>
                         <div>
-                            <label className="mb-2 block text-sm font-medium">Providers</label>
                             <SearchableInput<Provider>
                                 multiple={true}
                                 searchUrl={route('api.providers.search')}
@@ -774,7 +775,7 @@ export default function CreateUpdateLocation({
                                 onSelect={(providers) => {
                                     setData('providers', providers);
                                 }}
-                                placeholder="Search providers..."
+                                placeholder={t('actions.search-type', { type: tChoice('providers.title', 2) })}
                             />
                         </div>
                     </div>
@@ -783,9 +784,10 @@ export default function CreateUpdateLocation({
                         <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                             {/* Contracts */}
                             <div className="flex items-center gap-2">
-                                <h5>Contract</h5>
+                                <h5>{tChoice('contracts.title', 1)}</h5>
                                 <p className="">
-                                    Add new contract <PlusCircleIcon className="inline-block" onClick={() => setCountContracts((prev) => prev + 1)} />
+                                    {t('contracts.add_new_contract')}{' '}
+                                    <PlusCircleIcon className="inline-block" onClick={() => setCountContracts((prev) => prev + 1)} />
                                 </p>
                             </div>
                             <SearchableInput<Contract>
@@ -801,18 +803,21 @@ export default function CreateUpdateLocation({
                                         contracts.map((elem) => elem.id),
                                     );
                                 }}
-                                placeholder="Add existing contracts..."
+                                placeholder={t('contracts.add_existing_contract')}
                             />
 
                             {countContracts > 0 &&
                                 [...Array(countContracts)].map((_, index) => (
                                     <div key={index} className="flex flex-col gap-2 rounded-md border-2 border-slate-400 p-4">
                                         <div className="flex w-fit gap-2">
-                                            <p>Contract {index + 1}</p>
+                                            <p>
+                                                {' '}
+                                                {tChoice('contracts.title', 1)} {index + 1}
+                                            </p>
                                             <MinusCircleIcon onClick={() => handleRemoveContract(index)} />
                                         </div>
                                         <div>
-                                            <Label className="font-medium">Name</Label>
+                                            <Label className="font-medium">{t('common.name')}</Label>
                                             <Input
                                                 type="text"
                                                 value={data.contracts[index]?.name ?? ''}
@@ -823,7 +828,7 @@ export default function CreateUpdateLocation({
                                                 onChange={(e) => handleChangeContracts(index, 'name', e.target.value)}
                                             />
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.name : ''} />
-                                            <Label className="font-medium">Type</Label>
+                                            <Label className="font-medium">{t('common.type')}</Label>
                                             <Input
                                                 type="text"
                                                 // value={data.contracts[index].name ?? ''}
@@ -835,7 +840,7 @@ export default function CreateUpdateLocation({
                                             />
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.type : ''} />
 
-                                            <Label className="font-medium">Provider</Label>
+                                            <Label className="font-medium">{tChoice('providers.title', 2)}</Label>
                                             <SearchableInput<Provider>
                                                 searchUrl={route('api.providers.search')}
                                                 getKey={(provider) => provider.id}
@@ -845,12 +850,12 @@ export default function CreateUpdateLocation({
                                                     handleChangeContracts(index, 'provider_id', provider.id);
                                                     handleChangeContracts(index, 'provider_name', provider.name);
                                                 }}
-                                                placeholder="Search provider..."
+                                                placeholder={t('actions.search-type', { type: tChoice('providers.title', 1) })}
                                                 // className="mb-4"
                                             />
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.provider_id : ''} />
 
-                                            <Label htmlFor="start_date">Start date</Label>
+                                            <Label htmlFor="start_date">{t('contracts.start_date')}</Label>
                                             <Input
                                                 id="start_date"
                                                 type="date"
@@ -858,7 +863,7 @@ export default function CreateUpdateLocation({
                                                 onChange={(e) => handleChangeContracts(index, 'start_date', e.target.value)}
                                             />
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.start_date : ''} />
-                                            <Label htmlFor="contract_duration">Contract duration</Label>
+                                            <Label htmlFor="contract_duration">{t('contracts.duration_contract')}</Label>
                                             <select
                                                 name="contract_duration"
                                                 onChange={(e) => handleChangeContracts(index, 'contract_duration', e.target.value)}
@@ -874,7 +879,7 @@ export default function CreateUpdateLocation({
                                                 {contractDurations && contractDurations.length > 0 && (
                                                     <>
                                                         <option value="" disabled className="bg-background text-foreground">
-                                                            Select a duration
+                                                            {t('actions.select-type', { type: t('contracts.duration_contract') })}
                                                         </option>
                                                         {contractDurations?.map((type, index) => (
                                                             <option value={type} key={index} className="bg-background text-foreground">
@@ -896,7 +901,7 @@ export default function CreateUpdateLocation({
                                                 maxLength={250}
                                             />
                                             <InputError message={errors?.contracts ? errors?.contracts[index]?.notes : ''} />
-                                            <Label>Internal reference</Label>
+                                            <Label>{t('contracts.internal_ref')}</Label>
                                             <Input
                                                 type="text"
                                                 onChange={(e) => handleChangeContracts(index, 'internal_reference', e.target.value)}
@@ -904,7 +909,7 @@ export default function CreateUpdateLocation({
                                                 maxLength={50}
                                             />
                                             <InputError message={errors?.contracts ? errors?.contracts[index]?.internal_reference : ''} />
-                                            <Label>Provider reference</Label>
+                                            <Label>{t('contracts.provider_ref')}</Label>
                                             <Input
                                                 type="text"
                                                 onChange={(e) => handleChangeContracts(index, 'provider_reference', e.target.value)}
@@ -912,7 +917,7 @@ export default function CreateUpdateLocation({
                                                 maxLength={50}
                                             />
                                             <InputError message={errors?.contracts ? errors?.contracts[index]?.provider_reference : ''} />
-                                            <Label htmlFor="notice_period">Notice period</Label>
+                                            <Label htmlFor="notice_period">{t('contracts.notice_period')}</Label>
                                             <select
                                                 name="notice_period"
                                                 onChange={(e) => handleChangeContracts(index, 'notice_period', e.target.value)}
@@ -939,7 +944,7 @@ export default function CreateUpdateLocation({
                                                 )}
                                             </select>
                                             <InputError className="mt-2" message={errors?.notice_period ?? ''} />
-                                            <Label htmlFor="renewal_type">Renewal type</Label>
+                                            <Label htmlFor="renewal_type">{t('contracts.renewal_type')}</Label>
                                             <select
                                                 name="renewal_type"
                                                 // value={data.renewal_type ?? ''}
@@ -956,11 +961,11 @@ export default function CreateUpdateLocation({
                                                 {renewalTypes && renewalTypes.length > 0 && (
                                                     <>
                                                         <option value="" disabled className="bg-background text-foreground">
-                                                            Select an option
+                                                            {t('actions.select-type', { type: t('contracts.renewal_type') })}
                                                         </option>
                                                         {renewalTypes?.map((type, index) => (
                                                             <option value={type} key={index} className="bg-background text-foreground">
-                                                                {type}
+                                                                {t(`contracts.renewal_type.${type}`)}
                                                             </option>
                                                         ))}
                                                     </>
@@ -968,6 +973,8 @@ export default function CreateUpdateLocation({
                                             </select>
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.renewal_type : ''} />
                                             <div className="w-full">
+                                                {' '}
+                                                <Label htmlFor="status">{t('common.status')} </Label>
                                                 <Label htmlFor="status">Status</Label>
                                                 <select
                                                     name="status"
@@ -985,11 +992,11 @@ export default function CreateUpdateLocation({
                                                     {statuses && statuses.length > 0 && (
                                                         <>
                                                             <option value="" disabled className="bg-background text-foreground">
-                                                                Select an option
+                                                                {t('actions.select-type', { type: t('common.status') })}
                                                             </option>
                                                             {statuses?.map((status, index) => (
                                                                 <option value={status} key={index} className="bg-background text-foreground">
-                                                                    {status}
+                                                                    {t(`contracts.status.${status}`)}
                                                                 </option>
                                                             ))}
                                                         </>
@@ -1005,7 +1012,7 @@ export default function CreateUpdateLocation({
 
                     {!location && (
                         <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                            <h5>Documents</h5>
+                            <h5>{tChoice('documents.title', 2)}</h5>
                             <SearchableInput<Document>
                                 multiple={true}
                                 searchUrl={route('api.documents.search')}
@@ -1022,7 +1029,7 @@ export default function CreateUpdateLocation({
                                 placeholder="Add existing documents..."
                             />
                             <Button onClick={() => setShowFileModal(!showFileModal)} type="button">
-                                Add document
+                                {t('actions.add-type', { type: t('documents.file') })}
                             </Button>
 
                             {selectedDocuments.length > 0 && (
@@ -1046,7 +1053,7 @@ export default function CreateUpdateLocation({
 
                                                 <p>{document.description}</p>
                                                 <Button type="button" variant="destructive" className="" onClick={() => removeDocument(index)}>
-                                                    Remove
+                                                    {t('actions.remove')}
                                                 </Button>
                                             </li>
                                         );
@@ -1056,10 +1063,10 @@ export default function CreateUpdateLocation({
                         </div>
                     )}
                     <div className="mt-2 flex gap-2">
-                        <Button type="submit">{location ? 'Update' : 'Submit'}</Button>
+                        <Button type="submit">{location ? t('actions.update') : t('actions.submit')}</Button>
                         <a href={location ? route(`tenant.${routeName}.show`, location.reference_code) : route(`tenant.${routeName}.index`)}>
                             <Button type="button" tabIndex={6} variant={'secondary'}>
-                                Cancel
+                                {t('actions.cancel')}
                             </Button>
                         </a>
                     </div>
@@ -1069,8 +1076,12 @@ export default function CreateUpdateLocation({
                     <ModaleForm>
                         <div className="flex flex-col items-center gap-4">
                             <Loader size={48} className="animate-pulse" />
-                            <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
-                            <p className="mx-auto">{location ? `${routeName} is being updated...` : `${routeName} is being created...`}</p>
+                            <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.processing')}</p>
+                            <p className="mx-auto">
+                                {location
+                                    ? t('actions.type-being-updated', { type: routeName })
+                                    : t('actions.type-being-created', { type: routeName })}
+                            </p>
                         </div>
                     </ModaleForm>
                 )}

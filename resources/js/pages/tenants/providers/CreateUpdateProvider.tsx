@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Country, Provider } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 
@@ -45,9 +46,10 @@ export default function CreateUpdateProvider({
     providerCategories: CentralType[];
     countries: Country[];
 }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Create/Update providers`,
+            title: provider ? `Update ${tChoice('providers.title', 1)} ${provider.name}` : `Create ${tChoice('providers.title', 1)}`,
             href: `/providers`,
         },
     ];
@@ -138,19 +140,19 @@ export default function CreateUpdateProvider({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Sites" />
+            <Head title={provider ? `Update ${tChoice('providers.title', 1)} ${provider.name}` : `Create ${tChoice('providers.title', 1)}`} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <form onSubmit={submit} className="space-y-4">
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                        <h2>Provider information</h2>
+                        <h2>{t('common.information')}</h2>
                         <div className="flex w-full flex-col gap-4 lg:flex-row">
                             <div className="w-full">
-                                <Label>Company Name</Label>
+                                <Label>{t('providers.company_name')}</Label>
                                 <Input type="text" onChange={(e) => setData('name', e.target.value)} value={data.name} required />
                                 <InputError className="mt-2" message={errors?.name ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label htmlFor="name">Category</Label>
+                                <Label htmlFor="name">{t('common.category')}</Label>
                                 <select
                                     name="category"
                                     required
@@ -166,7 +168,7 @@ export default function CreateUpdateProvider({
                                     {providerCategories && providerCategories.length > 0 && (
                                         <>
                                             <option value="0" disabled className="bg-background text-foreground">
-                                                Select an option
+                                                {t('actions.select-type', { type: t('common.category') })}
                                             </option>
                                             {providerCategories?.map((category) => (
                                                 <option value={category.id} key={category.id} className="bg-background text-foreground">
@@ -181,60 +183,99 @@ export default function CreateUpdateProvider({
                         </div>
                         <div className="flex w-full flex-col gap-4 lg:flex-row">
                             <div className="w-full">
-                                <Label>Email</Label>
-                                <Input type="email" onChange={(e) => setData('email', e.target.value)} value={data.email} required />
+                                <Label>{t('common.email')}</Label>
+                                <Input
+                                    type="email"
+                                    onChange={(e) => setData('email', e.target.value)}
+                                    value={data.email}
+                                    required
+                                    placeholder={t('common.email_placeholder')}
+                                />
                                 <InputError className="mt-2" message={errors?.email ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label>Phone number</Label>
+                                <Label>{t('common.phone')}</Label>
                                 <Input
                                     type="text"
                                     onChange={(e) => setData('phone_number', e.target.value)}
                                     value={data.phone_number}
                                     required
                                     maxLength={16}
-                                    placeholder={`Phone number : +32123456789`}
+                                    placeholder={t('common.phone_placeholder')}
                                 />
                                 <InputError className="mt-2" message={errors?.phone_number ?? ''} />
                             </div>
                         </div>
                         <div className="flex w-full flex-col gap-4 lg:flex-row">
                             <div className="w-full">
-                                <Label>VAT</Label>
-                                <Input type="text" onChange={(e) => setData('vat_number', e.target.value)} value={data.vat_number} />
+                                <Label>{t('providers.vat_number')}</Label>
+                                <Input
+                                    type="text"
+                                    onChange={(e) => setData('vat_number', e.target.value)}
+                                    value={data.vat_number}
+                                    placeholder={t('common.vat_number_placeholder')}
+                                />
                                 <InputError className="mt-2" message={errors?.vat_number ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label>Website</Label>
-                                <Input type="text" onChange={(e) => setData('website', e.target.value)} value={data.website} />
+                                <Label>{t('common.website')}</Label>
+                                <Input
+                                    type="text"
+                                    onChange={(e) => setData('website', e.target.value)}
+                                    value={data.website}
+                                    placeholder={t('common.website_placeholder')}
+                                />
                                 <InputError className="mt-2" message={errors?.website ?? ''} />
                             </div>
                         </div>
 
-                        <h5>Address</h5>
+                        <h5>{t('common.address')}</h5>
                         <div className="flex w-full flex-col gap-4 lg:flex-row">
                             <div className="w-full">
-                                <Label>Street</Label>
-                                <Input type="text" onChange={(e) => setData('street', e.target.value)} value={data.street} required />
+                                <Label>{t('common.street')}</Label>
+                                <Input
+                                    type="text"
+                                    onChange={(e) => setData('street', e.target.value)}
+                                    value={data.street}
+                                    required
+                                    placeholder={t('common.street_placeholder')}
+                                />
                                 <InputError className="mt-2" message={errors?.street ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label>House nr.</Label>
-                                <Input type="text" onChange={(e) => setData('house_number', e.target.value)} value={data.house_number} />
+                                <Label>{t('common.house_number')}</Label>
+                                <Input
+                                    type="text"
+                                    onChange={(e) => setData('house_number', e.target.value)}
+                                    value={data.house_number}
+                                    placeholder={t('common.house_number_placeholder')}
+                                />
                                 <InputError className="mt-2" message={errors?.house_number ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label>Postal Code</Label>
-                                <Input type="text" onChange={(e) => setData('postal_code', e.target.value)} value={data.postal_code} required />
+                                <Label>{t('common.postal_code')}</Label>
+                                <Input
+                                    type="text"
+                                    onChange={(e) => setData('postal_code', e.target.value)}
+                                    value={data.postal_code}
+                                    required
+                                    placeholder={t('common.postal_code_placeholder')}
+                                />
                                 <InputError className="mt-2" message={errors?.postal_code ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label>City</Label>
-                                <Input type="text" onChange={(e) => setData('city', e.target.value)} value={data.city} required />
+                                <Label>{t('common.city')}</Label>
+                                <Input
+                                    type="text"
+                                    onChange={(e) => setData('city', e.target.value)}
+                                    value={data.city}
+                                    required
+                                    placeholder={t('common.city_placeholder')}
+                                />
                                 <InputError className="mt-2" message={errors?.city ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label>Country</Label>
+                                <Label>{t('common.country')}</Label>
                                 <Select value={selectedCountry} onValueChange={setSelectedCountry} required>
                                     <SelectTrigger className="w-[180px]">
                                         <SelectValue placeholder="Select a country" />
@@ -252,15 +293,15 @@ export default function CreateUpdateProvider({
 
                         {!provider && (
                             <>
-                                <Label>Logo</Label>
+                                <Label>{t('common.logo')}</Label>
                                 <Input
                                     type="file"
                                     name="logo"
                                     id="logo"
                                     onChange={(e) => setData('pictures', e.target.files ? [e.target.files[0]] : null)}
-                                    // accept="image/png, image/jpeg, image/jpg"
+                                    accept="image/png, image/jpeg, image/jpg"
                                 />
-                                <p className="text-xs">Accepted files: png, jpg, jpeg - Maximum file size: 4MB</p>
+                                <p className="text-xs">{t('common.pictures_restriction_description')}</p>
                                 {errors?.pictures &&
                                     errors?.pictures.map((error) => {
                                         <InputError className="mt-2" message={error ?? ''} />;
@@ -270,9 +311,9 @@ export default function CreateUpdateProvider({
                     </div>
                     {!provider && (
                         <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                            <h2>Contact persons</h2>
+                            <h2>{tChoice('contacts.title', 2)}</h2>
                             <p className="">
-                                Add new contact person{' '}
+                                {t('actions.add-type', { type: tChoice('contacts.title', 1) })}
                                 <PlusCircleIcon className="inline-block" onClick={() => setCountContactPersons((prev) => prev + 1)} />
                             </p>
                             <div className="space-y-4">
@@ -282,7 +323,7 @@ export default function CreateUpdateProvider({
                                             <summary>
                                                 <div className="flex w-fit gap-4">
                                                     <p>
-                                                        Contact {index + 1}{' '}
+                                                        {tChoice('contacts.title', 1)} {index + 1}{' '}
                                                         {data.users[index]?.first_name ? `- ${data.users[index]?.first_name}` : ''}
                                                         {data.users[index]?.last_name ? ` ${data.users[index]?.last_name}` : ''}
                                                     </p>
@@ -293,13 +334,13 @@ export default function CreateUpdateProvider({
                                                 <div className="flex w-full flex-col gap-4 lg:flex-row">
                                                     <div className="w-full">
                                                         <Label className="font-medium" htmlFor={data.users[index]?.first_name}>
-                                                            First name
+                                                            {t('common.first_name')}
                                                         </Label>
                                                         <Input
                                                             id={data.users[index]?.first_name}
                                                             type="text"
                                                             value={data.users[index]?.first_name ?? ''}
-                                                            placeholder={`First name ${index + 1}`}
+                                                            placeholder={t('common.first_name_placeholder')}
                                                             minLength={4}
                                                             maxLength={100}
                                                             required
@@ -312,13 +353,13 @@ export default function CreateUpdateProvider({
                                                     </div>
                                                     <div className="w-full">
                                                         <Label className="font-medium" htmlFor={data.users[index]?.last_name}>
-                                                            Last name
+                                                            {t('common.last_name')}
                                                         </Label>
                                                         <Input
                                                             id={data.users[index]?.last_name}
                                                             type="text"
                                                             value={data.users[index]?.last_name ?? ''}
-                                                            placeholder={`Last name ${index + 1}`}
+                                                            placeholder={t('common.last_name_placeholder')}
                                                             minLength={4}
                                                             maxLength={100}
                                                             required
@@ -330,13 +371,13 @@ export default function CreateUpdateProvider({
                                                 <div className="flex w-full flex-col gap-2 lg:flex-row">
                                                     <div className="w-full">
                                                         <Label className="font-medium" htmlFor={data.users[index]?.email}>
-                                                            Email
+                                                            {t('common.email')}
                                                         </Label>
                                                         <Input
                                                             id={data.users[index]?.email}
                                                             type="text"
                                                             value={data.users[index]?.email ?? ''}
-                                                            placeholder={`Email ${index + 1}`}
+                                                            placeholder={t('common.email_placeholder')}
                                                             minLength={4}
                                                             maxLength={100}
                                                             required
@@ -346,13 +387,13 @@ export default function CreateUpdateProvider({
                                                     </div>
                                                     <div className="w-full">
                                                         <Label className="font-medium" htmlFor={data.users[index]?.phone_number}>
-                                                            Phone number
+                                                            {t('common.phone')}
                                                         </Label>
                                                         <Input
                                                             id={data.users[index]?.phone_number}
                                                             type="text"
                                                             value={data.users[index]?.phone_number ?? ''}
-                                                            placeholder={`Phone number ${index + 1} : +32123456789`}
+                                                            placeholder={t('common.phone_placeholder')}
                                                             maxLength={16}
                                                             onChange={(e) => handleChangeContactPerson(index, 'phone_number', e.target.value)}
                                                         />
@@ -364,13 +405,13 @@ export default function CreateUpdateProvider({
                                                 </div>
 
                                                 <Label className="font-medium" htmlFor={data.users[index]?.job_position}>
-                                                    Job position
+                                                    {t('contacts.job_position')}
                                                 </Label>
                                                 <Input
                                                     id={data.users[index]?.job_position}
                                                     type="text"
                                                     value={data.users[index]?.job_position ?? ''}
-                                                    placeholder={`Job position ${index + 1}`}
+                                                    placeholder={t('contacts.job_position_placeholder')}
                                                     minLength={4}
                                                     maxLength={100}
                                                     onChange={(e) => handleChangeContactPerson(index, 'job_position', e.target.value)}
@@ -385,11 +426,11 @@ export default function CreateUpdateProvider({
 
                     <div className="flex gap-4">
                         <Button type="submit" disabled={isSubmitting}>
-                            {provider ? 'Update' : 'Submit'}
+                            {provider ? t('actions.update') : t('actions.submit')}
                         </Button>
                         <a href={provider ? route('tenant.providers.show', provider.id) : route('tenant.providers.index')}>
                             <Button type="button" tabIndex={6} variant={'secondary'} disabled={isSubmitting}>
-                                Cancel
+                                {t('actions.cancel')}
                             </Button>
                         </a>
                     </div>

@@ -2,6 +2,7 @@ import { useChartOptions } from '@/hooks/useChartOptions';
 import { useDashboardFilters } from '@/pages/tenants/statistics/IndexStatistics';
 import axios from 'axios';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LineElement, LinearScale, PointElement, Title, Tooltip } from 'chart.js';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useEffect, useState } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import ButtonsChart from './buttonsChart';
@@ -9,6 +10,7 @@ import ButtonsChart from './buttonsChart';
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
 export const InterventionsByTypeChart = ({ interventionsByType }: { interventionsByType: [] }) => {
+    const { t } = useLaravelReactI18n();
     const [type, setType] = useState<'doughnut' | 'horizontalBar' | 'verticalBar' | 'line'>('verticalBar');
     const [isFetching, setIsFetching] = useState(false);
     const { dateFrom, dateTo } = useDashboardFilters();
@@ -70,25 +72,23 @@ export const InterventionsByTypeChart = ({ interventionsByType }: { intervention
     };
 
     return (
-        <>
-            <div className="">
-                <ButtonsChart setType={setType} types={['horizontalBar', 'verticalBar', 'doughnut']} />
-                {isFetching ? (
-                    <p className="animate-pulse">Fetching datas...</p>
-                ) : interventionsByType.length === 0 ? (
-                    <p>No datas</p>
-                ) : (
-                    <>
-                        {(type === 'horizontalBar' || type === 'verticalBar') && (
-                            <p>
-                                <Bar options={baseOptions} data={data} />
-                            </p>
-                        )}
-                        {type === 'line' && <Line options={baseOptions} data={data} />}
-                        {type === 'doughnut' && <Doughnut options={baseOptions} data={data} />}
-                    </>
-                )}
-            </div>
-        </>
+        <div className="min-h-80">
+            <ButtonsChart setType={setType} types={['horizontalBar', 'verticalBar', 'doughnut']} />
+            {isFetching ? (
+                <p className="animate-pulse">{t('statistics.fetching_datas')}</p>
+            ) : interventionsByType.length === 0 ? (
+                <p>{t('statistics.no_datas')}</p>
+            ) : (
+                <>
+                    {(type === 'horizontalBar' || type === 'verticalBar') && (
+                        <p>
+                            <Bar options={baseOptions} data={data} />
+                        </p>
+                    )}
+                    {type === 'line' && <Line options={baseOptions} data={data} />}
+                    {type === 'doughnut' && <Doughnut options={baseOptions} data={data} />}
+                </>
+            )}
+        </div>
     );
 };

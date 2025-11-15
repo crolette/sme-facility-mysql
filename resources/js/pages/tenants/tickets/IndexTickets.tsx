@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import { BreadcrumbItem, PaginatedData, TicketStatus } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArrowDownNarrowWide, ArrowDownWideNarrow, Loader, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
@@ -21,9 +22,10 @@ export interface SearchParams {
 }
 
 export default function IndexTickets({ items, filters, statuses }: { items: PaginatedData; filters: SearchParams; statuses: TicketStatus }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Index tickets`,
+            title: `Index ${tChoice('tickets', 2)}`,
             href: `/tickets`,
         },
     ];
@@ -112,7 +114,7 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Tickets" />
+            <Head title={tChoice('tickets', 2)} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="border-accent flex gap-10 border-b-2">
                     <ul className="flex pl-4">
@@ -125,7 +127,7 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                 setQuery((prev) => ({ ...prev, q: null, status: null }));
                             }}
                         >
-                            all
+                            {t('common.all')}
                         </li>
 
                         <li
@@ -137,7 +139,7 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                 setQuery((prev) => ({ ...prev, q: null, status: 'open' }));
                             }}
                         >
-                            open
+                            {t('tickets.status.open')}
                         </li>
                         <li
                             className={cn(
@@ -148,7 +150,7 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                 setQuery((prev) => ({ ...prev, q: null, status: 'ongoing' }));
                             }}
                         >
-                            ongoing
+                            {t('tickets.status.ongoing')}
                         </li>
                         <li
                             className={cn(
@@ -159,18 +161,18 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                 setQuery((prev) => ({ ...prev, q: null, status: 'closed' }));
                             }}
                         >
-                            closed
+                            {t('tickets.status.closed')}
                         </li>
                     </ul>
                 </div>
 
                 <div className="flex w-full justify-between gap-2">
                     <details className="border-border relative w-full rounded-md border-2 p-1" open={isLoading ? false : undefined}>
-                        <summary>Search</summary>
+                        <summary>{t('actions.search')}</summary>
 
                         <div className="bg-border border-border text-background dark:text-foreground absolute top-full flex flex-col items-center gap-4 rounded-b-md border-2 p-2 sm:flex-row">
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="category">Search</Label>
+                                <Label htmlFor="search">{t('actions.search')}</Label>
                                 <div className="relative text-black dark:text-white">
                                     <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} className="" />
                                     <X
@@ -180,22 +182,24 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                 </div>
                             </div>
                             <Button onClick={clearSearch} size={'xs'}>
-                                Clear Search
+                                {t('actions.search-clear')}
                             </Button>
                         </div>
                     </details>
                 </div>
 
                 <div className="">
-                    <h3 className="inline">Tickets {!isLoading && `(${items.total ?? 0})`}</h3>
+                    <h3 className="inline">
+                        {tChoice('tickets', 2)} {!isLoading && `(${items.total ?? 0})`}
+                    </h3>
                     <Table>
                         <TableHead>
                             <TableHeadRow>
-                                <TableHeadData>Code</TableHeadData>
-                                <TableHeadData>Related to</TableHeadData>
-                                <TableHeadData>Status</TableHeadData>
-                                <TableHeadData>Reporter</TableHeadData>
-                                <TableHeadData>Description</TableHeadData>
+                                <TableHeadData>{t('common.code')}</TableHeadData>
+                                <TableHeadData>{t('tickets.related_to')}</TableHeadData>
+                                <TableHeadData>{t('common.status')}</TableHeadData>
+                                <TableHeadData>{t('tickets.reporter')}</TableHeadData>
+                                <TableHeadData>{t('common.description')}</TableHeadData>
                                 <TableHeadData>
                                     <div className="flex items-center gap-2">
                                         <ArrowDownNarrowWide
@@ -207,7 +211,7 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                             )}
                                             onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'created_at', orderBy: 'asc' }))}
                                         />
-                                        Created at
+                                        {t('common.created_at')}
                                         <ArrowDownWideNarrow
                                             size={16}
                                             className={cn(
@@ -228,7 +232,7 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                             )}
                                             onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'updated_at', orderBy: 'asc' }))}
                                         />
-                                        Updated at
+                                        {t('common.updated_at')}
                                         <ArrowDownWideNarrow
                                             size={16}
                                             className={cn(
@@ -248,7 +252,7 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                     <TableBodyData>
                                         <p className="flex animate-pulse gap-2">
                                             <Loader />
-                                            Loading...
+                                            {t('actions.loading')}
                                         </p>
                                     </TableBodyData>
                                 </TableBodyRow>
@@ -258,11 +262,11 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                         <TableBodyData>
                                             <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
                                         </TableBodyData>
-                                        <TableBodyData>
+                                        <TableBodyData className="text-center">
                                             <a href={ticket.ticketable.location_route}>{ticket.asset_code}</a>
                                         </TableBodyData>
                                         <TableBodyData>
-                                            <Pill variant={ticket.status}>{ticket.status}</Pill>
+                                            <Pill variant={ticket.status}>{t(`tickets.status.${ticket.status}`)}</Pill>
                                         </TableBodyData>
                                         <TableBodyData>{ticket.reporter?.full_name ?? ticket.reporter_email}</TableBodyData>
                                         <TableBodyData className="my-auto flex h-full w-40">
@@ -274,13 +278,13 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                         <TableBodyData className="space-x-2">
                                             {ticket.status == 'open' && (
                                                 <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'ongoing')}>
-                                                    Ongoing
+                                                    {t('tickets.status.ongoing')}
                                                 </Button>
                                             )}
                                             {ticket.status !== 'closed' && (
                                                 <>
                                                     <Button variant={'destructive'} onClick={() => changeStatusTicket(ticket.id, 'closed')}>
-                                                        Close
+                                                        {t('tickets.close')}
                                                     </Button>
                                                     {/* <a href={route('tenant.tickets.show', ticket.id)}>
                                                     <Button type="button">Show</Button>
@@ -289,7 +293,7 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                             )}
                                             {ticket.status === 'closed' && (
                                                 <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'open')}>
-                                                    Re-open
+                                                    {t('tickets.reopen')}
                                                 </Button>
                                             )}
                                         </TableBodyData>

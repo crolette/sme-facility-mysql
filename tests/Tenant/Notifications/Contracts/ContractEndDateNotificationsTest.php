@@ -9,8 +9,9 @@ use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Enums\NoticePeriodEnum;
-use App\Models\Tenants\Building;
+use App\Enums\ContractTypesEnum;
 
+use App\Models\Tenants\Building;
 use App\Models\Tenants\Contract;
 use App\Models\Tenants\Provider;
 use App\Enums\ContractStatusEnum;
@@ -45,7 +46,7 @@ beforeEach(function () {
     $this->basicContractData = [
         'provider_id' => $this->provider->id,
         'name' => 'Contrat de bail',
-        'type' => 'Bail',
+        'type' => ContractTypesEnum::ALLIN->value,
         'notes' => 'Nouveau contrat de bail 2025',
         'internal_reference' => 'Bail Site 2025',
         'provider_reference' => 'Provider reference 2025',

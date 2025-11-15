@@ -24,7 +24,10 @@ class RoomFactory extends Factory
      */
     public function definition(): array
     {
-        $locationType = LocationType::factory()->create(['level' => 'room', 'prefix' => 'R']);
+        $locationType = LocationType::where('level', 'room')->where('prefix', 'R')->first();
+
+        if (!$locationType)
+            $locationType = LocationType::factory()->create(['level' => 'room', 'prefix' => 'R']);
         $level = Floor::first();
 
         $count = Room::where('location_type_id', $locationType->id)->count();

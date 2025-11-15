@@ -44,7 +44,9 @@ class AssetNotificationSchedulingService
             $notifications = $asset->notifications()->where('notification_type', 'depreciation_end_date')->where('scheduled_at', '>', now())->get();
 
             if (count($notifications)) {
-                $this->updateScheduleForDepreciable($asset, $notifications);
+                foreach ($notifications as $notification) {
+                    $this->updateScheduleForDepreciable($asset, $notification);
+                }
             } else {
                 if ($asset->maintainable->manager) {
                     $this->createScheduleForDepreciable($asset, $asset->maintainable->manager);
@@ -57,14 +59,11 @@ class AssetNotificationSchedulingService
         }
     }
 
-    public function updateScheduleForDepreciable(Asset $asset, Collection $notifications)
+    public function updateScheduleForDepreciable(Asset $asset, ScheduledNotification $notification)
     {
-        foreach ($notifications as $notification) {
-            // changer scheduled_at en fonction de la nouvelle date de maintenance et en fonction des préférences utilisateurs
-            $notificationPreference = $notification->user->notification_preferences()->where('notification_type', 'depreciation_end_date')->first();
-
-            $notification->update(['scheduled_at' => $asset->depreciation_end_date->subDays($notificationPreference->notification_delay_days)]);
-        }
+        // changer scheduled_at en fonction de la nouvelle date de maintenance et en fonction des préférences utilisateurs
+        $notificationPreference = $notification->user->notification_preferences()->where('notification_type', 'depreciation_end_date')->first();
+        $notification->update(['scheduled_at' => $asset->depreciation_end_date->subDays($notificationPreference->notification_delay_days)]);
     }
 
     public function createScheduleForDepreciable(Asset $asset, User $user)

@@ -3,6 +3,7 @@
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Stancl\Tenancy\Middleware\ScopeSessions;
+use App\Http\Middleware\TenantLocaleMiddleware;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\CompanyProfileController;
@@ -15,6 +16,7 @@ Route::middleware([
     InitializeTenancyBySubdomain::class,
     ScopeSessions::class,
     PreventAccessFromCentralDomains::class,
+    TenantLocaleMiddleware::class,
     'auth:tenant'
 ])->group(function () {
     Route::redirect('settings', 'settings/profile');

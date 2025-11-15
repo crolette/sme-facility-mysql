@@ -4,52 +4,53 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { type PropsWithChildren } from 'react';
 
-const sidebarNavItems: NavItem[] = [
-    {
-        title: 'Profile',
-        href: '/settings/profile',
-        icon: null,
-    },
-    {
-        title: 'Notifications',
-        href: '/settings/notification-preferences',
-        icon: null,
-    },
-    {
-        title: 'Password',
-        href: '/settings/password',
-        icon: null,
-    },
-    {
-        title: 'Appearance',
-        href: '/settings/appearance',
-        icon: null,
-    },
-    {
-        title: 'Import/Export',
-        href: '/settings/import-export',
-        icon: null,
-    },
-    {
-        title: 'Company',
-        href: '/settings/company',
-        icon: null,
-    },
-];
-
 export default function SettingsLayout({ children }: PropsWithChildren) {
+    const { t } = useLaravelReactI18n();
     // When server-side rendering, we only render the layout on the client...
     if (typeof window === 'undefined') {
         return null;
     }
 
+    const sidebarNavItems: NavItem[] = [
+        {
+            title: `${t('settings.profile')}`,
+            href: '/settings/profile',
+            icon: null,
+        },
+        {
+            title: `${t('settings.notifications')}`,
+            href: '/settings/notification-preferences',
+            icon: null,
+        },
+        {
+            title: `${t('auth.password')}`,
+            href: '/settings/password',
+            icon: null,
+        },
+        {
+            title: `${t('settings.appearance')}`,
+            href: '/settings/appearance',
+            icon: null,
+        },
+        {
+            title: `${t('settings.import_export')}`,
+            href: '/settings/import-export',
+            icon: null,
+        },
+        {
+            title: `${t('settings.company')}`,
+            href: '/settings/company',
+            icon: null,
+        },
+    ];
     const currentPath = window.location.pathname;
 
     return (
         <div className="px-4 py-6">
-            <Heading title="Settings" description="Manage your profile and account settings" />
+            <Heading title={t('settings.title')} description={t('settings.settings_description')} />
 
             <div className="flex flex-col space-y-8 lg:flex-row lg:space-y-0 lg:space-x-12">
                 <aside className="w-full max-w-xl lg:w-48">
@@ -64,7 +65,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                     'bg-muted': currentPath === item.href,
                                 })}
                             >
-                                <Link href={item.href} prefetch className='!no-underline'>
+                                <Link href={item.href} prefetch className="!no-underline">
                                     {item.title}
                                 </Link>
                             </Button>
@@ -74,7 +75,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
                 <Separator className="my-6 md:hidden" />
 
-                <div className="px-2 w-full">
+                <div className="w-full px-2">
                     <section className="w-full space-y-12">{children}</section>
                 </div>
             </div>

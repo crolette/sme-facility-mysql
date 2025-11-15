@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { createContext, useContext, useState } from 'react';
 
 const DashboardFiltersContext = createContext<{
@@ -36,9 +37,10 @@ export default function IndexStatistics({
     ticketsAvgDuration: [];
     ticketsByAvgHandlingDuration: [];
 }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Index statistics`,
+            title: `Index ${t('statistics.title')}`,
             href: `/statistics`,
         },
     ];
@@ -48,13 +50,13 @@ export default function IndexStatistics({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Statistics" />
+            <Head title={t('statistics.title')} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <h1>Statistics</h1>
+                <h1>{t('statistics.title')}</h1>
                 <div className="flex items-center gap-4">
-                    <Label>From</Label>
+                    <Label>{t('common.from')}</Label>
                     <input type="date" name="dateFrom" id="" value={dateFrom ?? '2025-01-01'} onChange={(e) => setDateFrom(e.target.value)} />
-                    <Label>To</Label>
+                    <Label>{t('common.to')}</Label>
                     <input type="date" name="dateTo" id="" value={dateTo ?? '2025-12-31'} onChange={(e) => setDateTo(e.target.value)} />
                     <Button
                         onClick={() => {
@@ -62,18 +64,18 @@ export default function IndexStatistics({
                             setDateTo(null);
                         }}
                     >
-                        Clear interval
+                        {t('statistics.clear_interval')}
                     </Button>
                 </div>
 
                 <DashboardFiltersContext.Provider value={{ dateFrom, dateTo }}>
-                    <h2>Interventions</h2>
+                    <h2>{tChoice('interventions.title', 2)}</h2>
                     <div className="border-accent grid w-full grid-cols-1 gap-10 border-b-2 lg:grid-cols-3">
                         <InterventionsByTypeChart interventionsByType={interventionsByType} />
                         <InterventionsByStatusChart interventionsByStatus={interventionsByStatus} />
                         <InterventionsByAssigneeChart interventionsByAssignee={interventionsByAssignee} />
                     </div>
-                    <h2>Tickets</h2>
+                    <h2>{tChoice('tickets.title', 2)}</h2>
                     <div className="border-accent grid w-full grid-cols-1 gap-10 border-b-2 lg:grid-cols-3">
                         <TicketsByPeriodChart ticketsByPeriod={ticketsByPeriod} />
                         <TicketsByAvgDurationChart ticketsAvgDuration={ticketsAvgDuration} />
