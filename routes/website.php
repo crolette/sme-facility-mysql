@@ -1,9 +1,10 @@
 <?php
 
 use Inertia\Inertia;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Middleware\AuthenticateCentral;
 use App\Http\Middleware\LocaleMiddleware;
+use App\Http\Middleware\AuthenticateCentral;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 foreach (config('tenancy.central_domains') as $domain) {
@@ -17,9 +18,8 @@ foreach (config('tenancy.central_domains') as $domain) {
                 App::setLocale($locale);
             }
 
-            Debugbar::info(url()->previous());
             // Redirect back to the previous page
-            return Inertia::location(`/` . $locale);
+            return Inertia::location(route('home'));
         })->name('website.locale');
 
         Route::middleware([
