@@ -1,26 +1,20 @@
 import { Button } from '@/components/ui/button';
 import WebsiteLayout from '@/layouts/website-layout';
 import { Head } from '@inertiajs/react';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { BadgeCheck, Bell, Check, Clock, Group, QrCode, Settings } from 'lucide-react';
 
 export default function Welcome() {
+    const { t } = useLaravelReactI18n();
+
     return (
         <WebsiteLayout>
-            <Head title="Solution de Facility Management pour PME">
-                <meta name="robots" content="index, follow"></meta>
-                <meta property="title" content="Solution de Facility Management pour PME | SME-Facility" />
-                <meta
-                    name="description"
-                    itemProp="description"
-                    property="description"
-                    content="Simplifiez la gestion de vos installations avec SME-Facility. Une solution cloud tout-en-un pour centraliser vos équipements, maintenances, contrats et interventions."
-                />
+            <Head title={t('website_home.title')}>
+                <meta property="title" content={t('website_home.title') + ' | ' + import.meta.env.VITE_APP_NAME} />
+                <meta name="description" itemProp="description" property="description" content={t('website_home.description')} />
 
-                <meta property="og:title" content="Le système de Facility Management idéal pour les PME" />
-                <meta
-                    property="og:description"
-                    content="SME-Facility centralise la gestion de vos équipements, maintenances et contrats dans une application web simple et complète. Gagnez du temps et optimisez vos opérations."
-                />
+                <meta property="og:title" content={t('website_home.title_og')} />
+                <meta property="og:description" content={t('website_home.description_og')} />
             </Head>
             <section className="bg-logo text-website-card -mt-28 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
                 <div className="container mx-auto">

@@ -1,11 +1,11 @@
 import { router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 
-export default function LocaleChange() {
+export default function LocaleChange({ url = 'tenant.locale' }) {
     const { t, getLocales, currentLocale } = useLaravelReactI18n();
 
     const handleLocaleChange = (locale) => {
-        router.visit(route('tenant.locale', locale));
+        router.visit(route(url, locale));
     };
 
     return (

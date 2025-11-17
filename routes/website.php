@@ -3,12 +3,29 @@
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\AuthenticateCentral;
+use App\Http\Middleware\LocaleMiddleware;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->group(function () {
 
-        Route::middleware(['web', AuthenticateCentral::class])->group(function () {
+        Route::get('locale/{locale}', function (Request $request, $locale) {
+
+            if (in_array($locale, array_keys(config('laravellocalization.supportedLocales')))) {
+
+                Session::put('locale', $locale);
+                App::setLocale($locale);
+            }
+
+            Debugbar::info(url()->previous());
+            // Redirect back to the previous page
+            return Inertia::location(`/` . $locale);
+        })->name('website.locale');
+
+        Route::middleware([
+            'web',
+            LocaleMiddleware::class
+        ])->group(function () {
             Route::group(
                 [
                     'prefix' => LaravelLocalization::setLocale(),

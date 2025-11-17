@@ -18,19 +18,12 @@ class LocaleMiddleware
     {
         $urlLocale = LaravelLocalization::getCurrentLocale();
 
-        // dd($urlLocale);
         if ($urlLocale && LaravelLocalization::checkLocaleInSupportedLocales($urlLocale)) {
             App::setLocale($urlLocale);
             Session::put('locale', $urlLocale);
-
-            if (Auth::check()) {
-                Auth::user()->update(['preferred_locale' => $urlLocale]);
-            }
         } else {
             // Fallback si pas de locale valide dans l'URL
-            if (Auth::check() && Auth::user()->preferred_locale) {
-                App::setLocale(Auth::user()->preferred_locale);
-            } else if (Session::has('locale')) {
+            if (Session::has('locale')) {
                 App::setLocale(Session::get('locale'));
             } else {
                 $locale = request()->getPreferredLanguage(array_keys(config('laravellocalization.supportedLocales')));
