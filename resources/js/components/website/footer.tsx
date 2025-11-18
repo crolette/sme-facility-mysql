@@ -1,5 +1,6 @@
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Linkedin, Youtube } from 'lucide-react';
+import LocaleChange from '../tenant/LocaleChange';
 import FaqSection from './faq_section';
 import OurSolutions from './our_solutions';
 import WhySMESection from './why-sme-section';
@@ -21,6 +22,7 @@ export default function Footer() {
                             <Linkedin></Linkedin>
                             <Youtube></Youtube>
                         </div>
+                        <LocaleChange url={'website.locale'} />
                     </div>
                     <div className="flex flex-col gap-6">
                         <h6>{t('website_common.footer.column_one')}</h6>

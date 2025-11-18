@@ -1,4 +1,3 @@
-import LocaleChange from '@/components/tenant/LocaleChange';
 import { Button } from '@/components/ui/button';
 import Footer from '@/components/website/footer';
 import { Head, Link } from '@inertiajs/react';
@@ -65,7 +64,7 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                             <img src="/images/logo.png" alt="" className="max-w-32 lg:w-42" />
                         </a>
 
-                        <ul className="hidden gap-8 text-lg font-semibold md:flex md:shrink-0 md:items-center lg:gap-12" ref={featuresMenuRef}>
+                        <ul className="text-md hidden gap-8 font-semibold md:flex md:shrink-0 md:items-center lg:gap-12" ref={featuresMenuRef}>
                             <li className="relative">
                                 <a
                                     className="block py-2 !no-underline"
@@ -162,16 +161,114 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                             <li>
                                 <Button variant={'cta'}> {t('website_menu.demo')}</Button>
                             </li>
-                            <LocaleChange url={'website.locale'} />
                         </ul>
                         <Menu size={24} onClick={() => setShowMobileMenu(true)} className="block md:hidden" />
                     </nav>
                     {showMobileMenu && (
-                        <div className="bg-logo/80 absolute inset-0 flex h-screen items-center justify-center overflow-x-hidden">
+                        <div className="bg-logo/80 absolute inset-0 flex h-screen items-center justify-center overflow-x-hidden lg:hidden">
                             <div className="absolute inset-0 flex h-screen items-center justify-center bg-transparent md:hidden">
-                                <div className="bg-logo/90 flex h-full w-10/12 flex-col items-center justify-center">
-                                    MENU
-                                    <X onClick={() => setShowMobileMenu(false)} />
+                                <div className="bg-logo/90 flex h-full w-full flex-col justify-center text-center sm:w-10/12">
+                                    <ul className="space-y-4 pl-4 text-lg font-semibold sm:pl-10" ref={featuresMenuRef}>
+                                        <li className="relative">
+                                            <a
+                                                className="block py-2 !no-underline"
+                                                id="features"
+                                                onClick={() => {
+                                                    setShowFeaturesMenu(!showFeaturesMenu);
+                                                    setShowWhoMenu(false);
+                                                }}
+                                            >
+                                                {t('website_menu.features')}
+                                            </a>
+                                            {showFeaturesMenu && (
+                                                <ul className="bg-logo mt-2 flex flex-col gap-4 py-4">
+                                                    <li>
+                                                        <Link href={route('website.features.assets')} className="!no-underline">
+                                                            {t('website_menu.assets')}
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link href={route('website.features.documents')} className="!no-underline">
+                                                            {t('website_menu.documents')}
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link href={route('website.features.maintenance')} className="!no-underline">
+                                                            {t('website_menu.maintenance')}
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link href={route('website.features.contracts')} className="!no-underline">
+                                                            {t('website_menu.contracts')}
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link href={route('website.features.qrcode')} className="!no-underline">
+                                                            {t('website_menu.qrcode')}
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link href={route('website.features.roles')} className="!no-underline">
+                                                            {t('website_menu.roles')}
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link href={route('website.features.statistics')} className="!no-underline">
+                                                            {t('website_menu.statistics')}
+                                                        </Link>
+                                                    </li>
+                                                </ul>
+                                            )}
+                                        </li>
+                                        <li className="group relative" ref={whoMenuRef}>
+                                            <a
+                                                className="block py-2 !no-underline"
+                                                id="features"
+                                                onClick={() => {
+                                                    setShowWhoMenu(!showWhoMenu);
+                                                    setShowFeaturesMenu(false);
+                                                }}
+                                            >
+                                                {t('website_menu.for_who')}
+                                            </a>
+                                            {showWhoMenu && (
+                                                <ul className="bg-logo mt-2 flex flex-col gap-4 py-4">
+                                                    <li>
+                                                        <Link href={route('website.who.sme')} className="!no-underline" id="features">
+                                                            {t('website_menu.sme')}
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link href={route('website.who.facility-manager')} className="!no-underline" id="features">
+                                                            {t('website_menu.facility_manager')}
+                                                        </Link>
+                                                    </li>
+                                                    <li>
+                                                        <Link href={route('website.who.maintenance-manager')} className="!no-underline" id="features">
+                                                            {t('website_menu.maintenance_manager')}
+                                                        </Link>
+                                                    </li>
+                                                </ul>
+                                            )}
+                                        </li>
+                                        <li>
+                                            <Link href={route('website.why')} className="block py-2 !no-underline" id="why">
+                                                {t('website_menu.why_sme')}
+                                            </Link>
+                                        </li>
+                                        <li>
+                                            <Link href={route('website.pricing')} className="block py-2 !no-underline">
+                                                {t('website_menu.pricing')}
+                                            </Link>
+                                        </li>
+
+                                        <li>
+                                            <Button variant={'cta'}> {t('website_menu.demo')}</Button>
+                                        </li>
+                                        <li>
+                                            <X onClick={() => setShowMobileMenu(false)} className="mx-auto" size={32} />
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
