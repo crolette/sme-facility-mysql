@@ -8,13 +8,13 @@ export default function WhoSME() {
 
     return (
         <WebsiteLayout>
-            <Head title={t('website_who.sme.meta-title')}>
+            <Head title={t('website_who.sme.meta_title')}>
                 <meta name="robots" content="index, follow"></meta>
                 <meta property="title" content={t('website_who.sme.meta_title') + ' | ' + import.meta.env.VITE_APP_NAME} />
-                <meta name="description" itemProp="description" property="description" content={t('website_who.sme.meta-description')} />
+                <meta name="description" itemProp="description" property="description" content={t('website_who.sme.meta_description')} />
 
-                <meta property="og:title" content={t('website_who.sme.meta-title-og')} />
-                <meta property="og:description" content={t('website_who.sme.meta-description-og')} />
+                <meta property="og:title" content={t('website_who.sme.meta_title_og')} />
+                <meta property="og:description" content={t('website_who.sme.meta_description_og')} />
             </Head>
             <section className="bg-website-border text-website-card -mt-28 flex min-h-screen w-full flex-col items-center justify-center py-20 md:-mt-38">
                 <div className="container mx-auto">
@@ -27,7 +27,7 @@ export default function WhoSME() {
                             <h2 className="!text-xl">{t('website_who.sme.subtitle')}</h2>
                             <p className="">{t('website_who.sme.description')}</p>
                             <div className="flex flex-col items-center gap-6 md:flex-row md:gap-10">
-                                <a href={route('website.contact')}>
+                                <a href={route('website.demo')}>
                                     <Button variant={'cta'}>{t('website_menu.demo_appointment')}</Button>
                                 </a>
                                 <a href={route('website.pricing')}>

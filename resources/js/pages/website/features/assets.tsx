@@ -40,7 +40,7 @@ export default function FeaturesAssets() {
                             <h2 className="!text-xl">{t('website_features.assets.subtitle')}</h2>
                             <p className="">{t('website_features.assets.description')}</p>
                             <div className="flex flex-col items-center gap-6 md:flex-row md:gap-10">
-                                <a href={route('website.contact')}>
+                                <a href={route('website.demo')}>
                                     <Button variant={'cta'}>{t('website_menu.demo_appointment')}</Button>
                                 </a>
                                 <a href={route('website.pricing')}>

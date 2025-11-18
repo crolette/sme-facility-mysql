@@ -6,8 +6,8 @@ return [
     'meta_title_og' => 'SME-Facility, your Facility Management partner',
     'meta_description_og' => 'A solution designed by an SME for SMEs: data centralization, ease of use, personalized support and controlled cost. SME-Facility simplifies facility management.',
 
-    'title' => 'SME-Facility is your ideal partner',
-    'title-span' => 'for managing your facilities.',
+    'title-span' => 'SME-Facility is your ideal partner',
+    'title' => ' for managing your facilities.',
     'subtitle' => 'Designed for SMEs, SME-Facility brings together all essential Facility Management features in a simple, accessible and efficient solution.',
     'description' => 'A complete platform, without unnecessary complexity, to control your costs and gain efficiency.',
 

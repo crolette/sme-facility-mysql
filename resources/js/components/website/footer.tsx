@@ -22,7 +22,9 @@ export default function Footer() {
                             <Linkedin></Linkedin>
                             <Youtube></Youtube>
                         </div>
-                        <LocaleChange url={'website.locale'} />
+                        <div className="w-fit">
+                            <LocaleChange url={'website.locale'} />
+                        </div>
                     </div>
                     <div className="flex flex-col gap-6">
                         <h6>{t('website_common.footer.column_one')}</h6>

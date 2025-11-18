@@ -159,7 +159,9 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                             </li>
 
                             <li>
-                                <Button variant={'cta'}> {t('website_menu.demo')}</Button>
+                                <a href={route('website.demo')}>
+                                    <Button variant={'cta'}> {t('website_menu.demo')}</Button>
+                                </a>
                             </li>
                         </ul>
                         <Menu size={24} onClick={() => setShowMobileMenu(true)} className="block md:hidden" />
@@ -263,7 +265,9 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                                         </li>
 
                                         <li>
-                                            <Button variant={'cta'}> {t('website_menu.demo')}</Button>
+                                            <a href={route('website.demo')}>
+                                                <Button variant={'cta'}> {t('website_menu.demo')}</Button>
+                                            </a>
                                         </li>
                                         <li>
                                             <X onClick={() => setShowMobileMenu(false)} className="mx-auto" size={32} />

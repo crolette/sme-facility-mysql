@@ -6,8 +6,8 @@ return [
     'meta_title_og' => 'SME-Facility, votre partenaire Facility Management',
     'meta_description_og' => 'Une solution conçue par une PME pour les PME : centralisation des données, simplicité d’utilisation, accompagnement personnalisé et coût maîtrisé. SME-Facility facilite la gestion de vos installations.',
 
-    'title' => ' SME-Facility est votre partenaire idéal ',
-    'title-span' => 'pour gérer vos installations.',
+    'title-span' => ' SME-Facility est votre partenaire idéal ',
+    'title' => ' pour gérer vos installations.',
     'subtitle' => 'Conçu pour les PME, SME-Facility réunit toutes les fonctionnalités essentielles du Facility Management dans une solution simple, accessible et performante.',
     'description' => 'Une plateforme complète, sans complexité inutile, pour maîtriser vos coûts et gagner en efficacité.',
 

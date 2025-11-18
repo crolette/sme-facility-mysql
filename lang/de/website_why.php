@@ -6,8 +6,8 @@ return [
     'meta_title_og' => 'SME-Facility, Ihr Facility-Management-Partner',
     'meta_description_og' => 'Eine von einem KMU für KMUs entwickelte Lösung: Datenzentralisierung, Benutzerfreundlichkeit, persönliche Betreuung und kontrollierte Kosten. SME-Facility vereinfacht die Verwaltung Ihrer Anlagen.',
 
-    'title' => 'SME-Facility ist Ihr idealer Partner',
-    'title-span' => 'für die Verwaltung Ihrer Anlagen.',
+    'title-span' => 'SME-Facility ist Ihr idealer Partner',
+    'title' => ' für die Verwaltung Ihrer Anlagen.',
     'subtitle' => 'Für KMUs entwickelt, vereint SME-Facility alle wesentlichen Facility-Management-Funktionen in einer einfachen, zugänglichen und leistungsstarken Lösung.',
     'description' => 'Eine vollständige Plattform ohne unnötige Komplexität, um Ihre Kosten zu kontrollieren und effizienter zu werden.',
 

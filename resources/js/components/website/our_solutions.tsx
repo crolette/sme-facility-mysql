@@ -54,9 +54,9 @@ export default function OurSolutions() {
                         <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
                             <div className="flex gap-4">
                                 <FileStack size={24} className="shrink-0" />
-                                <h6 className="font-semibold">{t('website_common.our_solutions.documents.title')} </h6>
+                                <h6 className="font-semibold break-all">{t('website_common.our_solutions.documents.title')} </h6>
                             </div>
-                            <p>{t('website_common.our_solutions.documents.paragraph')}</p>
+                            <p className="">{t('website_common.our_solutions.documents.paragraph')}</p>
                             <a href={route('website.features.documents')} className="text-website-primary">
                                 {t('website_common.know_more')}
                             </a>
@@ -71,16 +71,6 @@ export default function OurSolutions() {
                                 {t('website_common.know_more')}
                             </a>
                         </div>
-                        {/* <div className="relative grid grid-cols-[2fr_1fr] sm:col-span-2 lg:col-span-3">
-                            <img src="/images/pexels-edmond-dantes-4347366.jpg" alt="" className="h-full w-auto object-cover" />
-
-                            <div className="relative">
-                                <div className="bg-logo text-website-secondary absolute top-6 -left-10 rounded-2xl p-2 text-sm">
-                                    <p className="font-semibold">SME-Facility me permet de pouvoir tout gérer dans un seul endroit.</p>
-                                    <p className="text-right italic">Christine, Facility Manager</p>
-                                </div>
-                            </div>
-                        </div> */}
                     </div>
                 </div>
                 <p className="text-website-font text-center text-xl italic">{t('website_common.our_solutions.headline')}</p>

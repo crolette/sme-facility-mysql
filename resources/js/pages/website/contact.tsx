@@ -66,7 +66,7 @@ export default function Contact({ reasons }: { reasons: string[] }) {
                         <div className="mx-auto flex flex-col gap-10 p-4 md:p-10 lg:max-w-11/12">
                             <h1>{t('website_contact.title')}</h1>
                             <p>{t('website_contact.description')}</p>
-                            <form onSubmit={handleForm}>
+                            <form onSubmit={handleForm} className="space-y-4">
                                 <input
                                     type="text"
                                     name="honey"
@@ -214,7 +214,7 @@ export default function Contact({ reasons }: { reasons: string[] }) {
             )}
             {emailSent && (
                 <section className="contact-success container mx-auto p-24 text-center">
-                    <div className="mx-auto flex flex-col gap-10 p-4 md:p-10 lg:max-w-11/12">
+                    <div className="mx-auto flex flex-col gap-10 p-4 text-center md:p-10 lg:max-w-1/2">
                         <div className="flex flex-col items-center gap-4">
                             <BadgeCheck size={48} className="" />
                             <p className="mx-auto text-3xl font-bold">{t('common.thank_you')}</p>

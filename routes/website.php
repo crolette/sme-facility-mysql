@@ -3,12 +3,14 @@
 use Inertia\Inertia;
 use App\Mail\ContactMail;
 use Illuminate\Http\Request;
+use App\Mail\ContactDemoMail;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Middleware\LocaleMiddleware;
 use App\Http\Middleware\AuthenticateCentral;
-use App\Http\Controllers\Website\ContactController;
 use App\Http\Requests\Central\ContactRequest;
+use App\Http\Controllers\Website\DemoController;
+use App\Http\Controllers\Website\ContactController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 foreach (config('tenancy.central_domains') as $domain) {
@@ -26,18 +28,23 @@ foreach (config('tenancy.central_domains') as $domain) {
             ];
 
             // $request = new ContactRequest($request);
-            return (new ContactMail($request))->render();
+            return (new ContactDemoMail($request))->render();
         });
 
         Route::get('locale/{locale}', function (Request $request, $locale) {
+
+            $oldLocale = Session::get('locale');
 
             if (in_array($locale, array_keys(config('laravellocalization.supportedLocales')))) {
                 Session::put('locale', $locale);
                 App::setLocale($locale);
             }
 
+            $newLocation = str_replace(`/` . $oldLocale, `/` . $locale, $request->header('Referer'));
+            $newLocation = str_replace(['http://' . $request->header('Host'), 'https://' . $request->header('Host')], '', $newLocation);
+
             // Redirect back to the previous page
-            return Inertia::location(route('home'));
+            return Inertia::location($newLocation);
         })->name('website.locale');
 
         Route::prefix(LaravelLocalization::setLocale())->middleware([
@@ -57,6 +64,9 @@ foreach (config('tenancy.central_domains') as $domain) {
 
             Route::get('/contact', [ContactController::class, 'index'])->name('website.contact');
             Route::post('/contact', [ContactController::class, 'store'])->name('website.contact.post');
+
+            Route::get('/demo', [DemoController::class, 'index'])->name('website.demo');
+            Route::post('/demo', [DemoController::class, 'store'])->name('website.demo.post');
 
             Route::prefix('features')->group(function () {
                 Route::get('/qr-code', function () {

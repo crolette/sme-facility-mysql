@@ -1,8 +1,9 @@
 <?php
 
+use App\Mail\ContactMail;
 use App\Enums\CategoryTypes;
 use App\Enums\ContactReasons;
-use App\Mail\ContactMail;
+use App\Mail\ContactDemoMail;
 use App\Models\Central\CentralUser;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Mail;
@@ -52,6 +53,37 @@ it('can post a contact request', function () {
         return $mail->hasTo('crolweb@gmail.com');
     });
     Mail::assertSent(ContactMail::class, function ($mail) {
+        return $mail->hasReplyTo('test@test.com');
+    });
+});
+
+it('renders the demo contact page', function () {
+    $response = $this->get(route('website.demo'));
+    $response->assertInertia(
+        fn($page) =>
+        $page->component('website/demo')
+    );
+});
+
+it('can post a demo request', function () {
+
+    Mail::fake();
+
+    $formData = [
+        'email' => 'test@test.com',
+        'company' => 'Company SA',
+        'phone_number' => '+32123456789',
+        'message' => fake()->words(25, true),
+        'subject' => ContactReasons::APPOINTMENT->value,
+    ];
+
+
+    $response = $this->post(route('website.demo.post', $formData));
+    $response->assertJson(['status' => 'success']);
+    Mail::assertSent(ContactDemoMail::class, function ($mail) {
+        return $mail->hasTo('crolweb@gmail.com');
+    });
+    Mail::assertSent(ContactDemoMail::class, function ($mail) {
         return $mail->hasReplyTo('test@test.com');
     });
 });

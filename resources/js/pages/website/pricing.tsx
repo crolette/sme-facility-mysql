@@ -134,9 +134,11 @@ export default function Pricing() {
                                         <p>{Array(...t('website_pricing.enterprise.items'))[2]}</p>
                                     </li>
                                 </ul>
-                                <Button variant={'cta'} className="">
-                                    {t('website_pricing.enterprise.discuss')}
-                                </Button>
+                                <a href={route('website.contact')} className="mx-auto w-full">
+                                    <Button variant={'cta'} className="w-full">
+                                        {t('website_pricing.enterprise.discuss')}
+                                    </Button>
+                                </a>
                             </div>
                         </div>
                         {/* <div className="mx-auto flex flex-col items-center gap-4">
