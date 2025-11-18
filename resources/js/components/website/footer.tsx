@@ -15,8 +15,8 @@ export default function Footer() {
 
             <footer className="bg-logo flex flex-col items-center justify-center space-y-10 px-4 py-10 text-white md:p-20">
                 <div className="container grid gap-12 md:grid-cols-4">
-                    <div className="gap flex flex-col gap-10">
-                        <img src="images/logo.png" alt="" className="w-40" />
+                    <div className="flex flex-col gap-10">
+                        <img src="/images/logo.png" alt="" className="w-40" />
                         <p>{t('website_common.footer.title')}</p>
                         <div className="flex gap-4">
                             <Linkedin></Linkedin>
@@ -27,7 +27,7 @@ export default function Footer() {
                         </div>
                     </div>
                     <div className="flex flex-col gap-6">
-                        <h6>{t('website_common.footer.column_one')}</h6>
+                        <h6 className="">{t('website_common.footer.column_one')}</h6>
                         <ul className="text-website-border text-md flex flex-col gap-4">
                             <li>
                                 <a href={route('website.features.qrcode')} className="!no-underline">
@@ -104,18 +104,18 @@ export default function Footer() {
                         </ul>
                     </div>
                 </div>
-                <div className="text-website-border container mx-auto flex w-full flex-col justify-between gap-4 lg:flex-row">
+                <div className="text-website-border container mx-auto flex w-full flex-col justify-between gap-20 text-sm lg:flex-row">
                     <p>
                         © SME-Facility 2025. {t('website_common.footer.sme_service')}{' '}
-                        <a href="https://www.facilitywebxp.be" target="_blank">
+                        <a href="https://www.facilitywebxp.be" target="_blank" className="block">
                             Facility Web Experience srl
                         </a>
                     </p>
-                    <ul className="flex flex-col md:flex-row">
+                    <ul className="flew-wrap flex flex-col md:flex-row">
                         <li> {t('website_common.footer.cgu')}</li>
-                        <span className="hidden md:inline-block">|</span>
+                        <span className="mx-2 hidden md:inline-block">|</span>
                         <li> {t('website_common.footer.cgv')}</li>
-                        <span className="hidden md:inline-block">|</span>
+                        <span className="mx-2 hidden md:inline-block">|</span>
                         <li> {t('website_common.footer.legal')}</li>
                     </ul>
                 </div>

@@ -14,5 +14,5 @@ return [
     'message_placeholder' => 'Je souhaite planifier une démonstration de SME-Facility.',
     'thank_you_message' => 'Merci pour votre demande de démo. Notre équipe reviendra vers vous dans les plus brefs délais pour fixer un créneau.',
 
-    'mail.contact.title' => 'Demande de d - :company'
+    'mail.contact.title' => 'Demande de démo - :company'
 ];

@@ -80,6 +80,7 @@ export default function Demo() {
                                                 type="text"
                                                 id="email"
                                                 required
+                                                className="text-logo"
                                                 placeholder={t('common.email_placeholder')}
                                                 onChange={(e) => setData('email', e.target.value)}
                                             />
@@ -91,6 +92,7 @@ export default function Demo() {
                                                 type="text"
                                                 id="phone_number"
                                                 maxLength={16}
+                                                className="text-logo"
                                                 placeholder={t('common.phone_placeholder')}
                                                 onChange={(e) => setData('phone_number', e.target.value)}
                                             />
@@ -103,6 +105,7 @@ export default function Demo() {
                                                 id="company"
                                                 maxLength={100}
                                                 required
+                                                className="text-logo"
                                                 placeholder={t('providers.company_name_placeholder')}
                                                 onChange={(e) => setData('company', e.target.value)}
                                             />
@@ -115,6 +118,7 @@ export default function Demo() {
                                                 id="message"
                                                 minLength={50}
                                                 maxLength={500}
+                                                className="text-logo"
                                                 // required
                                                 placeholder={t('website_demo.message_placeholder')}
                                                 onChange={(e) => setData('message', e.target.value)}
