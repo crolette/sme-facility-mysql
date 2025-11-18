@@ -45,7 +45,8 @@ return [
 
     //Placeholders
     'first_name_placeholder' => 'Marie',
-    'last_name_placeholder' => 'Janssen',
+    'last_nameplaceholder' => 'Janssen',
+    'name_place_holder' => 'Marie Janssen',
     'email_placeholder' => 'marie.janssen@jouwemail.com',
     'description_placeholder' => 'Voeg een beschrijving toe',
     'name' => 'Naam',

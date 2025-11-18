@@ -16,20 +16,27 @@ class LocaleMiddleware
 {
     public function handle($request, Closure $next)
     {
-        $urlLocale = LaravelLocalization::getCurrentLocale();
 
+        // 1. D'abord vérifier la session
+        if (Session::has('locale')) {
+            $locale = Session::get('locale');
+            if (LaravelLocalization::checkLocaleInSupportedLocales($locale)) {
+                App::setLocale($locale);
+                return $next($request);
+            }
+        }
+
+        // 2. Ensuite l'URL
+        $urlLocale = LaravelLocalization::getCurrentLocale();
         if ($urlLocale && LaravelLocalization::checkLocaleInSupportedLocales($urlLocale)) {
             App::setLocale($urlLocale);
             Session::put('locale', $urlLocale);
-        } else {
-            // Fallback si pas de locale valide dans l'URL
-            if (Session::has('locale')) {
-                App::setLocale(Session::get('locale'));
-            } else {
-                $locale = request()->getPreferredLanguage(array_keys(config('laravellocalization.supportedLocales')));
-                App::setLocale($locale);
-            }
+            return $next($request);
         }
+
+        // 3. Fallback sur la préférence navigateur
+        $locale = request()->getPreferredLanguage(array_keys(config('laravellocalization.supportedLocales')));
+        App::setLocale($locale);
 
         return $next($request);
     }

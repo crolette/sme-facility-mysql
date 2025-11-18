@@ -18,7 +18,7 @@ export default function OurSolutions() {
                             </div>
                             <p>{t('website_common.our_solutions.inventory.paragraph')}</p>
                             <a href={route('website.features.assets')} className="text-website-primary">
-                                {t('website_menu.know_more')}
+                                {t('website_common.know_more')}
                             </a>
                         </div>
                         <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
@@ -28,7 +28,7 @@ export default function OurSolutions() {
                             </div>
                             <p>{t('website_common.our_solutions.maintenance.paragraph')}</p>
                             <a href={route('website.features.maintenance')} className="text-website-primary">
-                                {t('website_menu.know_more')}
+                                {t('website_common.know_more')}
                             </a>
                         </div>
                         <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
@@ -38,7 +38,7 @@ export default function OurSolutions() {
                             </div>
                             <p>{t('website_common.our_solutions.contracts.paragraph')}</p>
                             <a href="" className="text-website-primary">
-                                {t('website_menu.know_more')}
+                                {t('website_common.know_more')}
                             </a>
                         </div>
                         <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
@@ -48,7 +48,7 @@ export default function OurSolutions() {
                             </div>
                             <p>{t('website_common.our_solutions.qrcode.paragraph')}</p>
                             <a href={route('website.features.qrcode')} className="text-website-primary">
-                                {t('website_menu.know_more')}
+                                {t('website_common.know_more')}
                             </a>
                         </div>
                         <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
@@ -58,7 +58,7 @@ export default function OurSolutions() {
                             </div>
                             <p>{t('website_common.our_solutions.documents.paragraph')}</p>
                             <a href={route('website.features.documents')} className="text-website-primary">
-                                {t('website_menu.know_more')}
+                                {t('website_common.know_more')}
                             </a>
                         </div>
                         <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
@@ -68,7 +68,7 @@ export default function OurSolutions() {
                             </div>
                             <p>{t('website_common.our_solutions.statistics.paragraph')}</p>
                             <a href={route('website.features.statistics')} className="text-website-primary">
-                                {t('website_menu.know_more')}
+                                {t('website_common.know_more')}
                             </a>
                         </div>
                         {/* <div className="relative grid grid-cols-[2fr_1fr] sm:col-span-2 lg:col-span-3">
@@ -83,7 +83,7 @@ export default function OurSolutions() {
                         </div> */}
                     </div>
                 </div>
-                <p className="text-website-font text-center text-xl italic">Une solution unique, pensée pour les PME.</p>
+                <p className="text-website-font text-center text-xl italic">{t('website_common.our_solutions.headline')}</p>
             </div>
         </section>
     );

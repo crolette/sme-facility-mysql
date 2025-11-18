@@ -46,6 +46,7 @@ return [
     //Placeholders
     'first_name_placeholder' => 'Marie',
     'last_name_placeholder' => 'Dupont',
+    'name_placeholder' => 'Marie Dupont',
     'email_placeholder' => 'marie.dupont@votremail.com',
     'description_placeholder' => 'Ajouter une description',
     'name' => 'Nom',

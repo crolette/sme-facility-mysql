@@ -6,6 +6,7 @@ use Illuminate\Http\Middleware\HandleCors;
 use Illuminate\Console\Scheduling\Schedule;
 use App\Http\Middleware\AddUserContextToLogs;
 use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\LocaleMiddleware;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;

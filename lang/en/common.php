@@ -28,27 +28,29 @@ return [
     'first_name' => 'First name',
     'last_name' => 'Last name',
     'full_name' => 'Full name',
+    'name' => 'Name',
     'email' => 'Email',
     'phone' => 'Phone',
-    'phone_placeholder' => '+32123456789',
     'mobile' => 'Mobile',
     'address' => 'Address',
     'city' => 'City',
-    'city_placeholder' => 'Brussels',
     'street' => 'Street',
-    'street_placeholder' => 'Common street',
     'house_number' => 'House number',
     'postal_code' => 'Postal code',
-    'postal_code_placeholder' => '1000',
     'country' => 'Country',
 
 
     //Placeholders
     'first_name_placeholder' => 'Jane',
     'last_name_placeholder' => 'Doe',
+    'name_placeholder' => 'Jane Doe',
     'email_placeholder' => 'jane.doe@youremail.com',
     'description_placeholder' => 'Add a description',
-    'name' => 'Name',
+    'phone_placeholder' => '+32123456789',
+    'postal_code_placeholder' => '1000',
+    'city_placeholder' => 'Brussels',
+    'street_placeholder' => 'Common street',
+    'notes_placeholder' => 'Add a note/comment',
 
     // Warranty
     'warranty' => 'Warranty',
@@ -56,7 +58,7 @@ return [
     // Generic fields
     'name' => 'Name',
     'notes' => 'Notes',
-    'notes_placeholder' => 'Add a note/comment',
+
     'code' => 'Code',
     'description' => 'Description',
     'status' => 'Status',
