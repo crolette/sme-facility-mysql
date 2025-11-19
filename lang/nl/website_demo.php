@@ -7,7 +7,7 @@ return [
     'meta-description-og' => 'Ontdek onze oplossing via een demo op maat en kom rechtstreeks in contact met ons team.',
 
     'title' => 'Een demo aanvragen',
-    'description' => 'Wilt u meer weten over onze oplossing of ontdekken hoe deze uw organisatie kan ondersteunen? Ons team staat klaar om u te begeleiden. Of u nu vragen heeft, ideeën wilt delen of uw project wilt bespreken, wij helpen u graag verder. Plan een persoonlijke demo en laten we samen de best passende oplossing bekijken.',
+    'description' => 'Ontdek het volledige potentieel van SME Facility. Neem contact met ons op om een demo te plannen en te zien hoe onze facility-managementoplossing uw operaties kan optimaliseren, uw gegevens kan centraliseren, uw processen kan automatiseren en het dagelijkse beheer kan vereenvoudigen. Ons team staat klaar om u te ondersteunen en in uw behoeften te voorzien.',
 
     'message' => 'Bericht',
     'message_placeholder' => 'Ik wil graag een demo van SME-Facility plannen.',

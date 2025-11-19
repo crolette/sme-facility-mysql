@@ -42,6 +42,7 @@ class QRCodeService
                 $text->setTextColor('#000000')
                     ->setFontSize(16)
                     ->setPadding(12)
+                    ->setFont(public_path('font.ttf'))
                     ->setBackgroundOpacity(0);
             })
             ->generate($route);

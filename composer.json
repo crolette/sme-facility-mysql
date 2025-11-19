@@ -19,6 +19,7 @@
         "mcamara/laravel-localization": "^2.3",
         "outhebox/laravel-translations": "^1.4",
         "spatie/laravel-permission": "^6.21",
+        "spatie/laravel-sitemap": "^7.3",
         "stancl/tenancy": "^3.9",
         "tightenco/ziggy": "^2.4",
         "tuncaybahadir/quar": "^1.5"

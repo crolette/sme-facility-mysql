@@ -34,7 +34,6 @@ foreach (config('tenancy.central_domains') as $domain) {
         Route::get('locale/{locale}', function (Request $request, $locale) {
 
             $oldLocale = Session::get('locale');
-            Debugbar::info($oldLocale);
 
             if (in_array($locale, array_keys(config('laravellocalization.supportedLocales')))) {
                 Session::put('locale', $locale);
@@ -43,7 +42,6 @@ foreach (config('tenancy.central_domains') as $domain) {
 
             $newLocation = str_replace(`/` . $oldLocale, `/` . $locale, $request->header('Referer'));
             $newLocation = str_replace(['http://' . $request->header('Host'), 'https://' . $request->header('Host')], '', $newLocation);
-            Debugbar::info($newLocation);
 
             // Redirect back to the previous page
             return Inertia::location($newLocation);
@@ -58,7 +56,7 @@ foreach (config('tenancy.central_domains') as $domain) {
 
             Route::get('/', function () {
                 return Inertia::render('welcome');
-            })->name('home');
+            })->name('website.home');
 
             Route::get('/faq', function () {
                 return Inertia::render('website/faq');

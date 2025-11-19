@@ -101,7 +101,7 @@ export default function Footer() {
                                 </a>
                             </li>
                             <li>
-                                <a href={route('website.careers')} className="!no-underline">
+                                <a href={route('website.contact')} className="!no-underline">
                                     {t('website_common.footer.contact')}
                                 </a>
                             </li>

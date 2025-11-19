@@ -8,7 +8,7 @@ return [
     'meta_description_og' => 'Découvrez notre solution à travers une démonstration adaptée à vos besoins et échangez avec notre équipe.',
 
     'title' => 'Demander une démo',
-    'description' => 'Vous souhaitez en savoir plus sur notre solution ou découvrir comment elle peut répondre aux besoins de votre organisation ? Notre équipe est à votre disposition pour vous guider. Que vous ayez des questions, des idées ou simplement l’envie d’échanger, nous sommes là pour vous accompagner. Planifiez une démonstration personnalisée et explorons ensemble la solution la mieux adaptée à vos attentes.',
+    'description' => 'Découvrez tout le potentiel de SME Facility. Contactez-nous pour planifier une démonstration et voir comment notre solution de facility management peut optimiser vos opérations, centraliser vos données, automatiser vos processus et simplifier la gestion au quotidien. Notre équipe vous accompagne pour répondre à vos besoins.',
 
     'message' => 'Message',
     'message_placeholder' => 'Je souhaite planifier une démonstration de SME-Facility.',

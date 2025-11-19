@@ -7,7 +7,7 @@ return [
     'meta-description-og' => 'Discover our solution through a tailor-made demonstration and speak with our team.',
 
     'title' => 'Request a demo',
-    'description' => 'Would you like to learn more about our solution or see how it can support your organization? Our team is here to guide you. Whether you have questions, ideas, or simply want to discuss your project, we’re here to help. Schedule a personalized demo and let’s explore together the solution best suited to your needs.',
+    'description' => 'Discover the full potential of SME Facility. Contact us to schedule a demo and see how our facility management solution can optimize your operations, centralize your data, automate your processes, and simplify daily management. Our team is here to support you and meet your needs.',
 
     'message' => 'Message',
     'message_placeholder' => 'I would like to schedule a demo of SME-Facility.',

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+    <url>
+    <loc>http://127.0.0.1:8000/nl</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/nl/faq</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/faq" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr/faq" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de/faq" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl/faq" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/nl/careers</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/careers" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr/careers" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de/careers" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl/careers" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/nl/contact</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/contact" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr/contact" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de/contact" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl/contact" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/nl/demo</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/demo" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr/demo" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de/demo" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl/demo" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/nl/features/qr-code</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/features/qr-code" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr/features/qr-code" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de/features/qr-code" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl/features/qr-code" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/nl/features/maintenance</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/features/maintenance" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr/features/maintenance" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de/features/maintenance" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl/features/maintenance" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/nl/features/contracts</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/features/contracts" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr/features/contracts" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de/features/contracts" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl/features/contracts" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/nl/features/assets</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/features/assets" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr/features/assets" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de/features/assets" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl/features/assets" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/nl/features/documents</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/features/documents" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr/features/documents" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de/features/documents" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl/features/documents" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/nl/features/statistics</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/features/statistics" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr/features/statistics" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de/features/statistics" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl/features/statistics" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/nl/features/roles</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/features/roles" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr/features/roles" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de/features/roles" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl/features/roles" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/nl/who/facility-manager</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/who/facility-manager" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr/who/facility-manager" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de/who/facility-manager" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl/who/facility-manager" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/nl/who/maintenance-manager</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/who/maintenance-manager" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr/who/maintenance-manager" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de/who/maintenance-manager" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl/who/maintenance-manager" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/nl/who/sme</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/who/sme" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr/who/sme" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de/who/sme" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl/who/sme" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/nl/why/sme-facility</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/why/sme-facility" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr/why/sme-facility" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de/why/sme-facility" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl/why/sme-facility" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+    <url>
+    <loc>http://127.0.0.1:8000/nl/pricing</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="http://127.0.0.1:8000/en/pricing" />
+    <xhtml:link rel="alternate" hreflang="fr" href="http://127.0.0.1:8000/fr/pricing" />
+    <xhtml:link rel="alternate" hreflang="de" href="http://127.0.0.1:8000/de/pricing" />
+    <xhtml:link rel="alternate" hreflang="nl" href="http://127.0.0.1:8000/nl/pricing" />
+    <lastmod>2025-11-19T15:51:56+00:00</lastmod>
+            </url>
+</urlset>
