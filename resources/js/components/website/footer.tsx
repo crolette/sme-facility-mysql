@@ -1,9 +1,12 @@
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Linkedin, Youtube } from 'lucide-react';
+import LocaleChange from '../tenant/LocaleChange';
 import FaqSection from './faq_section';
 import OurSolutions from './our_solutions';
 import WhySMESection from './why-sme-section';
 
 export default function Footer() {
+    const { t } = useLaravelReactI18n();
     return (
         <>
             <OurSolutions />
@@ -12,100 +15,122 @@ export default function Footer() {
 
             <footer className="bg-logo flex flex-col items-center justify-center space-y-10 px-4 py-10 text-white md:p-20">
                 <div className="container grid gap-12 md:grid-cols-4">
-                    <div className="gap flex flex-col gap-10">
-                        <img src="images/logo.png" alt="" className="w-40" />
-                        <p>Le système de gestion de facility management idéal pour les PME</p>
+                    <div className="flex flex-col gap-10">
+                        <img src="/images/logo.png" alt="" className="w-40" />
+                        <p>{t('website_common.footer.title')}</p>
                         <div className="flex gap-4">
                             <Linkedin></Linkedin>
                             <Youtube></Youtube>
                         </div>
+                        <div className="w-fit">
+                            <LocaleChange url={'website.locale'} />
+                        </div>
                     </div>
                     <div className="flex flex-col gap-6">
-                        <h6>Gérer vos installations</h6>
+                        <h6 className="">{t('website_common.footer.column_one')}</h6>
                         <ul className="text-website-border text-md flex flex-col gap-4">
                             <li>
                                 <a href={route('website.features.qrcode')} className="!no-underline">
-                                    QR Code
+                                    {t('website_common.qrcode')}
                                 </a>
                             </li>
                             <li>
                                 <a href={route('website.features.maintenance')} className="!no-underline">
-                                    Maintenance
+                                    {t('website_common.maintenance')}
                                 </a>
                             </li>
                             <li>
                                 <a href={route('website.features.contracts')} className="!no-underline">
-                                    Contrats
+                                    {t('website_common.contracts')}
                                 </a>
                             </li>
                             <li>
                                 <a href={route('website.features.documents')} className="!no-underline">
-                                    Documents
+                                    {t('website_common.documents')}
                                 </a>
                             </li>
                             <li>
                                 <a href={route('website.features.assets')} className="!no-underline">
-                                    Inventaire
+                                    {t('website_common.assets')}
                                 </a>
                             </li>
                             <li>
                                 <a href={route('website.features.statistics')} className="!no-underline">
-                                    Statistiques
+                                    {t('website_common.statistics')}
                                 </a>
                             </li>
                         </ul>
                     </div>
                     <div className="flex flex-col gap-6">
-                        <h6>Pour qui ?</h6>
+                        <h6>{t('website_common.footer.column_two')}</h6>
                         <ul className="text-website-border text-md flex flex-col gap-4">
                             <li>
                                 <a href={route('website.who.facility-manager')} className="!no-underline">
-                                    Facility Manager
+                                    {t('website_common.facility_manager')}
                                 </a>
                             </li>
                             <li>
                                 <a href={route('website.who.maintenance-manager')} className="!no-underline">
-                                    Responsable de maintenance
+                                    {t('website_common.maintenance_manager')}
                                 </a>
                             </li>
                             <li>
                                 <a href={route('website.who.sme')} className="!no-underline">
-                                    PME
+                                    {t('website_common.sme')}
                                 </a>
                             </li>
                         </ul>
                     </div>
                     <div className="flex flex-col gap-6">
-                        <h6>Avec SME-Facility</h6>
+                        <h6>{t('website_common.footer.column_three')}</h6>
                         <ul className="text-website-border text-md flex flex-col gap-4">
                             <li>
                                 <a href={route('website.why')} className="!no-underline">
-                                    Qui somme-nous ?
+                                    {t('website_common.footer.who_are_we')}
                                 </a>
                             </li>
                             <li>
                                 <a href={route('website.faq')} className="!no-underline">
-                                    FAQ
+                                    {t('website_common.faq')}
                                 </a>
                             </li>
-                            <li>Implémentation</li>
-                            <li>Recrutement</li>
+                            {/* <li> {t('website_common.footer.implementation')}</li> */}
                             <li>
-                                <a href={route('website.contact')} className="!no-underline">
-                                    Contact
+                                <a href={route('website.careers')} className="!no-underline">
+                                    {t('website_common.footer.careers')}
+                                </a>
+                            </li>
+                            <li>
+                                <a href={route('website.careers')} className="!no-underline">
+                                    {t('website_common.footer.contact')}
                                 </a>
                             </li>
                         </ul>
                     </div>
                 </div>
-                <div className="text-website-border flex w-full flex-col justify-between gap-4 md:flex-row">
-                    <p>© SME-Facility 2025. SME-Facility est un service de Facility Web Experience srl</p>
-                    <ul className="flex flex-col md:flex-row">
-                        <li>CGU</li>
-                        <span className="hidden md:inline-block">|</span>
-                        <li>CGV</li>
-                        <span className="hidden md:inline-block">|</span>
-                        <li>Mentions légales</li>
+                <div className="text-website-border container mx-auto flex w-full flex-col justify-between gap-20 text-sm lg:flex-row">
+                    <p>
+                        © SME-Facility 2025. {t('website_common.footer.sme_service')}{' '}
+                        <a href="https://www.facilitywebxp.be" target="_blank" className="block">
+                            Facility Web Experience srl
+                        </a>
+                    </p>
+                    <ul className="flew-wrap flex flex-col md:flex-row">
+                        <li>
+                            <a href={route('website.cgu')} className="!no-underline">
+                                {t('website_common.footer.cgu')}
+                            </a>
+                        </li>
+                        <span className="mx-2 hidden md:inline-block">|</span>
+                        <li>
+                            {' '}
+                            <a href={route('website.cgv')} className="!no-underline">
+                                {' '}
+                                {t('website_common.footer.cgv')}
+                            </a>
+                        </li>
+                        <span className="mx-2 hidden md:inline-block">|</span>
+                        <li> {t('website_common.footer.legal')}</li>
                     </ul>
                 </div>
             </footer>

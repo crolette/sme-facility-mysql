@@ -5,9 +5,10 @@ return [
 
     'company_name' => 'Company name',
     'vat_number' => 'VAT number',
-    'vat_number_placeholder' => 'BE0123456789',
-
     'website' => 'Website',
+
+    'company_name_placeholder' => 'My company',
+    'vat_number_placeholder' => 'BE0123456789',
     'website_placeholder' => 'https://www.sme-facility.com',
 
 

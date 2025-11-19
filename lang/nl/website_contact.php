@@ -1,0 +1,22 @@
+<?php
+
+return [
+    'meta-title' => 'Neem contact met ons op',
+    'meta-description' => 'Neem contact op met ons team voor informatie, vragen of persoonlijke ondersteuning.',
+    'meta-title-og' => 'Neem contact met ons op voor meer informatie',
+    'meta-description-og' => 'Neem contact op met ons team en ontvang de informatie of ondersteuning die u nodig heeft.',
+
+    'title' => 'Contact',
+    'description' => 'Ons team staat klaar om al uw vragen te beantwoorden. Of u nu informatie nodig heeft, ondersteuning zoekt of uw project wilt bespreken, aarzel niet om contact met ons op te nemen. We nemen zo snel mogelijk contact met u op.',
+
+    'subject' => 'Onderwerp',
+    'subject_placeholder' => 'Neem contact met mij op',
+    'reason' => 'Reden',
+    'reason.appointment' => 'Een demo plannen',
+    'reason.other' => 'Overig',
+    'message' => 'Bericht',
+    'message_placeholder' => 'Ik ben geïnteresseerd in een demo van SME-Facility.',
+    'thank_you_message' => 'Bedankt voor uw contactaanvraag. We nemen zo snel mogelijk contact met u op.',
+
+    'mail.contact.title' => '[:subject] - :company - :name'
+];

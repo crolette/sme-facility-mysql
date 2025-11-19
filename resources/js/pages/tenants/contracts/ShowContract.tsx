@@ -17,7 +17,7 @@ export default function ShowContract({ item, objects }: { item: Contract; object
     const [contract, setContract] = useState<Contract>(item);
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Index ${tChoice('contratcs.title', 2)}`,
+            title: `Index ${tChoice('contracts.title', 2)}`,
             href: `/contracts`,
         },
         {
@@ -42,7 +42,7 @@ export default function ShowContract({ item, objects }: { item: Contract; object
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={tChoice('contratcs.title', 2) + ' ' + contract.name} />
+            <Head title={tChoice('contracts.title', 2) + ' ' + contract.name} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex gap-2">
                     <a href={route(`tenant.contracts.edit`, contract.id)}>

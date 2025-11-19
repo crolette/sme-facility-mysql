@@ -46,6 +46,7 @@ return [
     //Placeholders
     'first_name_placeholder' => 'Marie',
     'last_name_placeholder' => 'Schmidt',
+    'name_placeholder' => 'Marie Schmidt',
     'email_placeholder' => 'marie.schmidt@ihremail.com',
     'description_placeholder' => 'Beschreibung hinzufügen',
     'name' => 'Name',

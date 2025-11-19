@@ -1,142 +1,144 @@
 import { Button } from '@/components/ui/button';
 import WebsiteLayout from '@/layouts/website-layout';
 import { Head } from '@inertiajs/react';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Building, Building2, Check, Factory, X } from 'lucide-react';
 
 export default function Pricing() {
+    const { t } = useLaravelReactI18n();
     return (
         <WebsiteLayout>
-            <Head title={'Tarifs'}>
+            <Head title={t('website_pricing.meta_title')}>
                 <meta name="robots" content="index, follow"></meta>
-                <meta property="title" content="Tarification application facility management | SME-Facility" />
-                <meta
-                    name="description"
-                    itemProp="description"
-                    property="description"
-                    content="Optimisez la gestion de vos équipements et la maintenance de votre PME avec SME-Facility, la solution cloud simple, rapide et prête à l’emploi."
-                />
+                <meta property="title" content={t('website_pricing.meta_title') + ' | ' + import.meta.env.VITE_APP_NAME} />
+                <meta name="description" itemProp="description" property="description" content={t('website_pricing.meta-description')} />
 
-                <meta property="og:title" content="Simplifiez la gestion de vos équipements avec SME-Facility" />
-                <meta
-                    property="og:description"
-                    content="SME-Facility aide les PME à centraliser la maintenance, suivre les contrats et automatiser les rappels. Un outil complet pour gagner du temps et booster la productivité."
-                />
+                <meta property="og:title" content={t('website_pricing.meta-title-og')} />
+                <meta property="og:description" content={t('website_pricing.meta-description-og')} />
             </Head>
             <section className="text-website-font w-full">
                 <div className="container mx-auto">
                     {/* <div className="mx-auto grid h-full gap-10 md:grid-cols-2 md:p-10 lg:max-w-11/12"></div> */}
                     <div className="mx-auto flex flex-col gap-10 p-4 md:p-10 lg:max-w-11/12">
-                        <h1>Notre tarification est aussi simple que notre produit</h1>
-                        <h2>Blabla</h2>
+                        <h1>{t('website_pricing.title')}</h1>
+                        {/* <h2>{t('website_pricing.subtitle')}</h2> */}
                         {/* <p>Un peu de patience... Plus d'informations très bientôt</p> */}
+                        <p>{t('website_pricing.description')}</p>
+
+                        <div className="bg-cta p-4 text-center">
+                            <h2 className="animate-pulse font-bold">{t('website_pricing.launching_offer')}</h2>
+                            <p>{t('website_pricing.launching_offer.description')}</p>
+                        </div>
 
                         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
                             <div className="flex flex-col gap-6 rounded-md border p-6 lg:p-10">
                                 <Building size={36} className="mx-auto" />
-                                <h3 className="text-center">Starter</h3>
+                                <h3 className="text-center">{t('website_pricing.starter.title')}</h3>
                                 <div className="text-center">
-                                    <p>A partir de</p>
-                                    <p className={'text-2xl font-extrabold'}>149€ / mois</p>
+                                    <p>{t('website_pricing.from')}</p>
+                                    <p className={'text-2xl font-extrabold'}>149€ / {t('website_pricing.month')}</p>
                                 </div>
                                 <ul className="flex flex-col gap-6">
                                     <li className="flex gap-4">
                                         <Check />
-                                        <p>1 site</p>
+                                        <p>{Array(...t('website_pricing.starter.items'))[0]}</p>
                                     </li>
                                     <li className="flex gap-4">
                                         <Check />
-                                        <p>Assets illimités</p>
+                                        <p>{Array(...t('website_pricing.starter.items'))[1]}</p>
                                     </li>
                                     <li className="flex gap-4">
                                         <Check />
-                                        <p>Jusqu'à 5 utilisateurs</p>
+                                        <p>{Array(...t('website_pricing.starter.items'))[2]}</p>
                                     </li>
                                     <li className="flex gap-4">
                                         <Check />
-                                        <p>20 GB d'espace de stockage</p>
+                                        <p>{Array(...t('website_pricing.starter.items'))[3]}</p>
+                                    </li>
+                                    <li className="flex gap-4">
+                                        <Check />
+                                        <p>{Array(...t('website_pricing.starter.items'))[4]}</p>
+                                    </li>
+                                    <li className="flex gap-4">
+                                        <Check />
+                                        <p>{Array(...t('website_pricing.starter.items'))[5]}</p>
                                     </li>
                                     <li className="flex gap-4">
                                         <X />
-                                        <p>Gestion des prestataires</p>
-                                    </li>
-                                    <li className="flex gap-4">
-                                        <X />
-                                        <p>Gestion des contrats</p>
-                                    </li>
-                                    <li className="flex gap-4">
-                                        <X />
-                                        <p>Statistiques</p>
+                                        <p>{Array(...t('website_pricing.starter.items'))[6]}</p>
                                     </li>
                                 </ul>
                                 <Button variant={'cta'} className="">
-                                    Démarrer aujourd'hui
+                                    {t('website_pricing.start_today')}
                                 </Button>
                             </div>
                             <div className="flex flex-col gap-6 rounded-md border p-6 lg:p-10">
                                 <Building2 size={36} className="mx-auto" />
                                 <h3 className="text-center">Premium</h3>
                                 <div className="text-center">
-                                    <p>A partir de</p>
-                                    <p className={'text-2xl font-extrabold'}>299€ / mois</p>
+                                    <p>{t('website_pricing.from')}</p>
+                                    <p className={'text-2xl font-extrabold'}>299€ / {t('website_pricing.month')}</p>
                                 </div>
                                 <ul className="flex flex-col gap-6">
                                     <li className="flex gap-4">
                                         <Check />
-                                        <p>2 sites</p>
+                                        <p>{Array(...t('website_pricing.premium.items'))[0]}</p>
                                     </li>
                                     <li className="flex gap-4">
                                         <Check />
-                                        <p>Assets illimités</p>
+                                        <p>{Array(...t('website_pricing.premium.items'))[1]}</p>
                                     </li>
                                     <li className="flex gap-4">
                                         <Check />
-                                        <p>Jusqu'à 15 utilisateurs</p>
+                                        <p>{Array(...t('website_pricing.premium.items'))[2]}</p>
                                     </li>
                                     <li className="flex gap-4">
                                         <Check />
-                                        <p>50 GB d'espace de stockage</p>
+                                        <p>{Array(...t('website_pricing.premium.items'))[3]}</p>
                                     </li>
                                     <li className="flex gap-4">
                                         <Check />
-                                        <p>Gestion des prestataires</p>
+                                        <p>{Array(...t('website_pricing.premium.items'))[4]}</p>
                                     </li>
                                     <li className="flex gap-4">
                                         <Check />
-                                        <p>Gestion des contrats</p>
+                                        <p>{Array(...t('website_pricing.premium.items'))[5]}</p>
                                     </li>
                                     <li className="flex gap-4">
                                         <Check />
-                                        <p>Statistiques</p>
+                                        <p>{Array(...t('website_pricing.premium.items'))[6]}</p>
                                     </li>
                                 </ul>
                                 <Button variant={'cta'} className="">
-                                    Démarrer aujourd'hui
+                                    {t('website_pricing.start_today')}
                                 </Button>
                             </div>
                             <div className="flex flex-col gap-6 rounded-md border p-6 sm:col-span-2 lg:col-auto lg:p-10">
                                 <Factory size={36} className="mx-auto" />
                                 <h3 className="text-center">Entreprise</h3>
                                 <div className="text-center">
-                                    <p>Offre</p>
-                                    <p className={'text-2xl font-extrabold'}>sur demande</p>
+                                    <p>{t('website_pricing.offer')}</p>
+                                    <p className={'text-2xl font-extrabold'}>{t('website_pricing.on_demand')}</p>
                                 </div>
                                 <ul className="flex flex-col gap-6">
                                     <li className="flex gap-4">
                                         <Check />
-                                        <p>Vous devez gérer plus de 2 sites ?</p>
+                                        <p>{Array(...t('website_pricing.enterprise.items'))[0]}</p>
                                     </li>
                                     <li className="flex gap-4">
                                         <Check />
-                                        <p>Vous avez besoin de plus d'espace de stockage ?</p>
+                                        <p>{Array(...t('website_pricing.enterprise.items'))[1]}</p>
                                     </li>
                                     <li className="flex gap-4">
                                         <Check />
-                                        <p>Support personnalisé</p>
+                                        <p>{Array(...t('website_pricing.enterprise.items'))[2]}</p>
                                     </li>
                                 </ul>
-                                <Button variant={'cta'} className="">
-                                    Discutons-en
-                                </Button>
+                                <a href={route('website.contact')} className="mx-auto w-full">
+                                    <Button variant={'cta'} className="w-full">
+                                        {t('website_pricing.enterprise.discuss')}
+                                    </Button>
+                                </a>
                             </div>
                         </div>
                         {/* <div className="mx-auto flex flex-col items-center gap-4">

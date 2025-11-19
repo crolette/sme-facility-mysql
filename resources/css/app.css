@@ -304,6 +304,18 @@ label:has(+ input:required)::after {
     background-color: var(--color-required);
 }
 
+.website .contact-success {
+    color: var(--success);
+}
+
+.website input,
+.website select,
+.website textarea {
+    background-color: oklch(93.908% 0.02466 265.621);
+    border-width: 1px;
+    border-color: oklch(0.922 0 0);
+}
+
 .website-details {
     details {
         margin-block: 0rem;
