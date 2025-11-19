@@ -94,10 +94,14 @@ export default function Footer() {
                                     {t('website_common.faq')}
                                 </a>
                             </li>
-                            <li> {t('website_common.footer.implementation')}</li>
-                            <li> {t('website_common.footer.careers')}</li>
+                            {/* <li> {t('website_common.footer.implementation')}</li> */}
                             <li>
-                                <a href={route('website.contact')} className="!no-underline">
+                                <a href={route('website.careers')} className="!no-underline">
+                                    {t('website_common.footer.careers')}
+                                </a>
+                            </li>
+                            <li>
+                                <a href={route('website.careers')} className="!no-underline">
                                     {t('website_common.footer.contact')}
                                 </a>
                             </li>
@@ -112,9 +116,19 @@ export default function Footer() {
                         </a>
                     </p>
                     <ul className="flew-wrap flex flex-col md:flex-row">
-                        <li> {t('website_common.footer.cgu')}</li>
+                        <li>
+                            <a href={route('website.cgu')} className="!no-underline">
+                                {t('website_common.footer.cgu')}
+                            </a>
+                        </li>
                         <span className="mx-2 hidden md:inline-block">|</span>
-                        <li> {t('website_common.footer.cgv')}</li>
+                        <li>
+                            {' '}
+                            <a href={route('website.cgv')} className="!no-underline">
+                                {' '}
+                                {t('website_common.footer.cgv')}
+                            </a>
+                        </li>
                         <span className="mx-2 hidden md:inline-block">|</span>
                         <li> {t('website_common.footer.legal')}</li>
                     </ul>
