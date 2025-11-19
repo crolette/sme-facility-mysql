@@ -48,6 +48,11 @@ class Site extends Model
         'maintainable'
     ];
 
+    protected $casts = [
+        'surface_floor' => 'decimal:2',
+        'surface_walls' => 'decimal:2',
+    ];
+
     protected $appends = [
         'name',
         'description',

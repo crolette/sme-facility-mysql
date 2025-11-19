@@ -7912,16 +7912,16 @@
         },
         {
             "name": "tuncaybahadir/quar",
-            "version": "1.6.1",
+            "version": "1.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/tuncaybahadir/quar.git",
-                "reference": "2add93af065d83fe64ec62ab54d227d3197aad3c"
+                "reference": "919ca54c083b96a080588a8668efb5b25a7975e4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/tuncaybahadir/quar/zipball/2add93af065d83fe64ec62ab54d227d3197aad3c",
-                "reference": "2add93af065d83fe64ec62ab54d227d3197aad3c",
+                "url": "https://api.github.com/repos/tuncaybahadir/quar/zipball/919ca54c083b96a080588a8668efb5b25a7975e4",
+                "reference": "919ca54c083b96a080588a8668efb5b25a7975e4",
                 "shasum": ""
             },
             "require": {
@@ -7980,9 +7980,9 @@
             ],
             "support": {
                 "issues": "https://github.com/tuncaybahadir/quar/issues",
-                "source": "https://github.com/tuncaybahadir/quar/tree/1.6.1"
+                "source": "https://github.com/tuncaybahadir/quar/tree/1.6.2"
             },
-            "time": "2025-11-10T21:17:02+00:00"
+            "time": "2025-11-15T00:29:40+00:00"
         },
         {
             "name": "vlucas/phpdotenv",

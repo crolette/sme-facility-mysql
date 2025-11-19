@@ -14,5 +14,6 @@ return [
     'surface_wall' => 'Surface des murs',
     'material_floor' => 'Matériau du sol',
     'material_wall' => 'Matériau des murs',
-    'material_outdoor' => 'Matériau extérieur'
+    'material_outdoor' => 'Matériau extérieur',
+    'height' => 'Hauteur'
 ];

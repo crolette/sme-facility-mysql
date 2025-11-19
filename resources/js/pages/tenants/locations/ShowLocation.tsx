@@ -185,6 +185,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                                                         text={`${location.surface_walls} m² - ${location.wall_material}`}
                                                     />
                                                 )}
+                                                {location.height && <Field label={t('locations.height')} text={`${location.height} m`} />}
                                             </>
                                         )}
                                     </div>
