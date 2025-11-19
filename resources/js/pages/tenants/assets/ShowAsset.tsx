@@ -103,7 +103,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Asset ${asset.maintainable.name}`} />
+            <Head title={item.name + ' - ' + item.code} />
 
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex flex-wrap items-center gap-4">
