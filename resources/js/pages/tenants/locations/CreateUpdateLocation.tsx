@@ -51,6 +51,7 @@ type TypeFormData = {
     surface_outdoor?: null | number;
     outdoor_material_id?: number | string | null;
     outdoor_material_other?: string;
+    height?: number | null;
     levelType: string | number;
     locationType: string | number;
     locationTypeName: string;
@@ -126,6 +127,7 @@ export default function CreateUpdateLocation({
         surface_walls: location?.surface_walls ?? null,
         wall_material_id: location?.wall_material_other != null ? 'other' : (location?.wall_material_id ?? null),
         wall_material_other: location?.wall_material_other ?? '',
+        height: location?.height ?? '',
         levelType: location?.level_id ?? '',
         need_qr_code: true,
         locationType: locationTypes.length == 1 ? locationTypes[0].id : (location?.location_type?.id ?? ''),
@@ -353,6 +355,7 @@ export default function CreateUpdateLocation({
     };
 
     const { t, tChoice } = useLaravelReactI18n();
+    const minEndDateWarranty = new Date().toISOString().split('T')[0];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -669,6 +672,21 @@ export default function CreateUpdateLocation({
                                         </div>
                                     )}
                                 </div>
+                                {routeName === 'rooms' && (
+                                    <div className="w-full">
+                                        <Label htmlFor="height">{t('locations.height')}</Label>
+                                        <Input
+                                            id="height"
+                                            type="number"
+                                            min={0}
+                                            step="0.01"
+                                            value={data.height ?? ''}
+                                            placeholder="Height (max. 2 decimals) : 4236.3"
+                                            onChange={(e) => setData('height', parseFloat(e.target.value))}
+                                        />
+                                        <InputError className="mt-2" message={errors.height ?? ''} />
+                                    </div>
+                                )}
                             </>
                         )}
                     </div>
@@ -739,7 +757,7 @@ export default function CreateUpdateLocation({
                                             id="next_maintenance_date"
                                             type="date"
                                             value={data.next_maintenance_date ?? ''}
-                                            min={asset ? '' : minEndDateWarranty}
+                                            min={location ? '' : minEndDateWarranty}
                                             onChange={(e) => setData('next_maintenance_date', e.target.value)}
                                         />
                                         <InputError className="mt-2" message={errors?.next_maintenance_date ?? ''} />

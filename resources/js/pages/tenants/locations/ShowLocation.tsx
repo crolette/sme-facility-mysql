@@ -108,7 +108,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={tChoice(`locations.${routeName}`, 2)} />
+            <Head title={item.name + ' - ' + item.reference_code} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex flex-wrap gap-2">
                     <a href={route(`tenant.${routeName}.edit`, location.reference_code)}>
@@ -185,6 +185,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                                                         text={`${location.surface_walls} m² - ${location.wall_material}`}
                                                     />
                                                 )}
+                                                {location.height && <Field label={t('locations.height')} text={`${location.height} m`} />}
                                             </>
                                         )}
                                     </div>

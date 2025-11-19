@@ -41,7 +41,6 @@ class APIRoomController extends Controller
         if (Auth::user()->cannot('create', Room::class))
             abort(403);
 
-
         try {
             DB::beginTransaction();
 
@@ -49,13 +48,9 @@ class APIRoomController extends Controller
             $roomType = LocationType::find($roomRequest->validated('locationType'));
             $room = new Room([
                 ...$roomRequest->validated(),
-                'surface_floor' => $roomRequest->validated('surface_floor'),
-                'floor_material_id'  => $roomRequest->validated('floor_material_id') === 'other' ? null :  $roomRequest->validated('floor_material_id'),
-                'floor_material_other'  => $roomRequest->validated('floor_material_other'),
-                'surface_walls' => $roomRequest->validated('surface_walls'),
-                'wall_material_id'  => $roomRequest->validated('wall_material_id') === 'other' ? null :  $roomRequest->validated('wall_material_id'),
-                'wall_material_other'  => $roomRequest->validated('wall_material_other'),
+
             ]);
+
 
             $count = Room::where('location_type_id', $roomType->id)->where('level_id', $floor->id)->count();
 
@@ -125,14 +120,7 @@ class APIRoomController extends Controller
         try {
             DB::beginTransaction();
 
-            $room->update([
-                'surface_floor' => $roomRequest->validated('surface_floor'),
-                'floor_material_id'  => $roomRequest->validated('floor_material_id') === 'other' ? null :  $roomRequest->validated('floor_material_id'),
-                'floor_material_other'  => $roomRequest->validated('floor_material_other'),
-                'surface_walls' => $roomRequest->validated('surface_walls'),
-                'wall_material_id'  => $roomRequest->validated('wall_material_id') === 'other' ? null :  $roomRequest->validated('wall_material_id'),
-                'wall_material_other'  => $roomRequest->validated('wall_material_other'),
-            ]);
+            $room->update($roomRequest->validated());
 
             $this->maintainableService->update($room->maintainable, $maintainableRequest);
 

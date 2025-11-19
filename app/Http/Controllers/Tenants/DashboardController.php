@@ -106,8 +106,51 @@ class DashboardController extends Controller
             ->with('maintainable')
             ->get();
 
-        $interventions = Intervention::select('id', 'intervention_type_id', 'priority', 'status', 'maintainable_id', 'interventionable_type', 'interventionable_id', 'ticket_id', 'planned_at')->where('planned_at', '>=', today())->orderBy('planned_at')->limit(10)->with('maintainable:id,name,maintainable_type', 'ticket:id,description', 'interventionable')->get();
-        $overdueInterventions = Intervention::select('id', 'intervention_type_id', 'priority', 'status', 'maintainable_id', 'interventionable_type', 'interventionable_id', 'ticket_id', 'planned_at')->where('planned_at', '<', today())->whereNotIn('status', ['completed', 'cancelled'])->orderBy('planned_at')->limit(10)->with('maintainable:id,name,maintainable_type', 'ticket:id,description', 'interventionable')->get();
+        $interventions = Intervention::select('id', 'intervention_type_id', 'priority', 'status', 'maintainable_id', 'interventionable_type', 'interventionable_id', 'ticket_id', 'planned_at')
+            ->where('planned_at', '>=', today())
+            ->whereHasMorph(
+                'interventionable',
+                [
+                    Asset::class,
+                    Site::class,
+                    Building::class,
+                    Floor::class,
+                    Room::class
+                ],
+                function ($query, $type) {
+                    if ($type === Asset::class) {
+                        $query->whereNull('deleted_at'); // exclut les soft deleted
+                    }
+                }
+            )
+            ->orderBy('planned_at')
+            ->limit(10)
+            ->with('maintainable:id,name,maintainable_type', 'ticket:id,description', 'interventionable')
+            ->get();
+
+
+        $overdueInterventions = Intervention::select('id', 'intervention_type_id', 'priority', 'status', 'maintainable_id', 'interventionable_type', 'interventionable_id', 'ticket_id', 'planned_at')
+            ->where('planned_at', '<', today())
+            ->whereHasMorph(
+                'interventionable',
+                [
+                    Asset::class,
+                    Site::class,
+                    Building::class,
+                    Floor::class,
+                    Room::class
+                ],
+                function ($query, $type) {
+                    if ($type === Asset::class) {
+                        $query->whereNull('deleted_at'); // exclut les soft deleted
+                    }
+                }
+            )
+            ->whereNotIn('status', ['completed', 'cancelled'])
+            ->orderBy('planned_at')
+            ->limit(10)
+            ->with('maintainable:id,name,maintainable_type', 'ticket:id,description', 'interventionable')
+            ->get();
 
         return Inertia::render('tenants/dashboard', ['counts' => $counts, 'overdueMaintenances' => $overdueMaintenances, 'overdueInterventions' => $overdueInterventions,  'maintainables' => $maintainables, 'interventions' => $interventions, 'diskSizes' => $diskSizes]);
     }

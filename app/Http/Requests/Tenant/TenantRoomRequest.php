@@ -26,12 +26,20 @@ class TenantRoomRequest extends FormRequest
 
         isset($data['need_qr_code']) && ($data['need_qr_code'] === 'true' || $data['need_qr_code'] === true) ? $data['need_qr_code'] = true : $data['need_qr_code'] = false;
 
-
         if (isset($data['surface_floor']) && ($data['surface_floor'] === 0 || $data['surface_floor'] === '0'))
             $data['surface_floor'] = null;
 
         if (isset($data['surface_walls']) && ($data['surface_walls'] === 0 || $data['surface_walls'] === '0'))
             $data['surface_walls'] = null;
+
+        if (isset($data['floor_material_id']) && ($data['floor_material_id'] === 'other'))
+            $data['floor_material_id'] = null;
+
+        if (isset($data['wall_material_id']) && ($data['wall_material_id'] === 'other'))
+            $data['wall_material_id'] = null;
+
+        if (isset($data['height']) && ($data['height'] === 0 || $data['height'] === '0'))
+            $data['height'] = null;
 
         $this->replace($data);
     }
@@ -54,6 +62,7 @@ class TenantRoomRequest extends FormRequest
             'floor_material_id' => ['nullable', Rule::anyOf([Rule::in(CategoryType::where('category', 'floor_materials')->pluck('id')->toArray()), Rule::in('other')])],
             'floor_material_other' => ['nullable', 'required_if:floor_material_id,other'],
             'surface_walls' => 'nullable|numeric|gt:0|decimal:0,2',
+            'height' => 'nullable|numeric|gt:0|decimal:0,2',
             'wall_material_id' => ['nullable', Rule::anyOf([Rule::in(CategoryType::where('category', 'wall_materials')->pluck('id')->toArray()), Rule::in('other')])],
             'wall_material_other' => ['nullable', 'required_if:wall_material_id,other'],
         ];
