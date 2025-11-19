@@ -144,6 +144,7 @@ export interface TenantRoom extends TenantSite {
     floor: TenantFloor;
     level: TenantFloor;
     level_path: string;
+    height: number;
 }
 
 export interface Contract {

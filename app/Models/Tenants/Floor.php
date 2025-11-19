@@ -54,6 +54,11 @@ class Floor extends Model
         'location_route'
     ];
 
+    protected $casts = [
+        'surface_floor' => 'decimal:2',
+        'surface_walls' => 'decimal:2',
+    ];
+
     // Ensure route model binding use the slug instead of ID
     public function getRouteKeyName()
     {

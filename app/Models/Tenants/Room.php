@@ -35,6 +35,7 @@ class Room extends Model
         'wall_material_id',
         'wall_material_other',
         'surface_walls',
+        'height'
     ];
 
     protected $hidden = [
@@ -42,7 +43,12 @@ class Room extends Model
         'updated_at',
         'level_id',
         'location_type_id'
+    ];
 
+    protected $casts = [
+        'surface_floor' => 'decimal:2',
+        'surface_walls' => 'decimal:2',
+        'height' => 'decimal:2',
     ];
 
     protected $with = [
