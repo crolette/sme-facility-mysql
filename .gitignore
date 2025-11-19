@@ -30,3 +30,4 @@ package-lock.json
 /.nova
 /.vscode
 /.zed
+/lang/php_*.json

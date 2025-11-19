@@ -173,18 +173,14 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                                             </>
                                         ) : (
                                             <>
-                                                {location.surface_floor && (
-                                                    <Field
-                                                        label={t('locations.surface_floor')}
-                                                        text={`${location.surface_floor} m² - ${location.floor_material}`}
-                                                    />
-                                                )}
-                                                {location.wall_material && (
-                                                    <Field
-                                                        label={t('locations.surface_wall')}
-                                                        text={`${location.surface_walls} m² - ${location.wall_material}`}
-                                                    />
-                                                )}
+                                                <Field
+                                                    label={t('locations.surface_floor')}
+                                                    text={`${location.surface_floor ?? 0} m² - ${location.floor_material}`}
+                                                />
+                                                <Field
+                                                    label={t('locations.surface_wall')}
+                                                    text={`${location.surface_walls ?? '0'} m² - ${location.wall_material}`}
+                                                />
                                                 {location.height && <Field label={t('locations.height')} text={`${location.height} m`} />}
                                             </>
                                         )}

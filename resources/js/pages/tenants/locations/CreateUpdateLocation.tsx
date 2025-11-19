@@ -572,7 +572,7 @@ export default function CreateUpdateLocation({
                                     </div>
                                     {floorMaterials && (
                                         <div className="w-full">
-                                            <Label htmlFor="floor_material_id">{t('locations.floor_material')}</Label>
+                                            <Label htmlFor="floor_material_id">{t('locations.material_floor')}</Label>
                                             <select
                                                 name="floor_material_id-type"
                                                 value={data.floor_material_id ?? ''}
@@ -590,7 +590,7 @@ export default function CreateUpdateLocation({
                                                 )}
                                             >
                                                 <option value="" disabled>
-                                                    {t('actions.select-type', { type: t('locations.floor_material') })}
+                                                    {t('actions.select-type', { type: t('locations.material_floor') })}
                                                 </option>
 
                                                 {floorMaterials.map((type) => (
@@ -630,7 +630,7 @@ export default function CreateUpdateLocation({
                                     </div>
                                     {wallMaterials && (
                                         <div className="w-full">
-                                            <Label htmlFor="wall_material_id">{t('locations.wall_material')}</Label>
+                                            <Label htmlFor="wall_material_id">{t('locations.material_wall')}</Label>
                                             <select
                                                 name="wall_material_id"
                                                 value={data.wall_material_id ?? ''}
@@ -648,7 +648,7 @@ export default function CreateUpdateLocation({
                                                 )}
                                             >
                                                 <option value="" disabled>
-                                                    {t('actions.select-type', { type: t('locations.wall_material') })}
+                                                    {t('actions.select-type', { type: t('locations.material_wall') })}
                                                 </option>
 
                                                 {wallMaterials.map((type) => (
