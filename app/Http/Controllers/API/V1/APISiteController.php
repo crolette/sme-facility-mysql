@@ -28,7 +28,7 @@ class APISiteController extends Controller
         protected SiteService $siteService,
         protected QRCodeService $qrCodeService,
         protected MaintainableService $maintainableService,
-        protected ContractService $contractService
+        protected ContractService $contractService,
     ) {}
 
 
@@ -40,23 +40,25 @@ class APISiteController extends Controller
         try {
             DB::beginTransaction();
 
-            $locationType = LocationType::find($siteRequest->validated('locationType'));
-            $count = Site::where('location_type_id', $locationType->id)->count();
+            $site = $this->siteService->create($siteRequest->validated());
 
-            $codeNumber = generateCodeNumber($count + 1, $locationType->prefix);
+            // $locationType = LocationType::find($siteRequest->validated('locationType'));
+            // $count = Site::where('location_type_id', $locationType->id)->count();
 
-            $site = Site::create([
-                'code' => $codeNumber,
-                'surface_floor' => $siteRequest->validated('surface_floor'),
-                'floor_material_id'  => $siteRequest->validated('floor_material_id') === 'other' ? null :  $siteRequest->validated('floor_material_id'),
-                'floor_material_other'  => $siteRequest->validated('floor_material_other'),
-                'surface_walls' => $siteRequest->validated('surface_walls'),
-                'wall_material_id'  => $siteRequest->validated('wall_material_id') === 'other' ? null :  $siteRequest->validated('wall_material_id'),
-                'wall_material_other'  => $siteRequest->validated('wall_material_other'),
-                'reference_code' => $codeNumber,
-                'location_type_id' => $locationType->id,
-                'address' => $siteRequest->validated('address')
-            ]);
+            // $codeNumber = generateCodeNumber($count + 1, $locationType->prefix);
+
+            // $site = Site::create([
+            //     'code' => $codeNumber,
+            //     'surface_floor' => $siteRequest->validated('surface_floor'),
+            //     'floor_material_id'  => $siteRequest->validated('floor_material_id') === 'other' ? null :  $siteRequest->validated('floor_material_id'),
+            //     'floor_material_other'  => $siteRequest->validated('floor_material_other'),
+            //     'surface_walls' => $siteRequest->validated('surface_walls'),
+            //     'wall_material_id'  => $siteRequest->validated('wall_material_id') === 'other' ? null :  $siteRequest->validated('wall_material_id'),
+            //     'wall_material_other'  => $siteRequest->validated('wall_material_other'),
+            //     'reference_code' => $codeNumber,
+            //     'location_type_id' => $locationType->id,
+            //     'address' => $siteRequest->validated('address')
+            // ]);
 
             $this->maintainableService->create($site, $maintainableRequest->validated());
 

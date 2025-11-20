@@ -25,7 +25,7 @@ use function PHPUnit\Framework\assertCount;
 beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
-    $this->siteType = LocationType::factory()->create(['level' => 'site']);
+    $this->siteType = LocationType::factory()->create(['level' => 'site', 'prefix' => 'S']);
 });
 
 it('can render the index sites page', function () {
@@ -283,7 +283,7 @@ it('can retrieve all assets from a site', function () {
     $response = $this->getFromTenant('api.sites.assets', $site);
     $response->assertStatus(200);
     $data = $response->json('data');
-    $this->assertCount(2, $data);
+    $this->assertCount(2, $data['data']);
 });
 
 it('can attach a provider to a site\'s maintainable', function () {

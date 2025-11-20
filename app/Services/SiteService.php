@@ -5,6 +5,7 @@ namespace App\Services;
 use Exception;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use App\Models\LocationType;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
@@ -23,15 +24,26 @@ class SiteService
 
     public function __construct(protected DocumentService $documentService, protected PictureService $pictureService) {}
 
-    // public function create(array $data): Site
-    // {
+    public function create(array $data): Site
+    {
+        $locationType = LocationType::find($data['locationType']);
+        $count = Site::where('location_type_id', $locationType->id)->count();
 
-    //     $site = new Site([
-    //         ...$data,
-    //     ]);
+        $codeNumber = generateCodeNumber($count + 1, $locationType->prefix);
 
-    //     return $site;
-    // }
+        $site = Site::create([
+            ...$data,
+            'code' => $codeNumber,
+            'floor_material_id'  => $data['floor_material_id'] === 'other' ? null :  $data['floor_material_id'],
+            'wall_material_id'  => $data['wall_material_id'] === 'other' ? null :  $data['wall_material_id'],
+            'reference_code' => $codeNumber,
+            'location_type_id' => $locationType->id,
+        ]);
+
+        return $site;
+    }
+
+
 
     // public function update(Site $site, array $data)
     // {
