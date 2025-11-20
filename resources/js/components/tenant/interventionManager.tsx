@@ -63,7 +63,6 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
     const fetchInterventionTypes = async () => {
         try {
             const response = await axios.get(route('api.category-types', { type: 'intervention' }));
-            console.log(response.data.data);
             setInterventionTypes(response.data.data);
         } catch (error) {
             console.log(error);
@@ -182,6 +181,8 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
             setIsProcessing(false);
         }
     };
+
+    console.log(interventionDataForm);
 
     function formatDateForInput(dateStr: string) {
         const [day, month, year] = dateStr.split('-');

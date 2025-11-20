@@ -91,6 +91,12 @@ class Provider extends Model
         return $this->belongsToMany(Maintainable::class, 'provider_maintainable');
     }
 
+    public function interventions(): MorphMany
+    {
+        return $this->morphMany(Intervention::class, 'interventionable');
+    }
+
+
     public function providerCategory(): BelongsTo
     {
         return $this->belongsTo(CategoryType::class, 'category_type_id');

@@ -20,6 +20,7 @@ use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\TicketRequest;
 use App\Http\Requests\Tenant\InterventionRequest;
 use App\Http\Requests\Tenant\PictureUploadRequest;
+use App\Models\Tenants\Provider;
 use Illuminate\Support\Facades\Log;
 
 class APIInterventionController extends Controller
@@ -57,12 +58,20 @@ class APIInterventionController extends Controller
                     'floors' => \App\Models\Tenants\Floor::class,
                     'rooms' => \App\Models\Tenants\Room::class,
                     'asset' => \App\Models\Tenants\Asset::class,
+                    'providers' => \App\Models\Tenants\Provider::class,
                 ];
 
+
                 $model = $modelMap[$request->validated('locationType')];
-                $location = $model::where('reference_code', $request->validated('locationId'))->first();
-                $intervention->interventionable()->associate($location);
-                $intervention->maintainable()->associate($location->maintainable->id);
+
+                if ($model === Provider::class) {
+                    $location = $model::where('id', $request->validated('locationId'))->first();
+                    $intervention->interventionable()->associate($location);
+                } else {
+                    $location = $model::where('reference_code', $request->validated('locationId'))->first();
+                    $intervention->interventionable()->associate($location);
+                    $intervention->maintainable()->associate($location->maintainable->id);
+                }
             }
 
             $intervention->interventionType()->associate($request->validated('intervention_type_id'));

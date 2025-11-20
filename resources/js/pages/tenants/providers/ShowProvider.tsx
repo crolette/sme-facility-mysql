@@ -2,16 +2,15 @@ import ImageUploadModale from '@/components/ImageUploadModale';
 import Modale from '@/components/Modale';
 import { AssetManager } from '@/components/tenant/assetManager';
 import { ContractsList } from '@/components/tenant/contractsList';
+import { InterventionManager } from '@/components/tenant/interventionManager';
 import { LocationList } from '@/components/tenant/LocationList';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
 import { UsersList } from '@/components/tenant/usersList';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import Field from '@/components/ui/field';
-import { Pill } from '@/components/ui/pill';
-import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { BreadcrumbItem, Intervention, Provider } from '@/types';
+import { BreadcrumbItem, Provider } from '@/types';
 import { router } from '@inertiajs/core';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
@@ -143,77 +142,78 @@ export default function ShowProvider({ item }: { item: Provider }) {
                         )}
 
                         {activeTab === 'interventions' && (
-                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h3>{tChoice('interventions.title', 2)}</h3>
+                            <InterventionManager itemCodeId={item.id} getInterventionsUrl={`api.providers.interventions`} type={'providers'} />
+                            // <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                            //     <h3>{tChoice('interventions.title', 2)}</h3>
 
-                                {item.assigned_interventions ? (
-                                    <div>
-                                        {item.assigned_interventions.map((intervention: Intervention) => (
-                                            <div>
-                                                <Table key={intervention.id} className="table-fixed">
-                                                    <TableHead>
-                                                        <TableHeadRow>
-                                                            <TableHeadData className="">{t('common.description')}</TableHeadData>
-                                                            <TableHeadData>{t('common.type')}</TableHeadData>
-                                                            <TableHeadData>{t('interventions.priority')}</TableHeadData>
-                                                            <TableHeadData>{t('common.status')}</TableHeadData>
-                                                            <TableHeadData>{t('interventions.assigned_to')}</TableHeadData>
-                                                            <TableHeadData>{t('interventions.planned_at')}</TableHeadData>
-                                                            <TableHeadData>{t('interventions.repair_delay')}</TableHeadData>
-                                                            <TableHeadData>{t('interventions.total_costs')}</TableHeadData>
-                                                        </TableHeadRow>
-                                                    </TableHead>
+                            //     {/* {item.assigned_interventions ? (
+                            //         <div>
+                            //             {item.assigned_interventions.map((intervention: Intervention) => (
+                            //                 <div>
+                            //                     <Table key={intervention.id} className="table-fixed">
+                            //                         <TableHead>
+                            //                             <TableHeadRow>
+                            //                                 <TableHeadData className="">{t('common.description')}</TableHeadData>
+                            //                                 <TableHeadData>{t('common.type')}</TableHeadData>
+                            //                                 <TableHeadData>{t('interventions.priority')}</TableHeadData>
+                            //                                 <TableHeadData>{t('common.status')}</TableHeadData>
+                            //                                 <TableHeadData>{t('interventions.assigned_to')}</TableHeadData>
+                            //                                 <TableHeadData>{t('interventions.planned_at')}</TableHeadData>
+                            //                                 <TableHeadData>{t('interventions.repair_delay')}</TableHeadData>
+                            //                                 <TableHeadData>{t('interventions.total_costs')}</TableHeadData>
+                            //                             </TableHeadRow>
+                            //                         </TableHead>
 
-                                                    <TableBody>
-                                                        <TableBodyRow className="">
-                                                            <TableBodyData className="flex max-w-72">
-                                                                <a
-                                                                    className="overflow-hidden overflow-ellipsis whitespace-nowrap"
-                                                                    href={route('tenant.interventions.show', intervention.id)}
-                                                                >
-                                                                    {intervention.description}
-                                                                </a>
-                                                                <p className="tooltip tooltip-top">{intervention.description}</p>
-                                                            </TableBodyData>
-                                                            <TableBodyData>{intervention.type}</TableBodyData>
-                                                            <TableBodyData>
-                                                                <Pill variant={intervention.priority}>
-                                                                    {t(`interventions.priority.${intervention.priority}`)}
-                                                                </Pill>
-                                                            </TableBodyData>
-                                                            <TableBodyData>{t(`interventions.status.${intervention.status}`)}</TableBodyData>
-                                                            <TableBodyData>
-                                                                {intervention.assignable ? (
-                                                                    intervention.assignable.full_name ? (
-                                                                        <a href={route('tenant.users.show', intervention.assignable.id)}>
-                                                                            {intervention.assignable.full_name}
-                                                                        </a>
-                                                                    ) : (
-                                                                        <a href={route('tenant.providers.show', intervention.assignable.id)}>
-                                                                            {intervention.assignable.name}
-                                                                        </a>
-                                                                    )
-                                                                ) : (
-                                                                    t(`interventions.assigned_not`)
-                                                                )}
-                                                            </TableBodyData>
-                                                            <TableBodyData>{intervention.planned_at ?? t(`interventions.planned_not`)}</TableBodyData>
-                                                            <TableBodyData>
-                                                                {intervention.repair_delay ?? t(`interventions.repair_delay_no`)}
-                                                            </TableBodyData>
-                                                            <TableBodyData>
-                                                                {intervention.total_costs ? `${intervention.total_costs} €` : '-'}
-                                                            </TableBodyData>
-                                                        </TableBodyRow>
-                                                    </TableBody>
-                                                </Table>
-                                            </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <p>No interventions</p>
-                                )}
-                            </div>
+                            //                         <TableBody>
+                            //                             <TableBodyRow className="">
+                            //                                 <TableBodyData className="flex max-w-72">
+                            //                                     <a
+                            //                                         className="overflow-hidden overflow-ellipsis whitespace-nowrap"
+                            //                                         href={route('tenant.interventions.show', intervention.id)}
+                            //                                     >
+                            //                                         {intervention.description}
+                            //                                     </a>
+                            //                                     <p className="tooltip tooltip-top">{intervention.description}</p>
+                            //                                 </TableBodyData>
+                            //                                 <TableBodyData>{intervention.type}</TableBodyData>
+                            //                                 <TableBodyData>
+                            //                                     <Pill variant={intervention.priority}>
+                            //                                         {t(`interventions.priority.${intervention.priority}`)}
+                            //                                     </Pill>
+                            //                                 </TableBodyData>
+                            //                                 <TableBodyData>{t(`interventions.status.${intervention.status}`)}</TableBodyData>
+                            //                                 <TableBodyData>
+                            //                                     {intervention.assignable ? (
+                            //                                         intervention.assignable.full_name ? (
+                            //                                             <a href={route('tenant.users.show', intervention.assignable.id)}>
+                            //                                                 {intervention.assignable.full_name}
+                            //                                             </a>
+                            //                                         ) : (
+                            //                                             <a href={route('tenant.providers.show', intervention.assignable.id)}>
+                            //                                                 {intervention.assignable.name}
+                            //                                             </a>
+                            //                                         )
+                            //                                     ) : (
+                            //                                         t(`interventions.assigned_not`)
+                            //                                     )}
+                            //                                 </TableBodyData>
+                            //                                 <TableBodyData>{intervention.planned_at ?? t(`interventions.planned_not`)}</TableBodyData>
+                            //                                 <TableBodyData>
+                            //                                     {intervention.repair_delay ?? t(`interventions.repair_delay_no`)}
+                            //                                 </TableBodyData>
+                            //                                 <TableBodyData>
+                            //                                     {intervention.total_costs ? `${intervention.total_costs} €` : '-'}
+                            //                                 </TableBodyData>
+                            //                             </TableBodyRow>
+                            //                         </TableBody>
+                            //                     </Table>
+                            //                 </div>
+                            //             ))}
+                            //         </div>
+                            //     ) : (
+                            //         <p>No interventions</p>
+                            //     )} */}
+                            // </div>
                         )}
 
                         {activeTab === 'contracts' && (
