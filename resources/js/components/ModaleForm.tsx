@@ -1,3 +1,4 @@
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Loader } from 'lucide-react';
 
 // Props pour Modal
@@ -8,6 +9,7 @@ interface ModaleProps {
 }
 
 export default function ModaleForm({ title, children, isUpdating = false }: ModaleProps) {
+    const { t } = useLaravelReactI18n();
     return (
         <>
             <div className="bg-background/50 fixed inset-0 z-50 overflow-y-auto">
@@ -16,11 +18,11 @@ export default function ModaleForm({ title, children, isUpdating = false }: Moda
                         {isUpdating ? (
                             <>
                                 <Loader className="animate-pulse text-center" />
-                                <p className="mx-auto animate-pulse text-center text-3xl font-bold">Updating...</p>
+                                <p className="mx-auto animate-pulse text-center text-3xl font-bold">{t('actions.updating')}.</p>
                             </>
                         ) : (
                             <>
-                                <h4>{title}</h4>
+                                <h4 className="lowercase first-letter:uppercase">{title}</h4>
                                 {children}
                             </>
                         )}

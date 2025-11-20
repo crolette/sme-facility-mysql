@@ -132,6 +132,26 @@ class Intervention extends Model
         );
     }
 
+    public function scopeWithoutTrashed($query)
+    {
+        return $query->whereHasMorph(
+            'interventionable',
+            [
+                Asset::class,
+                Site::class,
+                Building::class,
+                Floor::class,
+                Room::class,
+                Provider::class
+            ],
+            function ($query, $type) {
+                if ($type === Asset::class) {
+                    $query->whereNull('deleted_at'); // exclut les soft deleted
+                }
+            }
+        );
+    }
+
     public function scopeOrderByPriority($query, $direction = 'asc')
     {
         $order = $direction === 'asc'

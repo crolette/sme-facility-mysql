@@ -60,6 +60,7 @@ class Provider extends Model
         'logo_path',
         'category',
         'address',
+        'location_route'
         // 'country_label'
     ];
 
@@ -135,6 +136,13 @@ class Provider extends Model
     {
         return Attribute::make(
             get: fn() => $this->street . ' ' . ($this->house_number ?? '') . ' - ' . $this->postal_code . ' ' . $this->city . ' - ' . ($this->country->label ?? '')
+        );
+    }
+
+    public function locationRoute(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => route('tenant.providers.show', $this->id)
         );
     }
 

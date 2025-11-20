@@ -4,6 +4,7 @@ use App\Helpers\ApiResponse;
 use App\Models\Tenants\User;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Ticket;
+use App\Models\Tenants\Provider;
 use App\Services\PictureService;
 use App\Enums\InterventionStatus;
 use App\Services\DocumentService;
@@ -73,9 +74,13 @@ Route::middleware([
 
         Route::get('providers', function (Intervention $intervention) {
 
-            $providers = $intervention->interventionable->maintainable->providers->load('users');
+            if ($intervention->interventionable_type === Provider::class) {
+                return ApiResponse::success([$intervention->interventionable->load('users')]);
+            }
 
-            return ApiResponse::success($providers, 'Providers');
+            $providers = $intervention->interventionable->maintainable?->providers?->load('users');
+
+            return ApiResponse::success($providers ?? [], 'Providers');
         })->name('api.interventions.providers');
     });
 

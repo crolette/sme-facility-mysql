@@ -116,7 +116,7 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
             },
             {
                 tabName: 'locations',
-                tabDisplay: tChoice('locations.title', 2),
+                tabDisplay: tChoice('locations.location', 2),
             },
         ],
         ticket: [

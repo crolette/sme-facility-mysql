@@ -182,8 +182,6 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         }
     };
 
-    console.log(interventionDataForm);
-
     function formatDateForInput(dateStr: string) {
         const [day, month, year] = dateStr.split('-');
         return `${year}-${month}-${day}`;
@@ -243,6 +241,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
 
     const [externalProviders, setExternalProviders] = useState<Provider[] | null>(null);
     const [externalProvidersQuery, setExternalProvidersQuery] = useState<string | null>(null);
+
     const fetchExternalProviders: FormEventHandler = async (e) => {
         e.preventDefault();
         if (externalProvidersQuery)
@@ -489,12 +488,13 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                                                     provider.users.map((user: User) => (
                                                                         <li
                                                                             className="odd:bg-sidebar hover:bg-accent cursor-pointer px-4 py-1"
-                                                                            onClick={() => {
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
                                                                                 setUser(null);
                                                                                 addAssignee(user, provider.id);
                                                                             }}
                                                                         >
-                                                                            {user.full_name} -{user.email}
+                                                                            {user.full_name} - {user.email}
                                                                         </li>
                                                                     ))
                                                                 ) : (
@@ -527,41 +527,47 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                         <Button type="submit">{t('actions.search')}</Button>
                                     </div>
                                 </form>
-                                {externalProviders &&
-                                    externalProviders.length > 0 &&
-                                    externalProviders?.map((provider, i) => (
-                                        <ul>
-                                            <li
-                                                key={i}
-                                                className="mt-2 cursor-pointer font-bold"
-                                                onClick={() => {
-                                                    setInterventionAssignees([provider]);
-                                                    setProvider(provider.id);
-                                                    setUser(null);
-                                                }}
-                                            >
-                                                <p>
-                                                    {provider.name}
-                                                    <span className="ml-2 text-sm">({provider.email})</span>
-                                                </p>
-                                            </li>
-                                            {provider.users && provider.users.length > 0 && (
-                                                <ul className="mt-1">
-                                                    {provider.users.map((user) => (
-                                                        <li
-                                                            className="cursor-pointer"
-                                                            onClick={() => {
-                                                                setUser(null);
-                                                                addAssignee(user, provider.id);
-                                                            }}
-                                                        >
-                                                            {user.full_name} - {user.email}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            )}
-                                        </ul>
-                                    ))}
+                                <ul>
+                                    {externalProviders &&
+                                        externalProviders.length > 0 &&
+                                        externalProviders?.map((provider, i) => (
+                                            <>
+                                                <li
+                                                    key={provider.id}
+                                                    className="border-foreground mt-2 cursor-pointer border-t font-bold last:border-b"
+                                                    onClick={() => {
+                                                        setInterventionAssignees([provider]);
+                                                        setProvider(provider.id);
+                                                        setUser(null);
+                                                    }}
+                                                >
+                                                    <p className="hover:bg-accent bg-sidebar-border text-background dark:text-foreground px-2 py-1">
+                                                        {provider.name}
+                                                        <span className="ml-2 text-sm">({provider.email})</span>
+                                                    </p>
+                                                    <ul className="mt-1 font-normal">
+                                                        {provider.users && provider.users?.length > 0 ? (
+                                                            provider.users.map((user: User) => (
+                                                                <li
+                                                                    className="odd:bg-sidebar hover:bg-accent cursor-pointer px-4 py-1"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        setUser(null);
+                                                                        addAssignee(user, provider.id);
+                                                                    }}
+                                                                >
+                                                                    {user.full_name} -{user.email}
+                                                                </li>
+                                                            ))
+                                                        ) : (
+                                                            <p>{t('contacts.none')}</p>
+                                                        )}
+                                                    </ul>
+                                                </li>
+                                            </>
+                                        ))}
+                                    {externalProviders?.length === 0 && <li>No results...</li>}
+                                </ul>
                             </div>
                             <div className="flex w-full flex-col">
                                 <p className="font-semibold">{tChoice('contacts.title', 2)}</p>
@@ -625,7 +631,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
             )}
 
             {addIntervention && (
-                <ModaleForm title={t('actions.add-type', { type: tChoice('interventions.titel', 1) })}>
+                <ModaleForm title={t('actions.add-type', { type: tChoice('interventions.title', 1) })}>
                     {isProcessing && (
                         <div className="flex flex-col items-center gap-4">
                             <Loader size={48} className="animate-pulse" />
@@ -726,7 +732,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                 </div>
                             )}
                             <Label>{t('interventions.planned_at')}</Label>
-                            <div className="flex gap-2">
+                            <div className="flex items-center gap-2">
                                 <Input
                                     type="date"
                                     value={interventionDataForm.planned_at ?? ''}
@@ -751,7 +757,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                 </Button>
                             </div>
                             <Label>{t('interventions.repair_delay')}</Label>
-                            <div className="flex gap-2">
+                            <div className="flex items-center gap-2">
                                 <Input
                                     type="date"
                                     value={interventionDataForm.repair_delay ?? ''}
@@ -775,12 +781,14 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     {t('actions.clear-type', { type: t('interventions.repair_delay') })}
                                 </Button>
                             </div>
-                            <Button type="submit">
-                                <Label>{t('actions.submit')}</Label>
-                            </Button>
-                            <Button onClick={closeModale} type="button" variant={'secondary'}>
-                                <Label>{t('actions.cancel')}</Label>
-                            </Button>
+                            <div className="flex gap-4">
+                                <Button type="submit">
+                                    <Label>{t('actions.submit')}</Label>
+                                </Button>
+                                <Button onClick={closeModale} type="button" variant={'secondary'}>
+                                    <Label>{t('actions.cancel')}</Label>
+                                </Button>
+                            </div>
                         </form>
                     )}
                 </ModaleForm>

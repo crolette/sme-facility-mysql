@@ -51,7 +51,7 @@ function TableHeadData({ className, children,  ...props }: React.ComponentProps<
   return (
     <th
       data-slot="table-head-data"
-      className={cn("p-4 capitalize", className)}
+      className={cn("p-4 first-letter:uppercase", className)}
       {...props}
     >
       <p className="">{children}</p>

@@ -76,27 +76,10 @@ Route::middleware([
     Route::delete('/{provider}/logo', [APIRemoveProviderLogoController::class, 'destroy'])->name('api.providers.logo.destroy');
 
     Route::get('{provider}/interventions/', function (Provider $provider) {
-        Debugbar::info($provider);
-
-        Debugbar::info($provider->interventions()->with('pictures')->where('ticket_id', null)->get());
-        Debugbar::info($provider->assignedInterventions()->with('pictures')->where('ticket_id', null)->get());
-
-        // $allProviderInterventions = collect([]);
 
         $allProviderInterventions = $provider->interventions()->with('pictures')->where('ticket_id', null)->get();
-        // if (count($providerInterventions) > 0)
-        //     $allProviderInterventions->merge(...$providerInterventions);
 
         $allProviderInterventions->push(...$provider->assignedInterventions()->with('pictures')->where('ticket_id', null)->get());
-
-        // $providerAssignedInterventions = $provider->assignedInterventions()->with('pictures')->where('ticket_id', null)->get();
-
-        // if (count($providerAssignedInterventions) > 0)
-        //     $allProviderInterventions->merge(...$providerAssignedInterventions);
-
-
-        Debugbar::info($allProviderInterventions);
-
 
         return  $provider ? ApiResponse::success($allProviderInterventions) : ApiResponse::error('No interventions');
     })->name('api.providers.interventions');
