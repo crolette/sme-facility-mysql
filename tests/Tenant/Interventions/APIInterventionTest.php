@@ -35,17 +35,16 @@ beforeEach(function () {
     $this->building = Building::factory()->create();
     $this->floor = Floor::factory()->create();
 
-    $this->room = Room::factory()
-        ->for(LocationType::where('level', 'room')->first())
-        ->for(Floor::first())
-        ->create();
+    $this->room = Room::factory()->create();
+
+    $this->provider = Provider::factory()->create();
 
     $this->asset =  Asset::factory()->forLocation($this->room)->create();
     $this->asset->refresh();
     $this->ticket = Ticket::factory()->forLocation($this->asset)->create();
 });
 
-it('can get an intervention', function() {
+it('can get an intervention', function () {
     $intervention = Intervention::factory()->forLocation($this->asset)->create();
     $response = $this->getFromTenant('api.interventions.show', $intervention->id);
     $response->assertStatus(200)
@@ -53,7 +52,6 @@ it('can get an intervention', function() {
             'status' => 'success',
             'data' => ['id' => $intervention->id, 'interventionable' => ['id' => $this->asset->id]]
         ]);
-
 });
 
 
@@ -91,6 +89,8 @@ it('can get all interventions for an ASSET', function () {
         ])
         ->assertJsonCount(2, 'data');
 });
+
+
 
 it('can get all interventions for a SITE', function () {
     Intervention::factory()->forLocation($this->site)->count(2)->create();
@@ -137,4 +137,27 @@ it('can get all interventions for a ROOM', function () {
         ->assertJsonCount(2, 'data');
 });
 
+it('can get all interventions directly linked to a PROVIDER', function () {
+    Intervention::factory()->forProvider($this->provider)->count(2)->create();
+    $response = $this->getFromTenant('api.providers.interventions', $this->provider->id);
 
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ])
+        ->assertJsonCount(2, 'data');
+});
+
+it('can get all interventions directly linked to and assigned to a PROVIDER ', function () {
+    Intervention::factory()->forProvider($this->provider)->count(2)->create();
+    $intervention = Intervention::factory()->forProvider($this->room)->create();
+    $intervention->assignable()->associate($this->provider)->save();
+
+    $response = $this->getFromTenant('api.providers.interventions', $this->provider->id);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ])
+        ->assertJsonCount(3, 'data');
+});

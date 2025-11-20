@@ -291,7 +291,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
         setUser(null);
         setInterventionToSend(null);
         setIsProcessing(false);
-        fetchInterventions();
+        // fetchInterventions();
     };
 
     const addAssignee = (assignee: User | Provider, provider_id?: number) => {

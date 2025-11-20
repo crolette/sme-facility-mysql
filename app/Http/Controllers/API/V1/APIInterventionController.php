@@ -21,12 +21,13 @@ use App\Http\Requests\Tenant\TicketRequest;
 use App\Http\Requests\Tenant\InterventionRequest;
 use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Models\Tenants\Provider;
+use App\Services\InterventionService;
 use Illuminate\Support\Facades\Log;
 
 class APIInterventionController extends Controller
 {
 
-    public function __construct(protected PictureService $pictureService) {}
+    public function __construct(protected PictureService $pictureService, protected InterventionService $interventionService) {}
 
 
     public function show(Intervention $intervention)
@@ -41,41 +42,8 @@ class APIInterventionController extends Controller
         try {
             DB::beginTransaction();
 
-            $intervention = new Intervention(
-                $request->validated()
-            );
+            $intervention = $this->interventionService->create($request->validated());
 
-            if ($request->validated('ticket_id')) {
-                $ticket = Ticket::find($request->validated('ticket_id'));
-                $intervention->ticket()->associate($ticket);
-                $intervention->interventionable()->associate($ticket->ticketable);
-                $intervention->maintainable()->associate($ticket->ticketable->maintainable->id);
-            } else {
-
-                $modelMap = [
-                    'sites' => \App\Models\Tenants\Site::class,
-                    'buildings' => \App\Models\Tenants\Building::class,
-                    'floors' => \App\Models\Tenants\Floor::class,
-                    'rooms' => \App\Models\Tenants\Room::class,
-                    'asset' => \App\Models\Tenants\Asset::class,
-                    'providers' => \App\Models\Tenants\Provider::class,
-                ];
-
-
-                $model = $modelMap[$request->validated('locationType')];
-
-                if ($model === Provider::class) {
-                    $location = $model::where('id', $request->validated('locationId'))->first();
-                    $intervention->interventionable()->associate($location);
-                } else {
-                    $location = $model::where('reference_code', $request->validated('locationId'))->first();
-                    $intervention->interventionable()->associate($location);
-                    $intervention->maintainable()->associate($location->maintainable->id);
-                }
-            }
-
-            $intervention->interventionType()->associate($request->validated('intervention_type_id'));
-            $intervention->save();
 
             if ($pictureUploadRequest->validated('pictures')) {
                 $this->pictureService->uploadAndAttachPictures($intervention, $pictureUploadRequest->validated('pictures'));
@@ -98,11 +66,7 @@ class APIInterventionController extends Controller
         try {
             DB::beginTransaction();
 
-            $intervention->update([
-                ...$request->safe()->except('locationType', 'locationId', 'ticket_id')
-            ]);
-            $intervention->interventionType()->associate($request->validated('intervention_type_id'));
-            $intervention->save();
+            $intervention = $this->interventionService->update($intervention, $request->safe()->except('locationType', 'locationId', 'ticket_id'));
 
             if ($pictureUploadRequest->validated('pictures')) {
                 $this->pictureService->uploadAndAttachPictures($intervention, $pictureUploadRequest->validated('pictures'));
@@ -120,7 +84,9 @@ class APIInterventionController extends Controller
 
     public function destroy(Intervention $intervention)
     {
-        $intervention->delete();
-        return ApiResponse::success(null, 'Intervention deleted');
+        $deleted = $this->interventionService->delete($intervention);
+
+        return $deleted ? ApiResponse::success(null, 'Intervention deleted') : ApiResponse::error('Error during intervention deletion');
+        // return ApiResponse::success(null, 'Intervention deleted');
     }
 }

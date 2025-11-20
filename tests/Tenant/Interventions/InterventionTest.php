@@ -10,10 +10,11 @@ use App\Models\Tenants\Floor;
 use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Building;
 
-use App\Models\Central\CategoryType;
-use App\Models\Tenants\Intervention;
+use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
+use App\Models\Central\CategoryType;
 
+use App\Models\Tenants\Intervention;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
@@ -29,6 +30,7 @@ beforeEach(function () {
     $this->site = Site::factory()->create();
     $this->building = Building::factory()->create();
     $this->floor = Floor::factory()->create();
+    $this->provider = Provider::factory()->create();
 
     $this->room = Room::factory()->create();
 
@@ -40,21 +42,10 @@ beforeEach(function () {
 it('can factory intervention', function () {
     Intervention::factory()->forLocation($this->asset)->create();
     Intervention::factory()->forTicket($this->ticket)->create();
-    assertDatabaseCount('interventions', 2);
-    assertDatabaseCount('intervention_actions', 2);
+    Intervention::factory()->forProvider($this->provider)->create();
+    assertDatabaseCount('interventions', 3);
+    assertDatabaseCount('intervention_actions', 3);
 });
-
-// it('shows the create intervention page for a ticket', function () {
-
-//     $response = $this->getFromTenant('tenant.interventions.create', $this->ticket);
-//     $response->assertOk();
-
-//     $response->assertInertia(
-//         fn($page) => $page->component('tenants/tickets/interventions/create')
-//             ->has('ticket')
-//             ->where('ticket.id', $this->ticket->id)
-//     );
-// });
 
 it('shows an intervention page', function () {
     $intervention = Intervention::factory()->forLocation($this->asset)->create(['ticket_id' => $this->ticket->id]);
@@ -70,17 +61,17 @@ it('shows an intervention page', function () {
     );
 });
 
-// it('shows the index interventions page', function () {
-//     Intervention::factory()->forLocation($this->asset)->count(2)->create();
+it('shows the index interventions page', function () {
+    Intervention::factory()->forLocation($this->asset)->count(2)->create();
 
-//     $response = $this->getFromTenant('tenant.interventions.index');
-//     $response->assertOk();
+    $response = $this->getFromTenant('tenant.interventions.index');
+    $response->assertOk();
 
-//     $response->assertInertia(
-//         fn($page) => $page->component('tenants/tickets/interventions/index')
-//             ->has('interventions', 2)
-//     );
-// });
+    $response->assertInertia(
+        fn($page) => $page->component('tenants/interventions/IndexInterventions')
+            ->has('items', 2)
+    );
+});
 
 it('can create a new intervention for a TICKET', function () {
 
@@ -340,7 +331,3 @@ it('can upload pictures when creating an intervention', function () {
     foreach ($pictures as $picture)
         expect(Storage::disk('tenants')->exists($picture->path))->toBeTrue();
 });
-
-// it('can create a new intervention not linked to asset/location', function() {
-
-// });
