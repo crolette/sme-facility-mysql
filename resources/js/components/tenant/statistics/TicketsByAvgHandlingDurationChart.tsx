@@ -1,14 +1,12 @@
-import { useChartOptions } from '@/hooks/useChartOptions';
 import { useDashboardFilters } from '@/pages/tenants/statistics/IndexStatistics';
 import axios from 'axios';
-import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LineElement, LinearScale, PointElement, Title, Tooltip } from 'chart.js';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useEffect, useState } from 'react';
-import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import ButtonsChart from './buttonsChart';
 import ButtonsPeriod from './buttonsPeriod';
-
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
+import HorizontalBarChart from './HorizontalBarChart';
+import LineChart from './LineChart';
+import VerticalBarChart from './VerticalBarChart';
 
 export const TicketsByAvgHandlingDurationChart = ({ ticketsByAvgHandlingDuration }: { ticketsByAvgHandlingDuration: [] }) => {
     const { t, tChoice } = useLaravelReactI18n();
@@ -60,19 +58,6 @@ export const TicketsByAvgHandlingDurationChart = ({ ticketsByAvgHandlingDuration
         if (period || dateFrom || dateTo) fetchTicketsByAvgHandlingDuration();
     }, [period, dateFrom, dateTo]);
 
-    const { datasetStyle, baseOptions } = useChartOptions('ticketsByAvgHandlingDuration', type);
-
-    const data = {
-        labels: labels,
-        datasets: [
-            {
-                label: 'ticketsByAvgHandlingDuration',
-                data: dataCount,
-                ...datasetStyle,
-            },
-        ],
-    };
-
     return (
         <>
             <div className="min-h-80">
@@ -86,13 +71,15 @@ export const TicketsByAvgHandlingDurationChart = ({ ticketsByAvgHandlingDuration
                     <p>{t('statistics.no_datas')}</p>
                 ) : (
                     <>
-                        {(type === 'horizontalBar' || type === 'verticalBar') && (
-                            <p>
-                                <Bar options={baseOptions} data={data} />
-                            </p>
+                        {type === 'horizontalBar' && (
+                            <HorizontalBarChart type={type} labels={labels} dataCount={dataCount} chartName="TicketsByAvgDuration" />
                         )}
-                        {type === 'line' && <Line options={baseOptions} data={data} />}
-                        {type === 'doughnut' && <Doughnut options={baseOptions} data={data} />}
+
+                        {type === 'verticalBar' && (
+                            <VerticalBarChart type={type} labels={labels} dataCount={dataCount} chartName="TicketsByAvgDuration" />
+                        )}
+
+                        {type === 'line' && <LineChart type={type} labels={labels} dataCount={dataCount} chartName="TicketsByAvgDuration" />}
                     </>
                 )}
             </div>

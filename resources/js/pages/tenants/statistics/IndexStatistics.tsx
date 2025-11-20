@@ -53,11 +53,15 @@ export default function IndexStatistics({
             <Head title={t('statistics.title')} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <h1>{t('statistics.title')}</h1>
-                <div className="flex items-center gap-4">
-                    <Label>{t('common.from')}</Label>
-                    <input type="date" name="dateFrom" id="" value={dateFrom ?? '2025-01-01'} onChange={(e) => setDateFrom(e.target.value)} />
-                    <Label>{t('common.to')}</Label>
-                    <input type="date" name="dateTo" id="" value={dateTo ?? '2025-12-31'} onChange={(e) => setDateTo(e.target.value)} />
+                <div className="flex flex-wrap items-center gap-4">
+                    <div className="space-x-2">
+                        <Label>{t('common.from')}</Label>
+                        <input type="date" name="dateFrom" id="" value={dateFrom ?? '2025-01-01'} onChange={(e) => setDateFrom(e.target.value)} />
+                    </div>
+                    <div className="space-x-2">
+                        <Label>{t('common.to')}</Label>
+                        <input type="date" name="dateTo" id="" value={dateTo ?? '2025-12-31'} onChange={(e) => setDateTo(e.target.value)} />
+                    </div>
                     <Button
                         onClick={() => {
                             setDateFrom(null);
@@ -70,19 +74,21 @@ export default function IndexStatistics({
 
                 <DashboardFiltersContext.Provider value={{ dateFrom, dateTo }}>
                     <h2>{tChoice('interventions.title', 2)}</h2>
-                    <div className="border-accent grid w-full grid-cols-1 gap-10 border-b-2 lg:grid-cols-3">
+                    <div className="border-accent flex w-full flex-wrap gap-10 border-b-2">
                         <InterventionsByTypeChart interventionsByType={interventionsByType} />
                         <InterventionsByStatusChart interventionsByStatus={interventionsByStatus} />
                         <InterventionsByAssigneeChart interventionsByAssignee={interventionsByAssignee} />
                     </div>
                     <h2>{tChoice('tickets.title', 2)}</h2>
-                    <div className="border-accent grid w-full grid-cols-1 gap-10 border-b-2 lg:grid-cols-3">
+                    <div className="border-accent flex w-full flex-wrap gap-10 border-b-2">
                         <TicketsByPeriodChart ticketsByPeriod={ticketsByPeriod} />
                         <TicketsByAvgDurationChart ticketsAvgDuration={ticketsAvgDuration} />
                         <TicketsByAvgHandlingDurationChart ticketsByAvgHandlingDuration={ticketsByAvgHandlingDuration} />
                     </div>
-                    <h2>Assets/Locations</h2>
-                    <div className="border-accent grid w-full grid-cols-1 gap-10 border-b-2 lg:grid-cols-3">
+                    <h2>
+                        {tChoice('assets.title', 2)}/{tChoice('locations.location', 2)}
+                    </h2>
+                    <div className="border-accent flex w-full flex-wrap gap-10 border-b-2">
                         <TicketsByItemChart ticketsByAssetOrLocations={ticketsByAssetOrLocations} />
                     </div>
                 </DashboardFiltersContext.Provider>

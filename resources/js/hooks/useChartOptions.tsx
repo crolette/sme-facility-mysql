@@ -1,4 +1,4 @@
-export const useChartOptions = (title?: string, type: 'doughnut' | 'horizontalBar' | 'verticalBar' | 'line') => {
+export const useChartOptions = (title?: string, type: 'doughnut' | 'horizontalBar' | 'verticalBar' | 'line', datas?: string[] | number[]) => {
     const rootStyles = getComputedStyle(document.documentElement);
     const gridColor = rootStyles.getPropertyValue('--sidebar-accent').trim();
     const textColor = rootStyles.getPropertyValue('--foreground').trim();
@@ -31,32 +31,40 @@ export const useChartOptions = (title?: string, type: 'doughnut' | 'horizontalBa
                 text: title,
                 color: textColor,
             },
+            datalabels: {
+                color: textColor, // Label color
+                anchor: 'end', // Position the label near the bar's edge
+                align: 'top', // Align the label to the top of the bar
+                formatter: (value) => parseInt(value), // Format the label (e.g., show the value)
+            },
         },
         scales: {
             x: {
                 grid: {
-                    color: gridColor, // Couleur des lignes verticales
-                    lineWidth: 1, // Épaisseur
-                    display: true, // Afficher ou non
-                },
-                ticks: {
-                    color: textColor, // Couleur du texte des labels
-                },
-            },
-            y: {
-                // min: 0,
-                grid: {
-                    color: gridColor, // Couleur des lignes horizontales
+                    color: gridColor,
                     lineWidth: 1,
                     display: true,
                 },
                 ticks: {
                     color: textColor,
-                    stepSize: 1,
+                    stepSize: 5,
+                },
+            },
+            y: {
+                grid: {
+                    color: gridColor,
+                    lineWidth: 1,
+                    display: true,
+                },
+                ticks: {
+                    color: textColor,
+                    stepSize: 5,
                 },
             },
         },
     };
 
-    return { datasetStyle, baseOptions };
+    const max = Math.ceil((Math.max(...datas) * 1.15) / 10) * 10;
+
+    return { datasetStyle, baseOptions, max };
 };
