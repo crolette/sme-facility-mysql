@@ -9,6 +9,7 @@ use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Company;
 use App\Models\Central\CategoryType;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -108,6 +109,21 @@ class Document extends Model
             ->merge($this->buildings)
             ->merge($this->floors)
             ->merge($this->rooms);
+    }
+
+    public function scopeWithManager($query, $user)
+    {
+        $query->whereHas('assets.maintainable', function (Builder $query) use ($user) {
+            $query->where('maintenance_manager_id', $user->id);
+        })->orWhereHas('rooms.maintainable', function (Builder $query) use ($user) {
+            $query->where('maintenance_manager_id', $user->id);
+        })->orWhereHas('floors.maintainable', function (Builder $query) use ($user) {
+            $query->where('maintenance_manager_id', $user->id);
+        })->orWhereHas('buildings.maintainable', function (Builder $query) use ($user) {
+            $query->where('maintenance_manager_id', $user->id);
+        })->orWhereHas('sites.maintainable', function (Builder $query) use ($user) {
+            $query->where('maintenance_manager_id', $user->id);
+        });
     }
 
 

@@ -58,7 +58,10 @@ beforeEach(function () {
         'name' => 'Facility Web Experience SPRL',
         'email' => 'info@facilitywebxp.be',
         'vat_number' => 'BE0123456789',
-        'address' => 'Rue sur le Hour 16A, 4910 La Reid, Belgique',
+        'street' => fake()->streetName(),
+        'postal_code' => '' . fake()->randomNumber(4, true) . '',
+        'city' => fake()->city(),
+        'country_code' => 'BEL',
         'phone_number' => '+32450987654',
         'categoryId' => $this->categoryType->id,
         'website' => 'www.website.com',
@@ -173,7 +176,7 @@ test('test access roles to post a new logo to a provider', function (string $rol
     $this->actingAs($user, 'tenant');
 
     $file1 = UploadedFile::fake()->image('avatar.png');
-    
+
     $formData = ['pictures' => [$file1]];
 
     $response = $this->postToTenant('api.providers.logo.store', $formData, $this->provider);

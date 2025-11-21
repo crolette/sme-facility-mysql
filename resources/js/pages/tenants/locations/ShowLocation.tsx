@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import Field from '@/components/ui/field';
 import AppLayout from '@/layouts/app-layout';
 import { Contract, TenantBuilding, TenantFloor, TenantRoom, TenantSite, type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { CircleCheckBig, Move, Pencil, QrCode } from 'lucide-react';
@@ -22,6 +22,7 @@ import { useState } from 'react';
 
 export default function ShowLocation({ item, routeName }: { item: TenantSite | TenantBuilding | TenantFloor | TenantRoom; routeName: string }) {
     const { showToast } = useToast();
+    const { permissions } = usePage().props.auth;
     const [location, setLocation] = useState(item);
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
@@ -111,23 +112,27 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
             <Head title={item.name + ' - ' + item.reference_code} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex flex-wrap gap-2">
-                    <a href={route(`tenant.${routeName}.edit`, location.reference_code)}>
-                        <Button>
-                            <Pencil />
-                            {t('actions.edit')}
-                        </Button>
-                    </a>
-
-                    {location.maintainable.need_maintenance && (
-                        <Button onClick={() => markMaintenanceDone()} variant={'green'}>
-                            <CircleCheckBig />
-                            {t('maintenances.mark_done')}
-                        </Button>
+                    {permissions.find((item) => item == 'update locations') && (
+                        <>
+                            <a href={route(`tenant.${routeName}.edit`, location.reference_code)}>
+                                <Button>
+                                    <Pencil />
+                                    {t('actions.edit')}
+                                </Button>
+                            </a>
+                            {location.maintainable.need_maintenance && (
+                                <Button onClick={() => markMaintenanceDone()} variant={'green'}>
+                                    <CircleCheckBig />
+                                    {t('maintenances.mark_done')}
+                                </Button>
+                            )}
+                        </>
                     )}
                     <Button onClick={generateQR} variant={'secondary'}>
                         <QrCode /> {t('actions.generate_qr')}
                     </Button>
-                    {routeName === 'rooms' && (
+
+                    {permissions.find((item) => item == 'create locations') && routeName === 'rooms' && (
                         <Button variant={'secondary'} onClick={() => setShowModaleRelocateRoom(!showModaleRelocateRoom)}>
                             <Move />
                             {t('locations.rooms.relocate')}

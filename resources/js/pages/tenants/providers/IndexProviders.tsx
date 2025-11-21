@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, CentralType, Provider, ProvidersPaginated } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { LayoutGrid, Loader, Pencil, PlusCircle, TableIcon, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -27,6 +27,7 @@ export default function IndexProviders({
     categories: CentralType[];
     filters: SearchParams;
 }) {
+    const { permissions } = usePage().props.auth;
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -151,12 +152,14 @@ export default function IndexProviders({
                             </Button>
                         </div>
                     </details>
-                    <a href={route(`tenant.providers.create`)}>
-                        <Button>
-                            <PlusCircle />
-                            {t('actions.add-type', { type: tChoice('providers.title', 1) })}
-                        </Button>
-                    </a>
+                    {permissions.find((item) => item == 'create providers') && (
+                        <a href={route(`tenant.providers.create`)}>
+                            <Button>
+                                <PlusCircle />
+                                {t('actions.add-type', { type: tChoice('providers.title', 1) })}
+                            </Button>
+                        </a>
+                    )}
                 </div>
                 <div className="flex gap-4">
                     <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('grid')}>

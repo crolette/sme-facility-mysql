@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Tenants\Document;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Validator;
 
@@ -25,6 +26,11 @@ class DocumentsController extends Controller
 
         $validatedFields = $validator->validated();
         $documents = Document::query();
+
+
+        if (Auth::user()->hasRole('Maintenance Manager')) {
+            $documents->withManager(Auth::user());
+        }
 
         if (isset($validatedFields['type'])) {
             $documents->where('category_type_id', $validatedFields['type']);

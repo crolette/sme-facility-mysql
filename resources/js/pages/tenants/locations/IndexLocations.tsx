@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, CentralType, PaginatedData, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -35,6 +35,7 @@ export default function IndexSites({
     filters: SearchParams;
     categories: CentralType[];
 }) {
+    const { permissions } = usePage().props.auth;
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -191,20 +192,22 @@ export default function IndexSites({
                         </div>
                     </details>
 
-                    <div className="flex space-x-2">
-                        <a href={route(`tenant.${routeName}.create`)}>
-                            <Button>
-                                <PlusCircle />
-                                {t('actions.create')}
-                            </Button>
-                        </a>
-                        <a href={route('tenant.pdf.qr-codes', { type: routeName })} target="__blank">
-                            <Button variant={'secondary'}>
-                                <BiSolidFilePdf size={20} />
-                                {t('actions.download-type', { type: tChoice('common.qr_codes', 2) })}
-                            </Button>
-                        </a>
-                    </div>
+                    {permissions.find((item) => item == 'create locations') && (
+                        <div className="flex space-x-2">
+                            <a href={route(`tenant.${routeName}.create`)}>
+                                <Button>
+                                    <PlusCircle />
+                                    {t('actions.create')}
+                                </Button>
+                            </a>
+                            <a href={route('tenant.pdf.qr-codes', { type: routeName })} target="__blank">
+                                <Button variant={'secondary'}>
+                                    <BiSolidFilePdf size={20} />
+                                    {t('actions.download-type', { type: tChoice('common.qr_codes', 2) })}
+                                </Button>
+                            </a>
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex gap-4">
@@ -248,6 +251,8 @@ export default function IndexSites({
                                         </p>
                                     </TableBodyData>
                                 </TableBodyRow>
+                            ) : locations.length === 0 ? (
+                                <p>No results... </p>
                             ) : (
                                 locations &&
                                 locations.map((item, index) => {

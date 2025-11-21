@@ -10,7 +10,7 @@ import Field from '@/components/ui/field';
 import AppLayout from '@/layouts/app-layout';
 import { Asset, Contract, type BreadcrumbItem } from '@/types';
 import { router } from '@inertiajs/core';
-import { Head } from '@inertiajs/react';
+import { Head, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArchiveRestore, CircleCheckBig, Pencil, QrCode, Shredder, Trash2 } from 'lucide-react';
@@ -18,9 +18,10 @@ import { useState } from 'react';
 
 export default function ShowAsset({ item }: { item: Asset }) {
     const { t, tChoice } = useLaravelReactI18n();
+    const { permissions } = usePage().props.auth;
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Index assets`,
+            title: `Index ${tChoice('assets.title', 2)}`,
             href: `/assets`,
         },
         {
@@ -109,31 +110,41 @@ export default function ShowAsset({ item }: { item: Asset }) {
                 <div className="flex flex-wrap items-center gap-4">
                     {asset.deleted_at ? (
                         <>
-                            <Button onClick={() => restoreAsset(asset)} variant={'green'}>
-                                <ArchiveRestore />
-                                {t('actions.restore')}
-                            </Button>
-                            <Button onClick={() => deleteDefinitelyAsset(asset)} variant={'destructive'}>
-                                <Shredder />
-                                {t('actions.delete_definitely')}
-                            </Button>
+                            {permissions.find((item) => item == 'restore assets') && (
+                                <Button onClick={() => restoreAsset(asset)} variant={'green'}>
+                                    <ArchiveRestore />
+                                    {t('actions.restore')}
+                                </Button>
+                            )}
+                            {permissions.find((item) => item == 'force delete assets') && (
+                                <Button onClick={() => deleteDefinitelyAsset(asset)} variant={'destructive'}>
+                                    <Shredder />
+                                    {t('actions.delete_definitely')}
+                                </Button>
+                            )}
                         </>
                     ) : (
                         <>
-                            <a href={route(`tenant.assets.edit`, asset.reference_code)}>
-                                <Button>
-                                    <Pencil />
-                                    {t('actions.edit')}
-                                </Button>
-                            </a>
-                            <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
-                                <Trash2 />
-                                {t('actions.delete')}
-                            </Button>
-                            {asset.maintainable.need_maintenance && (
-                                <Button onClick={() => markMaintenanceDone()} variant={'green'}>
-                                    <CircleCheckBig />
-                                    {t('maintenances.mark_as_done')}
+                            {permissions.find((item) => item == 'update assets') && (
+                                <>
+                                    <a href={route(`tenant.assets.edit`, asset.reference_code)}>
+                                        <Button>
+                                            <Pencil />
+                                            {t('actions.edit')}
+                                        </Button>
+                                    </a>
+                                    {asset.maintainable.need_maintenance && (
+                                        <Button onClick={() => markMaintenanceDone()} variant={'green'}>
+                                            <CircleCheckBig />
+                                            {t('maintenances.mark_as_done')}
+                                        </Button>
+                                    )}
+                                </>
+                            )}
+                            {permissions.find((item) => item == 'delete assets') && (
+                                <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
+                                    <Trash2 />
+                                    {t('actions.delete')}
                                 </Button>
                             )}
                         </>
@@ -160,7 +171,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h2>Asset information</h2>
+                                <h2>{t('common.information')}</h2>
                                 <div className="grid grid-cols-[1fr_160px] gap-4">
                                     <div className="space-y-2">
                                         <Field label={t('common.name')} text={asset.name} />

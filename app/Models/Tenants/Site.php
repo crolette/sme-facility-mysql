@@ -11,6 +11,7 @@ use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -222,5 +223,13 @@ class Site extends Model
         return Attribute::make(
             get: fn() => 'data:' . $mimeType . ';base64,' . base64_encode($imageData)
         );
+    }
+
+    // SCOPES
+    public function scopeWhereMaintenanceManagerIsUser($query, $user)
+    {
+        $query->whereHas('maintainable', function (Builder $query) use ($user) {
+            $query->where('maintenance_manager_id', $user->id);
+        });
     }
 }

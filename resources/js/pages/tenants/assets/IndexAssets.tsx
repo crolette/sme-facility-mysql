@@ -9,7 +9,7 @@ import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { Asset, AssetsPaginated, BreadcrumbItem, CentralType } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArchiveRestore, LayoutGrid, Loader, Pencil, PlusCircle, Shredder, TableIcon, Trash2, X } from 'lucide-react';
@@ -27,6 +27,7 @@ export interface SearchParams {
 
 export default function IndexAssets({ items, filters, categories }: { items: AssetsPaginated; filters: SearchParams; categories: CentralType[] }) {
     const { t, tChoice } = useLaravelReactI18n();
+    const { permissions } = usePage().props.auth;
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index ${tChoice('assets.title', 2)}`,
@@ -279,20 +280,22 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                 </Button>
                             </div>
                         </details>
-                        <div className="flex space-x-2">
-                            <a href={route(`tenant.assets.create`)} className="w-fit">
-                                <Button>
-                                    <PlusCircle />
-                                    {t('actions.create')}
-                                </Button>
-                            </a>
-                            <a href={route('tenant.pdf.qr-codes', { type: 'assets' })} target="__blank">
-                                <Button variant={'secondary'}>
-                                    <BiSolidFilePdf size={20} />
-                                    {t('actions.download-type', { type: tChoice('common.qr_codes', 2) })}
-                                </Button>
-                            </a>
-                        </div>
+                        {permissions.find((item) => item == 'create assets') && (
+                            <div className="flex space-x-2">
+                                <a href={route(`tenant.assets.create`)} className="w-fit">
+                                    <Button>
+                                        <PlusCircle />
+                                        {t('actions.create')}
+                                    </Button>
+                                </a>
+                                <a href={route('tenant.pdf.qr-codes', { type: 'assets' })} target="__blank">
+                                    <Button variant={'secondary'}>
+                                        <BiSolidFilePdf size={20} />
+                                        {t('actions.download-type', { type: tChoice('common.qr_codes', 2) })}
+                                    </Button>
+                                </a>
+                            </div>
+                        )}
                     </div>
                 </div>
 

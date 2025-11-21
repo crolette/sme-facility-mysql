@@ -9,7 +9,7 @@ import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { BreadcrumbItem, PaginatedData, TicketStatus } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArrowDownNarrowWide, ArrowDownWideNarrow, LayoutGrid, Loader, TableIcon, X } from 'lucide-react';
@@ -24,6 +24,10 @@ export interface SearchParams {
 
 export default function IndexTickets({ items, filters, statuses }: { items: PaginatedData; filters: SearchParams; statuses: TicketStatus }) {
     const { t, tChoice } = useLaravelReactI18n();
+    const { permissions } = usePage().props.auth;
+
+    console.log(permissions);
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index ${tChoice('tickets', 2)}`,

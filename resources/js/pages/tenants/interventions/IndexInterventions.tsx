@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Intervention, InterventionStatus, PaginatedData, PriorityLevel } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArrowDownNarrowWide, ArrowDownWideNarrow, LayoutGrid, Loader, Pencil, TableIcon, Trash2, X } from 'lucide-react';
@@ -57,6 +57,7 @@ export default function IndexInterventions({
     types: CentralType[];
 }) {
     const { t, tChoice } = useLaravelReactI18n();
+    const { permissions } = usePage().props.auth;
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index ${tChoice('interventions.title', 2)}`,
@@ -511,19 +512,23 @@ export default function IndexInterventions({
                                             <TableBodyData className="flex space-x-2">
                                                 {!closed && (
                                                     <>
-                                                        <Button onClick={() => editIntervention(item.id)}>
-                                                            <Pencil />
-                                                        </Button>
-                                                        <Button
-                                                            type="button"
-                                                            variant="destructive"
-                                                            onClick={() => {
-                                                                setInterventionToDelete(item);
-                                                                setShowDeleteInterventionModale(true);
-                                                            }}
-                                                        >
-                                                            <Trash2 />
-                                                        </Button>
+                                                        {permissions.find((item) => item == 'update interventions') && (
+                                                            <Button onClick={() => editIntervention(item.id)}>
+                                                                <Pencil />
+                                                            </Button>
+                                                        )}
+                                                        {permissions.find((item) => item == 'delete interventions') && (
+                                                            <Button
+                                                                type="button"
+                                                                variant="destructive"
+                                                                onClick={() => {
+                                                                    setInterventionToDelete(item);
+                                                                    setShowDeleteInterventionModale(true);
+                                                                }}
+                                                            >
+                                                                <Trash2 />
+                                                            </Button>
+                                                        )}
                                                     </>
                                                 )}
                                             </TableBodyData>

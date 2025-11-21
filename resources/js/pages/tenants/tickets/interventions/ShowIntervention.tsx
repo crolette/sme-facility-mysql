@@ -14,7 +14,7 @@ import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Intervention, InterventionStatus, Provider, User } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Loader, Pencil, Trash2, X } from 'lucide-react';
@@ -29,6 +29,7 @@ export default function ShowIntervention({
     statuses: InterventionStatus[];
     types: CentralType[];
 }) {
+    const { permissions } = usePage().props.auth;
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -273,19 +274,23 @@ export default function ShowIntervention({
                         <Button onClick={() => sendIntervention(intervention.id)} variant={'cta'}>
                             {t('interventions.assign_to')}
                         </Button>
-                        <Button onClick={() => editIntervention(intervention.id)}>
-                            <Pencil />
-                        </Button>
-                        <Button
-                            type="button"
-                            variant="destructive"
-                            onClick={() => {
-                                setInterventionToDelete(intervention);
-                                setShowDeleteInterventionModale(true);
-                            }}
-                        >
-                            <Trash2 />
-                        </Button>
+                        {permissions.find((item) => item == 'update interventions') && (
+                            <Button onClick={() => editIntervention(intervention.id)}>
+                                <Pencil />
+                            </Button>
+                        )}
+                        {permissions.find((item) => item == 'delete interventions') && (
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                onClick={() => {
+                                    setInterventionToDelete(intervention);
+                                    setShowDeleteInterventionModale(true);
+                                }}
+                            >
+                                <Trash2 />
+                            </Button>
+                        )}
                     </div>
                 </div>
                 <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_6fr]">

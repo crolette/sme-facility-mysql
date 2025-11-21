@@ -11,14 +11,14 @@ use Illuminate\Support\Facades\Gate;
 
 class ImportExportController extends Controller
 {
-    public function show() 
+    public function show()
     {
 
-        if (!Gate::allows('export-excel')) {
+        if (!Gate::allows('export excel')) {
             ApiResponse::notAuthorized();
             return redirect()->back();
         }
-        
+
         return Inertia::render('settings/import-export');
     }
 }
