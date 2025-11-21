@@ -1,12 +1,13 @@
-import { useChartOptions } from '@/hooks/useChartOptions';
 import { useDashboardFilters } from '@/pages/tenants/statistics/IndexStatistics';
 import axios from 'axios';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LineElement, LinearScale, PointElement, Title, Tooltip } from 'chart.js';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useEffect, useState } from 'react';
-import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import ButtonsChart from './buttonsChart';
 import ButtonsPeriod from './buttonsPeriod';
+import HorizontalBarChart from './HorizontalBarChart';
+import LineChart from './LineChart';
+import VerticalBarChart from './VerticalBarChart';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
@@ -60,19 +61,6 @@ export const TicketsByPeriodChart = ({ ticketsByPeriod }: { ticketsByPeriod: [] 
         if (period || dateFrom || dateTo) fetchTicketsByPeriod();
     }, [period, dateFrom, dateTo]);
 
-    const { datasetStyle, baseOptions } = useChartOptions('TicketsByPeriod', type);
-
-    const data = {
-        labels: labels,
-        datasets: [
-            {
-                label: 'TicketsByPeriod',
-                data: dataCount,
-                ...datasetStyle,
-            },
-        ],
-    };
-
     return (
         <div className="min-h-80">
             <div className="flex justify-between">
@@ -85,13 +73,11 @@ export const TicketsByPeriodChart = ({ ticketsByPeriod }: { ticketsByPeriod: [] 
                 <p>{t('statistics.no_datas')}</p>
             ) : (
                 <>
-                    {(type === 'horizontalBar' || type === 'verticalBar') && (
-                        <p>
-                            <Bar options={baseOptions} data={data} />
-                        </p>
-                    )}
-                    {type === 'line' && <Line options={baseOptions} data={data} />}
-                    {type === 'doughnut' && <Doughnut options={baseOptions} data={data} />}
+                    {type === 'horizontalBar' && <HorizontalBarChart type={type} labels={labels} dataCount={dataCount} chartName="TicketsByPeriod" />}
+
+                    {type === 'verticalBar' && <VerticalBarChart type={type} labels={labels} dataCount={dataCount} chartName="TicketsByPeriod" />}
+
+                    {type === 'line' && <LineChart type={type} labels={labels} dataCount={dataCount} chartName="TicketsByAvgDuration" />}
                 </>
             )}
         </div>

@@ -1,11 +1,12 @@
-import { useChartOptions } from '@/hooks/useChartOptions';
 import { useDashboardFilters } from '@/pages/tenants/statistics/IndexStatistics';
 import axios from 'axios';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LineElement, LinearScale, PointElement, Title, Tooltip } from 'chart.js';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useEffect, useState } from 'react';
-import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import ButtonsChart from './buttonsChart';
+import DoughnutChart from './DoughnutChart';
+import HorizontalBarChart from './HorizontalBarChart';
+import VerticalBarChart from './VerticalBarChart';
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
 
@@ -58,19 +59,6 @@ export const InterventionsByTypeChart = ({ interventionsByType }: { intervention
         if (dateFrom || dateTo) fetchInterventionsByType();
     }, [dateFrom, dateTo]);
 
-    const { datasetStyle, baseOptions } = useChartOptions('InterventionsByType', type);
-
-    const data = {
-        labels: labels,
-        datasets: [
-            {
-                label: 'InterventionsByTypeChart',
-                data: dataCount,
-                ...datasetStyle,
-            },
-        ],
-    };
-
     return (
         <div className="min-h-80">
             <ButtonsChart setType={setType} types={['horizontalBar', 'verticalBar', 'doughnut']} />
@@ -80,13 +68,13 @@ export const InterventionsByTypeChart = ({ interventionsByType }: { intervention
                 <p>{t('statistics.no_datas')}</p>
             ) : (
                 <>
-                    {(type === 'horizontalBar' || type === 'verticalBar') && (
-                        <p>
-                            <Bar options={baseOptions} data={data} />
-                        </p>
+                    {type === 'horizontalBar' && (
+                        <HorizontalBarChart type={type} labels={labels} dataCount={dataCount} chartName="InterventionsByType" />
                     )}
-                    {type === 'line' && <Line options={baseOptions} data={data} />}
-                    {type === 'doughnut' && <Doughnut options={baseOptions} data={data} />}
+
+                    {type === 'verticalBar' && <VerticalBarChart type={type} labels={labels} dataCount={dataCount} chartName="InterventionsByType" />}
+
+                    {type === 'doughnut' && <DoughnutChart type={type} labels={labels} dataCount={dataCount} chartName="InterventionsByType" />}
                 </>
             )}
         </div>

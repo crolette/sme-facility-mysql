@@ -1,13 +1,28 @@
-import { useChartOptions } from '@/hooks/useChartOptions';
 import { useDashboardFilters } from '@/pages/tenants/statistics/IndexStatistics';
 import axios from 'axios';
 import { ArcElement, BarElement, CategoryScale, Chart as ChartJS, Legend, LineElement, LinearScale, PointElement, Title, Tooltip } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { useEffect, useState } from 'react';
-import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import ButtonsChart from './buttonsChart';
+import DoughnutChart from './DoughnutChart';
+import HorizontalBarChart from './HorizontalBarChart';
+import VerticalBarChart from './VerticalBarChart';
 
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend);
+ChartJS.register(
+    ArcElement,
+    Tooltip,
+    Legend,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    BarElement,
+    Title,
+    Tooltip,
+    Legend,
+    ChartDataLabels,
+);
 
 export const InterventionsByStatusChart = ({ interventionsByStatus }: { interventionsByStatus: [] }) => {
     const { t } = useLaravelReactI18n();
@@ -17,7 +32,7 @@ export const InterventionsByStatusChart = ({ interventionsByStatus }: { interven
 
     const [labels, setLabels] = useState<string[]>(
         Object.entries(interventionsByStatus).map((item) => {
-            return item[0];
+            return t(`interventions.status.${item[0]}`);
         }),
     );
 
@@ -57,18 +72,6 @@ export const InterventionsByStatusChart = ({ interventionsByStatus }: { interven
         if (dateFrom || dateTo) fetchInterventionsByStatus();
     }, [dateFrom, dateTo]);
 
-    const { datasetStyle, baseOptions } = useChartOptions('InterventionsbyStatus', type);
-
-    const data = {
-        labels: labels,
-        datasets: [
-            {
-                data: dataCount,
-                ...datasetStyle,
-            },
-        ],
-    };
-
     return (
         <>
             <div className="min-h-80">
@@ -79,13 +82,15 @@ export const InterventionsByStatusChart = ({ interventionsByStatus }: { interven
                     <p>{t('statistics.no_datas')}</p>
                 ) : (
                     <>
-                        {(type === 'horizontalBar' || type === 'verticalBar') && (
-                            <p>
-                                <Bar options={baseOptions} data={data} />
-                            </p>
+                        {type === 'horizontalBar' && (
+                            <HorizontalBarChart type={type} labels={labels} dataCount={dataCount} chartName="interventionsByStatus" />
                         )}
-                        {type === 'line' && <Line options={baseOptions} data={data} />}
-                        {type === 'doughnut' && <Doughnut options={baseOptions} data={data} />}
+
+                        {type === 'verticalBar' && (
+                            <VerticalBarChart type={type} labels={labels} dataCount={dataCount} chartName="interventionsByStatus" />
+                        )}
+
+                        {type === 'doughnut' && <DoughnutChart type={type} labels={labels} dataCount={dataCount} chartName="interventionsByStatus" />}
                     </>
                 )}
             </div>
