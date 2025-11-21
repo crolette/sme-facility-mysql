@@ -33,7 +33,6 @@ class Floor extends Model
         'surface_walls',
         'wall_material_id',
         'wall_material_other',
-        'location_type_id',
         'level_id'
     ];
 

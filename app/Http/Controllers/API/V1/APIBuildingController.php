@@ -87,9 +87,9 @@ class APIBuildingController extends Controller
 
         if ($buildingRequest->validated('locationType') !== $building->locationType->id) {
             $errors = new MessageBag([
-                'locationType' => ['You cannot change the building type of a location'],
+                'locationType' => ['You cannot change the type of a location'],
             ]);
-            return ApiResponse::error('Error while updating the building', $errors);
+            return ApiResponse::error('You cannot change the type of a location', $errors);
         }
 
         try {

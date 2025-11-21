@@ -83,9 +83,9 @@ class APISiteController extends Controller
 
         if ($siteRequest->validated('locationType') !== $site->locationType->id) {
             $errors = new MessageBag([
-                'locationType' => ['You cannot change the site of a location'],
+                'locationType' => ['You cannot change the type of a location'],
             ]);
-            return ApiResponse::error('ERROR', $errors);
+            return ApiResponse::error('You cannot change the type of a location', $errors);
         }
 
         try {

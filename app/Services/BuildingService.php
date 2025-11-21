@@ -29,15 +29,15 @@ class BuildingService
 
         $building = new Building([
             ...$data,
-            'reference_code' => $referenceCode,
             'code' => $code,
+            'reference_code' => $referenceCode,
 
             'floor_material_id'  => !isset($data['floor_material_id']) ? null : ($data['floor_material_id'] === 'other' ? null :  $data['floor_material_id']),
             'wall_material_id'  => !isset($data['wall_material_id']) ? null : ($data['wall_material_id'] === 'other' ? null :  $data['wall_material_id']),
             'outdoor_material_id'  => !isset($data['outdoor_material_id']) ? null : ($data['outdoor_material_id'] === 'other' ? null :  $data['outdoor_material_id']),
         ]);
 
-        $building->reference_code = $referenceCode;
+        // $building->reference_code = $referenceCode;
         $building->locationType()->associate($buildingType);
 
         $building->site()->associate($site);
