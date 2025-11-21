@@ -56,7 +56,7 @@ it('can render the create site page', function () {
     );
 });
 
-it('can create a new site', function () {
+it('can create a new site with all information', function () {
 
     $wallMaterial = CategoryType::factory()->create(['category' => 'wall_materials']);
     $floorMaterial = CategoryType::factory()->create(['category' => 'floor_materials']);
@@ -97,6 +97,35 @@ it('can create a new site', function () {
         'need_maintenance' => false
     ]);
 });
+
+it('can create a new site with only basic information', function () {
+
+
+    $formData = [
+        'name' => 'New site',
+        'description' => 'Description new site',
+        'locationType' => $this->siteType->id,
+    ];
+
+    $response = $this->postToTenant('api.sites.store', $formData);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
+
+    assertDatabaseCount('sites', 1);
+    assertDatabaseCount('maintainables', 1);
+
+    assertDatabaseHas('sites', [
+        'location_type_id' => $this->siteType->id,
+        'code' => $this->siteType->prefix . '01',
+        'reference_code' => $this->siteType->prefix . '01',
+    ]);
+
+    assertDatabaseHas('maintainables', [
+        'name' => 'New site',
+        'description' => 'Description new site',
+    ]);
+});
+
 
 it('can create a new site with other matherials', function () {
 
@@ -298,8 +327,10 @@ it('can attach a provider to a site\'s maintainable', function () {
     ];
 
     $response = $this->postToTenant('api.sites.store', $formData);
+    $response->assertStatus(200);
     $response->assertSessionHasNoErrors();
 
     $site = Site::first();
+
     assertCount(1, $site->maintainable->providers);
 });
