@@ -317,7 +317,7 @@ it('can render the show building page', function () {
 it('can render the update building page', function () {
     LocationType::factory()->count(3)->create(['level' => 'site']);
     LocationType::factory()->count(3)->create(['level' => 'building']);
-    $site = Site::factory()->create();
+    Site::factory()->create();
     $building = Building::factory()->create();
 
     $response = $this->getFromTenant('tenant.buildings.edit', $building);
@@ -329,16 +329,16 @@ it('can render the update building page', function () {
             ->has('location')
             ->has('location.site')
             ->has('levelTypes', 1)
-            ->has('locationTypes', 3)
+            ->has('locationTypes', 4)
             ->where('location.reference_code', $building->reference_code)
     );
 });
 
 it('can update a building', function () {
     $level = LocationType::factory()->create(['level' => 'site']);
-    $buildingType = LocationType::factory()->create(['level' => 'building']);
     $site = Site::factory()->create();
     $building = Building::factory()->create();
+    $buildingType = LocationType::where('level', 'building')->first();
     $wallMaterial = CategoryType::factory()->create(['category' => 'wall_materials']);
     $floorMaterial = CategoryType::factory()->create(['category' => 'floor_materials']);
 
@@ -552,5 +552,5 @@ it('can retrieve all assets from a building', function () {
     $response = $this->getFromTenant('api.buildings.assets', $building);
     $response->assertStatus(200);
     $data = $response->json('data');
-    $this->assertCount(2, $data);
+    $this->assertCount(2, $data['data']);
 });

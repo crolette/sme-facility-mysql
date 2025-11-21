@@ -34,13 +34,8 @@ class SiteService
         $site = Site::create([
             ...$data,
             'code' => $codeNumber,
-            'floor_material_id'  =>
-            isset($data['floor_material_id']) && $data['floor_material_id'] === 'other'
-                ? null
-                : (isset($data['floor_material_id']) ? $data['floor_material_id'] : null),
-            'wall_material_id'  => isset($data['wall_material_id']) && $data['wall_material_id'] === 'other'
-                ? null
-                : (isset($data['wall_material_id']) ? $data['wall_material_id'] : null),
+            'floor_material_id'  => !isset($data['floor_material_id']) ? null : ($data['floor_material_id'] === 'other' ? null :  $data['floor_material_id']),
+            'wall_material_id'  => !isset($data['wall_material_id']) ? null : ($data['wall_material_id'] === 'other' ? null :  $data['wall_material_id']),
             'reference_code' => $codeNumber,
             'location_type_id' => $locationType->id,
         ]);
@@ -65,18 +60,6 @@ class SiteService
         return $site;
     }
 
-
-
-    // public function update(Site $site, array $data)
-    // {
-    //     $site->update(
-    //         [
-    //             ...$data
-    //         ],
-    //     );
-
-    //     return $site;
-    // }
 
     public function deleteSite(Site $site): bool
     {
