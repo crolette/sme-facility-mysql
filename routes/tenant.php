@@ -170,10 +170,10 @@ Route::middleware([
 
     Route::prefix('interventions')->group(function () {
         Route::get('', [InterventionController::class, 'index'])->name('tenant.interventions.index');
-        Route::get('/create/{ticket}', [InterventionController::class, 'create'])->name('tenant.interventions.create');
+        // Route::get('/create/{ticket}', [InterventionController::class, 'create'])->name('tenant.interventions.create');
         Route::get('/{intervention}', [InterventionController::class, 'show'])->name('tenant.interventions.show');
-        Route::get('/{intervention}/actions/create', [InterventionActionController::class, 'create'])->name('tenant.interventions.actions.create');
-        Route::get('/{intervention}/actions/{action}/edit', [InterventionActionController::class, 'edit'])->name('tenant.interventions.actions.edit');
+        // Route::get('/{intervention}/actions/create', [InterventionActionController::class, 'create'])->name('tenant.interventions.actions.create');
+        // Route::get('/{intervention}/actions/{action}/edit', [InterventionActionController::class, 'edit'])->name('tenant.interventions.actions.edit');
     });
 });
 

@@ -39,6 +39,10 @@ class APIInterventionController extends Controller
 
     public function store(InterventionRequest $request, PictureUploadRequest $pictureUploadRequest)
     {
+
+        if ($request->user()->cannot('create interventions', Intervention::class))
+            return ApiResponse::notAuthorized();
+
         try {
             DB::beginTransaction();
 

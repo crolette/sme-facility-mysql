@@ -30,9 +30,6 @@ class NewPermissions extends Seeder
                 }
             }
 
-            // // create permissions
-            // Permission::create(['guard_name' => 'tenant', 'name' => 'assign roles']);
-
             app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
             $superAdminRole = Role::where('name', 'Super Admin')->first();

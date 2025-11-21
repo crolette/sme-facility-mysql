@@ -13,7 +13,6 @@ class AssetPolicy
      */
     public function viewAny(User $user): bool
     {
-
         return $user->can('view any assets');
     }
 
@@ -54,7 +53,7 @@ class AssetPolicy
             return true;
 
         if ($user->hasRole('Maintenance Manager'))
-            return $user->can('update assets') && $asset->maintainable->manager->id == $user->id;
+            return $user->can('update assets') && $asset->maintainable->manager?->id == $user->id;
 
         if ($user->hasRole('Provider'))
             return $user->can('update assets') && array_search($user->id, $asset->providers?->pluck('id'));
@@ -71,7 +70,7 @@ class AssetPolicy
             return true;
 
         if ($user->hasRole('Maintenance Manager'))
-            return $user->can('delete assets') && $asset->maintainable->manager->id == $user->id;
+            return $user->can('delete assets') && $asset->maintainable->manager?->id == $user->id;
 
         return false;
     }

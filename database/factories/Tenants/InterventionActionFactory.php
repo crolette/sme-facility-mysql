@@ -23,7 +23,7 @@ class InterventionActionFactory extends Factory
      */
     public function definition(): array
     {
-        $actionType = CategoryType::where('category', 'action')->first();
+        $actionType = CategoryType::factory()->create(['category' => 'action']);
         return [
             'action_type_id' => $actionType->id,
             'description' => fake()->paragraph(),

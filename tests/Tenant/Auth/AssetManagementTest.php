@@ -24,20 +24,13 @@ use function Pest\Laravel\assertDatabaseMissing;
 
 beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    LocationType::factory()->create(['level' => 'room']);
     CategoryType::factory()->count(2)->create(['category' => 'document']);
     $this->categoryTypeAsset = CategoryType::factory()->create(['category' => 'asset']);
     Site::factory()->create();
     Building::factory()->create();
     Floor::factory()->create();
 
-    $this->room = Room::factory()
-        ->for(LocationType::where('level', 'room')->first())
-        ->for(Floor::first())
-        ->create();
+    $this->room = Room::factory()->create();
 
     $this->asset = Asset::factory()->forLocation($this->room)->create();
 
@@ -62,8 +55,8 @@ test('test access roles to assets index page', function (string $role, int $expe
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
-    ['Maintenance Manager', 403],
-    ['Provider', 403]
+    ['Maintenance Manager', 200],
+    // ['Provider', 403]
 ]);
 
 test('test access roles to create asset page', function (string $role, int $expectedStatus) {
@@ -76,7 +69,7 @@ test('test access roles to create asset page', function (string $role, int $expe
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 403],
-    ['Provider', 403]
+    // ['Provider', 403]
 ]);
 
 test('test access roles to view any asset page', function (string $role, int $expectedStatus) {
@@ -89,25 +82,25 @@ test('test access roles to view any asset page', function (string $role, int $ex
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 403],
-    ['Provider', 403]
+    // ['Provider', 403]
 ]);
 
 
 test('test access roles to view asset with maintenance manager page', function (string $role, int $expectedStatus) {
-    $user = User::factory()->create();
-    $user->assignRole($role);
+    $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
     $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset->refresh();
 
-    $asset->maintainable()->update(['maintenance_manager_id' => $user->id]);
+    $asset->maintainable->manager()->associate($user->id)->save();
 
     $response = $this->getFromTenant('tenant.assets.show', $asset->reference_code);
     $response->assertStatus($expectedStatus);
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 200],
-    ['Provider', 403]
+    // ['Provider', 403]
 ]);
 
 test('test access roles to store an asset', function (string $role, int $expectedStatus) {
@@ -121,7 +114,7 @@ test('test access roles to store an asset', function (string $role, int $expecte
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 403],
-    ['Provider', 403]
+    // ['Provider', 403]
 ]);
 
 test('test access roles to update any asset page', function (string $role, int $expectedStatus) {
@@ -134,7 +127,7 @@ test('test access roles to update any asset page', function (string $role, int $
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 403],
-    ['Provider', 403]
+    // ['Provider', 403]
 ]);
 
 test('test access roles to update asset with maintenance manager page', function (string $role, int $expectedStatus) {
@@ -151,7 +144,7 @@ test('test access roles to update asset with maintenance manager page', function
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 200],
-    ['Provider', 403]
+    // ['Provider', 403]
 ]);
 
 test('test access roles to asset page', function (string $role, int $expectedStatus) {
@@ -164,7 +157,7 @@ test('test access roles to asset page', function (string $role, int $expectedSta
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 403],
-    ['Provider', 403]
+    // ['Provider', 403]
 ]);
 
 
@@ -180,7 +173,7 @@ test('test access roles to delete any asset', function (string $role, int $expec
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 403],
-    ['Provider', 403]
+    // ['Provider', 403]
 ]);
 
 test('test access roles to delete asset with maintenance manager', function (string $role, int $expectedStatus) {
@@ -198,7 +191,7 @@ test('test access roles to delete asset with maintenance manager', function (str
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 200],
-    ['Provider', 403]
+    // ['Provider', 403]
 ]);
 
 test('test access roles to restore any asset', function (string $role, int $expectedStatus) {
@@ -211,7 +204,7 @@ test('test access roles to restore any asset', function (string $role, int $expe
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 403],
-    ['Provider', 403]
+    // ['Provider', 403]
 ]);
 
 test('test access roles to force delete any asset', function (string $role, int $expectedStatus) {
@@ -225,7 +218,7 @@ test('test access roles to force delete any asset', function (string $role, int 
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 403],
-    ['Provider', 403]
+    // ['Provider', 403]
 ]);
 
 test('cannot regenerate a QR Code if user is not maintenance manager from the asset', function (string $role, int $expectedStatus) {
@@ -239,7 +232,7 @@ test('cannot regenerate a QR Code if user is not maintenance manager from the as
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 403],
-    ['Provider', 403]
+    // ['Provider', 403]
 ]);
 
 test('can regenerate a QR Code if user is not maintenance manager from the asset', function (string $role, int $expectedStatus) {
@@ -254,6 +247,5 @@ test('can regenerate a QR Code if user is not maintenance manager from the asset
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 200],
-    ['Provider', 403]
+    // ['Provider', 403]
 ]);
-

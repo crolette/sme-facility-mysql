@@ -6,6 +6,8 @@ use App\Models\Tenants\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Database\Seeders\tenant\NewPermissions;
+use Database\Seeders\tenant\CountriesSeeder;
 use Database\Seeders\tenant\PermissionsSeeder;
 use Database\Seeders\tenant\ContractsPermissionsSeeder;
 use Database\Seeders\tenant\ProvidersPermissionsSeeder;
@@ -20,7 +22,10 @@ class DatabaseSeeder extends Seeder
         $this->call([
             PermissionsSeeder::class,
             ContractsPermissionsSeeder::class,
-            ProvidersPermissionsSeeder::class
+            ProvidersPermissionsSeeder::class,
+            CountriesSeeder::class,
+            CountryTranslationsSeeder::class,
+            NewPermissions::class,
         ]);
 
         if (!User::where('email', 'super@sme-facility.com')->first()) {
