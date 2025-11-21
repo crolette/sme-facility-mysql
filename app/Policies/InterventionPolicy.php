@@ -40,9 +40,34 @@ class InterventionPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user, array $data): bool
     {
-        return $user->can('create interventions');
+        if ($user->hasRole('Admin'))
+            return $user->can('create interventions');
+
+
+        if ($user->hasRole('Maintenance Manager')) {
+            $modelMap = [
+                'sites' => \App\Models\Tenants\Site::class,
+                'buildings' => \App\Models\Tenants\Building::class,
+                'floors' => \App\Models\Tenants\Floor::class,
+                'rooms' => \App\Models\Tenants\Room::class,
+                'asset' => \App\Models\Tenants\Asset::class,
+                'providers' => \App\Models\Tenants\Provider::class,
+            ];
+
+
+            $model = $modelMap[$data['locationType']];
+
+            if ($model === Provider::class) {
+                return false;
+            } else {
+                $location = $model::where('reference_code', $data['locationId'])->first();
+                return $user->can('view interventions') && $location->maintainable->manager?->id == $user->id;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -67,12 +92,7 @@ class InterventionPolicy
      */
     public function delete(User $user, Intervention $intervention): bool
     {
-        if ($user->hasRole('Admin'))
-            return true;
 
-        if ($user->hasRole('Maintenance Manager'))
-            return $user->can('delete interventions') && $intervention->maintainable->manager?->id == $user->id;
-
-        return false;
+        return $user->can('delete interventions');
     }
 }

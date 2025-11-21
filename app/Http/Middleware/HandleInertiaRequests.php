@@ -69,11 +69,12 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'version' => env('APP_VERSION'),
             'tenant' => [
-                'name' => session('tenantName') ?? config('app.name'),
+                'name' => session('tenantName'),
                 'logo' => session('tenantLogo')
             ],
             'auth' => [
                 'user' => $request->user(),
+                'permissions' => $request->user()?->getAllPermissions()->pluck('name') ?? null,
             ],
             'flash' => ['message' => session('message'), 'type' => session('type')],
             'ziggy' => fn(): array => [

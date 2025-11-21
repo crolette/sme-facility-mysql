@@ -57,7 +57,8 @@ Route::middleware([
 
         Route::patch('/status/', function (Intervention $intervention, Request $request) {
 
-            Debugbar::info($request->status);
+            if ($request->user()->cannot('update', $intervention))
+                return ApiResponse::notAuthorized();
 
             if (in_array($request->status, array_column(InterventionStatus::cases(), 'value'))) {
                 $intervention->update(['status' => $request->status]);
