@@ -9,7 +9,7 @@ return [
     'download-type' => 'Télécharger :type',
     'edit-type' => 'Modifier :type',
     'save-type' => 'Enregistrer :type',
-    'upload-type' => 'Téléverser :type',
+    'upload-type' => 'Uploader :type',
     'update-type' => 'Mettre à jour :type',
 
     // View actions
@@ -32,7 +32,7 @@ return [
     'search' => 'Rechercher',
     'create' => 'Créer',
     'update' => 'Mettre à jour',
-    'upload' => 'Téléverser',
+    'upload' => 'Uploader',
     'cancel' => 'Annuler',
     'submit' => 'Soumettre',
     'confirm' => 'Confirmer',

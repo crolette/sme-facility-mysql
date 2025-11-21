@@ -129,7 +129,7 @@ export default function ShowIntervention({
         setUser(null);
         setInterventionToSend(null);
         setIsProcessing(false);
-        router.visit(route('tenant.interventions.show', intervention.id));
+        // router.visit(route('tenant.interventions.show', intervention.id));
     };
 
     const addAssignee = (assignee: User | Provider, provider_id?: number) => {
@@ -299,7 +299,7 @@ export default function ShowIntervention({
                             status: intervention.status,
                             priority: intervention.priority,
                             levelPath: intervention.interventionable?.location_route ?? '',
-                            levelName: intervention.interventionable?.reference_code ?? 'NULL',
+                            levelName: intervention.interventionable?.reference_code ?? intervention.interventionable?.name,
                         }}
                     />
                     <div className="overflow-hidden">
@@ -361,7 +361,7 @@ export default function ShowIntervention({
                 </div>
             </div>
             <Modale
-                title={t('actions.delete-type', { type: tChoice('interventions.titel', 1) })}
+                title={t('actions.delete-type', { type: tChoice('interventions.title', 1) })}
                 message={t('interventions.delete_description')}
                 isOpen={showDeleteInterventionModale}
                 isProcessing={isProcessing}
@@ -372,12 +372,12 @@ export default function ShowIntervention({
                 }}
             />
             {addIntervention && (
-                <ModaleForm title={t('actions.add-type', { type: tChoice('interventions.titel', 1) })}>
+                <ModaleForm title={t('actions.add-type', { type: tChoice('interventions.title', 1) })}>
                     {isProcessing && (
                         <div className="flex flex-col items-center gap-4">
                             <Loader size={48} className="animate-pulse" />
                             <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.processing')}</p>
-                            <p className="mx-auto">{t('actions.being-created-type', { type: tChoice('interventions.titel', 1) })}</p>
+                            <p className="mx-auto">{t('actions.being-created-type', { type: tChoice('interventions.title', 1) })}</p>
                         </div>
                     )}
                     {!isProcessing && (
@@ -552,7 +552,8 @@ export default function ShowIntervention({
                                                                     provider.users.map((user: User) => (
                                                                         <li
                                                                             className="odd:bg-sidebar hover:bg-accent cursor-pointer px-4 py-1"
-                                                                            onClick={() => {
+                                                                            onClick={(e) => {
+                                                                                e.stopPropagation();
                                                                                 setUser(null);
                                                                                 addAssignee(user, provider.id);
                                                                             }}
@@ -614,7 +615,8 @@ export default function ShowIntervention({
                                                         {provider.users.map((user) => (
                                                             <li
                                                                 className="odd:bg-sidebar hover:bg-accent cursor-pointer px-4 py-1"
-                                                                onClick={() => {
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
                                                                     setUser(null);
                                                                     addAssignee(user, provider.id);
                                                                 }}

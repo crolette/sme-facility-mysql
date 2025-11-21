@@ -16,7 +16,7 @@ return [
     'priority.high' => 'Haute',
     'priority.urgent' => 'Urgente',
     'assign_to' => 'Assigner à',
-    'assign_to_description' => 'Sélectionnez un utilisateur fournisseur ou un utilisateur interne pour assigner cette intervention',
+    'assign_to_description' => 'Sélectionnez un contact d\'un fournisseur, un fournisseur ou un utilisateur interne pour assigner cette intervention',
     'assigned_to' => 'Assignée à',
 
     'assigned_not' => 'Non assignée',

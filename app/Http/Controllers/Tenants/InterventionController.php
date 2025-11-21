@@ -4,16 +4,22 @@ namespace App\Http\Controllers\Tenants;
 
 use Inertia\Inertia;
 use App\Enums\PriorityLevel;
+use App\Models\Tenants\Room;
+use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
+use App\Models\Tenants\Asset;
+use App\Models\Tenants\Floor;
 use App\Models\Tenants\Ticket;
+use App\Models\Tenants\Building;
+use App\Models\Tenants\Provider;
+
+use function PHPSTORM_META\type;
 use App\Enums\InterventionStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Validator;
-
-use function PHPSTORM_META\type;
 
 class InterventionController extends Controller
 {
@@ -33,7 +39,7 @@ class InterventionController extends Controller
         ]);
 
         $validatedFields = $validator->validated();
-        $interventions = Intervention::with('interventionable');
+        $interventions = Intervention::withoutTrashed()->with('interventionable');
 
         if (isset($validatedFields['status'])) {
             $interventions->where('status', $validatedFields['status']);

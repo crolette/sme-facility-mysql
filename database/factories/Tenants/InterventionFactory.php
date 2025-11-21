@@ -46,6 +46,18 @@ class InterventionFactory extends Factory
         });
     }
 
+    public function forProvider($provider)
+    {
+        return $this->for($provider, 'interventionable')->state(function () use ($provider) {
+            $provider->refresh();
+
+            return [
+                'maintainable_id' => null,
+                'interventionable_type' => get_class($provider),
+                'interventionable_id' => $provider->id,
+            ];
+        });
+    }
 
 
     public function forLocation($location)

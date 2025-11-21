@@ -485,7 +485,7 @@ export default function IndexInterventions({
                                             <TableBodyData>{item.type}</TableBodyData>
                                             <TableBodyData>
                                                 <a href={item.interventionable?.location_route ?? ''}>
-                                                    {item.interventionable?.reference_code ?? 'NULL'}
+                                                    {item.interventionable?.reference_code ?? item.interventionable?.name ?? 'NA'}
                                                 </a>
                                             </TableBodyData>
                                             <TableBodyData>
