@@ -11,6 +11,7 @@ return [
     'save-type' => 'Enregistrer :type',
     'upload-type' => 'Uploader :type',
     'update-type' => 'Mettre à jour :type',
+    'relocate-type' => 'Réaffecter :type',
 
     // View actions
     'see-details' => 'Voir les détails',
@@ -24,9 +25,11 @@ return [
     // Form actions
     'add' => 'Ajouter',
     'edit' => 'Modifier',
+    'follow' => 'Suivre',
     'save' => 'Enregistrer',
     'remove' => 'Retirer',
     'restore' => 'Restaurer',
+    'relocate' => 'Réaffecter',
     'delete' => 'Supprimer',
     'delete_definitely' => 'Supprimer définitivement',
     'search' => 'Rechercher',

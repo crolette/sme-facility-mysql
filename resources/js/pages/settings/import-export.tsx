@@ -115,6 +115,8 @@ export default function ImportExportSettings() {
         }
     };
 
+    console.log(itemsToBeExported);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.import_export')} />

@@ -130,7 +130,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                     {routeName === 'rooms' && (
                         <Button variant={'secondary'} onClick={() => setShowModaleRelocateRoom(!showModaleRelocateRoom)}>
                             <Move />
-                            {t('locations.redefine_room')}
+                            {t('locations.rooms.relocate')}
                         </Button>
                     )}
                 </div>

@@ -31,6 +31,7 @@ class ApiImportProvidersController extends Controller
         $validated = $request->validated();
 
         if (!str_contains($validated['file']->getClientOriginalName(), 'providers')) {
+            Log::error('Wrong file. The file name should include providers');
             return ApiResponse::error('Wrong file. The file name should include providers');
         }
 

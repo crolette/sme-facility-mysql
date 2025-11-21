@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use Exception;
+use App\Models\LocationType;
 use App\Models\Tenants\Floor;
+use App\Models\Tenants\Building;
 use App\Services\PictureService;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
@@ -15,120 +17,44 @@ class FloorService
 
     public function __construct(protected DocumentService $documentService, protected PictureService $pictureService) {}
 
-    // public function create(array $data): Building
-    // {
-    //     $site = Site::find($data['levelType']);
-    //     $buildingType = LocationType::find($data['locationType']);
+    public function create(array $data): Floor
+    {
+        $building = Building::find($data['levelType']);
+        $floorType = LocationType::find($data['locationType']);
+        $count = Floor::where('location_type_id', $floorType->id)->where('level_id', $building->id)->count();
 
-    //     $count = Building::where('location_type_id', $buildingType->id)->where('level_id', $site->id)->count();
+        $codeNumber = generateCodeNumber($count + 1, $floorType->prefix);
 
-    //     $code = generateCodeNumber($count + 1, $buildingType->prefix);
-    //     $referenceCode = $site->reference_code . '-' . $code;
+        $referenceCode = $building->reference_code . '-' . $codeNumber;
 
-    //     $building = new Building([
-    //         ...$data,
-    //         'reference_code' => $referenceCode,
-    //         'code' => $code,
+        $floor = Floor::create([
+            ...$data,
+            'code' => $codeNumber,
+            'reference_code' => $referenceCode,
+            'floor_material_id'  => !isset($data['floor_material_id']) ? null : ($data['floor_material_id'] === 'other' ? null :  $data['floor_material_id']),
+            'wall_material_id'  => !isset($data['wall_material_id']) ? null : ($data['wall_material_id'] === 'other' ? null :  $data['wall_material_id']),
+        ]);
 
-    //         'floor_material_id'  => !isset($data['floor_material_id']) ? null : ($data['floor_material_id'] === 'other' ? null :  $data['floor_material_id']),
-    //         'wall_material_id'  => !isset($data['wall_material_id']) ? null : ($data['wall_material_id'] === 'other' ? null :  $data['wall_material_id']),
-    //         'outdoor_material_id'  => !isset($data['outdoor_material_id']) ? null : ($data['outdoor_material_id'] === 'other' ? null :  $data['outdoor_material_id']),
-    //     ]);
+        $floor->locationType()->associate($floorType);
+        $floor->building()->associate($building);
+        $floor->save();
 
-    //     $building->reference_code = $referenceCode;
-    //     $building->locationType()->associate($buildingType);
+        return $floor;
+    }
 
-    //     $building->site()->associate($site);
-    //     $building->save();
+    public function update(Floor $floor, array $data): Floor
+    {
+        $floor->update([
+            ...$data,
+            'floor_material_id'  => !isset($data['floor_material_id']) ? null : ($data['floor_material_id'] === 'other' ? null :  $data['floor_material_id']),
+            'wall_material_id'  => !isset($data['wall_material_id']) ? null : ($data['wall_material_id'] === 'other' ? null :  $data['wall_material_id']),
+        ]);
 
-    //     return $building;
-    // }
-
-    // public function update(Building $building, array $data): Building
-    // {
-    //     $building->update([
-    //         ...$data,
-    //         'floor_material_id'  => !isset($data['floor_material_id']) ? null : ($data['floor_material_id'] === 'other' ? null :  $data['floor_material_id']),
-    //         'wall_material_id'  => !isset($data['wall_material_id']) ? null : ($data['wall_material_id'] === 'other' ? null :  $data['wall_material_id']),
-    //         'outdoor_material_id'  => !isset($data['outdoor_material_id']) ? null : ($data['outdoor_material_id'] === 'other' ? null :  $data['outdoor_material_id']),
-    //     ]);
-
-    //     return $building;
-    // }
-
-    // private function createAssetCodeNumber(): string
-    // {
-    //     $count = Company::incrementAndGetAssetNumber();
-    //     $codeNumber = generateCodeNumber($count, 'A', 4);
-
-    //     return $codeNumber;
-    // }
-
-    // public function attachLocationFromImport($asset, $assetData)
-    // {
-    //     // will be the reference code of the location or email of the user
-    //     $locationCode = null ;
-
-    //     $locationType = $assetData['is_mobile'] === true ? 'user' : 
-    //         (isset($assetData['room']) ? 'room' : 
-    //             (isset($assetData['floor']) ? 'floor' : 
-    //                 (isset($assetData['building']) ? 'building' : 
-    //                     'site')));
+        return $floor;
+    }
 
 
-    //     if($locationType === 'user') {
-    //         $locationCode = Str::after($assetData['user'], ' - ');
-    //     } else {
-    //         $locationCode = match ($locationType) {
-    //             'site'  => Str::before($assetData['site'], ' - '),
-    //             'building' => Str::before($assetData['building'], ' - '),
-    //             'floor' => Str::before($assetData['floor'], ' - '),
-    //             'room' => Str::before($assetData['room'], ' - '),
-    //         };
-    //     }
-
-    //     $location = match ($locationType) {
-    //         'user'  => User::where('email', $locationCode)->first(),
-    //         'site'  => Site::where('reference_code', $locationCode)->first(),
-    //         'building' => Building::where('reference_code', $locationCode)->first(),
-    //         'floor' => Floor::where('reference_code', $locationCode)->first(),
-    //         'room' => Room::where('reference_code', $locationCode)->first(),
-    //     };
-
-    //     if (!$location)
-    //         throw new Exception("No location found");
-
-    //     if (!$asset->code) {
-    //         $asset->code = $this->createAssetCodeNumber();
-    //     }
-
-    //     $referenceCode = $locationType === 'user' ? $asset->code : $location->reference_code . '-' . $asset->code;
-
-    //     $asset->location()->associate($location);
-
-    //     $asset->reference_code = $referenceCode;
-
-    //     return $asset;
-    // }
-
-
-
-    // public function deleteAsset(Asset $asset): bool
-    // {
-    //     try {
-    //         DB::beginTransaction();
-    //         $deleted = $asset->delete();
-    //         DB::commit();
-    //         return $deleted;
-    //     } catch (Exception $e) {
-    //         DB::rollBack();
-    //         return false;
-    //     }
-
-    //     return false;
-    // }
-
-    public function deleteRoom(Floor $floor): bool
+    public function delete(Floor $floor): bool
     {
         try {
             DB::beginTransaction();

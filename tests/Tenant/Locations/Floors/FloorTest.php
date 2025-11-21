@@ -24,9 +24,6 @@ use function Pest\Laravel\assertDatabaseMissing;
 beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
-    $this->siteType = LocationType::factory()->create(['level' => 'site']);
-    $this->buildingType = LocationType::factory()->create(['level' => 'building']);
-    $this->floorType = LocationType::factory()->create(['level' => 'floor']);
     Site::factory()->create();
     $this->building = Building::factory()->create();
 });
@@ -56,13 +53,14 @@ it('can render the create floor page', function () {
     $response->assertInertia(
         fn($page) => $page->component('tenants/locations/CreateUpdateLocation')
             ->has('levelTypes', 3)
-            ->has('locationTypes', 3)
+            ->has('locationTypes', 2)
     );
 });
 
 it('can create a new floor', function () {
     $wallMaterial = CategoryType::factory()->create(['category' => 'wall_materials']);
     $floorMaterial = CategoryType::factory()->create(['category' => 'floor_materials']);
+    $floorType = LocationType::factory()->create(['level' => 'floor']);
 
     $formData = [
         'name' => 'New floor',
@@ -72,7 +70,7 @@ it('can create a new floor', function () {
         'wall_material_id' => $wallMaterial->id,
         'description' => 'Description new floor',
         'levelType' => $this->building->id,
-        'locationType' => $this->floorType->id
+        'locationType' => $floorType->id
     ];
 
     $response = $this->postToTenant('api.floors.store', $formData);
@@ -88,13 +86,13 @@ it('can create a new floor', function () {
 
 
     assertDatabaseHas('floors', [
-        'location_type_id' => $this->floorType->id,
-        'code' => $this->floorType->prefix . '01',
+        'location_type_id' => $floorType->id,
+        'code' => $floorType->prefix . '01',
         'surface_floor' => 2569.12,
         'floor_material_id' => $floorMaterial->id,
         'surface_walls' => 256.9,
         'wall_material_id' => $wallMaterial->id,
-        'reference_code' => $this->building->reference_code . '-' . $this->floorType->prefix . '01',
+        'reference_code' => $this->building->reference_code . '-' . $floorType->prefix . '01',
         'level_id' => $this->building->id
     ]);
 
@@ -109,6 +107,8 @@ it('can create a new floor', function () {
 
 it('can create a new floor with other materials', function () {
 
+    $floorType = LocationType::factory()->create(['level' => 'floor']);
+
     $formData = [
         'name' => 'New floor',
         'surface_floor' => 2569.12,
@@ -119,7 +119,7 @@ it('can create a new floor with other materials', function () {
         'wall_material_other' => 'Van Gogh',
         'description' => 'Description new floor',
         'levelType' => $this->building->id,
-        'locationType' => $this->floorType->id
+        'locationType' => $floorType->id
     ];
 
     $response = $this->postToTenant('api.floors.store', $formData);
@@ -135,13 +135,13 @@ it('can create a new floor with other materials', function () {
 
 
     assertDatabaseHas('floors', [
-        'location_type_id' => $this->floorType->id,
-        'code' => $this->floorType->prefix . '01',
+        'location_type_id' => $floorType->id,
+        'code' => $floorType->prefix . '01',
         'surface_floor' => 2569.12,
         'floor_material_other' => 'Concrete',
         'surface_walls' => 256.9,
         'wall_material_other' => 'Van Gogh',
-        'reference_code' => $this->building->reference_code . '-' . $this->floorType->prefix . '01',
+        'reference_code' => $this->building->reference_code . '-' . $floorType->prefix . '01',
         'level_id' => $this->building->id
     ]);
 
@@ -156,13 +156,14 @@ it('can create a new floor with other materials', function () {
 
 it('can attach a provider to a floor\'s maintainable', function () {
     CategoryType::factory()->create(['category' => 'provider']);
+    $floorType = LocationType::factory()->create(['level' => 'floor']);
     $provider = Provider::factory()->create();
 
     $formData = [
         'name' => 'New floor',
         'description' => 'Description new floor',
         'levelType' => $this->building->id,
-        'locationType' => $this->floorType->id,
+        'locationType' => $floorType->id,
         'providers' => [['id' => $provider->id]]
     ];
 
@@ -214,6 +215,7 @@ it('can render the update floor page', function () {
 it('can update a floor maintainable', function () {
 
     $floor = Floor::factory()->create();
+    $floorType = LocationType::where('level', 'floor')->first();
 
     $oldName = $floor->maintainable->name;
     $oldDescription = $floor->maintainable->description;
@@ -224,7 +226,7 @@ it('can update a floor maintainable', function () {
         'surface_walls' => 256.9,
         'description' => 'Description new floor',
         'levelType' => $this->building->id,
-        'locationType' => $this->floorType->id
+        'locationType' => $floorType->id
     ];
 
     $response = $this->patchToTenant('api.floors.update', $formData, $floor);
@@ -237,12 +239,12 @@ it('can update a floor maintainable', function () {
     assertDatabaseCount('maintainables', 3);
 
     assertDatabaseHas('floors', [
-        'location_type_id' => $this->floorType->id,
+        'location_type_id' => $floorType->id,
         'level_id' => $this->building->id,
-        'code' => $this->floorType->prefix . '01',
+        'code' => $floorType->prefix . '01',
         'surface_floor' => 2569.12,
         'surface_walls' => 256.9,
-        'reference_code' => $this->building->reference_code . '-' . $this->floorType->prefix . '01',
+        'reference_code' => $this->building->reference_code . '-' . $floorType->prefix . '01',
     ]);
 
     assertDatabaseHas('maintainables', [
@@ -273,7 +275,7 @@ it('fails when update of an existing floor with a non existing floor type', func
 });
 
 it('cannot update a floor type of an existing floor', function () {
-    LocationType::factory()->create(['level' => 'floor']);
+    $floorType = LocationType::factory()->create(['level' => 'floor']);
 
     $floor = Floor::factory()->create();
 
@@ -281,16 +283,13 @@ it('cannot update a floor type of an existing floor', function () {
         'name' => 'New site',
         'description' => 'Description new site',
         'levelType' => $this->building->level_id,
-        'locationType' => 4
+        'locationType' => $floorType->id
     ];
 
     $response = $this->patchToTenant('api.floors.update', $formData, $floor);
     $response->assertStatus(400)
-        ->assertJson(['status' => 'error']);
-
-    // $response->assertSessionHasErrors([
-    //     'locationType' => 'You cannot change the type of a location',
-    // ]);
+        ->assertJson(['status' => 'error'])
+        ->assertJson(['message' => 'You cannot change the type of a location']);
 });
 
 it('can delete a floor and his maintainable', function () {
@@ -330,5 +329,5 @@ it('can retrieve all assets from a floor', function () {
     $response = $this->getFromTenant('api.floors.assets', $floor);
     $response->assertStatus(200);
     $data = $response->json('data');
-    $this->assertCount(2, $data);
+    $this->assertCount(2, $data['data']);
 });

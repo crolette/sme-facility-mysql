@@ -3,11 +3,13 @@
 return [
     'sites' => 'Site|Sites',
     'location' => 'Emplacement|Emplacements',
+    'location_type' => 'Type d\'emplacement',
     'buildings_outdoor' => 'Bâtiment/Extérieur|Bâtiments/Extérieur',
     'outdoor' => 'Extérieur',
     'buildings' => 'Bâtiment|Bâtiments',
     'floors' => 'Étage|Étages',
     'rooms' => 'Pièce|Pièces',
+    'rooms.relocate' => 'Réaffecter la pièce',
     'level' => 'Niveau',
     'redefine_room' => 'Redéfinir la pièce',
     'surface_floor' => 'Surface du sol',

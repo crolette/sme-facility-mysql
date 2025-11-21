@@ -28,7 +28,7 @@ class APISiteController extends Controller
         protected SiteService $siteService,
         protected QRCodeService $qrCodeService,
         protected MaintainableService $maintainableService,
-        protected ContractService $contractService
+        protected ContractService $contractService,
     ) {}
 
 
@@ -40,23 +40,7 @@ class APISiteController extends Controller
         try {
             DB::beginTransaction();
 
-            $locationType = LocationType::find($siteRequest->validated('locationType'));
-            $count = Site::where('location_type_id', $locationType->id)->count();
-
-            $codeNumber = generateCodeNumber($count + 1, $locationType->prefix);
-
-            $site = Site::create([
-                'code' => $codeNumber,
-                'surface_floor' => $siteRequest->validated('surface_floor'),
-                'floor_material_id'  => $siteRequest->validated('floor_material_id') === 'other' ? null :  $siteRequest->validated('floor_material_id'),
-                'floor_material_other'  => $siteRequest->validated('floor_material_other'),
-                'surface_walls' => $siteRequest->validated('surface_walls'),
-                'wall_material_id'  => $siteRequest->validated('wall_material_id') === 'other' ? null :  $siteRequest->validated('wall_material_id'),
-                'wall_material_other'  => $siteRequest->validated('wall_material_other'),
-                'reference_code' => $codeNumber,
-                'location_type_id' => $locationType->id,
-                'address' => $siteRequest->validated('address')
-            ]);
+            $site = $this->siteService->create($siteRequest->validated());
 
             $this->maintainableService->create($site, $maintainableRequest->validated());
 
@@ -96,27 +80,19 @@ class APISiteController extends Controller
     {
         if (Auth::user()->cannot('update', $site))
             abort(403);
-        // TODO Check how to perform a check or be sure that a user can't change the level/location type as it would change every child (building, floor, room)
 
         if ($siteRequest->validated('locationType') !== $site->locationType->id) {
             $errors = new MessageBag([
-                'locationType' => ['You cannot change the site of a location'],
+                'locationType' => ['You cannot change the type of a location'],
             ]);
-            return ApiResponse::error('ERROR', $errors);
+            return ApiResponse::error('You cannot change the type of a location', $errors);
         }
 
         try {
             DB::beginTransaction();
 
-            $site->update([
-                'surface_floor' => $siteRequest->validated('surface_floor'),
-                'floor_material_id'  => $siteRequest->validated('floor_material_id') === 'other' ? null :  $siteRequest->validated('floor_material_id'),
-                'floor_material_other'  => $siteRequest->validated('floor_material_other'),
-                'surface_walls' => $siteRequest->validated('surface_walls'),
-                'wall_material_id'  => $siteRequest->validated('wall_material_id') === 'other' ? null :  $siteRequest->validated('wall_material_id'),
-                'wall_material_other'  => $siteRequest->validated('wall_material_other'),
-                'address' => $siteRequest->validated('address')
-            ]);
+            $site = $this->siteService->update($site, $siteRequest->validated());
+
 
             $this->maintainableService->update($site->maintainable, $maintainableRequest);
 

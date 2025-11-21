@@ -44,26 +44,8 @@ class APIRoomController extends Controller
         try {
             DB::beginTransaction();
 
-            $floor = Floor::find($roomRequest->validated('levelType'));
-            $roomType = LocationType::find($roomRequest->validated('locationType'));
-            $room = new Room([
-                ...$roomRequest->validated(),
+            $room = $this->roomService->create($roomRequest->validated());
 
-            ]);
-
-
-            $count = Room::where('location_type_id', $roomType->id)->where('level_id', $floor->id)->count();
-
-            $codeNumber = generateCodeNumber($count + 1, $roomType->prefix, 3);
-            $referenceCode = $floor->reference_code . '-' . $codeNumber;
-
-            $room->code = $codeNumber;
-            $room->reference_code = $referenceCode;
-
-            $room->floor()->associate($floor);
-            $room->locationType()->associate($roomType);
-
-            $room->save();
 
             $this->maintainableService->create($room, $maintainableRequest->validated());
 
@@ -120,7 +102,7 @@ class APIRoomController extends Controller
         try {
             DB::beginTransaction();
 
-            $room->update($roomRequest->validated());
+            $room = $this->roomService->update($room, $roomRequest->validated());
 
             $this->maintainableService->update($room->maintainable, $maintainableRequest);
 

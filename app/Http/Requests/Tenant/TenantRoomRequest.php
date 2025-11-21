@@ -32,12 +32,6 @@ class TenantRoomRequest extends FormRequest
         if (isset($data['surface_walls']) && ($data['surface_walls'] === 0 || $data['surface_walls'] === '0'))
             $data['surface_walls'] = null;
 
-        if (isset($data['floor_material_id']) && ($data['floor_material_id'] === 'other'))
-            $data['floor_material_id'] = null;
-
-        if (isset($data['wall_material_id']) && ($data['wall_material_id'] === 'other'))
-            $data['wall_material_id'] = null;
-
         if (isset($data['height']) && ($data['height'] === 0 || $data['height'] === '0'))
             $data['height'] = null;
 

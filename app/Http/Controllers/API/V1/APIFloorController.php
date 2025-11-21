@@ -41,28 +41,7 @@ class APIFloorController extends Controller
         try {
             DB::beginTransaction();
 
-            $building = Building::find($floorRequest->validated('levelType'));
-            $floorType = LocationType::find($floorRequest->validated('locationType'));
-            $count = Floor::where('location_type_id', $floorType->id)->where('level_id', $building->id)->count();
-
-            $codeNumber = generateCodeNumber($count + 1, $floorType->prefix);
-
-            $referenceCode = $building->reference_code . '-' . $codeNumber;
-
-            $floor = Floor::create([
-                'code' => $codeNumber,
-                'surface_floor' => $floorRequest->validated('surface_floor'),
-                'floor_material_id'  => $floorRequest->validated('floor_material_id') === 'other' ? null :  $floorRequest->validated('floor_material_id'),
-                'floor_material_other'  => $floorRequest->validated('floor_material_other'),
-                'surface_walls' => $floorRequest->validated('surface_walls'),
-                'wall_material_id'  => $floorRequest->validated('wall_material_id') === 'other' ? null :  $floorRequest->validated('wall_material_id'),
-                'wall_material_other'  => $floorRequest->validated('wall_material_other'),
-                'reference_code' => $referenceCode,
-                'location_type_id' => $floorType->id
-            ]);
-
-            $floor->building()->associate($building);
-            $floor->save();
+            $floor = $this->floorService->create($floorRequest->validated());
 
             $this->maintainableService->create($floor, $maintainableRequest->validated());
 
@@ -106,9 +85,9 @@ class APIFloorController extends Controller
 
         if (intval($floorRequest->validated('locationType')) !== $floor->locationType->id) {
             $errors = new MessageBag([
-                'locationType' => ['You cannot change the floor type of a location'],
+                'locationType' => ['You cannot change the type of a location'],
             ]);
-            return ApiResponse::error('You cannot change the floor type of a location', $errors);
+            return ApiResponse::error('You cannot change the type of a location', $errors);
         }
 
         if (intval($floorRequest->validated('levelType')) !== $floor->building->id) {
@@ -121,14 +100,7 @@ class APIFloorController extends Controller
         try {
             DB::beginTransaction();
 
-            $floor->update([
-                'surface_floor' => $floorRequest->validated('surface_floor'),
-                'floor_material_id'  => $floorRequest->validated('floor_material_id') === 'other' ? null :  $floorRequest->validated('floor_material_id'),
-                'floor_material_other'  => $floorRequest->validated('floor_material_other'),
-                'surface_walls' => $floorRequest->validated('surface_walls'),
-                'wall_material_id'  => $floorRequest->validated('wall_material_id') === 'other' ? null :  $floorRequest->validated('wall_material_id'),
-                'wall_material_other'  => $floorRequest->validated('wall_material_other'),
-            ]);
+            $floor = $this->floorService->update($floor, $floorRequest->validated());
 
             $this->maintainableService->update($floor->maintainable, $maintainableRequest);
 
@@ -155,7 +127,7 @@ class APIFloorController extends Controller
             return ApiResponse::error('Floor cannot be deleted ! Assets and/or rooms are linked to this floor', [], 409);
         }
 
-        $response = $this->floorService->deleteRoom($floor);
+        $response = $this->floorService->delete($floor);
 
         return $response === true ? ApiResponse::success('', 'Floor deleted') : ApiResponse::error('', 'Error during Floor deletion');
     }
