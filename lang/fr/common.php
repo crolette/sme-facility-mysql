@@ -82,6 +82,7 @@ return [
     'all' => 'Tout',
     'yes' => 'Oui',
     'no' => 'Non',
+    'option' => 'Option',
     'type' => 'Type',
     'active' => 'Actif',
     'inactive' => 'Inactif',

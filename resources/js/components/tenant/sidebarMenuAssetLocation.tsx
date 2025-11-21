@@ -193,7 +193,7 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
     const navSidebar = MENUS[menu];
 
     return (
-        <div className="bg-sidebar border-sidebar-border z-50 flex h-fit flex-col gap-2 rounded-md shadow-xl">
+        <div className="bg-sidebar border-sidebar-border z-20 flex h-fit flex-col gap-2 rounded-md shadow-xl">
             <div className="flex flex-col items-center gap-1 px-4 py-2 text-center">
                 <p className="font-semibold">{infos.name}</p>
 

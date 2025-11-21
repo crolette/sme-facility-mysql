@@ -25,6 +25,7 @@ return [
     'add' => 'Toevoegen',
     'edit' => 'Bewerken',
     'save' => 'Opslaan',
+    'follow' => 'Volgen',
     'remove' => 'Verwijderen',
     'restore' => 'Herstellen',
     'delete' => 'Verwijderen',

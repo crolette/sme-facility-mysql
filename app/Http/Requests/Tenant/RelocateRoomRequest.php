@@ -32,7 +32,7 @@ class RelocateRoomRequest extends FormRequest
         return [
             'locationType' => ['required', Rule::in([...$locationTypes])],
             'assets.*' => 'nullable|array',
-            'assets.*.change' => 'nullable|in:follow,change,delete',
+            'assets.*.change' => 'nullable|in:follow,relocate,delete',
             'assets.*.assetId' => 'nullable|exists:assets,id',
             'assets.*.locationType' => 'nullable|in:room',
             'assets.*.locationId' => 'nullable|exists:rooms,id'
