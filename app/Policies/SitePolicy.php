@@ -25,7 +25,7 @@ class SitePolicy
             return true;
 
         if ($user->hasRole('Maintenance Manager'))
-            return $user->can('view locations') && $site->maintainable->manager->id == $user->id;
+            return $user->can('view locations') && $site->maintainable->manager?->id == $user->id;
 
         if ($user->hasRole('Provider') && $site->providers) {
             return $user->can('view locations') && array_search($user->provider?->id, $site->maintainable->providers?->pluck('id'));
@@ -53,7 +53,7 @@ class SitePolicy
             return true;
 
         if ($user->hasRole('Maintenance Manager'))
-            return $user->can('view locations') && $site->maintainable->manager->id == $user->id;
+            return $user->can('view locations') && $site->maintainable->manager?->id == $user->id;
 
         return false;
     }

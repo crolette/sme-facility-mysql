@@ -1,10 +1,11 @@
 import HeadingSmall from '@/components/heading-small';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
+import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, useForm, usePage } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Loader } from 'lucide-react';
@@ -16,7 +17,7 @@ interface TypeFormData {
 }
 
 export default function ImportExportSettings() {
-    const { permissions } = usePage().props.permissions;
+    const { hasPermission } = usePermissions();
     // const [isModalOpen, setIsModalOpen] = useState(false);
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
@@ -116,8 +117,6 @@ export default function ImportExportSettings() {
         }
     };
 
-    console.log(itemsToBeExported);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.import_export')} />
@@ -127,7 +126,7 @@ export default function ImportExportSettings() {
                     <div className="relative gap-4">
                         <HeadingSmall title={t('settings.import_export')} description={t('settings.import_export_description')} />
                     </div>
-                    {permissions.find((item) => item == 'export excel') && (
+                    {hasPermission('export excel') && (
                         <div className="flex w-fit flex-col gap-4">
                             <select name="" id="" defaultValue={''} onChange={(e) => setItemsToBeExported(e.target.value)}>
                                 <option value="" disabled>
@@ -143,7 +142,7 @@ export default function ImportExportSettings() {
                             </Button>
                         </div>
                     )}
-                    {permissions.find((item) => item == 'import excel') && (
+                    {hasPermission('import excel') && (
                         <>
                             <h3>{tChoice('assets.title', 2)}</h3>
                             <form action="" onSubmit={uploadAssetFile}>

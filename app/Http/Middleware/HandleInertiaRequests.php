@@ -8,6 +8,7 @@ use Tighten\Ziggy\Ziggy;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Company;
+use Illuminate\Support\Facades\Auth;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -64,6 +65,8 @@ class HandleInertiaRequests extends Middleware
             }
         }
 
+        $ticketsCount = $request->user()->hasRole('Maintenance Manager') ? Ticket::where('status', 'open')->orWhere('status', 'ongoing')->forMaintenanceManager()->count() : Ticket::where('status', 'open')->orWhere('status', 'ongoing')->count();
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
@@ -81,7 +84,7 @@ class HandleInertiaRequests extends Middleware
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
-            'openTicketsCount' => tenancy()->tenant ? Ticket::where('status', 'open')->orWhere('status', 'ongoing')->count() : '',
+            'openTicketsCount' => $ticketsCount,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'indexLayout' => ! $request->hasCookie('index_layout') || $request->cookie('index_layout') === 'table',
         ];

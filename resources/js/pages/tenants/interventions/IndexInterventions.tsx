@@ -9,10 +9,11 @@ import { Label } from '@/components/ui/label';
 import { Pill } from '@/components/ui/pill';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Intervention, InterventionStatus, PaginatedData, PriorityLevel } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArrowDownNarrowWide, ArrowDownWideNarrow, LayoutGrid, Loader, Pencil, TableIcon, Trash2, X } from 'lucide-react';
@@ -57,7 +58,7 @@ export default function IndexInterventions({
     types: CentralType[];
 }) {
     const { t, tChoice } = useLaravelReactI18n();
-    const { permissions } = usePage().props.auth;
+    const { hasPermission } = usePermissions();
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index ${tChoice('interventions.title', 2)}`,
@@ -512,12 +513,12 @@ export default function IndexInterventions({
                                             <TableBodyData className="flex space-x-2">
                                                 {!closed && (
                                                     <>
-                                                        {permissions.find((item) => item == 'update interventions') && (
+                                                        {hasPermission('update interventions') && (
                                                             <Button onClick={() => editIntervention(item.id)}>
                                                                 <Pencil />
                                                             </Button>
                                                         )}
-                                                        {permissions.find((item) => item == 'delete interventions') && (
+                                                        {hasPermission('delete interventions') && (
                                                             <Button
                                                                 type="button"
                                                                 variant="destructive"
@@ -537,7 +538,7 @@ export default function IndexInterventions({
                                 })
                             ) : (
                                 <TableBodyRow key={0}>
-                                    <TableBodyData>No results...</TableBodyData>
+                                    <TableBodyData>{t('common.no_results')}</TableBodyData>
                                 </TableBodyRow>
                             )}
                         </TableBody>

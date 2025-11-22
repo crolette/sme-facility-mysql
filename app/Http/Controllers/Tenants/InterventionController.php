@@ -45,13 +45,7 @@ class InterventionController extends Controller
         ]);
 
         $validatedFields = $validator->validated();
-        $interventions = Intervention::withoutTrashed()->with('interventionable');
-
-        if (Auth::user()->hasRole('Maintenance Manager')) {
-            $interventions->whereHas('maintainable', function (Builder $query) {
-                $query->where('maintenance_manager_id', Auth::user()->id);
-            });
-        }
+        $interventions = Intervention::withoutTrashed()->with('interventionable')->forMaintenanceManager();
 
         if (isset($validatedFields['status'])) {
             $interventions->where('status', $validatedFields['status']);

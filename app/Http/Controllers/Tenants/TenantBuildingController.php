@@ -54,11 +54,7 @@ class TenantBuildingController extends Controller
 
         $validatedFields = $validator->validated();
 
-        $locations = Building::query();
-
-        if (Auth::user()->hasRole('Maintenance Manager')) {
-            $locations->whereMaintenanceManagerIsUser(Auth::user());
-        }
+        $locations = Building::query()->forMaintenanceManager();
 
         if (isset($validatedFields['category'])) {
             $locations->where('location_type_id', $validatedFields['category']);

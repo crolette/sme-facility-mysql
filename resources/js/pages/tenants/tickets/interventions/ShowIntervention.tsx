@@ -11,10 +11,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Pill } from '@/components/ui/pill';
 import { Textarea } from '@/components/ui/textarea';
+import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Intervention, InterventionStatus, Provider, User } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Loader, Pencil, Trash2, X } from 'lucide-react';
@@ -29,7 +30,7 @@ export default function ShowIntervention({
     statuses: InterventionStatus[];
     types: CentralType[];
 }) {
-    const { permissions } = usePage().props.auth;
+    const { hasPermission } = usePermissions();
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -274,12 +275,12 @@ export default function ShowIntervention({
                         <Button onClick={() => sendIntervention(intervention.id)} variant={'cta'}>
                             {t('interventions.assign_to')}
                         </Button>
-                        {permissions.find((item) => item == 'update interventions') && (
+                        {hasPermission('update interventions') && (
                             <Button onClick={() => editIntervention(intervention.id)}>
                                 <Pencil />
                             </Button>
                         )}
-                        {permissions.find((item) => item == 'delete interventions') && (
+                        {hasPermission('delete interventions') && (
                             <Button
                                 type="button"
                                 variant="destructive"

@@ -21,8 +21,8 @@ class TicketPolicy
      */
     public function view(User $user, Ticket $ticket): bool
     {
-        if($user->hasRole('Maintenance Manager')) {
-            return $user->can('view tickets') && $user->id === $ticket->ticketable->manager->id ? true : false;
+        if ($user->hasRole('Maintenance Manager')) {
+            return $user->can('view tickets') && $user->id === $ticket->ticketable->manager?->id ? true : false;
         }
 
         return $user->can('view tickets');
@@ -43,9 +43,9 @@ class TicketPolicy
     public function update(User $user, Ticket $ticket): bool
     {
         if ($user->hasRole('Maintenance Manager')) {
-            return $user->can('update tickets') && $user->id === $ticket->ticketable->manager->id ? true : false;
+            return $user->can('update tickets') && $user->id === $ticket->ticketable->manager?->id ? true : false;
         }
-    
+
         // dump('--- after Maintenacne Manager --- ');
         return $user->can('update tickets');
     }

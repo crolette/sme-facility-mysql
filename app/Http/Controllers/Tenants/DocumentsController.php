@@ -25,12 +25,7 @@ class DocumentsController extends Controller
         ]);
 
         $validatedFields = $validator->validated();
-        $documents = Document::query();
-
-
-        if (Auth::user()->hasRole('Maintenance Manager')) {
-            $documents->withManager(Auth::user());
-        }
+        $documents = Document::query()->forMaintenanceManager();
 
         if (isset($validatedFields['type'])) {
             $documents->where('category_type_id', $validatedFields['type']);

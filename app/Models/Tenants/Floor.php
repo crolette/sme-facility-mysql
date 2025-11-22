@@ -3,11 +3,14 @@
 namespace App\Models\Tenants;
 
 use App\Models\LocationType;
+use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Contract;
 use App\Models\Tenants\Document;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
+use App\Traits\HasMaintenanceManager;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
@@ -21,7 +24,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Floor extends Model
 {
-    use HasFactory;
+    use HasFactory, HasMaintenanceManager;
 
     protected $fillable = [
         'reference_code',
@@ -245,10 +248,5 @@ class Floor extends Model
     }
 
     // SCOPES
-    public function scopeWhereMaintenanceManagerIsUser($query, $user)
-    {
-        $query->whereHas('maintainable', function (Builder $query) use ($user) {
-            $query->where('maintenance_manager_id', $user->id);
-        });
-    }
+
 }

@@ -89,6 +89,7 @@ return [
     'required' => 'Erforderlich',
     'thank_you' => 'Danke',
     'close_window' => 'Sie können dieses Fenster jetzt schließen.',
+    'no_results' => 'Keine Ergebnisse...',
 
     'error' => 'Fehler',
     'error_submitting' => 'Fehler beim Senden. Bitte versuchen Sie es erneut.',

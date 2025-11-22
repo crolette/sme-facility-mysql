@@ -90,6 +90,7 @@ return [
     'required' => 'Requis',
     'thank_you' => 'Merci',
     'close_window' => 'Vous pouvez maintenant fermer cette fenêtre.',
+    'no_results' => 'Aucun résultat...',
 
     'error' => 'Erreur',
     'error_submitting' => 'Erreur lors de l\'envoi. Veuillez réessayer.',

@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
+import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, CentralType, Provider, ProvidersPaginated } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { LayoutGrid, Loader, Pencil, PlusCircle, TableIcon, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -27,7 +28,7 @@ export default function IndexProviders({
     categories: CentralType[];
     filters: SearchParams;
 }) {
-    const { permissions } = usePage().props.auth;
+    const { hasPermission } = usePermissions();
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -152,7 +153,7 @@ export default function IndexProviders({
                             </Button>
                         </div>
                     </details>
-                    {permissions.find((item) => item == 'create providers') && (
+                    {hasPermission('create providers') && (
                         <a href={route(`tenant.providers.create`)}>
                             <Button>
                                 <PlusCircle />
@@ -226,7 +227,7 @@ export default function IndexProviders({
                                 })
                             ) : (
                                 <TableBodyRow>
-                                    <TableBodyData>No results..</TableBodyData>
+                                    <TableBodyData>{t('common.no_results')}..</TableBodyData>
                                 </TableBodyRow>
                             )}
                         </TableBody>

@@ -49,7 +49,7 @@ class ContractController extends Controller
 
         $validatedFields = $validator->validated();
 
-        $contracts = Contract::select('id', 'name', 'type', 'provider_id', 'status', 'renewal_type', 'end_date', 'internal_reference', 'provider_reference')->with('provider:id,name,category_type_id');
+        $contracts = Contract::select('id', 'name', 'type', 'provider_id', 'status', 'renewal_type', 'end_date', 'internal_reference', 'provider_reference')->with('provider:id,name,category_type_id')->forMaintenanceManager();
 
 
 

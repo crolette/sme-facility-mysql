@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Pill } from '@/components/ui/pill';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
+import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Contract, ContractsPaginated } from '@/types';
@@ -40,6 +41,7 @@ export default function IndexContracts({
     renewalTypes: string[];
     providerCategories: CentralType[];
 }) {
+    const { hasPermission } = usePermissions();
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -265,12 +267,14 @@ export default function IndexContracts({
                         </div>
                     </details>
 
-                    <a href={route('tenant.contracts.create')}>
-                        <Button>
-                            <PlusCircle />
-                            {t('actions.add-type', { type: tChoice('contracts.title', 1) })}
-                        </Button>
-                    </a>
+                    {hasPermission('create contracts') && (
+                        <a href={route('tenant.contracts.create')}>
+                            <Button>
+                                <PlusCircle />
+                                {t('actions.add-type', { type: tChoice('contracts.title', 1) })}
+                            </Button>
+                        </a>
+                    )}
                 </div>
 
                 <div className="flex gap-4">
@@ -368,27 +372,31 @@ export default function IndexContracts({
                                             <TableBodyData>{contract.end_date}</TableBodyData>
 
                                             <TableBodyData className="flex space-x-2">
-                                                <a href={route(`tenant.contracts.edit`, contract.id)}>
-                                                    <Button>
-                                                        <Pencil />
+                                                {hasPermission('update contracts') && (
+                                                    <a href={route(`tenant.contracts.edit`, contract.id)}>
+                                                        <Button>
+                                                            <Pencil />
+                                                        </Button>
+                                                    </a>
+                                                )}
+                                                {hasPermission('delete contracts') && (
+                                                    <Button
+                                                        onClick={() => {
+                                                            setContractToDelete(contract);
+                                                            setShowDeleteModale(true);
+                                                        }}
+                                                        variant={'destructive'}
+                                                    >
+                                                        <Trash2 />
                                                     </Button>
-                                                </a>
-                                                <Button
-                                                    onClick={() => {
-                                                        setContractToDelete(contract);
-                                                        setShowDeleteModale(true);
-                                                    }}
-                                                    variant={'destructive'}
-                                                >
-                                                    <Trash2 />
-                                                </Button>
+                                                )}
                                             </TableBodyData>
                                         </TableBodyRow>
                                     );
                                 })
                             ) : (
                                 <TableBodyRow key={0}>
-                                    <TableBodyData>No results...</TableBodyData>
+                                    <TableBodyData>{t('common.no_results')}</TableBodyData>
                                 </TableBodyRow>
                             )}
                         </TableBody>

@@ -24,7 +24,7 @@ class RoomPolicy
             return true;
 
         if ($user->hasRole('Maintenance Manager'))
-            return $user->can('view locations') && $room->maintainable->manager->id == $user->id;
+            return $user->can('view locations') && $room->maintainable->manager?->id == $user->id;
 
         if ($user->hasRole('Provider') && $room->providers) {
             return $user->can('view locations') && array_search($user->provider?->id, $room->maintainable->providers?->pluck('id'));
@@ -52,7 +52,7 @@ class RoomPolicy
             return true;
 
         if ($user->hasRole('Maintenance Manager'))
-            return $user->can('view locations') && $room->maintainable->manager->id == $user->id;
+            return $user->can('view locations') && $room->maintainable->manager?->id == $user->id;
 
         return false;
     }

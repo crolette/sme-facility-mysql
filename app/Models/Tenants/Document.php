@@ -9,9 +9,10 @@ use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Company;
 use App\Models\Central\CategoryType;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -111,19 +112,23 @@ class Document extends Model
             ->merge($this->rooms);
     }
 
-    public function scopeWithManager($query, $user)
+    public function scopeForMaintenanceManager(Builder $query, ?User $user = null)
     {
-        $query->whereHas('assets.maintainable', function (Builder $query) use ($user) {
-            $query->where('maintenance_manager_id', $user->id);
-        })->orWhereHas('rooms.maintainable', function (Builder $query) use ($user) {
-            $query->where('maintenance_manager_id', $user->id);
-        })->orWhereHas('floors.maintainable', function (Builder $query) use ($user) {
-            $query->where('maintenance_manager_id', $user->id);
-        })->orWhereHas('buildings.maintainable', function (Builder $query) use ($user) {
-            $query->where('maintenance_manager_id', $user->id);
-        })->orWhereHas('sites.maintainable', function (Builder $query) use ($user) {
-            $query->where('maintenance_manager_id', $user->id);
-        });
+        $user = $user ?? Auth::user();
+
+        if ($user?->hasRole('Maintenance Manager')) {
+            $query->whereHas('assets.maintainable', function (Builder $query) use ($user) {
+                $query->where('maintenance_manager_id', $user->id);
+            })->orWhereHas('rooms.maintainable', function (Builder $query) use ($user) {
+                $query->where('maintenance_manager_id', $user->id);
+            })->orWhereHas('floors.maintainable', function (Builder $query) use ($user) {
+                $query->where('maintenance_manager_id', $user->id);
+            })->orWhereHas('buildings.maintainable', function (Builder $query) use ($user) {
+                $query->where('maintenance_manager_id', $user->id);
+            })->orWhereHas('sites.maintainable', function (Builder $query) use ($user) {
+                $query->where('maintenance_manager_id', $user->id);
+            });
+        }
     }
 
 

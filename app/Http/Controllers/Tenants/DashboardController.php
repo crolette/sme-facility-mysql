@@ -19,15 +19,13 @@ use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
 use App\Models\Tenants\Intervention;
 use App\Models\Tenants\Maintainable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
 {
     public function show()
     {
-        $assetsCount = Asset::count();
-        $ticketsCount = Ticket::where('status', '!=', 'closed')->count();
-        $interventionsCount = Intervention::where('status', '!=', 'completed')->where('status', '!=', 'cancelled')->count();
 
         $company = Company::first();
 
@@ -37,11 +35,6 @@ class DashboardController extends Controller
             'percent' => round($company->disk_size_gb / 20, 2)
         ];
 
-        $counts = [
-            'assetsCount' => $assetsCount,
-            'ticketsCount' => $ticketsCount,
-            'interventionsCount' => $interventionsCount,
-        ];
 
         $maintainables = Maintainable::select(
             'id',
@@ -71,8 +64,7 @@ class DashboardController extends Controller
             )
             ->orderBy('next_maintenance_date')
             ->limit(10)
-            ->with('maintainable')
-            ->get();
+            ->with('maintainable');
 
 
         $overdueMaintenances =
@@ -104,17 +96,15 @@ class DashboardController extends Controller
             )
             ->orderBy('next_maintenance_date')
             ->limit(10)
-            ->with('maintainable')
-            ->get();
+            ->with('maintainable');
+
 
         $interventions = Intervention::select('id', 'intervention_type_id', 'priority', 'status', 'maintainable_id', 'interventionable_type', 'interventionable_id', 'ticket_id', 'planned_at')
             ->where('planned_at', '>=', today())
             ->withoutTrashed()
             ->orderBy('planned_at')
             ->limit(10)
-            ->with('maintainable:id,name,maintainable_type', 'ticket:id,description', 'interventionable')
-            ->get();
-
+            ->with('maintainable:id,name,maintainable_type', 'ticket:id,description', 'interventionable');
 
         $overdueInterventions = Intervention::select('id', 'intervention_type_id', 'priority', 'status', 'maintainable_id', 'interventionable_type', 'interventionable_id', 'ticket_id', 'planned_at')
             ->where('planned_at', '<', today())
@@ -122,9 +112,30 @@ class DashboardController extends Controller
             ->whereNotIn('status', ['completed', 'cancelled'])
             ->orderBy('planned_at')
             ->limit(10)
-            ->with('maintainable:id,name,maintainable_type', 'ticket:id,description', 'interventionable')
-            ->get();
+            ->with('maintainable:id,name,maintainable_type', 'ticket:id,description', 'interventionable');
 
-        return Inertia::render('tenants/dashboard', ['counts' => $counts, 'overdueMaintenances' => $overdueMaintenances, 'overdueInterventions' => $overdueInterventions,  'maintainables' => $maintainables, 'interventions' => $interventions, 'diskSizes' => $diskSizes]);
+        if (Auth::user()->hasRole('Maintenance Manager')) {
+            $assetsCount = Asset::forMaintenanceManager()->count();
+            $ticketsCount = Ticket::forMaintenanceManager()->where('status', '!=', 'closed')->count();
+            $interventionsCount = Intervention::forMaintenanceManager()->where('status', '!=', 'completed')->where('status', '!=', 'cancelled')->count();
+            $maintainables->forMaintenanceManager();
+            $overdueMaintenances->forMaintenanceManager();
+            $interventions->forMaintenanceManager();
+            $overdueInterventions->forMaintenanceManager();
+        } else {
+            $assetsCount = Asset::count();
+            $ticketsCount = Ticket::where('status', '!=', 'closed')->count();
+            $interventionsCount = Intervention::where('status', '!=', 'completed')->where('status', '!=', 'cancelled')->count();
+        }
+
+        $counts = [
+            'assetsCount' => $assetsCount,
+            'ticketsCount' => $ticketsCount,
+            'interventionsCount' => $interventionsCount,
+        ];
+
+        return Inertia::render('tenants/dashboard', ['counts' => $counts, 'overdueMaintenances' => $overdueMaintenances
+            ->get(), 'overdueInterventions' => $overdueInterventions->get(),  'maintainables' => $maintainables
+            ->get(), 'interventions' => $interventions->get(), 'diskSizes' => $diskSizes]);
     }
 }

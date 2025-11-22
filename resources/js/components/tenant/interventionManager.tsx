@@ -566,7 +566,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                                 </li>
                                             </>
                                         ))}
-                                    {externalProviders?.length === 0 && <li>No results...</li>}
+                                    {externalProviders?.length === 0 && <li>{t('common.no_results')}</li>}
                                 </ul>
                             </div>
                             <div className="flex w-full flex-col">

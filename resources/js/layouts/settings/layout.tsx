@@ -1,6 +1,7 @@
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { usePermissions } from '@/hooks/usePermissions';
 import { cn } from '@/lib/utils';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
@@ -8,6 +9,7 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { type PropsWithChildren } from 'react';
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
+    const { hasPermission, hasAnyPermission } = usePermissions();
     const { t } = useLaravelReactI18n();
     // When server-side rendering, we only render the layout on the client...
     if (typeof window === 'undefined') {
@@ -35,17 +37,22 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
             href: '/settings/appearance',
             icon: null,
         },
-        {
-            title: `${t('settings.import_export')}`,
-            href: '/settings/import-export',
-            icon: null,
-        },
-        {
+    ];
+
+    if (hasPermission('update company'))
+        sidebarNavItems.push({
             title: `${t('settings.company')}`,
             href: '/settings/company',
             icon: null,
-        },
-    ];
+        });
+
+    if (hasAnyPermission(['import excel', 'export excel']))
+        sidebarNavItems.push({
+            title: `${t('settings.import_export')}`,
+            href: '/settings/import-export',
+            icon: null,
+        });
+
     const currentPath = window.location.pathname;
 
     return (

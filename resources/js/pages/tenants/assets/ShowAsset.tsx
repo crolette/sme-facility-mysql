@@ -7,10 +7,11 @@ import { TicketManager } from '@/components/tenant/ticketManager';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import Field from '@/components/ui/field';
+import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import { Asset, Contract, type BreadcrumbItem } from '@/types';
 import { router } from '@inertiajs/core';
-import { Head, usePage } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArchiveRestore, CircleCheckBig, Pencil, QrCode, Shredder, Trash2 } from 'lucide-react';
@@ -18,7 +19,7 @@ import { useState } from 'react';
 
 export default function ShowAsset({ item }: { item: Asset }) {
     const { t, tChoice } = useLaravelReactI18n();
-    const { permissions } = usePage().props.auth;
+    const { hasPermission } = usePermissions();
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index ${tChoice('assets.title', 2)}`,
@@ -110,13 +111,13 @@ export default function ShowAsset({ item }: { item: Asset }) {
                 <div className="flex flex-wrap items-center gap-4">
                     {asset.deleted_at ? (
                         <>
-                            {permissions.find((item) => item == 'restore assets') && (
+                            {hasPermission('restore assets') && (
                                 <Button onClick={() => restoreAsset(asset)} variant={'green'}>
                                     <ArchiveRestore />
                                     {t('actions.restore')}
                                 </Button>
                             )}
-                            {permissions.find((item) => item == 'force delete assets') && (
+                            {hasPermission('force delete assets') && (
                                 <Button onClick={() => deleteDefinitelyAsset(asset)} variant={'destructive'}>
                                     <Shredder />
                                     {t('actions.delete_definitely')}
@@ -125,7 +126,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                         </>
                     ) : (
                         <>
-                            {permissions.find((item) => item == 'update assets') && (
+                            {hasPermission('update assets') && (
                                 <>
                                     <a href={route(`tenant.assets.edit`, asset.reference_code)}>
                                         <Button>
@@ -141,7 +142,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                     )}
                                 </>
                             )}
-                            {permissions.find((item) => item == 'delete assets') && (
+                            {hasPermission('delete assets') && (
                                 <Button onClick={() => deleteAsset(asset)} variant={'destructive'}>
                                     <Trash2 />
                                     {t('actions.delete')}

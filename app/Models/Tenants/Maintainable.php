@@ -4,12 +4,14 @@ namespace App\Models\Tenants;
 
 use App\Enums\MaintenanceFrequency;
 use App\Models\Tenants\Intervention;
+use Illuminate\Support\Facades\Auth;
 use App\Observers\MaintainableObserver;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 #[ObservedBy([MaintainableObserver::class])]
@@ -84,5 +86,16 @@ class Maintainable extends Model
     public function interventions(): HasMany
     {
         return $this->hasMany(Intervention::class);
+    }
+
+    public function scopeForMaintenanceManager(Builder $query, ?User $user = null)
+    {
+        $user = $user ?? Auth::user();
+
+        if ($user?->hasRole('Maintenance Manager')) {
+            return $query->where('maintenance_manager_id', $user->id);
+        }
+
+        return $query;
     }
 }

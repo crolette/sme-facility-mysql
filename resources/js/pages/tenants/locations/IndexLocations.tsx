@@ -6,9 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
+import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, CentralType, PaginatedData, TenantBuilding, TenantFloor, TenantRoom, TenantSite } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -35,7 +36,7 @@ export default function IndexSites({
     filters: SearchParams;
     categories: CentralType[];
 }) {
-    const { permissions } = usePage().props.auth;
+    const { hasPermission } = usePermissions();
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -192,7 +193,7 @@ export default function IndexSites({
                         </div>
                     </details>
 
-                    {permissions.find((item) => item == 'create locations') && (
+                    {hasPermission('create locations') && (
                         <div className="flex space-x-2">
                             <a href={route(`tenant.${routeName}.create`)}>
                                 <Button>
@@ -252,7 +253,7 @@ export default function IndexSites({
                                     </TableBodyData>
                                 </TableBodyRow>
                             ) : locations.length === 0 ? (
-                                <p>No results... </p>
+                                <p>{t('common.no_results')} </p>
                             ) : (
                                 locations &&
                                 locations.map((item, index) => {
@@ -275,20 +276,24 @@ export default function IndexSites({
                                             </TableBodyData>
 
                                             <TableBodyData className="space-x-2">
-                                                <a href={route(`tenant.${routeName}.edit`, item.reference_code)}>
-                                                    <Button>
-                                                        <Pencil />
+                                                {hasPermission('update locations') && (
+                                                    <a href={route(`tenant.${routeName}.edit`, item.reference_code)}>
+                                                        <Button>
+                                                            <Pencil />
+                                                        </Button>
+                                                    </a>
+                                                )}
+                                                {hasPermission('delete locations') && (
+                                                    <Button
+                                                        onClick={() => {
+                                                            setShowDeleteModale(true);
+                                                            setLocationToDelete(item);
+                                                        }}
+                                                        variant={'destructive'}
+                                                    >
+                                                        <Trash2 />
                                                     </Button>
-                                                </a>
-                                                <Button
-                                                    onClick={() => {
-                                                        setShowDeleteModale(true);
-                                                        setLocationToDelete(item);
-                                                    }}
-                                                    variant={'destructive'}
-                                                >
-                                                    <Trash2 />
-                                                </Button>
+                                                )}
                                             </TableBodyData>
                                         </TableBodyRow>
                                     );
@@ -300,8 +305,8 @@ export default function IndexSites({
                 <Pagination items={items} />
             </div>
             <Modale
-                title={`Delete ${routeName}`}
-                message={`Are you sure you want to delete ${locationToDelete?.name}`}
+                title={t('actions.delete-type', { type: tChoice(`locations.${routeName}`, 1) })}
+                message={t('locations.delete_description', { name: locationToDelete?.name ?? '' })}
                 isOpen={showDeleteModale}
                 onConfirm={deleteLocation}
                 onCancel={() => {

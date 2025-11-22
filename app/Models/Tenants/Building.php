@@ -4,12 +4,15 @@ namespace App\Models\Tenants;
 
 use App\Models\LocationType;
 use App\Models\Tenants\Site;
+use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Contract;
 use App\Models\Tenants\Document;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
+use App\Traits\HasMaintenanceManager;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,7 +26,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Building extends Model
 {
-    use HasFactory;
+    use HasFactory, HasMaintenanceManager;
 
 
     protected $fillable = [
@@ -267,10 +270,18 @@ class Building extends Model
     }
 
     // SCOPES
-    public function scopeWhereMaintenanceManagerIsUser($query, $user)
+    public function scopeForMaintenanceManager(Builder $query, ?User $user = null)
     {
-        $query->whereHas('maintainable', function (Builder $query) use ($user) {
-            $query->where('maintenance_manager_id', $user->id);
-        });
+        $user = $user ?? Auth::user();
+
+        if ($user?->hasRole('Maintenance Manager')) {
+            return $query->whereHas(
+                'maintainable',
+                fn($q) =>
+                $q->where('maintenance_manager_id', $user->id)
+            );
+        }
+
+        return $query;
     }
 }
