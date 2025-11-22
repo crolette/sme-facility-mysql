@@ -54,6 +54,10 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
                 tabName: 'assets',
                 tabDisplay: tChoice('assets.title', 2),
             },
+            {
+                tabName: 'maintenance',
+                tabDisplay: t('maintenances.maintenance_manager'),
+            },
         ],
         asset: [
             {
