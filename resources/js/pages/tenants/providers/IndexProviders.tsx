@@ -1,6 +1,7 @@
 import { Pagination } from '@/components/pagination';
 import { useGridTableLayoutContext } from '@/components/tenant/gridTableLayoutContext';
 import { Button } from '@/components/ui/button';
+import DisplayGridTableIndex from '@/components/ui/displayGridTableIndex';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
@@ -9,7 +10,7 @@ import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, CentralType, Provider, ProvidersPaginated } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { LayoutGrid, Loader, Pencil, PlusCircle, TableIcon, X } from 'lucide-react';
+import { Loader, Pencil, PlusCircle, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export interface SearchParams {
@@ -110,7 +111,7 @@ export default function IndexProviders({
             });
     }, [query]);
 
-    const { layout, setLayout } = useGridTableLayoutContext();
+    const { layout } = useGridTableLayoutContext();
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -162,13 +163,9 @@ export default function IndexProviders({
                         </a>
                     )}
                 </div>
-                <div className="flex gap-4">
-                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('grid')}>
-                        <LayoutGrid size={20} />
-                    </div>
-                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('table')}>
-                        <TableIcon size={20} />
-                    </div>
+                <div className="flex w-full items-center justify-between">
+                    <h1>{tChoice(`providers.title`, 2)}</h1>
+                    <DisplayGridTableIndex />
                 </div>
                 {layout === 'grid' ? (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">

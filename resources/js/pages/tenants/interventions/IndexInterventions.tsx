@@ -4,6 +4,7 @@ import { Pagination } from '@/components/pagination';
 import { useGridTableLayoutContext } from '@/components/tenant/gridTableLayoutContext';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
+import DisplayGridTableIndex from '@/components/ui/displayGridTableIndex';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Pill } from '@/components/ui/pill';
@@ -16,7 +17,7 @@ import { BreadcrumbItem, CentralType, Intervention, InterventionStatus, Paginate
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { ArrowDownNarrowWide, ArrowDownWideNarrow, LayoutGrid, Loader, Pencil, TableIcon, Trash2, X } from 'lucide-react';
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, Loader, Pencil, Trash2, X } from 'lucide-react';
 
 import { FormEventHandler, useEffect, useState } from 'react';
 
@@ -244,8 +245,7 @@ export default function IndexInterventions({
         }
     };
 
-    // const [listStyle, setListStyle] = useState<'grid' | 'table'>('table');
-    const { layout, setLayout } = useGridTableLayoutContext();
+    const { layout } = useGridTableLayoutContext();
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -320,13 +320,9 @@ export default function IndexInterventions({
                         </div>
                     </details>
                 </div>
-                <div className="flex gap-4">
-                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('grid')}>
-                        <LayoutGrid size={20} />
-                    </div>
-                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('table')}>
-                        <TableIcon size={20} />
-                    </div>
+                <div className="flex w-full items-center justify-between">
+                    <h1>{tChoice(`interventions.title`, 2)}</h1>
+                    <DisplayGridTableIndex />
                 </div>
                 {layout === 'grid' ? (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">

@@ -1,4 +1,5 @@
 import { Pill } from '@/components/ui/pill';
+import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import { Intervention, Maintainable, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
@@ -20,6 +21,7 @@ export default function TenantDashboard({
     overdueInterventions: Intervention[];
     diskSizes: { mb: number; gb: number; percent: number };
 }) {
+    const { hasPermission } = usePermissions();
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -31,42 +33,44 @@ export default function TenantDashboard({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="grid grid-cols-4 gap-4">
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex items-center justify-center overflow-hidden rounded-xl border p-4">
-                        <div className="flex flex-col">
-                            <p className="font-semibold uppercase">{t('dashboard.disk_space')}</p>
-                            <HardDrive strokeWidth={1} className="m-auto h-12 w-12" />
-                            <p className="text-lg">
-                                {diskSizes.gb} GB <span className="text-xs">({diskSizes.percent < 1 ? '< 1 ' : diskSizes.percent} %)</span>
-                            </p>
+                <div className="grid grid-flow-col-dense gap-4">
+                    {hasPermission('update company') && (
+                        <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex items-center justify-center overflow-hidden rounded-xl border p-4">
+                            <div className="flex flex-col">
+                                <p className="font-semibold uppercase">{t('dashboard.disk_space')}</p>
+                                <HardDrive strokeWidth={1} className="m-auto h-4 w-4 md:h-12 md:w-12" />
+                                <p className="text-lg">
+                                    {diskSizes.gb} GB <span className="text-xs">({diskSizes.percent < 1 ? '< 1 ' : diskSizes.percent} %)</span>
+                                </p>
+                            </div>
+                            {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
                         </div>
-                        {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
-                    </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex items-center justify-center overflow-hidden rounded-xl border p-4">
+                    )}
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border hover:bg-secondary relative flex items-center justify-center overflow-hidden rounded-xl border p-4">
                         <a href={route('tenant.tickets.index')} className="w-full text-center !no-underline">
                             <div className="flex flex-col">
-                                <p className="font-semibold uppercase">{tChoice('tickets.title', 2)}</p>
+                                <p className="hidden font-semibold uppercase md:inline-block">{tChoice('tickets.title', 2)}</p>
                                 <Ticket strokeWidth={1} className="m-auto h-12 w-12" />
                                 <p className="text-lg">{counts.ticketsCount}</p>
                             </div>
                         </a>
                         {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
                     </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex items-center justify-center overflow-hidden rounded-xl border p-4">
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border hover:bg-secondary relative flex items-center justify-center overflow-hidden rounded-xl border p-4">
                         <a href={route('tenant.assets.index')} className="text-center !no-underline">
                             <div className="flex flex-col items-center justify-center">
-                                <p className="font-semibold uppercase">{tChoice('assets.title', 2)}</p>
+                                <p className="hidden font-semibold uppercase md:inline-block">{tChoice('assets.title', 2)}</p>
                                 <Cuboid strokeWidth={1} className="m-auto h-12 w-12" />
                                 <p className="text-lg">{counts.assetsCount}</p>
                             </div>
                         </a>
                         {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
                     </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border p-4">
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border hover:bg-secondary relative overflow-hidden rounded-xl border p-4">
                         {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
                         <a href={route('tenant.assets.index')} className="text-center !no-underline">
                             <div className="flex flex-col items-center justify-center">
-                                <p className="font-semibold uppercase">{tChoice('interventions.title', 2)}</p>
+                                <p className="hidden font-semibold uppercase md:inline-block">{tChoice('interventions.title', 2)}</p>
                                 <Wrench strokeWidth={1} className="m-auto h-12 w-12" />
                                 <p className="text-lg">{counts.interventionsCount}</p>
                             </div>

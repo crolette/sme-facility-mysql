@@ -32,7 +32,8 @@ class UserPolicy
         if ($user->hasPermissionTo('view any users')) {
             return true;
         } else {
-            return $user->can('view users') && $user->id == $model->id;
+            return $user->can('view users');
+            // return $user->can('view users') && $user->id == $model->id;
         }
 
         return false;
@@ -59,7 +60,8 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        return $user->can('update users') && $user->id !== $model->id;
+        return $user->can('update users');
+        // return $user->can('update users') && $user->id !== $model->id;
     }
 
     /**

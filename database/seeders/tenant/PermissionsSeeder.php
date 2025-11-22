@@ -33,6 +33,7 @@ class PermissionsSeeder extends Seeder
                 'actions' => ['view any', 'view', 'create', 'update', 'delete'],
                 'documents' => ['view any', 'view', 'create', 'update', 'delete'],
                 'pictures' => ['view any', 'view', 'create', 'update', 'delete'],
+                'statistics' => ['view', 'export']
             ];
 
             foreach ($permissions as $entity => $actions) {
@@ -91,6 +92,8 @@ class PermissionsSeeder extends Seeder
                 'create pictures',
                 'update pictures',
                 'delete pictures',
+
+                'view statistics'
             ]);
 
             Role::create(['guard_name' => 'tenant', 'name' => 'Provider'])->givePermissionTo([

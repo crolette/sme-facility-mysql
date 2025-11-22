@@ -65,7 +65,9 @@ class HandleInertiaRequests extends Middleware
             }
         }
 
-        $ticketsCount = $request->user()->hasRole('Maintenance Manager') ? Ticket::where('status', 'open')->orWhere('status', 'ongoing')->forMaintenanceManager()->count() : Ticket::where('status', 'open')->orWhere('status', 'ongoing')->count();
+        if (tenancy()->tenant) {
+            $ticketsCount = $request->user()->hasRole('Maintenance Manager') ? Ticket::where('status', 'open')->orWhere('status', 'ongoing')->forMaintenanceManager()->count() : Ticket::where('status', 'open')->orWhere('status', 'ongoing')->count();
+        }
 
         return [
             ...parent::share($request),
@@ -84,7 +86,7 @@ class HandleInertiaRequests extends Middleware
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
-            'openTicketsCount' => $ticketsCount,
+            'openTicketsCount' => $ticketsCount ?? null,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'indexLayout' => ! $request->hasCookie('index_layout') || $request->cookie('index_layout') === 'table',
         ];

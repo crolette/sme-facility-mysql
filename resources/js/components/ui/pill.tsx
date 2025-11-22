@@ -13,11 +13,11 @@ const pillVariants = cva(
         draft: "bg-sidebar-accent",
 
         'waiting for parts':"bg-sidebar-border text-background dark:text-foreground",
-        open: "bg-destructive",
-        ongoing: "bg-emerald-500",
+        open: "bg-destructive text-background dark:text-foreground",
+        ongoing: "bg-emerald-500 text-background dark:text-foreground",
         planned: "bg-ring",
         in_progress: "bg-emerald-300 dark:text-background",
-        closed: "bg-green-900",
+        closed: "bg-green-900 text-background dark:text-foreground",
         completed: "bg-green-900 text-background dark:text-foreground",
         active:
           "bg-emerald-700",
