@@ -118,10 +118,10 @@
     --input: oklch(0.922 0 0);
     --ring: oklch(0.87 0 0);
     --success: oklch(0.6 0.118 184.704);
-    --chart-1: oklch(45.633% 0.13478 263.563);
+    --chart-1: oklch(50.163% 0.21271 262.679);
     --chart-2: oklch(56.627% 0.09703 258.464);
-    --chart-3: oklch(42.935% 0.11812 258.322);
-    --chart-4: oklch(54.636% 0.08264 263.21);
+    --chart-3: oklch(43.634% 0.10447 257.957);
+    --chart-4: oklch(33.703% 0.08577 263.304);
     --chart-5: oklch(56.983% 0.15547 258.607);
     /* --chart-1: oklch(0.646 0.222 41.116);
     --chart-2: oklch(0.6 0.118 184.704);
@@ -254,12 +254,12 @@ a:hover {
 
 h1 {
     font-size: clamp(2rem, 5vw, 3.5rem);
-    line-height: 4rem;
+    line-height: clamp(3.5rem, 5vw, 4rem);
 }
 
 h2 {
     font-size: clamp(1.75rem, 4vw, 2.75rem);
-    line-height: 3rem;
+    line-height: clamp(2rem, 4vw, 3rem);
 }
 
 h3 {

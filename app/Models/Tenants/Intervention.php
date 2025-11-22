@@ -3,11 +3,14 @@
 namespace App\Models\Tenants;
 
 use App\Enums\PriorityLevel;
+use App\Models\Tenants\User;
 use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Picture;
 use App\Enums\InterventionStatus;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
+use Illuminate\Support\Facades\Auth;
+use App\Traits\HasMaintenanceManager;
 use App\Observers\InterventionObserver;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
@@ -24,7 +27,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 #[ObservedBy([InterventionObserver::class])]
 class Intervention extends Model
 {
-    use HasFactory;
+    use HasFactory, HasMaintenanceManager;
 
     protected $fillable = [
         'priority',
@@ -131,6 +134,7 @@ class Intervention extends Model
             get: fn() => $this->interventionType->translations->where('locale', $locale)->first()?->label ?? $this->interventionType->translations->where('locale', config('app.fallback_locale'))?->label
         );
     }
+
 
     public function scopeWithoutTrashed($query)
     {

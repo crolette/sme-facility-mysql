@@ -2,6 +2,7 @@ import { Pagination } from '@/components/pagination';
 import { useGridTableLayoutContext } from '@/components/tenant/gridTableLayoutContext';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
+import DisplayGridTableIndex from '@/components/ui/displayGridTableIndex';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Pill } from '@/components/ui/pill';
@@ -9,10 +10,10 @@ import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { BreadcrumbItem, PaginatedData, TicketStatus } from '@/types';
-import { Head, router } from '@inertiajs/react';
+import { Head, router, usePage } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { ArrowDownNarrowWide, ArrowDownWideNarrow, LayoutGrid, Loader, TableIcon, X } from 'lucide-react';
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, Loader, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export interface SearchParams {
@@ -24,6 +25,10 @@ export interface SearchParams {
 
 export default function IndexTickets({ items, filters, statuses }: { items: PaginatedData; filters: SearchParams; statuses: TicketStatus }) {
     const { t, tChoice } = useLaravelReactI18n();
+    const { permissions } = usePage().props.auth;
+
+    console.log(permissions);
+
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index ${tChoice('tickets', 2)}`,
@@ -113,7 +118,7 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
             });
     }, [query]);
 
-    const { layout, setLayout } = useGridTableLayoutContext();
+    const { layout } = useGridTableLayoutContext();
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -191,18 +196,16 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                     </details>
                 </div>
 
-                <h3 className="inline">
-                    {tChoice('tickets', 2)} {!isLoading && `(${items.total ?? 0})`}
-                </h3>
-                <div className="flex gap-4">
-                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('grid')}>
-                        <LayoutGrid size={20} />
-                    </div>
-                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('table')}>
-                        <TableIcon size={20} />
-                    </div>
+                <div className="flex w-full items-center justify-between">
+                    <h1>
+                        {tChoice('tickets.title', 2)} {!isLoading && `(${items.total ?? 0})`}
+                    </h1>
+                    <DisplayGridTableIndex />
                 </div>
-                {layout === 'grid' ? (
+
+                {isLoading ? (
+                    <p>{t('actions.loading')}</p>
+                ) : layout === 'grid' ? (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
                         {items.data.map((ticket, index) => (
                             <div key={index} className="border-accent bg-sidebar flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4">

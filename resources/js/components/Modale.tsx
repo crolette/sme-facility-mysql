@@ -1,3 +1,4 @@
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Loader } from 'lucide-react';
 import { Button } from './ui/button';
 
@@ -18,6 +19,7 @@ export default function Modale({
     onConfirm: () => void;
     onCancel: () => void;
 }) {
+    const { t } = useLaravelReactI18n();
     return (
         <>
             {isOpen && (
@@ -29,25 +31,25 @@ export default function Modale({
                                     {isProcessing && (
                                         <>
                                             <Loader className="animate-pulse" />
-                                            <p className="mx-auto animate-pulse text-3xl font-bold">Processing...</p>
+                                            <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.processing')}</p>
                                         </>
                                     )}
                                     {isUpdating && (
                                         <>
                                             <Loader className="animate-pulse" />
-                                            <p className="mx-auto animate-pulse text-3xl font-bold">Updating...</p>
+                                            <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.updating')}</p>
                                         </>
                                     )}
                                     {!isProcessing && !isUpdating && (
                                         <>
-                                            <p className="text-destructive mx-auto text-3xl font-bold">{title}</p>
+                                            <p className="text-destructive mx-auto text-3xl font-bold lowercase first-letter:uppercase">{title}</p>
                                             <p className="mx-auto w-2/3">{message}</p>
                                             <div className="mx-auto flex gap-4">
                                                 <Button variant={'secondary'} onClick={onCancel}>
-                                                    Cancel
+                                                    {t('actions.cancel')}
                                                 </Button>
                                                 <Button variant={'destructive'} onClick={onConfirm}>
-                                                    Delete
+                                                    {t('actions.delete')}
                                                 </Button>
                                             </div>
                                         </>

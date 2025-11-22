@@ -2,16 +2,19 @@
 
 namespace App\Models\Tenants;
 
+use App\Models\Tenants\User;
 use App\Observers\AssetObserver;
 use App\Models\Central\AssetType;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
 use App\Models\Tenants\Maintainable;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Central\AssetCategory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Tenants\ScheduledNotification;
+use App\Traits\HasMaintenanceManager;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -26,7 +29,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 #[ObservedBy([AssetObserver::class])]
 class Asset extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasMaintenanceManager;
 
     protected $fillable = [
         'code',
@@ -231,4 +234,20 @@ class Asset extends Model
             get: fn() => Storage::disk('tenants')->url($this->qr_code) ?? null
         );
     }
+
+    // SCOPE
+    // public function scopeForMaintenanceManager(Builder $query, ?User $user = null)
+    // {
+    //     $user = $user ?? Auth::user();
+
+    //     if ($user?->hasRole('Maintenance Manager')) {
+    //         return $query->whereHas(
+    //             'maintainable',
+    //             fn($q) =>
+    //             $q->where('maintenance_manager_id', $user->id)
+    //         );
+    //     }
+
+    //     return $query;
+    // }
 }

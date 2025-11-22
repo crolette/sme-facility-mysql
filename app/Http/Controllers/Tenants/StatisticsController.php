@@ -3,12 +3,9 @@
 namespace App\Http\Controllers\Tenants;
 
 use Inertia\Inertia;
-use App\Enums\TicketStatus;
-use App\Models\Tenants\Ticket;
-use Illuminate\Support\Facades\DB;
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Models\Central\CategoryType;
-use App\Models\Tenants\Intervention;
+use Illuminate\Support\Facades\Gate;
 use App\Http\Requests\Tenant\StatisticsRequest;
 use App\Services\Statistics\StatisticTicketsService;
 use App\Services\Statistics\StatisticInterventionsService;
@@ -18,6 +15,11 @@ class StatisticsController extends Controller
 
     public function index(StatisticsRequest $request)
     {
+        if (!Gate::allows('view statistics')) {
+            ApiResponse::notAuthorized();
+            return redirect()->back();
+        }
+
         $interventionsByStatus = app(StatisticInterventionsService::class)->getByStatus($request->validated());
         $interventionsByType = app(StatisticInterventionsService::class)->getByType($request->validated());
         $interventionsByAssignee = app(StatisticInterventionsService::class)->getByAssignee($request->validated());

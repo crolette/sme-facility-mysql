@@ -3,6 +3,7 @@
 namespace App\Models\Tenants;
 
 use App\Models\Tenants\Site;
+use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Enums\NoticePeriodEnum;
@@ -11,9 +12,11 @@ use App\Models\Tenants\Document;
 use App\Enums\ContractStatusEnum;
 use App\Enums\ContractDurationEnum;
 use App\Observers\ContractObserver;
+use Illuminate\Support\Facades\Auth;
 use App\Enums\ContractRenewalTypesEnum;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use App\Models\Tenants\ScheduledNotification;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -113,6 +116,26 @@ class Contract extends Model
             ->concat($this->buildings)
             ->concat($this->floors)
             ->concat($this->rooms);
+    }
+
+
+    public function scopeForMaintenanceManager(Builder $query, ?User $user = null)
+    {
+        $user = $user ?? Auth::user();
+
+        if ($user?->hasRole('Maintenance Manager')) {
+            $query->whereHas('assets.maintainable', function (Builder $query) use ($user) {
+                $query->where('maintenance_manager_id', $user->id);
+            })->orWhereHas('rooms.maintainable', function (Builder $query) use ($user) {
+                $query->where('maintenance_manager_id', $user->id);
+            })->orWhereHas('floors.maintainable', function (Builder $query) use ($user) {
+                $query->where('maintenance_manager_id', $user->id);
+            })->orWhereHas('buildings.maintainable', function (Builder $query) use ($user) {
+                $query->where('maintenance_manager_id', $user->id);
+            })->orWhereHas('sites.maintainable', function (Builder $query) use ($user) {
+                $query->where('maintenance_manager_id', $user->id);
+            });
+        }
     }
 
 

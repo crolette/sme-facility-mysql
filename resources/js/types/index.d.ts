@@ -50,6 +50,7 @@ export interface NavItem {
     icon?: LucideIcon | null;
     isActive?: boolean;
     count?: number;
+    canView?: boolean;
 }
 
 type FlashType = 'success' | 'error' | 'warning' | 'info';

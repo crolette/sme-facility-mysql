@@ -3,14 +3,18 @@
 namespace App\Models\Tenants;
 
 use App\Models\LocationType;
+use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Contract;
 use App\Models\Tenants\Document;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
+use App\Traits\HasMaintenanceManager;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -21,7 +25,7 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class Site extends Model
 {
-    use HasFactory;
+    use HasFactory, HasMaintenanceManager;
 
     protected $fillable = [
         'reference_code',
@@ -223,4 +227,7 @@ class Site extends Model
             get: fn() => 'data:' . $mimeType . ';base64,' . base64_encode($imageData)
         );
     }
+
+    // SCOPES
+
 }

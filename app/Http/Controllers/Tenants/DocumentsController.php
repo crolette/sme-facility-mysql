@@ -7,14 +7,17 @@ use Illuminate\Http\Request;
 use App\Models\Tenants\Document;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 
 class DocumentsController extends Controller
 {
     public function index(Request $request)
     {
-
+        if (!Gate::allows('view any documents'))
+            abort(403);
 
         $validator = Validator::make($request->all(), [
             'q' => 'string|max:255|nullable',
@@ -24,7 +27,7 @@ class DocumentsController extends Controller
         ]);
 
         $validatedFields = $validator->validated();
-        $documents = Document::query();
+        $documents = Document::query()->forMaintenanceManager();
 
         if (isset($validatedFields['type'])) {
             $documents->where('category_type_id', $validatedFields['type']);

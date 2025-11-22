@@ -3,16 +3,18 @@ import { Pagination } from '@/components/pagination';
 import { useGridTableLayoutContext } from '@/components/tenant/gridTableLayoutContext';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
+import DisplayGridTableIndex from '@/components/ui/displayGridTableIndex';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
+import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { Asset, AssetsPaginated, BreadcrumbItem, CentralType } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { ArchiveRestore, LayoutGrid, Loader, Pencil, PlusCircle, Shredder, TableIcon, Trash2, X } from 'lucide-react';
+import { ArchiveRestore, Loader, Pencil, PlusCircle, Shredder, Trash2, X } from 'lucide-react';
 
 import { useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
@@ -27,6 +29,7 @@ export interface SearchParams {
 
 export default function IndexAssets({ items, filters, categories }: { items: AssetsPaginated; filters: SearchParams; categories: CentralType[] }) {
     const { t, tChoice } = useLaravelReactI18n();
+    const { hasPermission } = usePermissions();
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index ${tChoice('assets.title', 2)}`,
@@ -204,7 +207,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
             });
     }, [query]);
 
-    const { layout, setLayout } = useGridTableLayoutContext();
+    const { layout } = useGridTableLayoutContext();
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -279,32 +282,32 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                 </Button>
                             </div>
                         </details>
-                        <div className="flex space-x-2">
-                            <a href={route(`tenant.assets.create`)} className="w-fit">
-                                <Button>
-                                    <PlusCircle />
-                                    {t('actions.create')}
-                                </Button>
-                            </a>
-                            <a href={route('tenant.pdf.qr-codes', { type: 'assets' })} target="__blank">
-                                <Button variant={'secondary'}>
-                                    <BiSolidFilePdf size={20} />
-                                    {t('actions.download-type', { type: tChoice('common.qr_codes', 2) })}
-                                </Button>
-                            </a>
-                        </div>
+                        {hasPermission('create assets') && (
+                            <div className="flex space-x-2">
+                                <a href={route(`tenant.assets.create`)} className="w-fit">
+                                    <Button>
+                                        <PlusCircle />
+                                        {t('actions.create')}
+                                    </Button>
+                                </a>
+                                <a href={route('tenant.pdf.qr-codes', { type: 'assets' })} target="__blank">
+                                    <Button variant={'secondary'}>
+                                        <BiSolidFilePdf size={20} />
+                                        {t('actions.download-type', { type: tChoice('common.qr_codes', 2) })}
+                                    </Button>
+                                </a>
+                            </div>
+                        )}
                     </div>
                 </div>
 
-                <div className="flex gap-4">
-                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('grid')}>
-                        <LayoutGrid size={20} />
-                    </div>
-                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('table')}>
-                        <TableIcon size={20} />
-                    </div>
+                <div className="flex w-full items-center justify-between">
+                    <h1>{tChoice('assets.title', 2)}</h1>
+                    <DisplayGridTableIndex />
                 </div>
-                {layout === 'grid' ? (
+                {isLoading ? (
+                    <p>{t('actions.loading')}</p>
+                ) : layout === 'grid' ? (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
                         {assets.map((asset, index) => (
                             <div key={index} className="border-accent bg-sidebar flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4">
@@ -371,37 +374,45 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                             <TableBodyData className="space-x-2">
                                                 {asset.deleted_at ? (
                                                     <>
-                                                        <Button onClick={() => restoreAsset(asset)} variant={'green'}>
-                                                            <ArchiveRestore />
-                                                            {/* Restore */}
-                                                        </Button>
-                                                        <Button
-                                                            onClick={() => {
-                                                                setAssetToDeleteDefinitely(asset.reference_code);
-                                                                setShowDeleteDefinitelyModale(true);
-                                                            }}
-                                                            variant={'destructive'}
-                                                        >
-                                                            <Shredder />
-                                                            {/* Delete definitely */}
-                                                        </Button>
+                                                        {hasPermission('restore assets') && (
+                                                            <Button onClick={() => restoreAsset(asset)} variant={'green'}>
+                                                                <ArchiveRestore />
+                                                                {/* Restore */}
+                                                            </Button>
+                                                        )}
+                                                        {hasPermission('force delete assets') && (
+                                                            <Button
+                                                                onClick={() => {
+                                                                    setAssetToDeleteDefinitely(asset.reference_code);
+                                                                    setShowDeleteDefinitelyModale(true);
+                                                                }}
+                                                                variant={'destructive'}
+                                                            >
+                                                                <Shredder />
+                                                                {/* Delete definitely */}
+                                                            </Button>
+                                                        )}
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <a href={route(`tenant.assets.edit`, asset.reference_code)}>
-                                                            <Button>
-                                                                <Pencil />
+                                                        {hasPermission('update assets') && (
+                                                            <a href={route(`tenant.assets.edit`, asset.reference_code)}>
+                                                                <Button>
+                                                                    <Pencil />
+                                                                </Button>
+                                                            </a>
+                                                        )}
+                                                        {hasPermission('delete assets') && (
+                                                            <Button
+                                                                onClick={() => {
+                                                                    setAssetToDelete(asset);
+                                                                    setShowDeleteModale(true);
+                                                                }}
+                                                                variant={'destructive'}
+                                                            >
+                                                                <Trash2 />
                                                             </Button>
-                                                        </a>
-                                                        <Button
-                                                            onClick={() => {
-                                                                setAssetToDelete(asset);
-                                                                setShowDeleteModale(true);
-                                                            }}
-                                                            variant={'destructive'}
-                                                        >
-                                                            <Trash2 />
-                                                        </Button>
+                                                        )}
                                                     </>
                                                 )}
                                             </TableBodyData>
@@ -410,7 +421,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                 })
                             ) : (
                                 <TableBodyRow key={0}>
-                                    <TableBodyData>No results...</TableBodyData>
+                                    <TableBodyData>{t('common.no_results')}</TableBodyData>
                                 </TableBodyRow>
                             )}
                         </TableBody>
@@ -421,8 +432,8 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                 <Pagination items={items} />
             </div>
             <Modale
-                title={'Delete asset'}
-                message={`Are you sure you want to delete the asset ${assetToDelete?.maintainable.name} ? `}
+                title={t('actions.delete-type', { type: tChoice('assets.title', 1) })}
+                message={t('assets.delete_description', { name: assetToDelete?.maintainable.name ?? '' })}
                 isOpen={showDeleteModale}
                 onConfirm={deleteAsset}
                 onCancel={() => {
@@ -431,10 +442,8 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                 }}
             />
             <Modale
-                title={'Delete definitely'}
-                message={
-                    'Are you sure to delete this asset DEFINITELY ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.'
-                }
+                title={t('actions.delete_definitely')}
+                message={t('assets.delete_definitely_description')}
                 isOpen={showDeleteDefinitelyModale}
                 onConfirm={deleteDefinitelyAsset}
                 onCancel={() => {

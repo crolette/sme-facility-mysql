@@ -9,6 +9,7 @@ use App\Models\Tenants\Asset;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -130,5 +131,20 @@ class Ticket extends Model
         $this->handled_at = Carbon::now()->toDateString();
         $this->status = TicketStatus::ONGOING->value;
         $this->save();
+    }
+
+    public function scopeForMaintenanceManager(Builder $query, ?User $user = null)
+    {
+        $user = $user ?? Auth::user();
+
+        if ($user?->hasRole('Maintenance Manager')) {
+            return $query->whereHas(
+                'ticketable.maintainable',
+                fn($q) =>
+                $q->where('maintenance_manager_id', $user->id)
+            );
+        }
+
+        return $query;
     }
 }

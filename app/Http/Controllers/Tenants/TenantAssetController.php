@@ -56,6 +56,12 @@ class TenantAssetController extends Controller
             $assets = Asset::withoutTrashed();
         }
 
+        if (Auth::user()->hasRole('Maintenance Manager')) {
+            $assets->whereHas('maintainable', function (Builder $query) {
+                $query->where('maintenance_manager_id', Auth::user()->id);
+            });
+        }
+
         if (isset($validatedFields['category'])) {
             $assets->where('category_type_id', $validatedFields['category']);
         };
@@ -65,6 +71,7 @@ class TenantAssetController extends Controller
                 $query->where('name', 'like', '%' . $validatedFields['q'] . '%');
             });
         }
+
 
         $categories = CategoryType::where('category', 'asset')->get();
 

@@ -1,6 +1,7 @@
 import HeadingSmall from '@/components/heading-small';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
+import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
@@ -16,6 +17,7 @@ interface TypeFormData {
 }
 
 export default function ImportExportSettings() {
+    const { hasPermission } = usePermissions();
     // const [isModalOpen, setIsModalOpen] = useState(false);
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
@@ -115,8 +117,6 @@ export default function ImportExportSettings() {
         }
     };
 
-    console.log(itemsToBeExported);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.import_export')} />
@@ -126,83 +126,88 @@ export default function ImportExportSettings() {
                     <div className="relative gap-4">
                         <HeadingSmall title={t('settings.import_export')} description={t('settings.import_export_description')} />
                     </div>
+                    {hasPermission('export excel') && (
+                        <div className="flex w-fit flex-col gap-4">
+                            <select name="" id="" defaultValue={''} onChange={(e) => setItemsToBeExported(e.target.value)}>
+                                <option value="" disabled>
+                                    -- Select items to export --
+                                </option>
+                                <option value="assets">{tChoice('assets.title', 2)}</option>
+                                <option value="providers">{tChoice('providers.title', 2)}</option>
+                                <option value="users">{tChoice('contacts.title', 2)}</option>
+                            </select>
+                            <Button variant={'secondary'} onClick={exportItems} disabled={isProcessing || !itemsToBeExported}>
+                                <BiSolidFilePdf size={20} />
+                                {t('actions.export')}
+                            </Button>
+                        </div>
+                    )}
+                    {hasPermission('import excel') && (
+                        <>
+                            <h3>{tChoice('assets.title', 2)}</h3>
+                            <form action="" onSubmit={uploadAssetFile}>
+                                <input
+                                    type="file"
+                                    name=""
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                    id=""
+                                    onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
+                                />
+                                <Button disabled={isProcessing || data.file === null}>
+                                    {isProcessing ? (
+                                        <>
+                                            <Loader className="animate-pulse" />
+                                            <span>{t('actions.processing')}</span>
+                                        </>
+                                    ) : (
+                                        <span>{t('actions.submit')}</span>
+                                    )}
+                                </Button>
+                            </form>
+                            <h3>{tChoice('providers.title', 2)}</h3>
 
-                    <div className="flex w-fit flex-col gap-4">
-                        <select name="" id="" defaultValue={''} onChange={(e) => setItemsToBeExported(e.target.value)}>
-                            <option value="" disabled>
-                                -- Select items to export --
-                            </option>
-                            <option value="assets">{tChoice('assets.title', 2)}</option>
-                            <option value="providers">{tChoice('providers.title', 2)}</option>
-                            <option value="users">{tChoice('contacts.title', 2)}</option>
-                        </select>
-                        <Button variant={'secondary'} onClick={exportItems} disabled={isProcessing || !itemsToBeExported}>
-                            <BiSolidFilePdf size={20} />
-                            {t('actions.export')}
-                        </Button>
-                    </div>
-                    <h3>{tChoice('assets.title', 2)}</h3>
-                    <form action="" onSubmit={uploadAssetFile}>
-                        <input
-                            type="file"
-                            name=""
-                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                            id=""
-                            onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
-                        />
-                        <Button disabled={isProcessing || data.file === null}>
-                            {isProcessing ? (
-                                <>
-                                    <Loader className="animate-pulse" />
-                                    <span>{t('actions.processing')}</span>
-                                </>
-                            ) : (
-                                <span>{t('actions.submit')}</span>
-                            )}
-                        </Button>
-                    </form>
-                    <h3>{tChoice('providers.title', 2)}</h3>
+                            <form action="" onSubmit={uploadProviderFile}>
+                                <input
+                                    type="file"
+                                    name=""
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                    id=""
+                                    onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
+                                />
+                                <Button disabled={isProcessing || data.file === null}>
+                                    {isProcessing ? (
+                                        <>
+                                            <Loader className="animate-pulse" />
+                                            <span>{t('actions.processing')}</span>
+                                        </>
+                                    ) : (
+                                        <span>{t('actions.submit')}</span>
+                                    )}
+                                </Button>
+                            </form>
 
-                    <form action="" onSubmit={uploadProviderFile}>
-                        <input
-                            type="file"
-                            name=""
-                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                            id=""
-                            onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
-                        />
-                        <Button disabled={isProcessing || data.file === null}>
-                            {isProcessing ? (
-                                <>
-                                    <Loader className="animate-pulse" />
-                                    <span>{t('actions.processing')}</span>
-                                </>
-                            ) : (
-                                <span>{t('actions.submit')}</span>
-                            )}
-                        </Button>
-                    </form>
-
-                    <h3>{tChoice('contacts.title', 2)}</h3>
-                    <form action="" onSubmit={uploadUserFile}>
-                        <input
-                            type="file"
-                            name=""
-                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                            id=""
-                            onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
-                        />
-                        <Button disabled={isProcessing || data.file === null}>
-                            {isProcessing ? (
-                                <>
-                                    <Loader className="animate-pulse" />
-                                    <span>{t('actions.processing')}</span>
-                                </>
-                            ) : (
-                                <span>{t('actions.submit')}</span>
-                            )}
-                        </Button>
-                    </form>
+                            <h3>{tChoice('contacts.title', 2)}</h3>
+                            <form action="" onSubmit={uploadUserFile}>
+                                <input
+                                    type="file"
+                                    name=""
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                    id=""
+                                    onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
+                                />
+                                <Button disabled={isProcessing || data.file === null}>
+                                    {isProcessing ? (
+                                        <>
+                                            <Loader className="animate-pulse" />
+                                            <span>{t('actions.processing')}</span>
+                                        </>
+                                    ) : (
+                                        <span>{t('actions.submit')}</span>
+                                    )}
+                                </Button>
+                            </form>
+                        </>
+                    )}
                 </div>
             </SettingsLayout>
         </AppLayout>

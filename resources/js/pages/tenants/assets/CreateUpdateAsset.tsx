@@ -566,7 +566,7 @@ export default function CreateUpdateAsset({
                                         {listIsOpen && locations && locations.length == 0 && (
                                             <>
                                                 <li value="0" key="">
-                                                    No results
+                                                    {t('common.no_results')}
                                                 </li>
                                             </>
                                         )}

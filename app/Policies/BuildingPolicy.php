@@ -26,7 +26,7 @@ class BuildingPolicy
             return true;
 
         if ($user->hasRole('Maintenance Manager'))
-            return $user->can('view locations') && $building->maintainable->manager->id == $user->id;
+            return $user->can('view locations') && $building->maintainable->manager?->id == $user->id;
 
         if ($user->hasRole('Provider') && $building->providers) {
             return $user->can('view locations') && array_search($user->provider?->id, $building->maintainable->providers?->pluck('id'));
@@ -54,7 +54,7 @@ class BuildingPolicy
             return true;
 
         if ($user->hasRole('Maintenance Manager'))
-            return $user->can('view locations') && $building->maintainable->manager->id == $user->id;
+            return $user->can('view locations') && $building->maintainable->manager?->id == $user->id;
 
         return false;
     }

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import Field from '@/components/ui/field';
 import { Pill } from '@/components/ui/pill';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
+import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, Intervention, User } from '@/types';
 import { Head, router } from '@inertiajs/react';
@@ -16,6 +17,7 @@ import { Pencil, Trash, Trash2, Upload } from 'lucide-react';
 import { useState } from 'react';
 
 export default function ShowUser({ item }: { item: User }) {
+    const { hasPermission } = usePermissions();
     const { t, tChoice } = useLaravelReactI18n();
     const [user, setUser] = useState(item);
     const { showToast } = useToast();
@@ -80,20 +82,26 @@ export default function ShowUser({ item }: { item: User }) {
             <Head title={user.full_name} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex gap-2">
-                    <a href={route(`tenant.users.edit`, user.id)}>
-                        <Button>
-                            <Pencil />
-                            {t('actions.edit')}
+                    {hasPermission('update users') && (
+                        <>
+                            <a href={route(`tenant.users.edit`, user.id)}>
+                                <Button>
+                                    <Pencil />
+                                    {t('actions.edit')}
+                                </Button>
+                            </a>
+                            <Button onClick={() => setIsModalOpen(true)} variant={'secondary'}>
+                                <Upload size={20} />
+                                {t('actions.upload-type', { type: t('contacts.profile_picture') })}
+                            </Button>
+                        </>
+                    )}
+                    {hasPermission('delete users') && (
+                        <Button onClick={() => setShowDeleteModale(!showDeleteModale)} variant={'destructive'}>
+                            <Trash2 />
+                            {t('actions.delete')}
                         </Button>
-                    </a>
-                    <Button onClick={() => setShowDeleteModale(!showDeleteModale)} variant={'destructive'}>
-                        <Trash2 />
-                        {t('actions.delete')}
-                    </Button>
-                    <Button onClick={() => setIsModalOpen(true)} variant={'secondary'}>
-                        <Upload size={20} />
-                        {t('actions.upload-type', { type: t('contacts.profile_picture') })}
-                    </Button>
+                    )}
                 </div>
 
                 <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_6fr]">

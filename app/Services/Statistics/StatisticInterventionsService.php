@@ -12,6 +12,7 @@ class StatisticInterventionsService
     public function getByType($filters = [])
     {
         $interventionsTypeCount = Intervention::query()
+            ->forMaintenanceManager()
             ->withoutGlobalScope('ancient')
             ->where('status', '<>', 'completed')
             ->where('created_at', '>', $filters['date_from'])->where('created_at', '<', $filters['date_to'])
@@ -34,6 +35,7 @@ class StatisticInterventionsService
     public function getByAssignee($filters = [])
     {
         $interventionsByAssignee = Intervention::query()
+            ->forMaintenanceManager()
             ->withoutGlobalScope('ancient')
             ->where('created_at', '>', $filters['date_from'])->where('created_at', '<', $filters['date_to'])
             ->selectRaw('assignable_type, assignable_id, COUNT(*) as count')
@@ -66,6 +68,7 @@ class StatisticInterventionsService
     {
 
         $interventionsByStatus =  Intervention::query()
+            ->forMaintenanceManager()
             ->withoutGlobalScope('ancient')
             ->where('created_at', '>', $filters['date_from'])->where('created_at', '<', $filters['date_to'])
             ->where('status', '<>', 'completed')

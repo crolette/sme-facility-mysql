@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Pill } from '@/components/ui/pill';
 import { Textarea } from '@/components/ui/textarea';
+import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Intervention, InterventionStatus, Provider, User } from '@/types';
@@ -29,6 +30,7 @@ export default function ShowIntervention({
     statuses: InterventionStatus[];
     types: CentralType[];
 }) {
+    const { hasPermission } = usePermissions();
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -273,19 +275,23 @@ export default function ShowIntervention({
                         <Button onClick={() => sendIntervention(intervention.id)} variant={'cta'}>
                             {t('interventions.assign_to')}
                         </Button>
-                        <Button onClick={() => editIntervention(intervention.id)}>
-                            <Pencil />
-                        </Button>
-                        <Button
-                            type="button"
-                            variant="destructive"
-                            onClick={() => {
-                                setInterventionToDelete(intervention);
-                                setShowDeleteInterventionModale(true);
-                            }}
-                        >
-                            <Trash2 />
-                        </Button>
+                        {hasPermission('update interventions') && (
+                            <Button onClick={() => editIntervention(intervention.id)}>
+                                <Pencil />
+                            </Button>
+                        )}
+                        {hasPermission('delete interventions') && (
+                            <Button
+                                type="button"
+                                variant="destructive"
+                                onClick={() => {
+                                    setInterventionToDelete(intervention);
+                                    setShowDeleteInterventionModale(true);
+                                }}
+                            >
+                                <Trash2 />
+                            </Button>
+                        )}
                     </div>
                 </div>
                 <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_6fr]">

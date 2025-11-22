@@ -90,6 +90,7 @@ return [
     'required' => 'Required',
     'thank_you' => 'Thank you',
     'close_window' => 'You can now close this window.',
+    'no_results' => 'No results...',
 
     'error' => 'Error',
     'error_submitting' => 'Error while submitting. Try again.',

@@ -2,17 +2,19 @@ import Modale from '@/components/Modale';
 import { Pagination } from '@/components/pagination';
 import { useGridTableLayoutContext } from '@/components/tenant/gridTableLayoutContext';
 import { Button } from '@/components/ui/button';
+import DisplayGridTableIndex from '@/components/ui/displayGridTableIndex';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Pill } from '@/components/ui/pill';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
+import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Contract, ContractsPaginated } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { ArrowDownNarrowWide, ArrowDownWideNarrow, LayoutGrid, Loader, Pencil, PlusCircle, TableIcon, Trash2, X } from 'lucide-react';
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, Loader, Pencil, PlusCircle, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export interface SearchParams {
@@ -40,6 +42,7 @@ export default function IndexContracts({
     renewalTypes: string[];
     providerCategories: CentralType[];
 }) {
+    const { hasPermission } = usePermissions();
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -172,7 +175,7 @@ export default function IndexContracts({
             });
     }, [query]);
 
-    const { layout, setLayout } = useGridTableLayoutContext();
+    const { layout } = useGridTableLayoutContext();
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -265,21 +268,19 @@ export default function IndexContracts({
                         </div>
                     </details>
 
-                    <a href={route('tenant.contracts.create')}>
-                        <Button>
-                            <PlusCircle />
-                            {t('actions.add-type', { type: tChoice('contracts.title', 1) })}
-                        </Button>
-                    </a>
+                    {hasPermission('create contracts') && (
+                        <a href={route('tenant.contracts.create')}>
+                            <Button>
+                                <PlusCircle />
+                                {t('actions.add-type', { type: tChoice('contracts.title', 1) })}
+                            </Button>
+                        </a>
+                    )}
                 </div>
 
-                <div className="flex gap-4">
-                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('grid')}>
-                        <LayoutGrid size={20} />
-                    </div>
-                    <div className="bg-sidebar hover:bg-sidebar-accent cursor-pointer rounded-md p-2" onClick={() => setLayout('table')}>
-                        <TableIcon size={20} />
-                    </div>
+                <div className="flex w-full items-center justify-between">
+                    <h1>{tChoice(`contracts.title`, 2)}</h1>
+                    <DisplayGridTableIndex />
                 </div>
 
                 {layout === 'grid' ? (
@@ -368,27 +369,31 @@ export default function IndexContracts({
                                             <TableBodyData>{contract.end_date}</TableBodyData>
 
                                             <TableBodyData className="flex space-x-2">
-                                                <a href={route(`tenant.contracts.edit`, contract.id)}>
-                                                    <Button>
-                                                        <Pencil />
+                                                {hasPermission('update contracts') && (
+                                                    <a href={route(`tenant.contracts.edit`, contract.id)}>
+                                                        <Button>
+                                                            <Pencil />
+                                                        </Button>
+                                                    </a>
+                                                )}
+                                                {hasPermission('delete contracts') && (
+                                                    <Button
+                                                        onClick={() => {
+                                                            setContractToDelete(contract);
+                                                            setShowDeleteModale(true);
+                                                        }}
+                                                        variant={'destructive'}
+                                                    >
+                                                        <Trash2 />
                                                     </Button>
-                                                </a>
-                                                <Button
-                                                    onClick={() => {
-                                                        setContractToDelete(contract);
-                                                        setShowDeleteModale(true);
-                                                    }}
-                                                    variant={'destructive'}
-                                                >
-                                                    <Trash2 />
-                                                </Button>
+                                                )}
                                             </TableBodyData>
                                         </TableBodyRow>
                                     );
                                 })
                             ) : (
                                 <TableBodyRow key={0}>
-                                    <TableBodyData>No results...</TableBodyData>
+                                    <TableBodyData>{t('common.no_results')}</TableBodyData>
                                 </TableBodyRow>
                             )}
                         </TableBody>

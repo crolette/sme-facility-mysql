@@ -22,7 +22,7 @@ class InterventionFactory extends Factory
      */
     public function definition(): array
     {
-        $category = CategoryType::where('category', 'intervention')->first();
+        $category = CategoryType::factory()->create(['category' => 'intervention']);
 
         return [
             'intervention_type_id' => $category->id,

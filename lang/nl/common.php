@@ -89,6 +89,7 @@ return [
     'required' => 'Verplicht',
     'thank_you' => 'Bedankt',
     'close_window' => 'U kunt dit venster nu sluiten.',
+    'no_results' => 'Geen resultaat...',
 
     'error' => 'Fout',
     'error_submitting' => 'Fout bij het verzenden. Probeer opnieuw.',

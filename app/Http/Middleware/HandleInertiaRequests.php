@@ -8,6 +8,7 @@ use Tighten\Ziggy\Ziggy;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Company;
+use Illuminate\Support\Facades\Auth;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -64,23 +65,28 @@ class HandleInertiaRequests extends Middleware
             }
         }
 
+        if (tenancy()->tenant) {
+            $ticketsCount = $request->user()->hasRole('Maintenance Manager') ? Ticket::where('status', 'open')->orWhere('status', 'ongoing')->forMaintenanceManager()->count() : Ticket::where('status', 'open')->orWhere('status', 'ongoing')->count();
+        }
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'version' => env('APP_VERSION'),
             'tenant' => [
-                'name' => session('tenantName') ?? config('app.name'),
+                'name' => session('tenantName'),
                 'logo' => session('tenantLogo')
             ],
             'auth' => [
                 'user' => $request->user(),
+                'permissions' => $request->user()?->getAllPermissions()->pluck('name') ?? null,
             ],
             'flash' => ['message' => session('message'), 'type' => session('type')],
             'ziggy' => fn(): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
-            'openTicketsCount' => tenancy()->tenant ? Ticket::where('status', 'open')->orWhere('status', 'ongoing')->count() : '',
+            'openTicketsCount' => $ticketsCount ?? null,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'indexLayout' => ! $request->hasCookie('index_layout') || $request->cookie('index_layout') === 'table',
         ];

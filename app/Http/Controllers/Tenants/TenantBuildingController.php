@@ -54,7 +54,7 @@ class TenantBuildingController extends Controller
 
         $validatedFields = $validator->validated();
 
-        $locations = Building::query();
+        $locations = Building::query()->forMaintenanceManager();
 
         if (isset($validatedFields['category'])) {
             $locations->where('location_type_id', $validatedFields['category']);

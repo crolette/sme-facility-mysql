@@ -11,6 +11,7 @@ return [
     'password_current' => 'Current password',
     'password_new' => 'New Password',
     'password_confirm' => 'Confirm password',
+    'reset' => 'Password has been resetted',
     'profile_info' => 'Profile information',
     'delete_account' => 'Delete my account',
     'login' => 'ogin',

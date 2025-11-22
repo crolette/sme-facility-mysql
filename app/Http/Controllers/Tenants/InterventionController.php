@@ -18,7 +18,9 @@ use App\Enums\InterventionStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
+use Illuminate\Support\Facades\Auth;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Validator;
 
 class InterventionController extends Controller
@@ -28,6 +30,10 @@ class InterventionController extends Controller
      */
     public function index(Request $request)
     {
+
+        if (Auth::user()->cannot('viewAny', Intervention::class))
+            abort(403);
+
 
         $validator = Validator::make($request->all(), [
             'q' => 'string|max:255|nullable',
@@ -39,7 +45,7 @@ class InterventionController extends Controller
         ]);
 
         $validatedFields = $validator->validated();
-        $interventions = Intervention::withoutTrashed()->with('interventionable');
+        $interventions = Intervention::withoutTrashed()->with('interventionable')->forMaintenanceManager();
 
         if (isset($validatedFields['status'])) {
             $interventions->where('status', $validatedFields['status']);
@@ -74,16 +80,12 @@ class InterventionController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Ticket $ticket)
-    {
-        return Inertia::render('tenants/tickets/interventions/create', ['ticket' => $ticket]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    // public function edit(Intervention $intervention)
+    // public function create(Ticket $ticket)
     // {
+    //     if (Auth::user()->cannot('create', Intervention::class))
+    //         abort(403);
+
+
     //     return Inertia::render('tenants/tickets/interventions/create', ['ticket' => $ticket]);
     // }
 
@@ -93,6 +95,10 @@ class InterventionController extends Controller
      */
     public function show(Intervention $intervention)
     {
+        if (Auth::user()->cannot('view', $intervention))
+            abort(403);
+
+
         $statuses = array_column(InterventionStatus::cases(), 'value');
         $types = CategoryType::where('category', 'intervention')->get();
 

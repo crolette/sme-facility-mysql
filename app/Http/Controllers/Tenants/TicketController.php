@@ -9,6 +9,7 @@ use App\Models\Tenants\Ticket;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Validator;
 
 class TicketController extends Controller
@@ -31,6 +32,12 @@ class TicketController extends Controller
         $statuses = array_column(TicketStatus::cases(), 'value');
 
         $tickets = Ticket::query();
+
+        if (Auth::user()->hasRole('Maintenance Manager')) {
+            $tickets->whereHas('ticketable.maintainable', function (Builder $query) {
+                $query->where('maintenance_manager_id', Auth::user()->id);
+            });
+        }
 
         if (isset($validatedFields['q'])) {
             $tickets->where('description', 'like', '%' . $validatedFields['q'] . '%');

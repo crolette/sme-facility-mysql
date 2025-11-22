@@ -44,10 +44,7 @@ beforeEach(function () {
     $this->building = Building::factory()->create();
     $this->floor = Floor::factory()->create();
 
-    $this->room = Room::factory()
-        ->for(LocationType::where('level', 'room')->first())
-        ->for(Floor::first())
-        ->create();
+    $this->room = Room::factory()->create();
 
     $this->asset = Asset::factory()->forLocation($this->room)->create();
     $this->provider = Provider::factory()->create();
@@ -162,7 +159,6 @@ test('test access roles to create tickets page for building', function (string $
 
     $response = $this->getFromTenant('tenant.buildings.tickets.create', $this->building->qr_hash);
     $response->assertStatus($expectedStatus);
-
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 200],
@@ -230,7 +226,6 @@ test('test access roles to update any ticket', function (string $role, int $expe
 
     $response = $this->patchToTenant('api.tickets.update', $this->formData, $ticket);
     $response->assertStatus($expectedStatus);
-
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 403],

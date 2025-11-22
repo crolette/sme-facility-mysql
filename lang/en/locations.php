@@ -17,5 +17,7 @@ return [
     'material_floor' => 'Floor material',
     'material_wall' => 'Wall material',
     'material_outdoor' => 'Outdoor material',
-    'height' => 'Height'
+    'height' => 'Height',
+
+    'delete_description' => 'Are you sure you want to delete :name. ',
 ];

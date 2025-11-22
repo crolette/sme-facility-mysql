@@ -45,7 +45,7 @@ class TenantRoomController extends Controller
 
         $validatedFields = $validator->validated();
 
-        $locations = Room::with('floor');
+        $locations = Room::with('floor')->forMaintenanceManager();
 
         if (isset($validatedFields['category'])) {
             $locations->where('location_type_id', $validatedFields['category']);

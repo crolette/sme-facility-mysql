@@ -31,4 +31,7 @@ return [
     'purchase_cost_placeholder' => 'Purchase cost (max. 2 decimals) : 4236.36',
     'warranty_end_date' => 'Warranty end date',
 
+    'delete_description' => 'Are you sure you want to delete the asset :name. ',
+    'delete_definitely_description' => 'Are you sure to delete this asset DEFINITELY ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.',
+
 ];

@@ -302,7 +302,7 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
                                 })
                             ) : (
                                 <TableBodyRow key={0}>
-                                    <TableBodyData>No results...</TableBodyData>
+                                    <TableBodyData>{t('common.no_results')}</TableBodyData>
                                 </TableBodyRow>
                             )}
                         </TableBody>

@@ -39,6 +39,10 @@ class APIInterventionController extends Controller
 
     public function store(InterventionRequest $request, PictureUploadRequest $pictureUploadRequest)
     {
+
+        if ($request->user()->cannot('create', [Intervention::class, $request->validated()]))
+            return ApiResponse::notAuthorized();
+
         try {
             DB::beginTransaction();
 
@@ -63,6 +67,10 @@ class APIInterventionController extends Controller
 
     public function update(InterventionRequest $request, Intervention $intervention, PictureUploadRequest $pictureUploadRequest)
     {
+
+        if ($request->user()->cannot('update', $intervention))
+            return ApiResponse::notAuthorized();
+
         try {
             DB::beginTransaction();
 
@@ -84,6 +92,9 @@ class APIInterventionController extends Controller
 
     public function destroy(Intervention $intervention)
     {
+        if (Auth::user()->cannot('delete', $intervention))
+            return ApiResponse::notAuthorized();
+
         $deleted = $this->interventionService->delete($intervention);
 
         return $deleted ? ApiResponse::success(null, 'Intervention deleted') : ApiResponse::error('Error during intervention deletion');

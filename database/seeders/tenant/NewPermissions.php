@@ -21,7 +21,7 @@ class NewPermissions extends Seeder
             DB::beginTransaction();
 
             $permissions = [
-                'excel' => ['import', 'export'],
+                'statistics' => ['view', 'export'],
             ];
 
             foreach ($permissions as $entity => $actions) {
@@ -30,26 +30,30 @@ class NewPermissions extends Seeder
                 }
             }
 
-            // // create permissions
-            // Permission::create(['guard_name' => 'tenant', 'name' => 'assign roles']);
-
             app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
             $superAdminRole = Role::where('name', 'Super Admin')->first();
             $superAdminRole->givePermissionTo(
                 [
-                    'import excel',
-                    'export excel',
+                    'view statistics',
+                    'export statistics',
                 ]
             );
 
             $adminRole = Role::where('name', 'Admin')->first();
             $adminRole->givePermissionTo(
                 [
-                    'import excel',
-                    'export excel',
+                    'view statistics',
+                    'export statistics',
                 ]
-            );;
+            );
+
+            $adminRole = Role::where('name', 'Maintenance Manager')->first();
+            $adminRole->givePermissionTo(
+                [
+                    'view statistics',
+                ]
+            );
 
             DB::commit();
         } catch (Exception $e) {

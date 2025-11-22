@@ -24,7 +24,7 @@ class FloorPolicy
             return true;
 
         if ($user->hasRole('Maintenance Manager'))
-            return $user->can('view locations') && $floor->maintainable->manager->id == $user->id;
+            return $user->can('view locations') && $floor->maintainable->manager?->id == $user->id;
 
         if ($user->hasRole('Provider') && $floor->providers) {
             return $user->can('view locations') && array_search($user->provider?->id, $floor->maintainable->providers?->pluck('id'));
@@ -52,7 +52,7 @@ class FloorPolicy
             return true;
 
         if ($user->hasRole('Maintenance Manager'))
-            return $user->can('view locations') && $floor->maintainable->manager->id == $user->id;
+            return $user->can('view locations') && $floor->maintainable->manager?->id == $user->id;
 
         return false;
     }
