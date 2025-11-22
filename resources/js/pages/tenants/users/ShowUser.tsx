@@ -73,6 +73,8 @@ export default function ShowUser({ item }: { item: User }) {
 
     const [activeTab, setActiveTab] = useState('information');
 
+    console.log(item.manager);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={user.full_name} />
@@ -218,6 +220,18 @@ export default function ShowUser({ item }: { item: User }) {
                             </div>
                         )}
                         {activeTab === 'assets' && <AssetManager items={user.assets} />}
+                        {activeTab === 'maintenance' && (
+                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                                <h3>{t('maintenances.maintenance_manager')}</h3>
+                                {item.manager.map((item) => (
+                                    <a href={item.maintainable.location_route}>
+                                        <p>
+                                            {item.maintainable.reference_code} - {item.name}
+                                        </p>
+                                    </a>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
