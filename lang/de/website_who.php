@@ -30,7 +30,7 @@ return [
     'sme.meta_title_og' => 'Vereinfachen Sie die Verwaltung Ihrer Ausrüstung mit SME-Facility',
     'sme.meta_description_og' => 'SME-Facility hilft KMUs bei der Zentralisierung der Wartung, der Vertragsverfolgung und der Automatisierung von Erinnerungen. Ein vollständiges Tool, um Zeit zu sparen und die Produktivität zu steigern.',
 
-    'sme.title' => 'Vereinfachen Sie die Verwaltung Ihrer Ausrüstung und',
+    'sme.title' => 'Vereinfachen Sie die Verwaltung Ihrer Ausrüstung und ',
     'sme.title-span' => 'konzentrieren Sie sich auf Ihr Geschäft.',
     'sme.subtitle' => 'Mit SME-Facility haben KMUs endlich ein einfaches, vollständiges und einsatzbereites Facility-Management-Tool.',
     'sme.description' => 'Sparen Sie Zeit, strukturieren Sie Ihre Wartungsabläufe und verbessern Sie die Produktivität ohne technische Komplexität.',

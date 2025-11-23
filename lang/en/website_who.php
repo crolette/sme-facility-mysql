@@ -30,7 +30,7 @@ return [
     'sme.meta_title_og' => 'Simplify your equipment management with SME-Facility',
     'sme.meta_description_og' => 'SME-Facility helps SMEs centralize maintenance, track contracts and automate reminders. A complete tool to save time and boost productivity.',
 
-    'sme.title' => 'Simplify your equipment management and',
+    'sme.title' => 'Simplify your equipment management and ',
     'sme.title-span' => 'focus on your business.',
     'sme.subtitle' => 'With SME-Facility, SMEs finally have a simple, complete and ready-to-use facility management tool.',
     'sme.description' => 'Save time, structure your maintenance operations and improve productivity without technical complexity.',

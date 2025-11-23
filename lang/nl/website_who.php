@@ -30,7 +30,7 @@ return [
     'sme.meta_title_og' => 'Vereenvoudig het beheer van uw uitrusting met SME-Facility',
     'sme.meta_description_og' => 'SME-Facility helpt KMO\'s bij het centraliseren van onderhoud, het opvolgen van contracten en het automatiseren van herinneringen. Een complete tool om tijd te besparen en de productiviteit te verhogen.',
 
-    'sme.title' => 'Vereenvoudig het beheer van uw uitrusting en',
+    'sme.title' => 'Vereenvoudig het beheer van uw uitrusting en ',
     'sme.title-span' => 'concentreer u op uw activiteit.',
     'sme.subtitle' => 'Met SME-Facility hebben KMO\'s eindelijk een eenvoudige, complete en gebruiksklare facility management tool.',
     'sme.description' => 'Bespaar tijd, structureer uw onderhoudsoperaties en verbeter de productiviteit zonder technische complexiteit.',

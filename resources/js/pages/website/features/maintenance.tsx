@@ -31,9 +31,9 @@ export default function FeaturesMaintenance() {
                 <meta property="og:title" content={t('website_features.maintenance.meta_title_og')} />
                 <meta property="og:description" content={t('website_features.maintenance.meta_description_og')} />
             </Head>
-            <section className="bg-website-primary text-website-card -mt-20 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
+            <section className="bg-website-primary text-website-card -mt-30 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
                 <div className="container">
-                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-2 md:px-10">
+                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:grid-cols-2 md:px-10 xl:w-11/12">
                         <div className="flex flex-col justify-center gap-10 md:max-w-lg">
                             <h1 className="">
                                 {t('website_features.maintenance.title')}{' '}

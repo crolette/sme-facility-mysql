@@ -1,10 +1,10 @@
 <?php
 
 return [
-    'meta_title' => 'Qui sommes-nous ?',
-    'meta_description' => 'Découvrez pourquoi SME-Facility est le partenaire idéal des PME. Une solution cloud abordable, simple et complète pour centraliser vos équipements, maintenances et contrats.',
-    'meta_title_og' => 'SME-Facility, votre partenaire Facility Management',
-    'meta_description_og' => 'Une solution conçue par une PME pour les PME : centralisation des données, simplicité d’utilisation, accompagnement personnalisé et coût maîtrisé. SME-Facility facilite la gestion de vos installations.',
+    'meta_title' => "Qui sommes-nous — SME-Facility : histoire, mission & valeurs",
+    'meta_description' => "SME-Facility : une équipe dédiée aux PME. Découvrez notre histoire, notre mission et nos valeurs — Respect, Innovation, Excellence et Flexibilité.",
+    'meta_title_og' => "SME-Facility — À propos de nous",
+    'meta_description_og' => "Née d’un constat terrain, SME-Facility accompagne les PME pour simplifier la gestion de leurs installations. Découvrez notre parcours, nos engagements et notre approche collaborative.",
 
     'title' => ' A propos de nous',
     'subtitle' => 'SME-Facility est né d’une conviction forte : le Facility Management ne doit pas être réservé aux grandes structures.',
