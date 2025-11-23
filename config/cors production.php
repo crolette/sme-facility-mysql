@@ -6,7 +6,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://127.0.0.1', 'http://localhost:8000'],
+    'allowed_origins' => ['https://www.sme-facility.com', '/^https:\/\/(.+\.)?sme-facility\.com$/'],
 
     'allowed_origins_patterns' => [],
 

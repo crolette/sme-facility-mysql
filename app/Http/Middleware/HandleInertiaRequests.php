@@ -65,7 +65,7 @@ class HandleInertiaRequests extends Middleware
             }
         }
 
-        if ($request->user()) {
+        if (tenancy()->tenant) {
             $ticketsCount = $request->user()?->hasRole('Maintenance Manager') ? Ticket::where('status', 'open')->orWhere('status', 'ongoing')->forMaintenanceManager()->count() : Ticket::where('status', 'open')->orWhere('status', 'ongoing')->count();
         }
 
@@ -74,12 +74,12 @@ class HandleInertiaRequests extends Middleware
             'name' => config('app.name'),
             'version' => env('APP_VERSION'),
             'tenant' => [
-                'name' => session('tenantName'),
-                'logo' => session('tenantLogo')
+                'name' => session('tenantName') ?? config('app.name'),
+                'logo' => session('tenantLogo') ?? env('APP_LOGO')
             ],
             'auth' => [
                 'user' => $request->user(),
-                'permissions' => $request->user()?->getAllPermissions()->pluck('name') ?? null,
+                'permissions' => tenancy()->tenant ? $request->user()?->getAllPermissions()?->pluck('name') ?? null : null,
             ],
             'flash' => ['message' => session('message'), 'type' => session('type')],
             'ziggy' => fn(): array => [

@@ -12,21 +12,25 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: '/dashboard',
         icon: LayoutGrid,
+        canView: true,
     },
     {
         title: 'Tenants',
         href: '/tenants',
         icon: LayoutGrid,
+        canView: true,
     },
     {
         title: 'Location Types',
         href: route('central.locations.index'),
         icon: LayoutGrid,
+        canView: true,
     },
     {
         title: 'Category types',
         href: route('central.types.index'),
         icon: LayoutGrid,
+        canView: true,
     },
     // {
     //     title: 'Building Types',
@@ -40,6 +44,7 @@ const footerNavItems: NavItem[] = [
         title: 'Home',
         href: '/',
         icon: BookOpen,
+        canView: true,
     },
 ];
 

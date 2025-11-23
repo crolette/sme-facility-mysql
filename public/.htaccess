@@ -5,6 +5,14 @@
 
     RewriteEngine On
 
+        # Force HTTPS
+    RewriteCond %{HTTPS} !=on
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+        # WWW redirect
+    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    RewriteRule ^(.*)$ https://%1/$1 [L,R=301]
+
     # Existing rewrite conditions
     RewriteCond %{REQUEST_FILENAME} -s [OR]
     RewriteCond %{REQUEST_FILENAME} -l [OR]
@@ -12,13 +20,9 @@
     RewriteRule ^.*$ - [NC,L]
     RewriteRule ^(.*) /index.php [NC,L]
 
-    # WWW redirect
-    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
-    RewriteRule ^(.*)$ https://%1/$1 [L,R=301]
 
-    # Force HTTPS
-    RewriteCond %{HTTPS} !=on
-    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+
 
     # Enhanced PATCH handling
     # RewriteCond %{REQUEST_METHOD} ^PATCH
