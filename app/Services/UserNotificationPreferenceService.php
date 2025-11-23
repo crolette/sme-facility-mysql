@@ -85,6 +85,15 @@ class UserNotificationPreferenceService
         return true;
     }
 
+
+    public function deleteNotifications(User $user)
+    {
+        $notifications = $user->notifications()->where('status', 'pending')->get();
+        foreach ($notifications as $notification) {
+            $notification->delete();
+        }
+    }
+
     /**
      * update
      *

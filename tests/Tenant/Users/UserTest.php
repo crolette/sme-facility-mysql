@@ -210,6 +210,34 @@ it('can update the role of an existing user', function () {
     assertTrue($user->hasRole('Maintenance Manager'));
 });
 
+it('can remove a provider from a user', function () {
+    $provider = Provider::factory()->create();
+    $user = User::factory()->create(['provider_id' => $provider->id]);
+
+    assertDatabaseHas('users', [
+        'id' => $user->id,
+        'provider_id' => $provider->id,
+    ]);
+
+
+    $formData = [
+        'first_name' => $user->first_name,
+        'last_name' => $user->last_name,
+        'email' => $user->email,
+        'provider_id' => null
+    ];
+
+    $response = $this->patchToTenant('api.users.update', $formData, $user);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseHas('users', [
+        'id' => $user->id,
+        'provider_id' => null,
+    ]);
+});
+
+it('can ', function () {});
+
 
 it('can delete an existing user', function () {
     $user = User::factory()->create();

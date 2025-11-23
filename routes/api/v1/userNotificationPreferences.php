@@ -17,7 +17,7 @@ Route::middleware([
     'auth:tenant'
 ])->prefix('/v1/notification-preferences')->group(
     function () {
-        Route::post('/', [APIUserNotificationPreferencesController::class, 'store'])->name('api.notifications.store');
+        // Route::post('/', [APIUserNotificationPreferencesController::class, 'store'])->name('api.notifications.store');
 
         Route::prefix('{preference}')->group(function () {
 

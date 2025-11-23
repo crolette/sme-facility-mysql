@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Password;
 use App\Http\Requests\Tenant\UserRequest;
 use App\Services\AssetNotificationSchedulingService;
 use App\Services\NotificationSchedulingService;
+use App\Services\UserNotificationPreferenceService;
 
 class APIUserController extends Controller
 {
@@ -78,6 +79,17 @@ class APIUserController extends Controller
             $user->syncRoles($request->validated('role'));
             $newRoles = $user->getRoleNames();
 
+            if (!$user->can_login && $request->validated('can_login') === true && $user->hasAnyRole('Admin', 'Maintenance Manager')) {
+                app(UserNotificationPreferenceService::class)->createDefaultUserNotificationPreferences($user);
+                Password::sendResetLink(
+                    $request->only('email')
+                );
+            }
+
+            if ($user->can_login && $request->validated('can_login') === false) {
+                app(UserNotificationPreferenceService::class)->deleteNotifications($user);
+            }
+
             if ([...$previousRoles] !== [...$newRoles] && $newRoles->contains('Maintenance Manager')) {
                 app(NotificationSchedulingService::class)->removeNotificationsForOldAdminRole($user);
             }
@@ -86,16 +98,14 @@ class APIUserController extends Controller
                 app(NotificationSchedulingService::class)->createNotificationsForNewAdmin($user);
             }
 
-            $user->update($request->safe()->except('avatar'));
+            $user = $this->userService->update($user, $request->safe()->except('avatar'));
 
-            if (!$user->can_login && $request->validated('can_login') === true && $user->hasAnyRole('Admin', 'Maintenance Manager')) {
-                Password::sendResetLink(
-                    $request->only('email')
-                );
-            }
+            // if ($user->provider && !$request->validated('provider_id')) {
+            //     $user = $user->provider()->disassociate();
+            // }
 
-            if ($request->validated('provider_id'))
-                $user = $this->userService->attachProvider($user, $request->validated('provider_id'));
+            // if ($request->validated('provider_id'))
+            //     $user = $this->userService->attachProvider($user, $request->validated('provider_id'));
 
             $user->save();
 

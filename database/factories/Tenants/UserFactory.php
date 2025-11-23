@@ -48,10 +48,10 @@ class UserFactory extends Factory
     public function withRole($role)
     {
         return $this->afterCreating(function (User $user) use ($role) {
+            $user->update(['can_login' => true]);
             $user->assignRole($role);
             if ($user->hasAnyRole(['Admin', 'Maintenance Manager']))
                 app(UserNotificationPreferenceService::class)->createDefaultUserNotificationPreferences($user);
         });
     }
-
 }

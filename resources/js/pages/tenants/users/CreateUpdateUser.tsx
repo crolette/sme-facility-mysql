@@ -19,8 +19,8 @@ interface FormDataUser {
     job_position: string;
     can_login: boolean;
     avatar: File | string | null;
-    provider_id: string | number;
-    provider_name: string;
+    provider_id: string | number | null;
+    provider_name: string | null;
     phone_number: string;
     role: string;
 }
@@ -212,6 +212,10 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
                                 onSelect={(provider) => {
                                     setData('provider_id', provider.id);
                                     setData('provider_name', provider.name);
+                                }}
+                                onDelete={() => {
+                                    setData('provider_id', null);
+                                    setData('provider_name', null);
                                 }}
                                 placeholder={t('actions.search-type', { type: tChoice('providers.title', 1) })}
                                 className="mb-4"

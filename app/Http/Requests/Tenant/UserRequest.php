@@ -40,6 +40,7 @@ class UserRequest extends FormRequest
             $data['can_login'] = true;
         } else {
             $data['can_login'] = false;
+            $data['role'] = null;
         }
 
         $this->replace($data);
