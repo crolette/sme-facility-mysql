@@ -33,8 +33,8 @@ export default function FeaturesStatistics() {
             </Head>
             <section className="bg-website-primary text-website-card -mt-30 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
                 <div className="container">
-                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:max-w-11/12 md:grid-cols-2 md:px-10">
-                        <div className="flex flex-col justify-center gap-10 md:max-w-lg">
+                    <div className="mx-auto grid h-full gap-10 px-4 py-32 md:grid-cols-[2fr_1fr] md:gap-10 md:px-10 lg:max-w-11/12">
+                        <div className="flex flex-col justify-center gap-10">
                             <h1 className="">
                                 {t('website_features.statistics.title')}{' '}
                                 <span className="font-extrabold">{t('website_features.statistics.title-span')}</span>
@@ -51,7 +51,7 @@ export default function FeaturesStatistics() {
                             </div>
                         </div>
                         <div className="mx-auto my-auto">
-                            <img src="/images/Group 22.png" alt="" className="" />
+                            <img src="/images/website/features/hero_statistics.jpg" alt="" className="blob h-auto max-w-72 shadow-2xl md:w-full" />
                         </div>
                     </div>
                 </div>
@@ -79,12 +79,12 @@ export default function FeaturesStatistics() {
                                 </div>
                             </div>
                         </div>
-                        <img src="/images/Group 20.png" alt="" className="w-full" />
+                        <img src="/images/website/features/statistics.png" alt="" className="mx-auto w-3/4" />
 
                         <div className="border-website-border flex w-full flex-col gap-4 rounded-md border p-6">{FAQ()}</div>
-                        <Button variant={'cta'} className="mx-auto w-fit p-6 text-lg">
-                            {t('website_common.demo_appointment')}
-                        </Button>
+                        <a href={route('website.demo')} className="mx-auto">
+                            <Button variant={'cta'}>{t('website_menu.demo_appointment')}</Button>
+                        </a>
                     </div>
                 </div>
             </section>

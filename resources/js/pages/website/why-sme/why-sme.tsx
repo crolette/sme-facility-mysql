@@ -18,8 +18,8 @@ export default function WhySME() {
             </Head>
             <section className="bg-website-secondary text-website-font -mt-20 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
                 <div className="container mx-auto">
-                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:grid-cols-2 md:px-10 lg:max-w-11/12">
-                        <div className="flex flex-col justify-center gap-10 md:max-w-lg">
+                    <div className="mx-auto grid h-full gap-10 px-4 py-32 md:grid-cols-[2fr_1fr] md:gap-10 md:px-10 lg:max-w-11/12">
+                        <div className="flex flex-col justify-center gap-10">
                             <h1 className="">
                                 <span className="font-extrabold">{t('website_why.title-span')}</span>
                                 {t('website_why.title')}
@@ -36,7 +36,7 @@ export default function WhySME() {
                             </div>
                         </div>
                         <div className="mx-auto my-auto">
-                            <img src="/images/Group 22.png" alt="" className="" />
+                            <img src="/images/website/partner.jpg" alt="" className="blob h-auto max-w-72 shadow-2xl md:w-full" />
                         </div>
                     </div>
                 </div>

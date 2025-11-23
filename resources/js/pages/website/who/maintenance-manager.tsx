@@ -22,10 +22,10 @@ export default function WhoMaintenanceManager() {
             </Head>
             <section className="bg-website-border text-website-card -mt-28 flex min-h-screen w-full flex-col items-center justify-center py-20 md:-mt-38">
                 <div className="container mx-auto">
-                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:grid-cols-[2fr_1fr] md:px-10 md:py-16 lg:max-w-11/12">
-                        <div className="flex flex-col justify-center gap-10 md:max-w-lg">
+                    <div className="mx-auto grid h-full gap-10 px-4 py-32 md:grid-cols-[2fr_1fr] md:gap-10 md:px-10 lg:max-w-11/12">
+                        <div className="flex flex-col justify-center gap-10">
                             <h1 className="leading-16">
-                                <span className="font-extrabold">{t('website_who.maintenance_manager.title-span')}</span>{' '}
+                                <span className="font-extrabold">{t('website_who.maintenance_manager.title-span')}</span>
                                 {t('website_who.maintenance_manager.title')}
                             </h1>
                             <h2 className="!text-xl">{t('website_who.maintenance_manager.subtitle')}</h2>
@@ -40,7 +40,11 @@ export default function WhoMaintenanceManager() {
                             </div>
                         </div>
                         <div className="mx-auto my-auto">
-                            <img src="/images/Group 22.png" alt="" className="" />
+                            <img
+                                src="/images/website/who/hero_maintenance_manager.jpg"
+                                alt=""
+                                className="blob h-auto max-w-72 shadow-2xl md:w-full"
+                            />
                         </div>
                     </div>
                 </div>
@@ -56,13 +60,13 @@ export default function WhoMaintenanceManager() {
                                 <p>{t('website_who.maintenance_manager.section.1.description')}</p>
                             </div>
                             <div className="flex items-center">
-                                <img src="/images/Group 22.png" alt="" className="" />
+                                <img src="/images/website/features/assets.png" alt="" className="" />
                             </div>
                         </div>
                         <div className="relative grid grid-cols-1 gap-10 overflow-hidden p-10 md:grid-cols-2">
                             <span className="text-border/10 absolute top-1/3 -right-24 -translate-1/2 font-sans text-[256px] font-extrabold">2</span>
                             <div className="order-2 flex items-center md:order-none">
-                                <img src="/images/Group 22.png" alt="" className="" />
+                                <img src="/images/website/features/maintenance.png" alt="" className="" />
                             </div>
                             <div className="space-y-4">
                                 <p className="font-bold">{t('website_who.maintenance_manager.section.2.title')}</p>
@@ -77,13 +81,13 @@ export default function WhoMaintenanceManager() {
                                 <p>{t('website_who.maintenance_manager.section.3.description')}</p>
                             </div>
                             <div className="flex items-center">
-                                <img src="/images/Group 22.png" alt="" className="" />
+                                <img src="/images/website/features/documents.png" alt="" className="" />
                             </div>
                         </div>
                         <div className="relative grid grid-cols-1 gap-10 overflow-hidden p-10 md:grid-cols-2">
                             <span className="text-border/10 absolute top-1/4 -right-24 -translate-1/2 font-sans text-[256px] font-extrabold">4</span>
                             <div className="order-2 flex items-center md:order-none">
-                                <img src="/images/Group 22.png" alt="" className="" />
+                                <img src="/images/website/features/statistics.png" alt="" className="" />
                             </div>
                             <div className="space-y-4">
                                 <p className="font-bold">{t('website_who.maintenance_manager.section.4.title')}</p>

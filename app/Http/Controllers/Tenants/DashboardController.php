@@ -32,9 +32,10 @@ class DashboardController extends Controller
         $diskSizes = [
             'mb' => $company->disk_size_mb,
             'gb' => $company->disk_size_gb,
-            'percent' => round($company->disk_size_gb / 20, 2)
+            'percent' => round($company->disk_size_gb / 0.5, 2)
         ];
 
+        // dd($diskSizes);
 
         $maintainables = Maintainable::select(
             'id',

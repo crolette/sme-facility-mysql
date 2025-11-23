@@ -137,7 +137,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                     {asset.maintainable.need_maintenance && (
                                         <Button onClick={() => markMaintenanceDone()} variant={'green'}>
                                             <CircleCheckBig />
-                                            {t('maintenances.mark_as_done')}
+                                            {t('maintenances.mark_done')}
                                         </Button>
                                     )}
                                 </>

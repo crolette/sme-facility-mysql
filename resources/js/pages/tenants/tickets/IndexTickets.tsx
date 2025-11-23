@@ -27,8 +27,6 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
     const { t, tChoice } = useLaravelReactI18n();
     const { permissions } = usePage().props.auth;
 
-    console.log(permissions);
-
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index ${tChoice('tickets', 2)}`,

@@ -80,9 +80,11 @@ export default function Pricing() {
                                         <p>{Array(...t('website_pricing.starter.items'))[6]}</p>
                                     </li>
                                 </ul>
-                                <Button variant={'cta'} className="">
-                                    {t('website_pricing.start_today')}
-                                </Button>
+                                <a href={route('website.demo')} className="mx-auto">
+                                    <Button variant={'cta'} className="">
+                                        {t('website_pricing.start_today')}
+                                    </Button>
+                                </a>
                             </div>
                             <div className="flex flex-col gap-6 rounded-md border p-6 lg:p-10">
                                 <Building2 size={36} className="mx-auto" />
@@ -121,9 +123,11 @@ export default function Pricing() {
                                         <p>{Array(...t('website_pricing.premium.items'))[6]}</p>
                                     </li>
                                 </ul>
-                                <Button variant={'cta'} className="">
-                                    {t('website_pricing.start_today')}
-                                </Button>
+                                <a href={route('website.demo')} className="mx-auto">
+                                    <Button variant={'cta'} className="">
+                                        {t('website_pricing.start_today')}
+                                    </Button>
+                                </a>
                             </div>
                             <div className="flex flex-col gap-6 rounded-md border p-6 sm:col-span-2 lg:col-auto lg:p-10">
                                 <Factory size={36} className="mx-auto" />
@@ -146,23 +150,13 @@ export default function Pricing() {
                                         <p>{Array(...t('website_pricing.enterprise.items'))[2]}</p>
                                     </li>
                                 </ul>
-                                {/* <a href={route('website.contact')} className="mx-auto text-wrap"> */}
-                                <Button variant={'cta'} className="text-wrap">
-                                    {t('website_pricing.enterprise.discuss')}
-                                </Button>
-                                {/* </a> */}
+                                <a href={route('website.demo')} className="mx-auto">
+                                    <Button variant={'cta'} className="text-wrap">
+                                        {t('website_pricing.enterprise.discuss')}
+                                    </Button>
+                                </a>
                             </div>
                         </div>
-                        {/* <div className="mx-auto flex flex-col items-center gap-4">
-                            <p>Vous n’êtes pas encore convaincu que SME-Facility soit fait pour vous ?</p>
-                            <p>
-                                Pas de problème, nous pouvons vous proposer une démo afin de vous montrer la facilité d’utilisation de notre outil.
-                                Prenez rendez-vous avec nous afin de convenir d’un rendez-vous.
-                            </p>
-                            <a href={route('website.contact')}>
-                                <Button variant={'cta'}>Prendre rendez-vous pour une démo</Button>
-                            </a>
-                        </div> */}
                     </div>
                 </div>
             </section>
