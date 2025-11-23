@@ -180,7 +180,7 @@ return [
     'qrcode.faq.4.answer' => 'Chaque ticket est automatiquement rattaché à l’actif ou au local correspondant. Depuis l’application, le responsable peut consulter l’historique complet : incidents passés, interventions réalisées, délais de traitement.',
 
     'qrcode.faq.5.question' => 'Gain de temps et meilleure réactivité',
-    'qrcode.faq.5.answer' => 'En éliminant les échanges informels (emails, appels, messages), le QR code simplifie la remontée d’information depuis le terrain. Les problèmes sont signalés plus vite, les interventions mieux planifiées et les délais de résolution réduits.',
+    'qrcode.faq.5.answer' => 'En éliminant les échanges informels (emails, appels, messages), le QR code simplifie la remontée d’informations depuis le terrain. Les problèmes sont signalés plus vite, les interventions mieux planifiées et les délais de résolution réduits.',
 
     // ROLES
     'roles.meta_title' => 'Rôles et gestion des accès utilisateurs',
@@ -204,10 +204,10 @@ return [
 
 
     'roles.faq.1.question' => 'Facility Manager : supervision complète',
-    'roles.faq.1.answer' => 'Le Facility Manager dispose d’un accès complet à l’application : création d’assets, configuration des emplacements, gestion des contrats et suivi global de la maintenance. Il supervise l’ensemble du parc technique et des opérations.',
+    'roles.faq.1.answer' => 'Le Facility Manager dispose d’un accès complet à l’application : création actifs, configuration des emplacements, gestion des contrats et suivi global de la maintenance. Il supervise l’ensemble du parc technique et des opérations.',
 
     'roles.faq.2.question' => 'Responsable de maintenance : gestion ciblée',
-    'roles.faq.2.answer' => 'Ce profil accède uniquement aux assets dont il est responsable. Il peut mettre à jour les informations et suivre les interventions sans interférer avec les autres zones de gestion, garantissant une utilisation simple et maîtrisée.',
+    'roles.faq.2.answer' => 'Ce profil accède uniquement aux actifs dont il est responsable. Il peut mettre à jour les informations et suivre les interventions sans interférer avec les autres zones de gestion, garantissant une utilisation simple et maîtrisée.',
 
     'roles.faq.3.question' => 'Un modèle pensé pour les PME',
     'roles.faq.3.answer' => 'La séparation des rôles dans SME-Facility évite la complexité des systèmes à permissions multiples. Vous bénéficiez d’un outil clair, facile à administrer et parfaitement adapté aux structures à taille humaine.',
@@ -235,7 +235,7 @@ return [
 
 
     'statistics.faq.1.question' => 'Tableau de bord visuel et intuitif',
-    'statistics.faq.1.answer' => 'SME-Facility met à disposition un tableau de bord dynamique présentant vos principaux indicateurs : nombre total d’interventions, maintenance en retard, temps moyen de résolution et répartition des types d’intervention. Les graphiques facilitent la lecture et la comparaison dans le temps.',
+    'statistics.faq.1.answer' => 'SME-Facility met à disposition un tableau de bord dynamique présentant vos principaux indicateurs : nombre total d’interventions, maintenances en retard, temps moyens de résolution et répartition des types d’interventions. Les graphiques facilitent la lecture et la comparaison dans le temps.',
 
     'statistics.faq.2.question' => 'Suivi de la performance opérationnelle',
     'statistics.faq.2.answer' => 'Les responsables peuvent mesurer la réactivité et la charge de travail des équipes, évaluer les prestataires et identifier les zones nécessitant une attention particulière. Ces données favorisent une gestion proactive et un meilleur équilibre des ressources.',

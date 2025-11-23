@@ -3,8 +3,8 @@
 return [
 
     'features' => 'Fonctionnalités',
-    'for_who' => 'Pour qui?',
-    'why_sme' => 'Pourquoi choisir SME-Facility?',
+    'for_who' => 'Pour qui ?',
+    'why_sme' => 'Pourquoi choisir SME-Facility ?',
     'pricing' => 'Tarifs',
     'pricing_discover' => 'Découvrir les formules',
     'demo' => 'Démo',
@@ -22,11 +22,11 @@ return [
     'know_more' => 'En savoir plus',
 
     'footer.column_one' => 'Gérez vos installations',
-    'footer.column_two' => 'Pour qui?',
+    'footer.column_two' => 'Pour qui ?',
     'footer.column_three' => 'Avec SME-Facility',
 
     'footer.title' => 'Le système de gestion de facility management idéal pour les PME',
-    'footer.who_are_we' => 'Qui sommes-nous?',
+    'footer.who_are_we' => 'Qui sommes-nous ?',
     'footer.implementation' => 'Implémentation',
     'footer.careers' => 'Recrutement',
     'footer.contact' => 'Contact',

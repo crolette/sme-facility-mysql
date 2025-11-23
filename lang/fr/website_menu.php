@@ -2,8 +2,8 @@
 
 return [
     'features' => 'Fonctionnalités',
-    'for_who' => 'Pour qui?',
-    'why_sme' => 'Pourquoi choisir SME-Facility?',
+    'for_who' => 'Pour qui ?',
+    'why_sme' => 'Pourquoi choisir SME-Facility ?',
     'pricing' => 'Tarifs',
     'pricing_discover' => 'Découvrir les formules',
     'demo' => 'Démo',
@@ -14,8 +14,8 @@ return [
     'assets' => 'Actifs',
     'documents' => 'Documents',
     'maintenance' => 'Maintenance',
-    'contracts' => 'Contracts',
+    'contracts' => 'Contrats',
     'qrcode' => 'QR Code',
-    'roles' => 'Roles',
+    'roles' => 'Rôles',
     'statistics' => 'Statistiques',
 ];

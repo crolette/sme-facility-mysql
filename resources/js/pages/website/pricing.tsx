@@ -35,8 +35,8 @@ export default function Pricing() {
                                 <Building size={36} className="mx-auto" />
                                 <h3 className="text-center">{t('website_pricing.starter.title')}</h3>
                                 <div className="text-center">
-                                    <p>{t('website_pricing.from')}</p>
-                                    <p className={'text-2xl font-extrabold'}>149€ / {t('website_pricing.month')}</p>
+                                    <p className={'text-xl line-through'}>149€ / {t('website_pricing.month')}</p>
+                                    <p className={'animate-pulse text-2xl font-extrabold'}>99€ / {t('website_pricing.month')}</p>
                                 </div>
                                 <ul className="flex flex-col gap-6">
                                     <li className="flex gap-4">
@@ -76,8 +76,8 @@ export default function Pricing() {
                                 <Building2 size={36} className="mx-auto" />
                                 <h3 className="text-center">Premium</h3>
                                 <div className="text-center">
-                                    <p>{t('website_pricing.from')}</p>
-                                    <p className={'text-2xl font-extrabold'}>299€ / {t('website_pricing.month')}</p>
+                                    <p className={'text-xl line-through'}>299€ / {t('website_pricing.month')}</p>
+                                    <p className={'animate-pulse text-2xl font-extrabold'}>199€ / {t('website_pricing.month')}</p>
                                 </div>
                                 <ul className="flex flex-col gap-6">
                                     <li className="flex gap-4">

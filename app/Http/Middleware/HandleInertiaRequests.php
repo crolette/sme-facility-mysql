@@ -65,8 +65,8 @@ class HandleInertiaRequests extends Middleware
             }
         }
 
-        if (tenancy()->tenant) {
-            $ticketsCount = $request->user()->hasRole('Maintenance Manager') ? Ticket::where('status', 'open')->orWhere('status', 'ongoing')->forMaintenanceManager()->count() : Ticket::where('status', 'open')->orWhere('status', 'ongoing')->count();
+        if ($request->user()) {
+            $ticketsCount = $request->user()?->hasRole('Maintenance Manager') ? Ticket::where('status', 'open')->orWhere('status', 'ongoing')->forMaintenanceManager()->count() : Ticket::where('status', 'open')->orWhere('status', 'ongoing')->count();
         }
 
         return [

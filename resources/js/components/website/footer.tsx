@@ -86,6 +86,11 @@ export default function Footer() {
                         <ul className="text-website-border text-md flex flex-col gap-4">
                             <li>
                                 <a href={route('website.why')} className="!no-underline">
+                                    {t('website_common.why_sme')}
+                                </a>
+                            </li>
+                            <li>
+                                <a href={route('website.who-are-we')} className="!no-underline">
                                     {t('website_common.footer.who_are_we')}
                                 </a>
                             </li>
@@ -95,11 +100,11 @@ export default function Footer() {
                                 </a>
                             </li>
                             {/* <li> {t('website_common.footer.implementation')}</li> */}
-                            <li>
+                            {/* <li>
                                 <a href={route('website.careers')} className="!no-underline">
                                     {t('website_common.footer.careers')}
                                 </a>
-                            </li>
+                            </li> */}
                             <li>
                                 <a href={route('website.contact')} className="!no-underline">
                                     {t('website_common.footer.contact')}

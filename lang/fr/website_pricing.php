@@ -10,7 +10,7 @@ return [
     'description' => 'Une plateforme complète, sans complexité inutile, pour maîtriser vos coûts et gagner en efficacité.',
 
     'from' => 'A partir de',
-    'month' => 'month',
+    'month' => 'mois',
     'start_today' => 'Démarrer aujourd\'hui',
 
     'starter.title' => 'Starter',

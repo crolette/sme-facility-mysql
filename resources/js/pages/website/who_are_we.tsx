@@ -18,22 +18,20 @@ export default function FAQ() {
                 <div className="container mx-auto">
                     {/* <div className="mx-auto grid h-full gap-10 md:grid-cols-2 md:p-10 lg:max-w-11/12"></div> */}
                     <div className="mx-auto flex flex-col gap-10 p-4 md:p-10 lg:max-w-11/12">
-                        <h1>FAQ</h1>
-                        <h2>Statistics</h2>
-                        {Array(...t('website_faq.statistics.questions')).map((question, index) => (
-                            <>
-                                <p>{question}</p>
-                                <p>{Array(...t('website_faq.statistics.answers'))[index]}</p>
-                            </>
-                        ))}
-
-                        <h2>Coûts</h2>
-                        {Array(...t('website_faq.costs.questions')).map((question, index) => (
-                            <>
-                                <p>{question}</p>
-                                <p>{Array(...t('website_faq.costs.answers'))[index]}</p>
-                            </>
-                        ))}
+                        <h1>{t('website_who_are_we.title')}</h1>
+                        <div className="space-y-4">
+                            <p>{t('website_who_are_we.paragraph_1')}</p>
+                            <p>{t('website_who_are_we.paragraph_2')}</p>
+                            <p>{t('website_who_are_we.paragraph_3')}</p>
+                            <ul>
+                                {Array(...t('website_who_are_we.paragraph_3_list')).map((elem, index) => (
+                                    <li key={index} className="ml-10 list-disc">
+                                        {elem}
+                                    </li>
+                                ))}
+                            </ul>
+                            <p>{t('website_who_are_we.paragraph_4')}</p>
+                        </div>
                     </div>
                 </div>
             </section>

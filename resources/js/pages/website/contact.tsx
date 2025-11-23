@@ -146,7 +146,6 @@ export default function Contact({ reasons }: { reasons: string[] }) {
                                             type="text"
                                             id="vat_number"
                                             maxLength={14}
-                                            required
                                             placeholder={t('providers.vat_number_placeholder')}
                                             onChange={(e) => setData('vat_number', e.target.value)}
                                         />

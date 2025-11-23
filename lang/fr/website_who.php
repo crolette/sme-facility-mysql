@@ -31,7 +31,7 @@ return [
     'sme.meta_title_og' => 'Simplifiez la gestion de vos équipements avec SME-Facility',
     'sme.meta_description_og' => 'SME-Facility aide les PME à centraliser la maintenance, suivre les contrats et automatiser les rappels. Un outil complet pour gagner du temps et booster la productivité.',
 
-    'sme.title' => 'Simplifiez la gestion de vos équipements et',
+    'sme.title' => 'Simplifiez la gestion de vos équipements et ',
     'sme.title-span' => 'concentrez-vous sur votre activité.',
     'sme.subtitle' => 'Avec SME-Facility, les PME disposent enfin d’un outil de facility management simple, complet et prêt à l’emploi.',
     'sme.description' => 'Gagnez du temps, structurez vos opérations de maintenance et améliorez la productivité sans complexité technique.',

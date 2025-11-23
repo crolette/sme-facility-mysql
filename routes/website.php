@@ -71,6 +71,9 @@ foreach (config('tenancy.central_domains') as $domain) {
             Route::get('/cgv', function () {
                 return Inertia::render('website/cgv');
             })->name('website.cgv');
+            Route::get('/who-are-we', function () {
+                return Inertia::render('website/who_are_we');
+            })->name('website.who-are-we');
 
             Route::get('/contact', [ContactController::class, 'index'])->name('website.contact');
             Route::post('/contact', [ContactController::class, 'store'])->name('website.contact.post');
