@@ -76,10 +76,10 @@ foreach (config('tenancy.central_domains') as $domain) {
             })->name('website.who-are-we');
 
             Route::get('/contact', [ContactController::class, 'index'])->name('website.contact');
-            Route::post('/contact', [ContactController::class, 'store'])->name('website.contact.post');
+            Route::middleware('throttle:2,60')->post('/contact', [ContactController::class, 'store'])->name('website.contact.post')->throt;
 
             Route::get('/demo', [DemoController::class, 'index'])->name('website.demo');
-            Route::post('/demo', [DemoController::class, 'store'])->name('website.demo.post');
+            Route::middleware('throttle:2,60')->post('/demo', [DemoController::class, 'store'])->name('website.demo.post');
 
             Route::prefix('features')->group(function () {
                 Route::get('/qr-code', function () {
