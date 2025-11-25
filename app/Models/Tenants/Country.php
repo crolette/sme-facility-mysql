@@ -22,6 +22,10 @@ class Country extends Model
         'updated_at',
     ];
 
+    protected $with = [
+        'translations'
+    ];
+
     // Relationships
 
     public function translations(): HasMany

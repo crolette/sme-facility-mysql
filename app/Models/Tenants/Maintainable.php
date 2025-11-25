@@ -43,7 +43,8 @@ class Maintainable extends Model
     ];
 
     protected $with = [
-        // 'manager',
+        // 'maintainable',
+        // 'interventions'
     ];
 
     protected function casts(): array

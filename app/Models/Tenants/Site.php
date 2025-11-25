@@ -49,7 +49,7 @@ class Site extends Model
 
     protected $with = [
         'locationType',
-        'maintainable'
+        'maintainable',
     ];
 
     protected $casts = [

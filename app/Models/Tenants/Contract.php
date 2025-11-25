@@ -62,6 +62,10 @@ class Contract extends Model
         ];
     }
 
+    protected $with = [
+        'provider'
+    ];
+
     public static function boot()
     {
         parent::boot();

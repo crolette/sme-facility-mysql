@@ -38,6 +38,10 @@ class Document extends Model
         'sizeMo'
     ];
 
+    protected $with = [
+        'documentCategory'
+    ];
+
     protected function casts(): array
     {
         return [

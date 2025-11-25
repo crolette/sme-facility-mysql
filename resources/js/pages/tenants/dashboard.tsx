@@ -29,6 +29,9 @@ export default function TenantDashboard({
             href: '/dashboard',
         },
     ];
+
+    console.log(overdueInterventions);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />

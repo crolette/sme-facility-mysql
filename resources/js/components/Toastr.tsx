@@ -10,10 +10,6 @@ export default function Toastr() {
     const { flash } = usePage<SharedData>().props;
     const [currentMessage, setCurrentMessage] = useState<string | null>(null);
 
-    console.log('TOAST');
-    console.log(toastData);
-    console.log(flash);
-
     useEffect(() => {
         if (flash?.message || toastData) {
             setCurrentMessage(flash?.message ?? toastData?.message);

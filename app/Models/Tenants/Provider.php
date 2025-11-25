@@ -64,6 +64,11 @@ class Provider extends Model
         // 'country_label'
     ];
 
+    protected $with = [
+        'providerCategory',
+        'country'
+    ];
+
 
     public const MAX_UPLOAD_SIZE_MB = 4;
 

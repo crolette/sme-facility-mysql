@@ -26,6 +26,10 @@ class CategoryType extends Model
         'updated_at'
     ];
 
+    protected $with = [
+        'translations'
+    ];
+
     public function getRouteKeyName()
     {
         return 'slug';
@@ -37,6 +41,13 @@ class CategoryType extends Model
 
         static::deleting(function ($categoryType) {
             $categoryType->translations()->delete();
+        });
+    }
+
+    public static function getAllCached()
+    {
+        return Cache::remember('category_types', 3600, function () {
+            return static::with('translations')->get();
         });
     }
 

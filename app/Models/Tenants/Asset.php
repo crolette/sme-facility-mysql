@@ -54,7 +54,6 @@ class Asset extends Model
     ];
 
     protected $with = [
-        'location',
         'maintainable',
         'assetCategory'
     ];

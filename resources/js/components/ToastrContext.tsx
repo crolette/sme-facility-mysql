@@ -37,7 +37,5 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
         setToastData({ message, type });
     };
 
-    console.log('TOASTR CONTEXT');
-
     return <ToastContext.Provider value={{ showToast, toastData, clearToast }}>{children}</ToastContext.Provider>;
 };

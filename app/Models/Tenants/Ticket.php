@@ -38,7 +38,7 @@ class Ticket extends Model
 
     protected $with = [
         'reporter:id,first_name,last_name',
-
+        'ticketable',
         'interventions',
     ];
 

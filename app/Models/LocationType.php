@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Translation;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -27,6 +28,10 @@ class LocationType extends Model
         'updated_at'
     ];
 
+    protected $with = [
+        'translations'
+    ];
+
     public function getRouteKeyName()
     {
         return 'slug';
@@ -39,6 +44,13 @@ class LocationType extends Model
 
         static::deleting(function ($locationType) {
             $locationType->translations()->delete();
+        });
+    }
+
+    public static function getAllCached()
+    {
+        return Cache::remember('location_types', 3600, function () {
+            return static::with('translations')->get();
         });
     }
 

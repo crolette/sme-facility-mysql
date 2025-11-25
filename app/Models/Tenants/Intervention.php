@@ -38,8 +38,11 @@ class Intervention extends Model
     ];
 
     protected $with = [
-        'assignable',
+        'maintainable',
+        'interventionType',
         'actions'
+        // 'assignable',
+        // 'interventionable',
     ];
 
     protected $appends = [
@@ -113,6 +116,7 @@ class Intervention extends Model
         return $this->morphMany(Picture::class, 'imageable');
     }
 
+    // User or Provi
     public function assignable(): MorphTo
     {
         return $this->morphTo();
