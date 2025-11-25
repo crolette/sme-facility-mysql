@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Tenants;
 
+use Carbon\Carbon;
 use Inertia\Inertia;
 use DirectoryIterator;
 use App\Enums\CategoryTypes;
+use App\Models\LocationType;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
@@ -17,7 +19,6 @@ use App\Models\Tenants\Provider;
 use App\Enums\MaintenanceFrequency;
 use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
-use App\Models\LocationType;
 use App\Models\Tenants\Intervention;
 use App\Models\Tenants\Maintainable;
 use Illuminate\Support\Facades\Auth;
@@ -52,6 +53,7 @@ class DashboardController extends Controller
             ->where('need_maintenance', true)
             ->whereNotNull('next_maintenance_date')
             ->where('next_maintenance_date', '>=', today())
+            ->where('next_maintenance_date', '<=', Carbon::now()->addWeek())
             ->whereHasMorph(
                 'maintainable',
                 [
@@ -106,6 +108,7 @@ class DashboardController extends Controller
 
         $interventions = Intervention::select('id', 'intervention_type_id', 'priority', 'status', 'maintainable_id', 'interventionable_type', 'interventionable_id', 'ticket_id', 'planned_at')
             ->where('planned_at', '>=', today())
+            ->where('planned_at', '<=', Carbon::now()->addWeek())
             ->withoutTrashed()
             ->orderBy('planned_at')
             ->limit(10)
