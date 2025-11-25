@@ -4,40 +4,30 @@ import { useEffect, useState } from 'react';
 import { BiCheck, BiError, BiInfoCircle, BiXCircle } from 'react-icons/bi';
 import { useToast } from './ToastrContext';
 
-
 export default function Toastr() {
-    const { toastData } = useToast();
+    const { toastData, clearToast } = useToast();
     const [visible, setVisible] = useState(true);
     const { flash } = usePage<SharedData>().props;
     const [currentMessage, setCurrentMessage] = useState<string | null>(null);
-    
+
+    console.log('TOAST');
+    console.log(toastData);
+    console.log(flash);
+
     useEffect(() => {
-        if (flash?.message) {
-            setCurrentMessage(flash?.message);
+        if (flash?.message || toastData) {
+            setCurrentMessage(flash?.message ?? toastData?.message);
             setVisible(true);
             const timer = setTimeout(() => {
                 setVisible(false);
                 setCurrentMessage(null);
-            }, 3000);
-            
+                clearToast();
+            }, 2000);
+
             return () => clearTimeout(timer);
         }
-    }, [flash?.message]);
+    }, [flash?.message, toastData]);
 
-    // Gérer les messages du context
-    useEffect(() => {
-        if (toastData?.message) {
-            setCurrentMessage(toastData?.message);
-            setVisible(true);
-            const timer = setTimeout(() => {
-                setVisible(false);
-                setCurrentMessage(null);
-            }, 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [toastData]);
-
-   
     const currentType = toastData?.type || flash?.type;
 
     if (!visible || !currentMessage) return null; // Don't render if no message

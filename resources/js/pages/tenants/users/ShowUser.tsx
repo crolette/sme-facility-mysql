@@ -75,8 +75,6 @@ export default function ShowUser({ item }: { item: User }) {
 
     const [activeTab, setActiveTab] = useState('information');
 
-    console.log(item.manager);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={user.full_name} />

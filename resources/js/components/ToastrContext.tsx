@@ -8,6 +8,7 @@ interface ToastData {
 
 interface ToastContextType {
     showToast: (message: string, type?: ToastData['type']) => void;
+    clearToast: () => void;
     toastData: ToastData | null;
 }
 
@@ -28,13 +29,15 @@ interface ToastProviderProps {
 export const ToastProvider = ({ children }: ToastProviderProps) => {
     const [toastData, setToastData] = useState<ToastData | null>(null);
 
+    const clearToast = () => {
+        setToastData(null);
+    };
+
     const showToast = (message: string, type: ToastData['type'] = 'success') => {
         setToastData({ message, type });
     };
 
-    return (
-        <ToastContext.Provider value={{ showToast, toastData }}>
-            {children}
-        </ToastContext.Provider>
-    );
+    console.log('TOASTR CONTEXT');
+
+    return <ToastContext.Provider value={{ showToast, toastData, clearToast }}>{children}</ToastContext.Provider>;
 };
