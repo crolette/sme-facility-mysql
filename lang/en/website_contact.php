@@ -18,5 +18,10 @@ return [
     'message_placeholder' => 'I am interested in a demo of SME-Facility.',
     'thank_you_message' => 'Thank you for your contact request. We will get back to you as soon as possible.',
 
-    'mail.contact.title' => '[:subject] - :company - :name'
+    'mail.contact.title' => '[:subject] - :company - :name',
+
+    'newsletter.launch_title_line1' => 'Launch on 05/01/2026',
+    'newsletter.launch_title_line2' => 'Click here to be notified first!',
+    'newsletter.consent_description' => 'I agree to receive information by email about the launch and news of SME-Facility. By signing up, you accept our ',
+    'newsletter.thank_you' => 'Thank you! You will be among the first to know. See you very soon!'
 ];

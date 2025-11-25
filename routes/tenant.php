@@ -68,6 +68,23 @@ Route::middleware([
     'auth:tenant'
 ])->group(function () {
 
+
+    Route::get('/robots.txt', function () {
+        if (tenancy()->initialized) {
+            // Tous les tenants : bloquer tout
+            $content = "User-agent: *\nDisallow: /";
+        } else {
+            // Central : bloquer seulement l'app, permettre le site vitrine
+            $content = "User-agent: *\n";
+            $content .= "Disallow: /login\n";
+            $content .= "Disallow: /register\n";
+            $content .= "Disallow: /admin\n";
+            $content .= "Allow: /\n";
+        }
+
+        return response($content)->header('Content-Type', 'text/plain');
+    });
+
     Route::get('locale/{locale}', function (Request $request, $locale) {
 
         if (in_array($locale, array_keys(config('laravellocalization.supportedLocales')))) {

@@ -1,12 +1,17 @@
 <?php
 
+use Carbon\Carbon;
 use Inertia\Inertia;
 use App\Mail\ContactMail;
+use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 use App\Mail\ContactDemoMail;
+use App\Rules\NotDisposableEmail;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Middleware\LocaleMiddleware;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Middleware\AuthenticateCentral;
 use App\Http\Requests\Central\ContactRequest;
 use App\Http\Controllers\Website\DemoController;
@@ -14,22 +19,26 @@ use App\Http\Controllers\Website\ContactController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 foreach (config('tenancy.central_domains') as $domain) {
-    Route::domain($domain)->group(function () {
-        Route::get('/mail', function () {
-            $request = [
-                'subject' => 'appointment',
-                'first_name' => 'Test',
-                'last_name' => 'SME',
-                'vat_number' => 'BE0123456789',
-                'phone_number' => '+32123456789',
-                'company' => 'SME Facility',
-                'email' => 'contact@sme-facility.com',
-                'message' => 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nihil corporis doloremque aperiam! Quaerat accusamus commodi alias non itaque a magni?'
-            ];
 
-            // $request = new ContactRequest($request);
-            return (new ContactDemoMail($request))->render();
-        });
+
+    Route::domain($domain)->group(function () {
+
+
+        // Route::get('/mail', function () {
+        //     $request = [
+        //         'subject' => 'appointment',
+        //         'first_name' => 'Test',
+        //         'last_name' => 'SME',
+        //         'vat_number' => 'BE0123456789',
+        //         'phone_number' => '+32123456789',
+        //         'company' => 'SME Facility',
+        //         'email' => 'contact@sme-facility.com',
+        //         'message' => 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Nihil corporis doloremque aperiam! Quaerat accusamus commodi alias non itaque a magni?'
+        //     ];
+
+        //     // $request = new ContactRequest($request);
+        //     return (new ContactDemoMail($request))->render();
+        // });
 
         Route::get('locale/{locale}', function (Request $request, $locale) {
 
@@ -65,15 +74,57 @@ foreach (config('tenancy.central_domains') as $domain) {
             Route::get('/careers', function () {
                 return Inertia::render('website/careers');
             })->name('website.careers');
+
             Route::get('/cgu', function () {
                 return Inertia::render('website/cgu');
             })->name('website.cgu');
+
+            Route::get('/confidentiality', function () {
+                return Inertia::render('website/confidentiality');
+            })->name('website.confidentiality');
+
+            Route::get('/legal', function () {
+                return Inertia::render('website/legal');
+            })->name('website.legal');
+
             Route::get('/cgv', function () {
                 return Inertia::render('website/cgv');
             })->name('website.cgv');
+
             Route::get('/who-are-we', function () {
                 return Inertia::render('website/who_are_we');
             })->name('website.who-are-we');
+
+            // Route::middleware('throttle:2,60')->post('/newsletter', function (Request $request) {
+            Route::post('/newsletter', function (Request $request) {
+
+                $data = $request->all();
+                $data['email'] = strtolower($data['email']);
+
+                $validated = Validator::make($data, [
+                    'email' => ['required', 'string', 'lowercase', 'email', 'unique:newsletter,email', 'max:255', new NotDisposableEmail],
+                    'consent' => 'required|accepted'
+                ]);
+                $validated = $validated->validated();
+
+                try {
+                    DB::beginTransaction();
+                    DB::table('newsletter')->insertGetId(
+                        [
+                            'email' => $validated['email'],
+                            'consent' => $validated['consent'],
+                            'created_at' => now()
+                        ]
+                    );
+
+                    DB::commit();
+                    return ApiResponse::success([], 'Check');
+                } catch (Exception $e) {
+                    Log::info('Error during insert email to newsletters', [$e->getMessage()]);
+                    DB::rollback();
+                    return ApiResponse::error('Error');
+                }
+            })->name('website.newsletter');
 
             Route::get('/contact', [ContactController::class, 'index'])->name('website.contact');
             Route::middleware('throttle:2,60')->post('/contact', [ContactController::class, 'store'])->name('website.contact.post');

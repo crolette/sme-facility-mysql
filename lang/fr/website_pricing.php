@@ -15,7 +15,7 @@ return [
 
     'starter.title' => 'Starter',
     'starter.items' => [
-        ':number site',
+        '1 site',
         'Actifs illimités',
         'Jusqu\'à 5 utilisateurs',
         '5 GB d\'espace de stockage',
@@ -29,7 +29,7 @@ return [
 
     'premium.title' => 'Premium',
     'premium.items' => [
-        ':number sites',
+        '2 sites',
         'Actifs illimités',
         'Jusqu\'à 15 utilisateurs',
         '15 GB d\'espace de stockage',

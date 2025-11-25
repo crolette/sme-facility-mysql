@@ -16,7 +16,7 @@ export default function WhySME() {
                 <meta property="og:title" content={t('website_why.meta_title_og')} />
                 <meta property="og:description" content={t('website_why.meta_description_og')} />
             </Head>
-            <section className="bg-website-secondary text-website-font -mt-20 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
+            <section className="bg-website-secondary text-website-font -mt-30 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
                 <div className="container mx-auto">
                     <div className="mx-auto grid h-full gap-10 px-4 py-32 md:grid-cols-[2fr_1fr] md:gap-10 md:px-10 lg:max-w-11/12">
                         <div className="flex flex-col justify-center gap-10">

@@ -29,6 +29,8 @@ return [
     'footer.who_are_we' => 'Wie zijn wij?',
     'footer.implementation' => 'Implementatie',
     'footer.careers' => 'Werken bij ons',
+    'footer.confidentiality' => 'Privacybeleid',
+    'footer.legal' => 'Wettelijke vermeldingen',
     'footer.contact' => 'Contact',
     'footer.cgu' => 'Gebruiksvoorwaarden',
     'footer.cgv' => 'Verkoopvoorwaarden',

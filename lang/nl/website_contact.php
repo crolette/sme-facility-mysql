@@ -18,5 +18,10 @@ return [
     'message_placeholder' => 'Ik ben geïnteresseerd in een demo van SME-Facility.',
     'thank_you_message' => 'Bedankt voor uw contactaanvraag. We nemen zo snel mogelijk contact met u op.',
 
-    'mail.contact.title' => '[:subject] - :company - :name'
+    'mail.contact.title' => '[:subject] - :company - :name',
+
+    'newsletter.launch_title_line1' => 'Lancering op 05/01/2026',
+    'newsletter.launch_title_line2' => 'Klik hier om als eerste op de hoogte gebracht te worden!',
+    'newsletter.consent_description' => 'Ik ga akkoord om per e-mail informatie te ontvangen over de lancering en het nieuws van SME-Facility. Door u in te schrijven, accepteert u ons ',
+    'newsletter.thank_you' => 'Bedankt! U behoort tot de eersten die op de hoogte worden gebracht. Tot zeer binnenkort!'
 ];

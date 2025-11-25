@@ -16,9 +16,9 @@ export default function Welcome() {
                 <meta property="og:title" content={t('website_home.title_og')} />
                 <meta property="og:description" content={t('website_home.description_og')} />
             </Head>
-            <section className="bg-logo text-website-card -mt-28 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
+            <section className="bg-logo text-website-card -mt-30 flex min-h-screen w-full items-center justify-center py-20 md:-mt-40">
                 <div className="container mx-auto">
-                    <div className="mx-auto grid h-full gap-10 px-4 py-20 md:grid-cols-[2fr_1fr] md:gap-10 md:px-10 lg:max-w-11/12">
+                    <div className="mx-auto grid h-full gap-10 px-4 py-32 md:grid-cols-[2fr_1fr] md:gap-10 md:px-10 lg:max-w-11/12">
                         <div className="flex flex-col items-center justify-center gap-10">
                             <h1 className="">
                                 {t('website_home.hero_title')}
@@ -140,7 +140,7 @@ export default function Welcome() {
                 <div className="container mx-auto">
                     <div className="text-website-font mx-auto h-full space-y-14 px-4 py-10 md:max-w-11/12 md:p-10">
                         <h2 className="">{t('website_home.section-3.title')}</h2>
-                        <h3>{t('website_home.section-3.subtitle')}?</h3>
+                        <h3>{t('website_home.section-3.subtitle')}</h3>
 
                         <div className="from-website-primary text-website-secondary mx-auto grid grid-cols-1 gap-10 rounded-md bg-linear-to-r to-white p-10 lg:grid-cols-[2fr_1fr]">
                             <div className="">

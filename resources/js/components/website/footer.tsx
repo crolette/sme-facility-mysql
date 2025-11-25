@@ -1,5 +1,4 @@
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Linkedin, Youtube } from 'lucide-react';
 import LocaleChange from '../tenant/LocaleChange';
 import FaqSection from './faq_section';
 import OurSolutions from './our_solutions';
@@ -14,14 +13,14 @@ export default function Footer() {
             <FaqSection />
 
             <footer className="bg-logo flex flex-col items-center justify-center space-y-10 px-4 py-10 text-white md:p-20">
-                <div className="container grid gap-12 md:grid-cols-4">
+                <div className="container grid gap-12 text-xs md:grid-cols-4">
                     <div className="flex flex-col gap-10">
                         <img src="/images/logo.png" alt="" className="w-40" />
                         <p>{t('website_common.footer.title')}</p>
-                        <div className="flex gap-4">
+                        {/* <div className="flex gap-4">
                             <Linkedin></Linkedin>
                             <Youtube></Youtube>
-                        </div>
+                        </div> */}
                         <div className="w-fit">
                             <LocaleChange url={'website.locale'} />
                         </div>
@@ -113,7 +112,7 @@ export default function Footer() {
                         </ul>
                     </div>
                 </div>
-                <div className="text-website-border container mx-auto flex w-full flex-col justify-between gap-20 text-sm lg:flex-row">
+                <div className="text-website-border container mx-auto flex w-full flex-col justify-between gap-10 pb-5 text-sm md:flex-row">
                     <p>
                         © SME-Facility 2025. {t('website_common.footer.sme_service')}{' '}
                         <a href="https://www.facilitywebxp.be" target="_blank" className="block">
@@ -121,21 +120,29 @@ export default function Footer() {
                         </a>
                     </p>
                     <ul className="flew-wrap flex flex-col md:flex-row">
-                        <li>
+                        {/* <li>
                             <a href={route('website.cgu')} className="!no-underline">
                                 {t('website_common.footer.cgu')}
                             </a>
                         </li>
-                        <span className="mx-2 hidden md:inline-block">|</span>
+                        <span className="mx-2 hidden md:inline-block">|</span> */}
                         <li>
+                            <a href={route('website.confidentiality')} className="!no-underline">
+                                {t('website_common.footer.confidentiality')}
+                            </a>
+                        </li>
+                        <span className="mx-2 hidden md:inline-block">|</span>
+                        {/* <li>
                             {' '}
                             <a href={route('website.cgv')} className="!no-underline">
                                 {' '}
                                 {t('website_common.footer.cgv')}
                             </a>
                         </li>
-                        <span className="mx-2 hidden md:inline-block">|</span>
-                        <li> {t('website_common.footer.legal')}</li>
+                        <span className="mx-2 hidden md:inline-block">|</span> */}
+                        <a href={route('website.legal')} className="!no-underline">
+                            <li> {t('website_common.footer.legal')}</li>
+                        </a>
                     </ul>
                 </div>
             </footer>

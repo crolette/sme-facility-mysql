@@ -19,5 +19,10 @@ return [
     'message_placeholder' => 'Je suis intéressé par une démo de SME-Facility.',
     'thank_you_message' => 'Merci pour votre demande de contact. Nous vous recontacterons dans les plus brefs délais.',
 
-    'mail.contact.title' => '[:subject] - :company - :name'
+    'mail.contact.title' => '[:subject] - :company - :name',
+
+    'newsletter.launch_title_line1' => 'Lancement le 05/01/2026',
+    'newsletter.launch_title_line2' => 'Cliquez ici pour être alerté en avant-première !',
+    'newsletter.consent_description' => 'J\'accepte de recevoir par email des informations concernant le lancement et l\'actualité de SME-Facility. En vous inscrivant, vous acceptez notre ',
+    'newsletter.thank_you' => 'Merci ! Vous serez parmi les premiers informés. Rendez-vous très bientôt !'
 ];

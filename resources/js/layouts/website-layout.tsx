@@ -1,12 +1,23 @@
+import InputError from '@/components/input-error';
+import LocaleChange from '@/components/tenant/LocaleChange';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
 import Footer from '@/components/website/footer';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, useForm } from '@inertiajs/react';
+import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Menu, X } from 'lucide-react';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { CheckCircle, ChevronDown, ChevronUp, Menu, X } from 'lucide-react';
+import { FormEventHandler, useEffect, useRef, useState, type ReactNode } from 'react';
 
 interface AppLayoutProps {
     children: ReactNode;
+}
+
+interface NewsletterFormData {
+    honey: string;
+    email: string;
+    consent: boolean;
 }
 
 export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
@@ -47,6 +58,32 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
         };
     }, []);
 
+    const { data, setData, reset, setError, errors } = useForm<NewsletterFormData>({
+        honey: '',
+        email: null,
+        consent: false,
+    });
+
+    const handleNewsletterForm: FormEventHandler = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post(route('website.newsletter'), data);
+            if (response.data.status === 'success') {
+                setShowLaunchEmail(false);
+                setSuccessEmail(true);
+                reset();
+            }
+        } catch (error) {
+            console.log(error);
+            setError('email', error.response.data.message);
+        }
+    };
+
+    console.log(errors);
+
+    const [showLaunchEmail, setShowLaunchEmail] = useState<boolean>(false);
+    const [successEmail, setSuccessEmail] = useState<boolean>(false);
+
     return (
         <>
             <Head>
@@ -61,7 +98,7 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                 <header className="text-website-card sticky top-0 z-50 container mb-6 w-full text-sm not-has-[nav]:hidden">
                     <nav className="bg-logo mx-auto flex flex-row items-center justify-between gap-4 rounded-b-md px-5 py-6 shadow-2xl lg:px-5 lg:py-10">
                         <a href={route('website.home')}>
-                            <img src="/images/logo.png" alt="" className="max-w-32 lg:w-42" />
+                            <img src="/images/logo.png" alt="" className="w-32 lg:w-42" />
                         </a>
 
                         <ul className="text-md hidden gap-8 font-semibold md:flex md:shrink-0 md:items-center lg:gap-12" ref={featuresMenuRef}>
@@ -158,10 +195,11 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                                 </Link>
                             </li>
 
-                            <li>
+                            <li className="space-x-2">
                                 <a href={route('website.demo')}>
                                     <Button variant={'cta'}> {t('website_menu.demo')}</Button>
                                 </a>
+                                <LocaleChange url={'website.locale'} />
                             </li>
                         </ul>
                         <Menu size={24} onClick={() => setShowMobileMenu(true)} className="block md:hidden" />
@@ -269,6 +307,7 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                                                 <Button variant={'cta'}> {t('website_menu.demo')}</Button>
                                             </a>
                                         </li>
+                                        <LocaleChange url={'website.locale'} />
                                         <li>
                                             <X onClick={() => setShowMobileMenu(false)} className="mx-auto" size={32} />
                                         </li>
@@ -281,6 +320,72 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
 
                 <div className="w-full">
                     <main className="website">{children}</main>
+                    <div className="fixed bottom-0 flex w-full flex-col items-center justify-center">
+                        <div className="bg-cta mx-auto w-9/12 rounded-t-lg px-4 py-2 md:w-7/12">
+                            <div>
+                                <div
+                                    className="text-logo flex cursor-pointer items-center justify-center gap-4"
+                                    onClick={() => setShowLaunchEmail(!showLaunchEmail)}
+                                >
+                                    <div>
+                                        <p className="animate-pulse text-center text-2xl font-extrabold">
+                                            {t('website_contact.newsletter.launch_title_line1')}
+                                        </p>
+                                        <p className="animate-pulse text-center">{t('website_contact.newsletter.launch_title_line2')}</p>
+                                    </div>
+                                    {showLaunchEmail ? <ChevronDown /> : <ChevronUp />}
+                                </div>
+                                {showLaunchEmail && (
+                                    <form onSubmit={handleNewsletterForm} className="flex flex-col items-center space-y-2">
+                                        <input
+                                            type="text"
+                                            name="honey"
+                                            style={{ display: 'none' }}
+                                            onChange={(e) => setData('honey', e.target.value)}
+                                            tabIndex={-1}
+                                            autoComplete="off"
+                                        />
+                                        <div className="w-full">
+                                            <Input
+                                                type="email"
+                                                name="email"
+                                                id=""
+                                                required
+                                                className="w-full"
+                                                placeholder={t('common.email_placeholder')}
+                                                onChange={(e) => setData('email', e.target.value)}
+                                            />
+                                            <InputError message={errors.email} />
+                                        </div>
+                                        <div className="text-logo flex items-center gap-2 text-xs">
+                                            <Checkbox
+                                                id="consent"
+                                                checked={data.consent}
+                                                onClick={() => {
+                                                    setData('consent', !data.consent);
+                                                }}
+                                            />
+                                            <label htmlFor="consent">
+                                                {t('website_contact.newsletter.consent_description')}
+                                                <a href={route('website.confidentiality')}>{t('website_common.footer.confidentiality')}.</a>
+                                            </label>
+                                        </div>
+                                        <div>
+                                            <Button variant={'default'} disabled={!data.consent}>
+                                                {t('actions.submit')}
+                                            </Button>
+                                        </div>
+                                    </form>
+                                )}
+                                {successEmail && (
+                                    <div className="text-logo mt-2 flex items-center gap-2 text-xs">
+                                        <CheckCircle />
+                                        <p>{t('website_contact.newsletter.thank_you')}</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
                     <Footer />
                 </div>
             </div>

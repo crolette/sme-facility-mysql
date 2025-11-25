@@ -20,8 +20,21 @@ use App\Http\Controllers\Central\CentralAssetCategoryController;
 use App\Http\Controllers\Central\RegisterCentralTenantController;
 use App\Notifications\TenantAdminCreatedPasswordResetNotification;
 
+
 foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->group(function () {
+
+        Route::get('/robots.txt', function () {
+            // Central : bloquer seulement l'app, permettre le site vitrine
+            $content = "User-agent: *\n";
+            $content .= "Disallow: /login\n";
+            $content .= "Disallow: /register\n";
+            $content .= "Disallow: /admin\n";
+            $content .= "Allow: /\n";
+
+            return response($content)->header('Content-Type', 'text/plain');
+        });
+
 
         Route::middleware([
             'web',

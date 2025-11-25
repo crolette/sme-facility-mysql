@@ -14,10 +14,10 @@ foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->group(
         function () {
             Route::middleware('guest')->group(function () {
-                Route::get('register', [RegisteredUserController::class, 'create'])
-                    ->name('central.register');
+                // Route::get('register', [RegisteredUserController::class, 'create'])
+                //     ->name('central.register');
 
-                Route::post('register', [RegisteredUserController::class, 'store'])->name('central.register.post');
+                // Route::post('register', [RegisteredUserController::class, 'store'])->name('central.register.post');
 
                 Route::get('login', [AuthenticatedSessionController::class, 'create'])
                     ->name('central.login');

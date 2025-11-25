@@ -18,5 +18,10 @@ return [
     'message_placeholder' => 'Ich interessiere mich für eine Demo von SME-Facility.',
     'thank_you_message' => 'Vielen Dank für Ihre Anfrage. Wir werden uns so schnell wie möglich bei Ihnen melden.',
 
-    'mail.contact.title' => '[:reason] - :subject - :name'
+    'mail.contact.title' => '[:reason] - :subject - :name',
+
+    'newsletter.launch_title_line1' => 'Start am 05.01.2026',
+    'newsletter.launch_title_line2' => 'Klicken Sie hier, um als Erster benachrichtigt zu werden!',
+    'newsletter.consent_description' => 'Ich akzeptiere, per E-Mail Informationen über den Start und die Neuigkeiten von SME-Facility zu erhalten. Mit Ihrer Anmeldung akzeptieren Sie unsere ',
+    'newsletter.thank_you' => 'Vielen Dank! Sie gehören zu den Ersten, die informiert werden. Bis bald!'
 ];

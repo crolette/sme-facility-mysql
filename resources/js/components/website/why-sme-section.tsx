@@ -11,20 +11,20 @@ export default function WhySMESection() {
                     <h2>{t('website_common.why_sme.title')}</h2>
                     <h3>{t('website_common.why_sme.subtitle')}</h3>
                     <ul className="ml-6 flex flex-col gap-4">
-                        <li className="flex gap-4">
-                            <BadgeEuro className="mr-6 inline-block" />
+                        <li className="grid grid-cols-[24px_1fr] gap-4">
+                            <BadgeEuro className="inline-block" size={24} />
                             <p>{t('website_common.why_sme.one')}</p>
                         </li>
-                        <li className="flex gap-4">
-                            <User className="mr-6 inline-block" />
+                        <li className="grid grid-cols-[24px_1fr] gap-4">
+                            <User className="inline-block" />
                             <p>{t('website_common.why_sme.two')}</p>
                         </li>
-                        <li className="flex gap-4">
-                            <BadgeCheck className="mr-6 inline-block" />
+                        <li className="grid grid-cols-[24px_1fr] gap-4">
+                            <BadgeCheck className="inline-block" />
                             <p>{t('website_common.why_sme.three')}</p>
                         </li>
-                        <li className="flex gap-4">
-                            <BadgeEuro className="mr-6 inline-block" />
+                        <li className="grid grid-cols-[24px_1fr] gap-4">
+                            <BadgeEuro className="inline-block" />
                             <p>{t('website_common.why_sme.four')}</p>
                         </li>
                     </ul>

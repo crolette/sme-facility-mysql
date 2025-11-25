@@ -30,6 +30,8 @@ return [
     'footer.implementation' => 'Implementation',
     'footer.careers' => 'Careers',
     'footer.contact' => 'Contact',
+    'footer.confidentiality' => 'Privacy Policy',
+    'footer.legal' => 'Legal Notice',
     'footer.cgu' => 'Terms of Use',
     'footer.cgv' => 'Terms of Sale',
     'footer.legal' => 'Legal Notice',

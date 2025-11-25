@@ -30,10 +30,10 @@ return [
     'footer.implementation' => 'Implémentation',
     'footer.careers' => 'Recrutement',
     'footer.contact' => 'Contact',
-    'footer.contact' => 'Contact',
+    'footer.confidentiality' => 'Politique de confidentialité',
+    'footer.legal' => 'Mentions légales',
     'footer.cgu' => 'CGU',
     'footer.cgv' => 'CGV',
-    'footer.legal' => 'Mentions légales',
     'footer.sme_service' => 'SME-Facility est un service de ',
 
 

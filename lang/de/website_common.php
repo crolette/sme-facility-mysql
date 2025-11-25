@@ -28,6 +28,8 @@ return [
     'footer.title' => 'Das ideale Facility-Management-System für KMUs',
     'footer.who_are_we' => 'Wer sind wir?',
     'footer.implementation' => 'Implementierung',
+    'footer.confidentiality' => 'Datenschutzerklärung',
+    'footer.legal' => 'Impressum',
     'footer.careers' => 'Karriere',
     'footer.contact' => 'Kontakt',
     'footer.cgu' => 'Nutzungsbedingungen',

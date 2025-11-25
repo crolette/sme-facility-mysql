@@ -27,6 +27,8 @@ class NotDisposableEmail implements Rule
         'burnermail.io',
         'anonymbox.com',
         'mailcatch.com',
+        'sme-facility.com',
+        'wow-resto.com'
     ];
 
     public function passes($attribute, $value)

@@ -44,10 +44,6 @@ class DemoController extends Controller
                     ->send(new ContactDemoMail($request->validated()));
             }
 
-            // Mail::to($request->email)
-            //     ->locale($request->user()?->preferred_locale ?? 'en')
-            //     ->send(new ContactCopyMail($request));
-
             return ApiResponse::success([], 'E-mail sent');
         } catch (Exception $e) {
             return ApiResponse::error('Error E-mail sent');
