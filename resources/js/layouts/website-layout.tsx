@@ -336,7 +336,10 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                                     {showLaunchEmail ? <ChevronDown /> : <ChevronUp />}
                                 </div>
                                 {showLaunchEmail && (
-                                    <form onSubmit={handleNewsletterForm} className="flex flex-col items-center space-y-2">
+                                    <form
+                                        onSubmit={handleNewsletterForm}
+                                        className="mx-auto flex w-9/12 max-w-lg flex-col items-center justify-center space-y-2"
+                                    >
                                         <input
                                             type="text"
                                             name="honey"
