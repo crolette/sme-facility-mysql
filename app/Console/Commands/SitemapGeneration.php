@@ -41,7 +41,7 @@ class SitemapGeneration extends Command
 
         );
 
-        $urlShouldntBeListed = ['website.locale', 'website.cgv', 'website.cgu'];
+        $urlShouldntBeListed = ['website.locale', 'website.cgv', 'website.cgu', 'website.careers', 'website.legal', 'website.confidentiality', 'website.newsletter'];
 
         $websiteRoutes = $websiteRoutes->diff($urlShouldntBeListed);
 

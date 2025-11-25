@@ -32,3 +32,8 @@ package-lock.json
 /.vscode
 /.zed
 /lang/php_*.json
+public/sitemap_de.xml
+public/sitemap_en.xml
+public/sitemap_fr.xml
+public/sitemap_nl.xml
+public/sitemap.xml
