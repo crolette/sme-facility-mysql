@@ -6,7 +6,6 @@ use App\Models\Tenants\Asset;
 use App\Models\Tenants\Company;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
-use App\Models\Central\AssetCategory;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

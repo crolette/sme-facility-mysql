@@ -2,18 +2,10 @@
 
 namespace Database\Factories\Tenants;
 
-use Carbon\Carbon;
-use App\Models\Tenants\Asset;
-use App\Enums\NoticePeriodEnum;
-use App\Models\Tenants\Company;
 use App\Enums\ContractTypesEnum;
 use App\Models\Tenants\Contract;
 use App\Models\Tenants\Provider;
 use App\Enums\ContractStatusEnum;
-use App\Enums\ContractDurationEnum;
-use App\Models\Central\CategoryType;
-use App\Models\Tenants\Maintainable;
-use App\Models\Central\AssetCategory;
 use App\Enums\ContractRenewalTypesEnum;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

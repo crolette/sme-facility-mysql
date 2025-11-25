@@ -73,7 +73,7 @@ class TenantAssetController extends Controller
         }
 
 
-        $categories = CategoryType::where('category', 'asset')->get();
+        $categories = CategoryType::getByCategoryCache('asset');
 
         return Inertia::render('tenants/assets/IndexAssets', ['items' => $assets->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'sortBy', 'trashed', 'orderBy', 'category']), 'categories' => $categories]);
     }
@@ -86,8 +86,8 @@ class TenantAssetController extends Controller
         if (Auth::user()->cannot('create', Asset::class))
             abort(403);
 
-        $categories = CategoryType::where('category', 'asset')->get();
-        $documentTypes = CategoryType::where('category', 'document')->get();
+        $categories = CategoryType::getByCategoryCache('asset');
+        $documentTypes = CategoryType::getByCategoryCache('document');
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
@@ -128,8 +128,8 @@ class TenantAssetController extends Controller
             abort(403);
 
 
-        $categories = CategoryType::where('category', 'asset')->get();
-        $documentTypes = CategoryType::where('category', 'document')->get();
+        $categories = CategoryType::getByCategoryCache('asset');
+        $documentTypes = CategoryType::getByCategoryCache('document');
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');

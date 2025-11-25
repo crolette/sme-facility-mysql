@@ -3,6 +3,7 @@
 namespace App\Models\Central;
 
 use App\Models\Translation;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -49,6 +50,16 @@ class CategoryType extends Model
         return Cache::remember('category_types', 3600, function () {
             return static::with('translations')->get();
         });
+    }
+
+    public static function getByCategoryCache(string $category)
+    {
+        return Cache::remember(
+            "category_types.{$category}",
+            3600,
+            fn() =>
+            static::where('category', $category)->with('translations')->get()
+        );
     }
 
     public function translations(): MorphMany

@@ -2,17 +2,12 @@
 
 namespace App\Models\Tenants;
 
-use App\Models\Tenants\User;
 use App\Observers\AssetObserver;
-use App\Models\Central\AssetType;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
 use App\Models\Tenants\Maintainable;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Central\AssetCategory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Database\Eloquent\Builder;
 use App\Models\Tenants\ScheduledNotification;
 use App\Traits\HasMaintenanceManager;
 use Illuminate\Database\Eloquent\SoftDeletes;
