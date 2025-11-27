@@ -29,7 +29,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class ContractsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, ShouldAutoSize, WithStyles, WithColumnFormatting, WithTitle
+class ContractsSheet implements FromQuery, WithMapping, Responsable, ShouldAutoSize, WithHeadings, WithStyles, WithColumnFormatting, WithTitle
 {
     use Exportable;
 
@@ -60,9 +60,7 @@ class ContractsSheet implements FromQuery, WithMapping, Responsable, WithHeading
         $rowData = app(ContractExportImportService::class)->generateDataForHash($contract);
         $hash = app(ContractExportImportService::class)->calculateHash($rowData);
 
-        Log::info('rowExcel');
         $rowExcel = app(ContractExportImportService::class)->generateExcelDisplayData($contract);
-        Log::info($rowExcel);
         // Debugbar::info($asset->id, $asset->location);
         return array_merge(array_values($rowExcel), [$hash]);
     }
@@ -115,18 +113,24 @@ class ContractsSheet implements FromQuery, WithMapping, Responsable, WithHeading
 
     public function styles(Worksheet $sheet)
     {
-        // $protection = $sheet->getProtection();
-        // $protection->setPassword('');
-        // $protection->setSheet(true);
-        $sheet->protectCells('1:1', '');
-        $sheet->protectCells('1:2', '');
-        $sheet->protectCells('A:A', '');
-        $sheet->protectCells('B:M', '');
+        $protection = $sheet->getProtection();
+        $protection->setSheet(true);
+        $protection->setPassword('');
+
+        $sheet->getColumnDimension('B')->setWidth(25);
+        $sheet->getColumnDimension('C')->setWidth(15);
+        $sheet->getColumnDimension('D')->setWidth(20);
+        $sheet->getColumnDimension('E')->setWidth(20);
+        $sheet->getColumnDimension('K')->setWidth(15);
+        $sheet->getColumnDimension('L')->setWidth(50);
+        $sheet->getColumnDimension('M')->setWidth(25);
+
+        $sheet->getStyle('B3:M9999')->getProtection()
+            ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+
         $sheet->getRowDimension('1')->setRowHeight(0);
         $sheet->getColumnDimension('N')->setVisible(false);
         $sheet->freezePane('D3');
-
-        $validation = $sheet->getStyle('B3:M9999')->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
 
         $contractTypes = collect(array_column(ContractTypesEnum::cases(), 'value'));
         $contractTypes = $contractTypes->join(',');
@@ -216,17 +220,6 @@ class ContractsSheet implements FromQuery, WithMapping, Responsable, WithHeading
         $validationLength->setError('Le texte doit contenir entre 4 et 100 caractères.');
         $sheet->setDataValidation('B3:B9999', clone $validationLength);
 
-        $validationLength = $sheet->getDataValidation('K3');
-        $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
-        $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_BETWEEN);
-        $validationLength->setFormula1('4');
-        $validationLength->setFormula2('250');
-        $validationLength->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
-        $validationLength->setShowErrorMessage(true);
-        $validationLength->setErrorTitle('Erreur de longueur');
-        $validationLength->setError('Le texte doit contenir entre 4 et 250 caractères.');
-        $sheet->setDataValidation('K3:K9999', clone $validationLength);
-
         $validationLength = $sheet->getDataValidation('D3');
         $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
         $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_LESSTHANOREQUAL);
@@ -237,6 +230,20 @@ class ContractsSheet implements FromQuery, WithMapping, Responsable, WithHeading
         $validationLength->setError('Le texte doit contenir max 14 caractères.');
         $sheet->setDataValidation('D3:D9999', clone $validationLength);
         $sheet->setDataValidation('E3:E9999', clone $validationLength);
+
+        $validationLength = $sheet->getDataValidation('L3');
+        $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
+        $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_BETWEEN);
+        $validationLength->setFormula1('4');
+        $validationLength->setFormula2('250');
+        $validationLength->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
+        $validationLength->setShowErrorMessage(true);
+        $validationLength->setErrorTitle('Erreur de longueur');
+        $validationLength->setError('Le texte doit contenir entre 4 et 250 caractères.');
+        $sheet->setDataValidation('L3:L9999', clone $validationLength);
+
+
+
 
 
         return [
@@ -250,10 +257,23 @@ class ContractsSheet implements FromQuery, WithMapping, Responsable, WithHeading
     // {
     //     return [
     //         AfterSheet::class => function (AfterSheet $event) {
-    //             $event->sheet->getDelegate()
-    //                 ->getStyle('G:G')
-    //                 ->getNumberFormat()
-    //                 ->setFormatCode(NumberFormat::FORMAT_TEXT);
+    //             $sheet = $event->sheet->getDelegate();
+
+    //             // D'abord déverrouiller les cellules éditables
+    //             $sheet->getStyle('C3:AD9999')->getProtection()
+    //                 ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+
+    //             // Ensuite activer la protection
+    //             $protection = $sheet->getProtection();
+    //             $protection->setSheet(true);
+    //             $protection->setPassword('');
+    //             $protection->setFormatColumns(true);
+    //             $protection->setFormatCells(true);
+
+    //             // Ton autre code
+    //             $sheet->getRowDimension('1')->setRowHeight(0);
+    //             $sheet->getColumnDimension('AE')->setVisible(false);
+    //             $sheet->freezePane('F3');
     //         },
     //     ];
     // }

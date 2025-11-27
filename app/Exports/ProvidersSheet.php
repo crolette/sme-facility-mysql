@@ -105,16 +105,21 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
         $protection = $sheet->getProtection();
         $protection->setPassword('');
         $protection->setSheet(true);
-        $sheet->protectCells('1:1', '');
-        $sheet->protectCells('1:2', '');
-        $sheet->protectCells('A:A', '');
-        $sheet->protectCells('B:M', '');
+        $protection->setFormatColumns(true);
+
+        $sheet->getColumnDimension('C')->setWidth(40);
+        $sheet->getColumnDimension('D')->setWidth(40);
+        $sheet->getColumnDimension('E')->setWidth(50);
+        $sheet->getColumnDimension('H')->setWidth(50);
+        $sheet->getColumnDimension('K')->setWidth(50);
+        $sheet->getColumnDimension('L')->setWidth(50);
+
+        $sheet->getStyle('B3:M9999')->getProtection()
+            ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+
         $sheet->getRowDimension('1')->setRowHeight(0);
         $sheet->getColumnDimension('M')->setVisible(false);
         $sheet->freezePane('D3');
-
-
-        $validation = $sheet->getStyle('B3:M9999')->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
 
         // $categories = CategoryType::where('category', 'provider')->get()->pluck('label');
         // $categoriesList = $categories->join(',');

@@ -156,18 +156,19 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $protection = $sheet->getProtection();
         $protection->setPassword('');
         $protection->setSheet(true);
-        $sheet->protectCells('1:1', '');
+
+        $sheet->getColumnDimension('C')->setWidth(35);
+        $sheet->getColumnDimension('D')->setWidth(35);
+        $sheet->getColumnDimension('M')->setWidth(20);
+        $sheet->getColumnDimension('N')->setWidth(20);
+
+
+        $sheet->getStyle('C3:AD9999')->getProtection()
+            ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+
         $sheet->getRowDimension('1')->setRowHeight(0);
-        $sheet->protectCells('2:2', '');
-        $sheet->protectCells('A:A', '');
-        $sheet->protectCells('B:B', '');
-        $sheet->protectCells('AE:AE', '');
         $sheet->getColumnDimension('AE')->setVisible(false);
-
         $sheet->freezePane('F3');
-
-
-        $validation = $sheet->getStyle('C3:AD9999')->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
 
         $categories = CategoryType::where('category', 'asset')->get()->pluck('label');
         $categoriesList = $categories->join(',');

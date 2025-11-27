@@ -103,6 +103,8 @@ it('can update existing contracts by import', function () {
         'name' => 'Contract two',
     ]);
 
+    Contract::factory()->create();
+
 
     Storage::fake('local');
 
@@ -113,6 +115,7 @@ it('can update existing contracts by import', function () {
     assertDatabaseHas(
         'contracts',
         [
+            'id' => 1,
             'name' => 'Updated first contract',
             'type' => ContractTypesEnum::MAINTENANCE,
             'internal_reference' => 'MAINT',
@@ -127,6 +130,7 @@ it('can update existing contracts by import', function () {
     assertDatabaseHas(
         'contracts',
         [
+            'id' => 2,
             'name' => 'Contract Two',
             'internal_reference' => 'ALLIN',
             'provider_reference' => '123ALL',
@@ -157,90 +161,45 @@ it('can update existing contracts by import', function () {
 //     $response->assertJson(['status' => 'error', 'message' => 'Wrong file. The file name should include users']);
 // });
 
-// it('does not update user with no changes', function () {
-//     assertDatabaseHas(
-//         'users',
-//         [
-//             'first_name' => 'Brad',
-//             'last_name' => 'Pitt',
-//             'email' => 'bradpitt@actorstudio.com',
-//             'job_position' => 'Actor',
-//             'phone_number' => '+32654821379'
-//         ],
-//     );
+it('does not update contracts with no changes', function () {
 
-//     Storage::fake('local');
+    Contract::factory()->count(2)->create();
+    Contract::factory()->create([
+        'name' => 'Contract three',
+        'internal_reference' => 'CLEAN',
+        'provider_reference' => '123CLEAN',
+        'type' => ContractTypesEnum::CLEANING,
+        'contract_duration' => ContractDurationEnum::TWO_YEARS,
+        'notice_period' => NoticePeriodEnum::DEFAULT,
+        'start_date' => Carbon::createFromDate(2025, 9, 1)->addYears(2)->toDateString(),
+        'end_date' => Carbon::createFromDate(2025, 9, 1)->addYears(2)->toDateString(),
+        'notice_date' => Carbon::createFromDate(2025, 9, 1)->addYears(2)->subMonths(3)->toDateString(),
+        'renewal_type' => ContractRenewalTypesEnum::MANUAL,
+        'status' => ContractStatusEnum::ACTIVE,
+    ]);
 
-//     $file = UploadedFile::fake()->createWithContent('users.xlsx', file_get_contents(base_path('tests/fixtures/users.xlsx')));
+    Storage::fake('local');
 
-//     Excel::import(new UsersImport, $file);
+    $file = UploadedFile::fake()->createWithContent('contracts_update.xlsx', file_get_contents(base_path('tests/fixtures/contracts_update.xlsx')));
 
-//     assertDatabaseHas(
-//         'users',
-//         [
-//             'first_name' => 'Brad',
-//             'last_name' => 'Pitt',
-//             'email' => 'bradpitt@actorstudio.com',
-//             'job_position' => 'Actor',
-//             'phone_number' => '+32654821379'
-//         ],
-//     );
-// });
+    Excel::import(new ContractsImport, $file);
 
-// it('can import and update users', function () {
-
-//     assertDatabaseHas(
-//         'users',
-//         [
-//             'id' => 3,
-//             'first_name' => 'Michael',
-//             'last_name' => 'Jones',
-//             'provider_id' => null,
-//         ],
-//     );
-
-//     assertDatabaseHas(
-//         'users',
-//         [
-//             'id' => 4,
-//             'first_name' => 'Josiane',
-//             'last_name' => 'Balasko',
-//             'phone_number' => null,
-//             'job_position' => null,
-//             'provider_id' => 2,
-//         ],
-//     );
-
-
-//     Storage::fake('local');
-
-//     $file = UploadedFile::fake()->createWithContent('users.xlsx', file_get_contents(base_path('tests/fixtures/users.xlsx')));
-
-//     Excel::import(new UsersImport, $file);
-
-//     assertDatabaseHas(
-//         'users',
-//         [
-//             'id' => 3,
-//             'first_name' => 'Miguel',
-//             'last_name' => 'Paquito',
-//             'email' => 'miguelpaquito@gmail.com',
-//             'job_position' => 'Incognito mode',
-//             'phone_number' => '+32987654321',
-//             'provider_id' => 1,
-//         ],
-//     );
-
-//     assertDatabaseHas(
-//         'users',
-//         [
-//             'id' => 4,
-//             'first_name' => 'Josiane',
-//             'last_name' => 'Balasko',
-//             'email' => 'jobalasko@icloud.com',
-//             'job_position' => 'Sales Manager',
-//             'phone_number' => '+32852963147',
-//             'provider_id' => null,
-//         ],
-//     );
-// });
+    assertDatabaseHas(
+        'contracts',
+        [
+            'id' => 3,
+            'name' => 'Contract three',
+            'internal_reference' => 'CLEAN',
+            'provider_reference' => '123CLEAN',
+            'type' => ContractTypesEnum::CLEANING,
+            'contract_duration' => ContractDurationEnum::TWO_YEARS,
+            'notice_period' => NoticePeriodEnum::THREE_MONTHS,
+            'start_date' => Carbon::createFromDate(2025, 9, 1)->toDateString(),
+            'end_date' => Carbon::createFromDate(2025, 9, 1)->addYears(2)->toDateString(),
+            'notice_date' => Carbon::createFromDate(2025, 9, 1)->addYears(2)->subMonths(3)->toDateString(),
+            'renewal_type' => ContractRenewalTypesEnum::MANUAL,
+            'status' => ContractStatusEnum::ACTIVE,
+            'provider_id' => 2,
+        ],
+    );
+});

@@ -96,17 +96,19 @@ class UsersSheet implements FromQuery, WithMapping, Responsable, WithEvents, Wit
         $protection = $sheet->getProtection();
         $protection->setPassword('');
         $protection->setSheet(true);
-        $sheet->protectCells('1:1', '');
-        $sheet->protectCells('1:2', '');
-        $sheet->protectCells('A:A', '');
-        $sheet->protectCells('B:H', '');
+
+        $sheet->getColumnDimension('B')->setWidth(50);
+        $sheet->getColumnDimension('C')->setWidth(50);
+        $sheet->getColumnDimension('D')->setWidth(50);
+        $sheet->getColumnDimension('G')->setWidth(50);
+
+        $sheet->getStyle('B3:H9999')->getProtection()
+            ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+
         $sheet->getRowDimension('1')->setRowHeight(0);
         $sheet->getColumnDimension('A')->setVisible(false);
         $sheet->getColumnDimension('H')->setVisible(false);
         $sheet->freezePane('D3');
-
-
-        $validation = $sheet->getStyle('B3:H9999')->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
 
         // Validation on Category List
         $validation = $sheet->getDataValidation('G3');
