@@ -34,6 +34,9 @@ use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, ShouldAutoSize, WithStyles, WithColumnFormatting, WithTitle
 {
     use Exportable;
+
+    public function __construct(private array $assetIds = [], private $template = false) {}
+
     public function title(): string
     {
         return 'Assets';
@@ -42,8 +45,15 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
 
     public function query()
     {
-        return Asset::query();
-        // return Asset::query()->whereIn('id', [37, 49]);
+        $query = Asset::query();
+
+        if ($this->template) {
+            $query->limit(0);
+        } else if (!empty($this->assetIds)) {
+            $query->whereIn('id', $this->assetIds);
+        }
+
+        return $query;
     }
 
     public function map($asset): array
@@ -89,38 +99,40 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
                 'maintenance_frequency',
                 'next_maintenance_date',
                 'last_maintenance_date',
+                'maintenance_manager',
                 'hash'
             ],
             [
-                'Reference Code',
-                'Code',
-                'Name',
-                'Description',
-                'Category',
-                'Need QR Code ?',
-                'Is Mobile ? ',
-                'Site',
-                'Building',
-                'Floor',
-                'Room',
-                'User',
-                'Brand',
-                'Model',
-                'Serial number',
-                'Depreciable ?',
-                'Depreciation Start date',
-                'Depreciation End date',
-                'Depreciation duration (years)',
-                'Residual value',
-                'Surface (m²)',
-                'Purchase date',
-                'Purchase cost',
-                'under_warranty',
-                'end_warranty_date',
-                'need_maintenance',
-                'maintenance_frequency',
-                'next_maintenance_date',
-                'last_maintenance_date',
+                __('common.reference_code'),
+                __('common.code'),
+                __('common.name'),
+                __('common.description'),
+                __('common.category'),
+                __('assets.need_qr_code') . ' ?',
+                __('assets.mobile_asset') . ' ?',
+                trans_choice('locations.sites', 1),
+                trans_choice('locations.buildings', 1),
+                trans_choice('locations.floors', 1),
+                trans_choice('locations.rooms', 1),
+                __('assets.mobile_asset_user'),
+                __('assets.brand'),
+                __('assets.model'),
+                __('assets.serial_number'),
+                __('assets.depreciable') . ' ?',
+                __('assets.depreciation_start_date'),
+                __('assets.depreciation_end_date'),
+                __('assets.depreciation_duration'),
+                __('assets.residual_value'),
+                __('common.surface') . ' (m²)',
+                __('assets.purchase_date'),
+                __('assets.purchase_cost'),
+                __('assets.still_under_warranty') . ' ?',
+                __('assets.warranty_end_date'),
+                __('maintenances.need_maintenance') . ' ?',
+                __('maintenances.frequency'),
+                __('maintenances.next_maintenance_date'),
+                __('maintenances.last_maintenance_date'),
+                __('maintenances.maintenance_manager'),
                 '_hash'
             ]
         ];
@@ -144,23 +156,26 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $protection->setPassword('');
         $protection->setSheet(true);
         $sheet->protectCells('1:1', '');
+        $sheet->getRowDimension('1')->setRowHeight(0);
         $sheet->protectCells('2:2', '');
         $sheet->protectCells('A:A', '');
         $sheet->protectCells('B:B', '');
-        $sheet->protectCells('AD:AD', '');
-        $sheet->getRowDimension('1')->setRowHeight(0);
+        $sheet->protectCells('AE:AE', '');
+        $sheet->getColumnDimension('AE')->setVisible(false);
+
         $sheet->freezePane('F3');
 
 
-        $validation = $sheet->getStyle('C3:Y9999')->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+        $validation = $sheet->getStyle('C3:AD9999')->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
 
         $categories = CategoryType::where('category', 'asset')->get()->pluck('label');
         $categoriesList = $categories->join(',');
 
+
         // Validation on Category List
         $validation = $sheet->getDataValidation('E3');
         $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
-        $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
+        $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
         $validation->setAllowBlank(false);
         $validation->setShowInputMessage(true);
         $validation->setShowErrorMessage(true);
@@ -177,7 +192,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         // Boolean on Need Qr Code ?
         $validation = $sheet->getDataValidation('F3');
         $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
-        $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
+        $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
         $validation->setAllowBlank(false);
         $validation->setShowInputMessage(true);
         $validation->setShowErrorMessage(true);
@@ -196,6 +211,49 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         // Depreciable ?
         $sheet->setDataValidation('P3:P9999', clone $validation);
 
+
+        $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
+        $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
+        $conditional->addCondition('OR(AND($C3<>"",ISBLANK($C3)),AND($B3<>"",ISBLANK($C3)))');
+        $conditional->getStyle()->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFF0000');
+        $sheet->getStyle('C3:C9999')->setConditionalStyles([$conditional]);
+
+        $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
+        $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
+        $conditional->addCondition('OR(AND($C3<>"",ISBLANK($D3)),AND($B3<>"",ISBLANK($D3)))');
+        $conditional->getStyle()->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFF0000');
+        $sheet->getStyle('D3:D9999')->setConditionalStyles([$conditional]);
+
+
+        $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
+        $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
+        $conditional->addCondition('OR(AND($C3<>"",ISBLANK($E3)),AND($B3<>"",ISBLANK($E3)))');
+        $conditional->getStyle()->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFF0000');
+        $sheet->getStyle('E3:E9999')->setConditionalStyles([$conditional]);
+
+        $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
+        $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
+        $conditional->addCondition('OR(AND($C3<>"",ISBLANK($F3)),AND($B3<>"",ISBLANK($F3)))');
+        $conditional->getStyle()->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFF0000');
+        $sheet->getStyle('F3:F9999')->setConditionalStyles([$conditional]);
+
+        $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
+        $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
+        $conditional->addCondition('OR(AND($C3<>"",ISBLANK($G3)),AND($B3<>"",ISBLANK($G3)))');
+        $conditional->getStyle()->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFF0000');
+        $sheet->getStyle('G3:G9999')->setConditionalStyles([$conditional]);
+
+
         // Conditional formatting on depreciation_start_date
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
@@ -203,7 +261,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $conditional->getStyle()->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFF0000');
-        $sheet->getStyle('Q3:Q1000')->setConditionalStyles([$conditional]);
+        $sheet->getStyle('Q3:Q9999')->setConditionalStyles([$conditional]);
 
         // Conditional formatting on depreciation_duration
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
@@ -212,7 +270,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $conditional->getStyle()->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFF0000');
-        $sheet->getStyle('S3:S1000')->setConditionalStyles([$conditional]);
+        $sheet->getStyle('S3:S9999')->setConditionalStyles([$conditional]);
 
         // Under warranty
         $sheet->setDataValidation('X3:X9999', clone $validation);
@@ -224,7 +282,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $conditional->getStyle()->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFF0000');
-        $sheet->getStyle('Y3:Y1000')->setConditionalStyles([$conditional]);
+        $sheet->getStyle('Y3:Y9999')->setConditionalStyles([$conditional]);
 
         //Need maintenance
         $sheet->setDataValidation('Z3:Z9999', clone $validation);
@@ -236,13 +294,13 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $conditional->getStyle()->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFF0000');
-        $sheet->getStyle('AA3:AA1000')->setConditionalStyles([$conditional]);
+        $sheet->getStyle('AA3:AA9999')->setConditionalStyles([$conditional]);
 
 
         // Site
         $validation = $sheet->getDataValidation('H3');
         $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
-        $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
+        $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
         $validation->setAllowBlank(true);
         $validation->setShowInputMessage(true);
         $validation->setShowErrorMessage(true);
@@ -269,6 +327,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         // Users
         $validation->setFormula1('users');
         $sheet->setDataValidation('L3:L9999', clone $validation);
+        $sheet->setDataValidation('AD3:AD9999', clone $validation);
 
         $conditional1 = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional1->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
@@ -277,10 +336,10 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFF0000');
 
-        $sheet->getStyle('H3:H1000')->setConditionalStyles([$conditional1]);
-        $sheet->getStyle('I3:I1000')->setConditionalStyles([$conditional1]);
-        $sheet->getStyle('J3:J1000')->setConditionalStyles([$conditional1]);
-        $sheet->getStyle('K3:K1000')->setConditionalStyles([$conditional1]);
+        $sheet->getStyle('H3:H9999')->setConditionalStyles([$conditional1]);
+        $sheet->getStyle('I3:I9999')->setConditionalStyles([$conditional1]);
+        $sheet->getStyle('J3:J9999')->setConditionalStyles([$conditional1]);
+        $sheet->getStyle('K3:K9999')->setConditionalStyles([$conditional1]);
 
         $conditional2 = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional2->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
@@ -289,7 +348,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFF0000');
 
-        $sheet->getStyle('L3:L1000')->setConditionalStyles([$conditional2]);
+        $sheet->getStyle('L3:L9999')->setConditionalStyles([$conditional2]);
 
         // Maintenance Frequency
         $frequencies = collect(array_column(MaintenanceFrequency::cases(), 'value'));
@@ -297,7 +356,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
 
         $validation = $sheet->getDataValidation('AA3');
         $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
-        $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
+        $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
         $validation->setAllowBlank(false);
         $validation->setShowInputMessage(true);
         $validation->setShowErrorMessage(true);
@@ -310,6 +369,63 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
 
         $sheet->setDataValidation('AA3:AA9999', clone $validation);
 
+        // Validation longueur de champs
+        $validationLength = $sheet->getDataValidation('C3');
+        $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
+        $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_BETWEEN);
+        $validationLength->setFormula1('4');   // min
+        $validationLength->setFormula2('100'); // max
+        $validationLength->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
+        $validationLength->setShowErrorMessage(true);
+        $validationLength->setErrorTitle('Erreur de longueur');
+        $validationLength->setError('Le texte doit contenir entre 4 et 100 caractères.');
+        $sheet->setDataValidation('C3:C9999', clone $validationLength);
+
+        $validationLength = $sheet->getDataValidation('D3');
+        $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
+        $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_BETWEEN);
+        $validationLength->setFormula1('10');   // min
+        $validationLength->setFormula2('255'); // max
+        $validationLength->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
+        $validationLength->setShowErrorMessage(true);
+        $validationLength->setErrorTitle('Erreur de longueur');
+        $validationLength->setError('Le texte doit contenir entre 10 et 255 caractères.');
+        $sheet->setDataValidation('D3:D9999', clone $validationLength);
+
+
+
+        $validationLength = $sheet->getDataValidation('M3');
+        $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
+        $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_LESSTHANOREQUAL);
+        $validationLength->setFormula1('100');
+        $validationLength->setAllowBlank(true);
+        $validationLength->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
+        $validationLength->setShowErrorMessage(true);
+        $validationLength->setErrorTitle('Erreur de longueur');
+        $validationLength->setError('Le texte doit contenir max 100 caractères.');
+        $sheet->setDataValidation('M3:M9999', clone $validationLength);
+
+        $validationLength = $sheet->getDataValidation('N3');
+        $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
+        $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_LESSTHANOREQUAL);
+        $validationLength->setFormula1('100');
+        $validationLength->setAllowBlank(true);
+        $validationLength->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
+        $validationLength->setShowErrorMessage(true);
+        $validationLength->setErrorTitle('Erreur de longueur');
+        $validationLength->setError('Le texte doit contenir max 100 caractères.');
+        $sheet->setDataValidation('N3:N9999', clone $validationLength);
+
+        $validationLength = $sheet->getDataValidation('O3');
+        $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
+        $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_LESSTHANOREQUAL);
+        $validationLength->setFormula1('50');
+        $validationLength->setAllowBlank(true);
+        $validationLength->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
+        $validationLength->setShowErrorMessage(true);
+        $validationLength->setErrorTitle('Erreur de longueur');
+        $validationLength->setError('Le texte doit contenir max 50 caractères.');
+        $sheet->setDataValidation('O3:O9999', clone $validationLength);
 
 
         return [

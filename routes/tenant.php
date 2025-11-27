@@ -125,9 +125,9 @@ Route::middleware([
 
     Route::prefix('/settings/import-export/')->group(function () {
         Route::get('/', [ImportExportController::class, 'show'])->name('tenant.import-export');
-        Route::get('/assets/export', [AssetsExportController::class, 'index'])->name('tenant.assets.export');
-        Route::get('/providers/export', [ProvidersExportController::class, 'index'])->name('tenant.providers.export');
-        Route::get('/users/export', [UsersExportController::class, 'index'])->name('tenant.users.export');
+        Route::post('/assets/export', [AssetsExportController::class, 'index'])->name('tenant.assets.export');
+        Route::post('/providers/export', [ProvidersExportController::class, 'index'])->name('tenant.providers.export');
+        Route::post('/users/export', [UsersExportController::class, 'index'])->name('tenant.users.export');
     });
 
     Route::resource('sites', TenantSiteController::class)->parameters(['sites' => 'site'])->only('index', 'show', 'create', 'edit')->names('tenant.sites');

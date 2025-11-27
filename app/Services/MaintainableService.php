@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Str;
+use App\Models\Tenants\User;
 use App\Enums\MaintenanceFrequency;
 use App\Models\Tenants\Maintainable;
 use Barryvdh\Debugbar\Facades\Debugbar;
@@ -60,6 +62,15 @@ class MaintainableService
 
 
         return $model;
+    }
+
+    public function attachMaintenanceManagerFromImport(Maintainable $maintainable, $data)
+    {
+
+        $userEmail = Str::after($data, ' - ');
+        $user = User::where('email', $userEmail)->first();
+        if ($user)
+            $maintainable->manager()->associate($user)->save();
     }
 
     public function update(Maintainable $maintainable, $request)

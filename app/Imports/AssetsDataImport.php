@@ -72,6 +72,7 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
                 $asset->save();
 
                 app(MaintainableService::class)->updateOrCreate($asset, $maintainableData);
+                app(MaintainableService::class)->attachMaintenanceManagerFromImport($asset->maintainable, $maintainableData['maintenance_manager']);
 
                 if ($row['need_qr_code'] === true)
                     app(QRCodeService::class)->createAndAttachQR($asset);
@@ -100,6 +101,7 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
             'depreciation_end_date' => $rowData['depreciation_end_date'] ?? null,
             'depreciation_duration' => $rowData['depreciation_duration'] ?? null,
             'residual_value' => $rowData['residual_value'] ?? null,
+
         ];
 
         return $data;
@@ -118,6 +120,7 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
             'maintenance_frequency' => $rowData['maintenance_frequency'],
             'next_maintenance_date' => $rowData['next_maintenance_date'],
             'last_maintenance_date' => $rowData['last_maintenance_date'],
+            'maintenance_manager' => $rowData['maintenance_manager'],
         ];
 
 
@@ -204,7 +207,7 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
             "depreciation_duration" => 'nullable|required_with:depreciation_start_date|numeric|gt:0',
 
             'name' => 'required|string|min:4|max:100',
-            'description' => 'nullable|string|min:10|max:255',
+            'description' => 'required|string|min:10|max:255',
             'purchase_date' => ['nullable', 'date', Rule::date()->todayOrBefore()],
             'purchase_cost' => 'nullable|numeric|gt:0|decimal:0,2',
             'under_warranty' => "boolean",
@@ -215,7 +218,7 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
             ],
             'need_maintenance' => "boolean",
             'maintenance_frequency' => ['nullable', 'required_if_accepted:need_maintenance', Rule::in($frequencies)],
-            'next_maintenance_date' => ['nullable', 'date', Rule::date()->todayOrAfter()],
+            'next_maintenance_date' => ['nullable', 'date'],
             'last_maintenance_date' =>  ['nullable', 'date', Rule::date()->todayOrBefore()],
         ];
     }

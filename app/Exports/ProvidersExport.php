@@ -10,10 +10,12 @@ use Maatwebsite\Excel\Concerns\RegistersEventListeners;
 
 class ProvidersExport implements WithMultipleSheets
 {
+    public function __construct(private array $providerIds = [], private $template = false) {}
+
     public function sheets(): array
     {
         return [
-            'Providers' => new ProvidersSheet(),
+            'Providers' => new ProvidersSheet($this->providerIds, $this->template),
             'Datas' => new ProviderDataSheet()
         ];
     }

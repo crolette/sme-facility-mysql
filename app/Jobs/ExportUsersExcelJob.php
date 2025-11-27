@@ -28,7 +28,7 @@ class ExportUsersExcelJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public User $user)
+    public function __construct(public User $user, public array $data)
     {
         //
     }
@@ -43,7 +43,7 @@ class ExportUsersExcelJob implements ShouldQueue
         $directory = tenancy()->tenant->id . '/exports/' . Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_users.xlsx';
         try {
 
-            Excel::store(new UsersExport(), $directory, 'tenants');
+            Excel::store(new UsersExport($this->data['ids'], $this->data['template']), $directory, 'tenants');
 
             Log::info('EXPORT USERS EXCEL JOB DONE');
 

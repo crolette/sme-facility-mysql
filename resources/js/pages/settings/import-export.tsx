@@ -35,6 +35,7 @@ export default function ImportExportSettings() {
 
     const { data, setData, reset } = useForm<TypeFormData>({
         file: null,
+        template: false,
     });
 
     const uploadAssetFile: FormEventHandler = async (e) => {
@@ -105,7 +106,7 @@ export default function ImportExportSettings() {
     const exportItems = async () => {
         setIsProcessing(true);
         try {
-            const response = await axios.get(route(`tenant.${itemsToBeExported}.export`));
+            const response = await axios.post(route(`tenant.${itemsToBeExported}.export`));
             if (response.data.status === 'success') {
                 showToast(response.data.message, response.data.status);
             }
@@ -114,6 +115,25 @@ export default function ImportExportSettings() {
         } finally {
             reset();
             setIsProcessing(false);
+            setItemsToBeExported(null);
+        }
+    };
+
+    const [templateToBeExported, setTemplateToBeExported] = useState<string | null>(null);
+
+    const exportTemplate = async () => {
+        setIsProcessing(true);
+        try {
+            const response = await axios.post(route(`tenant.${templateToBeExported}.export`), { template: true });
+            if (response.data.status === 'success') {
+                showToast(response.data.message, response.data.status);
+            }
+        } catch (error) {
+            showToast(error.response.data.message, error.response.data.status);
+        } finally {
+            reset();
+            setIsProcessing(false);
+            setTemplateToBeExported(null);
         }
     };
 
@@ -126,9 +146,16 @@ export default function ImportExportSettings() {
                     <div className="relative gap-4">
                         <HeadingSmall title={t('settings.import_export')} description={t('settings.import_export_description')} />
                     </div>
+                    <h4>Export datas</h4>
                     {hasPermission('export excel') && (
-                        <div className="flex w-fit flex-col gap-4">
-                            <select name="" id="" defaultValue={''} onChange={(e) => setItemsToBeExported(e.target.value)}>
+                        <div className="flex w-fit items-center gap-4">
+                            <select
+                                name=""
+                                id=""
+                                defaultValue={''}
+                                value={itemsToBeExported ?? ''}
+                                onChange={(e) => setItemsToBeExported(e.target.value)}
+                            >
                                 <option value="" disabled>
                                     -- Select items to export --
                                 </option>
@@ -142,9 +169,35 @@ export default function ImportExportSettings() {
                             </Button>
                         </div>
                     )}
+                    <h4>Export template</h4>
+                    {hasPermission('export excel') && (
+                        <div className="flex w-fit items-center gap-4">
+                            <select
+                                name=""
+                                id=""
+                                defaultValue={''}
+                                value={templateToBeExported ?? ''}
+                                onChange={(e) => setTemplateToBeExported(e.target.value)}
+                            >
+                                <option value="" disabled>
+                                    -- Select template to export --
+                                </option>
+                                <option value="assets">{tChoice('assets.title', 2)}</option>
+                                <option value="providers">{tChoice('providers.title', 2)}</option>
+                                <option value="users">{tChoice('contacts.title', 2)}</option>
+                            </select>
+                            <Button variant={'secondary'} onClick={exportTemplate} disabled={isProcessing || !templateToBeExported}>
+                                <BiSolidFilePdf size={20} />
+                                {t('actions.export')}
+                            </Button>
+                        </div>
+                    )}
                     {hasPermission('import excel') && (
                         <>
-                            <h3>{tChoice('assets.title', 2)}</h3>
+                            <h4>Import</h4>
+                            <p className="font-bold">Remarque</p>
+                            <p>Pour pouvoir importer des données, il faut avoir au préalable télécharger un template ou avoir exporté des données.</p>
+                            <h6>{tChoice('assets.title', 2)}</h6>
                             <form action="" onSubmit={uploadAssetFile}>
                                 <input
                                     type="file"
@@ -164,7 +217,7 @@ export default function ImportExportSettings() {
                                     )}
                                 </Button>
                             </form>
-                            <h3>{tChoice('providers.title', 2)}</h3>
+                            <h6>{tChoice('providers.title', 2)}</h6>
 
                             <form action="" onSubmit={uploadProviderFile}>
                                 <input
@@ -186,7 +239,7 @@ export default function ImportExportSettings() {
                                 </Button>
                             </form>
 
-                            <h3>{tChoice('contacts.title', 2)}</h3>
+                            <h6>{tChoice('contacts.title', 2)}</h6>
                             <form action="" onSubmit={uploadUserFile}>
                                 <input
                                     type="file"

@@ -13,22 +13,38 @@ use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Support\Facades\Validator;
 
 class AssetsExportController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        Debugbar::info($request);
         if (!Gate::allows('export-excel')) {
             ApiResponse::notAuthorized();
             return redirect()->back();
         }
 
+        $request = Validator::make($request->all(), [
+            'ids' => 'nullable|array',
+            'template' => 'nullable|boolean'
+        ]);
+
+        $validated = $request->validated();
+
+        $validated['ids'] = isset($validated['ids']) ?  $validated['ids'] : [];
+        $validated['template'] = isset($validated['template']) ?  $validated['template'] : false;
+
+
+        Debugbar::info($request->validated(), $validated['ids'], $validated['template']);
+
         Log::info('DISPATCH EXPORT ASSETS EXCEL JOB');
-        ExportAssetsExcelJob::dispatch(Auth::user())->onQueue('default');;
+        ExportAssetsExcelJob::dispatch(Auth::user(), $validated)->onQueue('default');;
 
         return ApiResponse::success([], 'Assets will be exported, you will receive an e-mail when it\'s done');
         // return new AssetsExport();
