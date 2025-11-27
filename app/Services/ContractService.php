@@ -6,6 +6,7 @@ use Exception;
 use Carbon\Carbon;
 use App\Enums\NoticePeriodEnum;
 use App\Models\Tenants\Contract;
+use App\Models\Tenants\Provider;
 use Illuminate\Support\Facades\DB;
 use App\Enums\ContractDurationEnum;
 use Illuminate\Support\Facades\Log;
@@ -22,15 +23,9 @@ class ContractService
         foreach ($request as $key => $contractRequest) {
             $contract = new Contract([...$contractRequest]);
 
-            // if (isset($contractRequest['contract_duration']))
-            //     $contract = $this->updateContractEndDate($contract,  $contract->contract_duration);
-
-            // if (isset($contractRequest['notice_period'])) {
-            //     $contract = $this->updateNoticeDate($contract, $contract->notice_period);
-            // }
-
-            $contract->provider()->associate($contractRequest['provider_id']);
-            $contract->save();
+            if (isset($contractRequest['provider_id'])) {
+                $contract->provider()->associate($contractRequest['provider_id'])->save();
+            }
 
             if (isset($contractRequest['files']))
                 app(DocumentService::class)->uploadAndAttachDocuments($contract, $contractRequest['files']);
@@ -38,6 +33,14 @@ class ContractService
             $model->contracts()->attach($contract);
             $model->save();
         }
+    }
+
+    public function associateProviderToContractWhenImport(Contract $contract, $data): Contract
+    {
+        $provider = Provider::where('name', $data)->first();
+        $contract->provider()->associate($provider)->save();
+
+        return $contract;
     }
 
     public function attachExistingContractsToModel(Model $model, $request): void
@@ -58,24 +61,19 @@ class ContractService
 
     public function create($request): Contract | string
     {
-        // dump($request);
         $contract = new Contract([...$request]);
 
-        // if (isset($request['contract_duration']))
-        //     $contract = $this->updateContractEndDate($contract, $contract->contract_duration);
-
-        // if (isset($request['notice_period'])) {
-        //     $contract = $this->updateNoticeDate($contract, $contract->notice_period);
-        // }
-
-        $contract->provider()->associate($request['provider_id']);
-        $contract->save();
+        if (isset($contractRequest['provider_id'])) {
+            $contract->provider()->associate($request['provider_id'])->save();
+        }
 
         if (isset($request['contractables']))
             $contract = $this->syncContractables($contract, $request['contractables']);
 
         if (isset($request['files']))
             app(DocumentService::class)->uploadAndAttachDocuments($contract, $request['files']);
+
+        $contract->save();
 
         return $contract;
     }
@@ -88,8 +86,10 @@ class ContractService
         if (($contract->wasChanged('notice_period') && !isset($request['notice_period'])))
             $contract->notice_date = null;
 
-        if ($contract->provider->id !== $request['provider_id']) {
-            $contract->provider()->associate($request['provider_id']);
+        if (isset($request['provider_id'])) {
+            if ($contract->provider->id !== $request['provider_id']) {
+                $contract->provider()->associate($request['provider_id']);
+            }
         }
 
         if (isset($request['contractables']))

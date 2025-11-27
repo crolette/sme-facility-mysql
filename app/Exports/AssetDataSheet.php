@@ -131,5 +131,6 @@ class AssetDataSheet implements FromCollection, WithHeadings, ShouldAutoSize, Wi
         $spreadsheet->addNamedRange($users);
 
         // }
+        $dataSheet->setSheetState(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet::SHEETSTATE_HIDDEN);
     }
 }

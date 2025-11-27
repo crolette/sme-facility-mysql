@@ -160,8 +160,9 @@ export default function ImportExportSettings() {
                                     -- Select items to export --
                                 </option>
                                 <option value="assets">{tChoice('assets.title', 2)}</option>
-                                <option value="providers">{tChoice('providers.title', 2)}</option>
                                 <option value="users">{tChoice('contacts.title', 2)}</option>
+                                <option value="providers">{tChoice('providers.title', 2)}</option>
+                                <option value="contracts">{tChoice('contracts.title', 2)}</option>
                             </select>
                             <Button variant={'secondary'} onClick={exportItems} disabled={isProcessing || !itemsToBeExported}>
                                 <BiSolidFilePdf size={20} />
@@ -183,8 +184,9 @@ export default function ImportExportSettings() {
                                     -- Select template to export --
                                 </option>
                                 <option value="assets">{tChoice('assets.title', 2)}</option>
-                                <option value="providers">{tChoice('providers.title', 2)}</option>
                                 <option value="users">{tChoice('contacts.title', 2)}</option>
+                                <option value="providers">{tChoice('providers.title', 2)}</option>
+                                <option value="contracts">{tChoice('contracts.title', 2)}</option>
                             </select>
                             <Button variant={'secondary'} onClick={exportTemplate} disabled={isProcessing || !templateToBeExported}>
                                 <BiSolidFilePdf size={20} />

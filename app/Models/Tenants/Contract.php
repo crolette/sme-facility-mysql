@@ -6,14 +6,14 @@ use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Models\Tenants\Document;
 use App\Enums\NoticePeriodEnum;
 use App\Enums\ContractTypesEnum;
-use App\Models\Tenants\Document;
 use App\Enums\ContractStatusEnum;
 use App\Enums\ContractDurationEnum;
+use App\Enums\ContractRenewalTypesEnum;
 use App\Observers\ContractObserver;
 use Illuminate\Support\Facades\Auth;
-use App\Enums\ContractRenewalTypesEnum;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -54,8 +54,8 @@ class Contract extends Model
             'notice_date' => 'date:Y-m-d',
             'end_date' => 'immutable_date:Y-m-d',
             'start_date' => 'date:Y-m-d',
-            'notice_period' => NoticePeriodEnum::class,
             'type' => ContractTypesEnum::class,
+            'notice_period' => NoticePeriodEnum::class,
             'contract_duration' => ContractDurationEnum::class,
             'renewal_type' => ContractRenewalTypesEnum::class,
             'status' => ContractStatusEnum::class
