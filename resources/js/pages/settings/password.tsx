@@ -92,7 +92,7 @@ export default function Password() {
                                 autoComplete="new-password"
                                 placeholder={t('auth.password_new')}
                             />
-
+                            <span className="text-xs">{t('auth.password_description')}</span>
                             <InputError message={errors.password} />
                         </div>
 

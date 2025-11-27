@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 
 interface ResetPasswordProps {
     token: string;
@@ -21,6 +22,7 @@ type ResetPasswordForm = {
 };
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
+    const { t } = useLaravelReactI18n();
     const { data, setData, post, processing, errors, reset } = useForm<Required<ResetPasswordForm>>({
         token: token,
         email: email,
@@ -42,7 +44,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
             <form onSubmit={submit}>
                 <div className="grid gap-6">
                     <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">{t('common.email')}</Label>
                         <Input
                             id="email"
                             type="email"
@@ -57,7 +59,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password">{t('auth.password')}</Label>
                         <Input
                             id="password"
                             type="password"
@@ -69,11 +71,12 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                             onChange={(e) => setData('password', e.target.value)}
                             placeholder="Password"
                         />
+                        <span className="text-xs">{t('auth.password_description')}</span>
                         <InputError message={errors.password} />
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">Confirm password</Label>
+                        <Label htmlFor="password_confirmation">{t('auth.confirm_password')}</Label>
                         <Input
                             id="password_confirmation"
                             type="password"

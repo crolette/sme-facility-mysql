@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 import { SharedData } from '@/types';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 
 type LoginForm = {
     email: string;
@@ -24,6 +25,7 @@ interface LoginProps {
 }
 
 export default function TenantLogin({ status, canResetPassword, company }: LoginProps) {
+    const { t } = useLaravelReactI18n();
     const { version } = usePage<SharedData>().props;
     const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>({
         email: '',
@@ -44,7 +46,7 @@ export default function TenantLogin({ status, canResetPassword, company }: Login
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
                     <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
+                        <Label htmlFor="email">{t('common.email')}</Label>
                         <Input
                             id="email"
                             type="email"
@@ -61,10 +63,10 @@ export default function TenantLogin({ status, canResetPassword, company }: Login
 
                     <div className="grid gap-2">
                         <div className="flex items-center">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password">{t('auth.password')}</Label>
                             {canResetPassword && (
                                 <TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
-                                    Forgot password?
+                                    {t('auth.password_forgot')}
                                 </TextLink>
                             )}
                         </div>
@@ -78,6 +80,7 @@ export default function TenantLogin({ status, canResetPassword, company }: Login
                             onChange={(e) => setData('password', e.target.value)}
                             placeholder="Password"
                         />
+
                         <InputError message={errors.password} />
                     </div>
 
@@ -89,12 +92,12 @@ export default function TenantLogin({ status, canResetPassword, company }: Login
                             onClick={() => setData('remember', !data.remember)}
                             tabIndex={3}
                         />
-                        <Label htmlFor="remember">Remember me</Label>
+                        <Label htmlFor="remember">{t('auth.remember_me')}</Label>
                     </div>
 
                     <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        Log in
+                        {t('auth.login')}
                     </Button>
                 </div>
             </form>

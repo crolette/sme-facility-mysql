@@ -480,20 +480,20 @@ export default function CreateUpdateAsset({
                         </p>
                         {asset?.is_mobile ? (
                             <p>
-                                {t('asset_linked_to')} : {asset.location.full_name}
+                                {t('assets.linked_to')} : {asset.location.full_name}
                             </p>
                         ) : (
                             <p>
-                                {t('asset_linked_to')} : {asset.location.maintainable.name} - {asset.location.location_type.label}
+                                {t('assets.linked_to')} : {asset.location.maintainable.name} - {asset.location.location_type.label}
                             </p>
                         )}
                     </div>
                 )}
                 <form onSubmit={submit} className="flex flex-col gap-4">
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                        <h5>{tChoice('locations.title', 1)}</h5>
+                        <h5>{tChoice('locations.location', 1)}</h5>
                         <div className="flex items-center gap-2">
-                            <Label htmlFor="is_mobile">{t('asset.mobile_asset')}</Label>
+                            <Label htmlFor="is_mobile">{t('assets.mobile_asset')}</Label>
                             <Checkbox
                                 id="is_mobile"
                                 name="is_mobile"

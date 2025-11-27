@@ -7,6 +7,7 @@ return [
     'password' => 'The provided password is incorrect.',
     'throttle' => 'Too many login attempts. Please try again in :seconds seconds.',
     'password' => 'Password',
+    'password_description' => 'The password must be at least 12 characters long and contain uppercase letters, lowercase letters, numbers, and special characters.',
     'password_update' => 'Update password',
     'password_current' => 'Current password',
     'password_new' => 'New Password',
