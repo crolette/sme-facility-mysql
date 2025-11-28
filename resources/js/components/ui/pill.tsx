@@ -18,10 +18,10 @@ const pillVariants = cva(
         in_progress: "bg-emerald-300 dark:text-background",
         closed: "bg-green-900 text-background dark:text-foreground",
         completed: "bg-green-900 text-background dark:text-foreground",
-        active:"bg-emerald-700",
-        expired: "bg-amber-800",
+        active: "bg-emerald-700 text-background dark:text-foreground",
+        expired: "bg-amber-800 text-background dark:text-foreground",
         cancelled: "bg-destructive text-background dark:text-foreground",
-        low: "bg-slate-400  dark:text-background",
+        low: "bg-slate-300 dark:text-background",
         medium: "bg-amber-400 text-foreground dark:text-background",
         high: "bg-red-400 text-foreground  dark:text-background",
         urgent:"bg-destructive uppercase font-bold  text-background dark:text-foreground"
