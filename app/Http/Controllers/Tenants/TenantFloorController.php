@@ -63,7 +63,7 @@ class TenantFloorController extends Controller
             });
         }
 
-        $categories = LocationType::where('level', 'floor')->get();
+        $categories = LocationType::getByLevelCache('floor');
 
         return Inertia::render('tenants/locations/IndexLocations', ['items' => $locations->paginate()->withQueryString(), 'categories' => $categories, 'filters' =>  $validator->safe()->only(['q', 'sortBy',  'orderBy', 'category']), 'routeName' => 'floors']);
     }
@@ -77,11 +77,11 @@ class TenantFloorController extends Controller
             abort(403);
 
         $levelTypes = Building::all();
-        $locationTypes = LocationType::where('level', 'floor')->get();
-        $documentTypes = CategoryType::where('category', 'document')->get();
+        $locationTypes = LocationType::getByLevelCache('floor');
+        $documentTypes = CategoryType::getByCategoryCache('document');
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-        $floorMaterials = CategoryType::where('category', 'floor_materials')->get();
-        $wallMaterials = CategoryType::where('category', 'wall_materials')->get();
+        $floorMaterials = CategoryType::getByCategoryCache('floor_materials');
+        $wallMaterials = CategoryType::getByCategoryCache('wall_materials');
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
         $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
@@ -115,11 +115,11 @@ class TenantFloorController extends Controller
 
 
         $levelTypes = Building::all();
-        $locationTypes = LocationType::where('level', 'floor')->get();
-        $documentTypes = CategoryType::where('category', 'document')->get();
+        $locationTypes = LocationType::getByLevelCache('floor');
+        $documentTypes = CategoryType::getByCategoryCache('document');
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-        $floorMaterials = CategoryType::where('category', 'floor_materials')->get();
-        $wallMaterials = CategoryType::where('category', 'wall_materials')->get();
+        $floorMaterials = CategoryType::getByCategoryCache('floor_materials');
+        $wallMaterials = CategoryType::getByCategoryCache('wall_materials');
         return Inertia::render('tenants/locations/CreateUpdateLocation', ['location' => $floor->load('building'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'floors', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials]);
     }
 }

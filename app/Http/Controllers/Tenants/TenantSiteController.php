@@ -66,7 +66,7 @@ class TenantSiteController extends Controller
             });
         }
 
-        $categories = LocationType::where('level', 'site')->get();
+        $categories = LocationType::getByLevelCache('site');
 
 
 
@@ -81,11 +81,11 @@ class TenantSiteController extends Controller
         if (Auth::user()->cannot('create', Site::class))
             abort(403);
 
-        $locationTypes = LocationType::where('level', 'site')->get();
-        $documentTypes = CategoryType::where('category', 'document')->get();
+        $locationTypes = LocationType::getByLevelCache('site');
+        $documentTypes = CategoryType::getByCategoryCache('document');
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-        $floorMaterials = CategoryType::where('category', 'floor_materials')->get();
-        $wallMaterials = CategoryType::where('category', 'wall_materials')->get();
+        $floorMaterials = CategoryType::getByCategoryCache('floor_materials');
+        $wallMaterials = CategoryType::getByCategoryCache('wall_materials');
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
         $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
@@ -117,12 +117,11 @@ class TenantSiteController extends Controller
         if (Auth::user()->cannot('update', $site))
             abort(403);
 
-        $locationTypes = LocationType::where('level', 'site')->get();
-
-        $documentTypes = CategoryType::where('category', 'document')->get();
+        $locationTypes = LocationType::getByLevelCache('site');
+        $documentTypes = CategoryType::getByCategoryCache('document');
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
-        $floorMaterials = CategoryType::where('category', 'floor_materials')->get();
-        $wallMaterials = CategoryType::where('category', 'wall_materials')->get();
+        $floorMaterials = CategoryType::getByCategoryCache('floor_materials');
+        $wallMaterials = CategoryType::getByCategoryCache('wall_materials');
 
         return Inertia::render('tenants/locations/CreateUpdateLocation', ['location' => $site, 'locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials]);
     }

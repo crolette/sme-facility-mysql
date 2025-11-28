@@ -40,7 +40,7 @@ class DocumentsController extends Controller
             });
         }
 
-        $types = CategoryType::where('category', 'document')->get();
+        $types = CategoryType::getByCategoryCache('document');
 
         return Inertia::render('tenants/documents/IndexDocuments', ['items' => $documents->orderBy($validatedFields['orderBy'] ?? 'created_at', $validatedFields['sortBy'] ?? 'desc')->paginate()->withQueryString(), 'filters' => $validator->safe()->only(['q', 'sortBy', 'status', 'orderBy', 'type', 'priority']), 'types' => $types]);
     }

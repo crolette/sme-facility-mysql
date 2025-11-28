@@ -37,11 +37,6 @@ class DashboardController extends Controller
             'percent' => round($company->disk_size_gb / 0.5, 2)
         ];
 
-        // $categoryTypes = CategoryType::with('translations')->get()->keyBy('id');
-        $locationTypes = LocationType::with('translations')->get()->keyBy('id');
-
-        // dd($diskSizes);
-
         $maintainables = Maintainable::select(
             'id',
             'name',

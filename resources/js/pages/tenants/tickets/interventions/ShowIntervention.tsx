@@ -45,6 +45,8 @@ export default function ShowIntervention({
     const { showToast } = useToast();
 
     const changeInterventionStatus = async (status: string) => {
+        if (status === intervention.status) return;
+
         try {
             const response = await axios.patch(route('api.interventions.status', intervention.id), { status: status });
             if (response.data.status === 'success') {
@@ -261,8 +263,8 @@ export default function ShowIntervention({
                                     variant={status}
                                     onClick={() => changeInterventionStatus(status)}
                                     className={cn(
-                                        intervention.status === status ? 'border-2 border-amber-50 font-extrabold uppercase' : '',
-                                        'cursor-pointer',
+                                        intervention.status === status ? 'border-2 border-amber-50 font-extrabold uppercase' : 'cursor-pointer',
+                                        '',
                                     )}
                                 >
                                     {t(`interventions.status.${status}`)}

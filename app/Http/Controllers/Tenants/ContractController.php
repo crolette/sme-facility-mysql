@@ -32,7 +32,7 @@ class ContractController extends Controller
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $contractTypes = array_column(ContractTypesEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
-        $providerCategories = CategoryType::where('category', 'provider')->get();
+        $providerCategories = CategoryType::getByCategoryCache('provider');
 
         // dd($providerCategories);
 

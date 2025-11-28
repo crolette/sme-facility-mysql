@@ -282,7 +282,7 @@ export default function IndexInterventions({
                                     </option>
                                     {statuses.map((status) => (
                                         <option key={status} value={status}>
-                                            {t(`interventions.priority.${status}`)}
+                                            {t(`interventions.status.${status}`)}
                                         </option>
                                     ))}
                                 </select>

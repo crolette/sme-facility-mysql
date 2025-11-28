@@ -25,19 +25,20 @@ class InterventionProviderController extends Controller
         protected PictureService $pictureService
     ) {}
 
-    public function create(Intervention $intervention, Request $request, ) {
-        
-        $intervention->select('id', 'intervention_type_id', 'description', 'updated_at')->with('interventionable','ticket', 'actions:id,action_type_id,intervention_id,description')->get();
-        
+    public function create(Intervention $intervention, Request $request,)
+    {
+
+        $intervention->select('id', 'intervention_type_id', 'description', 'updated_at')->with('interventionable', 'ticket', 'actions:id,action_type_id,intervention_id,description')->get();
+
         $asset = $intervention->interventionable;
         $pastInterventions = $asset->interventions()->select('id', 'intervention_type_id', 'description', 'updated_at')->with('actions:id,action_type_id,intervention_id,description,updated_at')->whereNot('id', $intervention->id)->get();
 
-        $types = CategoryType::where('category', 'action')->get();
+        $types = CategoryType::getByCategoryCache('action');
 
         return Inertia::render('tenants/interventions/InterventionProviderPage', ['intervention' => $intervention, 'email' => $request->email, 'actionTypes' => $types, 'query' => $request->getQueryString(), 'pastInterventions' => $pastInterventions]);
     }
 
-    public function store(Intervention $intervention, InterventionActionRequest $request, PictureUploadRequest $pictureUploadRequest) 
+    public function store(Intervention $intervention, InterventionActionRequest $request, PictureUploadRequest $pictureUploadRequest)
     {
         try {
             DB::beginTransaction();
@@ -57,6 +58,5 @@ class InterventionProviderController extends Controller
             DB::rollback();
             return ApiResponse::error('Error during Intervention action creation', [$e->getMessage()]);
         }
-        
     }
 }

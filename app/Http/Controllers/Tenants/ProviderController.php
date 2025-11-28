@@ -41,7 +41,7 @@ class ProviderController extends Controller
             $providers->where('name', 'like', '%' . $validator['q'] . '%');
         }
 
-        $categories = CategoryType::where('category', 'provider')->get();
+        $categories = CategoryType::getByCategoryCache('provider');
 
         return Inertia::render('tenants/providers/IndexProviders', ['items' => $providers->paginate()->withQueryString(), 'categories' => $categories, 'filters' => $request->only(['q', 'category'])]);
     }
@@ -54,7 +54,7 @@ class ProviderController extends Controller
         if (Auth::user()->cannot('create', Provider::class))
             abort(403);
 
-        $categories = CategoryType::where('category', 'provider')->get();
+        $categories = CategoryType::getByCategoryCache('provider');
         $countries = Country::all();
         return Inertia::render('tenants/providers/CreateUpdateProvider', ['providerCategories' => $categories, 'countries' => $countries]);
     }
@@ -67,7 +67,7 @@ class ProviderController extends Controller
         if (Auth::user()->cannot('update', $provider))
             abort(403);
 
-        $categories = CategoryType::where('category', 'provider')->get();
+        $categories = CategoryType::getByCategoryCache('provider');
         $countries = Country::all();
         return Inertia::render('tenants/providers/CreateUpdateProvider', ['provider' => $provider->load('country'), 'providerCategories' => $categories, 'countries' => $countries]);
     }
