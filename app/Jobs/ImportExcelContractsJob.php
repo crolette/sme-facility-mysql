@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Tenants\User;
 use App\Imports\AssetsImport;
+use App\Imports\ContractsImport;
 use App\Mail\ImportErrorMail;
 use App\Mail\ImportSuccessMail;
 use App\Imports\ProvidersImport;
@@ -18,7 +19,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class ImportExcelUsersJob implements ShouldQueue
+class ImportExcelContractsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -41,26 +42,26 @@ class ImportExcelUsersJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info('BEGIN IMPORT CONTACTS EXCEL JOB : ' . $this->user->email);
+        Log::info('BEGIN IMPORT CONTRACTS EXCEL JOB : ' . $this->user->email);
 
         try {
-            Excel::import(new UsersImport, $this->path, 'tenants');
+            Excel::import(new ContractsImport, $this->path, 'tenants');
 
             Log::info('IMPORT PROVIDERS EXCEL JOB DONE');
 
-            Log::info('SENDING MAIL IMPORT CONTACTS SUCCESS');
+            Log::info('SENDING MAIL IMPORT CONTRACTS SUCCESS');
             if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
-                    new ImportSuccessMail($this->user, 'users')
+                    new ImportSuccessMail($this->user, 'contracts')
                 );
                 Log::info("Mail sent to : crolweb@gmail.com");
             } else {
                 Mail::to($this->user->email)->send(
-                    new ImportSuccessMail($this->user, 'users')
+                    new ImportSuccessMail($this->user, 'contracts')
                 );
                 Log::info("Mail sent to : {$this->user->email}");
             }
-            Log::info('SUCCESS SENDING MAIL CONTACTS IMPORT');
+            Log::info('SUCCESS SENDING MAIL CONTRACTS IMPORT');
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
 
@@ -74,12 +75,12 @@ class ImportExcelUsersJob implements ShouldQueue
 
             if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
-                    new ImportErrorMail('users', $failures)
+                    new ImportErrorMail('contracts', $failures)
                 );
                 Log::info("Mail sent to : crolweb@gmail.com");
             } else {
                 Mail::to($this->user->email)->send(
-                    new ImportErrorMail('users', $failures)
+                    new ImportErrorMail('contracts', $failures)
                 );
             }
         } catch (\Exception $e) {
@@ -88,12 +89,12 @@ class ImportExcelUsersJob implements ShouldQueue
 
             if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
-                    new \App\Mail\ImportErrorMail('users')
+                    new \App\Mail\ImportErrorMail('contracts')
                 );
                 Log::info("Mail sent to : crolweb@gmail.com");
             } else {
                 Mail::to($this->user->email)->send(
-                    new \App\Mail\ImportErrorMail('users')
+                    new \App\Mail\ImportErrorMail('contracts')
                 );
                 Log::info("Mail sent to : {$this->user->email}");
             }
@@ -103,12 +104,12 @@ class ImportExcelUsersJob implements ShouldQueue
 
             if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
-                    new \App\Mail\ImportErrorMail('users')
+                    new \App\Mail\ImportErrorMail('contracts')
                 );
                 Log::info("Mail sent to : crolweb@gmail.com");
             } else {
                 Mail::to($this->user->email)->send(
-                    new \App\Mail\ImportErrorMail('users')
+                    new \App\Mail\ImportErrorMail('contracts')
                 );
                 Log::info("Mail sent to : {$this->user->email}");
             }
@@ -119,7 +120,7 @@ class ImportExcelUsersJob implements ShouldQueue
 
     public function failed($exception): void
     {
-        Log::error('!!! FAILED IMPORT CONTACTS EXCEL');
+        Log::error('!!! FAILED IMPORT USERS EXCEL');
         Log::error($exception);
     }
 }

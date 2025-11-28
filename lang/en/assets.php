@@ -16,7 +16,7 @@ return [
 
     'depreciation' => 'Depreciation',
     'depreciable' => 'Depreciable',
-    'depreciation_duration' => 'Depreciation duration',
+    'depreciation_duration' => 'Depreciation duration (years)',
     'depreciation_duration_placeholder' => 'Years',
     'depreciation_start_date' => 'Depreciation start date',
     'depreciation_end_date' => 'Depreciation end date',

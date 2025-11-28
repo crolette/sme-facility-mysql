@@ -27,15 +27,25 @@ use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 class UsersSheet implements FromQuery, WithMapping, Responsable, WithEvents, WithHeadings, ShouldAutoSize, WithStyles, WithColumnFormatting, WithTitle
 {
     use Exportable;
+    public function __construct(private array $userIds = [], private $template = false) {}
+
     public function title(): string
     {
-        return 'Users';
+        return 'Contacts';
     }
 
 
     public function query()
     {
-        return User::query();
+        $query = User::query();
+
+        if ($this->template) {
+            $query->limit(0);
+        } else if (!empty($this->userIds)) {
+            $query->whereIn('id', $this->userIds);
+        }
+
+        return $query;
     }
 
     public function map($provider): array
@@ -62,13 +72,13 @@ class UsersSheet implements FromQuery, WithMapping, Responsable, WithEvents, Wit
                 'hash'
             ],
             [
-                'id',
-                'First Name',
-                'Last Name',
-                "Email",
-                "Job Position",
-                "Phone number",
-                'Provider',
+                'ID',
+                __('common.first_name'),
+                __('common.last_name'),
+                __('common.email'),
+                __('contacts.job_position'),
+                __('common.phone'),
+                trans_choice('providers.title', 1) . ' ?',
                 '_hash'
             ]
         ];
@@ -86,22 +96,24 @@ class UsersSheet implements FromQuery, WithMapping, Responsable, WithEvents, Wit
         $protection = $sheet->getProtection();
         $protection->setPassword('');
         $protection->setSheet(true);
-        $sheet->protectCells('1:1', '');
-        $sheet->protectCells('1:2', '');
-        $sheet->protectCells('A:A', '');
-        $sheet->protectCells('B:H', '');
+
+        $sheet->getColumnDimension('B')->setWidth(50);
+        $sheet->getColumnDimension('C')->setWidth(50);
+        $sheet->getColumnDimension('D')->setWidth(50);
+        $sheet->getColumnDimension('G')->setWidth(50);
+
+        $sheet->getStyle('B3:H9999')->getProtection()
+            ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
+
         $sheet->getRowDimension('1')->setRowHeight(0);
         $sheet->getColumnDimension('A')->setVisible(false);
         $sheet->getColumnDimension('H')->setVisible(false);
         $sheet->freezePane('D3');
 
-
-        $validation = $sheet->getStyle('B3:H9999')->getProtection()->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
-
         // Validation on Category List
         $validation = $sheet->getDataValidation('G3');
         $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
-        $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_INFORMATION);
+        $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
         $validation->setAllowBlank(false);
         $validation->setShowInputMessage(true);
         $validation->setShowErrorMessage(true);
@@ -130,6 +142,44 @@ class UsersSheet implements FromQuery, WithMapping, Responsable, WithEvents, Wit
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFF0000');
         $sheet->getStyle('D3:D1000')->setConditionalStyles([$conditional]);
+
+
+        //Validation longueur champs
+        $validationLength = $sheet->getDataValidation('B3');
+        $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
+        $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_BETWEEN);
+        $validationLength->setFormula1('3');
+        $validationLength->setFormula2('255');
+        $validationLength->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
+        $validationLength->setShowErrorMessage(true);
+        $validationLength->setErrorTitle('Erreur de longueur');
+        $validationLength->setError('Le texte doit contenir entre 3 et 255 caractères.');
+        $sheet->setDataValidation('B3:B9999', clone $validationLength);
+        $sheet->setDataValidation('C3:C9999', clone $validationLength);
+        $sheet->setDataValidation('D3:D9999', clone $validationLength);
+
+        $validationLength = $sheet->getDataValidation('E3');
+        $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
+        $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_LESSTHANOREQUAL);
+        $validationLength->setFormula1('100');
+        $validationLength->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
+        $validationLength->setShowErrorMessage(true);
+        $validationLength->setAllowBlank(true);
+        $validationLength->setErrorTitle('Erreur de longueur');
+        $validationLength->setError('Le texte doit contenir max 100 caractères.');
+        $sheet->setDataValidation('E3:E9999', clone $validationLength);
+
+        $validationLength = $sheet->getDataValidation('F3');
+        $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
+        $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_LESSTHANOREQUAL);
+        $validationLength->setFormula1('16');
+        $validationLength->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
+        $validationLength->setShowErrorMessage(true);
+        $validationLength->setAllowBlank(true);
+        $validationLength->setErrorTitle('Erreur de longueur');
+        $validationLength->setError('Le texte doit contenir max 16 caractères.');
+        $sheet->setDataValidation('F3:F9999', clone $validationLength);
+
 
 
         return [

@@ -24,17 +24,30 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Tenant\ProviderRequest;
 use App\Http\Requests\Tenant\ImportFileRequest;
+use App\Jobs\ImportExcelContractsJob;
+use App\Models\Tenants\Contract;
 use App\Models\Tenants\User;
 
-class ApiImportUsersController extends Controller
+class ApiImportController extends Controller
 {
 
     public function store(ImportFileRequest $request)
     {
         $validated = $request->validated();
 
-        if (!str_contains($validated['file']->getClientOriginalName(), 'users')) {
-            return ApiResponse::error('Wrong file. The file name should include users');
+        $neededFileName = ['contracts', 'contacts', 'assets', 'providers'];
+        $hasNeededFileName = false;
+        $uploadedFileName = null;
+
+        foreach ($neededFileName as $fileName) {
+            if (str_contains($validated['file']->getClientOriginalName(), $fileName)) {
+                $hasNeededFileName = true;
+                $uploadedFileName = $fileName;
+            }
+        }
+
+        if ($hasNeededFileName === false) {
+            return ApiResponse::error('Wrong file.');
         }
 
         if (!Gate::allows('import-excel')) {
@@ -42,7 +55,14 @@ class ApiImportUsersController extends Controller
             return redirect()->back();
         }
 
-        if (Auth::user()->cannot('create', User::class)) {
+        $class = match ($uploadedFileName) {
+            'contracts' => Contract::class,
+            'assets' => Asset::class,
+            'providers' => Provider::class,
+            'contacts' => User::class,
+        };
+
+        if (Auth::user()->cannot('create', $class)) {
             ApiResponse::notAuthorized();
             return redirect()->back();
         }
@@ -54,15 +74,21 @@ class ApiImportUsersController extends Controller
             $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . $validated['file']->getClientOriginalName();
             Storage::disk('tenants')->putFileAs($directory, $validated['file'], $fileName);
 
-            Log::info('DISPATCH IMPORT USERS EXCEL JOB : ' . $directory . $fileName);
-            ImportExcelUsersJob::dispatch(Auth::user(), $directory . $fileName);
+            Log::info('DISPATCH IMPORT EXCEL JOB : ' . $directory . $fileName);
 
-            return ApiResponse::success('', 'Users will be imported, you will receive an email when it\'s done.');
+            match ($uploadedFileName) {
+                'contracts' => ImportExcelContractsJob::dispatch(Auth::user(), $directory . $fileName),
+                'assets' => ImportExcelAssetsJob::dispatch(Auth::user(), $directory . $fileName),
+                'providers' => ImportExcelProvidersJob::dispatch(Auth::user(), $directory . $fileName),
+                'contacts' => ImportExcelUsersJob::dispatch(Auth::user(), $directory . $fileName),
+            };
+
+
+            return ApiResponse::success('', $uploadedFileName . ' will be imported, you will receive an email when it\'s done.');
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
 
             foreach ($failures as $failure) {
-
                 $failure->row(); // row that went wrong
                 $failure->attribute(); // either heading key (if using heading row concern) or column index
                 $failure->errors(); // Actual error messages from Laravel validator
@@ -70,7 +96,7 @@ class ApiImportUsersController extends Controller
             }
             Log::info($failures);
 
-            return ApiResponse::error('Error during users import');
+            return ApiResponse::error('Error during ' . $uploadedFileName . ' import');
         }
     }
 };

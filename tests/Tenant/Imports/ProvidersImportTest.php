@@ -8,6 +8,7 @@ use App\Models\Tenants\User;
 use App\Imports\AssetsImport;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Models\Tenants\Country;
 use App\Imports\ProvidersImport;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Provider;
@@ -15,6 +16,8 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use App\Models\Central\CategoryType;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Jobs\ImportExcelProvidersJob;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use function PHPUnit\Framework\assertNull;
 use function Pest\Laravel\assertDatabaseHas;
@@ -64,6 +67,24 @@ beforeEach(function () {
     ]);
 });
 
+
+it('can upload providers and dispatch import providers job', function () {
+
+    Storage::fake('local');
+    Queue::fake();
+
+    $file = UploadedFile::fake()->createWithContent('providers.xlsx', file_get_contents(base_path('tests/fixtures/providers.xlsx')));
+
+    $formData = ['file' => $file];
+
+    $response = $this->postToTenant('api.tenant.import', $formData, [], [
+        'Content-Type' => 'multipart/form-data'
+    ]);
+    Queue::assertPushed(ImportExcelProvidersJob::class, function ($job) {
+        return $job->user->id === Auth::id();
+    });
+});
+
 it('can import and create new providers', function () {
 
     Storage::fake('local');
@@ -84,7 +105,7 @@ it('can import and create new providers', function () {
             'house_number' => '69',
             'postal_code' => '1234',
             'city' => 'Test',
-            'country_id' => 17,
+            'country_id' => Country::where('name', 'Belgium')->first()->id,
             'category_type_id' => 1
         ],
     );
@@ -101,7 +122,7 @@ it('can import and create new providers', function () {
             'house_number' => null,
             'postal_code' => '1234',
             'city' => 'Test',
-            'country_id' => 17,
+            'country_id' => Country::where('name', 'Belgium')->first()->id,
             'category_type_id' => 1
         ],
     );
@@ -118,7 +139,7 @@ it('can import and create new providers', function () {
             'house_number' => null,
             'postal_code' => '1234',
             'city' => 'Test',
-            'country_id' => 65,
+            'country_id' => Country::where('name', 'Germany')->first()->id,
             'category_type_id' => 2
         ],
     );
@@ -134,13 +155,14 @@ it('can import and create new providers', function () {
             'house_number' => null,
             'postal_code' => '6541',
             'city' => 'Gland',
-            'country_id' => 169,
+            'country_id' => Country::where('name', 'Switzerland')->first()->id,
             'category_type_id' => 2
         ],
     );
 });
 
-it('fails when the name of the file does not contain users', function () {
+
+it('fails when the name of the file does not contain providers', function () {
 
     Storage::fake('local');
 
@@ -148,10 +170,10 @@ it('fails when the name of the file does not contain users', function () {
 
     $formData = ['file' => $file];
 
-    $response = $this->postToTenant('api.tenant.import.providers', $formData, [], [
+    $response = $this->postToTenant('api.tenant.import', $formData, [], [
         'Content-Type' => 'multipart/form-data'
     ]);
-    $response->assertJson(['status' => 'error', 'message' => 'Wrong file. The file name should include providers']);
+    $response->assertJson(['status' => 'error', 'message' => 'Wrong file.']);
 });
 
 it('does not update provider with no changes', function () {
@@ -236,7 +258,7 @@ it('can import and update provider', function () {
             'house_number' => '100A',
             'postal_code' => '4001',
             'city' => 'Liège',
-            'country_id' => 65,
+            'country_id' => Country::where('name', 'Germany')->first()->id,
             'category_type_id' => 2
 
         ],

@@ -6,13 +6,16 @@ use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Imports\AssetsImport;
+use App\Jobs\ImportExcelAssetsJob;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Provider;
+use App\Jobs\ImportExcelUsersJob;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use function PHPUnit\Framework\assertNull;
 use function Pest\Laravel\assertDatabaseHas;
@@ -32,6 +35,23 @@ beforeEach(function () {
     $this->floor = Floor::factory()->create();
     $this->room = Room::factory()->create();
     $this->provider = Provider::factory()->create();
+});
+
+it('can upload assets and dispatch import assets job', function () {
+
+    Storage::fake('local');
+    Queue::fake();
+
+    $file = UploadedFile::fake()->createWithContent('assets.xlsx', file_get_contents(base_path('tests/fixtures/assets.xlsx')));
+
+    $formData = ['file' => $file];
+
+    $response = $this->postToTenant('api.tenant.import', $formData, [], [
+        'Content-Type' => 'multipart/form-data'
+    ]);
+    Queue::assertPushed(ImportExcelAssetsJob::class, function ($job) {
+        return $job->user->id === Auth::id();
+    });
 });
 
 it('can import and create new assets', function () {
@@ -236,10 +256,10 @@ it('fails when the name of the file does not contain users', function () {
 
     $formData = ['file' => $file];
 
-    $response = $this->postToTenant('api.tenant.import.assets', $formData, [], [
+    $response = $this->postToTenant('api.tenant.import', $formData, [], [
         'Content-Type' => 'multipart/form-data'
     ]);
-    $response->assertJson(['status' => 'error', 'message' => 'Wrong file. The file name should include assets']);
+    $response->assertJson(['status' => 'error', 'message' => 'Wrong file.']);
 });
 
 it('can update location of assets', function () {

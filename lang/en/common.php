@@ -58,8 +58,6 @@ return [
     // Generic fields
     'name' => 'Name',
     'notes' => 'Notes',
-
-    'code' => 'Code',
     'description' => 'Description',
     'status' => 'Status',
     'surface' => 'Surface',

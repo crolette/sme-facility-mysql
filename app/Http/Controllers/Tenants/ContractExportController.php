@@ -14,10 +14,11 @@ use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Jobs\ExportContractsExcelJob;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Validator;
 
-class AssetsExportController extends Controller
+class ContractExportController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -40,10 +41,10 @@ class AssetsExportController extends Controller
         $validated['template'] = isset($validated['template']) ?  $validated['template'] : false;
 
 
-        Log::info('DISPATCH EXPORT ASSETS EXCEL JOB');
-        ExportAssetsExcelJob::dispatch(Auth::user(), $validated)->onQueue('default');;
+        Log::info('DISPATCH EXPORT CONTRACTS EXCEL JOB');
+        ExportContractsExcelJob::dispatch(Auth::user(), $validated)->onQueue('default');;
 
-        return ApiResponse::success([], 'Assets will be exported, you will receive an e-mail when it\'s done');
+        return ApiResponse::success([], 'Contracts will be exported, you will receive an e-mail when it\'s done');
         // return new AssetsExport();
     }
 

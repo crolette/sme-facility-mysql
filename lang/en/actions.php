@@ -72,6 +72,7 @@ return [
     'validate-type' => 'Validate :type',
     'reject' => 'Reject',
     'handle-type' => 'Manage :type',
+    'clear-selection' => 'Clear selection',
 
     // Confirmations
     'delete-confirmation' => 'Yes, Delete',

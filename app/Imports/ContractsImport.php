@@ -2,16 +2,16 @@
 
 namespace App\Imports;
 
-use App\Imports\UsersDataImport;
+use App\Imports\ProvidersDataImport;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 
-class UsersImport implements WithMultipleSheets
+class ContractsImport implements WithMultipleSheets
 {
 
     public function sheets(): array
     {
         return [
-            'Contacts' => new UsersDataImport(),
+            'Contracts' => new ContractsDataImport(),
         ];
     }
 }

@@ -2,20 +2,17 @@
 
 namespace App\Exports;
 
-use Maatwebsite\Excel\Events\AfterSheet;
-use Maatwebsite\Excel\Concerns\Exportable;
-use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
-use Maatwebsite\Excel\Concerns\RegistersEventListeners;
 
 class AssetsExport implements WithMultipleSheets
 {
-    public function sheets() : array
+    public function __construct(private array $assetIds = [], private $template = false) {}
+
+    public function sheets(): array
     {
         return [
-            'Assets' => new AssetsSheet(),
+            'Assets' => new AssetsSheet($this->assetIds, $this->template),
             'Datas' => new AssetDataSheet()
         ];
     }
-
 }
