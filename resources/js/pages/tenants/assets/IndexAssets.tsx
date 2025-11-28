@@ -3,6 +3,7 @@ import { Pagination } from '@/components/pagination';
 import { useGridTableLayoutContext } from '@/components/tenant/gridTableLayoutContext';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import DisplayGridTableIndex from '@/components/ui/displayGridTableIndex';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,7 +17,7 @@ import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { ArchiveRestore, Loader, Pencil, PlusCircle, Shredder, Trash2, X } from 'lucide-react';
 
-import { useEffect, useState } from 'react';
+import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
 export interface SearchParams {
@@ -209,6 +210,48 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
 
     const { layout } = useGridTableLayoutContext();
 
+    const [selectedAssetIds, setSelectedAssetsIds] = useState<number[]>(() => {
+        const saved = sessionStorage.getItem('selectedAssets');
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    const handleSelectAssetId = (assetId: number) => {
+        setSelectedAssetsIds((prev) => (prev.includes(assetId) ? prev.filter((id) => id !== assetId) : [...prev, assetId]));
+    };
+
+    const handleSelectAllAssetId = (event: React.MouseEvent<HTMLButtonElement>, assets: Asset[]) => {
+        if (event.target.ariaChecked === 'true') {
+            assets.map((asset) => {
+                setSelectedAssetsIds((prev) => prev.filter((id) => id !== asset.id));
+            });
+        } else {
+            assets.map((asset) => {
+                setSelectedAssetsIds((prev) => (prev.includes(asset.id) ? [...prev] : [...prev, asset.id]));
+            });
+        }
+    };
+
+    const clearSelection = () => {
+        sessionStorage.removeItem('selectedAssets');
+        setSelectedAssetsIds([]);
+    };
+
+    useEffect(() => {
+        sessionStorage.setItem('selectedAssets', JSON.stringify(selectedAssetIds));
+    }, [selectedAssetIds]);
+
+    const submitSelectedIds: FormEventHandler = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post(route('tenant.assets.export'), { ids: selectedAssetIds });
+            showToast(response.data.message);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            clearSelection();
+        }
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={tChoice('assets.title', 2)} />
@@ -302,9 +345,25 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                 </div>
 
                 <div className="flex w-full items-center justify-between">
-                    <h1>{tChoice('assets.title', 2)}</h1>
+                    <div className="flex items-center gap-10">
+                        <h1>{tChoice('assets.title', 2)}</h1>
+                        {selectedAssetIds.length !== 0 && (
+                            <div className="flex gap-2 text-xs">
+                                <form onSubmit={submitSelectedIds}>
+                                    <Button type={'submit'} variant={'secondary'}>
+                                        {t('actions.export-type', { type: tChoice('assets.title', 2) })}
+                                    </Button>
+                                </form>
+                                <Button onClick={clearSelection} variant={'destructive'}>
+                                    {t('actions.clear-selection')}
+                                </Button>
+                            </div>
+                        )}
+                    </div>
+
                     <DisplayGridTableIndex />
                 </div>
+
                 {isLoading ? (
                     <p>{t('actions.loading')}</p>
                 ) : layout === 'grid' ? (
@@ -327,7 +386,19 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                     <Table>
                         <TableHead>
                             <TableHeadRow>
-                                <TableHeadData>{t('common.reference_code')}</TableHeadData>
+                                {/* <TableHeadData>check</TableHeadData> */}
+                                <TableHeadData className="flex items-center">
+                                    <Checkbox
+                                        name=""
+                                        id=""
+                                        value={''}
+                                        checked={assets.every((asset) => selectedAssetIds.includes(asset.id))}
+                                        onClick={(e) => handleSelectAllAssetId(e, assets)}
+                                        className="mr-2 -ml-2"
+                                    />
+
+                                    {t('common.reference_code')}
+                                </TableHeadData>
                                 <TableHeadData>{t('common.code')}</TableHeadData>
                                 <TableHeadData>{t('common.category')}</TableHeadData>
                                 <TableHeadData className="max-w-72">{t('common.name')}</TableHeadData>
@@ -350,11 +421,22 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                     return (
                                         <TableBodyRow key={index}>
                                             <TableBodyData>
-                                                {asset.deleted_at ? (
-                                                    <a href={route(`tenant.assets.deleted`, asset.id)}> {asset.reference_code} </a>
-                                                ) : (
-                                                    <a href={route(`tenant.assets.show`, asset.reference_code)}> {asset.reference_code} </a>
-                                                )}
+                                                <div className="flex items-center gap-2">
+                                                    <Checkbox
+                                                        name=""
+                                                        id=""
+                                                        className=""
+                                                        value={asset.id}
+                                                        checked={selectedAssetIds.includes(asset.id)}
+                                                        onClick={() => handleSelectAssetId(asset.id)}
+                                                    />
+
+                                                    {asset.deleted_at ? (
+                                                        <a href={route(`tenant.assets.deleted`, asset.id)}> {asset.reference_code} </a>
+                                                    ) : (
+                                                        <a href={route(`tenant.assets.show`, asset.reference_code)}> {asset.reference_code} </a>
+                                                    )}
+                                                </div>
                                             </TableBodyData>
                                             <TableBodyData>{asset.code}</TableBodyData>
                                             <TableBodyData>{asset.category}</TableBodyData>

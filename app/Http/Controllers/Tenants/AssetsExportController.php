@@ -24,7 +24,6 @@ class AssetsExportController extends Controller
      */
     public function index(Request $request)
     {
-        Debugbar::info($request);
         if (!Gate::allows('export-excel')) {
             ApiResponse::notAuthorized();
             return redirect()->back();
@@ -40,8 +39,6 @@ class AssetsExportController extends Controller
         $validated['ids'] = isset($validated['ids']) ?  $validated['ids'] : [];
         $validated['template'] = isset($validated['template']) ?  $validated['template'] : false;
 
-
-        Debugbar::info($request->validated(), $validated['ids'], $validated['template']);
 
         Log::info('DISPATCH EXPORT ASSETS EXCEL JOB');
         ExportAssetsExcelJob::dispatch(Auth::user(), $validated)->onQueue('default');;

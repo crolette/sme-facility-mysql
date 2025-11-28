@@ -72,6 +72,7 @@ return [
     'validate-type' => ':type valideren',
     'reject' => 'Afwijzen',
     'handle-type' => ':type beheren',
+    'clear-selection' => 'Selectie verwijderen',
 
     // Confirmations
     'delete-confirmation' => 'Ja, Verwijderen',
