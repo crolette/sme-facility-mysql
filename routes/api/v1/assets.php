@@ -46,7 +46,7 @@ Route::middleware([
         Route::prefix('{asset}')->group(function () {
             // Get one asset and his maintainable
             Route::get('/', function (Asset $asset) {
-                return ApiResponse::success($asset->load('maintainable.manager:id,first_name,last_name', 'maintainable.providers:id,name'));
+                return ApiResponse::success($asset->load('maintainable.manager:id,first_name,last_name', 'location', 'maintainable.providers:id,name'));
             })->name('api.assets.show');
 
             Route::patch('/', [APIAssetController::class, 'update'])->name('api.assets.update');
