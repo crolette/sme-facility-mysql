@@ -10,10 +10,12 @@ use Maatwebsite\Excel\Concerns\RegistersEventListeners;
 
 class UsersExport implements WithMultipleSheets
 {
+    public function __construct(private array $userIds = [], private $template = false) {}
+
     public function sheets(): array
     {
         return [
-            'Users' => new UsersSheet(),
+            'Contacts' => new UsersSheet($this->userIds, $this->template),
             'Datas' => new UsersDataSheet()
         ];
     }

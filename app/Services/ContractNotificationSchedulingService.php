@@ -121,14 +121,14 @@ class ContractNotificationSchedulingService
 
             $notification = [
                 'status' => ScheduledNotificationStatusEnum::PENDING->value,
-                'scheduled_at' => $contract->notice_date->subDays($delayDays),
+                'scheduled_at' => $contract->notice_date?->subDays($delayDays),
                 'notification_type' => 'notice_date',
                 'recipient_name' => $user->fullName,
                 'recipient_email' => $user->email,
                 'data' => [
                     'subject' => $contract->name,
                     'renewal_type' => $contract->renewal_type,
-                    'provider' => $contract->provider->name,
+                    'provider' => $contract->provider?->name,
                     'end_date' => $contract->end_date,
                     'notice_date' => $contract->notice_date,
                     'link' => route('tenant.contracts.show', $contract->id)
@@ -166,7 +166,7 @@ class ContractNotificationSchedulingService
                 'data' => [
                     'subject' => $contract->name,
                     'renewal_type' => $contract->renewal_type,
-                    'provider' => $contract->provider->name,
+                    'provider' => $contract->provider?->name,
                     'end_date' => $contract->end_date,
                     'link' => route('tenant.contracts.show', $contract->id)
                 ]

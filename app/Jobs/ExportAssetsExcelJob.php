@@ -26,7 +26,7 @@ class ExportAssetsExcelJob implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public User $user)
+    public function __construct(public User $user, public array $data)
     {
         //
     }
@@ -41,7 +41,7 @@ class ExportAssetsExcelJob implements ShouldQueue
         $directory = tenancy()->tenant->id . '/exports/' . Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_assets.xlsx';
         try {
 
-            Excel::store(new AssetsExport(), $directory, 'tenants');
+            Excel::store(new AssetsExport($this->data['ids'], $this->data['template']), $directory, 'tenants');
 
             Log::info('EXPORT ASSETS EXCEL JOB DONE');
 

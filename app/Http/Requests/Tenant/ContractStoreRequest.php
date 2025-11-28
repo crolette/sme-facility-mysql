@@ -55,13 +55,7 @@ class ContractStoreRequest extends FormRequest
     public function rules(): array
     {
 
-        $modelMap = [
-            'site' => \App\Models\Tenants\Site::class,
-            'building' => \App\Models\Tenants\Building::class,
-            'floor' => \App\Models\Tenants\Floor::class,
-            'room' => \App\Models\Tenants\Room::class,
-            'asset' => \App\Models\Tenants\Asset::class,
-        ];
+
 
         return [
             'provider_id' => 'required|exists:providers,id',

@@ -4,9 +4,11 @@ use Carbon\Carbon;
 use App\Imports\UsersImport;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Provider;
+use App\Jobs\ImportExcelUsersJob;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use App\Services\UserExportImportService;
 use function PHPUnit\Framework\assertNull;
@@ -44,11 +46,29 @@ beforeEach(function () {
     $this->userB->provider()->associate($this->providerTwo)->save();
 });
 
+it('can upload users and dispatch import users job', function () {
+
+    Storage::fake('local');
+    Queue::fake();
+
+    $file = UploadedFile::fake()->createWithContent('contacts.xlsx', file_get_contents(base_path('tests/fixtures/users.xlsx')));
+
+    $formData = ['file' => $file];
+
+    $response = $this->postToTenant('api.tenant.import', $formData, [], [
+        'Content-Type' => 'multipart/form-data'
+    ]);
+    Queue::assertPushed(ImportExcelUsersJob::class, function ($job) {
+        return $job->user->id === Auth::id();
+    });
+});
+
+
 it('can import and create new users', function () {
 
     Storage::fake('local');
 
-    $file = UploadedFile::fake()->createWithContent('users.xlsx', file_get_contents(base_path('tests/fixtures/users.xlsx')));
+    $file = UploadedFile::fake()->createWithContent('contacts.xlsx', file_get_contents(base_path('tests/fixtures/users.xlsx')));
 
     Excel::import(new UsersImport, $file);
 
@@ -89,18 +109,19 @@ it('can import and create new users', function () {
     );
 });
 
-it('fails when the name of the file does not contain users', function () {
+
+it('fails when the name of the file does not contain contacts', function () {
 
     Storage::fake('local');
 
-    $file = UploadedFile::fake()->createWithContent('providers.xlsx', file_get_contents(base_path('tests/fixtures/providers.xlsx')));
+    $file = UploadedFile::fake()->createWithContent('users.xlsx', file_get_contents(base_path('tests/fixtures/users.xlsx')));
 
     $formData = ['file' => $file];
 
-    $response = $this->postToTenant('api.tenant.import.users', $formData, [], [
+    $response = $this->postToTenant('api.tenant.import', $formData, [], [
         'Content-Type' => 'multipart/form-data'
     ]);
-    $response->assertJson(['status' => 'error', 'message' => 'Wrong file. The file name should include users']);
+    $response->assertJson(['status' => 'error', 'message' => 'Wrong file.']);
 });
 
 it('does not update user with no changes', function () {
@@ -117,7 +138,7 @@ it('does not update user with no changes', function () {
 
     Storage::fake('local');
 
-    $file = UploadedFile::fake()->createWithContent('users.xlsx', file_get_contents(base_path('tests/fixtures/users.xlsx')));
+    $file = UploadedFile::fake()->createWithContent('contacts.xlsx', file_get_contents(base_path('tests/fixtures/users.xlsx')));
 
     Excel::import(new UsersImport, $file);
 
@@ -160,7 +181,7 @@ it('can import and update users', function () {
 
     Storage::fake('local');
 
-    $file = UploadedFile::fake()->createWithContent('users.xlsx', file_get_contents(base_path('tests/fixtures/users.xlsx')));
+    $file = UploadedFile::fake()->createWithContent('contacts.xlsx', file_get_contents(base_path('tests/fixtures/users.xlsx')));
 
     Excel::import(new UsersImport, $file);
 
