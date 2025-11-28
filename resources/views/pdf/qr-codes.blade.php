@@ -17,7 +17,7 @@
         body {
             margin: 0;
             padding: 0;
-            font-family: Arial, sans-serif;
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif, sans-serif;
             font-size: 10px;
         }
 
@@ -61,6 +61,10 @@
             height: 20mm;
         }
 
+        .scan-me {
+            font-size: 8px;
+        }
+
         .title { font-weight: bold; font-size: 8px; margin-bottom: 1mm; }
         .description { font-size: 8px; color: #333; margin-bottom: 1mm; }
         .code {  font-size: 8px; }
@@ -95,6 +99,8 @@
                                 </td>
                                 <td class="text-cell">
                                     <div class="text-content">
+                                        <div class="scan-me">Un problème ? Scannez-moi !</div>
+                                        <br>
                                         <div class="title">{{ $code->name }}</div>
                                         <div class="code">{{ $code->reference_code }}</div>
                                     </div>
