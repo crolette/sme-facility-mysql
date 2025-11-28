@@ -11,7 +11,6 @@ const pillVariants = cva(
       variant: {
         default: "bg-sidebar-accent text-foreground hover:bg-sidebar dark:hover:bg-ring",
         draft: "bg-sidebar-accent",
-
         waiting_parts:"bg-sidebar-border text-background dark:text-foreground",
         open: "bg-destructive text-background dark:text-foreground",
         ongoing: "bg-emerald-500 text-background dark:text-foreground",
@@ -19,9 +18,7 @@ const pillVariants = cva(
         in_progress: "bg-emerald-300 dark:text-background",
         closed: "bg-green-900 text-background dark:text-foreground",
         completed: "bg-green-900 text-background dark:text-foreground",
-        active:
-          
-          "bg-emerald-700",
+        active:"bg-emerald-700",
         expired: "bg-amber-800",
         cancelled: "bg-destructive text-background dark:text-foreground",
         low: "bg-slate-400  dark:text-background",

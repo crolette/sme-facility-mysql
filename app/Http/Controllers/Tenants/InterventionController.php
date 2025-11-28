@@ -72,7 +72,7 @@ class InterventionController extends Controller
 
         $priorities = array_column(PriorityLevel::cases(), 'value');
         $statuses = array_column(InterventionStatus::cases(), 'value');
-        $types = CategoryType::where('category', 'intervention')->get();
+        $types = CategoryType::getByCategoryCache('intervention');
 
         return Inertia::render('tenants/interventions/IndexInterventions', ['items' => $interventions->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'sortBy', 'status', 'orderBy', 'type', 'priority']), 'priorities' => $priorities, 'types' => $types, 'statuses' => $statuses]);
     }
@@ -100,7 +100,7 @@ class InterventionController extends Controller
 
 
         $statuses = array_column(InterventionStatus::cases(), 'value');
-        $types = CategoryType::where('category', 'intervention')->get();
+        $types =  CategoryType::getByCategoryCache('intervention');
 
         return Inertia::render('tenants/tickets/interventions/ShowIntervention', ['intervention' => $intervention->load(['ticket', 'interventionable', 'pictures', 'actions.pictures']), 'statuses' => $statuses, 'types' => $types]);
     }
