@@ -81,6 +81,7 @@ return [
     'to' => 'To',
     'other' => 'Other',
     'all' => 'All',
+    'years' => 'Year|Years',
     'yes' => 'Yes',
     'no' => 'No',
     'type' => 'Type',

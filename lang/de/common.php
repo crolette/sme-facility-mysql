@@ -80,6 +80,7 @@ return [
     'to' => 'Bis',
     'other' => 'Andere',
     'all' => 'Alle',
+    'years' => 'Jahr|Jahre',
     'yes' => 'Ja',
     'no' => 'Nein',
     'type' => 'Typ',

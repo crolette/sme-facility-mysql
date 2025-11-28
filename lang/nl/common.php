@@ -60,6 +60,7 @@ return [
     'notes_placeholder' => 'Voeg een notitie/opmerking toe',
     'code' => 'Code',
     'description' => 'Beschrijving',
+
     'status' => 'Status',
     'surface' => 'Oppervlakte',
     'type' => 'Type',
@@ -80,6 +81,7 @@ return [
     'to' => 'Tot',
     'other' => 'Andere',
     'all' => 'Alles',
+    'years' => 'Jaar|Jaare',
     'yes' => 'Ja',
     'no' => 'Nee',
     'type' => 'Type',

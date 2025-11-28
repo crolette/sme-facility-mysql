@@ -75,11 +75,12 @@ return [
     'pictures_restriction_description' => 'Fichiers acceptés : png, jpg, jpeg - Taille maximale : 4MB',
 
     // Generic terms
-    'information' => 'Information',
+    'information' => 'Informations',
     'from' => 'De',
     'to' => 'À',
     'other' => 'Autre',
     'all' => 'Tout',
+    'years' => 'Année|Années',
     'yes' => 'Oui',
     'no' => 'Non',
     'option' => 'Option',

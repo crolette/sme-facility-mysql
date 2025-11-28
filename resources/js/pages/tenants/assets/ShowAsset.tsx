@@ -221,11 +221,14 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                         />
                                         {asset.maintainable.need_maintenance && (
                                             <>
-                                                <Field label={t('maintenances.frequency')} text={asset.maintainable.maintenance_frequency} />
+                                                <Field
+                                                    label={t('maintenances.frequency')}
+                                                    text={t(`maintenances.frequency.${asset.maintainable.maintenance_frequency}`)}
+                                                />
                                                 <Field
                                                     label={t('maintenances.next_maintenance_date')}
                                                     date
-                                                    text={asset.maintainable.next_maintenance_date ?? 'Not planned'}
+                                                    text={asset.maintainable.next_maintenance_date ?? t('maintenances.none')}
                                                 />
                                                 <Field
                                                     label={t('maintenances.last_maintenance_date')}
@@ -239,13 +242,16 @@ export default function ShowAsset({ item }: { item: Asset }) {
 
                                 {asset.depreciable && (
                                     <div className="border-sidebar-border bg-sidebar mt-4 rounded-md border p-4">
-                                        <h2>{t('actions.depreciation')}</h2>
+                                        <h2>{t('assets.depreciation')}</h2>
                                         <div className="space-y-2">
-                                            <Field label={t('actions.depreciation_duration')} text={asset.depreciation_duration} />
-                                            <Field label={t('actions.depreciation_start_date')} date text={asset.depreciation_start_date} />
-                                            <Field label={t('actions.depreciation_end_date')} date text={asset.depreciation_end_date} />
                                             <Field
-                                                label={t('actions.residual_value')}
+                                                label={t('assets.depreciation_duration')}
+                                                text={asset.depreciation_duration + ' ' + tChoice('common.years', asset.depreciation_duration)}
+                                            />
+                                            <Field label={t('assets.depreciation_start_date')} date text={asset.depreciation_start_date} />
+                                            <Field label={t('assets.depreciation_end_date')} date text={asset.depreciation_end_date} />
+                                            <Field
+                                                label={t('assets.residual_value')}
                                                 text={asset.residual_value ? asset.residual_value + ' €' : 'NC'}
                                             />
                                         </div>
