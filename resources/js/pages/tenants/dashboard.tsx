@@ -30,8 +30,6 @@ export default function TenantDashboard({
         },
     ];
 
-    console.log(overdueInterventions);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />

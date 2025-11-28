@@ -394,7 +394,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                         value={''}
                                         checked={assets.every((asset) => selectedAssetIds.includes(asset.id))}
                                         onClick={(e) => handleSelectAllAssetId(e, assets)}
-                                        className="mr-2 -ml-2"
+                                        className="mr-3 -ml-2 cursor-pointer"
                                     />
 
                                     {t('common.reference_code')}
@@ -421,11 +421,11 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                     return (
                                         <TableBodyRow key={index}>
                                             <TableBodyData>
-                                                <div className="flex items-center gap-2">
+                                                <div className="flex items-center gap-3">
                                                     <Checkbox
                                                         name=""
                                                         id=""
-                                                        className=""
+                                                        className="cursor-pointer"
                                                         value={asset.id}
                                                         checked={selectedAssetIds.includes(asset.id)}
                                                         onClick={() => handleSelectAssetId(asset.id)}
