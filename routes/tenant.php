@@ -102,13 +102,26 @@ Route::middleware([
     Route::get('/pdf-qr-codes', function (Request $request) {
 
         if ($request->query('type') !== 'all') {
+
+            $validation = Validator::make(
+                $request->all(),
+                [
+                    'ids' => 'nullable|array|max:12',
+                    'ids' => 'exists:' . $request->query('type') . ',id'
+                ]
+            );
+
             $codes = match ($request->query('type')) {
                 'sites' => Site::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->whereNotNull('qr_code')->get(),
                 'buildings' => Building::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->whereNotNull('qr_code')->get(),
                 'floors' => Floor::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->whereNotNull('qr_code')->get(),
                 'rooms' => Room::select('id', 'code', 'reference_code', 'qr_code', 'location_type_id')->whereNotNull('qr_code')->get(),
-                'assets' => Asset::select('id', 'code', 'reference_code', 'qr_code', 'category_type_id')->whereNotNull('qr_code')->get(),
+                'assets' => Asset::select('id', 'code', 'reference_code', 'qr_code', 'category_type_id')->whereNotNull('qr_code'),
             };
+
+            if ($validation->validated('ids')) {
+                $codes->whereIn('id',  [...collect($validation->validated('ids'))->flatten()]);
+            }
         } else {
             $collection = collect([]);
 
@@ -120,7 +133,7 @@ Route::middleware([
             $codes = $collection->merge($sites)->merge($buildings)->merge($floors)->merge($rooms)->merge($assets);
         }
 
-        $pdf = Pdf::loadView('pdf.qr-codes', ['codes' => $codes])->setPaper('a4', 'portrait');
+        $pdf = Pdf::loadView('pdf.qr-codes', ['codes' => $codes->get()])->setPaper('a4', 'portrait');
         return $pdf->stream('qrcode.pdf');
     })->name('tenant.pdf.qr-codes');
 

@@ -210,13 +210,16 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
 
     const { layout } = useGridTableLayoutContext();
 
+    const MAX_SELECTION = 100;
     const [selectedAssetIds, setSelectedAssetsIds] = useState<number[]>(() => {
         const saved = sessionStorage.getItem('selectedAssets');
         return saved ? JSON.parse(saved) : [];
     });
 
     const handleSelectAssetId = (assetId: number) => {
-        setSelectedAssetsIds((prev) => (prev.includes(assetId) ? prev.filter((id) => id !== assetId) : [...prev, assetId]));
+        setSelectedAssetsIds((prev) =>
+            prev.includes(assetId) ? prev.filter((id) => id !== assetId) : prev.length < MAX_SELECTION ? [...prev, assetId] : [...prev],
+        );
     };
 
     const handleSelectAllAssetId = (event: React.MouseEvent<HTMLButtonElement>, assets: Asset[]) => {
@@ -226,7 +229,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
             });
         } else {
             assets.map((asset) => {
-                setSelectedAssetsIds((prev) => (prev.includes(asset.id) ? [...prev] : [...prev, asset.id]));
+                setSelectedAssetsIds((prev) => (prev.includes(asset.id) ? [...prev] : prev.length < MAX_SELECTION ? [...prev, asset.id] : [...prev]));
             });
         }
     };
@@ -347,13 +350,19 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                 <div className="flex w-full items-center justify-between">
                     <div className="flex items-center gap-10">
                         <h1>{tChoice('assets.title', 2)}</h1>
-                        {selectedAssetIds.length !== 0 && (
+                        {hasPermission('create assets') && selectedAssetIds.length !== 0 && (
                             <div className="flex gap-2 text-xs">
                                 <form onSubmit={submitSelectedIds}>
                                     <Button type={'submit'} variant={'secondary'}>
                                         {t('actions.export-type', { type: tChoice('assets.title', 2) })}
                                     </Button>
                                 </form>
+                                <a href={route('tenant.pdf.qr-codes', { type: 'assets', ids: selectedAssetIds })} target="__blank">
+                                    <Button variant={'secondary'}>
+                                        <BiSolidFilePdf size={20} />
+                                        {t('actions.download-type', { type: tChoice('common.qr_codes', 2) })}
+                                    </Button>
+                                </a>
                                 <Button onClick={clearSelection} variant={'destructive'}>
                                     {t('actions.clear-selection')}
                                 </Button>
@@ -388,14 +397,16 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                             <TableHeadRow>
                                 {/* <TableHeadData>check</TableHeadData> */}
                                 <TableHeadData className="flex items-center">
-                                    <Checkbox
-                                        name=""
-                                        id=""
-                                        value={''}
-                                        checked={assets.every((asset) => selectedAssetIds.includes(asset.id))}
-                                        onClick={(e) => handleSelectAllAssetId(e, assets)}
-                                        className="mr-3 -ml-2 cursor-pointer"
-                                    />
+                                    {hasPermission('create assets') && (
+                                        <Checkbox
+                                            name=""
+                                            id=""
+                                            value={''}
+                                            checked={assets.every((asset) => selectedAssetIds.includes(asset.id))}
+                                            onClick={(e) => handleSelectAllAssetId(e, assets)}
+                                            className="mr-3 -ml-2 cursor-pointer"
+                                        />
+                                    )}
 
                                     {t('common.reference_code')}
                                 </TableHeadData>
@@ -422,14 +433,16 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                         <TableBodyRow key={index}>
                                             <TableBodyData>
                                                 <div className="flex items-center gap-3">
-                                                    <Checkbox
-                                                        name=""
-                                                        id=""
-                                                        className="cursor-pointer"
-                                                        value={asset.id}
-                                                        checked={selectedAssetIds.includes(asset.id)}
-                                                        onClick={() => handleSelectAssetId(asset.id)}
-                                                    />
+                                                    {hasPermission('create assets') && (
+                                                        <Checkbox
+                                                            name=""
+                                                            id=""
+                                                            className="cursor-pointer"
+                                                            value={asset.id}
+                                                            checked={selectedAssetIds.includes(asset.id)}
+                                                            onClick={() => handleSelectAssetId(asset.id)}
+                                                        />
+                                                    )}
 
                                                     {asset.deleted_at ? (
                                                         <a href={route(`tenant.assets.deleted`, asset.id)}> {asset.reference_code} </a>

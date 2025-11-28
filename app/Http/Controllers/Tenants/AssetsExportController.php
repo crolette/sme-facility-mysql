@@ -30,9 +30,11 @@ class AssetsExportController extends Controller
         }
 
         $request = Validator::make($request->all(), [
-            'ids' => 'nullable|array',
+            'ids' => 'nullable|array|max:12',
+            'ids' => 'exists:assets,id',
             'template' => 'nullable|boolean'
         ]);
+
 
         $validated = $request->validated();
 
