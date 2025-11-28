@@ -38,74 +38,11 @@ export default function ImportExportSettings() {
         template: false,
     });
 
-    const uploadAssetFile: FormEventHandler = async (e) => {
+    const uploadImportFile: FormEventHandler = async (e) => {
         e.preventDefault();
         setIsProcessing(true);
         try {
-            const response = await axios.post(route('api.tenant.import.assets'), data, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            if (response.data.status === 'success') {
-                showToast(response.data.message, response.data.status);
-            }
-        } catch (error) {
-            showToast(error.response.data.message, error.response.data.status);
-        } finally {
-            reset();
-            setData('file', null);
-            setIsProcessing(false);
-        }
-    };
-
-    const uploadProviderFile: FormEventHandler = async (e) => {
-        e.preventDefault();
-        setIsProcessing(true);
-        try {
-            const response = await axios.post(route('api.tenant.import.providers'), data, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            if (response.data.status === 'success') {
-                showToast(response.data.message, response.data.status);
-            }
-        } catch (error) {
-            showToast(error.response.data.message, error.response.data.status);
-        } finally {
-            reset();
-            setData('file', null);
-            setIsProcessing(false);
-        }
-    };
-
-    const uploadUserFile: FormEventHandler = async (e) => {
-        e.preventDefault();
-        setIsProcessing(true);
-        try {
-            const response = await axios.post(route('api.tenant.import.users'), data, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            if (response.data.status === 'success') {
-                showToast(response.data.message, response.data.status);
-            }
-        } catch (error) {
-            showToast(error.response.data.message, error.response.data.status);
-        } finally {
-            reset();
-            setData('file', null);
-            setIsProcessing(false);
-        }
-    };
-
-    const uploadContractsFile: FormEventHandler = async (e) => {
-        e.preventDefault();
-        setIsProcessing(true);
-        try {
-            const response = await axios.post(route('api.tenant.import.contracts'), data, {
+            const response = await axios.post(route('api.tenant.import'), data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
@@ -219,72 +156,13 @@ export default function ImportExportSettings() {
                         <>
                             <h4>Import</h4>
                             <p className="font-bold">Remarque</p>
-                            <p>Pour pouvoir importer des données, il faut avoir au préalable télécharger un template ou avoir exporté des données.</p>
-                            <h6>{tChoice('assets.title', 2)}</h6>
-                            <form action="" onSubmit={uploadAssetFile}>
-                                <input
-                                    type="file"
-                                    name=""
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                    id=""
-                                    onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
-                                />
-                                <Button disabled={isProcessing || data.file === null}>
-                                    {isProcessing ? (
-                                        <>
-                                            <Loader className="animate-pulse" />
-                                            <span>{t('actions.processing')}</span>
-                                        </>
-                                    ) : (
-                                        <span>{t('actions.submit')}</span>
-                                    )}
-                                </Button>
-                            </form>
-                            <h6>{tChoice('providers.title', 2)}</h6>
+                            <p>
+                                Pour pouvoir importer des données, il faut avoir au préalable télécharger un template ou avoir exporté des données.
+                                <br />
+                                Choisissez le fichier à importer. Le nom du fichier doit contenir le type de données à importer.
+                            </p>
 
-                            <form action="" onSubmit={uploadProviderFile}>
-                                <input
-                                    type="file"
-                                    name=""
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                    id=""
-                                    onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
-                                />
-                                <Button disabled={isProcessing || data.file === null}>
-                                    {isProcessing ? (
-                                        <>
-                                            <Loader className="animate-pulse" />
-                                            <span>{t('actions.processing')}</span>
-                                        </>
-                                    ) : (
-                                        <span>{t('actions.submit')}</span>
-                                    )}
-                                </Button>
-                            </form>
-
-                            <h6>{tChoice('contacts.title', 2)}</h6>
-                            <form action="" onSubmit={uploadUserFile}>
-                                <input
-                                    type="file"
-                                    name=""
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                    id=""
-                                    onChange={(e) => (e.target.files && e.target.files?.length > 0 ? setData('file', e.target.files[0]) : null)}
-                                />
-                                <Button disabled={isProcessing || data.file === null}>
-                                    {isProcessing ? (
-                                        <>
-                                            <Loader className="animate-pulse" />
-                                            <span>{t('actions.processing')}</span>
-                                        </>
-                                    ) : (
-                                        <span>{t('actions.submit')}</span>
-                                    )}
-                                </Button>
-                            </form>
-
-                            <h6>{tChoice('contracts.title', 2)}</h6>
-                            <form action="" onSubmit={uploadContractsFile}>
+                            <form action="" onSubmit={uploadImportFile}>
                                 <input
                                     type="file"
                                     name=""

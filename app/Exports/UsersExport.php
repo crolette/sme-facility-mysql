@@ -15,7 +15,7 @@ class UsersExport implements WithMultipleSheets
     public function sheets(): array
     {
         return [
-            'Users' => new UsersSheet($this->userIds, $this->template),
+            'Contacts' => new UsersSheet($this->userIds, $this->template),
             'Datas' => new UsersDataSheet()
         ];
     }

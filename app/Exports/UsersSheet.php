@@ -31,7 +31,7 @@ class UsersSheet implements FromQuery, WithMapping, Responsable, WithEvents, Wit
 
     public function title(): string
     {
-        return 'Users';
+        return 'Contacts';
     }
 
 

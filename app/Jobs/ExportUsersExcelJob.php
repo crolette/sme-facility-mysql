@@ -38,41 +38,41 @@ class ExportUsersExcelJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info('BEGIN EXPORT USERS EXCEL JOB : ' . $this->user->email);
+        Log::info('BEGIN EXPORT CONTACTS EXCEL JOB : ' . $this->user->email);
 
-        $directory = tenancy()->tenant->id . '/exports/' . Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_users.xlsx';
+        $directory = tenancy()->tenant->id . '/exports/' . Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_contacts.xlsx';
         try {
 
             Excel::store(new UsersExport($this->data['ids'], $this->data['template']), $directory, 'tenants');
 
-            Log::info('EXPORT USERS EXCEL JOB DONE');
+            Log::info('EXPORT CONTACTS EXCEL JOB DONE');
 
             // Mail
             Log::info('SENDING MAIL EXPORT SUCCESS');
             if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
-                    new \App\Mail\ExportSuccessMail($this->user, $directory, 'users')
+                    new \App\Mail\ExportSuccessMail($this->user, $directory, 'contacts')
                 );
                 Log::info("Mail sent to : crolweb@gmail.com");
             } else {
                 Mail::to($this->user->email)->send(
-                    new \App\Mail\ExportSuccessMail($this->user, $directory, 'users')
+                    new \App\Mail\ExportSuccessMail($this->user, $directory, 'contacts')
                 );
                 Log::info("Mail sent to : {$this->user->email}");
             }
-            Log::info('SUCCESS SENDING MAIL EXPORT');
+            Log::info('SUCCESS SENDING MAIL EXPORT CONTACTS');
         } catch (\Exception $e) {
             Log::error('Error during export');
             Log::error($e->getMessage());
 
             if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
-                    new \App\Mail\ExportErrorMail('users')
+                    new \App\Mail\ExportErrorMail('contacts')
                 );
                 Log::info("Mail sent to : crolweb@gmail.com");
             } else {
                 Mail::to($this->user->email)->send(
-                    new \App\Mail\ExportErrorMail('users')
+                    new \App\Mail\ExportErrorMail('contacts')
                 );
                 Log::info("Mail sent to : {$this->user->email}");
             }
@@ -85,7 +85,7 @@ class ExportUsersExcelJob implements ShouldQueue
 
     public function failed($exception): void
     {
-        Log::error('!!! FAILED EXPORT PROVIDERS EXCEL');
+        Log::error('!!! FAILED EXPORT CONTACTS EXCEL');
         Log::error($exception);
     }
 }

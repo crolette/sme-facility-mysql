@@ -11,7 +11,7 @@ class UsersImport implements WithMultipleSheets
     public function sheets(): array
     {
         return [
-            'Users' => new UsersDataImport(),
+            'Contacts' => new UsersDataImport(),
         ];
     }
 }

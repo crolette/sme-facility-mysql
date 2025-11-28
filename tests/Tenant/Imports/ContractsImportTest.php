@@ -13,6 +13,8 @@ use Illuminate\Http\UploadedFile;
 use App\Enums\ContractDurationEnum;
 use App\Models\Central\CategoryType;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Jobs\ImportExcelContractsJob;
+use Illuminate\Support\Facades\Queue;
 use App\Enums\ContractRenewalTypesEnum;
 use Illuminate\Support\Facades\Storage;
 use App\Services\UserExportImportService;
@@ -35,6 +37,37 @@ beforeEach(function () {
     $this->providerTwo = Provider::factory()->create([
         'name' => 'Company B',
     ]);
+});
+
+it('can upload contracts and dispatch import contracts job', function () {
+
+    Storage::fake('local');
+    Queue::fake();
+
+    $file = UploadedFile::fake()->createWithContent('contracts.xlsx', file_get_contents(base_path('tests/fixtures/contracts.xlsx')));
+
+    $formData = ['file' => $file];
+
+    $response = $this->postToTenant('api.tenant.import', $formData, [], [
+        'Content-Type' => 'multipart/form-data'
+    ]);
+    Queue::assertPushed(ImportExcelContractsJob::class, function ($job) {
+        return $job->user->id === Auth::id();
+    });
+});
+
+it('fails when the name of the file does not contain contracts', function () {
+
+    Storage::fake('local');
+
+    $file = UploadedFile::fake()->createWithContent('users.xlsx', file_get_contents(base_path('tests/fixtures/users.xlsx')));
+
+    $formData = ['file' => $file];
+
+    $response = $this->postToTenant('api.tenant.import', $formData, [], [
+        'Content-Type' => 'multipart/form-data'
+    ]);
+    $response->assertJson(['status' => 'error', 'message' => 'Wrong file.']);
 });
 
 it('can import and create new contracts', function () {
@@ -146,20 +179,6 @@ it('can update existing contracts by import', function () {
         ],
     );
 });
-
-// it('fails when the name of the file does not contain users', function () {
-
-//     Storage::fake('local');
-
-//     $file = UploadedFile::fake()->createWithContent('providers.xlsx', file_get_contents(base_path('tests/fixtures/providers.xlsx')));
-
-//     $formData = ['file' => $file];
-
-//     $response = $this->postToTenant('api.tenant.import.users', $formData, [], [
-//         'Content-Type' => 'multipart/form-data'
-//     ]);
-//     $response->assertJson(['status' => 'error', 'message' => 'Wrong file. The file name should include users']);
-// });
 
 it('does not update contracts with no changes', function () {
 

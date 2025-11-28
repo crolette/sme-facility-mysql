@@ -41,14 +41,14 @@ class ImportExcelUsersJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info('BEGIN IMPORT USERS EXCEL JOB : ' . $this->user->email);
+        Log::info('BEGIN IMPORT CONTACTS EXCEL JOB : ' . $this->user->email);
 
         try {
             Excel::import(new UsersImport, $this->path, 'tenants');
 
             Log::info('IMPORT PROVIDERS EXCEL JOB DONE');
 
-            Log::info('SENDING MAIL IMPORT USERS SUCCESS');
+            Log::info('SENDING MAIL IMPORT CONTACTS SUCCESS');
             if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
                     new ImportSuccessMail($this->user, 'users')
@@ -60,7 +60,7 @@ class ImportExcelUsersJob implements ShouldQueue
                 );
                 Log::info("Mail sent to : {$this->user->email}");
             }
-            Log::info('SUCCESS SENDING MAIL USERS IMPORT');
+            Log::info('SUCCESS SENDING MAIL CONTACTS IMPORT');
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
             $failures = $e->failures();
 
@@ -119,7 +119,7 @@ class ImportExcelUsersJob implements ShouldQueue
 
     public function failed($exception): void
     {
-        Log::error('!!! FAILED IMPORT USERS EXCEL');
+        Log::error('!!! FAILED IMPORT CONTACTS EXCEL');
         Log::error($exception);
     }
 }
