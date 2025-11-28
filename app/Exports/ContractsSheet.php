@@ -80,8 +80,8 @@ class ContractsSheet implements FromQuery, WithMapping, Responsable, ShouldAutoS
                 "end_date",
                 "renewal_type",
                 "status",
-                "notes",
                 "provider",
+                "notes",
                 'hash'
             ],
             [
@@ -96,8 +96,8 @@ class ContractsSheet implements FromQuery, WithMapping, Responsable, ShouldAutoS
                 __('contracts.end_date'),
                 __('contracts.renewal_type'),
                 __('common.status'),
-                __('common.notes'),
                 __('providers.company_name'),
+                __('common.notes'),
                 '_hash'
             ]
         ];
@@ -122,8 +122,8 @@ class ContractsSheet implements FromQuery, WithMapping, Responsable, ShouldAutoS
         $sheet->getColumnDimension('D')->setWidth(20);
         $sheet->getColumnDimension('E')->setWidth(20);
         $sheet->getColumnDimension('K')->setWidth(15);
-        $sheet->getColumnDimension('L')->setWidth(50);
-        $sheet->getColumnDimension('M')->setWidth(25);
+        $sheet->getColumnDimension('L')->setWidth(25);
+        $sheet->getColumnDimension('M')->setWidth(100);
 
         $sheet->getStyle('B3:M9999')->getProtection()
             ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
@@ -171,7 +171,7 @@ class ContractsSheet implements FromQuery, WithMapping, Responsable, ShouldAutoS
         $sheet->setDataValidation('K3:K9999', clone $validation);
 
         $validation->setFormula1('providersList');
-        $sheet->setDataValidation('M3:M9999', clone $validation);
+        $sheet->setDataValidation('L3:L9999', clone $validation);
 
 
         // Conditional formatting
@@ -231,7 +231,7 @@ class ContractsSheet implements FromQuery, WithMapping, Responsable, ShouldAutoS
         $sheet->setDataValidation('D3:D9999', clone $validationLength);
         $sheet->setDataValidation('E3:E9999', clone $validationLength);
 
-        $validationLength = $sheet->getDataValidation('L3');
+        $validationLength = $sheet->getDataValidation('M3');
         $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
         $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_BETWEEN);
         $validationLength->setFormula1('4');
@@ -240,10 +240,7 @@ class ContractsSheet implements FromQuery, WithMapping, Responsable, ShouldAutoS
         $validationLength->setShowErrorMessage(true);
         $validationLength->setErrorTitle('Erreur de longueur');
         $validationLength->setError('Le texte doit contenir entre 4 et 250 caractères.');
-        $sheet->setDataValidation('L3:L9999', clone $validationLength);
-
-
-
+        $sheet->setDataValidation('M3:M9999', clone $validationLength);
 
 
         return [

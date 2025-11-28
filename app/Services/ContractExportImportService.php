@@ -21,8 +21,8 @@ class ContractExportImportService
             "end_date" => $contract->end_date,
             "renewal_type" => $contract->renewal_type?->value,
             "status" => $contract->status?->value,
-            "notes" => trim($contract->notes),
             "provider" => $contract->provider?->name ?? null,
+            "notes" => trim($contract->notes),
         ];
     }
 
@@ -40,8 +40,8 @@ class ContractExportImportService
             "end_date" => $contract->end_date ? Date::dateTimeToExcel($contract->end_date) : null,
             "renewal_type" => $contract->renewal_type?->value,
             "status" => $contract->status?->value,
-            "notes" => $contract->notes,
             "provider" => $contract->provider?->name ?? null,
+            "notes" => $contract->notes,
         ];
     }
 
