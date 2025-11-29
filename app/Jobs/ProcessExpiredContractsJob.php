@@ -56,6 +56,16 @@ class ProcessExpiredContractsJob implements ShouldQueue
                     $expiredManualContract->update([
                         'status' => ContractStatusEnum::EXPIRED,
                     ]);
+
+                    if (env('APP_ENV') === 'local') {
+                        Mail::to('crolweb@gmail.com')->send(
+                            new \App\Mail\ContractExpiredMail($expiredManualContract)
+                        );
+                        Log::info("Mail sent to : crolweb@gmail.com");
+                    } else {
+                        app(ContractService::class)->sendExpiredContractMailToUsers($expiredManualContract);
+                    }
+
                     Log::info('Contract updated', [
                         'id' => $expiredManualContract->id,
                         'name' => $expiredManualContract->name,
@@ -72,6 +82,16 @@ class ProcessExpiredContractsJob implements ShouldQueue
 
                 try {
                     app(ContractService::class)->extendAutomaticContract($expiredAutomaticContract);
+
+                    if (env('APP_ENV') === 'local') {
+                        Mail::to('crolweb@gmail.com')->send(
+                            new \App\Mail\ContractExtendedMail($expiredAutomaticContract)
+                        );
+                        Log::info("Mail sent to : crolweb@gmail.com");
+                    } else {
+                        app(ContractService::class)->sendExtendedContractMailToUsers($expiredAutomaticContract);
+                    }
+
                     Log::info('Contract extended', [
                         'id' => $expiredAutomaticContract->id,
                         'name' => $expiredAutomaticContract->name,

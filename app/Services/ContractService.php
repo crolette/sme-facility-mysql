@@ -4,12 +4,14 @@ namespace App\Services;
 
 use Exception;
 use Carbon\Carbon;
+use App\Models\Tenants\User;
 use App\Enums\NoticePeriodEnum;
 use App\Models\Tenants\Contract;
 use App\Models\Tenants\Provider;
 use Illuminate\Support\Facades\DB;
 use App\Enums\ContractDurationEnum;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
@@ -33,6 +35,58 @@ class ContractService
             $model->contracts()->attach($contract);
             $model->save();
         }
+    }
+
+    public function sendExpiredContractMailToUsers(Contract $contract)
+    {
+        $users = User::role('Admin')->get();
+
+        foreach ($users as $user) {
+            Mail::to($user->email)->send(
+                new \App\Mail\ContractExpiredMail($contract)
+            );
+            Log::info("Mail sent to : {$user->email}");
+        }
+
+        // Create notifications for related assets/locations with manager
+        $contract = Contract::with(['assets', 'sites', 'rooms', 'floors', 'buildings'])->find($contract->id);
+        $contractables = $contract->contractables();
+        // dump(count($contractables));
+        $contractables->each(function ($contractable) use ($contract) {
+            // dump('contractables');
+            if ($contractable->manager) {
+                Mail::to($contractable->manager->email)->send(
+                    new \App\Mail\ContractExpiredMail($contract)
+                );
+                Log::info("Mail sent to : {$contractable->manager->email}");
+            }
+        });
+    }
+
+    public function sendExtendedContractMailToUsers(Contract $contract)
+    {
+        $users = User::role('Admin')->get();
+
+        foreach ($users as $user) {
+            Mail::to($user->email)->send(
+                new \App\Mail\ContractExpiredMail($contract)
+            );
+            Log::info("Mail sent to : {$user->email}");
+        }
+
+        // Create notifications for related assets/locations with manager
+        $contract = Contract::with(['assets', 'sites', 'rooms', 'floors', 'buildings'])->find($contract->id);
+        $contractables = $contract->contractables();
+        // dump(count($contractables));
+        $contractables->each(function ($contractable) use ($contract) {
+            // dump('contractables');
+            if ($contractable->manager) {
+                Mail::to($contractable->manager->email)->send(
+                    new \App\Mail\ContractExpiredMail($contract)
+                );
+                Log::info("Mail sent to : {$contractable->manager->email}");
+            }
+        });
     }
 
     public function associateProviderToContractWhenImport(Contract $contract, $data): Contract

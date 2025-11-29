@@ -136,5 +136,5 @@
 @endsection
 
 @section('footer')
-    <p>Cette notification a été générée automatiquement par votre système de facility management. Si vous avez des questions, contactez votre administrateur.</p>
+<p>{{__('notifications.disclaimer')}}</p>
 @endsection

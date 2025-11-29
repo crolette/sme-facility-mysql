@@ -2,7 +2,7 @@
 
 namespace App\Mail;
 
-use App\Models\Tenants\User;
+use App\Models\Tenants\Contract;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\App;
@@ -10,17 +10,18 @@ use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
-class ImportSuccessMail extends Mailable
+class ContractExpiredMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     /**
      * Create a new message instance.
      */
-    public function __construct(public User $user, public string $dataType)
-    {
+    public function __construct(
+        public Contract $contract,
+    ) {
+
         $locale = App::getLocale();
         App::setLocale($locale);
     }
@@ -32,7 +33,8 @@ class ImportSuccessMail extends Mailable
     {
         return new Envelope(
             from: new Address('notifications@sme-facility.com', 'SME-Facility - Notification'),
-            subject: __('export.type-imported', ['type' =>  $this->dataType]),
+            subject: 'Contract expired : ' . $this->contract->name . '(' . $this->contract->type->value . ') - ' . $this->contract->provider->name,
+
         );
     }
 
@@ -42,7 +44,7 @@ class ImportSuccessMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.import-success',
+            view: 'emails.contract-expired',
         );
     }
 

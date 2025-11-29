@@ -8,6 +8,6 @@ return [
     'planned_at' => 'Intervention planned at',
     'next_maintenance_date' => 'Next maintenance date',
     'end_warranty_date' => 'End warranty date',
-
+    'disclaimer' => 'Cette notification a été générée automatiquement par votre système de facility management. Si vous avez des questions, contactez votre administrateur.'
 
 ];

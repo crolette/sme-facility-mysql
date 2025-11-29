@@ -47,4 +47,7 @@ return [
     'add_existing_contract' => 'Add existing contract',
     'add_new_contract' => 'Add new contract',
 
+    'contract_expired' => 'Contract expired',
+    'contract_extended' => 'Contract extended',
+
 ];

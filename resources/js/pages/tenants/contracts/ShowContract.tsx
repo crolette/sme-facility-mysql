@@ -78,7 +78,7 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                                             <Field label={t('contracts.provider_ref')} text={contract.provider_reference} />
                                         )}
                                     </div>
-                                    <Field label={t('contracts.renewal_type')} text={contract.renewal_type} />
+                                    <Field label={t('contracts.renewal_type')} text={t(`contracts.renewal_type.${contract.renewal_type}`)} />
                                     <div className="flex gap-4">
                                         <Field label={t('contracts.start_date')} date text={contract.start_date} />
                                         <Field

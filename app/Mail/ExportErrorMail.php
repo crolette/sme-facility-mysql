@@ -34,7 +34,7 @@ class ExportErrorMail extends Mailable
     {
         return new Envelope(
             from: new Address('notifications@sme-facility.com', 'SME-Facility - Notification'),
-            subject: 'Export Error Mail',
+            subject: __('export.export-error', ['type' => $this->dataType]),
         );
     }
 

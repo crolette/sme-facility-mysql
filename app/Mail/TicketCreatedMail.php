@@ -38,8 +38,8 @@ class TicketCreatedMail extends Mailable
     {
         return new Envelope(
             from: new Address('notifications@sme-facility.com', 'SME-Facility - Notification'),
-            subject: 'New ticket : ' . $this->ticket->code . ' - ' . $this->model->name,
-            
+            subject: __('actions.new-type', ['type' => trans_choice('tickets.title', 1)]) . ' : ' . $this->ticket->code . ' - ' . $this->model->name,
+
         );
     }
 
@@ -60,7 +60,7 @@ class TicketCreatedMail extends Mailable
      */
     public function attachments(): array
     {
-    //    dump('PICTURES TICKETS', isset($this->ticket->pictures[2]) ? 'PICTURE' : 'NO PICTURE');
+        //    dump('PICTURES TICKETS', isset($this->ticket->pictures[2]) ? 'PICTURE' : 'NO PICTURE');
 
         return array_filter([
             isset($this->ticket->pictures[0])
@@ -73,6 +73,5 @@ class TicketCreatedMail extends Mailable
                 ? Attachment::fromStorageDisk('tenants',  $this->ticket->pictures[2]->path)
                 : null,
         ]);
-
     }
 }

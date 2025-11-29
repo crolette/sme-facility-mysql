@@ -47,4 +47,7 @@ return [
     'add_existing_contract' => 'Ajouter un contrat existant',
     'add_new_contract' => 'Ajouter un nouveau contrat',
 
+    'contract_expired' => 'Contrat expiré',
+    'contract_extended' => 'Contrat prolongé'
+
 ];

@@ -12,6 +12,8 @@ return [
     'rooms.relocate' => 'Reassign room',
     'level' => 'Level',
     'redefine_room' => 'Redefine room',
+    'surface_type_floor' => 'Floor surface & type',
+    'surface_type_wall' => 'Wall surface & type',
     'surface_floor' => 'Floor surface',
     'surface_wall' => 'Wall surface',
     'material_floor' => 'Floor material',

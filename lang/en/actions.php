@@ -15,11 +15,14 @@ return [
     // View actions
     'see-details' => 'See details',
     'see-all' => 'See all',
+    'see-type' => 'See :type',
     'select-type' => 'Select :type',
 
     // Search
     'search-type' => 'Search :type',
     'search-clear' => 'Clear search',
+
+    'new-type' => 'New :type',
 
     // Form actions
     'add' => 'Add',
@@ -53,6 +56,9 @@ return [
     'submitted' => 'Submitted',
     'confirmed' => 'Confirmed',
     'sent' => 'Sent',
+    'closed' => 'Closed',
+    'added-type' => ':type added',
+    'closed-type' => ':type closed',
 
     'search-type' => 'Search :type...',
 

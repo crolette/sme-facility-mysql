@@ -21,6 +21,9 @@ use App\Models\Central\CategoryType;
 use App\Enums\ContractRenewalTypesEnum;
 
 use App\Jobs\ProcessExpiredContractsJob;
+use App\Mail\ContractExpiredMail;
+use App\Mail\ContractExtendedMail;
+
 use function PHPUnit\Framework\assertCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;

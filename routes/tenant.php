@@ -11,9 +11,13 @@ use Illuminate\Http\Request;
 use App\Exports\AssetsExport;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Company;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Tenants\Building;
+use App\Models\Tenants\Contract;
+use App\Mail\ContractExpiredMail;
+use App\Mail\ContractExtendedMail;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
@@ -46,6 +50,8 @@ use App\Http\Controllers\Tenants\InterventionActionController;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Tenants\InterventionProviderController;
 use App\Http\Controllers\Tenants\CreateTicketFromQRCodeController;
+use App\Mail\TicketClosedMail;
+use App\Mail\TicketCreatedMail;
 
 /*
 |--------------------------------------------------------------------------
@@ -84,6 +90,13 @@ Route::middleware([
         }
 
         return response($content)->header('Content-Type', 'text/plain');
+    });
+
+    Route::get('mail', function () {
+        $data = Ticket::first();
+        $model = $data->ticketable;
+
+        return (new TicketClosedMail($data))->render();
     });
 
     Route::get('locale/{locale}', function (Request $request, $locale) {

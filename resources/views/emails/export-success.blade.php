@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>{{ $dataType }} exported</title>
+    <title>{{ __('export.type-exported', ['type' =>  $dataType])}}</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
         .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px; }
@@ -18,21 +18,20 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="title">{{ $dataType }} exported successfully</h1>
+            <h1 class="title">{{ __('export.type-exported', ['type' =>  $dataType])}}</h1>
         </div>
 
         <div class="content">
             <div class="alert">
-                        <strong>{{ $dataType }} exported</strong>
+                        <strong>{{ __('export.type-exported', ['type' =>  $dataType])}}</strong>
                     </div>
                     <div class="details">
-                        <p>All {{ $dataType }} have been exported - You can find the file enclosed.</p>
+                        <p>{{ __('export.export-file-enclosed', ['type' =>  $dataType])}}</p>
                     </div>
         </div>
 
         <div class="footer">
-            <p>Cette notification a été générée automatiquement par votre système de facility management.</p>
-            <p>Si vous avez des questions, contactez votre administrateur.</p>
+         <p>{{__('notifications.disclaimer')}}</p>
         </div>
     </div>
 </body>
