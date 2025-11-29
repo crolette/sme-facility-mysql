@@ -14,7 +14,7 @@ export default function OurSolutions() {
                         <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
                             <div className="flex gap-4">
                                 <Boxes size={24} className="shrink-0" />
-                                <h6 className="font-semibold">{t('website_common.our_solutions.inventory.title')}</h6>
+                                <h4 className="font-semibold">{t('website_common.our_solutions.inventory.title')}</h4>
                             </div>
                             <p>{t('website_common.our_solutions.inventory.paragraph')}</p>
                             <a href={route('website.features.assets')} className="text-website-primary">
@@ -24,7 +24,7 @@ export default function OurSolutions() {
                         <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
                             <div className="flex gap-4">
                                 <Settings size={24} className="shrink-0" />
-                                <h6 className="font-semibold">{t('website_common.our_solutions.maintenance.title')} </h6>
+                                <h4 className="font-semibold">{t('website_common.our_solutions.maintenance.title')} </h4>
                             </div>
                             <p>{t('website_common.our_solutions.maintenance.paragraph')}</p>
                             <a href={route('website.features.maintenance')} className="text-website-primary">
@@ -34,7 +34,7 @@ export default function OurSolutions() {
                         <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
                             <div className="flex gap-4">
                                 <ReceiptText size={24} className="shrink-0" />
-                                <h6 className="font-semibold">{t('website_common.our_solutions.contracts.title')} </h6>
+                                <h4 className="font-semibold">{t('website_common.our_solutions.contracts.title')} </h4>
                             </div>
                             <p>{t('website_common.our_solutions.contracts.paragraph')}</p>
                             <a href="" className="text-website-primary">
@@ -44,7 +44,7 @@ export default function OurSolutions() {
                         <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
                             <div className="flex gap-4">
                                 <QrCode size={24} className="shrink-0" />
-                                <h6 className="font-semibold">{t('website_common.our_solutions.qrcode.title')} </h6>
+                                <h4 className="font-semibold">{t('website_common.our_solutions.qrcode.title')} </h4>
                             </div>
                             <p>{t('website_common.our_solutions.qrcode.paragraph')}</p>
                             <a href={route('website.features.qrcode')} className="text-website-primary">
@@ -54,7 +54,7 @@ export default function OurSolutions() {
                         <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
                             <div className="flex gap-4">
                                 <FileStack size={24} className="shrink-0" />
-                                <h6 className="font-semibold break-all">{t('website_common.our_solutions.documents.title')} </h6>
+                                <h4 className="font-semibold break-all">{t('website_common.our_solutions.documents.title')} </h4>
                             </div>
                             <p className="">{t('website_common.our_solutions.documents.paragraph')}</p>
                             <a href={route('website.features.documents')} className="text-website-primary">
@@ -64,7 +64,7 @@ export default function OurSolutions() {
                         <div className="bg-website-card border-website-border flex flex-col justify-between gap-4 rounded-md border p-6">
                             <div className="flex gap-4">
                                 <ChartLine size={24} className="shrink-0" />
-                                <h6 className="font-semibold">{t('website_common.our_solutions.statistics.title')} </h6>
+                                <h4 className="font-semibold">{t('website_common.our_solutions.statistics.title')} </h4>
                             </div>
                             <p>{t('website_common.our_solutions.statistics.paragraph')}</p>
                             <a href={route('website.features.statistics')} className="text-website-primary">

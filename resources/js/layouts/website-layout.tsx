@@ -21,7 +21,7 @@ interface NewsletterFormData {
 }
 
 export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
-    const { t, currentLocale } = useLaravelReactI18n();
+    const { t } = useLaravelReactI18n();
     const [showMobileMenu, setShowMobileMenu] = useState(false);
     const [showFeaturesMenu, setShowFeaturesMenu] = useState(false);
     const [showWhoMenu, setShowWhoMenu] = useState(false);
@@ -98,7 +98,12 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                 <header className="text-website-card sticky top-0 z-50 container mb-6 w-full text-sm not-has-[nav]:hidden">
                     <nav className="bg-logo mx-auto flex flex-row items-center justify-between gap-4 rounded-b-md px-5 py-6 shadow-2xl lg:px-5 lg:py-10">
                         <a href={route('website.home')}>
-                            <img src="/images/logo.png" alt="" className="w-32 lg:w-42" />
+                            <img
+                                src="/images/logo.png"
+                                alt="Logo SME-Facility"
+                                className="w-32 lg:w-42"
+                                aria-label="Go to home of SME-Facility website"
+                            />
                         </a>
 
                         <ul className="text-md hidden gap-8 font-semibold md:flex md:shrink-0 md:items-center lg:gap-12" ref={featuresMenuRef}>

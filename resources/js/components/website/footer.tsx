@@ -27,7 +27,7 @@ export default function Footer() {
                     </div>
                     <div className="flex flex-col gap-6">
                         <h6 className="">{t('website_common.footer.column_one')}</h6>
-                        <ul className="text-website-border text-md flex flex-col gap-4">
+                        <ul className="text-website text-md flex flex-col gap-4">
                             <li>
                                 <a href={route('website.features.qrcode')} className="!no-underline">
                                     {t('website_common.qrcode')}
@@ -61,8 +61,8 @@ export default function Footer() {
                         </ul>
                     </div>
                     <div className="flex flex-col gap-6">
-                        <h6>{t('website_common.footer.column_two')}</h6>
-                        <ul className="text-website-border text-md flex flex-col gap-4">
+                        <h4>{t('website_common.footer.column_two')}</h4>
+                        <ul className="text-website text-md flex flex-col gap-4">
                             <li>
                                 <a href={route('website.who.facility-manager')} className="!no-underline">
                                     {t('website_common.facility_manager')}
@@ -81,8 +81,8 @@ export default function Footer() {
                         </ul>
                     </div>
                     <div className="flex flex-col gap-6">
-                        <h6>{t('website_common.footer.column_three')}</h6>
-                        <ul className="text-website-border text-md flex flex-col gap-4">
+                        <h4>{t('website_common.footer.column_three')}</h4>
+                        <ul className="text-website text-md flex flex-col gap-4">
                             <li>
                                 <a href={route('website.why')} className="!no-underline">
                                     {t('website_common.why_sme')}
@@ -112,7 +112,7 @@ export default function Footer() {
                         </ul>
                     </div>
                 </div>
-                <div className="text-website-border container mx-auto flex w-full flex-col justify-between gap-10 pb-5 text-sm md:flex-row">
+                <div className="text-website container mx-auto flex w-full flex-col justify-between gap-10 pb-5 text-sm md:flex-row">
                     <p>
                         © SME-Facility 2025. {t('website_common.footer.sme_service')}{' '}
                         <a href="https://www.facilitywebxp.be" target="_blank" className="block">
@@ -140,9 +140,12 @@ export default function Footer() {
                             </a>
                         </li>
                         <span className="mx-2 hidden md:inline-block">|</span> */}
-                        <a href={route('website.legal')} className="!no-underline">
-                            <li> {t('website_common.footer.legal')}</li>
-                        </a>
+
+                        <li>
+                            <a href={route('website.legal')} className="!no-underline">
+                                {t('website_common.footer.legal')}
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </footer>

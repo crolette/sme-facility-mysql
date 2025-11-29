@@ -14,7 +14,7 @@ export default function LocaleChange({ url = 'tenant.locale' }) {
                 {t('common.language')}
             </label>
 
-            <select value={currentLocale()} onChange={(e) => handleLocaleChange(e.target.value)}>
+            <select id="language" value={currentLocale()} aria-label="Language change" onChange={(e) => handleLocaleChange(e.target.value)}>
                 {getLocales().map((locale) => (
                     <option key={locale} value={locale} className="hover:bg-primary-50 block px-4 py-2">
                         {locale.toUpperCase()}
