@@ -20,10 +20,6 @@ use function Pest\Laravel\assertDatabaseMissing;
 
 beforeEach(function () {
     User::factory()->create();
-    LocationType::factory()->create(['level' => 'site']);
-    LocationType::factory()->create(['level' => 'building']);
-    LocationType::factory()->create(['level' => 'floor']);
-    LocationType::factory()->create(['level' => 'room']);
     CategoryType::factory()->count(2)->create(['category' => 'document']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
     CategoryType::factory()->count(2)->create(['category' => 'asset']);
@@ -31,10 +27,7 @@ beforeEach(function () {
     $this->building = Building::factory()->create();
     $this->floor = Floor::factory()->create();
 
-    $this->room = Room::factory()
-        ->for(LocationType::where('level', 'room')->first())
-        ->for(Floor::first())
-        ->create();
+    $this->room = Room::factory()->create();
 
     $this->asset =  Asset::factory()->forLocation($this->room)->create();
 });
@@ -126,7 +119,8 @@ it('can create a new ticket with pictures has "anonymous" user', function (strin
     ['room', 'rooms'],
 ]);
 
-it('displays the existing tickets for an asset / location', function ($modelType, $routeName) {
+it('displays existing open tickets for an asset / location', function ($modelType, $routeName) {
+
     $model = match ($modelType) {
         'asset' => $this->asset,
         'site' => $this->site,
@@ -135,6 +129,8 @@ it('displays the existing tickets for an asset / location', function ($modelType
         'room' => $this->room,
         default => throw new Exception('Unknown model type')
     };
+    Ticket::factory()->forLocation($model)->count(3)->create();
+    Ticket::factory()->forLocation($model)->count(2)->create(['closed_at' => now()]);
 
     $model->update([
         'qr_hash' => generateQRCodeHash($model)
@@ -148,7 +144,7 @@ it('displays the existing tickets for an asset / location', function ($modelType
 
     $response->assertInertia(
         fn($page) =>
-        $page->component('tenants/tickets/CreateTicketFromQRCode')->has('item')->where('item.name', $model->name)->where('item.reference_code', $model->reference_code)
+        $page->component('tenants/tickets/CreateTicketFromQRCode')->has('item')->where('item.name', $model->name)->where('item.reference_code', $model->reference_code)->has('existingTickets', 3)
     );
 })->with([
     ['asset', 'assets'],

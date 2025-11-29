@@ -17,6 +17,8 @@ return [
     'take_picture_camera' => 'Foto mit meiner Kamera aufnehmen',
     'pictures_max' => 'Maximum :number Fotos',
     'be_notified' => 'Möchten Sie benachrichtigt werden, wenn das Ticket geschlossen wird?',
-    'closed_at' => 'Geschlossen am'
+    'closed_at' => 'Geschlossen am',
+    'existing_tickets' => 'Bestehendes Ticket|Bestehende Tickets',
+    'encode_ticket' => 'Welches Problem ist aufgetreten?',
 
 ];

@@ -217,6 +217,13 @@ Route::middleware(array_merge([
     PreventAccessFromCentralDomains::class,
 ], app()->environment('local') ? [] : ['throttle:6,60']))->group(function () {
 
+    Route::get('/robots.txt', function () {
+        $content = "User-agent: *\nDisallow: /";
+
+
+        return response($content)->header('Content-Type', 'text/plain');
+    });
+
     Route::get('/assets/{qr_hash}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromAsset'])->name('tenant.assets.tickets.create');
 
     Route::get('/sites/{qr_hash}/tickets/create', [CreateTicketFromQRCodeController::class, 'createFromSite'])->name('tenant.sites.tickets.create');

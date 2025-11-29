@@ -47,6 +47,8 @@ class CreateTicketFromQRCodeController extends Controller
 
     public function create(Model $model, string $locationType)
     {
-        return Inertia::render('tenants/tickets/CreateTicketFromQRCode', ['item' => $model, 'location_type' => $locationType]);
+        $existingTickets = $model->tickets()->whereNull('closed_at')->select('description')->get();
+
+        return Inertia::render('tenants/tickets/CreateTicketFromQRCode', ['item' => $model, 'location_type' => $locationType, 'existingTickets' => $existingTickets]);
     }
 }
