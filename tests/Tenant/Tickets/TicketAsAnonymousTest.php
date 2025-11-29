@@ -37,7 +37,6 @@ beforeEach(function () {
         ->create();
 
     $this->asset =  Asset::factory()->forLocation($this->room)->create();
-    
 });
 
 it('can render a new ticket page for a guest', function (string $modelType, string $routeName) {
@@ -57,7 +56,7 @@ it('can render a new ticket page for a guest', function (string $modelType, stri
     $model->refresh();
 
 
-    $response = $this->getFromTenant('tenant.'.$routeName. '.tickets.create', $model->qr_hash);
+    $response = $this->getFromTenant('tenant.' . $routeName . '.tickets.create', $model->qr_hash);
     $response->assertOk();
 
     $response->assertInertia(
@@ -119,7 +118,38 @@ it('can create a new ticket with pictures has "anonymous" user', function (strin
         'imageable_type' => 'App\Models\Tenants\Ticket',
         'imageable_id' => 1
     ]);
+})->with([
+    ['asset', 'assets'],
+    ['site', 'sites'],
+    ['building', 'buildings'],
+    ['floor', 'floors'],
+    ['room', 'rooms'],
+]);
 
+it('displays the existing tickets for an asset / location', function ($modelType, $routeName) {
+    $model = match ($modelType) {
+        'asset' => $this->asset,
+        'site' => $this->site,
+        'building' => $this->building,
+        'floor' => $this->floor,
+        'room' => $this->room,
+        default => throw new Exception('Unknown model type')
+    };
+
+    $model->update([
+        'qr_hash' => generateQRCodeHash($model)
+    ]);
+
+    $model->refresh();
+
+
+    $response = $this->getFromTenant('tenant.' . $routeName . '.tickets.create', $model->qr_hash);
+    $response->assertOk();
+
+    $response->assertInertia(
+        fn($page) =>
+        $page->component('tenants/tickets/CreateTicketFromQRCode')->has('item')->where('item.name', $model->name)->where('item.reference_code', $model->reference_code)
+    );
 })->with([
     ['asset', 'assets'],
     ['site', 'sites'],
