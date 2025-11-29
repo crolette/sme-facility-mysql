@@ -380,7 +380,7 @@ export default function CreateUpdateContract({
                                     <InputError className="mt-2" message={errors?.contract_duration ?? ''} />
                                 </div>
                                 <div>
-                                    <Label htmlFor="notice_period">{t('contract.notice_period')}</Label>
+                                    <Label htmlFor="notice_period">{t('contracts.notice_period')}</Label>
                                     <select
                                         name="notice_period"
                                         onChange={(e) => setData('notice_period', e.target.value)}

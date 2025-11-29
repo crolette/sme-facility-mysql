@@ -131,6 +131,19 @@ class ContractService
         return $contract;
     }
 
+    public function extendAutomaticContract(Contract $contract): Contract
+    {
+        $contract->start_date = Carbon::now();
+        $contract->end_date = $contract->contract_duration->addTo(Carbon::now());
+
+        if ($contract->notice_period)
+            $contract->notice_date = $contract->notice_period->subFrom(Carbon::parse($contract->end_date));
+
+        $contract->save();
+
+        return $contract;
+    }
+
     public function updateNoticeDate(Contract $contract, NoticePeriodEnum $notice_period): Contract
     {
         // TODO check if the notice date is > then start_date

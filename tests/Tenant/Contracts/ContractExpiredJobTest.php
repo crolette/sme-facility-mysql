@@ -39,7 +39,7 @@ beforeEach(function () {
     $this->room = Room::factory()->create();
     $this->asset = Asset::factory()->forLocation(Room::first())->create();
 
-    $this->contractOneData = [
+    $this->manualContract = [
         'provider_id' => $this->provider->id,
         'name' => 'Contrat de bail',
         'type' => ContractTypesEnum::ALLIN->value,
@@ -49,11 +49,13 @@ beforeEach(function () {
         'start_date' => Carbon::now()->toDateString(),
         'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
         'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
-        'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
+        'renewal_type' => ContractRenewalTypesEnum::MANUAL->value,
         'status' => ContractStatusEnum::ACTIVE->value
     ];
 
-    $this->contractTwoData = [
+
+
+    $this->automaticContract = [
         'provider_id' => $this->provider->id,
         'name' => 'Contrat de sécurité',
         'type' => ContractTypesEnum::ALLIN->value,
@@ -61,18 +63,18 @@ beforeEach(function () {
         'internal_reference' => 'Sécurité Site 2025',
         'provider_reference' => 'Provider reference 2025',
         'start_date' => Carbon::now()->toDateString(),
-        'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
+        'contract_duration' => ContractDurationEnum::ONE_YEAR->value,
         'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
         'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
         'status' => ContractStatusEnum::ACTIVE->value
     ];
 });
 
-it('change contract status if end_date < now & status = active', function () {
+it('change contract status to expired for a manual contract if end_date < now & status = active', function () {
 
-    $expiredContract = Contract::factory()->create([...$this->contractOneData, 'start_date' => Carbon::now()->subYear(), 'end_date' => Carbon::yesterday()]);
+    $expiredContract = Contract::factory()->create([...$this->manualContract, 'start_date' => Carbon::now()->subYear(), 'end_date' => Carbon::yesterday()]);
 
-    $activeContract = Contract::factory()->create([...$this->contractTwoData]);
+    $activeContract = Contract::factory()->create([...$this->automaticContract]);
 
     $tenant = tenancy()->tenant;
 
@@ -95,16 +97,16 @@ it('change contract status if end_date < now & status = active', function () {
     ]);
 });
 
-it('does not change contract status if end_date >= now', function () {
+it('does not change manual contract status if end_date >= now', function () {
 
-    $contractNow = Contract::factory()->create([...$this->contractOneData, 'start_date' => Carbon::now()->subYear(), 'end_date' => Carbon::now()->toDateString()]);
+    $contractNow = Contract::factory()->create([...$this->manualContract, 'start_date' => Carbon::now()->subYear(), 'end_date' => Carbon::now()->toDateString()]);
 
     assertDatabaseHas('contracts', [
         'id' => $contractNow->id,
         'status' => ContractStatusEnum::ACTIVE
     ]);
 
-    $activeContract = Contract::factory()->create([...$this->contractTwoData]);
+    $activeContract = Contract::factory()->create([...$this->automaticContract]);
 
     $tenant = tenancy()->tenant;
 
@@ -127,11 +129,11 @@ it('does not change contract status if end_date >= now', function () {
     ]);
 });
 
-it('does not change contract status if end_date < now & status != active', function () {
+it('does not change manual contract status if end_date < now & status != active', function () {
 
-    $expiredContract = Contract::factory()->create([...$this->contractOneData, 'start_date' => Carbon::now()->subYear(), 'end_date' => Carbon::yesterday(),]);
-    $cancelledContract = Contract::factory()->create([...$this->contractOneData, 'start_date' => Carbon::now()->subYear(), 'end_date' => Carbon::yesterday(), 'status' => ContractStatusEnum::CANCELLED]);
-    $activeContract = Contract::factory()->create([...$this->contractTwoData]);
+    $expiredContract = Contract::factory()->create([...$this->manualContract, 'start_date' => Carbon::now()->subYear(), 'end_date' => Carbon::yesterday(),]);
+    $cancelledContract = Contract::factory()->create([...$this->manualContract, 'start_date' => Carbon::now()->subYear(), 'end_date' => Carbon::yesterday(), 'status' => ContractStatusEnum::CANCELLED]);
+    $activeContract = Contract::factory()->create([...$this->automaticContract]);
 
     $tenant = tenancy()->tenant;
 
@@ -158,3 +160,35 @@ it('does not change contract status if end_date < now & status != active', funct
         'status' => ContractStatusEnum::ACTIVE
     ]);
 });
+
+it('extends an automatic contract if end_date < now & status is active', function ($duration) {
+
+    $expiredContract = Contract::factory()->create([...$this->automaticContract, 'contract_duration' => $duration, 'start_date' => Carbon::now()->subYear(), 'end_date' => Carbon::yesterday(),]);
+    $cancelledContract = Contract::factory()->create([...$this->automaticContract, 'start_date' => Carbon::now()->subYear(), 'end_date' => Carbon::yesterday(), 'status' => ContractStatusEnum::CANCELLED]);
+    $activeContract = Contract::factory()->create([...$this->automaticContract]);
+
+    $tenant = tenancy()->tenant;
+
+    Queue::fake();
+    $job = new ProcessExpiredContractsJob($tenant);
+    dispatch($job);
+    $job->handle();
+
+    assertDatabaseHas('contracts', [
+        'id' => $expiredContract->id,
+        'start_date' => Carbon::now()->toDateString(),
+        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())->toDateString(),
+        'notice_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())->subDays(14)->toDateString(),
+        'status' => ContractStatusEnum::ACTIVE
+    ]);
+
+    assertDatabaseHas('contracts', [
+        'id' => $cancelledContract->id,
+        'status' => ContractStatusEnum::CANCELLED
+    ]);
+
+    assertDatabaseHas('contracts', [
+        'id' => $activeContract->id,
+        'status' => ContractStatusEnum::ACTIVE
+    ]);
+})->with(array_column(ContractDurationEnum::cases(), 'value'));
