@@ -368,6 +368,7 @@ export default function WebsiteLayout({ children, ...props }: AppLayoutProps) {
                                         <div className="text-logo flex items-center gap-2 text-xs">
                                             <Checkbox
                                                 id="consent"
+                                                required
                                                 checked={data.consent}
                                                 onClick={() => {
                                                     setData('consent', !data.consent);

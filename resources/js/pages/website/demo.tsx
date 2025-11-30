@@ -1,5 +1,6 @@
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -20,6 +21,7 @@ export default function Demo() {
         phone_number: '',
         subject: 'appointment',
         message: '',
+        consent: false,
         // 'g-recaptcha-response': '',
     });
 
@@ -119,11 +121,25 @@ export default function Demo() {
                                                 minLength={50}
                                                 maxLength={500}
                                                 className="text-logo"
-                                                // required
+                                                required
                                                 placeholder={t('website_demo.message_placeholder')}
                                                 onChange={(e) => setData('message', e.target.value)}
                                             />
                                             <InputError message={errors?.message} />
+                                        </div>
+                                        <div className="flex items-center gap-2 text-xs">
+                                            <Checkbox
+                                                id="consent"
+                                                required
+                                                checked={data.consent}
+                                                onClick={() => {
+                                                    setData('consent', !data.consent);
+                                                }}
+                                            />
+                                            <label htmlFor="consent">
+                                                {t('website_contact.newsletter.consent_description')}
+                                                <a href={route('website.confidentiality')}>{t('website_common.footer.confidentiality')}.</a>
+                                            </label>
                                         </div>
 
                                         <Button disabled={isProcessing} className="bg-cta mt-2">

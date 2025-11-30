@@ -49,6 +49,7 @@ class ContactRequest extends FormRequest
             'phone_number' => 'required|string|regex:/^\+\d{8,15}$/|max:16',
             'website' => 'nullable|url:http,https',
             'message' => 'required|string|min:50|max:500',
+            'consent' => 'required|accepted',
             'subject' => ['required', Rule::in(array_column(ContactReasons::cases(), 'value'))],
             // 'g-recaptcha-response' => 'required|captcha'
         ];

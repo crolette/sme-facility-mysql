@@ -41,6 +41,7 @@ class DemoRequest extends FormRequest
             'company' => 'required|string|max:100',
             'phone_number' => 'nullable|string|regex:/^\+\d{8,15}$/|max:16',
             'message' => 'required|string|min:50|max:500',
+            'consent' => 'required|accepted',
             'subject' => ['required', 'in:appointment'],
             // 'g-recaptcha-response' => 'required|captcha'
         ];

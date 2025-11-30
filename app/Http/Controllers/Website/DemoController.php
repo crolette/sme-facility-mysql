@@ -9,7 +9,9 @@ use Illuminate\Http\Request;
 use App\Enums\ContactReasons;
 use App\Mail\ContactCopyMail;
 use App\Mail\ContactDemoMail;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\Central\DemoRequest;
@@ -33,6 +35,18 @@ class DemoController extends Controller
     {
         // dd($request->user()->preferred_locale);
         try {
+            DB::beginTransaction();
+            DB::table('newsletter')->updateOrInsert(
+                ['email' => $request->validated('email')],
+                [
+                    'email' => $request->validated('email'),
+                    'consent' => $request->validated('consent'),
+                    'updated_at' => now()
+                ]
+            );
+
+            DB::commit();
+
 
             if (env('APP_ENV') === "local" || env('APP_ENV') === "testing") {
                 Mail::to('crolweb@gmail.com')
@@ -46,6 +60,8 @@ class DemoController extends Controller
 
             return ApiResponse::success([], 'E-mail sent');
         } catch (Exception $e) {
+            Log::info('Error during insert email to newsletters', [$e->getMessage()]);
+            DB::rollback();
             return ApiResponse::error('Error E-mail sent');
         }
 
