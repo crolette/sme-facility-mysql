@@ -1,21 +1,24 @@
 import Modale from '@/components/Modale';
 import { Pagination } from '@/components/pagination';
 import { useGridTableLayoutContext } from '@/components/tenant/gridTableLayoutContext';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import DisplayGridTableIndex from '@/components/ui/displayGridTableIndex';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Pill } from '@/components/ui/pill';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import { usePermissions } from '@/hooks/usePermissions';
+import { useSelectIds } from '@/hooks/useSelectIds';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { BreadcrumbItem, CentralType, Contract, ContractsPaginated } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { ArrowDownNarrowWide, ArrowDownWideNarrow, Loader, Pencil, PlusCircle, Trash2, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { ArrowDownNarrowWide, ArrowDownWideNarrow, FileDownIcon, Loader, Pencil, PlusCircle, SquareX, Trash2, X } from 'lucide-react';
+import { FormEventHandler, useEffect, useState } from 'react';
 
 export interface SearchParams {
     q: string | null;
@@ -51,6 +54,7 @@ export default function IndexContracts({
         },
     ];
 
+    const { showToast } = useToast();
     const [showDeleteModale, setShowDeleteModale] = useState<boolean>(false);
     const [contractToDelete, setContractToDelete] = useState<Contract | null>(null);
 
@@ -64,7 +68,7 @@ export default function IndexContracts({
                 setShowDeleteModale(false);
             }
         } catch (error) {
-            console.log(error);
+            showToast(error.response.data.message);
         }
     };
 
@@ -177,6 +181,20 @@ export default function IndexContracts({
 
     const { layout } = useGridTableLayoutContext();
 
+    const { selectedIds, handleSelectIds, handleSelectAllIds, clearSelection } = useSelectIds({ storageKey: 'selectedContracts' });
+
+    const submitSelectedIds: FormEventHandler = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post(route('tenant.contracts.export'), { ids: selectedIds });
+            showToast(response.data.message);
+        } catch (error) {
+            showToast(error.response.data.message);
+        } finally {
+            clearSelection();
+        }
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={tChoice('contracts.title', 2)} />
@@ -278,32 +296,99 @@ export default function IndexContracts({
                     )}
                 </div>
 
-                <div className="flex w-full flex-col sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <h1>{tChoice(`contracts.title`, 2)}</h1>
                     <DisplayGridTableIndex />
                 </div>
 
                 {layout === 'grid' ? (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
-                        {items.data.map((contract, index) => (
-                            <div key={index} className="border-accent bg-sidebar flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4">
-                                <a href={route(`tenant.contracts.show`, contract.id)}> {contract.name} </a>
-                                <p className="text-xs">{contract.type}</p>
-                                <p className="text-xs">{contract.provider?.category}</p>
-                                {contract.provider && <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>}
-                                <Pill variant={contract.status}>{t(`contracts.status.${contract.status}`)}</Pill>
-                                <p>{contract.internal_reference}</p>
-                                <p className="text-xs">
-                                    {t('contracts.end_date')} : {contract.end_date}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
+                    <>
+                        <div className="flex h-8 items-center gap-2">
+                            <p>{t('actions.select-all')}</p>
+                            {hasPermission('create contracts') && (
+                                <Checkbox
+                                    name=""
+                                    id=""
+                                    value={''}
+                                    checked={items.data.every((contract: Contract) => selectedIds.includes(contract.id))}
+                                    onClick={() => handleSelectAllIds(items.data)}
+                                    className="cursor-pointer"
+                                />
+                            )}
+                            {hasPermission('create contracts') && selectedIds.length !== 0 && (
+                                <div className="ml-4 space-x-2">
+                                    <Button type={'submit'} variant={'secondary'} size={'icon'}>
+                                        <FileDownIcon />
+                                    </Button>
+
+                                    <Button onClick={clearSelection} variant={'destructive'} size={'icon'}>
+                                        <SquareX />
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
+                            {items.data.map((contract, index) => (
+                                <div key={index} className="border-accent bg-sidebar flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4">
+                                    <div className="flex justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <a href={route(`tenant.contracts.show`, contract.id)}> {contract.name} </a>
+                                        </div>
+                                        {hasPermission('create contracts') && (
+                                            <Checkbox
+                                                name=""
+                                                id=""
+                                                className="cursor-pointer"
+                                                value={contract.id}
+                                                checked={selectedIds.includes(contract.id)}
+                                                onClick={() => handleSelectIds(contract.id)}
+                                            />
+                                        )}
+                                    </div>
+
+                                    <p className="text-xs">{contract.type}</p>
+                                    <p className="text-xs">{contract.provider?.category}</p>
+                                    {contract.provider && (
+                                        <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>
+                                    )}
+                                    <Pill variant={contract.status}>{t(`contracts.status.${contract.status}`)}</Pill>
+                                    <p>{contract.internal_reference}</p>
+                                    <p className="text-xs">
+                                        {t('contracts.end_date')} : {contract.end_date}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 ) : (
                     <Table>
                         <TableHead>
                             <TableHeadRow>
-                                <TableHeadData>{t('common.name')}</TableHeadData>
+                                <TableHeadData className="flex items-center">
+                                    {hasPermission('create contracts') && (
+                                        <Checkbox
+                                            name=""
+                                            id=""
+                                            value={''}
+                                            checked={items.data.every((contract: Contract) => selectedIds.includes(contract.id))}
+                                            onClick={() => handleSelectAllIds(items.data)}
+                                            className="mr-3 -ml-2 cursor-pointer"
+                                        />
+                                    )}
+                                    <p>{t('common.name')}</p>
+                                    {hasPermission('create contracts') && selectedIds.length !== 0 && (
+                                        <div className="ml-4 space-x-2">
+                                            <Button type={'submit'} variant={'secondary'} size={'icon'}>
+                                                <FileDownIcon />
+                                            </Button>
+
+                                            <Button onClick={clearSelection} variant={'destructive'} size={'icon'}>
+                                                <SquareX />
+                                            </Button>
+                                        </div>
+                                    )}
+                                </TableHeadData>
                                 <TableHeadData>{t('common.type')}</TableHeadData>
                                 <TableHeadData>{t('common.category')}</TableHeadData>
                                 <TableHeadData>{t('common.status')}</TableHeadData>
@@ -351,7 +436,19 @@ export default function IndexContracts({
                                     return (
                                         <TableBodyRow key={contract.id}>
                                             <TableBodyData>
-                                                <a href={route(`tenant.contracts.show`, contract.id)}> {contract.name} </a>
+                                                <div className="flex items-center gap-3">
+                                                    {hasPermission('create contracts') && (
+                                                        <Checkbox
+                                                            name=""
+                                                            id=""
+                                                            className="cursor-pointer"
+                                                            value={contract.id}
+                                                            checked={selectedIds.includes(contract.id)}
+                                                            onClick={() => handleSelectIds(contract.id)}
+                                                        />
+                                                    )}
+                                                    <a href={route(`tenant.contracts.show`, contract.id)}> {contract.name} </a>
+                                                </div>
                                             </TableBodyData>
                                             <TableBodyData>{t(`contracts.type.${contract.type}`)}</TableBodyData>
                                             <TableBodyData>{contract.provider?.category}</TableBodyData>

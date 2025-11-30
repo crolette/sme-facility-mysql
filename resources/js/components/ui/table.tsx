@@ -54,7 +54,7 @@ function TableHeadData({ className, children,  ...props }: React.ComponentProps<
       className={cn("p-4 first-letter:uppercase", className)}
       {...props}
     >
-      <p className="">{children}</p>
+      {children}
       </th>
   )
 }

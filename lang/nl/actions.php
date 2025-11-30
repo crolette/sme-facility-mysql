@@ -17,6 +17,7 @@ return [
     'see-all' => 'Alles bekijken',
     'see-type' => ':type bekijken',
     'select-type' => ':type selecteren',
+    'select-all' => 'Alles selecteren',
 
     // Search
     'search-type' => ':type zoeken',

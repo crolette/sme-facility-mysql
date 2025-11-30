@@ -26,6 +26,7 @@ class ProvidersExportController extends Controller
 
         $request = Validator::make($request->all(), [
             'ids' => 'nullable|array',
+            'ids.*' => 'exists:providers,id',
             'template' => 'nullable|boolean'
         ]);
 
