@@ -2,12 +2,26 @@
 
 
 return [
-    'depreciation_end_date' => 'Depreciation end date',
-    'notice_date' => 'Contract notice date',
-    'end_date' => 'Contract end date',
-    'planned_at' => 'Intervention planned at',
-    'next_maintenance_date' => 'Next maintenance date',
-    'end_warranty_date' => 'End warranty date',
-    'disclaimer' => 'Cette notification a été générée automatiquement par votre système de facility management. Si vous avez des questions, contactez votre administrateur.'
+    'title' => 'Notification|Notifications',
+    'depreciation_end_date' => 'Date de fin d’amortissement',
+    'depreciation_end_date_subtitle' => 'L’amortissement d’un asset arrive à expiration :',
+    'depreciation_end_date_description' => 'Après cette date, l’asset sera totalement amorti.',
+    'notice_date' => 'Date de préavis du contrat',
+    'notice_date_subtitle' => 'Un contrat arrive prochainement à expiration :',
+    'notice_date_description' => 'Nous vous recommandons de prendre les dispositions nécessaires pour le renouvellement ou la résiliation de ce contrat.',
+    'end_date' => 'Date de fin du contrat',
+    'end_date_subtitle' => 'Un contrat arrive prochainement à expiration :',
+    'end_date_description' => 'Nous vous recommandons de prendre les dispositions nécessaires pour le renouvellement ou la résiliation de ce contrat.',
+    'planned_at' => 'Intervention planifiée le',
+    'planned_at_subtitle' => 'Une intervention est à prévoir prochainement :',
+    'planned_at_description' => 'Nous vous recommandons de prendre les dispositions nécessaires pour l’intervention.',
+    'next_maintenance_date' => 'Prochaine date de maintenance',
+    'next_maintenance_date_subtitle' => 'Une maintenance est programmée prochainement :',
+    'next_maintenance_date_description' => 'Veillez à organiser cette maintenance dans les délais prévus.',
+    'end_warranty_date' => 'Date de fin de garantie',
+    'end_warranty_date_subtitle' => 'Une garantie arrive bientôt à expiration :',
+    'end_warranty_date_description' => 'Après cette date, vous ne serez plus couvert par la garantie.',
+    'disclaimer' => 'Cette notification a été générée automatiquement par votre système de facility management. Pour toute question, contactez votre administrateur.',
+
 
 ];

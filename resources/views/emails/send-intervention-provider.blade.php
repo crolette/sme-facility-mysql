@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Intervention</title>
+    <title>{{ __('interventions.assigned') . ' ' . $intervention->interventionable->name . ' ' . $tenant }}</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
         .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px; }
@@ -18,28 +18,29 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="title">{{  'Bonjour' }}</h1>
-            {{-- <h1 class="title">{{ $recipientName ? 'Bonjour ' . $recipientName : 'Bonjour' }}</h1> --}}
+            <h1 class="title">{{ __('interventions.assigned_email_title', ['tenant' => $tenant, 'item' => $intervention->interventionable->name]) }}</h1>
         </div>
 
         <div class="content">
                 <div class="alert">
-                        <strong>⚠️ Intervention</strong>
+                        <strong>🔧 {{ trans_choice('interventions.title', 1) }}</strong>
                     </div>
                     <div class="details">
-                        <strong>Intervention :</strong> {{ $intervention->priority }}  {{ $intervention->status }}<br>
-                        <strong>description :</strong> {{ $intervention->description }}<br>
-                        <strong>Name :</strong> {{ $intervention->interventionable->name }}<br>
-                        <strong>Description :</strong> {{ $intervention->interventionable->description }}<br>
-                        <strong>Planned at :</strong> {{ $intervention->planned_at }}<br>
-                         <a href={{ $url }} class="button">View problem</a>
+                        <strong>{{__('common.description')}} :</strong> {{ $intervention->description }}<br>
+                        <strong>{{__('interventions.priority')}} :</strong>{{__(`interventions.priority.` . $intervention->priority->value)}}<br>
+                        <strong>{{__('interventions.status')}} :</strong>{{ $intervention->status }}<br>
+                        <strong>{{__('common.name')}} :</strong> {{ $intervention->interventionable->name }}<br>
+                        @if($intervention->planned_at)
+                            <strong>{{__('interventions.planned_at')}} :</strong> {{ $intervention->planned_at }}<br>
+                        @endif
+                        
+                          <a href={{ $url }} class="button">{{__('actions.see-type', ['type' => trans_choice('interventions.title', 1)])}}</a>
                     </div>
-                    <strong>You have 7 days to act !!!</strong>
+                    <strong>{{__('interventions.assigned_duration')}} </strong>
         </div>
 
         <div class="footer">
-            <p>Cette notification a été générée automatiquement par votre système de facility management.</p>
-            <p>Si vous avez des questions, contactez votre administrateur.</p>
+           <p>{{__('notifications.disclaimer')}}</p>
         </div>
     </div>
 </body>

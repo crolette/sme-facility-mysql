@@ -2,13 +2,27 @@
 
 
 return [
-    'depreciation_end_date' => 'Einddatum afschrijving',
-    'notice_date' => 'Opzegdatum contract',
-    'end_date' => 'Einddatum contract',
+    'title' => 'Kennisgeving|Kennisgevingen',
+    'depreciation_end_date' => 'Einddatum van afschrijving',
+    'depreciation_end_date_subtitle' => 'De afschrijving van een asset loopt binnenkort af:',
+    'depreciation_end_date_description' => 'Na deze datum is het asset volledig afgeschreven.',
+    'notice_date' => 'Contractkennisgevingsdatum',
+    'notice_date_subtitle' => 'Een contract loopt binnenkort af:',
+    'notice_date_description' => 'We raden u aan de nodige stappen te ondernemen voor de verlenging of beëindiging van dit contract.',
+    'end_date' => 'Einddatum van het contract',
+    'end_date_subtitle' => 'Een contract loopt binnenkort af:',
+    'end_date_description' => 'We raden u aan de nodige stappen te ondernemen voor de verlenging of beëindiging van dit contract.',
     'planned_at' => 'Interventie gepland op',
-    'next_maintenance_date' => 'Datum volgend onderhoud',
-    'end_warranty_date' => 'Einddatum garantie',
-    'disclaimer' => 'Deze melding is automatisch gegenereerd door uw facilitymanagementsysteem. Als u vragen heeft, neem dan contact op met uw beheerder.',
+    'planned_at_subtitle' => 'Er is binnenkort een interventie gepland:',
+    'planned_at_description' => 'We raden u aan de nodige regelingen te treffen voor de interventie.',
+    'next_maintenance_date' => 'Volgende onderhoudsdatum',
+    'next_maintenance_date_subtitle' => 'Er is binnenkort een onderhoud gepland:',
+    'next_maintenance_date_description' => 'Zorg ervoor dat dit onderhoud binnen de geplande termijn wordt georganiseerd.',
+    'end_warranty_date' => 'Einde garantiedatum',
+    'end_warranty_date_subtitle' => 'Een garantie loopt binnenkort af:',
+    'end_warranty_date_description' => 'Na deze datum bent u niet langer door de garantie gedekt.',
+    'disclaimer' => 'Deze melding werd automatisch gegenereerd door uw facilitymanagementsysteem. Neem contact op met uw beheerder als u vragen heeft.',
+
 
 
 ];

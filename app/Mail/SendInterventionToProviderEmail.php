@@ -15,15 +15,15 @@ class SendInterventionToProviderEmail extends Mailable
 {
     use Queueable, SerializesModels;
 
+
     /**
      * Create a new message instance.
      */
     public function __construct(
         public Intervention $intervention,
+
         public string $url
-        )
-    {
-        //
+    ) {;
     }
 
     /**
@@ -33,7 +33,7 @@ class SendInterventionToProviderEmail extends Mailable
     {
         return new Envelope(
             from: new Address('notifications@sme-facility.com', 'SME-Facility - Notification'),
-            subject: 'An intervention requires your attention from ' . tenancy()->tenant->company_name . ' for ' . $this->intervention->interventionable->name,
+            subject: __('interventions.assigned_email_title', ['tenant' => tenancy()->tenant->company_name, 'item' => $this->intervention->interventionable->name]),
         );
     }
 
@@ -44,6 +44,7 @@ class SendInterventionToProviderEmail extends Mailable
     {
         return new Content(
             view: 'emails.send-intervention-provider',
+            with: ['tenant' => tenancy()->tenant->company_name]
         );
     }
 
