@@ -96,20 +96,21 @@ foreach (config('tenancy.central_domains') as $domain) {
             })->name('website.who-are-we');
 
             // Route::middleware('throttle:2,60')->post('/newsletter', function (Request $request) {
-            Route::post('/newsletter', function (Request $request) {
+            Route::middleware('throttle:10,60')->post('/newsletter', function (Request $request) {
 
                 $data = $request->all();
                 $data['email'] = strtolower($data['email']);
 
                 $validated = Validator::make($data, [
-                    'email' => ['required', 'string', 'lowercase', 'email', 'unique:newsletter,email', 'max:255', new NotDisposableEmail],
+                    'email' => ['required', 'string', 'lowercase', 'email', 'max:255', new NotDisposableEmail],
                     'consent' => 'required|accepted'
                 ]);
                 $validated = $validated->validated();
 
                 try {
                     DB::beginTransaction();
-                    DB::table('newsletter')->insertGetId(
+                    DB::table('newsletter')->updateOrInsert(
+                        ['email' => $validated['email']],
                         [
                             'email' => $validated['email'],
                             'consent' => $validated['consent'],
@@ -127,10 +128,10 @@ foreach (config('tenancy.central_domains') as $domain) {
             })->name('website.newsletter');
 
             Route::get('/contact', [ContactController::class, 'index'])->name('website.contact');
-            Route::middleware('throttle:2,60')->post('/contact', [ContactController::class, 'store'])->name('website.contact.post');
+            Route::middleware('throttle:10,60')->post('/contact', [ContactController::class, 'store'])->name('website.contact.post');
 
             Route::get('/demo', [DemoController::class, 'index'])->name('website.demo');
-            Route::middleware('throttle:2,60')->post('/demo', [DemoController::class, 'store'])->name('website.demo.post');
+            Route::middleware('throttle:10,60')->post('/demo', [DemoController::class, 'store'])->name('website.demo.post');
 
             Route::prefix('features')->group(function () {
                 Route::get('/qr-code', function () {
