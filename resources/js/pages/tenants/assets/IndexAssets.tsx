@@ -347,7 +347,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                     </div>
                 </div>
 
-                <div className="flex w-full items-center justify-between">
+                <div className="flex w-full flex-col sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-10">
                         <h1>{tChoice('assets.title', 2)}</h1>
                         {hasPermission('create assets') && selectedAssetIds.length !== 0 && (

@@ -251,76 +251,81 @@ export default function IndexInterventions({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={tChoice('interventions.title', 2)} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="flex w-full justify-between">
-                    <details className="border-border relative w-full cursor-pointer rounded-md border-2 p-2" open={isLoading ? false : undefined}>
-                        <summary>{t('common.search_filter')}</summary>
+                <div className="border-accent flex flex-col gap-2 border-b-2 pb-2 sm:flex-row sm:gap-10">
+                    <div className="flex w-full items-center justify-between gap-4">
+                        <details
+                            className="border-border relative w-full cursor-pointer rounded-md border-2 p-2"
+                            open={isLoading ? false : undefined}
+                        >
+                            <summary>{t('common.search_filter')}</summary>
 
-                        <div className="bg-border border-border text-background dark:text-foreground absolute top-full z-10 flex flex-col items-center gap-4 rounded-b-md border-2 p-2 sm:flex-row">
-                            <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="status">{t('common.type')}</Label>
-                                <select
-                                    name="type"
-                                    id="type"
-                                    value={query.type ?? ''}
-                                    onChange={(e) => setQuery((prev) => ({ ...prev, type: e.target.value }))}
-                                >
-                                    <option value={''} aria-readonly>
-                                        {t('actions.select-type', { type: t('common.type') })}
-                                    </option>
-                                    {types.map((type) => (
-                                        <option key={type.id} value={type.id}>
-                                            {type.label}
+                            <div className="bg-border border-border text-background dark:text-foreground absolute top-full z-10 flex flex-col items-center gap-4 rounded-b-md border-2 p-2 sm:flex-row">
+                                <div className="flex flex-col items-center gap-2">
+                                    <Label htmlFor="status">{t('common.type')}</Label>
+                                    <select
+                                        name="type"
+                                        id="type"
+                                        value={query.type ?? ''}
+                                        onChange={(e) => setQuery((prev) => ({ ...prev, type: e.target.value }))}
+                                    >
+                                        <option value={''} aria-readonly>
+                                            {t('actions.select-type', { type: t('common.type') })}
                                         </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="status">{t('interventions.status')}</Label>
-                                <select name="status" id="status" value={query.status ?? ''} onChange={(e) => setStatusSearch(e.target.value)}>
-                                    <option value={''} aria-readonly>
-                                        {t('actions.select-type', { type: t('interventions.status') })}
-                                    </option>
-                                    {statuses.map((status) => (
-                                        <option key={status} value={status}>
-                                            {t(`interventions.status.${status}`)}
+                                        {types.map((type) => (
+                                            <option key={type.id} value={type.id}>
+                                                {type.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="flex flex-col items-center gap-2">
+                                    <Label htmlFor="status">{t('interventions.status')}</Label>
+                                    <select name="status" id="status" value={query.status ?? ''} onChange={(e) => setStatusSearch(e.target.value)}>
+                                        <option value={''} aria-readonly>
+                                            {t('actions.select-type', { type: t('interventions.status') })}
                                         </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="canLogin">{t('interventions.priority')}</Label>
-                                <div className="space-x-1 text-center">
-                                    {priorities.map((priority) => (
-                                        <Pill
-                                            key={priority}
-                                            // size={'sm'}
-                                            className="cursor-pointer"
-                                            variant={query.priority === priority ? 'active' : 'default'}
-                                            onClick={() => setPrioritySearch(priority)}
-                                        >
-                                            {t(`interventions.priority.${priority}`)}
-                                        </Pill>
-                                    ))}
+                                        {statuses.map((status) => (
+                                            <option key={status} value={status}>
+                                                {t(`interventions.status.${status}`)}
+                                            </option>
+                                        ))}
+                                    </select>
                                 </div>
-                            </div>
-                            <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="category">Search</Label>
-                                <div className="relative text-black dark:text-white">
-                                    <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} />
-                                    <X
-                                        onClick={() => setQuery((prev) => ({ ...prev, q: null }))}
-                                        className={'absolute top-1/2 right-0 -translate-1/2'}
-                                    />
+                                <div className="flex flex-col items-center gap-2">
+                                    <Label htmlFor="canLogin">{t('interventions.priority')}</Label>
+                                    <div className="space-x-1 text-center">
+                                        {priorities.map((priority) => (
+                                            <Pill
+                                                key={priority}
+                                                // size={'sm'}
+                                                className="cursor-pointer"
+                                                variant={query.priority === priority ? 'active' : 'default'}
+                                                onClick={() => setPrioritySearch(priority)}
+                                            >
+                                                {t(`interventions.priority.${priority}`)}
+                                            </Pill>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
+                                <div className="flex flex-col items-center gap-2">
+                                    <Label htmlFor="category">Search</Label>
+                                    <div className="relative text-black dark:text-white">
+                                        <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} />
+                                        <X
+                                            onClick={() => setQuery((prev) => ({ ...prev, q: null }))}
+                                            className={'absolute top-1/2 right-0 -translate-1/2'}
+                                        />
+                                    </div>
+                                </div>
 
-                            <Button onClick={clearSearch} size={'sm'}>
-                                {t('actions.search-clear')}
-                            </Button>
-                        </div>
-                    </details>
+                                <Button onClick={clearSearch} size={'sm'}>
+                                    {t('actions.search-clear')}
+                                </Button>
+                            </div>
+                        </details>
+                    </div>
                 </div>
-                <div className="flex w-full items-center justify-between">
+                <div className="flex w-full flex-col sm:flex-row sm:items-center sm:justify-between">
                     <h1>{tChoice(`interventions.title`, 2)}</h1>
                     <DisplayGridTableIndex />
                 </div>

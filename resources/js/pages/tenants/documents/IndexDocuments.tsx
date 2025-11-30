@@ -209,7 +209,7 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Index documents" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="flex w-full justify-between">
+                <div className="border-accent flex flex-col gap-2 border-b-2 pb-2 sm:flex-row sm:gap-10">
                     <details
                         className="border-border relative z-10 w-full cursor-pointer rounded-md border-2 p-2"
                         open={isLoading ? false : undefined}

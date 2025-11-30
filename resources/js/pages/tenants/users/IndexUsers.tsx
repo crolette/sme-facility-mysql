@@ -156,7 +156,7 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={tChoice('contacts.title', 2)} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <div className="flex w-full justify-between">
+                <div className="border-accent flex flex-col gap-2 border-b-2 pb-2 sm:flex-row sm:gap-10">
                     <details className="border-border relative w-full cursor-pointer rounded-md border-2 p-1" open={isLoading ? false : undefined}>
                         <summary>{t('common.search_filter')}</summary>
 
@@ -219,7 +219,7 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
                         </Button>
                     </a>
                 </div>
-                <div className="flex w-full items-center justify-between">
+                <div className="flex w-full flex-col sm:flex-row sm:items-center sm:justify-between">
                     <h1>{tChoice(`contacts.title`, 2)}</h1>
                     <DisplayGridTableIndex />
                 </div>
