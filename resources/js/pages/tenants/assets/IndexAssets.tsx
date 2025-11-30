@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import { usePermissions } from '@/hooks/usePermissions';
+import { useSelectIds } from '@/hooks/useSelectIds';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
 import { Asset, AssetsPaginated, BreadcrumbItem, CentralType } from '@/types';
@@ -199,43 +200,45 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
 
     const { layout } = useGridTableLayoutContext();
 
-    const MAX_SELECTION = 100;
-    const [selectedAssetIds, setSelectedAssetsIds] = useState<number[]>(() => {
-        const saved = sessionStorage.getItem('selectedAssets');
-        return saved ? JSON.parse(saved) : [];
-    });
+    // const MAX_SELECTION = 100;
+    // const [selectedAssetIds, setSelectedAssetsIds] = useState<number[]>(() => {
+    //     const saved = sessionStorage.getItem('selectedAssets');
+    //     return saved ? JSON.parse(saved) : [];
+    // });
 
-    const handleSelectAssetId = (assetId: number) => {
-        setSelectedAssetsIds((prev) =>
-            prev.includes(assetId) ? prev.filter((id) => id !== assetId) : prev.length < MAX_SELECTION ? [...prev, assetId] : [...prev],
-        );
-    };
+    // const handleSelectAssetId = (assetId: number) => {
+    //     setSelectedAssetsIds((prev) =>
+    //         prev.includes(assetId) ? prev.filter((id) => id !== assetId) : prev.length < MAX_SELECTION ? [...prev, assetId] : [...prev],
+    //     );
+    // };
 
-    const handleSelectAllAssetId = (event: React.MouseEvent<HTMLButtonElement>, assets: Asset[]) => {
-        if (event.target.ariaChecked === 'true') {
-            assets.map((asset) => {
-                setSelectedAssetsIds((prev) => prev.filter((id) => id !== asset.id));
-            });
-        } else {
-            assets.map((asset) => {
-                setSelectedAssetsIds((prev) => (prev.includes(asset.id) ? [...prev] : prev.length < MAX_SELECTION ? [...prev, asset.id] : [...prev]));
-            });
-        }
-    };
+    // const handleSelectAllAssetId = (event: React.MouseEvent<HTMLButtonElement>, assets: Asset[]) => {
+    //     if (event.target.ariaChecked === 'true') {
+    //         assets.map((asset) => {
+    //             setSelectedAssetsIds((prev) => prev.filter((id) => id !== asset.id));
+    //         });
+    //     } else {
+    //         assets.map((asset) => {
+    //             setSelectedAssetsIds((prev) => (prev.includes(asset.id) ? [...prev] : prev.length < MAX_SELECTION ? [...prev, asset.id] : [...prev]));
+    //         });
+    //     }
+    // };
 
-    const clearSelection = () => {
-        sessionStorage.removeItem('selectedAssets');
-        setSelectedAssetsIds([]);
-    };
+    // const clearSelection = () => {
+    //     sessionStorage.removeItem('selectedAssets');
+    //     setSelectedAssetsIds([]);
+    // };
 
-    useEffect(() => {
-        sessionStorage.setItem('selectedAssets', JSON.stringify(selectedAssetIds));
-    }, [selectedAssetIds]);
+    // useEffect(() => {
+    //     sessionStorage.setItem('selectedAssets', JSON.stringify(selectedAssetIds));
+    // }, [selectedAssetIds]);
+
+    const { selectedIds, handleSelectIds, handleSelectAllIds, clearSelection } = useSelectIds({ storageKey: 'selectedAssets' });
 
     const submitSelectedIds: FormEventHandler = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(route('tenant.assets.export'), { ids: selectedAssetIds });
+            const response = await axios.post(route('tenant.assets.export'), { ids: selectedIds });
             showToast(response.data.message);
         } catch (error) {
             console.log(error);
@@ -339,14 +342,14 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                 <div className="flex w-full flex-col sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-10">
                         <h1>{tChoice('assets.title', 2)}</h1>
-                        {hasPermission('create assets') && selectedAssetIds.length !== 0 && (
+                        {hasPermission('create assets') && selectedIds.length !== 0 && (
                             <div className="flex gap-2 text-xs">
                                 <form onSubmit={submitSelectedIds}>
                                     <Button type={'submit'} variant={'secondary'}>
                                         {t('actions.export-type', { type: tChoice('assets.title', 2) })}
                                     </Button>
                                 </form>
-                                <a href={route('tenant.pdf.qr-codes', { type: 'assets', ids: selectedAssetIds })} target="__blank">
+                                <a href={route('tenant.pdf.qr-codes', { type: 'assets', ids: selectedIds })} target="__blank">
                                     <Button variant={'secondary'}>
                                         <BiSolidFilePdf size={20} />
                                         {t('actions.download-type', { type: tChoice('common.qr_codes', 2) })}
@@ -391,8 +394,8 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                             name=""
                                             id=""
                                             value={''}
-                                            checked={assets.every((asset) => selectedAssetIds.includes(asset.id))}
-                                            onClick={(e) => handleSelectAllAssetId(e, assets)}
+                                            checked={assets.every((asset) => selectedIds.includes(asset.id))}
+                                            onClick={() => handleSelectAllIds(assets)}
                                             className="mr-3 -ml-2 cursor-pointer"
                                         />
                                     )}
@@ -428,8 +431,8 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                                             id=""
                                                             className="cursor-pointer"
                                                             value={asset.id}
-                                                            checked={selectedAssetIds.includes(asset.id)}
-                                                            onClick={() => handleSelectAssetId(asset.id)}
+                                                            checked={selectedIds.includes(asset.id)}
+                                                            onClick={() => handleSelectIds(asset.id)}
                                                         />
                                                     )}
 
