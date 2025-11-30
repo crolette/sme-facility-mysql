@@ -90,17 +90,6 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
         }
     };
 
-    const fetchAssets = async () => {
-        try {
-            const response = await axios.get(route('api.assets.index'));
-            console.log(response);
-            setAssets(response.data.data.data);
-            setIsLoading(false);
-        } catch (error) {
-            showToast(error.response.data.message, error.response.data.status);
-        }
-    };
-
     const fetchTrashedAssets = async () => {
         setIsLoading(true);
         try {
