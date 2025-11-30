@@ -17,6 +17,8 @@ return [
     'take_picture_camera' => 'Take a picture with my camera',
     'pictures_max' => 'Maximum :number pictures',
     'be_notified' => 'Do you want to be notified when the ticket is closed ?',
-    'closed_at' => 'Closed at'
+    'closed_at' => 'Closed at',
+    'existing_tickets' => 'Existing ticket|Existing tickets',
+    'encode_ticket' => 'What issue did you encounter?',
 
 ];

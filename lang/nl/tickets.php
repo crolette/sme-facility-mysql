@@ -17,6 +17,8 @@ return [
     'take_picture_camera' => 'Maak een foto met mijn camera',
     'pictures_max' => 'Maximum :number foto\'s',
     'be_notified' => 'Wilt u op de hoogte worden gehouden wanneer het ticket wordt gesloten?',
-    'closed_at' => 'Gesloten op'
+    'closed_at' => 'Gesloten op',
+    'existing_tickets' => 'Bestaand ticket|Bestaande tickets',
+    'encode_ticket' => 'Welk probleem hebt u ondervonden?',
 
 ];

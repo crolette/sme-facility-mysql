@@ -17,6 +17,8 @@ return [
     'take_picture_camera' => 'Prendre une photo avec mon appareil photo',
     'pictures_max' => 'Maximum :number photos',
     'be_notified' => 'Souhaitez-vous être notifié lorsque le ticket est fermé ?',
-    'closed_at' => 'Fermé le'
+    'closed_at' => 'Fermé le',
+    'existing_tickets' => 'Ticket existant|Tickets existants',
+    'encode_ticket' => 'Quel est le problème rencontré ?'
 
 ];

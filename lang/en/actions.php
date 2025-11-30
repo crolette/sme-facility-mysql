@@ -54,6 +54,7 @@ return [
     'updated' => 'Updated',
     'cancelled' => 'Cancelled',
     'submitted' => 'Submitted',
+    'type-submitted' => ':type submitted',
     'confirmed' => 'Confirmed',
     'sent' => 'Sent',
     'closed' => 'Closed',

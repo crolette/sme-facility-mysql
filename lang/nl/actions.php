@@ -52,6 +52,7 @@ return [
     'updated' => 'Bijgewerkt',
     'cancelled' => 'Geannuleerd',
     'submitted' => 'Ingediend',
+    'type-submitted' => ':type ingediend',
     'confirmed' => 'Bevestigd',
     'sent' => 'Verzonden',
 

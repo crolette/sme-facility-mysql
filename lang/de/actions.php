@@ -52,6 +52,7 @@ return [
     'updated' => 'Aktualisiert',
     'cancelled' => 'Abgebrochen',
     'submitted' => 'Gesendet',
+    'type-submitted' => ':type gesendet',
     'confirmed' => 'Bestätigt',
     'sent' => 'Gesendet',
 
