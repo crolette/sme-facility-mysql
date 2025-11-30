@@ -94,7 +94,7 @@
     --website-primary: #224e91;
     --website-secondary: #e3ebfc;
     --website-cta: #ffd700;
-    --website-border: #5770a1;
+    --website-border: #44577e;
     --website-font: #0d0d3a;
     --website-card: #ebf5ff;
     --logo: #111154;
@@ -282,7 +282,9 @@ h3 {
 }
 
 h4 {
-    font-size: clamp(1.25rem, 2.75vw, 1.75rem);
+    font-size: clamp(1rem, 1.75vw, 1.25rem);
+    line-height: 2rem;
+    /* font-size: clamp(1.25rem, 2.75vw, 1.75rem); */
 }
 
 h5 {
