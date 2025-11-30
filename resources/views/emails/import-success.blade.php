@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>{{ $dataType}} 'imported' </title>
+    <title>{{ __('export.type-imported', ['type' =>  $dataType])}}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,21 +73,20 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="title">{{ $dataType}} imported</h1>
+            <h1 class="title">{{ __('export.type-imported', ['type' =>  $dataType])}}</h1>
         </div>
 
         <div class="content">
             <div class="alert">
-                <strong>{{ $dataType }} imported</strong>
+                <strong>{{ __('export.type-imported', ['type' =>  $dataType])}}</strong>
             </div>
             <div class="details">
-                <p>{{ $dataType  }} imported - Success</p>
+                <p>{{ __('export.type-imported', ['type' =>  $dataType])}}</p>
             </div>
         </div>
 
         <div class="footer">
-            <p>Cette notification a été générée automatiquement par votre système de facility management.</p>
-            <p>Si vous avez des questions, contactez votre administrateur.</p>
+            <p>{{__('notifications.disclaimer')}}</p>
         </div>
     </div>
 </body>

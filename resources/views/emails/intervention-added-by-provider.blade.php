@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Intervention added by provider</title>
+    <title>{{__('actions.added-type', ['type' => trans_choice('interventions.title', 1)])}}</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
         .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px; }
@@ -18,28 +18,27 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="title">{{  'Intervention added' }}</h1>
+            <h1 class="title">{{__('actions.added-type', ['type' => trans_choice('interventions.title', 1)])}}</h1>
  
         </div>
 
         <div class="content">
                 <div class="alert">
-                        <strong>🛡️ Intervention added</strong>
+                        <strong>🛡️ {{__('actions.added-type', ['type' => trans_choice('interventions.title', 1)])}}</strong>
                     </div>
                     <div class="details">
-                        <strong>Description :</strong> {{ $interventionAction->description }} <br>
-                        <strong>type :</strong> {{ $interventionAction->type }}<br>
-                        <strong>Email :</strong> {{ $interventionAction->creator_email }}<br>
-                        <strong>Costs :</strong> {{ $interventionAction->intervention_costs ?? '0' }}<br>
-                        <strong>Started at :</strong> {{ $interventionAction->started_at }}<br>
-                        <strong>Finished at :</strong> {{ $interventionAction->finished_at }}<br>
+                        <strong>{{__('common.description')}} :</strong> {{ $interventionAction->description }} <br>
+                        <strong>{{__('common.type')}} :</strong> {{ $interventionAction->type }}<br>
+                        <strong>{{__('common.email')}} :</strong> {{ $interventionAction->creator_email }}<br>
+                        <strong>{{__('interventions.costs')}} :</strong> {{ $interventionAction->intervention_costs ?? '0' }}<br>
+                        <strong>{{__('interventions.started_at')}} :</strong> {{ $interventionAction->started_at }}<br>
+                        <strong>{{__('interventions.finished_at')}} :</strong> {{ $interventionAction->finished_at }}<br>
                          {{-- <a href={{ $interventionAction->interventionable->locationRoute}} class="button">View problem</a> --}}
                     </div>
         </div>
 
         <div class="footer">
-            <p>Cette notification a été générée automatiquement par votre système de facility management.</p>
-            <p>Si vous avez des questions, contactez votre administrateur.</p>
+            <p>{{__('notifications.disclaimer')}}</p>
         </div>
     </div>
 </body>

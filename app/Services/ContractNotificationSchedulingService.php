@@ -55,8 +55,21 @@ class ContractNotificationSchedulingService
         if ($contract->wasChanged('end_date') && $contract->end_date?->toDateString() > Carbon::now()->toDateString()) {
             // dump('Contract End Date Changed');
             $notifications = $contract->notifications()->where('notification_type', 'end_date')->where('status', 'pending')->get();
-            foreach ($notifications as $notification) {
-                $this->updateScheduleForContractEndDate($contract, $notification);
+
+            if (count($notifications)) {
+                foreach ($notifications as $notification) {
+                    $this->updateScheduleForContractEndDate($contract, $notification);
+                }
+            } else {
+                foreach ($users as $user) {
+                    $this->createScheduleForContractEndDate($contract, $user);
+                }
+
+                $contractables->each(function ($contractable) use ($contract) {
+                    if ($contractable->manager) {
+                        $this->createScheduleForContractEndDate($contract, $contractable->manager);
+                    }
+                });
             }
         }
 
@@ -152,6 +165,7 @@ class ContractNotificationSchedulingService
 
     public function createScheduleForContractEndDate(Contract $contract, User $user)
     {
+
         $preference = $user->notification_preferences()->where('notification_type', 'end_date')->first();
         $delayDays = $preference->notification_delay_days;
 

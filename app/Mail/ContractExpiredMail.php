@@ -2,28 +2,28 @@
 
 namespace App\Mail;
 
+use App\Models\Tenants\Contract;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use App\Models\Tenants\Intervention;
+use Illuminate\Support\Facades\App;
 use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
-class SendInterventionToProviderEmail extends Mailable
+class ContractExpiredMail extends Mailable
 {
     use Queueable, SerializesModels;
-
 
     /**
      * Create a new message instance.
      */
     public function __construct(
-        public Intervention $intervention,
+        public Contract $contract,
+    ) {
 
-        public string $url
-    ) {;
+        $locale = App::getLocale();
+        App::setLocale($locale);
     }
 
     /**
@@ -33,7 +33,8 @@ class SendInterventionToProviderEmail extends Mailable
     {
         return new Envelope(
             from: new Address('notifications@sme-facility.com', 'SME-Facility - Notification'),
-            subject: __('interventions.assigned_email_title', ['tenant' => tenancy()->tenant->company_name, 'item' => $this->intervention->interventionable->name]),
+            subject: 'Contract expired : ' . $this->contract->name . '(' . $this->contract->type->value . ') - ' . $this->contract->provider->name,
+
         );
     }
 
@@ -43,8 +44,7 @@ class SendInterventionToProviderEmail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.send-intervention-provider',
-            with: ['tenant' => tenancy()->tenant->company_name]
+            view: 'emails.contract-expired',
         );
     }
 

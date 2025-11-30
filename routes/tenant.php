@@ -11,15 +11,23 @@ use Illuminate\Http\Request;
 use App\Exports\AssetsExport;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
+use App\Mail\TicketClosedMail;
+use App\Models\Tenants\Ticket;
+use App\Mail\TicketCreatedMail;
 use App\Models\Tenants\Company;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Tenants\Building;
+use App\Models\Tenants\Contract;
+use App\Mail\ContractExpiredMail;
+use App\Mail\ContractExtendedMail;
 use Illuminate\Support\Facades\App;
+use App\Models\Tenants\Intervention;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Stancl\Tenancy\Middleware\ScopeSessions;
+use App\Mail\SendInterventionToProviderEmail;
 use App\Http\Middleware\TenantLocaleMiddleware;
 use App\Http\Controllers\Tenants\UserController;
 use App\Http\Controllers\Tenants\TicketController;
@@ -46,6 +54,8 @@ use App\Http\Controllers\Tenants\InterventionActionController;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Tenants\InterventionProviderController;
 use App\Http\Controllers\Tenants\CreateTicketFromQRCodeController;
+use App\Mail\ScheduledNotificationMail;
+use App\Models\Tenants\ScheduledNotification;
 
 /*
 |--------------------------------------------------------------------------
@@ -84,6 +94,14 @@ Route::middleware([
         }
 
         return response($content)->header('Content-Type', 'text/plain');
+    });
+
+    Route::get('mail', function () {
+        $data = ScheduledNotification::where('notification_type', 'end_warranty_date')->first();
+        $model = $data->ticketable;
+        $url = 'hello';
+
+        return (new ScheduledNotificationMail($data))->render();
     });
 
     Route::get('locale/{locale}', function (Request $request, $locale) {

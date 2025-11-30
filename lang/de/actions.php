@@ -15,6 +15,7 @@ return [
     // View actions
     'see-details' => 'Details anzeigen',
     'see-all' => 'Alle anzeigen',
+    'see-type' => ':type anzeigen',
     'select-type' => ':type auswählen',
 
     // Search

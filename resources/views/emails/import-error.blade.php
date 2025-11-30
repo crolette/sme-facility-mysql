@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Error during import of {{ $dataType }}</title>
+    <title>{{ __('export.import-error', ['type' => $dataType])  }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,22 +73,22 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="title">Error during import of {{ $dataType }}</h1>
+            <h1 class="title">{{ __('export.import-error', ['type' => $dataType])  }}</h1>
         </div>
 
         <div class="content">
             <div class="alert">
-                <strong>Error import</strong>
+                <strong>{{ __('export.import-error', ['type' => $dataType])  }}</strong>
             </div>
             <div class="details">
                 @if ($failures)
-                    <h2>Erreurs d'importation ({{ count($failures) }} erreurs)</h2>
+                    <h2>{{ __('export.import-error-failures', ['number' => count($failures)])  }}</h2>
                     @php
                         $groupedByRow = collect($failures)->groupBy(fn($f) => $f->row());
                     @endphp
 
                     @foreach($groupedByRow as $row => $rowFailures)
-                        <h3>Ligne {{ $row }}</h3>
+                        <h3>{{__('export.line')}} {{ $row }}</h3>
                         <ul>
                             @foreach($rowFailures as $failure)
                                 <li>
@@ -99,8 +99,7 @@
                         </ul>
                     @endforeach
                 @else
-                    <h2>Erreurs d'importation erreurs)</h2>
-                     <p>Il y a eu une erreur lors de l'importation. Réessayez ou contactez votre administrateur ou le support de SME-Facility.</p>
+                     <p>{{__('export.import-error-description')}}</p>
                 @endif
                 @if ($failures)
                     
@@ -109,8 +108,7 @@
         </div>
 
         <div class="footer">
-            <p>Cette notification a été générée automatiquement par votre système de facility management.</p>
-            <p>Si vous avez des questions, contactez votre administrateur.</p>
+            <p>{{__('notifications.disclaimer')}}</p>
         </div>
     </div>
 </body>

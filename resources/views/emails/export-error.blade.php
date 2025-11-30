@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Error during export of {{ $dataType }}</title>
+    <title>{{ __('export.export-error', ['type' => $dataType])  }}</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -73,38 +73,22 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="title">Error during export of {{ $dataType }}</h1>
+           <h1 class="title">{{ __('export.export-error', ['type' => $dataType])  }}</h1>
         </div>
 
         <div class="content">
             <div class="alert">
-                <strong>Error export</strong>
+                <strong>{{ __('export.export-error', ['type' => $dataType])  }}</strong>
             </div>
             <div class="details">
-              <h2>Erreurs d'exportation</h2>
 
-              <p>Il y a eu une erreur lors de l'exportation. Réessayez ou contactez votre administrateur ou le support de SME-Facility.</p>
-                {{-- @php
-                    $groupedByRow = collect($failures)->groupBy(fn($f) => $f->row());
-                @endphp
-
-                @foreach($groupedByRow as $row => $rowFailures)
-                    <h3>Ligne {{ $row }}</h3>
-                    <ul>
-                        @foreach($rowFailures as $failure)
-                            <li>
-                                <strong>{{ $failure->attribute() }}</strong>: 
-                                {{ implode(', ', $failure->errors()) }}
-                            </li>
-                        @endforeach
-                    </ul>
-                @endforeach --}}
+             <p>{{__('export.export-error-description')}}</p>
+        
             </div>
         </div>
 
         <div class="footer">
-            <p>Cette notification a été générée automatiquement par votre système de facility management.</p>
-            <p>Si vous avez des questions, contactez votre administrateur.</p>
+          <p>{{__('notifications.disclaimer')}}</p>
         </div>
     </div>
 </body>

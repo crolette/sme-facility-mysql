@@ -179,11 +179,11 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                                         ) : (
                                             <>
                                                 <Field
-                                                    label={t('locations.surface_floor')}
+                                                    label={t('locations.surface_type_floor')}
                                                     text={`${location.surface_floor ?? 0} m² - ${location.floor_material}`}
                                                 />
                                                 <Field
-                                                    label={t('locations.surface_wall')}
+                                                    label={t('locations.surface_type_wall')}
                                                     text={`${location.surface_walls ?? '0'} m² - ${location.wall_material}`}
                                                 />
                                                 {location.height && <Field label={t('locations.height')} text={`${location.height} m`} />}

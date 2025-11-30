@@ -47,4 +47,7 @@ return [
     'add_existing_contract' => 'Bestaand contract toevoegen',
     'add_new_contract' => 'Nieuw contract toevoegen',
 
+    'contract_expired' => 'Contract verlopen',
+    'contract_extended' => 'Contract verlengd',
+
 ];

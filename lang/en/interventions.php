@@ -39,5 +39,8 @@ return [
     'past_interventions' => 'Past interventions',
     'past_actions' => 'Past actions',
 
+    'assigned_email_title' => 'An intervention requires your attention from :tenant for :item',
+    'assigned' => 'Intervention assigned',
+    'assigned_duration' => 'You have 7 days to act !'
 
 ];

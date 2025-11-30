@@ -33,7 +33,7 @@ class ImportErrorMail extends Mailable
     {
         return new Envelope(
             from: new Address('notifications@sme-facility.com', 'SME-Facility - Notification'),
-            subject: 'Import Error Mail',
+            subject: __('export.import-error', ['type' => $this->dataType]),
         );
     }
 

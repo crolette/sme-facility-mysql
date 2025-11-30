@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>{{ 'Ticket closed: ' . $ticket->code}}</title>
+    <title>{{ __('actions.closed-type', ['type' => trans_choice('tickets.title', 1)]) . ' : ' . $ticket->code}}</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
         .container { max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 8px; }
@@ -18,23 +18,23 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="title">{{ 'Ticket closed: ' . $ticket->closed . ' - ' . $ticket->ticketable->name}}</h1>
+            <h1 class="title">{{ __('actions.closed-type', ['type' => trans_choice('tickets.title', 1)]) . ' : ' . $ticket->code . ' - ' . $ticket->ticketable->name}}</h1>
         </div>
 
         <div class="content">
             <div class="alert">
-                        <strong>🛡️ Ticket</strong>
+                <strong>🛡️ {{__('actions.closed-type', ['type' => trans_choice('tickets.title', 1)])}}</strong>
                     </div>
                     <div class="details">
-                        <strong>Emplacement :</strong> {{ $ticket->asset_code }}  {{ $ticket->ticketable->name }}<br>
-                        <strong>Problem :</strong> {{ $ticket->description }}<br>
+                        <strong>{{trans_choice('locations.location',1)}} :</strong> {{ $ticket->asset_code }}  {{ $ticket->ticketable->name }}<br>
+                        <strong>{{__('common.description')}} :</strong> {{ $ticket->description }}<br>
+                        <a href={{ route('tenant.tickets.show', $ticket->id) }} class="button">{{__('actions.see-type', ['type' => trans_choice('tickets.title', 1)])}}</a>
                     </div>
 
         </div>
 
         <div class="footer">
-            <p>Cette notification a été générée automatiquement par votre système de facility management.</p>
-            <p>Si vous avez des questions, contactez votre administrateur.</p>
+          <p>{{__('notifications.disclaimer')}}</p>
         </div>
     </div>
 </body>

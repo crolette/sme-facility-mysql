@@ -32,7 +32,7 @@ class ImportSuccessMail extends Mailable
     {
         return new Envelope(
             from: new Address('notifications@sme-facility.com', 'SME-Facility - Notification'),
-            subject: 'Import Success Mail',
+            subject: __('export.type-imported', ['type' =>  $this->dataType]),
         );
     }
 

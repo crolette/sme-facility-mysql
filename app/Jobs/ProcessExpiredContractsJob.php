@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Enums\ContractRenewalTypesEnum;
 use App\Enums\ContractStatusEnum;
 use Carbon\Carbon;
 use App\Models\Tenant;
@@ -14,6 +15,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Models\Tenants\ScheduledNotification;
+use App\Services\ContractService;
 
 class ProcessExpiredContractsJob implements ShouldQueue
 {
@@ -39,23 +41,65 @@ class ProcessExpiredContractsJob implements ShouldQueue
         $this->tenant->run(function () use ($tenantId) {
 
             // Récupérer les notifications à envoyer (aujourd'hui)
-            $contracts = Contract::where('end_date', '<', Carbon::now()->toDateString())->where('status', ContractStatusEnum::ACTIVE)
-                ->get();
+            $expiredManualContracts = Contract::where('end_date', '<', Carbon::now()->toDateString())->where('status', ContractStatusEnum::ACTIVE)->where('renewal_type', ContractRenewalTypesEnum::MANUAL)->get();
+            $expiredAutomaticContracts = Contract::where('end_date', '<', Carbon::now()->toDateString())->where('status', ContractStatusEnum::ACTIVE)->where('renewal_type', ContractRenewalTypesEnum::AUTOMATIC)->get();
 
-            Log::info("Found {$contracts->count()} contracts to process for tenant: {$tenantId}");
+            Log::info("Found {$expiredManualContracts->count()} expiredManualContracts to process for tenant: {$tenantId}");
+            Log::info("Found {$expiredAutomaticContracts->count()} expiredAutomaticContracts to process for tenant: {$tenantId}");
 
             $successCount = 0;
             $errorCount = 0;
 
-            foreach ($contracts as $contract) {
+            foreach ($expiredManualContracts as $expiredManualContract) {
 
                 try {
-                    $contract->update([
+                    $expiredManualContract->update([
                         'status' => ContractStatusEnum::EXPIRED,
+                    ]);
+
+                    if (env('APP_ENV') === 'local') {
+                        Mail::to('crolweb@gmail.com')->send(
+                            new \App\Mail\ContractExpiredMail($expiredManualContract)
+                        );
+                        Log::info("Mail sent to : crolweb@gmail.com");
+                    } else {
+                        app(ContractService::class)->sendExpiredContractMailToUsers($expiredManualContract);
+                    }
+
+                    Log::info('Contract updated', [
+                        'id' => $expiredManualContract->id,
+                        'name' => $expiredManualContract->name,
+                        'description' => $expiredManualContract->description,
                     ]);
                     $successCount++;
                 } catch (\Exception $e) {
-                    $this->handleNotificationError($contract, $e, $tenantId);
+                    $this->handleNotificationError($expiredManualContract, $e, $tenantId);
+                    $errorCount++;
+                }
+            }
+
+            foreach ($expiredAutomaticContracts as $expiredAutomaticContract) {
+
+                try {
+                    app(ContractService::class)->extendAutomaticContract($expiredAutomaticContract);
+
+                    if (env('APP_ENV') === 'local') {
+                        Mail::to('crolweb@gmail.com')->send(
+                            new \App\Mail\ContractExtendedMail($expiredAutomaticContract)
+                        );
+                        Log::info("Mail sent to : crolweb@gmail.com");
+                    } else {
+                        app(ContractService::class)->sendExtendedContractMailToUsers($expiredAutomaticContract);
+                    }
+
+                    Log::info('Contract extended', [
+                        'id' => $expiredAutomaticContract->id,
+                        'name' => $expiredAutomaticContract->name,
+                        'description' => $expiredAutomaticContract->description,
+                    ]);
+                    $successCount++;
+                } catch (\Exception $e) {
+                    $this->handleNotificationError($expiredAutomaticContract, $e, $tenantId);
                     $errorCount++;
                 }
             }
