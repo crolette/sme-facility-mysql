@@ -1,7 +1,6 @@
 <?php
 
 return [
-    // Generic CRUD
     'add-type' => 'Add :type',
     'create-type' => 'Create :type',
     'clear-type' => 'Clear :type',
@@ -11,21 +10,14 @@ return [
     'save-type' => 'Save :type',
     'upload-type' => 'Upload :type',
     'update-type' => 'Update :type',
-
-    // View actions
     'see-details' => 'See details',
     'see-all' => 'See all',
     'see-type' => 'See :type',
     'select-type' => 'Select :type',
     'select-all' => 'Select all',
-
-    // Search
-    'search-type' => 'Search :type',
+    'search-type' => 'Search :type...',
     'search-clear' => 'Clear search',
-
     'new-type' => 'New :type',
-
-    // Form actions
     'add' => 'Add',
     'edit' => 'Edit',
     'save' => 'Save',
@@ -43,13 +35,10 @@ return [
     'confirm' => 'Confirm',
     'send' => 'Send',
     'close' => 'Close',
-
     'export' => 'Export',
     'export-type' => 'Export :type',
     'import' => 'Import',
     'import-type' => 'Import :type',
-
-    // Done actions
     'saved' => 'Saved',
     'created' => 'Created',
     'updated' => 'Updated',
@@ -61,10 +50,6 @@ return [
     'closed' => 'Closed',
     'added-type' => ':type added',
     'closed-type' => ':type closed',
-
-    'search-type' => 'Search :type...',
-
-    // Processing actions
     'loading' => 'Loading...',
     'searching' => 'Searching...',
     'processing' => 'Processing...',
@@ -73,21 +58,14 @@ return [
     'type-being-submitted' => ':type is being submitted...',
     'type-being-updated' => ':type is being updated...',
     'type-being-deleted' => ':type is being deleted...',
-
-    // Specific actions
     'assign-type' => 'Assign :type',
-    'select-type' => 'Select :type',
     'validate-type' => 'Validate :type',
     'reject' => 'Reject',
     'handle-type' => 'Manage :type',
     'clear-selection' => 'Clear selection',
-
-    // Confirmations
     'delete-confirmation' => 'Yes, Delete',
     'cancel-confirmation' => 'No, Cancel',
-
-    // Other
     'actions' => 'Actions',
     'edit-profile' => 'Edit profile',
-    'generate_qr' => 'Generate new QR'
+    'generate_qr' => 'Generate new QR',
 ];

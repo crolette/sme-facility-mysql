@@ -2,9 +2,11 @@
 
 return [
     'title' => 'Ticket|Tickets',
-    'status.open' => 'Ouvert',
-    'status.ongoing' => 'En cours',
-    'status.closed' => 'Fermé',
+    'status' => [
+        'open' => 'Ouvert',
+        'ongoing' => 'En cours',
+        'closed' => 'Fermé',
+    ],
     'reporter' => 'Rapporteur',
     'related_to' => 'Lié à',
     'close' => 'Fermer',
@@ -19,6 +21,5 @@ return [
     'be_notified' => 'Souhaitez-vous être notifié lorsque le ticket est fermé ?',
     'closed_at' => 'Fermé le',
     'existing_tickets' => 'Ticket existant|Tickets existants',
-    'encode_ticket' => 'Quel est le problème rencontré ?'
-
+    'encode_ticket' => 'Quel est le problème rencontré ?',
 ];

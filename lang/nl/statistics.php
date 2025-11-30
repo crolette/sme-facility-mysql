@@ -2,7 +2,6 @@
 
 return [
     'title' => 'Statistieken',
-
     'clear_interval' => 'Interval wissen',
     'week' => 'Week',
     'per_week' => 'Per week',

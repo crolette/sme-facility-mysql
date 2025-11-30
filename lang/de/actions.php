@@ -1,7 +1,6 @@
 <?php
 
 return [
-    // Generic CRUD
     'add-type' => ':type hinzufügen',
     'create-type' => ':type erstellen',
     'clear-type' => ':type löschen',
@@ -11,19 +10,13 @@ return [
     'save-type' => ':type speichern',
     'upload-type' => ':type hochladen',
     'update-type' => ':type aktualisieren',
-
-    // View actions
     'see-details' => 'Details anzeigen',
     'see-all' => 'Alle anzeigen',
     'see-type' => ':type anzeigen',
     'select-type' => ':type auswählen',
     'select-all' => 'Alle auswählen',
-
-    // Search
-    'search-type' => ':type suchen',
+    'search-type' => ':type suchen...',
     'search-clear' => 'Suche löschen',
-
-    // Form actions
     'add' => 'Hinzufügen',
     'edit' => 'Bearbeiten',
     'save' => 'Speichern',
@@ -41,13 +34,10 @@ return [
     'confirm' => 'Bestätigen',
     'send' => 'Senden',
     'close' => 'Schließen',
-
     'export' => 'Exportieren',
     'export-type' => ':type exportieren',
     'import' => 'Importieren',
     'import-type' => ':type importieren',
-
-    // Done actions
     'saved' => 'Gespeichert',
     'created' => 'Erstellt',
     'updated' => 'Aktualisiert',
@@ -56,10 +46,6 @@ return [
     'type-submitted' => ':type gesendet',
     'confirmed' => 'Bestätigt',
     'sent' => 'Gesendet',
-
-    'search-type' => ':type suchen...',
-
-    // Processing actions
     'loading' => 'Laden...',
     'searching' => 'Suchen...',
     'processing' => 'Verarbeiten...',
@@ -68,21 +54,18 @@ return [
     'type-being-submitted' => ':type wird eingereicht...',
     'type-being-updated' => ':type wird aktualisiert...',
     'type-being-deleted' => ':type wird gelöscht...',
-
-    // Specific actions
     'assign-type' => ':type zuweisen',
-    'select-type' => ':type auswählen',
     'validate-type' => ':type validieren',
     'reject' => 'Ablehnen',
     'handle-type' => ':type verwalten',
     'clear-selection' => 'Auswahl löschen',
-
-    // Confirmations
     'delete-confirmation' => 'Ja, Löschen',
     'cancel-confirmation' => 'Nein, Abbrechen',
-
-    // Other
     'actions' => 'Aktionen',
     'edit-profile' => 'Profil bearbeiten',
-    'generate_qr' => 'Neuen QR generieren'
+    'generate_qr' => 'Neuen QR generieren',
+    'new-type' => 'Neu :type',
+    'closed' => 'Geschlossen',
+    'added-type' => ':type hinzugefügt',
+    'closed-type' => ':type geschlossen',
 ];

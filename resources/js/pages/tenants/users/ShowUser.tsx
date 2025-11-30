@@ -229,13 +229,16 @@ export default function ShowUser({ item }: { item: User }) {
                         {activeTab === 'maintenance' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                 <h3>{t('maintenances.maintenance_manager')}</h3>
-                                {item.manager.map((item) => (
-                                    <a href={item.maintainable.location_route}>
-                                        <p>
-                                            {item.maintainable.reference_code} - {item.name}
-                                        </p>
-                                    </a>
-                                ))}
+                                {item.manager.map(
+                                    (item) =>
+                                        item.maintainable && (
+                                            <a href={item.maintainable.location_route ?? ''}>
+                                                <p>
+                                                    {item.maintainable.reference_code} - {item.name}
+                                                </p>
+                                            </a>
+                                        ),
+                                )}
                             </div>
                         )}
                     </div>

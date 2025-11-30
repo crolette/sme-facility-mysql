@@ -8,8 +8,9 @@ return [
     'outdoor' => 'Outdoor',
     'buildings' => 'Building|Buildings',
     'floors' => 'Floor|Floors',
-    'rooms' => 'Room|Rooms',
-    'rooms.relocate' => 'Reassign room',
+    'rooms' => [
+        'relocate' => 'Reassign room',
+    ],
     'level' => 'Level',
     'redefine_room' => 'Redefine room',
     'surface_type_floor' => 'Floor surface & type',
@@ -20,6 +21,5 @@ return [
     'material_wall' => 'Wall material',
     'material_outdoor' => 'Outdoor material',
     'height' => 'Height',
-
     'delete_description' => 'Are you sure you want to delete :name. ',
 ];

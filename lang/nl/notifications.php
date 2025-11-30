@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     'title' => 'Kennisgeving|Kennisgevingen',
     'depreciation_end_date' => 'Einddatum van afschrijving',
@@ -22,7 +21,4 @@ return [
     'end_warranty_date_subtitle' => 'Een garantie loopt binnenkort af:',
     'end_warranty_date_description' => 'Na deze datum bent u niet langer door de garantie gedekt.',
     'disclaimer' => 'Deze melding werd automatisch gegenereerd door uw facilitymanagementsysteem. Neem contact op met uw beheerder als u vragen heeft.',
-
-
-
 ];

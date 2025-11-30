@@ -8,6 +8,5 @@ return [
     'job_position_placeholder' => 'CEO/Account Manager/...',
     'can_login' => 'Can login',
     'internal' => 'Internal',
-    'profile_picture' => 'Profile picture'
-
+    'profile_picture' => 'Profile picture',
 ];

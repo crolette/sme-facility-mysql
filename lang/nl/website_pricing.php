@@ -5,48 +5,47 @@ return [
     'meta_description' => 'Optimaliseer het beheer van uw uitrusting en het onderhoud van uw KMO met SME-Facility, de eenvoudige, snelle en gebruiksklare cloudoplossing.',
     'meta_title_og' => 'Vereenvoudig het beheer van uw uitrusting met SME-Facility',
     'meta_description_og' => 'SME-Facility helpt KMO\'s bij het centraliseren van onderhoud, het opvolgen van contracten en het automatiseren van herinneringen. Een complete tool om tijd te besparen en de productiviteit te verhogen.',
-
     'title' => 'Onze prijzen zijn even eenvoudig als ons product',
     'description' => 'Een compleet platform, zonder onnodige complexiteit, om uw kosten te beheersen en efficiënter te worden.',
-
     'from' => 'Vanaf',
     'month' => 'maand',
     'start_today' => 'Start vandaag',
-
-    'starter.title' => 'Starter',
-    'starter.items' => [
-        '1 site',
-        'Onbeperkt aantal activa',
-        'Tot 5 gebruikers',
-        '5 GB opslagruimte',
-        'Beheer van dienstverleners',
-        'Contractbeheer',
-        'Statistieken'
+    'starter' => [
+        'title' => 'Starter',
+        'items' => [
+            '1 site',
+            'Onbeperkt aantal activa',
+            'Tot 5 gebruikers',
+            '5 GB opslagruimte',
+            'Beheer van dienstverleners',
+            'Contractbeheer',
+            'Statistieken',
+        ],
     ],
-
-    'launching_offer' => 'Lanceringaanbieding',
-    'launching_offer.description' => 'Om de lancering van SME Facility te vieren, profiteert u van een uitzonderlijke aanbieding!',
-
-    'premium.title' => 'Premium',
-    'premium.items' => [
-        '2 sites',
-        'Onbeperkt aantal activa',
-        'Tot 15 gebruikers',
-        '15 GB opslagruimte',
-        'Beheer van dienstverleners',
-        'Contractbeheer',
-        'Statistieken'
+    'launching_offer' => [
+        'description' => 'Om de lancering van SME Facility te vieren, profiteert u van een uitzonderlijke aanbieding!',
     ],
-
-    'enterprise.title' => 'Enterprise',
+    'premium' => [
+        'title' => 'Premium',
+        'items' => [
+            '2 sites',
+            'Onbeperkt aantal activa',
+            'Tot 15 gebruikers',
+            '15 GB opslagruimte',
+            'Beheer van dienstverleners',
+            'Contractbeheer',
+            'Statistieken',
+        ],
+    ],
+    'enterprise' => [
+        'title' => 'Enterprise',
+        'items' => [
+            'Moet u meer dan 2 sites beheren?',
+            'Heeft u meer opslagruimte nodig?',
+            'Persoonlijke ondersteuning',
+        ],
+        'discuss' => 'Laten we erover praten',
+    ],
     'offer' => 'Aanbieding',
     'on_demand' => 'op aanvraag',
-
-    'enterprise.items' => [
-        'Moet u meer dan 2 sites beheren?',
-        'Heeft u meer opslagruimte nodig?',
-        'Persoonlijke ondersteuning',
-    ],
-    'enterprise.discuss' => 'Laten we erover praten'
-
 ];

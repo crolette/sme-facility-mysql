@@ -2,7 +2,6 @@
 
 return [
     'title' => 'Statistiken',
-
     'clear_interval' => 'Intervall löschen',
     'week' => 'Woche',
     'per_week' => 'Pro Woche',

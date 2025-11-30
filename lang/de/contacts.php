@@ -8,6 +8,5 @@ return [
     'job_position_placeholder' => 'CEO/Kundenberater/...',
     'can_login' => 'Kann sich anmelden',
     'internal' => 'Intern',
-    'profile_picture' => 'Profilbild'
-
+    'profile_picture' => 'Profilbild',
 ];

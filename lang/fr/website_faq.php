@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     'questions' => [
         'Quel est le coût de SME-Facility ?',
         'Y a-t-il des frais supplémentaires ?',
@@ -22,8 +21,6 @@ return [
         'Le démarrage de l\'application pour votre société peut se faire en quelques minutes. Le temps d\'implémentation de vos données est facilité par l\'approche simple et efficace de l\'application et par la possibilité d\'importer vos données venant d\'Excel',
         'Nous pouvons vous remettre une copie de l\'ensemble de vos données si vous décidiez d\'arrêter votre abonnement. Vos données sont par ailleurs conservées durant 30 jours et sont de nouveau directement disponibles si vous changez d\'avis durant cette période. Elles sont ensuite complètement effacées conformément à notre politique de confidentialité.',
         'Nous hébergeons vos données sur des serveurs sécurisés en France et nous réalisons des sauvegardes régulières.',
-        'Oui, une documentation est accessible via l\'application. Vous y trouverez un grand nombre de réponses à vos questions. Néanmoins, il vous est toujours possible de contacter notre support en cas de besoin.'
+        'Oui, une documentation est accessible via l\'application. Vous y trouverez un grand nombre de réponses à vos questions. Néanmoins, il vous est toujours possible de contacter notre support en cas de besoin.',
     ],
-
-
 ];

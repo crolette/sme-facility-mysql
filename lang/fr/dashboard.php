@@ -8,5 +8,4 @@ return [
     'maintenances_next' => 'Prochaines maintenances',
     'interventions_overdue' => 'Interventions en retard',
     'interventions_next' => 'Prochaines interventions',
-
 ];

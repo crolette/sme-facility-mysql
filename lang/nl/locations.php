@@ -8,8 +8,9 @@ return [
     'outdoor' => 'Buitenruimte',
     'buildings' => 'Gebouw|Gebouwen',
     'floors' => 'Verdieping|Verdiepingen',
-    'rooms' => 'Ruimte|Ruimtes',
-    'rooms.relocate' => 'Kamer opnieuw toewijzen',
+    'rooms' => [
+        'relocate' => 'Kamer opnieuw toewijzen',
+    ],
     'level' => 'Niveau',
     'redefine_room' => 'Ruimte herdefiniëren',
     'surface_floor' => 'Vloeroppervlak',
@@ -17,5 +18,8 @@ return [
     'material_floor' => 'Vloermateriaal',
     'material_wall' => 'Wandmateriaal',
     'material_outdoor' => 'Buitenmateriaal',
-    'height' => 'Hoogte'
+    'height' => 'Hoogte',
+    'surface_type_floor' => 'Vloeroppervlak & type',
+    'surface_type_wall' => 'Wandoppervlak en -type',
+    'delete_description' => 'Weet u zeker dat u :name wilt verwijderen.',
 ];

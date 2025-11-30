@@ -8,8 +8,9 @@ return [
     'outdoor' => 'Außenbereich',
     'buildings' => 'Gebäude|Gebäude',
     'floors' => 'Etage|Etagen',
-    'rooms' => 'Raum|Räume',
-    'rooms.relocate' => 'Raum neu zuweisen',
+    'rooms' => [
+        'relocate' => 'Raum neu zuweisen',
+    ],
     'level' => 'Ebene',
     'redefine_room' => 'Raum neu definieren',
     'surface_floor' => 'Bodenfläche',
@@ -17,5 +18,8 @@ return [
     'material_floor' => 'Bodenmaterial',
     'material_wall' => 'Wandmaterial',
     'material_outdoor' => 'Außenmaterial',
-    'height' => 'Höhe'
+    'height' => 'Höhe',
+    'surface_type_floor' => 'Bodenoberfläche und -typ',
+    'surface_type_wall' => 'Wandoberfläche und -typ',
+    'delete_description' => 'Sind Sie sicher, dass Sie :name löschen möchten?',
 ];

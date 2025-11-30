@@ -13,7 +13,6 @@ return [
     'brand' => 'Brand',
     'model' => 'Model',
     'serial_number' => 'Serial number',
-
     'depreciation' => 'Depreciation',
     'depreciable' => 'Depreciable',
     'depreciation_duration' => 'Depreciation duration (years)',
@@ -22,7 +21,6 @@ return [
     'depreciation_end_date' => 'Depreciation end date',
     'residual_value' => 'Residual value',
     'residual_value_placeholder' => 'Residual value after end of depreciation (max. 2 decimals) : 4236.36',
-
     'still_under_warranty' => 'Still under warranty',
     'purchase_warranty' => 'Purchase/Warranty',
     'purchase_date' => 'Purchase date',
@@ -30,8 +28,6 @@ return [
     'purchase_cost' => 'Purchase cost',
     'purchase_cost_placeholder' => 'Purchase cost (max. 2 decimals) : 4236.36',
     'warranty_end_date' => 'Warranty end date',
-
     'delete_description' => 'Are you sure you want to delete the asset :name. ',
     'delete_definitely_description' => 'Are you sure to delete this asset DEFINITELY ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.',
-
 ];

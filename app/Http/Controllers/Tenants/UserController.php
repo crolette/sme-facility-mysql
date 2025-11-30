@@ -95,6 +95,8 @@ class UserController extends Controller
             abort(403);
         }
 
+        // dd($user->load('assets', 'manager.maintainable', 'roles:id,name', 'provider:id,name', 'assignedInterventions'));
+
         return Inertia::render('tenants/users/ShowUser', ['item' => $user->load('assets', 'manager.maintainable', 'roles:id,name', 'provider:id,name', 'assignedInterventions')]);
     }
 }

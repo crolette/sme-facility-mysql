@@ -2,7 +2,6 @@
 
 return [
     'title' => 'Statistics',
-
     'clear_interval' => 'Clear interval',
     'week' => 'Week',
     'per_week' => 'Per week',

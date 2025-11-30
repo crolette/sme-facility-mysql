@@ -2,9 +2,11 @@
 
 return [
     'title' => 'Ticket|Tickets',
-    'status.open' => 'Offen',
-    'status.ongoing' => 'In Bearbeitung',
-    'status.closed' => 'Geschlossen',
+    'status' => [
+        'open' => 'Offen',
+        'ongoing' => 'In Bearbeitung',
+        'closed' => 'Geschlossen',
+    ],
     'reporter' => 'Melder',
     'related_to' => 'Bezogen auf',
     'close' => 'Schließen',
@@ -20,5 +22,4 @@ return [
     'closed_at' => 'Geschlossen am',
     'existing_tickets' => 'Bestehendes Ticket|Bestehende Tickets',
     'encode_ticket' => 'Welches Problem ist aufgetreten?',
-
 ];

@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     'title' => 'Notification|Notifications',
     'depreciation_end_date' => 'Date de fin d’amortissement',
@@ -22,6 +21,4 @@ return [
     'end_warranty_date_subtitle' => 'Une garantie arrive bientôt à expiration :',
     'end_warranty_date_description' => 'Après cette date, vous ne serez plus couvert par la garantie.',
     'disclaimer' => 'Cette notification a été générée automatiquement par votre système de facility management. Pour toute question, contactez votre administrateur.',
-
-
 ];

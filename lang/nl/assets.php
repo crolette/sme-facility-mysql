@@ -13,7 +13,6 @@ return [
     'brand' => 'Merk',
     'model' => 'Model',
     'serial_number' => 'Serienummer',
-
     'depreciation' => 'Afschrijving',
     'depreciable' => 'Afschrijfbaar',
     'depreciation_duration' => 'Afschrijvingsduur',
@@ -22,7 +21,6 @@ return [
     'depreciation_end_date' => 'Einddatum afschrijving',
     'residual_value' => 'Restwaarde',
     'residual_value_placeholder' => 'Restwaarde na einde afschrijving (max. 2 decimalen) : 4236.36',
-
     'still_under_warranty' => 'Nog onder garantie',
     'purchase_warranty' => 'Aankoop/Garantie',
     'purchase_date' => 'Aankoopdatum',
@@ -30,5 +28,6 @@ return [
     'purchase_cost' => 'Aankoopkosten',
     'purchase_cost_placeholder' => 'Aankoopkosten (max. 2 decimalen) : 4236.36',
     'warranty_end_date' => 'Einddatum garantie',
-
+    'delete_description' => 'Weet u zeker dat u item :name wilt verwijderen.',
+    'delete_definitely_description' => 'Weet u zeker dat u dit item DEFINITIEF wilt verwijderen? U kunt het daarna niet meer herstellen! Alle foto\'s, documenten, ... worden ook verwijderd.',
 ];

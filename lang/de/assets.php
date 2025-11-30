@@ -13,7 +13,6 @@ return [
     'brand' => 'Marke',
     'model' => 'Modell',
     'serial_number' => 'Seriennummer',
-
     'depreciation' => 'Abschreibung',
     'depreciable' => 'Abschreibbar',
     'depreciation_duration' => 'Abschreibungsdauer',
@@ -22,7 +21,6 @@ return [
     'depreciation_end_date' => 'Enddatum der Abschreibung',
     'residual_value' => 'Restwert',
     'residual_value_placeholder' => 'Restwert nach Ende der Abschreibung (max. 2 Dezimalstellen) : 4236.36',
-
     'still_under_warranty' => 'Noch unter Garantie',
     'purchase_warranty' => 'Kauf/Garantie',
     'purchase_date' => 'Kaufdatum',
@@ -30,5 +28,6 @@ return [
     'purchase_cost' => 'Kaufkosten',
     'purchase_cost_placeholder' => 'Kaufkosten (max. 2 Dezimalstellen) : 4236.36',
     'warranty_end_date' => 'Enddatum der Garantie',
-
+    'delete_description' => 'Sind Sie sicher, dass Sie das Vermögenswert :name löschen möchten?',
+    'delete_definitely_description' => 'Sind Sie sicher, dass Sie dieses Vermögenswert ENDGÜLTIG löschen? Sie können es danach nicht mehr wiederherstellen! Alle Bilder, Dokumente, ... werden ebenfalls gelöscht.',
 ];

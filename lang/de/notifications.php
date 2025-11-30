@@ -1,6 +1,5 @@
 <?php
 
-
 return [
     'title' => 'Benachrichtigung|Benachrichtigungen',
     'depreciation_end_date' => 'Enddatum der Abschreibung',
@@ -22,7 +21,4 @@ return [
     'end_warranty_date_subtitle' => 'Eine Garantie läuft bald ab:',
     'end_warranty_date_description' => 'Nach diesem Datum sind Sie nicht mehr durch die Garantie abgedeckt.',
     'disclaimer' => 'Diese Benachrichtigung wurde automatisch von Ihrem Facility-Management-System erstellt. Bei Fragen wenden Sie sich bitte an Ihren Administrator.',
-
-
-
 ];

@@ -13,7 +13,6 @@ return [
     'brand' => 'Marque',
     'model' => 'Modèle',
     'serial_number' => 'Numéro de série',
-
     'depreciation' => 'Amortissement',
     'depreciable' => 'Amortissable',
     'depreciation_duration' => 'Durée d\'amortissement',
@@ -22,7 +21,6 @@ return [
     'depreciation_end_date' => 'Date de fin d\'amortissement',
     'residual_value' => 'Valeur résiduelle',
     'residual_value_placeholder' => 'Valeur résiduelle après fin d\'amortissement (max. 2 décimales) : 4236.36',
-
     'still_under_warranty' => 'Toujours sous garantie',
     'purchase_warranty' => 'Achat/Garantie',
     'purchase_date' => 'Date d\'achat',
@@ -30,5 +28,6 @@ return [
     'purchase_cost' => 'Coût d\'achat',
     'purchase_cost_placeholder' => 'Coût d\'achat (max. 2 décimales) : 4236.36',
     'warranty_end_date' => 'Date de fin de garantie',
-
+    'delete_description' => 'Êtes-vous sûr de vouloir supprimer l\'actif :name ?',
+    'delete_definitely_description' => 'Etes-vous sûr de supprimer définitivement cet actif ? Vous ne pourrez plus le restaurer par la suite ! Toutes les photos, documents, ... seront également supprimés.',
 ];
