@@ -21,6 +21,7 @@ export interface Error {
 
 export interface PaginatedData {
     // data: Asset[] | Contract[];
+    data: [];
     current_page: number;
     last_page: number;
     per_page: number;

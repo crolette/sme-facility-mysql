@@ -1,10 +1,10 @@
 import { cn } from '@/lib/utils';
-import { PaginatedData } from '@/types';
+import { AssetsPaginated, ContractsPaginated, ProvidersPaginated } from '@/types';
 import { Link } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Button } from './ui/button';
 
-function Pagination({ items, className }: { items: PaginatedData; className?: string }) {
+function Pagination({ items, className }: { items: ProvidersPaginated | AssetsPaginated | ContractsPaginated; className?: string }) {
     const { t } = useLaravelReactI18n();
     return (
         <div className={cn('mt-2 flex w-full flex-wrap gap-4', className)}>

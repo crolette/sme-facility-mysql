@@ -16,7 +16,7 @@ import { Asset, AssetsPaginated, BreadcrumbItem, CentralType } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { ArchiveRestore, Loader, Pencil, PlusCircle, Shredder, Trash2, X } from 'lucide-react';
+import { ArchiveRestore, FileDownIcon, Loader, Pencil, PlusCircle, Shredder, SquareX, Trash2, X } from 'lucide-react';
 
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
@@ -200,39 +200,6 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
 
     const { layout } = useGridTableLayoutContext();
 
-    // const MAX_SELECTION = 100;
-    // const [selectedAssetIds, setSelectedAssetsIds] = useState<number[]>(() => {
-    //     const saved = sessionStorage.getItem('selectedAssets');
-    //     return saved ? JSON.parse(saved) : [];
-    // });
-
-    // const handleSelectAssetId = (assetId: number) => {
-    //     setSelectedAssetsIds((prev) =>
-    //         prev.includes(assetId) ? prev.filter((id) => id !== assetId) : prev.length < MAX_SELECTION ? [...prev, assetId] : [...prev],
-    //     );
-    // };
-
-    // const handleSelectAllAssetId = (event: React.MouseEvent<HTMLButtonElement>, assets: Asset[]) => {
-    //     if (event.target.ariaChecked === 'true') {
-    //         assets.map((asset) => {
-    //             setSelectedAssetsIds((prev) => prev.filter((id) => id !== asset.id));
-    //         });
-    //     } else {
-    //         assets.map((asset) => {
-    //             setSelectedAssetsIds((prev) => (prev.includes(asset.id) ? [...prev] : prev.length < MAX_SELECTION ? [...prev, asset.id] : [...prev]));
-    //         });
-    //     }
-    // };
-
-    // const clearSelection = () => {
-    //     sessionStorage.removeItem('selectedAssets');
-    //     setSelectedAssetsIds([]);
-    // };
-
-    // useEffect(() => {
-    //     sessionStorage.setItem('selectedAssets', JSON.stringify(selectedAssetIds));
-    // }, [selectedAssetIds]);
-
     const { selectedIds, handleSelectIds, handleSelectAllIds, clearSelection } = useSelectIds({ storageKey: 'selectedAssets' });
 
     const submitSelectedIds: FormEventHandler = async (e) => {
@@ -340,27 +307,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                 </div>
 
                 <div className="flex w-full flex-col sm:flex-row sm:items-center sm:justify-between">
-                    <div className="flex items-center gap-10">
-                        <h1>{tChoice('assets.title', 2)}</h1>
-                        {hasPermission('create assets') && selectedIds.length !== 0 && (
-                            <div className="flex gap-2 text-xs">
-                                <form onSubmit={submitSelectedIds}>
-                                    <Button type={'submit'} variant={'secondary'}>
-                                        {t('actions.export-type', { type: tChoice('assets.title', 2) })}
-                                    </Button>
-                                </form>
-                                <a href={route('tenant.pdf.qr-codes', { type: 'assets', ids: selectedIds })} target="__blank">
-                                    <Button variant={'secondary'}>
-                                        <BiSolidFilePdf size={20} />
-                                        {t('actions.download-type', { type: tChoice('common.qr_codes', 2) })}
-                                    </Button>
-                                </a>
-                                <Button onClick={clearSelection} variant={'destructive'}>
-                                    {t('actions.clear-selection')}
-                                </Button>
-                            </div>
-                        )}
-                    </div>
+                    <h1>{tChoice('assets.title', 2)}</h1>
 
                     <DisplayGridTableIndex />
                 </div>
@@ -368,21 +315,61 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                 {isLoading ? (
                     <p>{t('actions.loading')}</p>
                 ) : layout === 'grid' ? (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
-                        {assets.map((asset, index) => (
-                            <div key={index} className="border-accent bg-sidebar flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4">
-                                {asset.deleted_at ? (
-                                    <a href={route(`tenant.assets.deleted`, asset.id)}> {asset.reference_code} </a>
-                                ) : (
-                                    <a href={route(`tenant.assets.show`, asset.reference_code)}> {asset.reference_code} </a>
-                                )}
-                                <p className="text-xs">{asset.code ?? ''}</p>
-                                <p className="text-xs">{asset.category ?? ''}</p>
-                                <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">{asset.maintainable.name}</p>
-                                <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">{asset.maintainable.description}</p>
-                            </div>
-                        ))}
-                    </div>
+                    <>
+                        <div className="flex h-8 items-center gap-2">
+                            <p>{t('actions.select-all')}</p>
+                            {hasPermission('create assets') && (
+                                <Checkbox
+                                    name=""
+                                    id=""
+                                    value={''}
+                                    checked={assets.every((asset) => selectedIds.includes(asset.id))}
+                                    onClick={() => handleSelectAllIds(assets)}
+                                    className="cursor-pointer"
+                                />
+                            )}
+                            {hasPermission('create assets') && selectedIds.length !== 0 && (
+                                <div className="ml-4 space-x-2">
+                                    <Button type={'submit'} variant={'secondary'} size={'icon'}>
+                                        <FileDownIcon />
+                                    </Button>
+
+                                    <Button onClick={clearSelection} variant={'destructive'} size={'icon'}>
+                                        <SquareX />
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
+                            {assets.map((asset, index) => (
+                                <div key={index} className="border-accent bg-sidebar flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4">
+                                    <div className="flex justify-between">
+                                        {asset.deleted_at ? (
+                                            <a href={route(`tenant.assets.deleted`, asset.id)}> {asset.reference_code} </a>
+                                        ) : (
+                                            <a href={route(`tenant.assets.show`, asset.reference_code)}> {asset.reference_code} </a>
+                                        )}
+                                        {hasPermission('create assets') && (
+                                            <Checkbox
+                                                name=""
+                                                id=""
+                                                className="cursor-pointer"
+                                                value={asset.id}
+                                                checked={selectedIds.includes(asset.id)}
+                                                onClick={() => handleSelectIds(asset.id)}
+                                            />
+                                        )}
+                                    </div>
+
+                                    <p className="text-xs">{asset.code ?? ''}</p>
+                                    <p className="text-xs">{asset.category ?? ''}</p>
+                                    <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">{asset.maintainable.name}</p>
+                                    <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">{asset.maintainable.description}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 ) : (
                     <Table>
                         <TableHead>
@@ -400,7 +387,18 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                         />
                                     )}
 
-                                    {t('common.reference_code')}
+                                    <p>{t('common.reference_code')}</p>
+                                    {hasPermission('create assets') && selectedIds.length !== 0 && (
+                                        <div className="ml-4 space-x-2">
+                                            <Button type={'submit'} variant={'secondary'} size={'icon'}>
+                                                <FileDownIcon />
+                                            </Button>
+
+                                            <Button onClick={clearSelection} variant={'destructive'} size={'icon'}>
+                                                <SquareX />
+                                            </Button>
+                                        </div>
+                                    )}
                                 </TableHeadData>
                                 <TableHeadData>{t('common.code')}</TableHeadData>
                                 <TableHeadData>{t('common.category')}</TableHeadData>

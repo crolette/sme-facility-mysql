@@ -1,17 +1,21 @@
 import { Pagination } from '@/components/pagination';
 import { useGridTableLayoutContext } from '@/components/tenant/gridTableLayoutContext';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import DisplayGridTableIndex from '@/components/ui/displayGridTableIndex';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import { usePermissions } from '@/hooks/usePermissions';
+import { useSelectIds } from '@/hooks/useSelectIds';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem, CentralType, Provider, ProvidersPaginated } from '@/types';
 import { Head, router } from '@inertiajs/react';
+import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Loader, Pencil, PlusCircle, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { FileDownIcon, Loader, Pencil, PlusCircle, SquareX, X } from 'lucide-react';
+import { FormEventHandler, useEffect, useState } from 'react';
 
 export interface SearchParams {
     category: number | null;
@@ -71,6 +75,7 @@ export default function IndexProviders({
 
     const [search, setSearch] = useState(query.q);
     const [debouncedSearch, setDebouncedSearch] = useState<string>('');
+    const { showToast } = useToast();
 
     useEffect(() => {
         if (!search) return;
@@ -112,13 +117,25 @@ export default function IndexProviders({
     }, [query]);
 
     const { layout } = useGridTableLayoutContext();
+    const { selectedIds, handleSelectIds, handleSelectAllIds, clearSelection } = useSelectIds({ storageKey: 'selectedProviders' });
+
+    const submitSelectedIds: FormEventHandler = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post(route('tenant.providers.export'), { ids: selectedIds });
+            showToast(response.data.message);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            clearSelection();
+        }
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={tChoice('providers.title', 2)} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="border-accent flex flex-col gap-2 border-b-2 pb-2 sm:flex-row sm:gap-10">
-                    {/* <div className="flex w-full justify-between gap-4"> */}
                     <details className="border-border relative w-full cursor-pointer rounded-md border-2 p-1" open={isLoading ? false : undefined}>
                         <summary>{t('common.search_filter')}</summary>
                         <div className="bg-border border-border text-background dark:text-foreground absolute top-full z-10 flex flex-col items-center gap-4 rounded-b-md border-2 p-2 sm:flex-row">
@@ -163,30 +180,92 @@ export default function IndexProviders({
                             </Button>
                         </a>
                     )}
-                    {/* </div> */}
                 </div>
                 <div className="flex w-full flex-col sm:flex-row sm:items-center sm:justify-between">
                     <h1>{tChoice(`providers.title`, 2)}</h1>
+
                     <DisplayGridTableIndex />
                 </div>
                 {layout === 'grid' ? (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
-                        {providers.map((item, index) => (
-                            <div key={index} className="border-accent bg-sidebar flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4">
-                                <a href={route('tenant.providers.show', item.id)} className="text-sm">
-                                    {item.name}
-                                </a>
-                                <p className="text-xs">{item.category ?? ''}</p>
-                                <p className="text-xs">{item.phone_number ?? ''}</p>
-                                <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">{item.email ?? ''}</p>
-                            </div>
-                        ))}
-                    </div>
+                    <>
+                        <div className="flex h-8 items-center gap-2">
+                            <p>{t('actions.select-all')}</p>
+                            {hasPermission('create providers') && (
+                                <Checkbox
+                                    name=""
+                                    id=""
+                                    value={''}
+                                    checked={providers.every((provider: Provider) => selectedIds.includes(provider.id))}
+                                    onClick={() => handleSelectAllIds(providers)}
+                                    className="cursor-pointer"
+                                />
+                            )}
+                            {hasPermission('create providers') && selectedIds.length !== 0 && (
+                                <div className="ml-4 space-x-2">
+                                    <Button type={'submit'} variant={'secondary'} size={'icon'}>
+                                        <FileDownIcon />
+                                    </Button>
+
+                                    <Button onClick={clearSelection} variant={'destructive'} size={'icon'}>
+                                        <SquareX />
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
+                            {providers.map((item, index) => (
+                                <div key={index} className="border-accent bg-sidebar flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4">
+                                    <div className="flex justify-between">
+                                        <a href={route('tenant.providers.show', item.id)} className="text-sm">
+                                            {item.name}
+                                        </a>
+                                        {hasPermission('create users') && (
+                                            <Checkbox
+                                                name=""
+                                                id=""
+                                                className="cursor-pointer"
+                                                value={item.id}
+                                                checked={selectedIds.includes(item.id)}
+                                                onClick={() => handleSelectIds(item.id)}
+                                            />
+                                        )}
+                                    </div>
+                                    <p className="text-xs">{item.category ?? ''}</p>
+                                    <p className="text-xs">{item.phone_number ?? ''}</p>
+                                    <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">{item.email ?? ''}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 ) : (
                     <Table>
                         <TableHead>
                             <TableHeadRow>
-                                <TableHeadData>{t('providers.company_name')}</TableHeadData>
+                                <TableHeadData className="flex items-center">
+                                    {hasPermission('create providers') && (
+                                        <Checkbox
+                                            name=""
+                                            id=""
+                                            value={''}
+                                            checked={providers.every((provider: Provider) => selectedIds.includes(provider.id))}
+                                            onClick={() => handleSelectAllIds(providers)}
+                                            className="mr-3 -ml-2 cursor-pointer"
+                                        />
+                                    )}
+                                    <p>{t('providers.company_name')}</p>
+                                    {hasPermission('create providers') && selectedIds.length !== 0 && (
+                                        <div className="ml-4 space-x-2">
+                                            <Button type={'submit'} variant={'secondary'} size={'icon'}>
+                                                <FileDownIcon />
+                                            </Button>
+
+                                            <Button onClick={clearSelection} variant={'destructive'} size={'icon'}>
+                                                <SquareX />
+                                            </Button>
+                                        </div>
+                                    )}
+                                </TableHeadData>
                                 <TableHeadData>{t('common.category')}</TableHeadData>
                                 <TableHeadData>{t('common.phone')}</TableHeadData>
                                 <TableHeadData>{t('common.email')}</TableHeadData>
@@ -208,7 +287,19 @@ export default function IndexProviders({
                                     return (
                                         <TableBodyRow key={index}>
                                             <TableBodyData>
-                                                <a href={route('tenant.providers.show', item.id)}>{item.name}</a>
+                                                <div className="flex items-center gap-3">
+                                                    {hasPermission('create providers') && (
+                                                        <Checkbox
+                                                            name=""
+                                                            id=""
+                                                            className="cursor-pointer"
+                                                            value={item.id}
+                                                            checked={selectedIds.includes(item.id)}
+                                                            onClick={() => handleSelectIds(item.id)}
+                                                        />
+                                                    )}
+                                                    <a href={route('tenant.providers.show', item.id)}>{item.name}</a>
+                                                </div>
                                             </TableBodyData>
                                             <TableBodyData>{item.category ?? ''}</TableBodyData>
                                             <TableBodyData>{item.phone_number}</TableBodyData>

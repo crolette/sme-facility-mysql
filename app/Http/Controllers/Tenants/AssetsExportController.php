@@ -30,17 +30,15 @@ class AssetsExportController extends Controller
         }
 
         $request = Validator::make($request->all(), [
-            'ids' => 'nullable|array|max:12',
-            'ids' => 'exists:assets,id',
+            'ids' => 'nullable|array',
+            'ids.*' => 'exists:assets,id',
             'template' => 'nullable|boolean'
         ]);
-
 
         $validated = $request->validated();
 
         $validated['ids'] = isset($validated['ids']) ?  $validated['ids'] : [];
         $validated['template'] = isset($validated['template']) ?  $validated['template'] : false;
-
 
         Log::info('DISPATCH EXPORT ASSETS EXCEL JOB');
         ExportAssetsExcelJob::dispatch(Auth::user(), $validated)->onQueue('default');;

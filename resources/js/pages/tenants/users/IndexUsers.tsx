@@ -1,18 +1,23 @@
 import { Pagination } from '@/components/pagination';
 import { useGridTableLayoutContext } from '@/components/tenant/gridTableLayoutContext';
+import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import DisplayGridTableIndex from '@/components/ui/displayGridTableIndex';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Pill } from '@/components/ui/pill';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
+import { usePermissions } from '@/hooks/usePermissions';
+import { useSelectIds } from '@/hooks/useSelectIds';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { BreadcrumbItem, PaginatedData } from '@/types';
+import { BreadcrumbItem, PaginatedData, User } from '@/types';
 import { Head, router } from '@inertiajs/react';
+import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Loader, PlusCircle, ShieldUser, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { FileDownIcon, Loader, PlusCircle, ShieldUser, SquareX, X } from 'lucide-react';
+import { FormEventHandler, useEffect, useState } from 'react';
 
 export interface SearchParams {
     q: string | null;
@@ -25,6 +30,7 @@ export interface SearchParams {
 
 export default function IndexUsers({ items, filters }: { items: PaginatedData; filters: SearchParams }) {
     const { t, tChoice } = useLaravelReactI18n();
+    const { hasPermission } = usePermissions();
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: `Index ${tChoice('contacts.title', 2)}`,
@@ -151,6 +157,20 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
     }, [query]);
 
     const { layout } = useGridTableLayoutContext();
+    const { showToast } = useToast();
+    const { selectedIds, handleSelectIds, handleSelectAllIds, clearSelection } = useSelectIds({ storageKey: 'selectedUsers' });
+
+    const submitSelectedIds: FormEventHandler = async (e) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post(route('tenant.users.export'), { ids: selectedIds });
+            showToast(response.data.message);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            clearSelection();
+        }
+    };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -159,7 +179,6 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
                 <div className="border-accent flex flex-col gap-2 border-b-2 pb-2 sm:flex-row sm:gap-10">
                     <details className="border-border relative w-full cursor-pointer rounded-md border-2 p-1" open={isLoading ? false : undefined}>
                         <summary>{t('common.search_filter')}</summary>
-
                         <div className="bg-border border-border text-background dark:text-foreground absolute top-full z-10 flex flex-col items-center gap-4 rounded-b-md border-2 p-2 md:flex-row">
                             <div className="flex flex-col items-center gap-2">
                                 <Label htmlFor="role">{t('contacts.role')}</Label>
@@ -167,8 +186,8 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
                                     <option value={''} aria-readonly>
                                         {t('actions.select-type', { type: t('contacts.role') })}
                                     </option>
-                                    <option value={'admin'}>Admin</option>
-                                    <option value={'manager'}>Maintenance Manager</option>
+                                    <option value={'admin'}>{t('contacts.role.admin')}</option>
+                                    <option value={'manager'}>{t('contacts.role.maintenance_manager')}</option>
                                 </select>
                             </div>
                             <div className="flex flex-col items-center gap-2">
@@ -221,40 +240,102 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
                 </div>
                 <div className="flex w-full flex-col sm:flex-row sm:items-center sm:justify-between">
                     <h1>{tChoice(`contacts.title`, 2)}</h1>
+
                     <DisplayGridTableIndex />
                 </div>
                 {layout === 'grid' ? (
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
-                        {items.data.map((item, index) => (
-                            <div
-                                key={index}
-                                className="border-accent bg-sidebar relative flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4"
-                            >
-                                <p className="text-xs">
-                                    <ShieldUser className={cn('absolute right-4', item.can_login ? 'text-green-600' : 'text-red-600')} size={16} />
-                                </p>
-                                <a href={route('tenant.users.show', item.id)}>{item.full_name}</a>
-                                <p className="text-xs">{item.job_position ?? ''}</p>
-                                <p className="text-xs">
-                                    <a href={`mailto:${item.email}`}>{item.email}</a>
-                                </p>
+                    <>
+                        <div className="flex h-8 items-center gap-2">
+                            <p>{t('actions.select-all')}</p>
+                            {hasPermission('create users') && (
+                                <Checkbox
+                                    name=""
+                                    id=""
+                                    value={''}
+                                    checked={items.data.every((user: User) => selectedIds.includes(user.id))}
+                                    onClick={() => handleSelectAllIds(items.data)}
+                                    className="cursor-pointer"
+                                />
+                            )}
+                            {hasPermission('create users') && selectedIds.length !== 0 && (
+                                <div className="ml-4 space-x-2">
+                                    <Button type={'submit'} variant={'secondary'} size={'icon'}>
+                                        <FileDownIcon />
+                                    </Button>
 
-                                <p className="text-xs">{item.roles && item.roles.length > 0 ? item.roles[0].name : ''}</p>
-                                <p className="text-xs">
-                                    {item.provider ? (
-                                        <a href={route('tenant.providers.show', item.provider?.id)}>{item.provider?.name}</a>
-                                    ) : (
-                                        <p>Internal</p>
-                                    )}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
+                                    <Button onClick={clearSelection} variant={'destructive'} size={'icon'}>
+                                        <SquareX />
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 xl:grid-cols-5">
+                            {items.data.map((item: User, index) => (
+                                <div
+                                    key={index}
+                                    className="border-accent bg-sidebar relative flex flex-col gap-2 overflow-hidden rounded-md border-2 p-4"
+                                >
+                                    <div className="flex justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <a href={route('tenant.users.show', item.id)}>{item.full_name}</a>
+                                            <ShieldUser className={cn(item.can_login ? 'text-green-600' : 'text-red-600')} size={16} />
+                                        </div>
+                                        {hasPermission('create users') && (
+                                            <Checkbox
+                                                name=""
+                                                id=""
+                                                className="cursor-pointer"
+                                                value={item.id}
+                                                checked={selectedIds.includes(item.id)}
+                                                onClick={() => handleSelectIds(item.id)}
+                                            />
+                                        )}
+                                    </div>
+                                    <p className="text-xs">{item.job_position ?? ''}</p>
+                                    <p className="text-xs">
+                                        <a href={`mailto:${item.email}`}>{item.email}</a>
+                                    </p>
+                                    <p className="text-xs">{item.roles && item.roles.length > 0 ? item.roles[0].name : ''}</p>
+                                    <p className="text-xs">
+                                        {item.provider ? (
+                                            <a href={route('tenant.providers.show', item.provider?.id)}>{item.provider?.name}</a>
+                                        ) : (
+                                            <p>{t('contacts.internal')}</p>
+                                        )}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </>
                 ) : (
                     <Table>
                         <TableHead>
                             <TableHeadRow>
-                                <TableHeadData>{t('common.full_name')}</TableHeadData>
+                                <TableHeadData className="flex items-center">
+                                    {hasPermission('create users') && (
+                                        <Checkbox
+                                            name=""
+                                            id=""
+                                            value={''}
+                                            checked={items.data.every((user: User) => selectedIds.includes(user.id))}
+                                            onClick={() => handleSelectAllIds(items.data)}
+                                            className="mr-3 -ml-2 cursor-pointer"
+                                        />
+                                    )}
+                                    <p>{t('common.full_name')}</p>
+                                    {hasPermission('create users') && selectedIds.length !== 0 && (
+                                        <div className="ml-4 space-x-2">
+                                            <Button type={'submit'} variant={'secondary'} size={'icon'}>
+                                                <FileDownIcon />
+                                            </Button>
+
+                                            <Button onClick={clearSelection} variant={'destructive'} size={'icon'}>
+                                                <SquareX />
+                                            </Button>
+                                        </div>
+                                    )}
+                                </TableHeadData>
                                 <TableHeadData>{t('contacts.job_position')}</TableHeadData>
                                 <TableHeadData>{t('common.email')}</TableHeadData>
                                 <TableHeadData>{t('contacts.role')}</TableHeadData>
@@ -272,15 +353,29 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
                                     </TableBodyData>
                                 </TableBodyRow>
                             ) : items.data.length > 0 ? (
-                                items.data.map((item, index) => {
+                                items.data.map((item: User, index) => {
                                     return (
                                         <TableBodyRow key={index}>
                                             <TableBodyData>
-                                                <a href={route('tenant.users.show', item.id)}>{item.full_name}</a>
-                                                <ShieldUser
-                                                    className={cn('ml-2 inline-block', item.can_login ? 'text-green-600' : 'text-red-600')}
-                                                    size={16}
-                                                />
+                                                <div className="flex items-center gap-3">
+                                                    {hasPermission('create users') && (
+                                                        <Checkbox
+                                                            name=""
+                                                            id=""
+                                                            className="cursor-pointer"
+                                                            value={item.id}
+                                                            checked={selectedIds.includes(item.id)}
+                                                            onClick={() => handleSelectIds(item.id)}
+                                                        />
+                                                    )}
+                                                    <div className="flex items-center">
+                                                        <a href={route('tenant.users.show', item.id)}>{item.full_name}</a>
+                                                        <ShieldUser
+                                                            className={cn('ml-2 inline-block', item.can_login ? 'text-green-600' : 'text-red-600')}
+                                                            size={16}
+                                                        />
+                                                    </div>
+                                                </div>
                                             </TableBodyData>
                                             <TableBodyData>{item.job_position}</TableBodyData>
                                             <TableBodyData>

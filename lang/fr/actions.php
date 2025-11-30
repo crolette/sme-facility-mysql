@@ -18,6 +18,7 @@ return [
     'see-all' => 'Voir tout',
     'see-type' => 'Voir :type',
     'select-type' => 'Sélectionner :type',
+    'select-all' => 'Sélectionner tout',
 
     // Search
     'search-type' => 'Rechercher :type',

@@ -27,6 +27,7 @@ class UsersExportController extends Controller
 
         $request = Validator::make($request->all(), [
             'ids' => 'nullable|array',
+            'ids.*' => 'exists:users,id',
             'template' => 'nullable|boolean'
         ]);
 
