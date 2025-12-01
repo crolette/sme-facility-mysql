@@ -96,14 +96,14 @@ Route::middleware([
         return response($content)->header('Content-Type', 'text/plain');
     });
 
-    Route::get('mail', function () {
-        // $data = ScheduledNotification::where('notification_type', 'end_warranty_date')->first();
-        $data = Intervention::first();
-        $model = $data->ticketable;
-        $url = 'hello';
+    // Route::get('mail', function () {
+    //     // $data = ScheduledNotification::where('notification_type', 'end_warranty_date')->first();
+    //     $data = Intervention::first();
+    //     $model = $data->ticketable;
+    //     $url = 'hello';
 
-        return (new SendInterventionToProviderEmail($data, 'google.com'))->render();
-    });
+    //     return (new SendInterventionToProviderEmail($data, 'google.com'))->render();
+    // });
 
     Route::get('locale/{locale}', function (Request $request, $locale) {
 
@@ -238,8 +238,6 @@ Route::middleware(array_merge([
 
     Route::get('/robots.txt', function () {
         $content = "User-agent: *\nDisallow: /";
-
-
         return response($content)->header('Content-Type', 'text/plain');
     });
 

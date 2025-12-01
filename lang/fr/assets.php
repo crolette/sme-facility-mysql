@@ -10,6 +10,7 @@ return [
     'selected_location_none' => 'Aucun emplacement sélectionné',
     'need_qr_code' => 'Besoin d\'un QR Code',
     'trashed' => 'Mis à la corbeille',
+    'trashed_description' => 'Cet actif n\'existe plus.',
     'brand' => 'Marque',
     'model' => 'Modèle',
     'serial_number' => 'Numéro de série',

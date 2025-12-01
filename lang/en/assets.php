@@ -10,6 +10,7 @@ return [
     'selected_location_none' => 'No location selected',
     'need_qr_code' => 'Need QR Code',
     'trashed' => 'Trashed',
+    'trashed_description' => 'This asset has been trashed',
     'brand' => 'Brand',
     'model' => 'Model',
     'serial_number' => 'Serial number',

@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Building;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +18,11 @@ class CreateTicketFromQRCodeController extends Controller
 {
     public function createFromAsset(string $qr_hash)
     {
-        $asset = Asset::select('id', 'code', 'reference_code', 'location_type', 'location_id', 'category_type_id')->where('qr_hash', $qr_hash)->with('maintainable:id,maintainable_type,maintainable_id,name,description')->first();
+        $asset = Asset::withTrashed()->select('id', 'code', 'reference_code', 'location_type', 'location_id', 'category_type_id', 'deleted_at')->where('qr_hash', $qr_hash)->with('maintainable:id,maintainable_type,maintainable_id,name,description')->first();
+
+        if ($asset->deleted_at)
+            return Inertia::render('tenants/tickets/TrashedAssetQRCode', ['item' => $asset]);
+
         return $this->create($asset, 'assets');
     }
 
@@ -49,6 +54,6 @@ class CreateTicketFromQRCodeController extends Controller
     {
         $existingTickets = $model->tickets()->whereNull('closed_at')->select('description')->get();
 
-        return Inertia::render('tenants/tickets/CreateTicketFromQRCode', ['item' => $model, 'location_type' => $locationType, 'existingTickets' => $existingTickets]);
+        return Inertia::render('tenants/tickets/CreateTicketFromQRCode', ['item' => $model, 'location_type' => $locationType, 'existingTickets' => $existingTickets ?? []]);
     }
 }

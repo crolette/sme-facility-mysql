@@ -10,6 +10,7 @@ return [
     'selected_location_none' => 'Geen locatie geselecteerd',
     'need_qr_code' => 'QR Code nodig',
     'trashed' => 'Verwijderd',
+    'trashed_description' => 'Dit actief bestaat niet meer.',
     'brand' => 'Merk',
     'model' => 'Model',
     'serial_number' => 'Serienummer',

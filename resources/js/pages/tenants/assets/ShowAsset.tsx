@@ -150,10 +150,12 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             )}
                         </>
                     )}
-                    <Button onClick={generateQR} variant={'secondary'}>
-                        <QrCode />
-                        {t('actions.generate_qr')}
-                    </Button>
+                    {!asset.deleted_at && (
+                        <Button onClick={generateQR} variant={'secondary'}>
+                            <QrCode />
+                            {t('actions.generate_qr')}
+                        </Button>
+                    )}
                 </div>
 
                 <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_6fr]">
@@ -166,7 +168,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             code: asset.code,
                             reference: asset.reference_code,
                             levelPath: asset.level_path,
-                            levelName: asset.is_mobile ? asset.location.full_name : asset.location.name,
+                            levelName: asset.is_mobile ? asset.location.full_name : (asset.location?.name ?? ''),
                         }}
                     />
                     <div className="overflow-hidden">
@@ -186,7 +188,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                         {asset.surface && <Field label={t('common.surface')} text={asset.surface + ' m²'} />}
                                     </div>
                                     <div className="mx-auto h-fit shrink-1 bg-white">
-                                        {asset.qr_code && (
+                                        {!asset.deleted_at && asset.qr_code && (
                                             <a href={route('api.file.download', { path: asset.qr_code })} download className="w-fit cursor-pointer">
                                                 <img
                                                     key={asset.qr_code}

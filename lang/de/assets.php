@@ -10,6 +10,7 @@ return [
     'selected_location_none' => 'Kein Standort ausgewählt',
     'need_qr_code' => 'QR-Code benötigt',
     'trashed' => 'Gelöscht',
+    'trashed_description' => 'Dieser Vermögenswert existiert nicht mehr.',
     'brand' => 'Marke',
     'model' => 'Modell',
     'serial_number' => 'Seriennummer',
