@@ -12,12 +12,13 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Laravel\Cashier\Billable;
 use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 
 
 class Tenant extends BaseTenant implements TenantWithDatabase
 {
-    use HasDatabase, HasDomains, HasFactory;
+    use HasDatabase, HasDomains, HasFactory, Billable;
 
     protected $connection = 'central';
 
@@ -29,7 +30,11 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         'email',
         'vat_number',
         'phone_number',
-        'company_code'
+        'company_code',
+        'stripe_id',
+        'pm_type',
+        'pm_last_four',
+        'trial_ends_at',
     ];
 
     protected $hidden = [
@@ -48,7 +53,11 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             'email',
             'vat_number',
             'phone_number',
-            'company_code'
+            'company_code',
+            'stripe_id',
+            'pm_type',
+            'pm_last_four',
+            'trial_ends_at',
         ];
     }
 
@@ -80,6 +89,16 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     public function domain(): HasOne
     {
         return $this->hasOne(Domain::class);
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    public function activeSubscription()
+    {
+        return $this->subscriptions()->where('status', 'active')->first();
     }
 
     public function domainAddress(): Attribute

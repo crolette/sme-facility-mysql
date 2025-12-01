@@ -43,17 +43,42 @@ class RegisterCentralTenantController extends Controller
      */
     public function store(CentralTenantRequest $tenantRequest, CompanyAddressRequest $companyAddressRequest, InvoiceAddressRequest $invoiceAddressRequest)
     {
+
         try {
             DB::beginTransaction();
 
-                $tenant = Tenant::create([...$tenantRequest->validated(), 'id' => $tenantRequest->validated('company_code')]);
+            $tenant = Tenant::create([...$tenantRequest->validated(), 'id' => $tenantRequest->validated('company_code')]);
 
-                $tenant->domain()->create(['domain' => $tenantRequest->validated('domain_name')]);
+            $tenant->domain()->create(['domain' => $tenantRequest->validated('domain_name')]);
 
-                $tenant->addresses()->create([...$companyAddressRequest->validated('company')]);
+            $tenant->addresses()->create([...$companyAddressRequest->validated('company')]);
 
-                if (!$invoiceAddressRequest->validated('same_address_as_company'))
-                    $tenant->addresses()->create([...$invoiceAddressRequest->validated('invoice'), 'address_type' => AddressTypes::INVOICE->value]);
+            $stripeCustomer = $tenant->createAsStripeCustomer(
+                [
+                    'business_name' => $tenant->company_name,
+                    'individual_name' => $tenant->first_name . ' ' . $tenant->last_name,
+                    'email' => $tenant->email,
+                    'phone' => $tenant->phone_number,
+                    'address' =>
+                    [
+                        'city' => $companyAddressRequest->validated('company')['city'],
+                        'line1' => $companyAddressRequest->validated('company')['street'] . ' ' . $companyAddressRequest->validated('company')['house_number'],
+                        'postal_code' => $companyAddressRequest->validated('company')['zip_code'],
+                        'country' => 'BE'
+                    ],
+
+                ]
+            );
+
+            $taxId = $tenant->createTaxId('eu_vat', $tenantRequest->validated('vat_number'));
+
+            Log::info($stripeCustomer);
+            Log::info($stripeCustomer['id']);
+            Log::info($taxId);
+
+
+            if (!$invoiceAddressRequest->validated('same_address_as_company'))
+                $tenant->addresses()->create([...$invoiceAddressRequest->validated('invoice'), 'address_type' => AddressTypes::INVOICE->value]);
 
             // FIXME this should be uncommented when on private server
             // $email = $tenantRequest->validated('email');
@@ -69,12 +94,10 @@ class RegisterCentralTenantController extends Controller
 
             DB::commit();
             return ApiResponse::successFlash([], 'Tenant created');
-
-        } catch(\Throwable $e) {
+        } catch (\Throwable $e) {
             Log::info('Error during tenant creation : ' . $e->getMessage());
             DB::rollBack();
             return ApiResponse::error($e->getMessage());
         }
-
     }
 }

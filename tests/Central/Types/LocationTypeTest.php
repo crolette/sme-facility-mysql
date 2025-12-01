@@ -1,9 +1,9 @@
 <?php
 
-use App\Models\Central\CentralUser;
 use App\Models\SiteType;
 use App\Enums\LevelTypes;
 use App\Models\LocationType;
+use App\Models\Central\CentralUser;
 use Database\Factories\SiteTypeFactory;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -13,12 +13,14 @@ use function Pest\Laravel\assertDatabaseMissing;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 
 uses(DatabaseTransactions::class);
 
 beforeEach(function () {
     $this->withoutMiddleware([
         \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
+        CustomInitializeTenancyBySubdomain::class,
         \Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain::class,
         \Stancl\Tenancy\Middleware\InitializeTenancyByPath::class,
         \Stancl\Tenancy\Middleware\InitializeTenancyByRequestData::class,

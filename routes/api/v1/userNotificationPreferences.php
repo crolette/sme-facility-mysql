@@ -3,15 +3,16 @@
 use Carbon\Carbon;
 use App\Helpers\ApiResponse;
 use App\Enums\MaintenanceFrequency;
-use App\Http\Controllers\API\V1\APIUserNotificationPreferencesController;
 use App\Models\Tenants\Maintainable;
-use App\Models\Tenants\UserNotificationPreference;
 use Illuminate\Support\Facades\Route;
+use App\Models\Tenants\UserNotificationPreference;
+use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
+use App\Http\Controllers\API\V1\APIUserNotificationPreferencesController;
 
 Route::middleware([
     'web',
-    InitializeTenancyBySubdomain::class,
+    CustomInitializeTenancyBySubdomain::class,
     \Stancl\Tenancy\Middleware\ScopeSessions::class,
     \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
     'auth:tenant'

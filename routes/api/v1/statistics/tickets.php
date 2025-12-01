@@ -3,20 +3,21 @@
 use Carbon\Carbon;
 use App\Enums\TicketStatus;
 use App\Helpers\ApiResponse;
-use App\Http\Requests\Tenant\StatisticsRequest;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Ticket;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
-use App\Services\Statistics\StatisticTicketsService;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Requests\Tenant\StatisticsRequest;
+use App\Services\Statistics\StatisticTicketsService;
+use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 
 Route::middleware([
     'web',
-    InitializeTenancyBySubdomain::class,
+    CustomInitializeTenancyBySubdomain::class,
     \Stancl\Tenancy\Middleware\ScopeSessions::class,
     \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
     'auth:tenant'

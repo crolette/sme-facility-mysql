@@ -23,6 +23,7 @@ return [
         ],
     ],
     'launching_offer' => [
+        'title' => 'Lancering aanbieding',
         'description' => 'Om de lancering van SME Facility te vieren, profiteert u van een uitzonderlijke aanbieding!',
     ],
     'premium' => [

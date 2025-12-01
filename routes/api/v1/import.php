@@ -2,11 +2,12 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\V1\ApiImportController;
+use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 
 Route::middleware([
     'web',
-    InitializeTenancyBySubdomain::class,
+    CustomInitializeTenancyBySubdomain::class,
     \Stancl\Tenancy\Middleware\ScopeSessions::class,
     \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
     'auth:tenant'

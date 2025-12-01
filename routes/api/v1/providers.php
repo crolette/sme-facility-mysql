@@ -3,19 +3,20 @@
 use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Provider;
+use App\Models\Tenants\Intervention;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Stancl\Tenancy\Middleware\ScopeSessions;
 use App\Http\Controllers\API\V1\APIProviderController;
+use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\API\V1\APIRemoveProviderLogoController;
 use App\Http\Controllers\API\V1\APIUploadProviderLogoController;
-use App\Models\Tenants\Intervention;
 
 Route::middleware([
     'web',
-    InitializeTenancyBySubdomain::class,
+    CustomInitializeTenancyBySubdomain::class,
     ScopeSessions::class,
     PreventAccessFromCentralDomains::class,
     'auth:tenant'

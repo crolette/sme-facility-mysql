@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Stancl\Tenancy\Middleware\ScopeSessions;
 use App\Http\Controllers\API\V1\APIUserController;
 use App\Http\Controllers\API\V1\APIProviderController;
+use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\API\V1\APIUploadProfilePictureController;
@@ -13,7 +14,7 @@ use App\Http\Controllers\API\V1\APIUploadProfilePictureController;
 
 Route::middleware([
     'web',
-    InitializeTenancyBySubdomain::class,
+    CustomInitializeTenancyBySubdomain::class,
     ScopeSessions::class,
     PreventAccessFromCentralDomains::class,
     'auth:tenant'

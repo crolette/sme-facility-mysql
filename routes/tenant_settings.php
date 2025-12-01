@@ -7,13 +7,15 @@ use App\Http\Middleware\TenantLocaleMiddleware;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\CompanyProfileController;
+use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Tenants\UserNotificationPreferenceController;
 
 Route::middleware([
     'web',
-    InitializeTenancyBySubdomain::class,
+    // InitializeTenancyBySubdomain::class,
+    CustomInitializeTenancyBySubdomain::class,
     ScopeSessions::class,
     PreventAccessFromCentralDomains::class,
     TenantLocaleMiddleware::class,

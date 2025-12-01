@@ -12,6 +12,7 @@ use App\Http\Controllers\API\V1\DestroyPictureController;
 use App\Http\Controllers\API\V1\UpdateDocumentController;
 use App\Http\Controllers\API\V1\UploadDocumentController;
 use App\Http\Controllers\API\V1\DestroyDocumentController;
+use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\API\V1\ApiSearchLocationController;
 use App\Http\Controllers\API\V1\APISearchAssetsLocationController;
@@ -20,8 +21,8 @@ Route::prefix('/v1/')->group(
     function () {
         Route::middleware([
             'web',
-
-            InitializeTenancyBySubdomain::class,
+            CustomInitializeTenancyBySubdomain::class,
+            // InitializeTenancyBySubdomain::class,
             \Stancl\Tenancy\Middleware\ScopeSessions::class,
             \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
             'auth:tenant'

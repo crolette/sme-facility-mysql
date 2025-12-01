@@ -13,6 +13,7 @@ use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Controllers\API\V1\APITicketController;
 use App\Http\Controllers\API\V1\APIProviderController;
+use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\API\V1\APIUploadProfilePictureController;
@@ -20,7 +21,7 @@ use App\Http\Controllers\API\V1\APIUploadProfilePictureController;
 
 Route::middleware([
     'web',
-    InitializeTenancyBySubdomain::class,
+    CustomInitializeTenancyBySubdomain::class,
     ScopeSessions::class,
     PreventAccessFromCentralDomains::class,
     'auth:tenant'

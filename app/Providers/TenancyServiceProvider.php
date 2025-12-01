@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Jobs\CreateTenantAdmin;
 use Stancl\Tenancy\Jobs;
 use Stancl\Tenancy\Events;
 use App\Jobs\DeleteDatabase;
 use Stancl\Tenancy\Listeners;
 use Stancl\Tenancy\Middleware;
+use App\Jobs\CreateTenantAdmin;
 use Stancl\JobPipeline\JobPipeline;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 
 class TenancyServiceProvider extends ServiceProvider
 {
@@ -153,8 +154,8 @@ class TenancyServiceProvider extends ServiceProvider
         $tenancyMiddleware = [
             // Even higher priority than the initialization middleware
             Middleware\PreventAccessFromCentralDomains::class,
-
-            Middleware\InitializeTenancyByDomain::class,
+            // Middleware\InitializeTenancyByDomain::class,
+            CustomInitializeTenancyBySubdomain::class,
             Middleware\InitializeTenancyBySubdomain::class,
             Middleware\InitializeTenancyByDomainOrSubdomain::class,
             Middleware\InitializeTenancyByPath::class,

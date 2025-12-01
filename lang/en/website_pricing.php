@@ -23,6 +23,7 @@ return [
         ],
     ],
     'launching_offer' => [
+        'title' => 'Launching offer',
         'description' => 'To celebrate the launch of SME Facility, enjoy an exceptional offer!',
     ],
     'premium' => [

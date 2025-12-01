@@ -17,12 +17,14 @@ use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 
 uses(ManagesTenantDatabases::class);
 
 beforeEach(function () {
     $this->withoutMiddleware([
         \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
+        CustomInitializeTenancyBySubdomain::class,
         \Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain::class,
         \Stancl\Tenancy\Middleware\InitializeTenancyByPath::class,
         \Stancl\Tenancy\Middleware\InitializeTenancyByRequestData::class,

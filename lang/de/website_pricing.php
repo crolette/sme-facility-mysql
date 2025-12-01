@@ -23,6 +23,7 @@ return [
         ],
     ],
     'launching_offer' => [
+        'title' => 'Startangebot',
         'description' => 'Um den Start von SME Facility zu feiern, profitieren Sie von einem außergewöhnlichen Angebot!',
     ],
     'premium' => [

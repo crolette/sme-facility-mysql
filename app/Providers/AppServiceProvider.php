@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\Tenant;
+use App\Models\Subscription;
 use App\Models\Tenants\User;
+use Laravel\Cashier\Cashier;
+use App\Models\SubscriptionItem;
 use App\Models\Tenants\Contract;
 use Illuminate\Support\Facades\DB;
 use App\Observers\ContractObserver;
@@ -28,10 +32,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
         // grant complete access to super admin
         Gate::before(function ($user, $ability) {
             return $user->hasRole('Super Admin') ? true : null;
         });
+
+        Cashier::useCustomerModel(Tenant::class);
+        Cashier::calculateTaxes();
+        Cashier::useSubscriptionModel(Subscription::class);
+        Cashier::useSubscriptionItemModel(SubscriptionItem::class);
+
 
         Gate::define('import-excel', function (User $user) {
             return $user->can('import excel');
