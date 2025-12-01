@@ -73,7 +73,7 @@
                     <p>{{__('notifications.planned_at_subtitle')}}</p>
                     <div class="details">
                         <strong>{{__('common.type')}} :</strong> {{ $data['type'] ?? 'N/A' }}<br>
-                        <strong>{{__('interventions.priority')}} :</strong> {{ $data['priority'] ?? 'N/A' }}<br>
+                        <strong>{{__('interventions.priority.title')}} :</strong> {{ $data['priority'] ?? 'N/A' }}<br>
                         <strong>{{trans_choice('locations.location', 1)}} : </strong> {{ $data['subject'] ?? 'N/A' }}<br>
                         <strong>{{__('common.description')}} : </strong> {{ $data['description'] ?? 'N/A' }}<br>
                         <strong>{{__('notifications.planned_at')}} :</strong> {{ isset($data['planned_at']) ? \Carbon\Carbon::parse($data['planned_at'])->format('d/m/Y') : 'N/A' }}<br>

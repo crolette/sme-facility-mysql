@@ -49,9 +49,6 @@ class RegenerateAllQRCodes extends Command
 
 
         tenancy()->runForMultiple($tenants, function ($tenant) {
-            Log::info('tenant domain : ' . $tenant->domain->domain);
-            Log::info('Regen QR codes for tenant : ' . $tenant);
-            Log::info('tenant initialized ? ' . tenancy()->initialized);
             $collection = collect([]);
             $assets = Asset::whereNotNull('qr_code')->get();
             $sites = Site::whereNotNull('qr_code')->get();

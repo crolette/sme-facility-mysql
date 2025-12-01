@@ -685,7 +685,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                 <option value="completed">{t('interventions.status.completed')}</option>
                                 <option value="cancelled">{t('interventions.status.cancelled')}</option>
                             </select>
-                            <Label>{t('interventions.priority')}</Label>
+                            <Label>{t('interventions.priority.title')}</Label>
                             <select
                                 name=""
                                 id=""
@@ -698,7 +698,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     }))
                                 }
                             >
-                                <option value="">{t('actions.select-type', { type: t('interventions.priority') })}</option>
+                                <option value="">{t('actions.select-type', { type: t('interventions.priority.title') })}</option>
                                 <option value="low">{t('interventions.priority.low')}</option>
                                 <option value="medium">{t('interventions.priority.medium')}</option>
                                 <option value="high">{t('interventions.priority.high')}</option>

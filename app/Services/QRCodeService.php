@@ -17,9 +17,6 @@ class QRCodeService
     public function createAndAttachQR(Model $model, $tenantDomain = false): void
     {
         $tenantId = tenancy()->tenant->id;
-        $tenant = tenancy()->tenant;
-        Log::info('createAndAttachQR for tenant : ' . $tenantId);
-        Log::info('tenant initialized ? ' . tenancy()->initialized);
         $modelType = Str::plural(Str::lower(class_basename($model))); // e.g., "assets", "sites", "buildings"
         $modelId = $model->id;
 
@@ -37,10 +34,8 @@ class QRCodeService
                 "https://{$tenantDomain}.",
                 $route
             );
-            Log::info('QR domain Route ' . $route);
         } else {
             $route = route('tenant.' . $modelType . '.tickets.create', $qr_hash);
-            Log::info('QR Route ' . $route);
         }
 
         $files = Storage::disk('tenants')->files($directory);
