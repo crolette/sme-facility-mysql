@@ -260,7 +260,7 @@ export default function ShowIntervention({
                         {statuses.map((status, index) => (
                             <li key={index} className="flex items-center gap-2">
                                 <Pill
-                                    variant={status}
+                                    variant={intervention.status === status ? status : 'disabled'}
                                     onClick={() => changeInterventionStatus(status)}
                                     className={cn(
                                         intervention.status === status ? 'border-2 border-amber-50 font-extrabold uppercase' : 'cursor-pointer',

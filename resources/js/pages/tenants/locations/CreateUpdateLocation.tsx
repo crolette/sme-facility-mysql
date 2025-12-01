@@ -496,14 +496,14 @@ export default function CreateUpdateLocation({
                         {data.locationTypeName === 'outdoor' && (
                             <div className="flex">
                                 <div className="w-full">
-                                    <Label htmlFor="surface_floor">{t('common.surface')}</Label>
+                                    <Label htmlFor="surface_outdoor">{t('common.surface')} (m²)</Label>
                                     <Input
                                         id="surface_outdoor"
                                         type="number"
                                         min={0}
                                         step="0.01"
                                         value={data.surface_outdoor ?? ''}
-                                        placeholder="Surface outdoor (max. 2 decimals) : 4236.3"
+                                        placeholder={t('locations.surface_outdoor_placeholder')}
                                         onChange={(e) => setData('surface_outdoor', parseFloat(e.target.value))}
                                     />
                                     <InputError className="mt-2" message={errors.surface_outdoor ?? ''} />
@@ -558,14 +558,14 @@ export default function CreateUpdateLocation({
                             <>
                                 <div className="flex">
                                     <div className="w-full">
-                                        <Label htmlFor="surface_floor">{t('locations.surface_floor')}</Label>
+                                        <Label htmlFor="surface_floor">{t('locations.surface_floor')} (m²)</Label>
                                         <Input
                                             id="surface_floor"
                                             type="number"
                                             min={0}
                                             step="0.01"
                                             value={data.surface_floor ?? ''}
-                                            placeholder="Surface floor (max. 2 decimals) : 4236.3"
+                                            placeholder={t('locations.surface_floor_placeholder')}
                                             onChange={(e) => setData('surface_floor', parseFloat(e.target.value))}
                                         />
                                         <InputError className="mt-2" message={errors.surface_floor ?? ''} />
@@ -616,7 +616,7 @@ export default function CreateUpdateLocation({
                                 </div>
                                 <div className="flex">
                                     <div className="w-full">
-                                        <Label htmlFor="surface_walls">{t('locations.surface_wall')}</Label>
+                                        <Label htmlFor="surface_walls">{t('locations.surface_wall')} (m²)</Label>
                                         <Input
                                             id="surface_walls"
                                             type="number"
@@ -624,7 +624,7 @@ export default function CreateUpdateLocation({
                                             step="0.01"
                                             value={data.surface_walls ?? ''}
                                             onChange={(e) => setData('surface_walls', parseFloat(e.target.value))}
-                                            placeholder="Surface walls (max. 2 decimals) : 4236.3"
+                                            placeholder={t('locations.surface_wall_placeholder')}
                                         />
                                         <InputError className="mt-2" message={errors.surface_walls ?? ''} />
                                     </div>
@@ -674,14 +674,14 @@ export default function CreateUpdateLocation({
                                 </div>
                                 {routeName === 'rooms' && (
                                     <div className="w-full">
-                                        <Label htmlFor="height">{t('locations.height')}</Label>
+                                        <Label htmlFor="height">{t('locations.height')} (m)</Label>
                                         <Input
                                             id="height"
                                             type="number"
                                             min={0}
                                             step="0.01"
                                             value={data.height ?? ''}
-                                            placeholder="Height (max. 2 decimals) : 4236.3"
+                                            placeholder={t('locations.height_placeholder')}
                                             onChange={(e) => setData('height', parseFloat(e.target.value))}
                                         />
                                         <InputError className="mt-2" message={errors.height ?? ''} />

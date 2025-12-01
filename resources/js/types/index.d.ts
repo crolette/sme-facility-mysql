@@ -65,9 +65,9 @@ export interface Flash {
 
 export type LocationLevel = 'site' | 'building' | 'floor' | 'room';
 export type TicketStatus = 'open' | 'ongoing' | 'closed';
-export type CategoryTypeEnum = 'document' | 'intervention' | 'asset' | 'provider' | 'outdoor materials' | 'floor materials' | 'wall materials';
+export type CategoryTypeEnum = 'document' | 'intervention' | 'asset' | 'provider' | 'outdoor_materials' | 'floor_materials' | 'wall_materials';
 export type PriorityLevel = 'low' | 'middle' | 'high' | 'urgent';
-export type InterventionStatus = 'draft' | 'planned' | 'in progress' | 'waiting for parts' | 'completed' | 'cancelled';
+export type InterventionStatus = 'draft' | 'planned' | 'in_progress' | 'waiting_parts' | 'completed' | 'cancelled';
 
 export interface Maintainable {
     id: number;
