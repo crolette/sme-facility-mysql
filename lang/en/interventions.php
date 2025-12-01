@@ -11,7 +11,9 @@ return [
         'completed' => 'Completed',
         'cancelled' => 'Cancelled',
     ],
+
     'priority' => [
+        'title' => 'Priority',
         'low' => 'Low',
         'medium' => 'Medium',
         'high' => 'High',

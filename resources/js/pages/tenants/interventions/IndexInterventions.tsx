@@ -405,7 +405,7 @@ export default function IndexInterventions({
                                             )}
                                             onClick={() => setQuery((prev) => ({ ...prev, sortBy: 'priority', orderBy: 'asc' }))}
                                         />
-                                        <p>{t('interventions.priority')}</p>
+                                        <p>{t('interventions.priority.title')}</p>
                                         <ArrowDownWideNarrow
                                             size={16}
                                             className={cn(
@@ -416,7 +416,7 @@ export default function IndexInterventions({
                                         />
                                     </div>
                                 </TableHeadData>
-                                <TableHeadData>{t('interventions.status')}</TableHeadData>
+                                <TableHeadData>{t('common.status')}</TableHeadData>
                                 <TableHeadData>{t('interventions.assigned_to')}</TableHeadData>
                                 <TableHeadData>
                                     <div className="flex items-center gap-2">

@@ -8,9 +8,8 @@ return [
     'outdoor' => 'Außenbereich',
     'buildings' => 'Gebäude|Gebäude',
     'floors' => 'Etage|Etagen',
-    'rooms' => [
-        'relocate' => 'Raum neu zuweisen',
-    ],
+    'rooms' => 'Raum|Räume',
+    'room_relocate' => 'Raum neu zuweisen',
     'level' => 'Ebene',
     'redefine_room' => 'Raum neu definieren',
     'surface_floor' => 'Bodenfläche',

@@ -73,36 +73,36 @@ it('can create a new intervention for a PROVIDER', function () {
     ]);
 });
 
-// it('can send an intervention to a provider and to multiple emails/users and assign it to this provider', function () {
+it('can send an intervention to a provider and to multiple emails/users and assign it to this provider', function () {
 
-//     Mail::fake();
+    Mail::fake();
 
-//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $intervention = Intervention::factory()->forLocation($this->asset)->create();
 
-//     $formData = [
-//         'provider_id' => $this->provider->id,
-//         'emails' => ['test@test.com', 'testa@test.com']
-//     ];
+    $formData = [
+        'provider_id' => $this->provider->id,
+        'emails' => ['test@test.com', 'testa@test.com']
+    ];
 
-//     $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
-//     $response->assertJson(['status' => 'success']);
+    $response = $this->postToTenant('api.interventions.send-provider', $formData, $intervention->id);
+    $response->assertJson(['status' => 'success']);
 
-//     Mail::assertSent(SendInterventionToProviderEmail::class, function ($mail) {
-//         return $mail->hasTo('test@test.com');
-//     });
-//     Mail::assertSent(SendInterventionToProviderEmail::class, function ($mail) {
-//         return $mail->hasTo('testa@test.com');
-//     });
+    Mail::assertSent(SendInterventionToProviderEmail::class, function ($mail) {
+        return $mail->hasTo('test@test.com');
+    });
+    Mail::assertSent(SendInterventionToProviderEmail::class, function ($mail) {
+        return $mail->hasTo('testa@test.com');
+    });
 
-//     assertDatabaseHas(
-//         'interventions',
-//         [
-//             'id' => $intervention->id,
-//             'assignable_type' => get_class($this->provider),
-//             'assignable_id' => $this->provider->id,
-//         ]
-//     );
-// });
+    assertDatabaseHas(
+        'interventions',
+        [
+            'id' => $intervention->id,
+            'assignable_type' => get_class($this->provider),
+            'assignable_id' => $this->provider->id,
+        ]
+    );
+});
 
 // it('can send an intervention to only one internal user and assign it to him', function () {
 

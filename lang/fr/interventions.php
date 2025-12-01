@@ -12,6 +12,7 @@ return [
         'cancelled' => 'Annulée',
     ],
     'priority' => [
+        'title' => 'Priorité',
         'low' => 'Basse',
         'medium' => 'Moyenne',
         'high' => 'Haute',

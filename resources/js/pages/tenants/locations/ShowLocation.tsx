@@ -135,7 +135,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                     {hasPermission('create locations') && routeName === 'rooms' && (
                         <Button variant={'secondary'} onClick={() => setShowModaleRelocateRoom(!showModaleRelocateRoom)}>
                             <Move />
-                            {t('locations.rooms.relocate')}
+                            {t('locations.rooms_relocate')}
                         </Button>
                     )}
                 </div>

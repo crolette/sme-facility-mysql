@@ -97,11 +97,12 @@ Route::middleware([
     });
 
     Route::get('mail', function () {
-        $data = ScheduledNotification::where('notification_type', 'end_warranty_date')->first();
+        // $data = ScheduledNotification::where('notification_type', 'end_warranty_date')->first();
+        $data = Intervention::first();
         $model = $data->ticketable;
         $url = 'hello';
 
-        return (new ScheduledNotificationMail($data))->render();
+        return (new SendInterventionToProviderEmail($data, 'google.com'))->render();
     });
 
     Route::get('locale/{locale}', function (Request $request, $locale) {

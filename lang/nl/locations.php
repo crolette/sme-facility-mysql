@@ -8,9 +8,8 @@ return [
     'outdoor' => 'Buitenruimte',
     'buildings' => 'Gebouw|Gebouwen',
     'floors' => 'Verdieping|Verdiepingen',
-    'rooms' => [
-        'relocate' => 'Kamer opnieuw toewijzen',
-    ],
+    'rooms' => 'Kamer|Kamern',
+    'room_relocate' => 'Kamer opnieuw toewijzen',
     'level' => 'Niveau',
     'redefine_room' => 'Ruimte herdefiniëren',
     'surface_floor' => 'Vloeroppervlak',

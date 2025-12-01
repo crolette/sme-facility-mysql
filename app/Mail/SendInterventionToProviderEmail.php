@@ -21,7 +21,6 @@ class SendInterventionToProviderEmail extends Mailable
      */
     public function __construct(
         public Intervention $intervention,
-
         public string $url
     ) {;
     }
@@ -31,6 +30,7 @@ class SendInterventionToProviderEmail extends Mailable
      */
     public function envelope(): Envelope
     {
+        // dd($this->intervention->status->value);
         return new Envelope(
             from: new Address('notifications@sme-facility.com', 'SME-Facility - Notification'),
             subject: __('interventions.assigned_email_title', ['tenant' => tenancy()->tenant->company_name, 'item' => $this->intervention->interventionable->name]),

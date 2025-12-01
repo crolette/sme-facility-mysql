@@ -8,9 +8,8 @@ return [
     'outdoor' => 'Outdoor',
     'buildings' => 'Building|Buildings',
     'floors' => 'Floor|Floors',
-    'rooms' => [
-        'relocate' => 'Reassign room',
-    ],
+    'rooms' => 'Room|Rooms',
+    'room_relocate' => 'Reassign room',
     'level' => 'Level',
     'redefine_room' => 'Redefine room',
     'surface_type_floor' => 'Floor surface & type',
