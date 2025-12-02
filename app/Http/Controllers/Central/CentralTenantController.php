@@ -8,14 +8,18 @@ use App\Models\Tenant;
 use App\Enums\AddressTypes;
 use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
+use Laravel\Cashier\Cashier;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
+use App\Models\Central\Subscription;
 use App\Models\Central\CentralCountry;
 use App\Http\Requests\Central\CentralTenantRequest;
 use App\Http\Requests\Central\CompanyAddressRequest;
 use App\Http\Requests\Central\InvoiceAddressRequest;
+use App\Models\Central\SubscriptionItem;
 
 class CentralTenantController extends Controller
 {
@@ -24,7 +28,7 @@ class CentralTenantController extends Controller
      */
     public function index()
     {
-        $tenants = Tenant::with('domain')->get();
+        $tenants = Tenant::with('domain', 'subscriptions')->get();
 
         return Inertia::render('central/tenants/index', ['items' => $tenants]);
     }
@@ -34,17 +38,19 @@ class CentralTenantController extends Controller
      */
     public function show(Tenant $tenant)
     {
-        if (str_starts_with(config('app.url'), 'https://')) {
-            $suffix = substr(config('app.url'), strlen('https://'));
-            $address = preg_replace('/^https?:\/\/[^\/]+/', "https://{$tenant->domain->domain}" . '.' . $suffix, config('app.url'));
-        } else {
-            $suffix = substr(config('app.url'), strlen('http://'));
-            $address = preg_replace('/^http?:\/\/[^\/]+/', "http://{$tenant->domain->domain}" . '.' . $suffix, config('app.url'));
-        }
+        $subscription = SubscriptionItem::first();
 
-        // dd($address);
+        $stripe = new \Stripe\StripeClient(config('cashier.secret'));
+        $price = $stripe->prices->retrieve('price_1SZXnhFHXryfbBkbXL0omY5n', ['expand' => ['product']]);
+        // dd($price->product->metadata);
 
-        return Inertia::render('central/tenants/show', ['tenant' => $tenant->load('domain')]);
+        $url = URL::temporarySignedRoute(
+            'choose-plan',
+            now()->addDays(7),
+            ['email' => $tenant->email, 'vat_number' => $tenant->vat_number]
+        );
+
+        return Inertia::render('central/tenants/show', ['tenant' => $tenant->load('domain'), 'url' => $url]);
     }
 
     /**

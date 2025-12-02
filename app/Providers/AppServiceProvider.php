@@ -3,18 +3,18 @@
 namespace App\Providers;
 
 use App\Models\Tenant;
-use App\Models\Subscription;
 use App\Models\Tenants\User;
 use Laravel\Cashier\Cashier;
-use App\Models\SubscriptionItem;
 use App\Models\Tenants\Contract;
 use Illuminate\Support\Facades\DB;
 use App\Observers\ContractObserver;
 use Illuminate\Support\Facades\Log;
+use App\Models\Central\Subscription;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Vite;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\ServiceProvider;
+use App\Models\Central\SubscriptionItem;
 use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider

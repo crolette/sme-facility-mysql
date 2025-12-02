@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Address;
 use App\Enums\AddressTypes;
 use Laravel\Cashier\Billable;
+use App\Models\Central\Subscription;
 use App\Models\Central\CentralCountry;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
@@ -72,7 +73,8 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     protected $appends = [
         'full_company_address',
         'full_invoice_address',
-        'domain_address'
+        'domain_address',
+        'active_subscription'
     ];
 
     public function companyAddress(): HasOne
@@ -100,9 +102,11 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         return $this->hasMany(Subscription::class);
     }
 
-    public function activeSubscription()
+    public function activeSubscription(): Attribute
     {
-        return $this->subscriptions()->where('status', 'active')->first();
+        return Attribute::make(
+            get: fn() => $this->subscriptions()->first() ?? null
+        );
     }
 
     public function domainAddress(): Attribute

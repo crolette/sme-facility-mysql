@@ -66,6 +66,16 @@ class StripeEventListener
             Log::info($event->payload);
         }
 
+        if ($event->payload['type'] === 'customer.subscription.created') {
+            Log::info('customer.subscription.created');
+            Log::info($event->payload);
+
+            // $stripe = new \Stripe\StripeClient(config('cashier.secret'));
+            // $price = $stripe->prices->retrieve('price_1SZXnhFHXryfbBkbXL0omY5n', ['expand' => ['product']]);
+            // dd($price->product->metadata);
+
+        }
+
         if ($event->payload['type'] === 'customer.subscription.updated') {
             Log::info('customer.subscription.updated');
             Log::info($event->payload);
@@ -74,10 +84,7 @@ class StripeEventListener
             Log::info('customer.subscription.deleted');
             Log::info($event->payload);
         }
-        if ($event->payload['type'] === 'customer.subscription.created') {
-            Log::info('customer.subscription.created');
-            Log::info($event->payload);
-        }
+
 
 
         if ($event->payload['type'] === 'customer.tax_id.updated') {
