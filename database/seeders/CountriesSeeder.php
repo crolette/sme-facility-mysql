@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Seeders\tenant;
+namespace Database\Seeders;
 
 use App\Models\Tenants\Country;
 use Illuminate\Database\Seeder;
@@ -214,7 +214,8 @@ class CountriesSeeder extends Seeder
 
         foreach ($countries as $key => $country) {
             Country::create([
-                'iso_code' => $country['code'],
+                'iso_code_a3' => $country['iso_code_a3'],
+                'iso_code_a2' => $country['iso_code_a2'],
                 'name' => $country['name'],
             ]);
         }

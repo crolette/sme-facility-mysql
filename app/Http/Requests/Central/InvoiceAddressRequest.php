@@ -34,7 +34,7 @@ class InvoiceAddressRequest extends FormRequest
             'invoice.house_number' => 'nullable|string|max:10',
             'invoice.city' => 'nullable|string|max:50',
             'invoice.zip_code' => 'nullable|string|min:4|max:6',
-            'invoice.country' => 'nullable|string|max:30',
+            'invoice.country' => 'nullable|string|exists:countries,iso_code_a2',
         ];
     }
 }

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use App\Models\Central\CentralCountry;
 use App\Http\Requests\Central\CentralTenantRequest;
 use App\Http\Requests\Central\CompanyAddressRequest;
 use App\Http\Requests\Central\InvoiceAddressRequest;
@@ -51,7 +52,8 @@ class CentralTenantController extends Controller
      */
     public function edit(Tenant $tenant)
     {
-        return Inertia::render('central/tenants/create', ['company' => $tenant->load('domain')]);
+        $countries = CentralCountry::all();
+        return Inertia::render('central/tenants/create', ['company' => $tenant->load('domain'), 'countries' => $countries]);
     }
 
     /**

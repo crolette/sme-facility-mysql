@@ -3,10 +3,11 @@ import ModaleForm from '@/components/ModaleForm';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/central/app-layout';
+import { cn } from '@/lib/utils';
 import { Tenant, type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 import axios from 'axios';
-import { Loader } from 'lucide-react';
+import { CheckCircle, Loader } from 'lucide-react';
 import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -88,7 +89,26 @@ export default function IndexTenants({ items }: { items: Tenant[] }) {
                     {tenants.length > 0 &&
                         tenants.map((tenant) => (
                             <li key={tenant.id} className="flex items-center justify-between gap-4">
-                                <p>{tenant.company_name}</p>
+                                <div className="flex gap-2">
+                                    <a href={route('central.tenants.show', tenant.id)}>
+                                        <p>{tenant.company_name}</p>
+                                    </a>
+                                    <CheckCircle className={tenant.verified_vat_status === 'verified' ? 'text-success' : 'text-destructive'} />
+                                    {/* Stripe logo */}
+                                    <svg
+                                        width="800px"
+                                        height="800px"
+                                        viewBox="0 0 24 24"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className={cn('h-6 w-6', tenant.stripe_id ? 'text-success' : 'text-destructive')}
+                                    >
+                                        <path
+                                            fill="currentColor"
+                                            fillRule="evenodd"
+                                            d="M1,1 L23,1 L23,23 L1,23 L1,1 Z M11.1196337,9.18908425 C11.1196337,8.58622711 11.6142857,8.35435897 12.4335531,8.35435897 C13.6083516,8.35435897 15.0923077,8.70989011 16.2671062,9.343663 L16.2671062,5.71106227 C14.9841026,5.20095238 13.7165568,5 12.4335531,5 C9.2956044,5 7.20879121,6.6385348 7.20879121,9.37457875 C7.20879121,13.6409524 13.0827839,12.9608059 13.0827839,14.800293 C13.0827839,15.5113553 12.4644689,15.7432234 11.5988278,15.7432234 C10.3158242,15.7432234 8.67728938,15.2176557 7.37882784,14.5065934 L7.37882784,18.1855678 C8.81641026,18.8038828 10.2694505,19.0666667 11.5988278,19.0666667 C14.8140659,19.0666667 17.0245421,17.4745055 17.0245421,14.7075458 C17.0090842,10.1010989 11.1196337,10.9203663 11.1196337,9.18908425 L11.1196337,9.18908425 Z"
+                                        />
+                                    </svg>
+                                </div>
                                 <div className="flex gap-2">
                                     <Button
                                         onClick={() => {
@@ -103,9 +123,7 @@ export default function IndexTenants({ items }: { items: Tenant[] }) {
                                     <a href={route('central.tenants.edit', tenant.id)}>
                                         <Button>Edit</Button>
                                     </a>
-                                    <a href={route('central.tenants.show', tenant.id)}>
-                                        <Button variant={'outline'}>See</Button>
-                                    </a>
+
                                     <a href={tenant.domain_address} target="__blank">
                                         <Button variant={'outline'}>Access domain</Button>
                                     </a>

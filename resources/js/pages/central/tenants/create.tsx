@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/central/app-layout';
-import { Tenant, type BreadcrumbItem } from '@/types';
+import { CentralCountry, Tenant, type BreadcrumbItem } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { Loader } from 'lucide-react';
@@ -48,7 +48,7 @@ type TenantFormData = {
     };
 };
 
-export default function CreateTenant({ company }: { company?: Tenant }) {
+export default function CreateTenant({ company, countries }: { company?: Tenant; countries: CentralCountry[] }) {
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const { showToast } = useToast();
 
@@ -217,32 +217,13 @@ export default function CreateTenant({ company }: { company?: Tenant }) {
                     />
                     <InputError className="mt-2" message={errors.email} />
 
-                    {/* <Label htmlFor="password">Tenant password</Label> */}
-                    {/* <Input
-                        id="password"
-                        type="password"
-                        required
-                        tabIndex={7}
-                        value={data.password}
-                        onChange={(e) => setData('password', e.target.value)}
-                        placeholder="Password"
-                    />
-                    <InputError className="mt-2" message={errors.password} />
-
-                    <Label htmlFor="password_confirmation">Tenant password_confirmation</Label>
-                    <Input
-                        id="password_confirmation"
-                        type="password"
-                        required
-                        tabIndex={8}
-                        value={data.password_confirmation}
-                        onChange={(e) => setData('password_confirmation', e.target.value)}
-                        placeholder="Password confirmation"
-                    />
-                    <InputError className="mt-2" message={errors.password_confirmation} /> */}
-
                     <h3>Company Address</h3>
-                    <AddressForm idPrefix="company" address={data.company} onChange={(updated) => setData('company', updated)} />
+                    <AddressForm
+                        idPrefix="company"
+                        address={data.company}
+                        onChange={(updated) => setData('company', updated)}
+                        countries={countries}
+                    />
 
                     <Label htmlFor="phone_number">Tenant phone_number</Label>
                     <Input
@@ -267,7 +248,12 @@ export default function CreateTenant({ company }: { company?: Tenant }) {
                     <br />
 
                     {!data.same_address_as_company && (
-                        <AddressForm idPrefix="invoice" address={data.invoice} onChange={(updated) => setData('invoice', updated)} />
+                        <AddressForm
+                            idPrefix="invoice"
+                            address={data.invoice}
+                            onChange={(updated) => setData('invoice', updated)}
+                            countries={countries}
+                        />
                     )}
 
                     <Button type="submit" tabIndex={10}>

@@ -24,7 +24,7 @@ use App\Notifications\TenantAdminCreatedPasswordResetNotification;
 
 foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->group(function () {
-        Route::post('stripe/webhook', [WebhookController::class, 'handleWebhook']);
+        Route::post('stripe/webhook', [WebhookController::class, 'handleWebhook'])->name('stripe.webhook');
 
 
         Route::get('/robots.txt', function () {

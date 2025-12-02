@@ -15,6 +15,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Events\NewTenantCreatedEvent;
+use App\Models\Central\CentralCountry;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Password;
@@ -35,7 +36,8 @@ class RegisterCentralTenantController extends Controller
      */
     public function create()
     {
-        return Inertia::render('central/tenants/create');
+        $countries = CentralCountry::all();
+        return Inertia::render('central/tenants/create', ['countries' => $countries]);
     }
 
     /**
@@ -43,7 +45,6 @@ class RegisterCentralTenantController extends Controller
      */
     public function store(CentralTenantRequest $tenantRequest, CompanyAddressRequest $companyAddressRequest, InvoiceAddressRequest $invoiceAddressRequest)
     {
-
         try {
             DB::beginTransaction();
 
@@ -52,6 +53,9 @@ class RegisterCentralTenantController extends Controller
             $tenant->domain()->create(['domain' => $tenantRequest->validated('domain_name')]);
 
             $tenant->addresses()->create([...$companyAddressRequest->validated('company')]);
+
+            if (!$invoiceAddressRequest->validated('same_address_as_company'))
+                $tenant->addresses()->create([...$invoiceAddressRequest->validated('invoice'), 'address_type' => AddressTypes::INVOICE->value]);
 
             $stripeCustomer = $tenant->createAsStripeCustomer(
                 [
@@ -64,21 +68,14 @@ class RegisterCentralTenantController extends Controller
                         'city' => $companyAddressRequest->validated('company')['city'],
                         'line1' => $companyAddressRequest->validated('company')['street'] . ' ' . $companyAddressRequest->validated('company')['house_number'],
                         'postal_code' => $companyAddressRequest->validated('company')['zip_code'],
-                        'country' => 'BE'
+                        'country' => $companyAddressRequest->validated('company')['country']
                     ],
 
                 ]
             );
 
-            $taxId = $tenant->createTaxId('eu_vat', $tenantRequest->validated('vat_number'));
-
-            Log::info($stripeCustomer);
-            Log::info($stripeCustomer['id']);
-            Log::info($taxId);
-
-
-            if (!$invoiceAddressRequest->validated('same_address_as_company'))
-                $tenant->addresses()->create([...$invoiceAddressRequest->validated('invoice'), 'address_type' => AddressTypes::INVOICE->value]);
+            if ($stripeCustomer)
+                $taxId = $tenant->createTaxId('eu_vat', $tenantRequest->validated('vat_number'));
 
             // FIXME this should be uncommented when on private server
             // $email = $tenantRequest->validated('email');

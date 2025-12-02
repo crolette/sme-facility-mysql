@@ -24,12 +24,14 @@ class AddressFactory extends Factory
     {
         $faker = \Faker\Factory::create('fr_BE');
 
+        $countries = ['BE', 'GB', 'DE', 'FR', 'NL'];
+
         return [
             'street' => fake()->streetName(),
             'house_number' => fake()->buildingNumber(),
             'zip_code' => $faker->postcode(),
             'city' => $faker->cityName(),
-            'country' => fake()->country(),
+            'country' => $countries[array_rand($countries, 1)],
             'address_type' => AddressTypes::COMPANY->value
 
         ];
