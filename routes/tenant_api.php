@@ -8,6 +8,8 @@ use App\Models\Tenants\Document;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use App\Http\Middleware\CacheTenantLimits;
+use App\Http\Middleware\TenantLocaleMiddleware;
 use App\Http\Controllers\API\V1\DestroyPictureController;
 use App\Http\Controllers\API\V1\UpdateDocumentController;
 use App\Http\Controllers\API\V1\UploadDocumentController;
@@ -25,6 +27,8 @@ Route::prefix('/v1/')->group(
             // InitializeTenancyBySubdomain::class,
             \Stancl\Tenancy\Middleware\ScopeSessions::class,
             \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+            CacheTenantLimits::class,
+            TenantLocaleMiddleware::class,
             'auth:tenant'
         ])->group(function () {
 

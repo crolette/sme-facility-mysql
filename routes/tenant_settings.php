@@ -18,6 +18,7 @@ Route::middleware([
     CustomInitializeTenancyBySubdomain::class,
     ScopeSessions::class,
     PreventAccessFromCentralDomains::class,
+    CacheTenantLimits::class,
     TenantLocaleMiddleware::class,
     'auth:tenant'
 ])->group(function () {

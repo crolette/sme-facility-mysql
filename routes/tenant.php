@@ -75,9 +75,9 @@ Route::middleware([
     'web',
     CustomInitializeTenancyBySubdomain::class,
     // InitializeTenancyBySubdomain::class,
-    CacheTenantLimits::class,
     ScopeSessions::class,
     PreventAccessFromCentralDomains::class,
+    CacheTenantLimits::class,
     TenantLocaleMiddleware::class,
     // 'localizationRedirect',
     'auth:tenant'

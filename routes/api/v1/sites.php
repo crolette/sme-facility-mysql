@@ -21,6 +21,7 @@ Route::middleware([
     CustomInitializeTenancyBySubdomain::class,
     \Stancl\Tenancy\Middleware\ScopeSessions::class,
     \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+    CacheTenantLimits::class,
     'auth:tenant'
 ])->prefix('/v1/sites')->group(
     function () {
