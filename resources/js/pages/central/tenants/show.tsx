@@ -31,22 +31,32 @@ export default function ShowTenant({ tenant, url }: { tenant: Tenant; url: strin
                                 VAT Number : {tenant.vat_number}{' '}
                                 <CheckCircle className={tenant.verified_vat_status === 'verified' ? 'text-success' : 'text-destructive'} />
                             </li>
-                            <li key="3">Trial ends at : {tenant.trial_ends_at}</li>
+                            {tenant.active_subscription?.trial_ends_at && (
+                                <li key="5">Trial ends at : {tenant.active_subscription?.trial_ends_at}</li>
+                            )}
                             <li key="3">Company address : {tenant.full_company_address}</li>
                             <li key="4">Invoice address : {tenant.full_invoice_address ?? 'Same as company address'}</li>
-                            {tenant.stripe_id && (
+                            {!tenant.has_active_subscription && (
                                 <a href={url} target="__blank">
-                                    <Button variant={'outline'}>Billing Portal</Button>
+                                    <Button variant={'outline'}>Link to Checkout</Button>
                                 </a>
                             )}
                         </ul>
                     </li>
                 </ul>
-                <div>
-                    Sites:{tenant.current_sites_count} / {tenant.max_sites}
-                    Users:{tenant.current_users_count} / {tenant.max_users}
-                    GB:{tenant.disk_size_gb} / {tenant.max_storage_gb}
-                </div>
+                <ul className="flex gap-2">
+                    <li>
+                        Sites: {tenant.current_sites_count} / <span className="font-bold">{tenant.max_sites}</span>
+                    </li>
+                    <span className="">|</span>
+                    <li>
+                        Users: {tenant.current_users_count} / <span className="font-bold">{tenant.max_users}</span>
+                    </li>
+                    <span className="">|</span>
+                    <li>
+                        Storage GB: {tenant.disk_size_gb} / <span className="font-bold">{tenant.max_storage_gb}</span>
+                    </li>
+                </ul>
             </div>
         </AppLayout>
     );

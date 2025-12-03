@@ -114,11 +114,19 @@ export default function IndexTenants({ items }: { items: Tenant[] }) {
                                         </svg>
                                         <p>Subscription status : {tenant.active_subscription?.stripe_status}</p>
                                     </div>
-                                    <div>
-                                        Sites:{tenant.current_sites_count} / {tenant.max_sites}
-                                        Users:{tenant.current_users_count} / {tenant.max_users}
-                                        GB:{tenant.disk_size_gb} / {tenant.max_storage_gb}
-                                    </div>
+                                    <ul className="flex gap-2">
+                                        <li>
+                                            Sites: {tenant.current_sites_count} / <span className="font-bold">{tenant.max_sites}</span>
+                                        </li>
+                                        <span className="">|</span>
+                                        <li>
+                                            Users: {tenant.current_users_count} / <span className="font-bold">{tenant.max_users}</span>
+                                        </li>
+                                        <span className="">|</span>
+                                        <li>
+                                            Storage GB: {tenant.disk_size_gb} / <span className="font-bold">{tenant.max_storage_gb}</span>
+                                        </li>
+                                    </ul>
                                 </div>
                                 <div className="flex gap-2">
                                     <Button

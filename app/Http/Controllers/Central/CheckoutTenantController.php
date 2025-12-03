@@ -14,14 +14,13 @@ class CheckoutTenantController extends Controller
     {
         $tenant = Tenant::where('vat_number', $request->query('vat_number'))->first();
 
-        return Inertia::render('website/checkout/choose-plan', ['tenant' => $tenant]);
+        return $tenant->hasActiveSubscription ?  Inertia::location($tenant->domainAddress) : Inertia::render('website/checkout/choose-plan', ['tenant' => $tenant]);
     }
 
     public function store(Request $request)
     {
         $tenant = Tenant::where('vat_number', '=', $request->vat_number)->first();
 
-        // dd($tenant, $request, $request->vat_number);
         $checkout = $tenant->newSubscription($request->product, $request->plan)
             ->trialDays(1)
             ->allowPromotionCodes()

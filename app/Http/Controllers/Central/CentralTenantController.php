@@ -38,13 +38,14 @@ class CentralTenantController extends Controller
      */
     public function show(Tenant $tenant)
     {
-        $url = URL::temporarySignedRoute(
-            'choose-plan',
-            now()->addDays(7),
-            ['email' => $tenant->email, 'vat_number' => $tenant->vat_number]
-        );
+        if (!$tenant->hasActiveSubscription)
+            $url = URL::temporarySignedRoute(
+                'choose-plan',
+                now()->addDays(7),
+                ['email' => $tenant->email, 'vat_number' => $tenant->vat_number]
+            );
 
-        return Inertia::render('central/tenants/show', ['tenant' => $tenant->load('domain'), 'url' => $url]);
+        return Inertia::render('central/tenants/show', ['tenant' => $tenant->load('domain'), 'url' => $url ?? null]);
     }
 
     /**

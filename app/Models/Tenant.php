@@ -90,6 +90,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         'full_invoice_address',
         'domain_address',
         'active_subscription',
+        'has_active_subscription',
         'disk_size_mb',
         'disk_size_gb'
     ];
@@ -122,7 +123,14 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     public function activeSubscription(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->subscriptions()->first() ?? null
+            get: fn() => $this->subscriptions()->where('stripe_status', 'trialing')->orWhere('stripe_status', 'active')->first() ?? null
+        );
+    }
+
+    public function hasActiveSubscription(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => $this->subscriptions()->where('stripe_status', 'trialing')->orWhere('stripe_status', 'active')->first() ? true : false
         );
     }
 
