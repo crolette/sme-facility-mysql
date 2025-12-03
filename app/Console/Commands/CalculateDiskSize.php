@@ -60,6 +60,8 @@ class CalculateDiskSize extends Command
                 ]
             );
 
+            $tenant->update(['current_storage_bytes' => $size]);
+
             Log::info("Dispatched tenant disk size calculation for tenant: {$tenant->company_code} : {$size}");
         });
 

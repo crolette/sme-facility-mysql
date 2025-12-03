@@ -414,6 +414,15 @@ export interface Tenant {
     trial_ends_at: string;
     domain: Domain;
     domain_address: string;
+    max_sites: number;
+    max_users: number;
+    max_storage_gb: number;
+    has_statistics: boolean;
+    current_sites_count: number;
+    current_users_count: number;
+    current_storage_bytes: number;
+    disk_size_gb: number;
+    disk_size_mb: number;
 }
 
 export interface Domain {

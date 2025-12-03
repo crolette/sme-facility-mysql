@@ -11,6 +11,7 @@ use Stancl\Tenancy\Listeners;
 use Stancl\Tenancy\Middleware;
 use App\Jobs\CreateTenantAdmin;
 use Stancl\JobPipeline\JobPipeline;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -125,6 +126,7 @@ class TenancyServiceProvider extends ServiceProvider
         // $this->loadRoutesFrom(base_path('routes/tenant_auth.php'));
 
     }
+
 
     protected function bootEvents()
     {

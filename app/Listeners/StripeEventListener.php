@@ -5,10 +5,12 @@ namespace App\Listeners;
 use App\Models\Tenant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Services\Central\StripeService;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Laravel\Cashier\Events\WebhookReceived;
+use App\Services\Central\SubscriptionRestrictionsService;
 
 class StripeEventListener
 {
@@ -70,19 +72,23 @@ class StripeEventListener
             Log::info('customer.subscription.created');
             Log::info($event->payload);
 
-            // $stripe = new \Stripe\StripeClient(config('cashier.secret'));
-            // $price = $stripe->prices->retrieve('price_1SZXnhFHXryfbBkbXL0omY5n', ['expand' => ['product']]);
-            // dd($price->product->metadata);
-
+            $data = $event->payload['data']['object'];
+            app(SubscriptionRestrictionsService::class)->updateSubscriptionRestrictions($data['id']);
         }
 
         if ($event->payload['type'] === 'customer.subscription.updated') {
             Log::info('customer.subscription.updated');
             Log::info($event->payload);
+
+            $data = $event->payload['data']['object'];
+            app(SubscriptionRestrictionsService::class)->updateSubscriptionRestrictions($data['id']);
         }
         if ($event->payload['type'] === 'customer.subscription.deleted') {
             Log::info('customer.subscription.deleted');
             Log::info($event->payload);
+
+            $data = $event->payload['data']['object'];
+            app(SubscriptionRestrictionsService::class)->removeSubscriptionRestrictions($data['id']);
         }
 
 

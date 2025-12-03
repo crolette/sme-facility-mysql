@@ -54,6 +54,7 @@ use App\Http\Controllers\Tenants\InterventionActionController;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\Tenants\InterventionProviderController;
 use App\Http\Controllers\Tenants\CreateTicketFromQRCodeController;
+use App\Http\Middleware\CacheTenantLimits;
 use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 use App\Mail\ScheduledNotificationMail;
 use App\Models\Tenants\ScheduledNotification;
@@ -74,6 +75,7 @@ Route::middleware([
     'web',
     CustomInitializeTenancyBySubdomain::class,
     // InitializeTenancyBySubdomain::class,
+    CacheTenantLimits::class,
     ScopeSessions::class,
     PreventAccessFromCentralDomains::class,
     TenantLocaleMiddleware::class,

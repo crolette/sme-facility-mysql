@@ -42,6 +42,11 @@ export default function ShowTenant({ tenant, url }: { tenant: Tenant; url: strin
                         </ul>
                     </li>
                 </ul>
+                <div>
+                    Sites:{tenant.current_sites_count} / {tenant.max_sites}
+                    Users:{tenant.current_users_count} / {tenant.max_users}
+                    GB:{tenant.disk_size_gb} / {tenant.max_storage_gb}
+                </div>
             </div>
         </AppLayout>
     );

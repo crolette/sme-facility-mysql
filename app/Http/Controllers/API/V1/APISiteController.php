@@ -78,6 +78,8 @@ class APISiteController extends Controller
      */
     public function update(TenantSiteRequest $siteRequest, MaintainableUpdateRequest $maintainableRequest,  Site $site)
     {
+
+
         if (Auth::user()->cannot('update', $site))
             abort(403);
 

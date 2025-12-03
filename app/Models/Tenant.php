@@ -38,6 +38,13 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         'pm_type',
         'pm_last_four',
         'trial_ends_at',
+        'max_sites',
+        'max_users',
+        'max_storage_gb',
+        'has_statistics',
+        'current_sites_count',
+        'current_users_count',
+        'current_storage_bytes',
     ];
 
     protected $hidden = [
@@ -62,19 +69,29 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             'pm_type',
             'pm_last_four',
             'trial_ends_at',
+            'max_sites',
+            'max_users',
+            'max_storage_gb',
+            'has_statistics',
+            'current_sites_count',
+            'current_users_count',
+            'current_storage_bytes',
         ];
     }
 
     protected $casts = [
         'data' => 'array',
-        'trial_ends_at' => 'date:d-m-Y'
+        'trial_ends_at' => 'date:d-m-Y',
+        'has_statistics' => 'boolean',
     ];
 
     protected $appends = [
         'full_company_address',
         'full_invoice_address',
         'domain_address',
-        'active_subscription'
+        'active_subscription',
+        'disk_size_mb',
+        'disk_size_gb'
     ];
 
     public function companyAddress(): HasOne
@@ -127,6 +144,20 @@ class Tenant extends BaseTenant implements TenantWithDatabase
                 get: fn() => null
             );
         }
+    }
+
+    public function diskSizeMb(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => round($this->current_storage_bytes / 1024 / 1024, 2)
+        );
+    }
+
+    public function diskSizeGb(): Attribute
+    {
+        return Attribute::make(
+            get: fn() => round($this->current_storage_bytes / 1024 / 1024 / 1024, 2)
+        );
     }
 
     public function fullCompanyAddress(): Attribute

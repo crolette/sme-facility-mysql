@@ -31,6 +31,6 @@ class Subscription extends CashierSubscription
     public function scopeActiveUserSubscription(Builder $query, Tenant $tenant): Builder
     {
         return
-            $query->where('stripe_status', "=", 'active')->where('tenant_id', $tenant->id);
+            $query->where('stripe_status', "=", 'active')->orWhere('stripe_status', "=", 'trialing')->where('tenant_id', $tenant->id);
     }
 }

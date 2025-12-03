@@ -55,7 +55,7 @@ class AppServiceProvider extends ServiceProvider
         if (tenant()) {
             $host = request()->getHost();
 
-            // Désactiver le préfixe tenant pour les assets
+
             \URL::forceRootUrl("https://{$host}");
             config(['app.url' => "https://{$host}"]);
             config(['app.asset_url' => "https://{$host}"]);

@@ -38,12 +38,6 @@ class CentralTenantController extends Controller
      */
     public function show(Tenant $tenant)
     {
-        $subscription = SubscriptionItem::first();
-
-        $stripe = new \Stripe\StripeClient(config('cashier.secret'));
-        $price = $stripe->prices->retrieve('price_1SZXnhFHXryfbBkbXL0omY5n', ['expand' => ['product']]);
-        // dd($price->product->metadata);
-
         $url = URL::temporarySignedRoute(
             'choose-plan',
             now()->addDays(7),

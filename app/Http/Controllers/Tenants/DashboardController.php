@@ -22,6 +22,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Tenants\Intervention;
 use App\Models\Tenants\Maintainable;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
