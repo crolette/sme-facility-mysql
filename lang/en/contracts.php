@@ -3,6 +3,7 @@
 return [
     'title' => 'Contract|Contracts',
     'renewal_type' => [
+        'title' => 'Renewal Type',
         'automatic' => 'Automatic',
         'manual' => 'Manuel',
     ],

@@ -98,11 +98,14 @@ Route::middleware([
 
     // Route::get('mail', function () {
     //     // $data = ScheduledNotification::where('notification_type', 'end_warranty_date')->first();
-    //     $data = Intervention::first();
-    //     $model = $data->ticketable;
-    //     $url = 'hello';
+    //     // $data = Intervention::first();
+    //     $data = Contract::first();
+    //     // $model = $data->ticketable;
+    //     // $url = 'hello';
 
-    //     return (new SendInterventionToProviderEmail($data, 'google.com'))->render();
+    //     // dd($data->data);
+
+    //     return (new ContractExtendedMail($data))->render();
     // });
 
     Route::get('locale/{locale}', function (Request $request, $locale) {

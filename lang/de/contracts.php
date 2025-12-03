@@ -3,6 +3,7 @@
 return [
     'title' => 'Vertrag|Verträge',
     'renewal_type' => [
+        'title' => 'Verlängerungstyp',
         'automatic' => 'Automatisch',
         'manual' => 'Manuell',
     ],

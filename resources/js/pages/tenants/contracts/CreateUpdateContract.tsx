@@ -429,7 +429,7 @@ export default function CreateUpdateContract({
                                     {renewalTypes && renewalTypes.length > 0 && (
                                         <>
                                             <option value="" disabled className="bg-background text-foreground">
-                                                {t('actions.select-type', { type: t('contracts.renewal_type') })}
+                                                {t('actions.select-type', { type: t('contracts.renewal_type.title') })}
                                             </option>
                                             {renewalTypes?.map((renewalType, index) => (
                                                 <option value={renewalType} key={index} className="bg-background text-foreground">

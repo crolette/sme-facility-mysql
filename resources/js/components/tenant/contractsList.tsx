@@ -148,7 +148,7 @@ export const ContractsList = ({
                             <TableHeadData>{t('common.status')}</TableHeadData>
                             <TableHeadData> {t('contracts.internal_ref')}</TableHeadData>
                             <TableHeadData> {t('contracts.provider_ref')}</TableHeadData>
-                            <TableHeadData> {t('contracts.renewal_type')}</TableHeadData>
+                            <TableHeadData> {t('contracts.renewal_type.title')}</TableHeadData>
                             <TableHeadData>{tChoice('providers.title', 1)}</TableHeadData>
                             <TableHeadData> {t('contracts.end_date')}</TableHeadData>
                             {(editable || removable) && <TableHeadData></TableHeadData>}

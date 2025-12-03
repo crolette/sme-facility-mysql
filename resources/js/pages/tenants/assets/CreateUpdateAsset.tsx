@@ -1117,7 +1117,7 @@ export default function CreateUpdateAsset({
                                                 )}
                                             </select>
                                             <InputError className="mt-2" message={errors?.notice_period ?? ''} />
-                                            <Label htmlFor="renewal_type">{t('contracts.renewal_type')}</Label>
+                                            <Label htmlFor="renewal_type">{t('contracts.renewal_type.title')}</Label>
                                             <select
                                                 name="renewal_type"
                                                 // value={data.renewal_type ?? ''}
@@ -1134,7 +1134,7 @@ export default function CreateUpdateAsset({
                                                 {renewalTypes && renewalTypes.length > 0 && (
                                                     <>
                                                         <option value="" disabled className="bg-background text-foreground">
-                                                            {t('actions.select-type', { type: t('contracts.renewal_type') })}
+                                                            {t('actions.select-type', { type: t('contracts.renewal_type.title') })}
                                                         </option>
                                                         {renewalTypes?.map((type, index) => (
                                                             <option value={type} key={index} className="bg-background text-foreground">

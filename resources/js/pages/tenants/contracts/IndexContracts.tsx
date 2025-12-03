@@ -205,7 +205,7 @@ export default function IndexContracts({
 
                         <div className="bg-border border-border text-background dark:text-foreground absolute top-full z-10 flex flex-col items-center gap-4 rounded-b-md border-2 p-2 lg:flex-row">
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="role">{t('contracts.renewal_type')}</Label>
+                                <Label htmlFor="role">{t('contracts.renewal_type.title')}</Label>
                                 <div className="space-x-1 text-center">
                                     {renewalTypes.map((renewalType) => (
                                         <Pill
@@ -394,7 +394,7 @@ export default function IndexContracts({
                                 <TableHeadData>{t('common.status')}</TableHeadData>
                                 <TableHeadData>{t('contracts.internal_ref')}</TableHeadData>
                                 <TableHeadData>{t('contracts.provider_ref')}</TableHeadData>
-                                <TableHeadData>{t('contracts.renewal_type')}</TableHeadData>
+                                <TableHeadData>{t('contracts.renewal_type.title')}</TableHeadData>
                                 <TableHeadData>{tChoice('providers.title', 1)}</TableHeadData>
                                 <TableHeadData>
                                     <div className="flex items-center gap-2">
