@@ -9,6 +9,10 @@ return [
     'description' => 'Une plateforme complète, sans complexité inutile, pour maîtriser vos coûts et gagner en efficacité.',
     'from' => 'A partir de',
     'month' => 'mois',
+    'year' => 'année',
+    'year_2months_free' => '2 mois gratuits sur la version annuelle !',
+    'vat_excluded' => 'HTVA',
+    'vat_excluded_description' => 'Les tarifs indiqués s’entendent hors taxe sur la valeur ajoutée (HTVA). La TVA applicable sera ajoutée conformément aux dispositions légales en vigueur au moment de la facturation.',
     'start_today' => 'Démarrer aujourd\'hui',
     'starter' => [
         'title' => 'Starter',
@@ -24,6 +28,7 @@ return [
     ],
     'launching_offer' => [
         'description' => 'Pour fêter le lancement de SME Facility, profitez d\'une offre exceptionnelle !',
+        'conditions' => 'L’offre de lancement est réservée aux nouveaux clients et s’applique exclusivement à la première année de souscription. À partir de la deuxième année, le tarif en vigueur sera automatiquement appliqué.'
     ],
     'premium' => [
         'title' => 'Premium',
