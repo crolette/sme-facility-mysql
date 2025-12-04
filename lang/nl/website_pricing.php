@@ -26,6 +26,7 @@ return [
         ],
     ],
     'launching_offer' => [
+        'title' => 'Lanceringsaanbieding',
         'description' => 'Om de lancering van SME Facility te vieren, profiteert u van een uitzonderlijke aanbieding!',
         'conditions' => 'De lanceringsaanbieding is voorbehouden aan nieuwe klanten en is uitsluitend van toepassing op het eerste abonnementsjaar. Vanaf het tweede jaar wordt automatisch het dan geldende tarief toegepast.',
     ],

@@ -39,7 +39,7 @@ export default function Pricing() {
                         <p>{t('website_pricing.description')}</p>
 
                         <div className="bg-cta p-4 text-center">
-                            <h2 className="animate-pulse font-bold">{t('website_pricing.launching_offer')}</h2>
+                            <h2 className="animate-pulse font-bold">{t('website_pricing.launching_offer.title')}</h2>
                             <p>{t('website_pricing.launching_offer.description')}</p>
                         </div>
                         <div className="mx-auto flex text-lg">

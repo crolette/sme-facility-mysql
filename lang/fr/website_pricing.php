@@ -27,6 +27,7 @@ return [
         ],
     ],
     'launching_offer' => [
+        'title' => 'Offre de lancement',
         'description' => 'Pour fêter le lancement de SME Facility, profitez d\'une offre exceptionnelle !',
         'conditions' => 'L’offre de lancement est réservée aux nouveaux clients et s’applique exclusivement à la première année de souscription. À partir de la deuxième année, le tarif en vigueur sera automatiquement appliqué.'
     ],

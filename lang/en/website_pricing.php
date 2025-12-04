@@ -26,6 +26,7 @@ return [
         ],
     ],
     'launching_offer' => [
+        'title' => 'Launching offer',
         'description' => 'To celebrate the launch of SME Facility, enjoy an exceptional offer!',
         'conditions' => 'The launching offer is reserved for new customers and applies exclusively to the first year of subscription. From the second year onward, the applicable rate in effect will be automatically applied.'
     ],
