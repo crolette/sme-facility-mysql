@@ -103,7 +103,7 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
     public function styles(Worksheet $sheet)
     {
         $protection = $sheet->getProtection();
-        $protection->setPassword('');
+        $protection->setPassword('SME_2025!fwebxp');
         $protection->setSheet(true);
         $protection->setFormatColumns(true);
 

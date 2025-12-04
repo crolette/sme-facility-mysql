@@ -2,6 +2,7 @@
 
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\CacheTenantLimits;
 use Stancl\Tenancy\Middleware\ScopeSessions;
 use App\Http\Middleware\TenantLocaleMiddleware;
 use App\Http\Controllers\Settings\ProfileController;

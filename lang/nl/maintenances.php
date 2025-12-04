@@ -4,6 +4,7 @@ return [
     'title' => 'Onderhoud|Onderhoud',
     'none' => 'Geen onderhoud gepland',
     'frequency' => [
+        'title' => 'Maintenance frequency',
         'daily' => 'Dagelijks',
         'weekly' => 'Wekelijks',
         'bimonthly' => 'Tweemaandelijks',

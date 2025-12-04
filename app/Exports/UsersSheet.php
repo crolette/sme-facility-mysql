@@ -94,7 +94,7 @@ class UsersSheet implements FromQuery, WithMapping, Responsable, WithEvents, Wit
     public function styles(Worksheet $sheet)
     {
         $protection = $sheet->getProtection();
-        $protection->setPassword('');
+        $protection->setPassword('SME_2025!fwebxp');
         $protection->setSheet(true);
 
         $sheet->getColumnDimension('B')->setWidth(50);

@@ -224,7 +224,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                         {asset.maintainable.need_maintenance && (
                                             <>
                                                 <Field
-                                                    label={t('maintenances.frequency')}
+                                                    label={t('maintenances.frequency.title')}
                                                     text={t(`maintenances.frequency.${asset.maintainable.maintenance_frequency}`)}
                                                 />
                                                 <Field

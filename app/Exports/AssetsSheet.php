@@ -31,7 +31,7 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Concerns\WithCustomStartCell;
 use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
-class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, ShouldAutoSize, WithStyles, WithColumnFormatting, WithTitle
+class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, WithStyles, WithColumnFormatting, WithTitle
 {
     use Exportable;
 
@@ -130,7 +130,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
                 __('assets.still_under_warranty') . ' ?',
                 __('assets.warranty_end_date'),
                 __('maintenances.need_maintenance') . ' ?',
-                __('maintenances.frequency'),
+                __('maintenances.frequency.title'),
                 __('maintenances.next_maintenance_date'),
                 __('maintenances.last_maintenance_date'),
                 __('maintenances.maintenance_manager'),
@@ -154,7 +154,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
     public function styles(Worksheet $sheet)
     {
         $protection = $sheet->getProtection();
-        $protection->setPassword('');
+        $protection->setPassword('SME_2025!fwebxp');
         $protection->setSheet(true);
 
         $sheet->getColumnDimension('C')->setWidth(35);

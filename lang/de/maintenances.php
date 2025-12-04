@@ -4,6 +4,7 @@ return [
     'title' => 'Wartung|Wartungen',
     'none' => 'Keine Wartung geplant',
     'frequency' => [
+        'title' => 'Wartungsfrequenz',
         'daily' => 'Täglich',
         'weekly' => 'Wöchentlich',
         'bimonthly' => 'Zweimonatlich',

@@ -4,6 +4,7 @@ return [
     'title' => 'Maintenance|Maintenances',
     'none' => 'No maintenances planned',
     'frequency' => [
+        'title' => 'Maintenance frequency',
         'daily' => 'Daily',
         'weekly' => 'Weekly',
         'bimonthly' => 'Bimonthly',

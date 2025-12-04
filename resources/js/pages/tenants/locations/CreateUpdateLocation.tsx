@@ -709,7 +709,7 @@ export default function CreateUpdateLocation({
                             <>
                                 <div className="flex flex-col gap-4 md:flex-row">
                                     <div className="w-full">
-                                        <Label htmlFor="maintenance_frequency">{t('maintenances.frequency')}</Label>
+                                        <Label htmlFor="maintenance_frequency">{t('maintenances.frequency.title')}</Label>
                                         <select
                                             name="maintenance_frequency"
                                             value={data.maintenance_frequency ?? ''}
@@ -725,7 +725,7 @@ export default function CreateUpdateLocation({
                                             {frequencies && frequencies.length > 0 && (
                                                 <>
                                                     <option value="" disabled className="bg-background text-foreground">
-                                                        {t('actions.select-type', { type: t('maintenances.frequency') })}
+                                                        {t('actions.select-type', { type: t('maintenances.frequency.title') })}
                                                     </option>
                                                     {frequencies?.map((frequency, index) => (
                                                         <option value={frequency} key={index} className="bg-background text-foreground">
