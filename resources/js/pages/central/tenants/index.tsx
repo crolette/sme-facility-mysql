@@ -78,8 +78,6 @@ export default function IndexTenants({ items }: { items: Tenant[] }) {
         }
     };
 
-    console.log(items);
-
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Tenants" />
@@ -114,6 +112,9 @@ export default function IndexTenants({ items }: { items: Tenant[] }) {
                                         </svg>
                                         <p>Subscription status : {tenant.active_subscription?.stripe_status}</p>
                                     </div>
+                                    <p>
+                                        Subscription: {tenant.subscription_name} ({tenant.subscription_plan})
+                                    </p>
                                     <ul className="flex gap-2">
                                         <li>
                                             Sites: {tenant.current_sites_count} / <span className="font-bold">{tenant.max_sites}</span>
@@ -125,6 +126,10 @@ export default function IndexTenants({ items }: { items: Tenant[] }) {
                                         <span className="">|</span>
                                         <li>
                                             Storage GB: {tenant.disk_size_gb} / <span className="font-bold">{tenant.max_storage_gb}</span>
+                                        </li>
+                                        <span className="">|</span>
+                                        <li className="flex items-center gap-2">
+                                            Statistics: <CheckCircle className={tenant.has_statistics ? 'text-success' : 'text-destructive'} />
                                         </li>
                                     </ul>
                                 </div>

@@ -73,7 +73,7 @@ class StripeEventListener
             Log::info($event->payload);
 
             $data = $event->payload['data']['object'];
-            app(SubscriptionRestrictionsService::class)->updateSubscriptionRestrictions($data['id']);
+            app(SubscriptionRestrictionsService::class)->updateSubscriptionRestrictions($data['id'], $data['plan']);
         }
 
         if ($event->payload['type'] === 'customer.subscription.updated') {
@@ -81,7 +81,7 @@ class StripeEventListener
             Log::info($event->payload);
 
             $data = $event->payload['data']['object'];
-            app(SubscriptionRestrictionsService::class)->updateSubscriptionRestrictions($data['id']);
+            app(SubscriptionRestrictionsService::class)->updateSubscriptionRestrictions($data['id'], $data['plan']);
         }
         if ($event->payload['type'] === 'customer.subscription.deleted') {
             Log::info('customer.subscription.deleted');

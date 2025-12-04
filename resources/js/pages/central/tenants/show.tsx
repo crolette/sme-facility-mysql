@@ -25,7 +25,7 @@ export default function ShowTenant({ tenant, url }: { tenant: Tenant; url: strin
                         {tenant.company_name} - {tenant.email} - {tenant.phone_number} - {tenant.company_code} -
                         <a href={tenant.domain_address}>{tenant.domain_address}</a>
                         <ul>
-                            <li key={tenant.domain.id}>Domain name: {tenant.domain.domain}</li>
+                            <li key="0">Domain name: {tenant.domain.domain}</li>
                             <li key="1">Stripe ID : {tenant.stripe_id ?? 'Not as customer in Stripe'}</li>
                             <li key="2" className="flex gap-2">
                                 VAT Number : {tenant.vat_number}{' '}
@@ -55,6 +55,10 @@ export default function ShowTenant({ tenant, url }: { tenant: Tenant; url: strin
                     <span className="">|</span>
                     <li>
                         Storage GB: {tenant.disk_size_gb} / <span className="font-bold">{tenant.max_storage_gb}</span>
+                    </li>
+                    <span className="">|</span>
+                    <li className="flex items-center gap-2">
+                        Statistics: <CheckCircle className={tenant.has_statistics ? 'text-success' : 'text-destructive'} />
                     </li>
                 </ul>
             </div>

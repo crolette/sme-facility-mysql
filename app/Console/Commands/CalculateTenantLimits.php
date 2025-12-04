@@ -48,7 +48,7 @@ class CalculateTenantLimits extends Command
         tenancy()->runForMultiple($tenants, function ($tenant) {
 
             $sites = Site::count();
-            $users = User::where('can_login', true)->count();
+            $users = User::withoutRole('Super Admin')->where('can_login', true)->count();
 
             $tenant->update(['current_sites_count' => $sites, 'current_users_count' => $users]);
 

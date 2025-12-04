@@ -423,6 +423,13 @@ export interface Tenant {
     current_storage_bytes: number;
     disk_size_gb: number;
     disk_size_mb: number;
+    subscription_name?: string;
+    subscription_plan?: string;
+    active_subscription?: Subscription;
+}
+
+export interface Subscription {
+    [key: string]: string | number;
 }
 
 export interface Domain {

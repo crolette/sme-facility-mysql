@@ -45,6 +45,8 @@ class Tenant extends BaseTenant implements TenantWithDatabase
         'current_sites_count',
         'current_users_count',
         'current_storage_bytes',
+        'subscription_name',
+        'subscription_plan',
     ];
 
     protected $hidden = [
@@ -76,6 +78,8 @@ class Tenant extends BaseTenant implements TenantWithDatabase
             'current_sites_count',
             'current_users_count',
             'current_storage_bytes',
+            'subscription_name',
+            'subscription_plan',
         ];
     }
 

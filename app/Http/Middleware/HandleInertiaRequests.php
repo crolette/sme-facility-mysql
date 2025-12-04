@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Company;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Barryvdh\Debugbar\Facades\Debugbar;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -56,17 +58,20 @@ class HandleInertiaRequests extends Middleware
     {
         // dd(Company::first()->logo_path);
 
-
+        $tenant = tenancy()->tenant;
         if (session()->missing('tenantName') || session()->missing('tenantLogo')) {
-            if (tenancy()->tenant) {
+            if ($tenant) {
                 $company = Company::first();
                 session(['tenantName' => $company->name ?? config('app.name')]);
                 session(['tenantLogo' => $company->logo ?? env('APP_LOGO')]);
             }
         }
 
-        if (tenancy()->tenant) {
+        if ($tenant) {
             $ticketsCount = $request->user()?->hasRole('Maintenance Manager') ? Ticket::where('status', 'open')->orWhere('status', 'ongoing')->forMaintenanceManager()->count() : Ticket::where('status', 'open')->orWhere('status', 'ongoing')->count();
+
+            // TODO improve/refactor in service ? Est-ce malin de rappeler chaque fois le cache pour une seule info sur les stats ?
+            $limits = Cache::get("tenant:{$tenant->id}:limits");
         }
 
         return [
@@ -81,6 +86,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
                 'permissions' => tenancy()->tenant ? $request->user()?->getAllPermissions()?->pluck('name') ?? null : null,
             ],
+            'has_statistics' => $limits['has_statistics'] ?? false,
             'flash' => ['message' => session('message'), 'type' => session('type')],
             'ziggy' => fn(): array => [
                 ...(new Ziggy)->toArray(),
