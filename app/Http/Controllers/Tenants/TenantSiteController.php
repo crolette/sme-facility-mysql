@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Tenants;
 use Exception;
 use Inertia\Inertia;
 use App\Services\QRService;
+use App\Helpers\ApiResponse;
 use App\Models\LocationType;
 use App\Models\Tenants\Site;
 use Illuminate\Http\Request;
+use App\Services\TenantLimits;
 use App\Enums\NoticePeriodEnum;
 use App\Services\QRCodeService;
 use App\Enums\ContractStatusEnum;
@@ -42,8 +44,10 @@ class TenantSiteController extends Controller
      */
     public function index(Request $request)
     {
-        if (Auth::user()->cannot('viewAny', Site::class))
-            abort(403);
+        if (Auth::user()->cannot('viewAny', Site::class)) {
+            ApiResponse::notAuthorizedFlash();
+            return back();
+        }
 
         $validator = Validator::make($request->all(), [
             'q' => 'string|max:255|nullable',
@@ -78,8 +82,10 @@ class TenantSiteController extends Controller
      */
     public function create()
     {
-        if (Auth::user()->cannot('create', Site::class))
-            abort(403);
+        if (Auth::user()->cannot('create', Site::class)) {
+            ApiResponse::notAuthorizedFlash();
+            return back();
+        }
 
         $locationTypes = LocationType::getByLevelCache('site');
         $documentTypes = CategoryType::getByCategoryCache('document');
@@ -99,8 +105,12 @@ class TenantSiteController extends Controller
      */
     public function show(Site $site)
     {
-        if (Auth::user()->cannot('view', $site))
-            abort(403);
+        if (Auth::user()->cannot('view', $site)) {
+            ApiResponse::notAuthorizedFlash();
+            return back();
+        }
+
+        // dd($site->assets, $site->buildings);
 
         $site = Site::where('reference_code', $site->reference_code)->with(['buildings', 'documents', 'tickets.pictures', 'maintainable.manager', 'maintainable.providers', 'contracts', 'contracts.provider'])->first();
         $site->append('floor_material', 'wall_material');
@@ -114,8 +124,10 @@ class TenantSiteController extends Controller
      */
     public function edit(Site $site)
     {
-        if (Auth::user()->cannot('update', $site))
-            abort(403);
+        if (Auth::user()->cannot('update', $site)) {
+            ApiResponse::notAuthorizedFlash();
+            return back();
+        }
 
         $locationTypes = LocationType::getByLevelCache('site');
         $documentTypes = CategoryType::getByCategoryCache('document');

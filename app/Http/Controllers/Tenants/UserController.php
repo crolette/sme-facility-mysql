@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Tenants;
 
 use Inertia\Inertia;
 use App\Enums\RoleTypes;
+use App\Helpers\ApiResponse;
 use App\Models\Tenants\User;
 use Illuminate\Http\Request;
+use App\Services\TenantLimits;
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class UserController extends Controller
 {
@@ -19,7 +21,8 @@ class UserController extends Controller
     public function index(Request $request)
     {
         if (Auth::user()->cannot('viewAny', User::class)) {
-            abort(403);
+            ApiResponse::notAuthorizedFlash();
+            return back();
         }
 
         $validator = Validator::make($request->all(), [
@@ -67,10 +70,11 @@ class UserController extends Controller
     public function create()
     {
         if (Auth::user()->cannot('create', User::class)) {
-            abort(403);
+            ApiResponse::notAuthorizedFlash();
+            return back();
         }
 
-        return Inertia::render('tenants/users/CreateUpdateUser', ['roles' => array_column(RoleTypes::cases(), 'value')]);
+        return Inertia::render('tenants/users/CreateUpdateUser', ['roles' => array_column(RoleTypes::cases(), 'value'), 'canAddLoginableUser' => TenantLimits::canCreateLoginableUser()]);
     }
 
     /**
@@ -79,10 +83,11 @@ class UserController extends Controller
     public function edit(User $user)
     {
         if (Auth::user()->cannot('update', $user)) {
-            abort(403);
+            ApiResponse::notAuthorizedFlash();
+            return back();
         }
 
-        return Inertia::render('tenants/users/CreateUpdateUser', ['user' => $user->load('roles:id,name', 'provider:id,name'), 'roles' => array_column(RoleTypes::cases(), 'value')]);
+        return Inertia::render('tenants/users/CreateUpdateUser', ['user' => $user->load('roles:id,name', 'provider:id,name'), 'roles' => array_column(RoleTypes::cases(), 'value'), 'canAddLoginableUser' => TenantLimits::canCreateLoginableUser()]);
     }
 
 
@@ -92,7 +97,8 @@ class UserController extends Controller
     public function show(User $user)
     {
         if (Auth::user()->cannot('view', $user)) {
-            abort(403);
+            ApiResponse::notAuthorizedFlash();
+            return back();
         }
 
         // dd($user->load('assets', 'manager.maintainable', 'roles:id,name', 'provider:id,name', 'assignedInterventions'));

@@ -10,13 +10,14 @@ use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use App\Http\Controllers\API\V1\APIUploadProfilePictureController;
-
+use App\Http\Middleware\CacheTenantLimits;
 
 Route::middleware([
     'web',
     CustomInitializeTenancyBySubdomain::class,
     ScopeSessions::class,
     PreventAccessFromCentralDomains::class,
+    CacheTenantLimits::class,
     'auth:tenant'
 ])->prefix('/v1/users')->group(function () {
 
@@ -37,8 +38,6 @@ Route::middleware([
 
     Route::get('/maintenance', function (Request $request) {
         $query  = User::role(['Admin', 'Maintenance Manager'])->select('id', 'first_name', 'last_name', 'email');
-
-        // $query->whereDoesntHave('provider');
 
         if ($request->query('q')) {
             $query->where(function ($subquery) use ($request) {

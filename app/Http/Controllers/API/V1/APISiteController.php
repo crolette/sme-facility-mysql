@@ -6,6 +6,8 @@ use Exception;
 use App\Helpers\ApiResponse;
 use App\Models\LocationType;
 use App\Models\Tenants\Site;
+use App\Services\SiteService;
+use App\Services\TenantLimits;
 use App\Services\QRCodeService;
 use App\Services\ContractService;
 use App\Services\DocumentService;
@@ -20,7 +22,6 @@ use App\Http\Requests\Tenant\MaintainableRequest;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Requests\Tenant\MaintainableUpdateRequest;
 use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
-use App\Services\SiteService;
 
 class APISiteController extends Controller
 {
@@ -35,7 +36,7 @@ class APISiteController extends Controller
     public function store(TenantSiteRequest $siteRequest, ContractWithModelStoreRequest $contractRequest, MaintainableRequest $maintainableRequest, DocumentUploadRequest $documentUploadRequest, DocumentService $documentService)
     {
         if (Auth::user()->cannot('create', Site::class))
-            abort(403);
+            return ApiResponse::notAuthorized();
 
         try {
             DB::beginTransaction();
@@ -63,6 +64,9 @@ class APISiteController extends Controller
                 $this->qrCodeService->createAndAttachQR($site);
 
             DB::commit();
+
+            TenantLimits::setSitesCount();
+
             return ApiResponse::successFlash('', 'Site created');
         } catch (Exception $e) {
             DB::rollback();
@@ -79,9 +83,8 @@ class APISiteController extends Controller
     public function update(TenantSiteRequest $siteRequest, MaintainableUpdateRequest $maintainableRequest,  Site $site)
     {
 
-
         if (Auth::user()->cannot('update', $site))
-            abort(403);
+            return ApiResponse::notAuthorized();
 
         if ($siteRequest->validated('locationType') !== $site->locationType->id) {
             $errors = new MessageBag([
@@ -114,13 +117,15 @@ class APISiteController extends Controller
     public function destroy(Site $site)
     {
         if (Auth::user()->cannot('delete', $site))
-            abort(403);
+            return ApiResponse::notAuthorized();
 
         if (count($site->assets) > 0 || count($site->buildings) > 0) {
+
             return ApiResponse::error('Site cannot be deleted ! Assets and/or buildings are linked to this site', [], 409);
         }
 
         $response = $this->siteService->deleteSite($site);
+        TenantLimits::setSitesCount();
 
         return $response === true ? ApiResponse::success('', 'Site deleted') : ApiResponse::error('', 'Error during Site deletion');
     }

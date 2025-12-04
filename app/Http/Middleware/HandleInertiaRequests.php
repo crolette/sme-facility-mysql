@@ -8,6 +8,7 @@ use Tighten\Ziggy\Ziggy;
 use Illuminate\Http\Request;
 use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Company;
+use App\Services\TenantLimits;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Barryvdh\Debugbar\Facades\Debugbar;
@@ -69,9 +70,6 @@ class HandleInertiaRequests extends Middleware
 
         if ($tenant) {
             $ticketsCount = $request->user()?->hasRole('Maintenance Manager') ? Ticket::where('status', 'open')->orWhere('status', 'ongoing')->forMaintenanceManager()->count() : Ticket::where('status', 'open')->orWhere('status', 'ongoing')->count();
-
-            // TODO improve/refactor in service ? Est-ce malin de rappeler chaque fois le cache pour une seule info sur les stats ?
-            $limits = Cache::get("tenant:{$tenant->id}:limits");
         }
 
         return [
@@ -86,7 +84,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
                 'permissions' => tenancy()->tenant ? $request->user()?->getAllPermissions()?->pluck('name') ?? null : null,
             ],
-            'has_statistics' => $limits['has_statistics'] ?? false,
+            'has_statistics' => TenantLimits::canAccessStatistics(),
             'flash' => ['message' => session('message'), 'type' => session('type')],
             'ziggy' => fn(): array => [
                 ...(new Ziggy)->toArray(),

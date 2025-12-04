@@ -12,7 +12,7 @@ import { Trash2, Upload } from 'lucide-react';
 import { useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
-export default function CompanySettings({ item, billingPortal, limits, usage }: { item: Company; billingPortal: string; limits: []; usage: [] }) {
+export default function CompanySettings({ item, billingPortal, usage }: { item: Company; billingPortal: string; usage: [] }) {
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -52,6 +52,8 @@ export default function CompanySettings({ item, billingPortal, limits, usage }: 
             showToast(error.response.data.message, error.response.data.status);
         }
     };
+
+    console.log(usage);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -107,15 +109,15 @@ export default function CompanySettings({ item, billingPortal, limits, usage }: 
                     <h3>Subscription Usage</h3>
                     <ul className="flex gap-2">
                         <li>
-                            Sites: {usage.current_sites_count} / <span className="font-bold">{limits.max_sites}</span>
+                            Sites: {usage.sites.current} / <span className="font-bold">{usage.sites.max}</span>
                         </li>
                         <span className="">|</span>
                         <li>
-                            Users: {usage.current_users_count} / <span className="font-bold">{limits.max_users}</span>
+                            Users: {usage.users.current} / <span className="font-bold">{usage.users.max}</span>
                         </li>
                         <span className="">|</span>
                         <li>
-                            Storage GB: {item.disk_size_gb} / <span className="font-bold">{limits.max_storage_gb}</span>
+                            Storage GB: {item.disk_size_gb} / <span className="font-bold">{usage.storage.max / 1024 / 1024}</span>
                         </li>
                     </ul>
                 </div>

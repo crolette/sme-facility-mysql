@@ -4,7 +4,9 @@ namespace App\Policies;
 
 use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
+use App\Services\TenantLimits;
 use Illuminate\Auth\Access\Response;
+use Barryvdh\Debugbar\Facades\Debugbar;
 
 class SitePolicy
 {
@@ -41,7 +43,7 @@ class SitePolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create locations');
+        return $user->can('create locations') && TenantLimits::canCreateSite();
     }
 
     /**
