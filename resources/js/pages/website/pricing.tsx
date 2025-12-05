@@ -1,10 +1,9 @@
 import { Button } from '@/components/ui/button';
 import WebsiteLayout from '@/layouts/website-layout';
-import { cn } from '@/lib/utils';
 import { Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Building, Building2, Check, Factory, X } from 'lucide-react';
-import React, { useState } from 'react';
+import React from 'react';
 
 export default function Pricing() {
     const { t } = useLaravelReactI18n();
@@ -19,8 +18,6 @@ export default function Pricing() {
 
         return newString;
     };
-
-    const [planType, setPlanType] = useState('month');
 
     return (
         <WebsiteLayout>
@@ -42,56 +39,20 @@ export default function Pricing() {
                             <h2 className="animate-pulse font-bold">{t('website_pricing.launching_offer.title')}</h2>
                             <p>{t('website_pricing.launching_offer.description')}</p>
                         </div>
-                        <div className="mx-auto flex text-lg">
-                            <div
-                                onClick={() => setPlanType('month')}
-                                className={cn(
-                                    'border-accent cursor-pointer rounded-l-full border px-10 py-4 first-letter:uppercase',
-                                    planType === 'month' ? 'bg-website-primary font-bold text-white' : 'hover:bg-website-secondary',
-                                )}
-                            >
-                                {t('website_pricing.month')}
-                            </div>
-                            <div
-                                onClick={() => setPlanType('year')}
-                                className={cn(
-                                    'border-accent cursor-pointer rounded-r-full border px-10 py-4 first-letter:uppercase',
-                                    planType === 'year' ? 'bg-website-primary font-bold text-white' : 'hover:bg-website-secondary',
-                                )}
-                            >
-                                {t('website_pricing.year')}
-                            </div>
-                        </div>
-                        {<p className="mx-auto text-xl font-bold">{t('website_pricing.year_2months_free')}</p>}
+
                         <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
                             <div className="flex flex-col gap-6 rounded-md border p-6 lg:p-10">
                                 <Building size={36} className="mx-auto" />
                                 <h3 className="text-center">{t('website_pricing.starter.title')}</h3>
                                 <div className="text-center">
-                                    {planType === 'month' && (
-                                        <>
-                                            <p className={'text-xl line-through'}>
-                                                149€ / {t('website_pricing.month')}
-                                                <sup className="">*</sup>
-                                            </p>
-                                            <p className={'animate-pulse text-2xl font-extrabold'}>
-                                                {(149 * 0.665).toFixed(2)} € / {t('website_pricing.month')}
-                                                <sup className="">*</sup>
-                                            </p>
-                                        </>
-                                    )}
-                                    {planType === 'year' && (
-                                        <>
-                                            <p className={'text-xl line-through'}>
-                                                1490€ / {t('website_pricing.year')}
-                                                <sup className="">*</sup>
-                                            </p>
-                                            <p className={'animate-pulse text-2xl font-extrabold'}>
-                                                {(1490 * 0.665).toFixed(2)} € / {t('website_pricing.year')}
-                                                <sup className="">*</sup>
-                                            </p>
-                                        </>
-                                    )}
+                                    <p className={'text-xl line-through'}>
+                                        149€ / {t('website_pricing.month')}
+                                        <sup className="">*</sup>
+                                    </p>
+                                    <p className={'animate-pulse text-2xl font-extrabold'}>
+                                        {(149 * 0.665).toFixed(2)} € / {t('website_pricing.month')}
+                                        <sup className="">*</sup>
+                                    </p>
                                 </div>
                                 <ul className="flex flex-col gap-6">
                                     <li className="grid grid-cols-[24px_1fr] gap-4">
@@ -133,30 +94,14 @@ export default function Pricing() {
                                 <Building2 size={36} className="mx-auto" />
                                 <h3 className="text-center">Premium</h3>
                                 <div className="text-center">
-                                    {planType === 'month' && (
-                                        <>
-                                            <p className={'text-xl line-through'}>
-                                                299€ / {t('website_pricing.month')}
-                                                <sup className="">*</sup>
-                                            </p>
-                                            <p className={'animate-pulse text-2xl font-extrabold'}>
-                                                {(299 * 0.665).toFixed(2)} € / {t('website_pricing.month')}
-                                                <sup className="">*</sup>
-                                            </p>
-                                        </>
-                                    )}
-                                    {planType === 'year' && (
-                                        <>
-                                            <p className={'text-xl line-through'}>
-                                                2990€ / {t('website_pricing.year')}
-                                                <sup className="">*</sup>
-                                            </p>
-                                            <p className={'animate-pulse text-2xl font-extrabold'}>
-                                                {(2990 * 0.665).toFixed(2)} € / {t('website_pricing.year')}
-                                                <sup className="">*</sup>
-                                            </p>
-                                        </>
-                                    )}
+                                    <p className={'text-xl line-through'}>
+                                        299€ / {t('website_pricing.month')}
+                                        <sup className="">*</sup>
+                                    </p>
+                                    <p className={'animate-pulse text-2xl font-extrabold'}>
+                                        {(299 * 0.665).toFixed(2)} € / {t('website_pricing.month')}
+                                        <sup className="">*</sup>
+                                    </p>
                                 </div>
                                 <ul className="flex flex-col gap-6">
                                     <li className="grid grid-cols-[24px_1fr] gap-4">
