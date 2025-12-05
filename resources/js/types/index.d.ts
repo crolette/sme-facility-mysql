@@ -185,6 +185,7 @@ export interface Asset {
     serial_number: string;
     has_meter_readings: boolean;
     meter_number: string;
+    meter_unit: string;
     category: string;
     asset_category_id: number;
     tickets?: Ticket[];

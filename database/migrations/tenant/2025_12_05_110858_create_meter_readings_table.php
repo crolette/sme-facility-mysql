@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('asset_id')->constrained()->onDelete('cascade');
             $table->decimal('meter', 10, 2);
             $table->date('meter_date');
-            $table->char('notes', 255);
+            $table->char('notes', 255)->nullable();
             $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
             $table->timestamps();
         });

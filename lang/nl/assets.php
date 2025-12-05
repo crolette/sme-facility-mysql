@@ -16,6 +16,11 @@ return [
     'serial_number' => 'Serienummer',
     'has_meter_readings' => 'Heeft een meter',
     'meter_number' => 'Meter nummer',
+    'meter_readings' => [
+        'title' => 'Meterstanden',
+        'meter' => 'Meter',
+        'unit' => 'Eenheid'
+    ],
     'depreciation' => 'Afschrijving',
     'depreciable' => 'Afschrijfbaar',
     'depreciation_duration' => 'Afschrijvingsduur',

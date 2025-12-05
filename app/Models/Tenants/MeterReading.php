@@ -15,6 +15,10 @@ class MeterReading extends Model
         'notes'
     ];
 
+    protected $casts = [
+        'meter' => 'decimal:2',
+    ];
+
 
     public function asset(): BelongsTo
     {

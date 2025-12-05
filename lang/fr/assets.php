@@ -16,6 +16,11 @@ return [
     'serial_number' => 'Numéro de série',
     'has_meter_readings' => 'A un compteur',
     'meter_number' => 'Numéro de compteur',
+    'meter_readings' => [
+        'title' => 'Relevés de compteur',
+        'meter' => 'Relevé',
+        'unit' => 'Unité'
+    ],
     'depreciation' => 'Amortissement',
     'depreciable' => 'Amortissable',
     'depreciation_duration' => 'Durée d\'amortissement',

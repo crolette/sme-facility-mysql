@@ -16,6 +16,11 @@ return [
     'serial_number' => 'Seriennummer',
     'has_meter_readings' => 'Hat einen Zähler',
     'meter_number' => 'Zählernummer',
+    'meter_readings' => [
+        'title' => 'Zählerstände',
+        'meter' => 'Zählerstand',
+        'unit' => 'Einheit'
+    ],
     'depreciation' => 'Abschreibung',
     'depreciable' => 'Abschreibbar',
     'depreciation_duration' => 'Abschreibungsdauer',

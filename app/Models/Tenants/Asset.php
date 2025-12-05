@@ -2,6 +2,7 @@
 
 namespace App\Models\Tenants;
 
+use App\Enums\MeterReadingsUnits;
 use App\Observers\AssetObserver;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
@@ -34,6 +35,7 @@ class Asset extends Model
         'serial_number',
         'has_meter_readings',
         'meter_number',
+        'meter_unit',
         'depreciable',
         "depreciation_start_date",
         "depreciation_end_date",
@@ -66,6 +68,7 @@ class Asset extends Model
     protected $casts = [
         'is_mobile' => 'boolean',
         'has_meter_readings' => 'boolean',
+        'meter_unit' => MeterReadingsUnits::class,
         'depreciable' => 'boolean',
         'residual_value' => 'decimal:2',
         'depreciation_start_date' => 'date:Y-m-d',
