@@ -205,6 +205,18 @@ export interface Asset {
     asset_category: AssetCategory;
     maintainable: Maintainable;
     location: Partial<TenantSite | TenantBuilding | TenantFloor | TenantRoom | User>;
+    meter_readings?: MeterReadings[];
+}
+
+export interface MeterReadings {
+    id: number;
+    meter: number;
+    meter_date: string;
+    user_id: number;
+    user: User;
+    asset_id: number;
+    asset: Asset;
+    notes: string;
 }
 
 export interface Picture {

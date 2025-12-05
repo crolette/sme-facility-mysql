@@ -1,6 +1,7 @@
 import { ContractsList } from '@/components/tenant/contractsList';
 import { DocumentManager } from '@/components/tenant/documentManager';
 import { InterventionManager } from '@/components/tenant/interventionManager';
+import { MeterReadingsManager } from '@/components/tenant/meterReadings';
 import { PictureManager } from '@/components/tenant/pictureManager';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
 import { TicketManager } from '@/components/tenant/ticketManager';
@@ -185,7 +186,12 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                             {asset.model && <Field label={t('assets.model')} text={asset.model} />}
                                             {asset.serial_number && <Field label={t('assets.serial_number')} text={asset.serial_number} />}
                                         </div>
-                                        {asset.has_meter_readings && <Field label={t('assets.meter_number')} text={asset.meter_number} />}
+                                        {asset.has_meter_readings && (
+                                            <>
+                                                <Field label={t('assets.meter_number')} text={asset.meter_number} />
+                                                <MeterReadingsManager items={asset.meter_readings} assetCode={asset.reference_code} />
+                                            </>
+                                        )}
                                         {asset.surface && <Field label={t('common.surface')} text={asset.surface + ' m²'} />}
                                     </div>
                                     <div className="mx-auto h-fit shrink-1 bg-white">
