@@ -14,6 +14,8 @@ return [
     'brand' => 'Marque',
     'model' => 'Modèle',
     'serial_number' => 'Numéro de série',
+    'has_meter_readings' => 'A un compteur',
+    'meter_number' => 'Numéro de compteur',
     'depreciation' => 'Amortissement',
     'depreciable' => 'Amortissable',
     'depreciation_duration' => 'Durée d\'amortissement',

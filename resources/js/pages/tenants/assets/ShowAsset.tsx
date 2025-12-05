@@ -185,6 +185,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                             {asset.model && <Field label={t('assets.model')} text={asset.model} />}
                                             {asset.serial_number && <Field label={t('assets.serial_number')} text={asset.serial_number} />}
                                         </div>
+                                        {asset.has_meter_readings && <Field label={t('assets.meter_number')} text={asset.meter_number} />}
                                         {asset.surface && <Field label={t('common.surface')} text={asset.surface + ' m²'} />}
                                     </div>
                                     <div className="mx-auto h-fit shrink-1 bg-white">

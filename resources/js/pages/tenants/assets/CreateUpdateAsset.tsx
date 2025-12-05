@@ -73,6 +73,8 @@ type TypeFormData = {
     brand: string;
     model: string;
     serial_number: string;
+    has_meter_readings: boolean;
+    meter_number: string;
     maintenance_manager_id: number | null;
     maintenance_manager_name: string;
     need_maintenance: boolean;
@@ -127,7 +129,7 @@ export default function CreateUpdateAsset({
             href: '/assets',
         },
         {
-            title: asset ? `Update ${tChoice('assets.title', 1)} ${asset.name}` : `Create ${tChoice('assets.title', 1)}`,
+            title: asset ? `${t('actions.update-type', { type: asset.name })}` : `${t('actions.create-type', { type: tChoice('assets.title', 1) })}`,
             href: '/assets/create',
         },
     ];
@@ -166,6 +168,8 @@ export default function CreateUpdateAsset({
         brand: asset?.brand ?? '',
         model: asset?.model ?? '',
         serial_number: asset?.serial_number ?? '',
+        has_meter_readings: asset?.has_meter_readings ?? false,
+        meter_number: asset?.meter_number ?? '',
         files: selectedDocuments,
         pictures: [],
         contracts: [],
@@ -468,7 +472,11 @@ export default function CreateUpdateAsset({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Create asset`} />
+            <Head
+                title={
+                    asset ? `${t('actions.update-type', { type: asset.name })}` : `${t('actions.create-type', { type: tChoice('assets.title', 1) })}`
+                }
+            />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 {asset && (
                     <div>
@@ -712,6 +720,30 @@ export default function CreateUpdateAsset({
                                 <InputError className="mt-2" message={errors?.serial_number ?? ''} />
                             </div>
                         </div>
+                        <div className="flex items-center gap-2">
+                            <Label htmlFor="has_meter_readings">{t('assets.has_meter_readings')} ?</Label>
+                            <Checkbox
+                                id="has_meter_readings"
+                                name="has_meter_readings"
+                                checked={data.has_meter_readings ?? true}
+                                onClick={() => setData('has_meter_readings', !data.has_meter_readings)}
+                            />
+                            <InputError className="mt-2" message={errors?.has_meter_readings ?? ''} />
+                        </div>
+                        {data.has_meter_readings && (
+                            <div className="w-full">
+                                <Label htmlFor="meter_number">{t('assets.meter_number')}</Label>
+                                <Input
+                                    id="meter_number"
+                                    type="text"
+                                    maxLength={18}
+                                    value={data.meter_number}
+                                    onChange={(e) => setData('meter_number', e.target.value)}
+                                    placeholder="16832477962041"
+                                />
+                                <InputError className="mt-2" message={errors?.meter_number ?? ''} />
+                            </div>
+                        )}
                     </div>
 
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">

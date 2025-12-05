@@ -14,6 +14,8 @@ return [
     'brand' => 'Merk',
     'model' => 'Model',
     'serial_number' => 'Serienummer',
+    'has_meter_readings' => 'Heeft een meter',
+    'meter_number' => 'Meter nummer',
     'depreciation' => 'Afschrijving',
     'depreciable' => 'Afschrijfbaar',
     'depreciation_duration' => 'Afschrijvingsduur',

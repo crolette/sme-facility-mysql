@@ -14,6 +14,8 @@ return [
     'brand' => 'Marke',
     'model' => 'Modell',
     'serial_number' => 'Seriennummer',
+    'has_meter_readings' => 'Hat einen Zähler',
+    'meter_number' => 'Zählernummer',
     'depreciation' => 'Abschreibung',
     'depreciable' => 'Abschreibbar',
     'depreciation_duration' => 'Abschreibungsdauer',

@@ -12,6 +12,8 @@ return [
     'trashed' => 'Trashed',
     'trashed_description' => 'This asset has been trashed',
     'brand' => 'Brand',
+    'has_meter_readings' => 'Has meter readings',
+    'meter_number' => 'Meter number',
     'model' => 'Model',
     'serial_number' => 'Serial number',
     'depreciation' => 'Depreciation',

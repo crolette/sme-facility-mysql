@@ -24,6 +24,11 @@ class AssetUpdateRequest extends FormRequest
 
         $data = $this->all();
 
+        isset($data['has_meter_readings']) && ($data['has_meter_readings'] === 'true' || $data['has_meter_readings'] === true) ? $data['has_meter_readings'] = true : $data['has_meter_readings'] = false;
+
+        if ($data['has_meter_readings'] === false)
+            $data['meter_number'] = null;
+
         isset($data['need_qr_code']) && ($data['need_qr_code'] === 'true' || $data['need_qr_code'] === true) ? $data['need_qr_code'] = true : $data['need_qr_code'] = false;
         isset($data['is_mobile']) && ($data['is_mobile'] === 'true' || $data['is_mobile'] === true) ? $data['is_mobile'] = true : $data['is_mobile'] = false;
         isset($data['depreciable']) && ($data['depreciable'] === 'true' || $data['depreciable'] === true) ? $data['depreciable'] = true : $data['depreciable'] = false;
@@ -70,6 +75,8 @@ class AssetUpdateRequest extends FormRequest
             'model' => ['nullable', 'string', 'max:100'],
             'brand' => ['nullable', 'string', 'max:100'],
             'serial_number' => ['nullable', 'string', 'max:50'],
+            'has_meter_readings' => 'boolean',
+            'meter_number' => 'nullable|string|max:20',
         ];
 
         $isCreate = $this->isMethod('post');

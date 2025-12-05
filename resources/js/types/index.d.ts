@@ -183,6 +183,8 @@ export interface Asset {
     model: string;
     brand: string;
     serial_number: string;
+    has_meter_readings: boolean;
+    meter_number: string;
     category: string;
     asset_category_id: number;
     tickets?: Ticket[];
