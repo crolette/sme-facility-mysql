@@ -65,7 +65,7 @@ class Provider extends Model
     ];
 
     protected $with = [
-        'providerCategory',
+        'categories',
         'country'
     ];
 
@@ -102,11 +102,21 @@ class Provider extends Model
         return $this->morphMany(Intervention::class, 'interventionable');
     }
 
-
-    public function providerCategory(): BelongsTo
+    public function categories(): BelongsToMany
     {
-        return $this->belongsTo(CategoryType::class, 'category_type_id');
+        return $this->belongsToMany(
+            CategoryType::class,
+            'category_provider',
+            'provider_id',
+            'category_id'
+        )->withTimestamps();
     }
+
+
+    // public function providerCategory(): BelongsTo
+    // {
+    //     return $this->belongsTo(CategoryType::class, 'category_type_id');
+    // }
 
     public function assignedInterventions(): MorphMany
     {
