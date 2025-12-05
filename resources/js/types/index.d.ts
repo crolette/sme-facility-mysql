@@ -183,6 +183,9 @@ export interface Asset {
     model: string;
     brand: string;
     serial_number: string;
+    has_meter_readings: boolean;
+    meter_number: string;
+    meter_unit: string;
     category: string;
     asset_category_id: number;
     tickets?: Ticket[];
@@ -203,6 +206,18 @@ export interface Asset {
     asset_category: AssetCategory;
     maintainable: Maintainable;
     location: Partial<TenantSite | TenantBuilding | TenantFloor | TenantRoom | User>;
+    meter_readings?: MeterReadings[];
+}
+
+export interface MeterReadings {
+    id: number;
+    meter: number;
+    meter_date: string;
+    user_id: number;
+    user: User;
+    asset_id: number;
+    asset: Asset;
+    notes: string;
 }
 
 export interface Picture {

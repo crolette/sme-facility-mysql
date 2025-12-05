@@ -1,6 +1,7 @@
 import { ContractsList } from '@/components/tenant/contractsList';
 import { DocumentManager } from '@/components/tenant/documentManager';
 import { InterventionManager } from '@/components/tenant/interventionManager';
+import { MeterReadingsManager } from '@/components/tenant/meterReadingsManager';
 import { PictureManager } from '@/components/tenant/pictureManager';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
 import { TicketManager } from '@/components/tenant/ticketManager';
@@ -175,7 +176,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                 <h2>{t('common.information')}</h2>
-                                <div className="grid grid-cols-[1fr_160px] gap-4">
+                                <div className="grid grid-cols-1 gap-4">
                                     <div className="space-y-2">
                                         <Field label={t('common.name')} text={asset.name} />
                                         <Field label={t('common.category')} text={asset.category} />
@@ -185,6 +186,16 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                             {asset.model && <Field label={t('assets.model')} text={asset.model} />}
                                             {asset.serial_number && <Field label={t('assets.serial_number')} text={asset.serial_number} />}
                                         </div>
+                                        {asset.has_meter_readings && (
+                                            <>
+                                                <Field label={t('assets.meter_number')} text={asset.meter_number} />
+                                                <MeterReadingsManager
+                                                    items={asset.meter_readings}
+                                                    unit={asset.meter_unit}
+                                                    assetCode={asset.reference_code}
+                                                />
+                                            </>
+                                        )}
                                         {asset.surface && <Field label={t('common.surface')} text={asset.surface + ' m²'} />}
                                     </div>
                                     <div className="mx-auto h-fit shrink-1 bg-white">

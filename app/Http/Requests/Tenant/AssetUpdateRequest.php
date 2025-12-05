@@ -4,6 +4,7 @@ namespace App\Http\Requests\Tenant;
 
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
+use App\Enums\MeterReadingsUnits;
 use App\Models\Central\CategoryType;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Foundation\Http\FormRequest;
@@ -23,6 +24,13 @@ class AssetUpdateRequest extends FormRequest
     {
 
         $data = $this->all();
+
+        isset($data['has_meter_readings']) && ($data['has_meter_readings'] === 'true' || $data['has_meter_readings'] === true) ? $data['has_meter_readings'] = true : $data['has_meter_readings'] = false;
+
+        if ($data['has_meter_readings'] === false) {
+            $data['meter_number'] = null;
+            $data['meter_unit'] = null;
+        }
 
         isset($data['need_qr_code']) && ($data['need_qr_code'] === 'true' || $data['need_qr_code'] === true) ? $data['need_qr_code'] = true : $data['need_qr_code'] = false;
         isset($data['is_mobile']) && ($data['is_mobile'] === 'true' || $data['is_mobile'] === true) ? $data['is_mobile'] = true : $data['is_mobile'] = false;
@@ -53,8 +61,6 @@ class AssetUpdateRequest extends FormRequest
 
         $data = $this->all();
 
-        Debugbar::info($this->input('categoryId'));
-
         $rules = [
             'need_qr_code' => 'sometimes|boolean',
             'is_mobile' => 'sometimes|boolean',
@@ -70,6 +76,9 @@ class AssetUpdateRequest extends FormRequest
             'model' => ['nullable', 'string', 'max:100'],
             'brand' => ['nullable', 'string', 'max:100'],
             'serial_number' => ['nullable', 'string', 'max:50'],
+            'has_meter_readings' => 'boolean',
+            'meter_number' => 'nullable|string|max:20',
+            'meter_unit' => ['nullable', Rule::in(array_column(MeterReadingsUnits::cases(), 'value'))]
         ];
 
         $isCreate = $this->isMethod('post');

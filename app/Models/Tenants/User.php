@@ -133,6 +133,11 @@ class User extends Authenticatable
         return $this->hasMany(ScheduledNotification::class);
     }
 
+    public function meterReadings(): HasMany
+    {
+        return $this->hasMany(MeterReading::class);
+    }
+
     public function assignedInterventions(): MorphMany
     {
         return $this->morphMany(Intervention::class, 'assignable');
