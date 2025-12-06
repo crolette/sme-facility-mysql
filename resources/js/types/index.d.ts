@@ -353,6 +353,7 @@ export interface Provider {
     house_number?: string;
     postal_code: string;
     city: string;
+    address: string;
     country_code: string;
     country_id: number;
     country: Country;
@@ -360,8 +361,8 @@ export interface Provider {
     phone_number: string;
     logo?: string;
     logo_path?: string;
-    category: string;
-    category_type_id: number;
+    categories: CentralType[];
+    // category_type_id: number;
     users?: User[];
     assigned_interventions?: Intervention[];
     contracts?: Contract[];

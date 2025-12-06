@@ -106,7 +106,7 @@ export default function ShowProvider({ item }: { item: Provider }) {
                         menu="provider"
                         infos={{
                             name: provider.name,
-                            code: provider.category,
+                            categories: provider.categories.map((elem) => elem.label),
                             levelPath: provider.website,
                             levelName: provider.website,
                         }}

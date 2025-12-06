@@ -6,6 +6,7 @@ namespace App\Models\Tenants;
 
 use App\Models\Tenants\User;
 use App\Models\Tenants\Country;
+use Illuminate\Support\Facades\DB;
 use App\Models\Central\CategoryType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Stancl\Tenancy\Database\Models\TenantPivot;
 
 class Provider extends Model
 {
@@ -58,7 +60,6 @@ class Provider extends Model
 
     protected $appends = [
         'logo_path',
-        'category',
         'address',
         'location_route'
         // 'country_label'
@@ -104,19 +105,14 @@ class Provider extends Model
 
     public function categories(): BelongsToMany
     {
+        // TODO check if bulletproof with DB::connection
         return $this->belongsToMany(
             CategoryType::class,
-            'category_provider',
+            DB::connection('tenant')->getDatabaseName() . '.category_type_provider',
             'provider_id',
-            'category_id'
-        )->withTimestamps();
+            'category_type_id'
+        )->using(CategoryProvider::class)->withTimestamps();
     }
-
-
-    // public function providerCategory(): BelongsTo
-    // {
-    //     return $this->belongsTo(CategoryType::class, 'category_type_id');
-    // }
 
     public function assignedInterventions(): MorphMany
     {
@@ -138,14 +134,14 @@ class Provider extends Model
             ->whereNot('maintainable_type', Asset::class)->with(['maintainable']);
     }
 
-    public function category($locale = null): Attribute
-    {
-        $locale = $locale ?? app()->getLocale();
+    // public function category($locale = null): Attribute
+    // {
+    //     $locale = $locale ?? app()->getLocale();
 
-        return Attribute::make(
-            get: fn() => $this->providerCategory?->translations->where('locale', $locale)->first()?->label ?? $this->providerCategory?->translations->where('locale', config('app.fallback_locale'))?->label ?? ''
-        );
-    }
+    //     return Attribute::make(
+    //         get: fn() => $this->providerCategory?->translations->where('locale', $locale)->first()?->label ?? $this->providerCategory?->translations->where('locale', config('app.fallback_locale'))?->label ?? ''
+    //     );
+    // }
 
     public function address(): Attribute
     {

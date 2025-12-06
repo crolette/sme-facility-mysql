@@ -4,25 +4,18 @@ namespace App\Http\Controllers\Tenants;
 
 use Carbon\Carbon;
 use Inertia\Inertia;
-use DirectoryIterator;
-use App\Enums\CategoryTypes;
-use App\Models\LocationType;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
-use Illuminate\Http\Request;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Company;
 use App\Models\Tenants\Building;
-use App\Models\Tenants\Provider;
-use App\Enums\MaintenanceFrequency;
 use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
 use App\Models\Tenants\Intervention;
 use App\Models\Tenants\Maintainable;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
 {
@@ -30,6 +23,7 @@ class DashboardController extends Controller
     {
         $locale = App::getLocale();
         $company = Company::first();
+
 
         $diskSizes = [
             'mb' => $company->disk_size_mb,
@@ -136,6 +130,8 @@ class DashboardController extends Controller
             'ticketsCount' => $ticketsCount,
             'interventionsCount' => $interventionsCount,
         ];
+
+        // dd('dashboard');
 
         return Inertia::render('tenants/dashboard', [
             'counts' => $counts,

@@ -158,9 +158,9 @@ export default function IndexProviders({
                                 </select>
                             </div>
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="category">{t('actions.search')}</Label>
+                                <Label htmlFor="search">{t('actions.search')}</Label>
                                 <div className="relative text-black dark:text-white">
-                                    <Input type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} />
+                                    <Input id="search" type="text" value={search ?? ''} onChange={(e) => setSearch(e.target.value)} />
                                     <X
                                         onClick={() => setQuery((prev) => ({ ...prev, q: null }))}
                                         className={'absolute top-1/2 right-0 -translate-1/2'}
@@ -231,7 +231,15 @@ export default function IndexProviders({
                                             />
                                         )}
                                     </div>
-                                    <p className="text-xs">{item.category ?? ''}</p>
+                                    <div>
+                                        {item.categories.length > 0
+                                            ? item.categories?.map((category, index) => (
+                                                  <p key={index} className="text-xs">
+                                                      {category.label}
+                                                  </p>
+                                              ))
+                                            : ''}
+                                    </div>
                                     <p className="text-xs">{item.phone_number ?? ''}</p>
                                     <p className="overflow-hidden text-xs overflow-ellipsis whitespace-nowrap">{item.email ?? ''}</p>
                                 </div>
@@ -301,7 +309,14 @@ export default function IndexProviders({
                                                     <a href={route('tenant.providers.show', item.id)}>{item.name}</a>
                                                 </div>
                                             </TableBodyData>
-                                            <TableBodyData>{item.category ?? ''}</TableBodyData>
+                                            <TableBodyData>
+                                                {' '}
+                                                <div>
+                                                    {item.categories.length > 0
+                                                        ? item.categories?.map((category, index) => <p key={index}>{category.label}</p>)
+                                                        : ''}
+                                                </div>
+                                            </TableBodyData>
                                             <TableBodyData>{item.phone_number}</TableBodyData>
                                             <TableBodyData>{item.email}</TableBodyData>
 

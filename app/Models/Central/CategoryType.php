@@ -2,6 +2,7 @@
 
 namespace App\Models\Central;
 
+use App\Models\Tenants\CategoryProvider;
 use App\Models\Translation;
 use App\Models\Tenants\Provider;
 use Illuminate\Support\Facades\Cache;
@@ -69,15 +70,15 @@ class CategoryType extends Model
         return $this->morphMany(Translation::class, 'translatable');
     }
 
-    public function providers(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            Provider::class,
-            'category_provider',
-            'category_id',
-            'provider_id'
-        )->withTimestamps();
-    }
+    // public function providers(): BelongsToMany
+    // {
+    //     return $this->belongsToMany(
+    //         Provider::class,
+    //         'category_provider',
+    //         'category_id',
+    //         'provider_id'
+    //     )->using(CategoryProvider::class)->withTimestamps();
+    // }
 
 
     public function label($locale = null): Attribute

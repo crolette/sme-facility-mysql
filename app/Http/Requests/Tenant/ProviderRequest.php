@@ -58,7 +58,8 @@ class ProviderRequest extends FormRequest
             'phone_number' => 'required|string|regex:/^\+\d{8,15}$/|max:16',
             'website' => 'nullable|url:http,https',
             'logo' => 'nullable|file|mimes:png,jpg,jpeg|max:' . Provider::maxUploadSizeKB(),
-            'categoryId' => ['required', Rule::in(CategoryType::where('category', 'provider')->pluck('id')->toArray())],
+            'categories' => 'array|min:1',
+            // 'categories.*.id' => ['required', Rule::in(CategoryType::where('category', 'provider')->pluck('id')->toArray())]
 
         ];
     }

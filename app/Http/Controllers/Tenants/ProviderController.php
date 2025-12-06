@@ -8,6 +8,7 @@ use App\Models\Tenants\Country;
 use App\Models\Tenants\Provider;
 use App\Http\Controllers\Controller;
 use App\Models\Central\CategoryType;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -32,9 +33,12 @@ class ProviderController extends Controller
 
         $validator = $validator->validated();
 
-
         if (isset($validator['category'])) {
-            $providers->where('category_type_id', $request->query('category'));
+            $providers->whereIn('id', function ($query) use ($request) {
+                $query->select('provider_id')
+                    ->from('category_type_provider')
+                    ->where('category_type_id', $request->query('category'));
+            });
         }
 
         if (isset($validator['q'])) {
