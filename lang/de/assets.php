@@ -19,7 +19,8 @@ return [
     'meter_readings' => [
         'title' => 'Zählerstände',
         'meter' => 'Zählerstand',
-        'unit' => 'Einheit'
+        'unit' => 'Einheit',
+        'delete' => 'Sind Sie sicher, dass Sie das Zählerstand löschen möchten?',
     ],
     'depreciation' => 'Abschreibung',
     'depreciable' => 'Abschreibbar',

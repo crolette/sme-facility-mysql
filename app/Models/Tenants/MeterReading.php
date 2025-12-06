@@ -19,7 +19,6 @@ class MeterReading extends Model
         'meter' => 'decimal:2',
     ];
 
-
     public function asset(): BelongsTo
     {
         return $this->belongsTo(Asset::class);

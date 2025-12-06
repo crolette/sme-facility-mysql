@@ -78,6 +78,7 @@ beforeEach(function () {
     ];
 });
 
+
 test('test access roles to interventions index page', function (string $role, int $expectedStatus) {
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
@@ -87,8 +88,6 @@ test('test access roles to interventions index page', function (string $role, in
 })->with([
     ['Admin', 200],
     ['Maintenance Manager', 200],
-    // ['Provider', 403],
-    // ['', 403]
 ]);
 
 test('test access roles to view intervention for an asset without maintenance manager', function (string $role, int $expectedStatus) {

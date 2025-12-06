@@ -24,6 +24,7 @@ beforeEach(function () {
     $this->actingAs($this->user, 'tenant');
     $this->categoryType = CategoryType::factory()->create(['category' => 'provider']);
 
+
     CategoryType::factory()->count(2)->create(['category' => 'document']);
 
     $this->site = Site::factory()->create();

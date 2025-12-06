@@ -56,7 +56,6 @@ beforeEach(function () {
         'provider_reference' => 'Provider reference 2025',
         'start_date' => Carbon::now()->toDateString(),
         'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
-        // 'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
         'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
         'status' => ContractStatusEnum::ACTIVE->value,
         'contractables' => [

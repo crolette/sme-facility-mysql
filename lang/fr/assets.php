@@ -19,7 +19,8 @@ return [
     'meter_readings' => [
         'title' => 'Relevés de compteur',
         'meter' => 'Relevé',
-        'unit' => 'Unité'
+        'unit' => 'Unité',
+        'delete' => 'Êtes-vous sûr de vouloir supprimer ce relevé ?',
     ],
     'depreciation' => 'Amortissement',
     'depreciable' => 'Amortissable',

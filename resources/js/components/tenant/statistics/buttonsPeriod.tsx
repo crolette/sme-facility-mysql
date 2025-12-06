@@ -8,6 +8,7 @@ export default function ButtonsChart({ setPeriod }: { setPeriod: (item: 'week' |
             <p className={'cursor-pointer'} onClick={() => setPeriod('week')}>
                 {t('statistics.per_week')}
             </p>
+
             <p className={'cursor-pointer'} onClick={() => setPeriod('month')}>
                 {t('statistics.per_month')}
             </p>

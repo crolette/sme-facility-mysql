@@ -70,6 +70,7 @@ it('can render the create provider page', function () {
         );
 });
 
+
 it('can render the edit provider page', function () {
     $provider = Provider::factory()->create();
     $response = $this->getFromTenant('tenant.providers.edit', $provider);

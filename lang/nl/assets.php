@@ -19,7 +19,8 @@ return [
     'meter_readings' => [
         'title' => 'Meterstanden',
         'meter' => 'Meter',
-        'unit' => 'Eenheid'
+        'unit' => 'Eenheid',
+        'delete' => 'Weet u zeker dat u dit meter wilt verwijderen ?',
     ],
     'depreciation' => 'Afschrijving',
     'depreciable' => 'Afschrijfbaar',
@@ -36,6 +37,6 @@ return [
     'purchase_cost' => 'Aankoopkosten',
     'purchase_cost_placeholder' => 'Aankoopkosten (max. 2 decimalen) : 4236.36',
     'warranty_end_date' => 'Einddatum garantie',
-    'delete_description' => 'Weet u zeker dat u item :name wilt verwijderen.',
+    'delete_description' => 'Weet u zeker dat u item :name wilt verwijderen ?',
     'delete_definitely_description' => 'Weet u zeker dat u dit item DEFINITIEF wilt verwijderen? U kunt het daarna niet meer herstellen! Alle foto\'s, documenten, ... worden ook verwijderd.',
 ];

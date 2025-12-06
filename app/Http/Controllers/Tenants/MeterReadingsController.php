@@ -40,7 +40,7 @@ class MeterReadingsController extends Controller
             $meterReading->asset()->associate($asset);
             $meterReading->save();
 
-            return ApiResponse::success('', 'Meter Reading added');
+            return ApiResponse::success('', 'Meter Reading added ');
         } catch (Exception $e) {
             Log::info($e->getMessage());
             return ApiResponse::error($e->getMessage());

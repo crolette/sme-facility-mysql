@@ -15,7 +15,8 @@ return [
     'meter_readings' => [
         'title' => 'Meter readings',
         'meter' => 'Meter',
-        'unit' => 'Unit'
+        'unit' => 'Unit',
+        'delete' => 'Are you sure you want to delete this meter ?',
     ],
     'has_meter_readings' => 'Has meter readings',
     'meter_number' => 'Meter number',

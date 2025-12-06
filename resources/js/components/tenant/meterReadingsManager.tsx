@@ -24,7 +24,7 @@ type MeterReadingsFormData = {
 };
 
 export const MeterReadingsManager = ({ items, unit, assetCode }: MeterReadingsProps) => {
-    const { t, tChoice } = useLaravelReactI18n();
+    const { t } = useLaravelReactI18n();
     const { showToast } = useToast();
 
     const [readings, setReadings] = useState(items);
@@ -54,7 +54,7 @@ export const MeterReadingsManager = ({ items, unit, assetCode }: MeterReadingsPr
     const handleDeleteMeterReadings = async () => {
         if (meterToDelete)
             try {
-                const response = await axios.delete(route('api.meter-readings.delete', meterToDelete));
+                const response = await axios.delete(route('api.meter-readings.delete', meterToDelete.id));
                 showToast(response.data.message);
                 setMeterToDelete(null);
             } catch (error) {
@@ -190,7 +190,11 @@ export const MeterReadingsManager = ({ items, unit, assetCode }: MeterReadingsPr
             )}
             {deleteMeterModale && (
                 <ModaleForm isUpdating={isProcessing} title={''}>
-                    <p>Are you sure ?</p>
+                    <h5>{t('assets.meter_readings.delete')}</h5>
+                    <p>
+                        {meterToDelete?.meter} - {meterToDelete?.meter_date}
+                    </p>
+
                     <Button type="submit" onClick={handleDeleteMeterReadings} disabled={isProcessing}>
                         {t('actions.submit')}
                     </Button>

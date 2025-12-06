@@ -14,7 +14,7 @@ export default function TrashedAssetQRCode({ item }: { item: Asset }) {
                 <div className="border-sidebar-border bg-sidebar mx-auto flex w-11/12 flex-col gap-4 rounded-md border p-4 shadow-xl md:w-1/2">
                     <div>
                         <h1>{t('assets.trashed_description')}</h1>
-                        <div className="">
+                        <div>
                             <h3>{item.name}</h3>
                             <p>{item.description}</p>
                             <p>{item.category}</p>

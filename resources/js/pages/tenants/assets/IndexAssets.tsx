@@ -155,7 +155,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
 
         const handler = setTimeout(() => {
             setDebouncedSearch(search);
-        }, 500);
+        }, 750);
 
         return () => {
             clearTimeout(handler);

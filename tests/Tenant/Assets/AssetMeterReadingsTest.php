@@ -54,8 +54,6 @@ it('can create a new asset with meter readings', function ($unit) {
     $response->assertStatus(200)
         ->assertJson(['status' => 'success']);
 
-    $asset = Asset::first();
-
     assertDatabaseCount('assets', 1);
 
     assertDatabaseHas('assets', [
