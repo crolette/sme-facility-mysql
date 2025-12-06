@@ -65,15 +65,18 @@ class Asset extends Model
         'location_route'
     ];
 
-    protected $casts = [
-        'is_mobile' => 'boolean',
-        'has_meter_readings' => 'boolean',
-        'meter_unit' => MeterReadingsUnits::class,
-        'depreciable' => 'boolean',
-        'residual_value' => 'decimal:2',
-        'depreciation_start_date' => 'date:Y-m-d',
-        'depreciation_end_date' => 'date:Y-m-d',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'is_mobile' => 'boolean',
+            'has_meter_readings' => 'boolean',
+            'meter_unit' => MeterReadingsUnits::class,
+            'depreciable' => 'boolean',
+            'residual_value' => 'decimal:2',
+            'depreciation_start_date' => 'date:Y-m-d',
+            'depreciation_end_date' => 'date:Y-m-d',
+        ];
+    }
 
     // Ensure route model binding use the slug instead of ID
     public function getRouteKeyName()
