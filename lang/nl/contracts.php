@@ -15,16 +15,12 @@ return [
         'on_demand' => 'Op aanvraag',
         'other' => 'Andere',
     ],
+    'name_placeholder' => 'Contractnaam',
     'linked_to' => 'Gekoppeld aan',
-    'status' => [
-        'active' => 'Actief',
-        'expired' => 'Verlopen',
-        'cancelled' => 'Geannuleerd',
-    ],
     'internal_ref' => 'Intern ref.',
     'provider_ref' => 'Leverancier ref.',
     'duration_contract' => 'Contractduur',
-    'duration_notice' => 'Opzegtermijn',
+    'notice_period.title' => 'Opzegtermijn',
     'duration' => [
         '1_month' => '1 maand',
         '6_months' => '6 maanden',

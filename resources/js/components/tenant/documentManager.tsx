@@ -107,7 +107,7 @@ export const DocumentManager = ({
         documentId: 0,
         name: '',
         description: '',
-        typeId: 0,
+        typeId: '',
         typeSlug: '',
     };
 
@@ -326,7 +326,7 @@ export const DocumentManager = ({
                     <p className="animate-pulse">Updating...</p>
                 </ModaleForm>
             )}
-            {showFileModal && (
+            {!isUpdating && showFileModal && (
                 <ModaleForm title={submitType === 'edit' ? 'Edit document' : 'Add document'}>
                     <div className="flex flex-col gap-2">
                         <form onSubmit={submitType === 'edit' ? submitEditFile : submitNewFile} className="space-y-4">
@@ -351,7 +351,7 @@ export const DocumentManager = ({
                                 >
                                     {documentTypes && documentTypes.length > 0 && (
                                         <>
-                                            <option value={0} disabled className="bg-background text-foreground">
+                                            <option value="" disabled className="bg-background text-foreground">
                                                 {t(`actions.select-type`, { type: t(`common.category`) })}
                                             </option>
                                             {documentTypes?.map((documentType) => (
@@ -384,12 +384,15 @@ export const DocumentManager = ({
                                 </>
                             )}
 
-                            <Label>{t(`common.name`)}</Label>
+                            <Label htmlFor="name">{t(`common.name`)}</Label>
                             <Input
+                                id="name"
                                 type="text"
                                 name="name"
                                 value={newFileData.name}
                                 required
+                                minLength={10}
+                                maxLength={100}
                                 placeholder={t(`documents.name_placeholder`)}
                                 onChange={(e) =>
                                     setNewFileData((prev) => ({
@@ -398,7 +401,7 @@ export const DocumentManager = ({
                                     }))
                                 }
                             />
-                            <Label>{t(`common.description`)}</Label>
+                            <Label htmlFor="description">{t(`common.description`)}</Label>
                             <Input
                                 type="text"
                                 name="description"
@@ -426,7 +429,7 @@ export const DocumentManager = ({
             )}
             <Modale
                 title={t('actions.delete-type', { type: tChoice('documents.title', 1) })}
-                message={`Are you sure you want to delete this document ?`}
+                message={t('documents.delete_description')}
                 isOpen={showDeleteModale}
                 onConfirm={deleteDocument}
                 onCancel={() => {

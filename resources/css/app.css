@@ -119,6 +119,7 @@
     --input: oklch(0.922 0 0);
     --ring: oklch(0.87 0 0);
     --success: oklch(0.6 0.118 184.704);
+    --valid: oklch(70.192% 0.15767 160.464 / 0.26);
     --chart-1: oklch(50.163% 0.21271 262.679);
     --chart-2: oklch(56.627% 0.09703 258.464);
     --chart-3: oklch(43.634% 0.10447 257.957);
@@ -162,6 +163,7 @@
     --input: oklch(36.768% 0.00004 271.152);
     --ring: oklch(0.439 0 0);
     --success: oklch(0.696 0.17 162.48);
+
     --chart-1: oklch(50.163% 0.21271 262.679);
     --chart-2: oklch(56.627% 0.09703 258.464);
     --chart-3: oklch(43.634% 0.10447 257.957);
@@ -301,13 +303,7 @@ label:has(input:required) {
     font-weight: bold;
 }
 
-div:has(+ input:required)::after {
-    content: '*';
-    color: var(--color-destructive);
-    font-size: large;
-    font-weight: bold;
-}
-
+div:has(+ input:required)::after,
 label:has(+ select:required)::after,
 label:has(+ textarea:required)::after,
 label:has(+ input:required)::after {
@@ -317,8 +313,14 @@ label:has(+ input:required)::after {
     font-weight: bold;
 }
 
-*:required {
+input:disabled:required,
+*:required:invalid {
     background-color: var(--color-required);
+}
+
+input:disabled:required:valid,
+*:required:valid {
+    background-color: var(--valid);
 }
 
 .website .contact-success {

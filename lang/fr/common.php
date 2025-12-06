@@ -22,7 +22,7 @@ return [
     'city' => 'Ville',
     'city_placeholder' => 'Bruxelles',
     'street' => 'Rue',
-    'street_placeholder' => 'Rue commune',
+    'street_placeholder' => 'Rue du village',
     'house_number' => 'Numéro',
     'postal_code' => 'Code postal',
     'postal_code_placeholder' => '1000',
@@ -36,7 +36,7 @@ return [
     'warranty' => 'Garantie',
     'notes' => 'Notes',
     'notes_placeholder' => 'Ajouter une note/commentaire',
-    'status' => 'Statut',
+
     'surface' => 'Surface',
     'type' => 'Type',
     'date' => 'Date',
@@ -66,4 +66,15 @@ return [
     'error_submitting' => 'Erreur lors de l\'envoi. Veuillez réessayer.',
     'next' => 'Suivant',
     'previous' => 'Précédent',
+    'status' => [
+        'title' => 'Statut',
+        'active' => 'Actif',
+        'expired' => 'Expiré',
+        'cancelled' => 'Annulé',
+        'draft' => 'Brouillon',
+        'planned' => 'Planifiée',
+        'in_progress' => 'En cours',
+        'waiting_parts' => 'En attente de pièces',
+        'completed' => 'Terminée',
+    ],
 ];

@@ -49,7 +49,7 @@ class ContractController extends Controller
 
         $validatedFields = $validator->validated();
 
-        $contracts = Contract::select('id', 'name', 'type', 'provider_id', 'status', 'renewal_type', 'end_date', 'internal_reference', 'provider_reference')->with('provider:id,name,category_type_id')->forMaintenanceManager();
+        $contracts = Contract::select('id', 'name', 'type', 'provider_id', 'status', 'renewal_type', 'end_date', 'internal_reference', 'provider_reference')->with('provider:id,name')->forMaintenanceManager();
 
 
 
@@ -76,8 +76,16 @@ class ContractController extends Controller
         }
 
         if (isset($validatedFields['provider_category_id'])) {
+            // $contracts->whereHas('provider', function (Builder $query) use ($validatedFields) {
+            //     $query->where('category_type_id', $validatedFields['provider_category_id']);
+            // });
+
             $contracts->whereHas('provider', function (Builder $query) use ($validatedFields) {
-                $query->where('category_type_id', $validatedFields['provider_category_id']);
+                $query->whereIn('id', function ($query) use ($validatedFields) {
+                    $query->select('provider_id')
+                        ->from('category_type_provider')
+                        ->where('category_type_id', $validatedFields['provider_category_id']);
+                });
             });
         }
 

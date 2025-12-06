@@ -3,14 +3,7 @@
 return [
     'title' => 'Intervention|Interventionen',
     'none' => 'Keine Interventionen geplant',
-    'status' => [
-        'draft' => 'Entwurf',
-        'planned' => 'Geplant',
-        'in_progress' => 'In Bearbeitung',
-        'waiting_parts' => 'Warten auf Teile',
-        'completed' => 'Abgeschlossen',
-        'cancelled' => 'Abgebrochen',
-    ],
+
     'priority' => [
         'title' => 'Priorität',
         'low' => 'Niedrig',

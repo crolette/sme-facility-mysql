@@ -227,7 +227,7 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                             <TableHeadRow>
                                 <TableHeadData>{t('common.code')}</TableHeadData>
                                 <TableHeadData>{t('tickets.related_to')}</TableHeadData>
-                                <TableHeadData>{t('common.status')}</TableHeadData>
+                                <TableHeadData>{t('common.status.title')}</TableHeadData>
                                 <TableHeadData>{t('tickets.reporter')}</TableHeadData>
                                 <TableHeadData>{t('common.description')}</TableHeadData>
                                 <TableHeadData>

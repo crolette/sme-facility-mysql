@@ -95,7 +95,7 @@ class ContractsSheet implements FromQuery, WithMapping, Responsable, ShouldAutoS
                 __('contracts.start_date'),
                 __('contracts.end_date'),
                 __('contracts.renewal_type.title'),
-                __('common.status'),
+                __('common.status.title'),
                 __('providers.company_name'),
                 __('common.notes'),
                 '_hash'

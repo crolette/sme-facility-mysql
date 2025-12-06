@@ -20,7 +20,7 @@ return [
     'mobile' => 'Mobile',
     'address' => 'Address',
     'city' => 'City',
-    'street' => 'Street',
+    'street' => 'Becket Street',
     'house_number' => 'House number',
     'postal_code' => 'Postal code',
     'country' => 'Country',
@@ -36,7 +36,7 @@ return [
     'notes_placeholder' => 'Add a note/comment',
     'warranty' => 'Warranty',
     'notes' => 'Notes',
-    'status' => 'Status',
+
     'surface' => 'Surface',
     'type' => 'Type',
     'date' => 'Date',
@@ -65,4 +65,15 @@ return [
     'error_submitting' => 'Error while submitting. Try again.',
     'next' => 'Next',
     'previous' => 'Previous',
+    'status' => [
+        'title' => 'Status',
+        'active' => 'Active',
+        'expired' => 'Expired',
+        'cancelled' => 'Cancelled',
+        'draft' => 'Draft',
+        'planned' => 'Planned',
+        'in_progress' => 'In progress',
+        'waiting_parts' => 'Waiting for parts',
+        'completed' => 'Completed',
+    ],
 ];

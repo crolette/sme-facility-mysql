@@ -28,7 +28,7 @@
                     <div class="details">
                         <strong>{{__('common.description')}} : </strong> {{ $intervention->description }}<br>
                         <strong>{{__('interventions.priority.title')}} : </strong>{{__(`interventions.priority.` . $intervention->priority->value)}}<br>
-                        <strong>{{__('common.status')}} : </strong>{{__(`interventions.status.` . $intervention->status->value)}}<br>
+                        <strong>{{__('common.status.title')}} : </strong>{{__(`interventions.status.` . $intervention->status->value)}}<br>
                         <strong>{{__('common.name')}} : </strong> {{ $intervention->interventionable->name }}<br>
                         @if($intervention->planned_at)
                             <strong>{{__('interventions.planned_at')}} :</strong> {{ $intervention->planned_at }}<br>

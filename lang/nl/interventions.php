@@ -3,14 +3,7 @@
 return [
     'title' => 'Interventie|Interventies',
     'none' => 'Geen interventies gepland',
-    'status' => [
-        'draft' => 'Concept',
-        'planned' => 'Gepland',
-        'in_progress' => 'Bezig',
-        'waiting_parts' => 'Wachten op onderdelen',
-        'completed' => 'Voltooid',
-        'cancelled' => 'Geannuleerd',
-    ],
+
     'priority' => [
         'title' => 'Prioriteit',
         'low' => 'Laag',

@@ -19,6 +19,7 @@ return [
     'mark_done' => 'Wartung als erledigt markieren',
     'next_maintenance_date' => 'Datum der nächsten Wartung',
     'last_maintenance_date' => 'Datum der letzten Wartung',
+    'next_maintenance_date_default' => 'Standardmäßig wird für die Berechnung des nächsten Wartungstermins das heutige Datum als letztes Wartungsdatum berücksichtigt.',
     'maintenance_manager' => 'Wartungsleiter',
     'no_manager' => 'Kein Verantwortlicher',
 ];

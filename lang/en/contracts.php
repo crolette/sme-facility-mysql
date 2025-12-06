@@ -15,16 +15,15 @@ return [
         'on_demand' => 'On demand',
         'other' => 'Other',
     ],
+
     'linked_to' => 'Linked to',
-    'status' => [
-        'active' => 'Active',
-        'expired' => 'Expired',
-        'cancelled' => 'Cancelled',
-    ],
+
+    'name_placeholder' => 'Contract name',
     'internal_ref' => 'Internal #',
     'provider_ref' => 'Provider #',
+    'internal_ref_placeholder' => 'CO-63-ABC',
     'duration_contract' => 'Contract duration',
-    'duration_notice' => 'Notice period duration',
+    'notice_period.title' => 'Notice period duration',
     'duration' => [
         '1_month' => '1 month',
         '6_months' => '6 months',
