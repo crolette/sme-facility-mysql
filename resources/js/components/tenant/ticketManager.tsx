@@ -170,7 +170,7 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                     <TableHead>
                         <TableHeadRow>
                             <TableHeadData>{t('common.code')}</TableHeadData>
-                            <TableHeadData>{t('common.status')}</TableHeadData>
+                            <TableHeadData>{t('common.status.title')}</TableHeadData>
                             <TableHeadData>{t('tickets.reporter')}</TableHeadData>
                             <TableHeadData>{t('common.description')}</TableHeadData>
                             <TableHeadData>{t('common.created_at')}</TableHeadData>

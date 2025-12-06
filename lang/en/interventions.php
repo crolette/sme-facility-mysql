@@ -3,14 +3,6 @@
 return [
     'title' => 'Intervention|Interventions',
     'none' => 'No interventions planned',
-    'status' => [
-        'draft' => 'Draft',
-        'planned' => 'Planned',
-        'in_progress' => 'In progress',
-        'waiting_parts' => 'Waiting for parts',
-        'completed' => 'Completed',
-        'cancelled' => 'Cancelled',
-    ],
 
     'priority' => [
         'title' => 'Priority',

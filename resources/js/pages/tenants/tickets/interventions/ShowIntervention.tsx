@@ -256,7 +256,7 @@ export default function ShowIntervention({
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                     <ul className="flex items-center gap-2">
-                        <p>{t('common.status')} : </p>
+                        <p>{t('common.status.title')} : </p>
                         {statuses.map((status, index) => (
                             <li key={index} className="flex items-center gap-2">
                                 <Pill
@@ -410,7 +410,7 @@ export default function ShowIntervention({
                                     </option>
                                 ))}
                             </select>
-                            <Label htmlFor="status">{t('common.status')}</Label>
+                            <Label htmlFor="status">{t('common.status.title')}</Label>
                             <select
                                 name="status"
                                 id="status"
@@ -423,13 +423,13 @@ export default function ShowIntervention({
                                     }))
                                 }
                             >
-                                <option value="">{t('actions.select-type', { type: t('common.status') })}</option>
-                                <option value="draft">{t('interventions.status.draft')}</option>
-                                <option value="planned">{t('interventions.status.planned')}</option>
-                                <option value="in_progress">{t('interventions.status.in_progress')}</option>
-                                <option value="waiting_parts">{t('interventions.status.waiting_parts')}</option>
-                                <option value="completed">{t('interventions.status.completed')}</option>
-                                <option value="cancelled">{t('interventions.status.cancelled')}</option>
+                                <option value="">{t('actions.select-type', { type: t('common.status.title') })}</option>
+                                <option value="draft">{t('common.status.draft')}</option>
+                                <option value="planned">{t('common.status.planned')}</option>
+                                <option value="in_progress">{t('common.status.in_progress')}</option>
+                                <option value="waiting_parts">{t('common.status.waiting_parts')}</option>
+                                <option value="completed">{t('common.status.completed')}</option>
+                                <option value="cancelled">{t('common.status.cancelled')}</option>
                             </select>
                             <Label>{t('interventions.priority.title')}</Label>
                             <select

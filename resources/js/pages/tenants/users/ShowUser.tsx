@@ -164,7 +164,7 @@ export default function ShowUser({ item }: { item: User }) {
                                                             <TableHeadData className="w-52">{t('common.description')}</TableHeadData>
                                                             <TableHeadData>{t('common.type')}</TableHeadData>
                                                             <TableHeadData>{t('interventions.priority.title')}</TableHeadData>
-                                                            <TableHeadData>{t('common.status')}</TableHeadData>
+                                                            <TableHeadData>{t('common.status.title')}</TableHeadData>
                                                             <TableHeadData>{t('interventions.assigned_to')}</TableHeadData>
                                                             <TableHeadData>{t('interventions.planned_at')}</TableHeadData>
                                                             <TableHeadData>{t('interventions.repair_delay')}</TableHeadData>

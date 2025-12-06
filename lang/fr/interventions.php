@@ -3,14 +3,7 @@
 return [
     'title' => 'Intervention|Interventions',
     'none' => 'Aucune intervention planifiée',
-    'status' => [
-        'draft' => 'Brouillon',
-        'planned' => 'Planifiée',
-        'in_progress' => 'En cours',
-        'waiting_parts' => 'En attente de pièces',
-        'completed' => 'Terminée',
-        'cancelled' => 'Annulée',
-    ],
+
     'priority' => [
         'title' => 'Priorité',
         'low' => 'Basse',

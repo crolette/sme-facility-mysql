@@ -15,16 +15,13 @@ return [
         'on_demand' => 'Auf Abruf',
         'other' => 'Andere',
     ],
+    'name_placeholder' => 'Vertragname',
     'linked_to' => 'Verknüpft mit',
-    'status' => [
-        'active' => 'Aktiv',
-        'expired' => 'Abgelaufen',
-        'cancelled' => 'Gekündigt',
-    ],
+
     'internal_ref' => 'Intern Ref.',
     'provider_ref' => 'Anbieter Ref.',
     'duration_contract' => 'Vertragsdauer',
-    'duration_notice' => 'Kündigungsfrist',
+    'notice_period.title' => 'Kündigungsfrist',
     'duration' => [
         '1_month' => '1 Monat',
         '6_months' => '6 Monate',

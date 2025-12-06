@@ -210,7 +210,7 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
                             {category}
                         </Pill>
                     ))}
-                {infos.status && <Pill variant={infos.status}>{t(`interventions.status.${infos.status}`)}</Pill>}
+                {infos.status && <Pill variant={infos.status}>{t(`common.status.${infos.status}`)}</Pill>}
                 {infos.priority && <Pill variant={infos.priority}>{t(`interventions.priority.${infos.priority}`)}</Pill>}
 
                 <p className="text-xs">{infos.reference ?? ''}</p>

@@ -19,6 +19,7 @@ return [
     'mark_done' => 'Onderhoud markeren als uitgevoerd',
     'next_maintenance_date' => 'Datum volgend onderhoud',
     'last_maintenance_date' => 'Datum laatste onderhoud',
+    'next_maintenance_date_default' => 'Standaard wordt voor het berekenen van de volgende onderhoudsdatum de datum van vandaag beschouwd als de laatste onderhoudsdatum.',
     'maintenance_manager' => 'Onderhoudsbeheerder',
     'no_manager' => 'Geen beheerder',
 ];

@@ -105,6 +105,8 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
                                     type="text"
                                     onChange={(e) => setData('first_name', e.target.value)}
                                     value={data.first_name}
+                                    minLength={3}
+                                    maxLength={100}
                                     required
                                     placeholder={t('common.first_name_placeholder')}
                                 />
@@ -115,6 +117,8 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
                                 <Input
                                     id="last_name"
                                     type="text"
+                                    minLength={3}
+                                    maxLength={100}
                                     onChange={(e) => setData('last_name', e.target.value)}
                                     value={data.last_name}
                                     required
@@ -129,6 +133,8 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
                                 <Input
                                     id="email"
                                     type="email"
+                                    minLength={20}
+                                    maxLength={255}
                                     onChange={(e) => setData('email', e.target.value)}
                                     value={data.email}
                                     required
@@ -141,6 +147,7 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
                                 <Input
                                     id="phone"
                                     type="text"
+                                    maxLength={16}
                                     onChange={(e) => setData('phone_number', e.target.value)}
                                     value={data.phone_number}
                                     placeholder={t('common.phone_placeholder')}
@@ -170,6 +177,7 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
                                 <div>
                                     <Label htmlFor="role">{t('contacts.role')}</Label>
                                     <select
+                                        required={data.can_login}
                                         name="role"
                                         id="role"
                                         value={data.role}

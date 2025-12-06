@@ -36,7 +36,7 @@ return [
     'warranty' => 'Garantie',
     'notes' => 'Notities',
     'notes_placeholder' => 'Voeg een notitie/opmerking toe',
-    'status' => 'Status',
+
     'surface' => 'Oppervlakte',
     'type' => 'Type',
     'date' => 'Datum',
@@ -67,4 +67,15 @@ return [
     'previous' => 'Vorige',
     'last_name_placeholder' => 'Doe',
     'name_placeholder' => 'Jane Doe',
+    'status' => [
+        'title' => 'Status',
+        'draft' => 'Concept',
+        'planned' => 'Gepland',
+        'in_progress' => 'Bezig',
+        'waiting_parts' => 'Wachten op onderdelen',
+        'completed' => 'Voltooid',
+        'active' => 'Actief',
+        'expired' => 'Verlopen',
+        'cancelled' => 'Geannuleerd',
+    ],
 ];

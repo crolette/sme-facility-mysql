@@ -145,7 +145,7 @@ export const ContractsList = ({
                         <TableHeadRow>
                             <TableHeadData>{t('common.name')}</TableHeadData>
                             <TableHeadData>{t('common.type')}</TableHeadData>
-                            <TableHeadData>{t('common.status')}</TableHeadData>
+                            <TableHeadData>{t('common.status.title')}</TableHeadData>
                             <TableHeadData> {t('contracts.internal_ref')}</TableHeadData>
                             <TableHeadData> {t('contracts.provider_ref')}</TableHeadData>
                             <TableHeadData> {t('contracts.renewal_type.title')}</TableHeadData>
@@ -173,7 +173,7 @@ export const ContractsList = ({
                                         </TableBodyData>
                                         <TableBodyData>{t(`contracts.type.${contract.type}`)}</TableBodyData>
                                         <TableBodyData>
-                                            <Pill variant={contract.status}>{t(`contracts.status.${contract.status}`)}</Pill>
+                                            <Pill variant={contract.status}>{t(`common.status.${contract.status}`)}</Pill>
                                         </TableBodyData>
                                         <TableBodyData>{contract.internal_reference}</TableBodyData>
                                         <TableBodyData>{contract.provider_reference}</TableBodyData>

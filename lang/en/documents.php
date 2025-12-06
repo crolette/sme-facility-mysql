@@ -9,5 +9,6 @@ return [
     'delete_description' => 'Are you sure you want to delete this document ?',
     'accepted_files_with_size' => 'Accepted files: png, jpg, pdf. - Maximum file size: :sizeMB',
     'add_existing_document' => 'Add existing document',
+    'filename_description' => 'Will be used to save the file name',
     'add_new_document' => 'Add new document',
 ];

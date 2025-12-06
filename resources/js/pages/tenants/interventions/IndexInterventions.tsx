@@ -279,10 +279,10 @@ export default function IndexInterventions({
                                     </select>
                                 </div>
                                 <div className="flex flex-col items-center gap-2">
-                                    <Label htmlFor="status">{t('common.status')}</Label>
+                                    <Label htmlFor="status">{t('common.status.title')}</Label>
                                     <select name="status" id="status" value={query.status ?? ''} onChange={(e) => setStatusSearch(e.target.value)}>
                                         <option value={''} aria-readonly>
-                                            {t('actions.select-type', { type: t('common.status') })}
+                                            {t('actions.select-type', { type: t('common.status.title') })}
                                         </option>
                                         {statuses.map((status) => (
                                             <option key={status} value={status}>
@@ -416,7 +416,7 @@ export default function IndexInterventions({
                                         />
                                     </div>
                                 </TableHeadData>
-                                <TableHeadData>{t('common.status')}</TableHeadData>
+                                <TableHeadData>{t('common.status.title')}</TableHeadData>
                                 <TableHeadData>{t('interventions.assigned_to')}</TableHeadData>
                                 <TableHeadData>
                                     <div className="flex items-center gap-2">
@@ -589,7 +589,7 @@ export default function IndexInterventions({
                                     </option>
                                 ))}
                             </select>
-                            <Label>{t('common.status')}</Label>
+                            <Label>{t('common.status.title')}</Label>
                             <select
                                 name=""
                                 id=""
@@ -602,14 +602,14 @@ export default function IndexInterventions({
                                     }))
                                 }
                             >
-                                <option value="">{t('actions.select-type', { type: t('common.status') })}</option>
+                                <option value="">{t('actions.select-type', { type: t('common.status.title') })}</option>
 
-                                <option value="draft">{t('interventions.status.draft')}</option>
-                                <option value="planned">{t('interventions.status.planned')}</option>
-                                <option value="in_progress">{t('interventions.status.in_progress')}</option>
-                                <option value="waiting_parts">{t('interventions.status.waiting_parts')}</option>
-                                <option value="completed">{t('interventions.status.completed')}</option>
-                                <option value="cancelled">{t('interventions.status.cancelled')}</option>
+                                <option value="draft">{t('common.status.draft')}</option>
+                                <option value="planned">{t('common.status.planned')}</option>
+                                <option value="in_progress">{t('common.status.in_progress')}</option>
+                                <option value="waiting_parts">{t('common.status.waiting_parts')}</option>
+                                <option value="completed">{t('common.status.completed')}</option>
+                                <option value="cancelled">{t('common.status.cancelled')}</option>
                             </select>
                             <Label>{t('interventions.priority.title')}</Label>
                             <select

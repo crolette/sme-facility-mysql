@@ -259,7 +259,7 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
                             )}
                             {hasPermission('create users') && selectedIds.length !== 0 && (
                                 <div className="ml-4 space-x-2">
-                                    <Button type={'submit'} variant={'secondary'} size={'icon'}>
+                                    <Button type={'submit'} variant={'secondary'} size={'icon'} onClick={submitSelectedIds}>
                                         <FileDownIcon />
                                     </Button>
 
@@ -326,7 +326,7 @@ export default function IndexUsers({ items, filters }: { items: PaginatedData; f
                                     <p>{t('common.full_name')}</p>
                                     {hasPermission('create users') && selectedIds.length !== 0 && (
                                         <div className="ml-4 space-x-2">
-                                            <Button type={'submit'} variant={'secondary'} size={'icon'}>
+                                            <Button type={'submit'} variant={'secondary'} size={'icon'} onClick={submitSelectedIds}>
                                                 <FileDownIcon />
                                             </Button>
 

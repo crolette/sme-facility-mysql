@@ -57,9 +57,9 @@ class UserRequest extends FormRequest
         $roles = array_column(RoleTypes::cases(), 'value');
 
         return [
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', new NotDisposableEmail, Rule::unique(User::class)->ignore($this->route('user'))],
-            'first_name' => ['required', 'string', 'min:3', 'max:255'],
-            'last_name' => ['required', 'string',  'min:3', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'min:20', 'max:255', new NotDisposableEmail, Rule::unique(User::class)->ignore($this->route('user'))],
+            'first_name' => ['required', 'string', 'min:3', 'max:100'],
+            'last_name' => ['required', 'string',  'min:3', 'max:100'],
             'avatar' => 'nullable|file|mimes:png,jpg,jpeg|max:' . User::maxUploadSizeKB(),
             'job_position' => 'nullable|string|max:100',
             'can_login' => 'nullable|boolean',
