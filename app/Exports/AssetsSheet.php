@@ -9,6 +9,7 @@ use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Building;
 use App\Enums\MaintenanceFrequency;
+use App\Enums\MeterReadingsUnits;
 use Illuminate\Support\Facades\Log;
 use App\Models\Central\CategoryType;
 use Barryvdh\Debugbar\Facades\Debugbar;
@@ -86,6 +87,11 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
                 'brand',
                 'model',
                 'serial_number',
+
+                'has_meter_readings',
+                'meter_number',
+                'meter_unit',
+
                 'depreciable',
                 'depreciation_start_date',
                 'depreciation_end_date',
@@ -119,6 +125,11 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
                 __('assets.brand'),
                 __('assets.model'),
                 __('assets.serial_number'),
+
+                __('assets.has_meter_readings') . ' ?',
+                __('assets.meter_number'),
+                __('assets.meter_readings.unit'),
+
                 __('assets.depreciable') . ' ?',
                 __('assets.depreciation_start_date'),
                 __('assets.depreciation_end_date'),
@@ -142,12 +153,13 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
     public function columnFormats(): array
     {
         return [
-            'Q' => NumberFormat::FORMAT_DATE_DDMMYYYY,
-            'R' => NumberFormat::FORMAT_DATE_DDMMYYYY,
-            'V' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'T' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'U' => NumberFormat::FORMAT_DATE_DDMMYYYY,
             'Y' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'Z' => NumberFormat::FORMAT_DATE_DDMMYYYY,
             'AB' => NumberFormat::FORMAT_DATE_DDMMYYYY,
-            'AC' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'AE' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'AF' => NumberFormat::FORMAT_DATE_DDMMYYYY,
         ];
     }
 
@@ -159,16 +171,43 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
 
         $sheet->getColumnDimension('C')->setWidth(35);
         $sheet->getColumnDimension('D')->setWidth(35);
+        $sheet->getColumnDimension('E')->setWidth(30);
+        $sheet->getColumnDimension('F')->setWidth(20);
+        $sheet->getColumnDimension('G')->setWidth(15);
+        $sheet->getColumnDimension('H')->setWidth(40);
+        $sheet->getColumnDimension('I')->setWidth(40);
+        $sheet->getColumnDimension('J')->setWidth(40);
+        $sheet->getColumnDimension('K')->setWidth(40);
+        $sheet->getColumnDimension('L')->setWidth(40);
         $sheet->getColumnDimension('M')->setWidth(20);
         $sheet->getColumnDimension('N')->setWidth(20);
+        $sheet->getColumnDimension('O')->setWidth(20);
+        $sheet->getColumnDimension('P')->setWidth(15);
+        $sheet->getColumnDimension('Q')->setWidth(25);
+        $sheet->getColumnDimension('R')->setWidth(15);
+        $sheet->getColumnDimension('S')->setWidth(15);
+        $sheet->getColumnDimension('T')->setWidth(30);
+        $sheet->getColumnDimension('U')->setWidth(30);
+        $sheet->getColumnDimension('V')->setWidth(30);
+        $sheet->getColumnDimension('W')->setWidth(20);
+        $sheet->getColumnDimension('X')->setWidth(20);
+        $sheet->getColumnDimension('Y')->setWidth(20);
+        $sheet->getColumnDimension('Z')->setWidth(20);
+        $sheet->getColumnDimension('AA')->setWidth(25);
+        $sheet->getColumnDimension('AB')->setWidth(25);
+        $sheet->getColumnDimension('AC')->setWidth(30);
+        $sheet->getColumnDimension('AD')->setWidth(30);
+        $sheet->getColumnDimension('AE')->setWidth(30);
+        $sheet->getColumnDimension('AF')->setWidth(30);
+        $sheet->getColumnDimension('AG')->setWidth(30);
 
 
         $sheet->getStyle('C3:AD9999')->getProtection()
             ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
 
         $sheet->getRowDimension('1')->setRowHeight(0);
-        $sheet->getColumnDimension('AE')->setVisible(false);
-        $sheet->freezePane('F3');
+        $sheet->getColumnDimension('AH')->setVisible(false);
+        $sheet->freezePane('E3');
 
         $categories = CategoryType::where('category', 'asset')->get()->pluck('label');
         $categoriesList = $categories->join(',');
@@ -210,8 +249,12 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         // Boolean on Is Mobile ?
         $sheet->setDataValidation('G3:G9999', clone $validation);
 
-        // Depreciable ?
+        // Has meter readings
         $sheet->setDataValidation('P3:P9999', clone $validation);
+
+        // Depreciable ?
+        $sheet->setDataValidation('S3:S9999', clone $validation);
+
 
 
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
@@ -259,44 +302,44 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         // Conditional formatting on depreciation_start_date
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
-        $conditional->addCondition('AND($P3="Yes",ISBLANK($Q3))');
+        $conditional->addCondition('AND($S3="Yes",ISBLANK($T3))');
         $conditional->getStyle()->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFF0000');
-        $sheet->getStyle('Q3:Q9999')->setConditionalStyles([$conditional]);
+        $sheet->getStyle('T3:T9999')->setConditionalStyles([$conditional]);
 
         // Conditional formatting on depreciation_duration
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
-        $conditional->addCondition('AND($P3="Yes",ISBLANK($S3))');
+        $conditional->addCondition('AND($S3="Yes",ISBLANK($V3))');
         $conditional->getStyle()->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFF0000');
-        $sheet->getStyle('S3:S9999')->setConditionalStyles([$conditional]);
+        $sheet->getStyle('V3:V9999')->setConditionalStyles([$conditional]);
 
         // Under warranty
-        $sheet->setDataValidation('X3:X9999', clone $validation);
+        $sheet->setDataValidation('AA3:AA9999', clone $validation);
 
         // Conditional formatting on end_warranty_date
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
-        $conditional->addCondition('AND($X3="Yes",ISBLANK($X3))');
+        $conditional->addCondition('AND($AA3="Yes",ISBLANK($AA3))');
         $conditional->getStyle()->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFF0000');
-        $sheet->getStyle('Y3:Y9999')->setConditionalStyles([$conditional]);
+        $sheet->getStyle('AB3:AB9999')->setConditionalStyles([$conditional]);
 
         //Need maintenance
-        $sheet->setDataValidation('Z3:Z9999', clone $validation);
+        $sheet->setDataValidation('AC3:AC9999', clone $validation);
 
         // Conditional formatting on maintenance_frequency
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
-        $conditional->addCondition('AND($Z3="Yes",ISBLANK($Z3))');
+        $conditional->addCondition('AND($AC3="Yes",ISBLANK($AC3))');
         $conditional->getStyle()->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFF0000');
-        $sheet->getStyle('AA3:AA9999')->setConditionalStyles([$conditional]);
+        $sheet->getStyle('AD3:AD9999')->setConditionalStyles([$conditional]);
 
 
         // Site
@@ -329,7 +372,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         // Users
         $validation->setFormula1('users');
         $sheet->setDataValidation('L3:L9999', clone $validation);
-        $sheet->setDataValidation('AD3:AD9999', clone $validation);
+        $sheet->setDataValidation('AG3:AG9999', clone $validation);
 
         $conditional1 = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional1->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
@@ -356,7 +399,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $frequencies = collect(array_column(MaintenanceFrequency::cases(), 'value'));
         $frequenciesList = $frequencies->join(',');
 
-        $validation = $sheet->getDataValidation('AA3');
+        $validation = $sheet->getDataValidation('AD3');
         $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
         $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
         $validation->setAllowBlank(false);
@@ -369,7 +412,26 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $validation->setPrompt('Please pick a value from the drop-down list.');
         $validation->setFormula1('"' . $frequenciesList . '"');
 
-        $sheet->setDataValidation('AA3:AA9999', clone $validation);
+        $sheet->setDataValidation('AD3:AD9999', clone $validation);
+
+        // Meter units
+        $meterUnits = collect(array_column(MeterReadingsUnits::cases(), 'value'));
+        $meterUnitsList = $meterUnits->join(',');
+
+        $validation = $sheet->getDataValidation('R3');
+        $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
+        $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
+        $validation->setAllowBlank(false);
+        $validation->setShowInputMessage(true);
+        $validation->setShowErrorMessage(true);
+        $validation->setShowDropDown(true);
+        $validation->setErrorTitle('Input error');
+        $validation->setError('Value is not in list.');
+        $validation->setPromptTitle('Pick from list');
+        $validation->setPrompt('Please pick a value from the drop-down list.');
+        $validation->setFormula1('"' . $meterUnitsList . '"');
+
+        $sheet->setDataValidation('R3:R9999', clone $validation);
 
         // Validation longueur de champs
         $validationLength = $sheet->getDataValidation('C3');

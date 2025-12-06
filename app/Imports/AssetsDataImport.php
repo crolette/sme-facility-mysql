@@ -11,6 +11,7 @@ use App\Models\Tenants\Asset;
 use App\Services\AssetService;
 use App\Services\QRCodeService;
 use Illuminate\Validation\Rule;
+use App\Enums\MeterReadingsUnits;
 use Illuminate\Support\Collection;
 use App\Enums\MaintenanceFrequency;
 use Illuminate\Support\Facades\Log;
@@ -89,6 +90,9 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
             'brand' => $rowData['brand'] ?? null,
             'model' => $rowData['model'] ?? null,
             'serial_number' => $rowData['serial_number'] ?? null,
+            'has_meter_readings' => $rowData['has_meter_readings'] ?? false,
+            'meter_number' => $rowData['meter_number'] ?? null,
+            'meter_unit' => $rowData['meter_unit'] ?? null,
             'surface' => $rowData['surface'] ?? null,
             'is_mobile' => $rowData['is_mobile'],
             'site' => $rowData['location_type_site'],
@@ -137,6 +141,13 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
     {
         isset($data['need_qr_code']) && ($data['need_qr_code'] === 'Yes') ? $data['need_qr_code'] = true : $data['need_qr_code'] = false;
         isset($data['is_mobile']) && ($data['is_mobile'] === 'Yes') ? $data['is_mobile'] = true : $data['is_mobile'] = false;
+        isset($data['has_meter_readings']) && ($data['has_meter_readings'] === 'Yes') ? $data['has_meter_readings'] = true : $data['has_meter_readings'] = false;
+
+        if ($data['has_meter_readings'] === false) {
+            $data['meter_number'] = null;
+            $data['meter_unit'] = null;
+        }
+
         isset($data['depreciable']) && ($data['depreciable'] === 'Yes') ? $data['depreciable'] = true : $data['depreciable'] = false;
 
         if (isset($data['serial_number'])) {
@@ -220,6 +231,10 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
             'maintenance_frequency' => ['nullable', 'required_if_accepted:need_maintenance', Rule::in($frequencies)],
             'next_maintenance_date' => ['nullable', 'date'],
             'last_maintenance_date' =>  ['nullable', 'date', Rule::date()->todayOrBefore()],
+
+            'has_meter_readings' => 'boolean',
+            'meter_number' => 'nullable|string|max:20',
+            'meter_unit' => ['nullable', Rule::in(array_column(MeterReadingsUnits::cases(), 'value'))]
         ];
     }
 
