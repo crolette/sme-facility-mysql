@@ -6,7 +6,8 @@ import { Pill } from '../ui/pill';
 
 interface InfosProps {
     name: string;
-    code: string;
+    code?: string;
+    categories?: string[];
     status?: string;
     reference?: string;
     levelPath: string;
@@ -201,8 +202,14 @@ export default function SidebarMenuAssetLocation({ activeTab, setActiveTab, menu
             <div className="flex flex-col items-center gap-1 px-4 py-2 text-center">
                 <p className="font-semibold">{infos.name}</p>
 
-                <p className="text-sm">{infos.code ?? ''}</p>
+                {infos.code && <p className="text-sm">{infos.code ?? ''}</p>}
 
+                {infos.categories &&
+                    infos.categories.map((category, index) => (
+                        <Pill key={index} variant={'default'}>
+                            {category}
+                        </Pill>
+                    ))}
                 {infos.status && <Pill variant={infos.status}>{t(`interventions.status.${infos.status}`)}</Pill>}
                 {infos.priority && <Pill variant={infos.priority}>{t(`interventions.priority.${infos.priority}`)}</Pill>}
 

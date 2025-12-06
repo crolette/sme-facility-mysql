@@ -2,12 +2,15 @@
 
 namespace App\Models\Central;
 
+use App\Models\Tenants\CategoryProvider;
 use App\Models\Translation;
+use App\Models\Tenants\Provider;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class CategoryType extends Model
 {
@@ -66,6 +69,16 @@ class CategoryType extends Model
     {
         return $this->morphMany(Translation::class, 'translatable');
     }
+
+    // public function providers(): BelongsToMany
+    // {
+    //     return $this->belongsToMany(
+    //         Provider::class,
+    //         'category_provider',
+    //         'category_id',
+    //         'provider_id'
+    //     )->using(CategoryProvider::class)->withTimestamps();
+    // }
 
 
     public function label($locale = null): Attribute

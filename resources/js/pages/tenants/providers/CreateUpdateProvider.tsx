@@ -3,6 +3,7 @@ import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Pill } from '@/components/ui/pill';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
@@ -10,7 +11,7 @@ import { BreadcrumbItem, CentralType, Country, Provider } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
+import { MinusCircleIcon, PlusCircleIcon, X } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 
 type ContactPerson = {
@@ -32,7 +33,7 @@ type TypeFormData = {
     postal_code: string;
     city: string;
     country_code: string;
-    categoryId: number | string;
+    categories: CentralType[];
     pictures: File[] | null;
     users: ContactPerson[];
 };
@@ -68,7 +69,7 @@ export default function CreateUpdateProvider({
         postal_code: provider?.postal_code ?? '',
         city: provider?.city ?? '',
         country_code: provider?.country.iso_code ?? '',
-        categoryId: provider?.category_type_id ?? '',
+        categories: provider?.categories ?? [],
         pictures: [],
         users: [],
     });
@@ -132,6 +133,26 @@ export default function CreateUpdateProvider({
         });
     };
 
+    const handleCategoryProvider = (categoryId: number) => {
+        const category = providerCategories.find((elem) => elem.id == categoryId);
+        if (!data.categories.find((elem) => elem.id == categoryId)) {
+            if (category) {
+                const newCategories = data.categories;
+
+                setData((prev) => ({ ...prev, categories: [...newCategories, category] }));
+            }
+        }
+    };
+
+    const handleRemoveCategoryProvider = (categoryId: number) => (e: React.MouseEvent<SVGElement, MouseEvent>) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const newCategories = data.categories.filter((elem) => elem.id !== categoryId);
+        setData((prev) => ({ ...prev, categories: newCategories }));
+    };
+
+    console.log(data.categories);
+
     const [selectedCountry, setSelectedCountry] = useState(data.country_code ?? '');
 
     useEffect(() => {
@@ -153,11 +174,13 @@ export default function CreateUpdateProvider({
                             </div>
                             <div className="w-full">
                                 <Label htmlFor="name">{t('common.category')}</Label>
+
                                 <select
                                     name="category"
-                                    required
-                                    value={data.categoryId === '' ? 0 : data.categoryId}
-                                    onChange={(e) => setData('categoryId', e.target.value)}
+                                    required={data.categories.length < 1}
+                                    value=""
+                                    // onChange={(e) => setData('categoryId', e.target.value)}
+                                    onChange={(e) => handleCategoryProvider(parseInt(e.target.value))}
                                     id=""
                                     className={cn(
                                         'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
@@ -167,7 +190,7 @@ export default function CreateUpdateProvider({
                                 >
                                     {providerCategories && providerCategories.length > 0 && (
                                         <>
-                                            <option value="0" disabled className="bg-background text-foreground">
+                                            <option value="" disabled className="bg-background text-foreground">
                                                 {t('actions.select-type', { type: t('common.category') })}
                                             </option>
                                             {providerCategories?.map((category) => (
@@ -178,7 +201,15 @@ export default function CreateUpdateProvider({
                                         </>
                                     )}
                                 </select>
-                                <InputError className="mt-2" message={errors?.categoryId ?? ''} />
+                                <div className="flex flex-wrap gap-2">
+                                    {data.categories.map((category, index) => (
+                                        <Pill size={'sm'} key={index} className="flex items-center gap-2">
+                                            {category.label}
+                                            <X size={16} onClick={handleRemoveCategoryProvider(category.id)} />
+                                        </Pill>
+                                    ))}
+                                </div>
+                                <InputError className="mt-2" message={errors?.categories ?? ''} />
                             </div>
                         </div>
                         <div className="flex w-full flex-col gap-4 lg:flex-row">

@@ -17,18 +17,19 @@ class ProviderService
         $provider = new Provider([...$data]);
 
         $provider = $this->associateCountry($provider, $data['country_code']);
-        $provider =  $this->associateCategory($provider, $data['categoryId']);
-
         $provider->save();
+        $provider =  $this->attachCategories($provider, $data['categories']);
         return $provider;
     }
+
+
 
     public function update(Provider $provider, array $data): Provider
     {
         $provider->update([...$data]);
 
         $provider = $this->associateCountry($provider, $data['country_code']);
-        $provider =  $this->associateCategory($provider, $data['categoryId']);
+        $provider =  $this->attachCategories($provider, $data['categories']);
 
         $provider->save();
 
@@ -42,9 +43,12 @@ class ProviderService
         return $provider;
     }
 
-    private function associateCategory($provider, $categoryId)
+    private function attachCategories($provider, $categories)
     {
-        $provider->providerCategory()->associate($categoryId);
+        $categoriesCollection = collect($categories);
+
+        $provider->categories()->sync($categoriesCollection->pluck('id'));
+
         return $provider;
     }
 
