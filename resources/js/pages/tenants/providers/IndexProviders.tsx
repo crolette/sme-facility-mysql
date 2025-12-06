@@ -15,7 +15,7 @@ import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { FileDownIcon, Loader, Pencil, PlusCircle, SquareX, X } from 'lucide-react';
-import { FormEventHandler, useEffect, useState } from 'react';
+import { MouseEventHandler, useEffect, useState } from 'react';
 
 export interface SearchParams {
     category: number | null;
@@ -119,13 +119,13 @@ export default function IndexProviders({
     const { layout } = useGridTableLayoutContext();
     const { selectedIds, handleSelectIds, handleSelectAllIds, clearSelection } = useSelectIds({ storageKey: 'selectedProviders' });
 
-    const submitSelectedIds: FormEventHandler = async (e) => {
+    const submitSelectedIds: MouseEventHandler = async (e) => {
         e.preventDefault();
         try {
             const response = await axios.post(route('tenant.providers.export'), { ids: selectedIds });
             showToast(response.data.message);
         } catch (error) {
-            console.log(error);
+            showToast(error.response.data.message);
         } finally {
             clearSelection();
         }
@@ -202,7 +202,7 @@ export default function IndexProviders({
                             )}
                             {hasPermission('create providers') && selectedIds.length !== 0 && (
                                 <div className="ml-4 space-x-2">
-                                    <Button type={'submit'} variant={'secondary'} size={'icon'}>
+                                    <Button variant={'secondary'} size={'icon'} onClick={(e) => submitSelectedIds(e)}>
                                         <FileDownIcon />
                                     </Button>
 
@@ -264,7 +264,7 @@ export default function IndexProviders({
                                     <p>{t('providers.company_name')}</p>
                                     {hasPermission('create providers') && selectedIds.length !== 0 && (
                                         <div className="ml-4 space-x-2">
-                                            <Button type={'submit'} variant={'secondary'} size={'icon'}>
+                                            <Button variant={'secondary'} size={'icon'} onClick={(e) => submitSelectedIds(e)}>
                                                 <FileDownIcon />
                                             </Button>
 

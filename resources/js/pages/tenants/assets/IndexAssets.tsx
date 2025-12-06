@@ -330,7 +330,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                             )}
                             {hasPermission('create assets') && selectedIds.length !== 0 && (
                                 <div className="ml-4 space-x-2">
-                                    <Button type={'submit'} variant={'secondary'} size={'icon'}>
+                                    <Button variant={'secondary'} size={'icon'} onClick={(e) => submitSelectedIds(e)}>
                                         <FileDownIcon />
                                     </Button>
 
@@ -390,7 +390,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                                     <p>{t('common.reference_code')}</p>
                                     {hasPermission('create assets') && selectedIds.length !== 0 && (
                                         <div className="ml-4 space-x-2">
-                                            <Button type={'submit'} variant={'secondary'} size={'icon'}>
+                                            <Button variant={'secondary'} size={'icon'} onClick={(e) => submitSelectedIds(e)}>
                                                 <FileDownIcon />
                                             </Button>
 

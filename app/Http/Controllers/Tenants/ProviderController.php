@@ -85,9 +85,6 @@ class ProviderController extends Controller
         if (Auth::user()->cannot('view', $provider))
             abort(403);
 
-        // dd(basename(Storage::disk('tenants')->path($provider->logo)));
-
-
         return Inertia::render('tenants/providers/ShowProvider', ['item' => $provider->load('users', 'contracts', 'contracts.provider', 'assignedInterventions')]);
     }
 }
