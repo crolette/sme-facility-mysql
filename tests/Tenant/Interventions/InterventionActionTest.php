@@ -34,7 +34,7 @@ beforeEach(function () {
     $this->asset =  Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     $this->ticket = Ticket::factory()->forLocation($this->asset)->create();
-    $this->intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $this->intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 });
 
 it('can create a new action to an intervention', function () {

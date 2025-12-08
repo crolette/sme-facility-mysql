@@ -2,11 +2,6 @@
 
 return [
     'title' => 'Ticket|Tickets',
-    'status' => [
-        'open' => 'Open',
-        'ongoing' => 'Bezig',
-        'closed' => 'Gesloten',
-    ],
     'reporter' => 'Melder',
     'related_to' => 'Gerelateerd aan',
     'close' => 'Sluiten',

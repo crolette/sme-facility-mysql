@@ -74,7 +74,7 @@ export default function ShowTicket({ item }: { item: Ticket }) {
                         infos={{
                             name: ticket.code,
                             code: ticket.closed_at ?? ticket.created_at,
-                            status: t(`tickets.status.${ticket.status}`),
+                            status: ticket.status,
                             levelPath: ticket.ticketable_route,
                             levelName: ticket.ticketable.name + ' - ' + ticket.ticketable.reference_code,
                         }}

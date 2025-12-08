@@ -286,7 +286,7 @@ export default function IndexInterventions({
                                         </option>
                                         {statuses.map((status) => (
                                             <option key={status} value={status}>
-                                                {t(`interventions.status.${status}`)}
+                                                {t(`common.status.${status}`)}
                                             </option>
                                         ))}
                                     </select>
@@ -348,7 +348,7 @@ export default function IndexInterventions({
                                 </a>
                                 <div className="flex gap-2">
                                     <Pill variant={item.priority}>{t(`interventions.priority.${item.priority}`)}</Pill>
-                                    <Pill variant={item.status}>{t(`interventions.status.${item.status}`)}</Pill>
+                                    <Pill variant={item.status}>{t(`common.status.${item.status}`)}</Pill>
                                 </div>
                                 <p className="text-xs">
                                     {' '}
@@ -495,7 +495,7 @@ export default function IndexInterventions({
                                                 <Pill variant={item.priority}>{t(`interventions.priority.${item.priority}`)}</Pill>
                                             </TableBodyData>
                                             <TableBodyData>
-                                                <Pill variant={item.status}>{t(`interventions.status.${item.status}`)}</Pill>
+                                                <Pill variant={item.status}>{t(`common.status.${item.status}`)}</Pill>
                                             </TableBodyData>
                                             <TableBodyData>
                                                 {item.assignable ? (

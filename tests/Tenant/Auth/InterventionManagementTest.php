@@ -94,7 +94,7 @@ test('test access roles to view intervention for an asset without maintenance ma
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
-    $ticket = Intervention::factory()->forLocation($this->asset)->create();
+    $ticket = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
     $response = $this->getFromTenant('tenant.interventions.show', $ticket->id);
     $response->assertStatus($expectedStatus);
@@ -110,7 +110,7 @@ test('test access roles to view intervention for an asset with maintenance manag
     $this->actingAs($user, 'tenant');
     $this->asset->maintainable->manager()->associate($user)->save();
 
-    $ticket = Intervention::factory()->forLocation($this->asset)->create();
+    $ticket = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
     $response = $this->getFromTenant('tenant.interventions.show', $ticket->id);
     $response->assertStatus($expectedStatus);
@@ -151,7 +151,7 @@ test('test access roles to update any intervention', function (string $role, int
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
     $response = $this->patchToTenant('api.interventions.update', [...$this->interventionAssetData, 'locationType' => Asset::class], $intervention);
     $response->assertStatus($expectedStatus);
@@ -168,7 +168,7 @@ test('test access roles to update intervention with maintenance manager', functi
 
     $this->asset->maintainable->manager()->associate($user)->save();
 
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
     $response = $this->patchToTenant('api.interventions.update', [...$this->interventionAssetData, 'locationType' => Asset::class], $intervention);
     $response->assertStatus($expectedStatus);
@@ -183,7 +183,7 @@ test('test access roles to update the status of any intervention', function (str
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
     $response = $this->patchToTenant('api.interventions.status', ['status' => InterventionStatus::COMPLETED->value], $intervention);
 
@@ -201,7 +201,7 @@ test('test access roles to update the status of intervention with maintenance ma
 
     $this->asset->maintainable->manager()->associate($user)->save();
 
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
     $response = $this->patchToTenant('api.interventions.status', ['status' => InterventionStatus::COMPLETED->value], $intervention);
 
@@ -217,7 +217,7 @@ test('test access roles to delete any intervention', function (string $role, int
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
     $response = $this->deleteFromTenant('api.interventions.destroy', $intervention);
     $response->assertStatus($expectedStatus);

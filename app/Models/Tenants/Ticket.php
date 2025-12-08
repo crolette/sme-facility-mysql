@@ -101,7 +101,8 @@ class Ticket extends Model
 
     public function closeTicket()
     {
-        $this->closer()->associate(Auth::guard('tenant')->user()->id);
+        if (Auth::guard('tenant')->user()?->id)
+            $this->closer()->associate(Auth::guard('tenant')->user()->id);
 
         if (!$this->handled_at)
             $this->handled_at = Carbon::now()->toDateString();

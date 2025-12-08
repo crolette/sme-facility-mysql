@@ -186,7 +186,7 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                                         <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
                                     </TableBodyData>
                                     <TableBodyData>
-                                        <Pill variant={ticket.status}>{t(`tickets.status.${ticket.status}`)}</Pill>
+                                        <Pill variant={ticket.status}>{t(`common.status.${ticket.status}`)}</Pill>
                                     </TableBodyData>
                                     <TableBodyData>{ticket.reporter_email ?? ticket.reporter?.email}</TableBodyData>
                                     <TableBodyData>{ticket.description}</TableBodyData>

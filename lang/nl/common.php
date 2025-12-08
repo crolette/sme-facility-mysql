@@ -77,5 +77,8 @@ return [
         'active' => 'Actief',
         'expired' => 'Verlopen',
         'cancelled' => 'Geannuleerd',
+        'open' => 'Open',
+        'ongoing' => 'Bezig',
+        'closed' => 'Gesloten',
     ],
 ];

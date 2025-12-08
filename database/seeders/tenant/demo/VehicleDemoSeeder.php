@@ -3,9 +3,10 @@
 namespace Database\Seeders\tenant\demo;
 
 use Carbon\Carbon;
+use App\Enums\PriorityLevel;
 use App\Models\LocationType;
-use App\Models\Tenants\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Enums\NoticePeriodEnum;
 use App\Services\QRCodeService;
@@ -14,9 +15,11 @@ use App\Enums\ContractTypesEnum;
 use App\Models\Tenants\Contract;
 use App\Models\Tenants\Provider;
 use App\Enums\ContractStatusEnum;
+use App\Enums\InterventionStatus;
 use App\Enums\ContractDurationEnum;
 use App\Enums\MaintenanceFrequency;
 use App\Models\Central\CategoryType;
+use App\Models\Tenants\Intervention;
 use App\Enums\ContractRenewalTypesEnum;
 
 class VehicleDemoSeeder extends Seeder
@@ -121,5 +124,16 @@ class VehicleDemoSeeder extends Seeder
         ]);
 
         $assetVehicle->contracts()->attach($contract);
+
+        $interventionMaintenance = CategoryType::where('category', 'intervention')->where('slug', 'intervention-maintenance')->first();
+
+        Intervention::factory()->forLocation($assetVehicle)->create([
+            'description' => 'Entretien Skoda',
+            'intervention_type_id' => $interventionMaintenance->id,
+            'priority' => PriorityLevel::MEDIUM->value,
+            'status' => InterventionStatus::PLANNED->value,
+            'planned_at' => Carbon::yesterday(),
+            'repair_delay' => null,
+        ]);
     }
 }

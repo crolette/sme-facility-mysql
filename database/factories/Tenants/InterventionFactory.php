@@ -22,7 +22,11 @@ class InterventionFactory extends Factory
      */
     public function definition(): array
     {
-        $category = CategoryType::factory()->create(['category' => 'intervention']);
+
+        $category = CategoryType::where('category', 'intervention')->first();
+        if (!$category)
+            $category = CategoryType::factory()->create(['category' => 'intervention']);
+
 
         return [
             'intervention_type_id' => $category->id,
@@ -73,18 +77,12 @@ class InterventionFactory extends Factory
         });
     }
 
-
-
-    public function configure()
+    public function withAction()
     {
-        return $this->afterCreating(
-
-            function (Intervention $intervention) {
-
-                $intervention->actions()->save(
-                    InterventionAction::factory()->make()
-                );
-            }
-        );
+        return $this->afterCreating(function (Intervention $intervention) {
+            $intervention->actions()->save(
+                InterventionAction::factory()->make()
+            );
+        });
     }
 }

@@ -76,5 +76,8 @@ return [
         'in_progress' => 'En cours',
         'waiting_parts' => 'En attente de pièces',
         'completed' => 'Terminée',
+        'open' => 'Ouvert',
+        'ongoing' => 'En cours',
+        'closed' => 'Fermé',
     ],
 ];

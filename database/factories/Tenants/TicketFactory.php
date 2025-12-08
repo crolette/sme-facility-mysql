@@ -32,7 +32,7 @@ class TicketFactory extends Factory
             'code' => $codeNumber,
             'status' => TicketStatus::OPEN->value,
             'description' => fake()->paragraph(2),
-            'reported_by' => User::factory()->create()->id,
+            'reported_by' => User::withoutRole(['Super Admin', 'Admin'])->first() ?? User::factory()->create()->id,
             'being_notified' => fake()->boolean(50),
         ];
     }

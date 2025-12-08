@@ -77,7 +77,7 @@ it('can send an intervention to a provider and to multiple emails/users and assi
 
     Mail::fake();
 
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
     $formData = [
         'provider_id' => $this->provider->id,
@@ -108,7 +108,7 @@ it('can send an intervention to a provider and to multiple emails/users and assi
 
 //     Mail::fake();
 
-//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 //     $user = User::factory()->withRole('Maintenance Manager')->create();
 
 
@@ -138,7 +138,7 @@ it('can send an intervention to a provider and to multiple emails/users and assi
 
 //     Mail::fake();
 
-//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 //     $user = User::factory()->withRole('Maintenance Manager')->create();
 
 
@@ -167,7 +167,7 @@ it('can send an intervention to a provider and to multiple emails/users and assi
 // it('sends email only once even if one email is multiple times', function () {
 //     Mail::fake();
 
-//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 //     $user = User::factory()->withRole('Maintenance Manager')->create();
 
 
@@ -189,7 +189,7 @@ it('can send an intervention to a provider and to multiple emails/users and assi
 // it('cannot send an intervention to a non-existing provider', function () {
 //     Mail::fake();
 
-//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 //     $user = User::factory()->withRole('Maintenance Manager')->create();
 
 
@@ -209,7 +209,7 @@ it('can send an intervention to a provider and to multiple emails/users and assi
 // it('cannot send an intervention to a non-existing user', function () {
 //     Mail::fake();
 
-//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
 //     $formData = [
 //         'user_id' => 10,
@@ -227,7 +227,7 @@ it('can send an intervention to a provider and to multiple emails/users and assi
 // it('cannot send an intervention without user_id or provider_id', function () {
 //     Mail::fake();
 
-//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
 //     $formData = [
 //         'email' => 'test@test.com'
@@ -245,7 +245,7 @@ it('can send an intervention to a provider and to multiple emails/users and assi
 
 //     Mail::fake();
 
-//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 //     $user = User::factory()->withRole('Maintenance Manager')->create();
 
 
@@ -307,7 +307,7 @@ it('can send an intervention to a provider and to multiple emails/users and assi
 
 //     Mail::fake();
 
-//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 //     $user = User::factory()->withRole('Maintenance Manager')->create();
 
 //     $formData = [
@@ -366,15 +366,15 @@ it('can send an intervention to a provider and to multiple emails/users and assi
 
 // it('a provider can access to the intervention page', function () {
 
-//     Intervention::factory()->forLocation($this->asset)->create();
-//     $interventionOne = Intervention::factory()->forLocation($this->asset)->create();
+//     Intervention::factory()->withAction()->forLocation($this->asset)->create();
+//     $interventionOne = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 //     InterventionAction::factory()->forIntervention($interventionOne)->create();
 //     InterventionAction::factory()->forIntervention($interventionOne)->create();
 //     $interventionOne->update([
 //         'status' => InterventionStatus::COMPLETED->value
 //     ]);
 
-//     $interventionTwo = Intervention::factory()->forLocation($this->asset)->create();
+//     $interventionTwo = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
 //     $actionTypesCount = CategoryType::where('category', 'action')->count();
 
@@ -393,7 +393,7 @@ it('can send an intervention to a provider and to multiple emails/users and assi
 
 // it('can post an action as external provider and intervention reassigned by default to admin', function () {
 
-//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 //     $provider = User::factory()->create();
 
 //     $formData = [
@@ -434,7 +434,7 @@ it('can send an intervention to a provider and to multiple emails/users and assi
 // it('sends an email to the admin when a provider encoded a new action and intervention reassigned to admin', function () {
 //     Mail::fake();
 
-//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 //     $provider = User::factory()->create();
 
 //     $formData = [
@@ -468,7 +468,7 @@ it('can send an intervention to a provider and to multiple emails/users and assi
 //     $user = User::factory()->withRole('Maintenance Manager')->create();
 //     $this->asset->maintainable()->update(['maintenance_manager_id' => $user->id]);
 
-//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 //     $provider = User::factory()->create();
 
 //     $formData = [
@@ -501,7 +501,7 @@ it('can send an intervention to a provider and to multiple emails/users and assi
 
 //     $user = User::factory()->withRole('Maintenance Manager')->create();
 //     $this->asset->maintainable()->update(['maintenance_manager_id' => $user->id]);
-//     $intervention = Intervention::factory()->forLocation($this->asset)->create();
+//     $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 //     $provider = User::factory()->create();
 
 //     $file1 = UploadedFile::fake()->image('action1.jpg');

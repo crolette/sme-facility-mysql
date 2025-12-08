@@ -67,7 +67,7 @@ it('can render the show ticket page', function () {
 
 it('can render interventions in the ticket page', function () {
     $ticket = Ticket::factory()->forLocation($this->asset)->create();
-    Intervention::factory()->forTicket($ticket)->count(2)->create();
+    Intervention::factory()->withAction()->forTicket($ticket)->count(2)->create();
 
     $response = $this->getFromTenant('tenant.tickets.show', $ticket);
     $response->assertOk();

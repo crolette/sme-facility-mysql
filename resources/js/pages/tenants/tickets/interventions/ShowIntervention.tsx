@@ -267,7 +267,7 @@ export default function ShowIntervention({
                                         '',
                                     )}
                                 >
-                                    {t(`interventions.status.${status}`)}
+                                    {t(`common.status.${status}`)}
                                 </Pill>
                                 {index !== statuses.length - 1 && <span className="">{' > '}</span>}
                             </li>

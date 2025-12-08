@@ -2,11 +2,6 @@
 
 return [
     'title' => 'Ticket|Tickets',
-    'status' => [
-        'open' => 'Open',
-        'ongoing' => 'Ongoing',
-        'closed' => 'Closed',
-    ],
     'reporter' => 'Reporter',
     'related_to' => 'Related to',
     'close' => 'close',

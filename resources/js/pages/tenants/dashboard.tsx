@@ -69,7 +69,7 @@ export default function TenantDashboard({
                     </div>
                     <div className="border-sidebar-border/70 dark:border-sidebar-border hover:bg-secondary relative overflow-hidden rounded-xl border p-4">
                         {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
-                        <a href={route('tenant.assets.index')} className="text-center !no-underline">
+                        <a href={route('tenant.interventions.index')} className="text-center !no-underline">
                             <div className="flex flex-col items-center justify-center">
                                 <p className="hidden font-semibold uppercase md:inline-block">{tChoice('interventions.title', 2)}</p>
                                 <Wrench strokeWidth={1} className="m-auto h-12 w-12" />
@@ -113,8 +113,8 @@ export default function TenantDashboard({
                                                 <Pill variant={intervention.priority}>{t(`interventions.priority.${intervention.priority}`)}</Pill>
                                             </p>
                                             <p className="text-sm">
-                                                ({intervention.interventionable.reference_code}) - {t(`interventions.status.${intervention.status}`)}{' '}
-                                                - {intervention.intervention_type.label}
+                                                ({intervention.interventionable.reference_code}) - {t(`common.status.${intervention.status}`)} -{' '}
+                                                {intervention.intervention_type.label}
                                             </p>
                                         </a>
                                     </li>
@@ -161,8 +161,8 @@ export default function TenantDashboard({
                                                 <Pill variant={intervention.priority}>{t(`interventions.priority.${intervention.priority}`)}</Pill>
                                             </p>
                                             <p className="text-sm">
-                                                ({intervention.interventionable.reference_code}) - {t(`interventions.status.${intervention.status}`)}{' '}
-                                                - {intervention.intervention_type.label}
+                                                ({intervention.interventionable.reference_code}) - {t(`common.status.${intervention.status}`)} -{' '}
+                                                {intervention.intervention_type.label}
                                             </p>
                                         </a>
                                     </li>

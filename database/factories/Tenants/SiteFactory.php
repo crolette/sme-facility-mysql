@@ -48,6 +48,7 @@ class SiteFactory extends Factory
             );
         });
     }
+
     public function configure()
     {
         return $this->afterCreating(

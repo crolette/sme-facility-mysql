@@ -75,5 +75,8 @@ return [
         'cancelled' => 'Abgebrochen',
         'active' => 'Aktiv',
         'expired' => 'Abgelaufen',
+        'open' => 'Offen',
+        'ongoing' => 'In Bearbeitung',
+        'closed' => 'Geschlossen',
     ],
 ];

@@ -23,9 +23,12 @@ class InterventionActionFactory extends Factory
      */
     public function definition(): array
     {
-        $actionType = CategoryType::factory()->create(['category' => 'action']);
+        $category = CategoryType::where('category', 'action')->first();
+        if (!$category)
+            $category = CategoryType::factory()->create(['category' => 'action']);
+
         return [
-            'action_type_id' => $actionType->id,
+            'action_type_id' => $category->id,
             'description' => fake()->paragraph(),
             'intervention_date' => Carbon::now(),
             'started_at' => '13:58',

@@ -75,5 +75,8 @@ return [
         'in_progress' => 'In progress',
         'waiting_parts' => 'Waiting for parts',
         'completed' => 'Completed',
+        'open' => 'Open',
+        'ongoing' => 'Ongoing',
+        'closed' => 'Closed',
     ],
 ];
