@@ -31,6 +31,7 @@ class UserController extends Controller
             'role' => 'nullable|in:admin,manager'
         ]);
 
+        // dd(User::with('roles:id,name', 'provider:id,name')->get());
 
         $validatedFields = $validator->validated();
 

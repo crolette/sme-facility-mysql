@@ -44,7 +44,7 @@ class ProviderFactory extends Factory
     public function configure()
 
     {
-        $category = CategoryType::factory()->create(['category' => 'provider']);
+        $category = CategoryType::where('category', 'provider')->first();
 
         return $this->afterCreating(
 

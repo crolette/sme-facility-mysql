@@ -2,15 +2,22 @@
 
 namespace Database\Seeders\tenant\demo;
 
-use App\Enums\MaintenanceFrequency;
 use Carbon\Carbon;
 use App\Models\LocationType;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Tenants\User;
+// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Tenants\Asset;
+use App\Enums\NoticePeriodEnum;
 use App\Services\QRCodeService;
 use Illuminate\Database\Seeder;
+use App\Enums\ContractTypesEnum;
+use App\Models\Tenants\Contract;
+use App\Models\Tenants\Provider;
+use App\Enums\ContractStatusEnum;
+use App\Enums\ContractDurationEnum;
+use App\Enums\MaintenanceFrequency;
 use App\Models\Central\CategoryType;
+use App\Enums\ContractRenewalTypesEnum;
 
 class VehicleDemoSeeder extends Seeder
 {
@@ -92,5 +99,27 @@ class VehicleDemoSeeder extends Seeder
         );
 
         app(QRCodeService::class)->createAndAttachQR($assetVehicle);
+
+        $assetVehicle->refresh();
+        $assetVehicle->maintainable->providers()->sync([Provider::where('name', 'Garage de l\'automobile')->first()->id]);
+
+        $provider = Provider::where('name', 'Garage de l\'automobile')->first();
+        $contract = Contract::factory()->create([
+            'provider_id' => $provider->id,
+            'name' => 'Leasing Skoda 2024-2026',
+            'type' => ContractTypesEnum::ALLIN->value,
+            'internal_reference' => 'LEASE_SKODA',
+            'provider_reference' => fake()->randomLetter() . fake()->randomNumber(4, true),
+            'start_date' => Carbon::now()->subYear(),
+            'contract_duration' => ContractDurationEnum::ONE_YEAR->value,
+            'end_date' => ContractDurationEnum::ONE_YEAR->addTo(Carbon::now()->subYear()),
+            'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
+            'notice_date' => NoticePeriodEnum::FOURTEEN_DAYS->addTo(ContractDurationEnum::ONE_YEAR->addTo(Carbon::now()->subYear())),
+            'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC,
+            'status' => ContractStatusEnum::ACTIVE,
+            'notes' => 'Leasing pour toutes les Skoda',
+        ]);
+
+        $assetVehicle->contracts()->attach($contract);
     }
 }
