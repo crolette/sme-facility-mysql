@@ -32,7 +32,7 @@ beforeEach(function () {
     CategoryType::factory()->count(2)->create(['category' => 'document']);
     $this->categoryTypeAsset = CategoryType::factory()->create(['category' => 'asset']);
     Site::factory()->withMaintainableData()->create();
-    Building::factory()->create();
+    Building::factory()->withMaintainableData()->create();
     $this->floor = Floor::factory()->withMaintainableData()->create();
     $this->room = Room::factory()->withMaintainableData()->create();
 

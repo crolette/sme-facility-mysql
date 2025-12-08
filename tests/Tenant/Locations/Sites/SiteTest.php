@@ -280,7 +280,7 @@ it('can delete a site and deletes directory', function () {
 it('cannot delete a site which has buildings', function () {
     LocationType::factory()->create(['level' => 'building']);
     $site = Site::factory()->withMaintainableData()->create();
-    Building::factory()->create();
+    Building::factory()->withMaintainableData()->create();
 
     $response = $this->deleteFromTenant('api.sites.destroy', $site->reference_code);
     $response->assertStatus(409);
@@ -290,7 +290,7 @@ it('cannot delete a site which has related buildings and related floors', functi
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
     $site = Site::factory()->withMaintainableData()->create();
-    Building::factory()->create();
+    Building::factory()->withMaintainableData()->create();
     Floor::factory()->withMaintainableData()->count(3)->create();
 
     assertDatabaseCount('sites', 1);

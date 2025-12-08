@@ -31,7 +31,7 @@ beforeEach(function () {
     $this->securityCat = CategoryType::factory()->create(['category' => 'asset', 'slug' => 'Security']);
     $this->furnitureCat = CategoryType::factory()->create(['category' => 'asset', 'slug' => 'Furniture']);
     $this->site = Site::factory()->withMaintainableData()->create();
-    $this->building = Building::factory()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
     $this->floor = Floor::factory()->withMaintainableData()->create();
     $this->room = Room::factory()->withMaintainableData()->create();
     $this->provider = Provider::factory()->create();

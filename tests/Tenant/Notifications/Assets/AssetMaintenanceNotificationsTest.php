@@ -35,7 +35,7 @@ beforeEach(function () {
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
 
     $this->site = Site::factory()->withMaintainableData()->create();
-    Building::factory()->create();
+    Building::factory()->withMaintainableData()->create();
     Floor::factory()->withMaintainableData()->create();
     $this->provider = Provider::factory()->create();
 

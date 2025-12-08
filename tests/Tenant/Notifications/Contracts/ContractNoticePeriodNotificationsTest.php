@@ -38,7 +38,7 @@ beforeEach(function () {
 
     $this->provider = Provider::factory()->create();
     $this->site = Site::factory()->withMaintainableData()->create();
-    $this->building = Building::factory()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
     $this->floor = Floor::factory()->withMaintainableData()->create();
     $this->room = Room::factory()->withMaintainableData()->create();
     $this->asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();

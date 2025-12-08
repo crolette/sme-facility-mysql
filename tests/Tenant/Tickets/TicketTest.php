@@ -27,7 +27,7 @@ beforeEach(function () {
     CategoryType::factory()->create(['category' => 'action']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
     $this->site = Site::factory()->withMaintainableData()->create();
-    $this->building = Building::factory()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
     $this->floor = Floor::factory()->withMaintainableData()->create();
 
     $this->room = Room::factory()->withMaintainableData()->create();

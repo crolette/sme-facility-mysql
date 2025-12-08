@@ -34,7 +34,7 @@ beforeEach(function () {
     $this->manager = User::factory()->withRole('Maintenance Manager')->create();
 
     $this->site = Site::factory()->withMaintainableData()->create();
-    $this->building = Building::factory()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
     $this->floor = Floor::factory()->withMaintainableData()->create();
     $this->provider = Provider::factory()->create();
 

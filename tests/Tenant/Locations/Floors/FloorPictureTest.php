@@ -29,7 +29,7 @@ beforeEach(function () {
     LocationType::factory()->create(['level' => 'building']);
     $this->locationType = LocationType::factory()->create(['level' => 'floor']);
     Site::factory()->withMaintainableData()->create();
-    $this->building = Building::factory()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
     $this->location = Floor::factory()->withMaintainableData()->create();
 });
 

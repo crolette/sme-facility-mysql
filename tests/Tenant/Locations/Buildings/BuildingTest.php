@@ -298,7 +298,7 @@ it('can render the show building page', function () {
     LocationType::factory()->count(3)->create(['level' => 'site']);
     LocationType::factory()->count(3)->create(['level' => 'building']);
     Site::factory()->withMaintainableData()->create();
-    $building = Building::factory()->create();
+    $building = Building::factory()->withMaintainableData()->create();
 
     $response = $this->getFromTenant('tenant.buildings.show', $building);
     $response->assertOk();
@@ -318,7 +318,7 @@ it('can render the update building page', function () {
     LocationType::factory()->count(3)->create(['level' => 'site']);
     LocationType::factory()->count(3)->create(['level' => 'building']);
     Site::factory()->withMaintainableData()->create();
-    $building = Building::factory()->create();
+    $building = Building::factory()->withMaintainableData()->create();
 
     $response = $this->getFromTenant('tenant.buildings.edit', $building);
     $response->assertOk();
@@ -337,7 +337,7 @@ it('can render the update building page', function () {
 it('can update a building', function () {
     $level = LocationType::factory()->create(['level' => 'site']);
     $site = Site::factory()->withMaintainableData()->create();
-    $building = Building::factory()->create();
+    $building = Building::factory()->withMaintainableData()->create();
     $buildingType = LocationType::where('level', 'building')->first();
     $wallMaterial = CategoryType::factory()->create(['category' => 'wall_materials']);
     $floorMaterial = CategoryType::factory()->create(['category' => 'floor_materials']);
@@ -391,7 +391,7 @@ it('cannot update a building type of an existing building', function () {
     LocationType::factory()->count(2)->create(['level' => 'site']);
     LocationType::factory()->count(2)->create(['level' => 'building']);
     Site::factory()->withMaintainableData()->count(2)->create();
-    $building = Building::factory()->create();
+    $building = Building::factory()->withMaintainableData()->create();
 
     $formData = [
         'name' => 'New building updated',
@@ -410,7 +410,7 @@ it('can delete a building', function () {
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
     $site = Site::factory()->withMaintainableData()->create();
-    $building = Building::factory()->create();
+    $building = Building::factory()->withMaintainableData()->create();
 
     assertDatabaseHas('buildings', [
         'level_id' => $site->id,
@@ -440,7 +440,7 @@ it('cannot delete a building which has related floors', function () {
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
     $site = Site::factory()->withMaintainableData()->create();
-    $building = Building::factory()->create();
+    $building = Building::factory()->withMaintainableData()->create();
     Floor::factory()->withMaintainableData()->count(2)->create();
 
     assertDatabaseHas('buildings', [
@@ -463,7 +463,7 @@ it('can update name and description of a document from a building ', function ()
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
     Site::factory()->withMaintainableData()->create();
-    $building = Building::factory()->create();
+    $building = Building::factory()->withMaintainableData()->create();
 
     $document = Document::factory()->withCustomAttributes([
         'user' => $this->user,
@@ -497,7 +497,7 @@ it('can add pictures to a building', function () {
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
     Site::factory()->withMaintainableData()->create();
-    $building = Building::factory()->create();
+    $building = Building::factory()->withMaintainableData()->create();
 
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->image('test.jpg');
@@ -524,7 +524,7 @@ it('can retrieve all pictures from a building', function () {
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
     Site::factory()->withMaintainableData()->create();
-    $building = Building::factory()->create();
+    $building = Building::factory()->withMaintainableData()->create();
 
     Picture::factory()->forModelAndUser($building, $this->user, 'buildings')->create();
     Picture::factory()->forModelAndUser($building, $this->user, 'buildings')->create();
@@ -542,7 +542,7 @@ it('can retrieve all assets from a building', function () {
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
     Site::factory()->withMaintainableData()->create();
-    $building = Building::factory()->create();
+    $building = Building::factory()->withMaintainableData()->create();
 
     CategoryType::factory()->create(['category' => 'asset']);
     Asset::factory()->withMaintainableData()->forLocation($building)->create();

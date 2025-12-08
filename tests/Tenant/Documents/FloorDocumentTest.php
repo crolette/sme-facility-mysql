@@ -29,7 +29,7 @@ beforeEach(function () {
     $this->actingAs($this->user, 'tenant');
 
     Site::factory()->withMaintainableData()->create();
-    $this->building = Building::factory()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
     $this->location = Floor::factory()->withMaintainableData()->create();
 });
 

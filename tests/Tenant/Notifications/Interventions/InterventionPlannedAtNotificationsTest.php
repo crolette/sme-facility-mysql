@@ -47,7 +47,7 @@ beforeEach(function () {
     $this->interventionActionType = CategoryType::factory()->create(['category' => 'action']);
 
     $this->site = Site::factory()->withMaintainableData()->create();
-    Building::factory()->create();
+    Building::factory()->withMaintainableData()->create();
     Floor::factory()->withMaintainableData()->create();
     $this->provider = Provider::factory()->create();
 

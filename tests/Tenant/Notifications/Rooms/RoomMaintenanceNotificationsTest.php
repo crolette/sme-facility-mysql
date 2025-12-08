@@ -24,7 +24,7 @@ beforeEach(function () {
     $this->actingAs($this->admin, 'tenant');
     $this->roomType = LocationType::factory()->create(['level' => 'room']);
     $this->site = Site::factory()->withMaintainableData()->create();
-    $this->building = Building::factory()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
     $this->floor = Floor::factory()->withMaintainableData()->create();
 
     $this->basicLocationData = [
