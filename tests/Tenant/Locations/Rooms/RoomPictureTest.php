@@ -30,10 +30,10 @@ beforeEach(function () {
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
     $this->locationType = LocationType::factory()->create(['level' => 'room']);
-    Site::factory()->create();
+    Site::factory()->withMaintainableData()->create();
     Building::factory()->create();
-    $this->floor = Floor::factory()->create();
-    $this->location = Room::factory()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
+    $this->location = Room::factory()->withMaintainableData()->create();
 });
 
 it('can add pictures to a room', function () {

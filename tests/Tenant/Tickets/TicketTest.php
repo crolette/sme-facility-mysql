@@ -26,13 +26,13 @@ beforeEach(function () {
     $this->interventionType = CategoryType::factory()->create(['category' => 'intervention']);
     CategoryType::factory()->create(['category' => 'action']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
     $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
 
-    $this->room = Room::factory()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
-    $this->asset =  Asset::factory()->forLocation($this->room)->create();
+    $this->asset =  Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 });
 
 it('can render the index tickets page', function () {

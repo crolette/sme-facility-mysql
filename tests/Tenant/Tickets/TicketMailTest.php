@@ -32,20 +32,19 @@ beforeEach(function () {
     CategoryType::factory()->count(2)->create(['category' => 'document']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
     CategoryType::factory()->count(2)->create(['category' => 'asset']);
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
     $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
 
-    $this->room = Room::factory()
+    $this->room = Room::factory()->withMaintainableData()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
 
-    $this->asset =  Asset::factory()->forLocation($this->room)->create();
-    
+    $this->asset =  Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 });
 
-it('sends an email when a new ticket is created for location without maintenance manager', function() {
+it('sends an email when a new ticket is created for location without maintenance manager', function () {
 
     // $this->floor->maintainable->manager()
 
@@ -92,7 +91,7 @@ it('sends an email when a new ticket is created for location with maintenance ma
     });
 });
 
-it('send an email to the notifier when a ticket is closed and the notifier wanted to be notified', function() {
+it('send an email to the notifier when a ticket is closed and the notifier wanted to be notified', function () {
 
     $formData = [
         'status' => TicketStatus::OPEN->value,
@@ -109,5 +108,4 @@ it('send an email to the notifier when a ticket is closed and the notifier wante
     Mail::assertSent(TicketClosedMail::class, function ($mail) {
         return $mail->hasTo('test@test.com');
     });
-
 });

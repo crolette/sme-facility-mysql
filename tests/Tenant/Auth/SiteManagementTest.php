@@ -25,7 +25,7 @@ use function Pest\Laravel\assertDatabaseMissing;
 beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
 
     $this->formData = [
         'name' => 'New site',

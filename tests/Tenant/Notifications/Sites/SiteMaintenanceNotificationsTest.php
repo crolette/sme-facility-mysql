@@ -160,7 +160,7 @@ it('creates next_maintenance_date notification when next/last_maintenance_date a
 
 it('updates next_maintenance_date notification when updating next_maintenance_date of the location manually', function ($frequency) {
 
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
 
     $formData = [
         ...$this->basicLocationData,
@@ -298,7 +298,7 @@ it('creates a notification if next_maintenance_date is > today even if the sched
 
 it('updates notification when updating next_maintenance_date of the location and scheduled_at will be in the past', function ($frequency) {
 
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
 
     $formData = [
         ...$this->basicLocationData,
@@ -355,7 +355,7 @@ it('updates notification when updating next_maintenance_date of the location and
 
 it('creates notification when the scheduled_at notification was previously in the past', function ($frequency) {
 
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
 
     $formData = [
         ...$this->basicLocationData,
@@ -414,7 +414,7 @@ it('creates notification when the scheduled_at notification was previously in th
 
 it('creates notification when need_maintenance passes from false to true', function ($frequency) {
 
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
 
     assertDatabaseCount('scheduled_notifications', 0);
 
@@ -971,7 +971,7 @@ it('creates notification when maintenance_frequency changes from ONDEMAND to ano
 
 it('creates next_maintenance_date notifications for a new created user with admin role', function ($frequency) {
 
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
 
     $location->maintainable()->update([
         'maintenance_frequency' => $frequency,
@@ -1008,7 +1008,7 @@ it('creates next_maintenance_date notifications for a new created user with admi
 
 it('creates next_maintenance_date notifications when the role of a maintenance manager changes to admin', function ($frequency) {
 
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
 
     $location->maintainable()->update([
         'maintenance_frequency' => $frequency,
@@ -1067,7 +1067,7 @@ it('creates next_maintenance_date notifications when the role of a maintenance m
 })->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('deletes next_maintenance_date notifications when the role of an admin changes to maintenance manager', function ($frequency) {
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
 
     $location->maintainable()->update([
         'maintenance_frequency' => $frequency,
@@ -1126,7 +1126,7 @@ it('deletes next_maintenance_date notifications when the role of an admin change
 })->with(array_values(array_diff(array_column(MaintenanceFrequency::cases(), 'value'), ['on_demand'])));
 
 it('deletes next_maintenance_date notifications when the role of an admin changes to maintenance manager for sites only where he is not maintenance manager', function ($frequency) {
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
 
     $location->maintainable()->update([
         'maintenance_frequency' => $frequency,
@@ -1135,7 +1135,7 @@ it('deletes next_maintenance_date notifications when the role of an admin change
         'next_maintenance_date' => Carbon::now()->addDays(MaintenanceFrequency::from($frequency)->days())->toDateString(),
     ]);
 
-    $locationWithoutManager = Site::factory()->create();
+    $locationWithoutManager = Site::factory()->withMaintainableData()->create();
 
     $locationWithoutManager->maintainable()->update([
         'maintenance_frequency' => $frequency,
@@ -1222,7 +1222,7 @@ it('deletes next_maintenance_date notifications when the role of an admin change
 
 it('deletes next_maintenance_date notifications when a user is deleted', function ($frequency) {
 
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
 
     $location->maintainable()->update([
         'maintenance_frequency' => $frequency,

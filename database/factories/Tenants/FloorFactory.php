@@ -20,10 +20,10 @@ class FloorFactory extends Factory
      */
     public function definition(): array
     {
-        $locationType = LocationType::where('level', 'floor')->where('prefix', 'L')->first();
+        $locationType = LocationType::where('level', 'floor')->first();
 
         if (!$locationType)
-            $locationType = LocationType::factory()->create(['level' => 'floor', 'prefix' => 'L']);
+            $locationType = LocationType::factory()->create(['level' => 'floor']);
 
         $building = Building::first();
 
@@ -33,6 +33,20 @@ class FloorFactory extends Factory
             'location_type_id' => $locationType->id,
             'level_id' => $building->id
         ];
+    }
+
+    public function withMaintainableData(array $data = [])
+    {
+        return $this->afterCreating(function (Floor $floor) use ($data) {
+            $maintainableData = array_merge([
+                'name' => fake()->text(20),
+                'description' => fake()->sentence(6),
+            ], $data);
+
+            $floor->maintainable()->save(
+                Maintainable::factory()->make($maintainableData)
+            );
+        });
     }
 
     public function configure()
@@ -53,10 +67,6 @@ class FloorFactory extends Factory
                     'reference_code' => $referenceCode,
                     'code' => $code,
                 ]);
-
-                $floor->maintainable()->save(
-                    Maintainable::factory()->make()
-                );
             }
         );
     }

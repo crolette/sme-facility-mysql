@@ -46,14 +46,14 @@ beforeEach(function () {
     $this->interventionType = CategoryType::factory()->create(['category' => 'intervention']);
     $this->interventionActionType = CategoryType::factory()->create(['category' => 'action']);
 
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
     Building::factory()->create();
-    Floor::factory()->create();
+    Floor::factory()->withMaintainableData()->create();
     $this->provider = Provider::factory()->create();
 
-    $this->room = Room::factory()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
-    $this->asset = Asset::factory()->forLocation($this->room)->create();
+    $this->asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 });
 
 it('creates a user preference "planned_at" notification when user (admin) is created', function () {

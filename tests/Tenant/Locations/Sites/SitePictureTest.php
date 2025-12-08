@@ -32,7 +32,7 @@ beforeEach(function () {
 
 it('can add pictures to a site and increments disk size', function () {
     Queue::fake();
-    $site = Site::factory()->create();
+    $site = Site::factory()->withMaintainableData()->create();
     $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
     $file2 = UploadedFile::fake()->image('test.jpg')->size(1200);
 
@@ -60,7 +60,7 @@ it('can add pictures to a site and increments disk size', function () {
 });
 
 it('can retrieve all pictures from a site', function () {
-    $site = Site::factory()->create();
+    $site = Site::factory()->withMaintainableData()->create();
 
     Picture::factory()->forModelAndUser($site, $this->user, 'sites')->create();
     Picture::factory()->forModelAndUser($site, $this->user, 'sites')->create();
@@ -74,7 +74,7 @@ it('can retrieve all pictures from a site', function () {
 it('deletes directory and pictures if a site is deleted', function () {
 
     Queue::fake();
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
     $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
     $file2 = UploadedFile::fake()->image('test.jpg')->size(1200);
 
@@ -106,7 +106,7 @@ it('deletes directory and pictures if a site is deleted', function () {
 
 it('can delete a picture from a site and decrement disk size', function () {
     Queue::fake();
-    $site = Site::factory()->create();
+    $site = Site::factory()->withMaintainableData()->create();
     $file1 = UploadedFile::fake()->image('avatar.png')->size(1100);
     $file2 = UploadedFile::fake()->image('test.jpg')->size(1100);
 
@@ -155,7 +155,7 @@ it('can delete a picture from a site and decrement disk size', function () {
 
 it('deletes picture directory if directory is empty', function () {
 
-    $site = Site::factory()->create();
+    $site = Site::factory()->withMaintainableData()->create();
     $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
 
     $formData = [
@@ -189,7 +189,7 @@ it('deletes picture directory if directory is empty', function () {
 
 it('does not delete picture directory if directory is not empty', function () {
     Queue::fake();
-    $site = Site::factory()->create();
+    $site = Site::factory()->withMaintainableData()->create();
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->image('test.jpg');
 

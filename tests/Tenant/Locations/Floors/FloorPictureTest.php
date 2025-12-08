@@ -28,9 +28,9 @@ beforeEach(function () {
     LocationType::factory()->create(['level' => 'site']);
     LocationType::factory()->create(['level' => 'building']);
     $this->locationType = LocationType::factory()->create(['level' => 'floor']);
-    Site::factory()->create();
+    Site::factory()->withMaintainableData()->create();
     $this->building = Building::factory()->create();
-    $this->location = Floor::factory()->create();
+    $this->location = Floor::factory()->withMaintainableData()->create();
 });
 
 it('can add pictures to a floor', function () {

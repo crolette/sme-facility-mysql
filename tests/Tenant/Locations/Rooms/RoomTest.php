@@ -26,15 +26,15 @@ use function PHPUnit\Framework\assertNull;
 beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
     $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
 });
 
 
 it('can render the index rooms page', function () {
-    $room = Room::factory()->create();
-    Room::factory()->create();
+    $room = Room::factory()->withMaintainableData()->create();
+    Room::factory()->withMaintainableData()->create();
 
     $response = $this->getFromTenant('tenant.rooms.index');
     $response->assertOk();
@@ -51,7 +51,7 @@ it('can render the index rooms page', function () {
 
 it('can render the create room page', function () {
     LocationType::factory()->create(['level' => 'room']);
-    Floor::factory()->count(3)->create();
+    Floor::factory()->withMaintainableData()->count(3)->create();
 
     $response = $this->getFromTenant('tenant.rooms.create');
     $response->assertOk();
@@ -229,7 +229,7 @@ it('can upload several files to site', function () {
 
 it('can render the show room page', function () {
 
-    $room = Room::factory()->create();
+    $room = Room::factory()->withMaintainableData()->create();
 
     $response = $this->getFromTenant('tenant.rooms.show', $room);
     $response->assertOk();
@@ -248,8 +248,8 @@ it('can render the show room page', function () {
 
 it('can render the update room page', function () {
     LocationType::factory()->count(2)->create(['level' => 'room']);
-    Floor::factory()->count(2)->create();
-    $room = Room::factory()
+    Floor::factory()->withMaintainableData()->count(2)->create();
+    $room = Room::factory()->withMaintainableData()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
@@ -272,7 +272,7 @@ it('can render the update room page', function () {
 it('can update a room maintainable', function () {
     $wallMaterial = CategoryType::factory()->create(['category' => 'wall_materials']);
     $floorMaterial = CategoryType::factory()->create(['category' => 'floor_materials']);
-    $room = Room::factory()->create();
+    $room = Room::factory()->withMaintainableData()->create();
     $locationType = LocationType::where('level', 'room')->first();
 
     $oldName = $room->maintainable->name;
@@ -324,8 +324,8 @@ it('can update a room maintainable', function () {
 it('cannot update a room type of an existing room', function () {
 
     LocationType::factory()->count(2)->create(['level' => 'room']);
-    $floor = Floor::factory()->create();
-    $room = Room::factory()
+    $floor = Floor::factory()->withMaintainableData()->create();
+    $room = Room::factory()->withMaintainableData()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
@@ -348,7 +348,7 @@ it('cannot update a room type of an existing room', function () {
 
 
 it('can delete a room and his maintainable', function () {
-    $room = Room::factory()->create();
+    $room = Room::factory()->withMaintainableData()->create();
 
     assertDatabaseHas('rooms', [
         'level_id' => $this->floor->id,
@@ -375,7 +375,7 @@ it('can delete a room and his maintainable', function () {
 });
 
 it('can update name and description of a document from a site ', function () {
-    $room = Room::factory()->create();
+    $room = Room::factory()->withMaintainableData()->create();
 
     $document = Document::factory()->withCustomAttributes([
         'user' => $this->user,
@@ -410,7 +410,7 @@ it('can upload a document to an existing room', function () {
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
     $locationType = LocationType::factory()->create(['level' => 'site']);
     CategoryType::factory()->count(2)->create(['category' => 'document']);
-    $room = Room::factory()->create();
+    $room = Room::factory()->withMaintainableData()->create();
     $categoryType = CategoryType::where('category', 'document')->first();
 
     $formData = [
@@ -450,7 +450,7 @@ it('can upload a document to an existing room', function () {
 });
 
 it('can add pictures to a room', function () {
-    $room = Room::factory()->create();
+    $room = Room::factory()->withMaintainableData()->create();
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->image('test.jpg');
 
@@ -473,7 +473,7 @@ it('can add pictures to a room', function () {
 });
 
 it('can retrieve all pictures from a room', function () {
-    $room = Room::factory()->create();
+    $room = Room::factory()->withMaintainableData()->create();
 
     Picture::factory()->forModelAndUser($room, $this->user, 'rooms')->create();
     Picture::factory()->forModelAndUser($room, $this->user, 'rooms')->create();
@@ -486,12 +486,12 @@ it('can retrieve all pictures from a room', function () {
 });
 
 it('can retrieve all assets from a room', function () {
-    $room = Room::factory()->create();
+    $room = Room::factory()->withMaintainableData()->create();
 
     CategoryType::factory()->create(['category' => 'asset']);
 
-    Asset::factory()->forLocation($room)->create();
-    Asset::factory()->forLocation($room)->create();
+    Asset::factory()->withMaintainableData()->forLocation($room)->create();
+    Asset::factory()->withMaintainableData()->forLocation($room)->create();
 
     $response = $this->getFromTenant('api.rooms.assets', $room);
     $response->assertStatus(200)->assertJson([
@@ -501,15 +501,15 @@ it('can retrieve all assets from a room', function () {
 });
 
 it('can change location type of a room and related assets', function () {
-    $roomOne = Room::factory()->create();
+    $roomOne = Room::factory()->withMaintainableData()->create();
 
-    $roomTwo = Room::factory()->create();
+    $roomTwo = Room::factory()->withMaintainableData()->create();
 
     CategoryType::factory()->create(['category' => 'asset']);
-    $assetOne = Asset::factory()->forLocation($roomTwo)->create();
-    $assetTwo = Asset::factory()->forLocation($roomOne)->create();
-    $assetThree = Asset::factory()->forLocation($roomOne)->create();
-    $assetFour = Asset::factory()->forLocation($roomOne)->create();
+    $assetOne = Asset::factory()->withMaintainableData()->forLocation($roomTwo)->create();
+    $assetTwo = Asset::factory()->withMaintainableData()->forLocation($roomOne)->create();
+    $assetThree = Asset::factory()->withMaintainableData()->forLocation($roomOne)->create();
+    $assetFour = Asset::factory()->withMaintainableData()->forLocation($roomOne)->create();
 
     $newLocationType = LocationType::factory()->create(['level' => 'room']);
     $newLocationType = LocationType::factory()->create(['level' => 'room']);

@@ -176,7 +176,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                         {activeTab === 'information' && (
                             <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                                 <h2>{t('common.information')}</h2>
-                                <div className="grid grid-cols-1 gap-4">
+                                <div className="grid grid-cols-[1fr_160px] gap-4">
                                     <div className="space-y-2">
                                         <Field label={t('common.name')} text={asset.name} />
                                         <Field label={t('common.category')} text={asset.category} />

@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
-            $table->string('code');
-            $table->string('reference_code')->unique();
+            $table->string('code')->nullable();
+            $table->string('reference_code')->unique()->nullable();
             $table->unsignedBigInteger('level_id')->nullable();
             $table->unsignedBigInteger('location_type_id');
             $table->timestamps();

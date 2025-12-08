@@ -29,10 +29,10 @@ beforeEach(function () {
     $this->manager = User::factory()->withRole('Maintenance Manager')->create();
 
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
     $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
-    $this->room = Room::factory()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 });
 
 
@@ -76,7 +76,7 @@ it('can create an asset with uploaded pictures and increment disk size', functio
 
 it('can add pictures to an asset', function () {
     Queue::fake();
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
     $file2 = UploadedFile::fake()->image('test.jpg')->size(1000);
 
@@ -105,7 +105,7 @@ it('can add pictures to an asset', function () {
 });
 
 it('does not delete pictures when asset is soft deleted', function () {
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
     $file2 = UploadedFile::fake()->image('test.jpg')->size(1000);
 
@@ -139,7 +139,7 @@ it('does not delete pictures when asset is soft deleted', function () {
 
 it('deletes pictures and directory when asset is force deleted', function () {
     Queue::fake();
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
     $file2 = UploadedFile::fake()->image('test.jpg')->size(1000);
 

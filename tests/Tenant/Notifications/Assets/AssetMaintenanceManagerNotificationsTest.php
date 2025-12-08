@@ -37,12 +37,12 @@ beforeEach(function () {
     CategoryType::factory()->create(['category' => 'provider']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
 
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
     Building::factory()->create();
-    Floor::factory()->create();
+    Floor::factory()->withMaintainableData()->create();
     $this->provider = Provider::factory()->create();
 
-    $this->room = Room::factory()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
     $this->basicAssetData = [
         'name' => 'New asset',

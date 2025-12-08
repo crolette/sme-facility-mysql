@@ -30,10 +30,10 @@ beforeEach(function () {
     CategoryType::factory()->count(2)->create(['category' => 'provider']);
     $this->securityCat = CategoryType::factory()->create(['category' => 'asset', 'slug' => 'Security']);
     $this->furnitureCat = CategoryType::factory()->create(['category' => 'asset', 'slug' => 'Furniture']);
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
     $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
-    $this->room = Room::factory()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
     $this->provider = Provider::factory()->create();
 });
 
@@ -264,11 +264,11 @@ it('fails when the name of the file does not contain users', function () {
 
 it('can update location of assets', function () {
 
-    Asset::factory()->forLocation($this->site)->create();
-    Asset::factory()->forLocation($this->building)->create();
-    Asset::factory()->forLocation($this->floor)->create();
-    Asset::factory()->forLocation($this->room)->create();
-    Asset::factory()->forLocation($this->manager)->create(['is_mobile' => true]);
+    Asset::factory()->withMaintainableData()->forLocation($this->site)->create();
+    Asset::factory()->withMaintainableData()->forLocation($this->building)->create();
+    Asset::factory()->withMaintainableData()->forLocation($this->floor)->create();
+    Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
+    Asset::factory()->withMaintainableData()->forLocation($this->manager)->create(['is_mobile' => true]);
 
     Storage::fake('local');
 
@@ -329,11 +329,11 @@ it('can update location of assets', function () {
 
 it('can update maintainable & information of assets', function () {
 
-    Asset::factory()->forLocation($this->site)->create();
-    Asset::factory()->forLocation($this->building)->create();
-    Asset::factory()->forLocation($this->floor)->create();
-    Asset::factory()->forLocation($this->room)->create();
-    Asset::factory()->forLocation($this->manager)->create(['is_mobile' => true]);
+    Asset::factory()->withMaintainableData()->forLocation($this->site)->create();
+    Asset::factory()->withMaintainableData()->forLocation($this->building)->create();
+    Asset::factory()->withMaintainableData()->forLocation($this->floor)->create();
+    Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
+    Asset::factory()->withMaintainableData()->forLocation($this->manager)->create(['is_mobile' => true]);
 
     Storage::fake('local');
 

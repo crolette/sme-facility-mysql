@@ -38,16 +38,16 @@ beforeEach(function () {
     CategoryType::factory()->create(['category' => 'document']);
     CategoryType::factory()->create(['category' => 'asset']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'provider']);
-    Site::factory()->create();
+    Site::factory()->withMaintainableData()->create();
     Building::factory()->create();
-    Floor::factory()->create();
+    Floor::factory()->withMaintainableData()->create();
 
-    $this->room = Room::factory()
+    $this->room = Room::factory()->withMaintainableData()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
 
-    $this->asset = Asset::factory()->forLocation($this->room)->create();
+    $this->asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $this->provider = Provider::factory()->create();
     $this->contract = Contract::factory()->create();
 

@@ -28,18 +28,18 @@ beforeEach(function () {
 
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
     CategoryType::factory()->count(2)->create(['category' => 'asset']);
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
     $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
-    $this->room = Room::factory()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 });
 
 // it('can render the index assets page', function () {
 
-//     $asset = Asset::factory()->forLocation($this->site)->create();
-//     Asset::factory()->forLocation($this->building)->create();
-//     Asset::factory()->forLocation($this->floor)->create();
-//     Asset::factory()->forLocation($this->room)->create();
+//     $asset = Asset::factory()->withMaintainableData()->forLocation($this->site)->create();
+//     Asset::factory()->withMaintainableData()->forLocation($this->building)->create();
+//     Asset::factory()->withMaintainableData()->forLocation($this->floor)->create();
+//     Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
 //     $response = $this->getFromTenant('tenant.assets.index');
 //     $response->assertOk();
@@ -327,7 +327,7 @@ beforeEach(function () {
 
 // it('can show the asset page', function () {
 
-//     $asset = Asset::factory()->forLocation($this->room)->create(['category_type_id' => $this->categoryType->id]);
+//     $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create(['category_type_id' => $this->categoryType->id]);
 
 //     $asset = Asset::find($asset->id);
 
@@ -347,7 +347,7 @@ beforeEach(function () {
 
 // it('can render the update asset page', function () {
 
-//     $asset = Asset::factory()->forLocation($this->room)->create();
+//     $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
 //     $response = $this->getFromTenant('tenant.assets.edit', $asset);
 
@@ -361,7 +361,7 @@ beforeEach(function () {
 
 // it('can update asset and his maintainable', function () {
 
-//     $asset = Asset::factory()->forLocation($this->room)->create();
+//     $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 //     $asset = Asset::find($asset->id);
 
 //     $oldName = $asset->maintainable->name;
@@ -406,7 +406,7 @@ beforeEach(function () {
 
 // it('can update asset\'s location', function () {
 
-//     $asset = Asset::factory()->forLocation($this->room)->create();
+//     $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
 //     $asset = Asset::find($asset->id);
 
@@ -451,7 +451,7 @@ beforeEach(function () {
 
 // it('can soft delete an asset but kept in DB with his maintainable', function () {
 
-//     $asset = Asset::factory()->forLocation($this->room)->create();
+//     $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 //     $asset = Asset::find($asset->id);
 
 //     assertDatabaseHas('maintainables', [
@@ -479,7 +479,7 @@ beforeEach(function () {
 // });
 
 // it('can restore a soft deleted asset', function () {
-//     $asset = Asset::factory()->forLocation($this->room)->create();
+//     $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 //     $asset = Asset::find($asset->id);
 //     $response = $this->deleteFromTenant('api.assets.destroy', $asset);
 //     $response->assertStatus(200)
@@ -511,7 +511,7 @@ beforeEach(function () {
 // });
 
 // it('can force delete a soft deleted asset', function () {
-//     $asset = Asset::factory()->forLocation($this->room)->create();
+//     $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 //     $asset = Asset::find($asset->id);
 
 //     $assetName = $asset->maintainable->name;
@@ -568,7 +568,7 @@ beforeEach(function () {
 //     CategoryType::factory()->create(['category' => 'provider']);
 //     Provider::factory()->count(3)->create();
 //     $providers = Provider::all()->pluck('id');
-//     $asset = Asset::factory()->forLocation($this->room)->create();
+//     $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 //     $asset = Asset::find($asset->id);
 
 //     $formData = [

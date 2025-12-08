@@ -24,28 +24,36 @@ class RoomFactory extends Factory
      */
     public function definition(): array
     {
-        $locationType = LocationType::where('level', 'room')->where('prefix', 'R')->first();
+        $locationType = LocationType::where('level', 'room')->first();
 
         if (!$locationType)
-            $locationType = LocationType::factory()->create(['level' => 'room', 'prefix' => 'R']);
+            $locationType = LocationType::factory()->create(['level' => 'room']);
+
         $level = Floor::first();
-
-        $count = Room::where('location_type_id', $locationType->id)->count();
-
-        $codeNumber = generateCodeNumber($count + 1, $locationType->prefix, 3);
-
-        $code = $level->reference_code . '-' .  $codeNumber;
 
         return [
             'surface_floor' => fake()->numberBetween(100, 3000),
             'surface_walls' => fake()->numberBetween(100, 3000),
             'height' => fake()->numberBetween(2, 3),
-            'reference_code' => $code,
-            'code' => $codeNumber,
             'location_type_id' => $locationType->id,
             'level_id' => $level->id
         ];
     }
+
+    public function withMaintainableData(array $data = [])
+    {
+        return $this->afterCreating(function (Room $room) use ($data) {
+            $maintainableData = array_merge([
+                'name' => fake()->text(20),
+                'description' => fake()->sentence(6),
+            ], $data);
+
+            $room->maintainable()->save(
+                Maintainable::factory()->make($maintainableData)
+            );
+        });
+    }
+
 
     public function configure()
     {
@@ -53,9 +61,18 @@ class RoomFactory extends Factory
 
             function (Room $room) {
 
-                $room->maintainable()->save(
-                    Maintainable::factory()->make()
-                );
+                $location = $room->locationType;
+                $level = $room->floor;
+
+                $count = Room::where('location_type_id', $location->id)->where('id', '<', $room->id)->count();
+
+                $code = generateCodeNumber($count + 1, $location->prefix, 2);
+                $referenceCode = $level->reference_code . '-' .  $code;
+
+                $room->update([
+                    'reference_code' => $referenceCode,
+                    'code' => $code,
+                ]);
             }
         );
     }

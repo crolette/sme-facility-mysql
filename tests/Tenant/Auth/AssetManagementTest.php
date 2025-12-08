@@ -26,13 +26,13 @@ beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
     CategoryType::factory()->count(2)->create(['category' => 'document']);
     $this->categoryTypeAsset = CategoryType::factory()->create(['category' => 'asset']);
-    Site::factory()->create();
+    Site::factory()->withMaintainableData()->create();
     Building::factory()->create();
-    Floor::factory()->create();
+    Floor::factory()->withMaintainableData()->create();
 
-    $this->room = Room::factory()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
-    $this->asset = Asset::factory()->forLocation($this->room)->create();
+    $this->asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     $this->formData = [
         'name' => 'New asset',
@@ -90,7 +90,7 @@ test('test access roles to view asset with maintenance manager page', function (
     $user = User::factory()->withRole($role)->create();
     $this->actingAs($user, 'tenant');
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $asset->refresh();
 
     $asset->maintainable->manager()->associate($user->id)->save();
@@ -135,7 +135,7 @@ test('test access roles to update asset with maintenance manager page', function
     $user = User::factory()->create();
     $user->assignRole($role);
     $this->actingAs($user, 'tenant');
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     $asset->maintainable()->update(['maintenance_manager_id' => $user->id]);
 
@@ -182,7 +182,7 @@ test('test access roles to delete asset with maintenance manager', function (str
     $user->assignRole($role);
     $this->actingAs($user, 'tenant');
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     $asset->maintainable()->update(['maintenance_manager_id' => $user->id]);
 

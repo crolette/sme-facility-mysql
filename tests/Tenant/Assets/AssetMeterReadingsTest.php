@@ -30,10 +30,10 @@ beforeEach(function () {
 
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
     CategoryType::factory()->count(2)->create(['category' => 'asset']);
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
     $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
-    $this->room = Room::factory()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 });
 
 it('can create a new asset with meter readings', function ($unit) {
@@ -70,7 +70,7 @@ it('can create a new asset with meter readings', function ($unit) {
 
 it('can update the has_meter_reading of an asset', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     assertDatabaseHas(
         'assets',
@@ -112,7 +112,7 @@ it('can update the has_meter_reading of an asset', function () {
 
 it('remove the meter number and unit if has_meter_reading passes from true to false', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create(['has_meter_readings' => true, 'meter_number' => '358412326dad', 'meter_unit' => 'kWh',]);
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create(['has_meter_readings' => true, 'meter_number' => '358412326dad', 'meter_unit' => 'kWh',]);
 
     assertDatabaseHas(
         'assets',
@@ -153,7 +153,7 @@ it('remove the meter number and unit if has_meter_reading passes from true to fa
 
 it('can add a new meter reading for an asset', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     $formData = [
         'meter' => 1234.24,
@@ -176,7 +176,7 @@ it('can add a new meter reading for an asset', function () {
 
 it('can update a meter reading', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create(['has_meter_readings' => true, 'meter_number' => '358412326dad', 'meter_unit' => 'kWh',]);
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create(['has_meter_readings' => true, 'meter_number' => '358412326dad', 'meter_unit' => 'kWh',]);
 
     $meter = new MeterReading([
         'meter' => 1669.58,
@@ -210,7 +210,7 @@ it('can update a meter reading', function () {
 
 it('cannot add a new meter that is smaller than previous meter', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create(['has_meter_readings' => true, 'meter_number' => '358412326dad', 'meter_unit' => 'kWh',]);
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create(['has_meter_readings' => true, 'meter_number' => '358412326dad', 'meter_unit' => 'kWh',]);
 
     $meter = new MeterReading([
         'meter' => 1669.58,
@@ -236,7 +236,7 @@ it('cannot add a new meter that is smaller than previous meter', function () {
 
 it('can delete a meter reading', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create(['has_meter_readings' => true, 'meter_number' => '358412326dad', 'meter_unit' => 'kWh',]);
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create(['has_meter_readings' => true, 'meter_number' => '358412326dad', 'meter_unit' => 'kWh',]);
 
     $meter = new MeterReading([
         'meter' => 1669.58,

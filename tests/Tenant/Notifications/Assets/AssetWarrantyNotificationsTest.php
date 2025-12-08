@@ -32,12 +32,12 @@ beforeEach(function () {
 
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
 
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
     Building::factory()->create();
-    Floor::factory()->create();
+    Floor::factory()->withMaintainableData()->create();
     $this->provider = Provider::factory()->create();
 
-    $this->room = Room::factory()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
     $this->basicAssetData = [
         'name' => 'New asset',
@@ -618,14 +618,14 @@ it('creates warranty notification for admin when notification preference warrant
 
     $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $asset->refresh();
     $asset->maintainable->update([
         'under_warranty' => true,
         'end_warranty_date' => Carbon::tomorrow()
     ]);
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $asset->refresh();
     $asset->maintainable->update([
         'under_warranty' => true,
@@ -683,7 +683,7 @@ it('creates warranty notification for maintenance manager when notification pref
 
     $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $asset->refresh();
     $asset->maintainable->update([
         'under_warranty' => true,
@@ -693,7 +693,7 @@ it('creates warranty notification for maintenance manager when notification pref
 
     $response = $this->postToTenant('api.assets.store', $formData);
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $asset->refresh();
     $asset->maintainable->update([
         'under_warranty' => true,
@@ -760,14 +760,14 @@ it('creates warranty notification for maintenance manager when notification pref
 
 it('creates warranty notifications for a new created user with admin role and only for not soft deleted assets', function () {
 
-    $assetActive = Asset::factory()->forLocation($this->room)->create([]);
+    $assetActive = Asset::factory()->withMaintainableData()->forLocation($this->room)->create([]);
 
     $assetActive->maintainable()->update([
         'under_warranty' => true,
         'end_warranty_date' => Carbon::tomorrow(),
     ]);
 
-    $assetSoftDeleted = Asset::factory()->forLocation($this->room)->create(['deleted_at' => Carbon::now()]);
+    $assetSoftDeleted = Asset::factory()->withMaintainableData()->forLocation($this->room)->create(['deleted_at' => Carbon::now()]);
 
     $assetSoftDeleted->maintainable()->update([
         'under_warranty' => true,
@@ -814,14 +814,14 @@ it('creates warranty notifications for a new created user with admin role and on
 
 it('creates warranty notifications when the role of a maintenance manager changes to admin', function () {
 
-    $assetActive = Asset::factory()->forLocation($this->room)->create([]);
+    $assetActive = Asset::factory()->withMaintainableData()->forLocation($this->room)->create([]);
 
     $assetActive->maintainable()->update([
         'under_warranty' => true,
         'end_warranty_date' => Carbon::tomorrow(),
     ]);
 
-    $assetSoftDeleted = Asset::factory()->forLocation($this->room)->create(['deleted_at' => Carbon::now()]);
+    $assetSoftDeleted = Asset::factory()->withMaintainableData()->forLocation($this->room)->create(['deleted_at' => Carbon::now()]);
 
     $assetSoftDeleted->maintainable()->update([
         'under_warranty' => true,
@@ -902,7 +902,7 @@ it('creates warranty notifications when the role of a maintenance manager change
 });
 
 it('deletes warranty notifications when the role of an admin changes to maintenance manager', function () {
-    $assetActive = Asset::factory()->forLocation($this->room)->create([]);
+    $assetActive = Asset::factory()->withMaintainableData()->forLocation($this->room)->create([]);
 
     $assetActive->maintainable()->update([
         'under_warranty' => true,
@@ -959,14 +959,14 @@ it('deletes warranty notifications when the role of an admin changes to maintena
 });
 
 it('deletes warranty notifications when the role of an admin changes to maintenance manager for assets where he is not maintenance manager', function () {
-    $assetActive = Asset::factory()->forLocation($this->room)->create();
+    $assetActive = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     $assetActive->maintainable()->update([
         'under_warranty' => true,
         'end_warranty_date' => Carbon::tomorrow(),
     ]);
 
-    $assetWithManager = Asset::factory()->forLocation($this->room)->create();
+    $assetWithManager = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     $assetWithManager->maintainable()->update([
         'under_warranty' => true,
@@ -1051,7 +1051,7 @@ it('deletes warranty notifications when the role of an admin changes to maintena
 
 it('deletes warranty notifications when a user is deleted', function () {
 
-    $assetActive = Asset::factory()->forLocation($this->room)->create();
+    $assetActive = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     $assetActive->maintainable()->update([
         'under_warranty' => true,

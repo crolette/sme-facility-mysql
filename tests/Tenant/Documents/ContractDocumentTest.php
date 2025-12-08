@@ -43,14 +43,14 @@ beforeEach(function () {
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
     CategoryType::factory()->count(2)->create(['category' => 'provider']);
     CategoryType::factory()->count(2)->create(['category' => 'asset']);
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
     $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
     $this->provider = Provider::factory()->create();
 
-    $this->room = Room::factory()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
-    $this->asset = Asset::factory()->forLocation(Room::first())->create();
+    $this->asset = Asset::factory()->withMaintainableData()->forLocation(Room::first())->create();
     $this->contractOneData = [
         'provider_id' => $this->provider->id,
         'name' => 'Contrat de bail',

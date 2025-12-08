@@ -32,9 +32,9 @@ beforeEach(function () {
     LocationType::factory()->create(['level' => 'floor']);
     $this->locationType = LocationType::factory()->create(['level' => 'room']);
     CategoryType::factory()->create(['category' => 'document']);
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
     $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
 
     $this->formData = [
         'name' => 'New room',
@@ -73,7 +73,7 @@ it('creates a QR Code when need_qr_code is true at room\'s creation', function (
 
 
 it('can regenerate a QR Code for a room', function () {
-    $location = Room::factory()->create();
+    $location = Room::factory()->withMaintainableData()->create();
 
     $response = $this->postToTenant('api.rooms.qr.regen', [], $location->reference_code);
     $response->assertSessionHasNoErrors();

@@ -19,7 +19,7 @@ beforeEach(function () {
     $this->manager = User::factory()->withRole('Maintenance Manager')->create();
     $this->actingAs($this->admin, 'tenant');
     $this->locationType = LocationType::factory()->create(['level' => 'building']);
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
 
     $this->basicLocationData = [
         'name' => 'New building',

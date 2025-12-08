@@ -30,7 +30,7 @@ beforeEach(function () {
 
 it('can render the index sites page', function () {
 
-    Site::factory()->count(3)->create();
+    Site::factory()->withMaintainableData()->count(3)->create();
     $response = $this->getFromTenant('tenant.sites.index');
     $response->assertOk();
 
@@ -167,7 +167,7 @@ it('can create a new site with other matherials', function () {
 });
 
 it('can render the show site page', function () {
-    $site = Site::factory()->create();
+    $site = Site::factory()->withMaintainableData()->create();
 
     $response = $this->getFromTenant('tenant.sites.show', $site);
     $response->assertOk();
@@ -184,7 +184,7 @@ it('can render the show site page', function () {
 
 it('can render the update site page', function () {
     LocationType::factory()->count(2)->create(['level' => 'site']);
-    $site = Site::factory()->create();
+    $site = Site::factory()->withMaintainableData()->create();
 
     $response = $this->getFromTenant('tenant.sites.edit', $site);
     $response->assertOk();
@@ -198,7 +198,7 @@ it('can render the update site page', function () {
 });
 
 it('can update a site maintainable and his name and description', function () {
-    $site = Site::factory()->create();
+    $site = Site::factory()->withMaintainableData()->create();
 
     $oldName = $site->maintainable->name;
     $oldDescription = $site->maintainable->description;
@@ -247,7 +247,7 @@ it('can update a site maintainable and his name and description', function () {
 
 it('cannot update a site type of an existing site', function () {
     LocationType::factory()->create(['level' => 'site']);
-    $site = Site::factory()->create();
+    $site = Site::factory()->withMaintainableData()->create();
 
     $formData = [
         'name' => 'New site',
@@ -261,7 +261,7 @@ it('cannot update a site type of an existing site', function () {
 });
 
 it('can delete a site and deletes directory', function () {
-    $site = Site::factory()->create();
+    $site = Site::factory()->withMaintainableData()->create();
 
     $response = $this->deleteFromTenant('api.sites.destroy', $site->reference_code);
     $response->assertStatus(200)
@@ -279,7 +279,7 @@ it('can delete a site and deletes directory', function () {
 
 it('cannot delete a site which has buildings', function () {
     LocationType::factory()->create(['level' => 'building']);
-    $site = Site::factory()->create();
+    $site = Site::factory()->withMaintainableData()->create();
     Building::factory()->create();
 
     $response = $this->deleteFromTenant('api.sites.destroy', $site->reference_code);
@@ -289,9 +289,9 @@ it('cannot delete a site which has buildings', function () {
 it('cannot delete a site which has related buildings and related floors', function () {
     LocationType::factory()->create(['level' => 'building']);
     LocationType::factory()->create(['level' => 'floor']);
-    $site = Site::factory()->create();
+    $site = Site::factory()->withMaintainableData()->create();
     Building::factory()->create();
-    Floor::factory()->count(3)->create();
+    Floor::factory()->withMaintainableData()->count(3)->create();
 
     assertDatabaseCount('sites', 1);
     assertDatabaseCount('buildings', 1);
@@ -303,11 +303,11 @@ it('cannot delete a site which has related buildings and related floors', functi
 });
 
 it('can retrieve all assets from a site', function () {
-    $site = Site::factory()->create();
+    $site = Site::factory()->withMaintainableData()->create();
     CategoryType::factory()->create(['category' => 'asset']);
 
-    Asset::factory()->forLocation($site)->create();
-    Asset::factory()->forLocation($site)->create();
+    Asset::factory()->withMaintainableData()->forLocation($site)->create();
+    Asset::factory()->withMaintainableData()->forLocation($site)->create();
 
     $response = $this->getFromTenant('api.sites.assets', $site);
     $response->assertStatus(200);

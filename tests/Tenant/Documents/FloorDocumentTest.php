@@ -28,9 +28,9 @@ beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
 
-    Site::factory()->create();
+    Site::factory()->withMaintainableData()->create();
     $this->building = Building::factory()->create();
-    $this->location = Floor::factory()->create();
+    $this->location = Floor::factory()->withMaintainableData()->create();
 });
 
 it('can attach existing documents to room', function () {

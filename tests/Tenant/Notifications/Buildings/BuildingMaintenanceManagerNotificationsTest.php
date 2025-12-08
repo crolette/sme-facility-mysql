@@ -20,7 +20,7 @@ beforeEach(function () {
     $this->actingAs($this->admin, 'tenant');
     LocationType::factory()->create(['level' => 'site']);
     $this->buildingType = LocationType::factory()->create(['level' => 'building']);
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
 
     $this->basicLocationData = [
         'name' => 'New building',

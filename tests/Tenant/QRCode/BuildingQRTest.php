@@ -26,7 +26,7 @@ beforeEach(function () {
     $this->actingAs($this->user, 'tenant');
     LocationType::factory()->create(['level' => 'site']);
     $this->locationType = LocationType::factory()->create(['level' => 'building']);
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
 
 
     $this->formData = [

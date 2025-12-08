@@ -29,15 +29,15 @@ beforeEach(function () {
 
     CategoryType::factory()->count(2)->create(['category' => 'document']);
 
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
     $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
-    $this->room = Room::factory()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
-    $this->assetSite = Asset::factory()->forLocation($this->site)->create();
-    $this->assetBuilding = Asset::factory()->forLocation($this->building)->create();
-    $this->assetFloor = Asset::factory()->forLocation($this->floor)->create();
-    $this->assetRoom = Asset::factory()->forLocation($this->room)->create();
+    $this->assetSite = Asset::factory()->withMaintainableData()->forLocation($this->site)->create();
+    $this->assetBuilding = Asset::factory()->withMaintainableData()->forLocation($this->building)->create();
+    $this->assetFloor = Asset::factory()->withMaintainableData()->forLocation($this->floor)->create();
+    $this->assetRoom = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 });
 
 it('can factory a provider', function () {

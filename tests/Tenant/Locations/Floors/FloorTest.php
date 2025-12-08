@@ -24,12 +24,12 @@ use function Pest\Laravel\assertDatabaseMissing;
 beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
-    Site::factory()->create();
+    Site::factory()->withMaintainableData()->create();
     $this->building = Building::factory()->create();
 });
 
 it('can render the index floors page', function () {
-    Floor::factory()->count(3)->create();
+    Floor::factory()->withMaintainableData()->count(3)->create();
     $response = $this->getFromTenant('tenant.floors.index');
     $response->assertOk();
 
@@ -176,7 +176,7 @@ it('can attach a provider to a floor\'s maintainable', function () {
 });
 
 it('can render the show floor page', function () {
-    $floor = Floor::factory()->create();
+    $floor = Floor::factory()->withMaintainableData()->create();
 
     $response = $this->getFromTenant('tenant.floors.show', $floor);
     $response->assertOk();
@@ -196,7 +196,7 @@ it('can render the update floor page', function () {
     LocationType::factory()->count(2)->create(['level' => 'building']);
     LocationType::factory()->count(2)->create(['level' => 'floor']);
     Building::factory()->count(2)->create();
-    $floor = Floor::factory()->create();
+    $floor = Floor::factory()->withMaintainableData()->create();
 
     $response = $this->getFromTenant('tenant.floors.edit', $floor);
     $response->assertOk();
@@ -214,7 +214,7 @@ it('can render the update floor page', function () {
 
 it('can update a floor maintainable', function () {
 
-    $floor = Floor::factory()->create();
+    $floor = Floor::factory()->withMaintainableData()->create();
     $floorType = LocationType::where('level', 'floor')->first();
 
     $oldName = $floor->maintainable->name;
@@ -259,7 +259,7 @@ it('can update a floor maintainable', function () {
 });
 
 it('fails when update of an existing floor with a non existing floor type', function () {
-    $floor = Floor::factory()->create();
+    $floor = Floor::factory()->withMaintainableData()->create();
 
     $formData = [
         'name' => 'New site',
@@ -277,7 +277,7 @@ it('fails when update of an existing floor with a non existing floor type', func
 it('cannot update a floor type of an existing floor', function () {
     $floorType = LocationType::factory()->create(['level' => 'floor']);
 
-    $floor = Floor::factory()->create();
+    $floor = Floor::factory()->withMaintainableData()->create();
 
     $formData = [
         'name' => 'New site',
@@ -293,7 +293,7 @@ it('cannot update a floor type of an existing floor', function () {
 });
 
 it('can delete a floor and his maintainable', function () {
-    $floor = Floor::factory()->create();
+    $floor = Floor::factory()->withMaintainableData()->create();
 
     assertDatabaseHas('floors', [
         'level_id' => $this->building->id,
@@ -320,11 +320,11 @@ it('can delete a floor and his maintainable', function () {
 
 
 it('can retrieve all assets from a floor', function () {
-    $floor = Floor::factory()->create();
+    $floor = Floor::factory()->withMaintainableData()->create();
     CategoryType::factory()->create(['category' => 'asset']);
 
-    Asset::factory()->forLocation($floor)->create();
-    Asset::factory()->forLocation($floor)->create();
+    Asset::factory()->withMaintainableData()->forLocation($floor)->create();
+    Asset::factory()->withMaintainableData()->forLocation($floor)->create();
 
     $response = $this->getFromTenant('api.floors.assets', $floor);
     $response->assertStatus(200);

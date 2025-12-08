@@ -23,8 +23,10 @@ class AssetFactory extends Factory
      */
     public function definition(): array
     {
+        $category = CategoryType::where('category', 'asset')->first();
+        if (!$category)
+            $category = CategoryType::factory()->create(['category' => 'asset']);
 
-        $category = CategoryType::factory()->create(['category' => 'asset']);
 
         $randomDepreciationDuration = fake()->randomDigitNotZero();
         return [
@@ -44,6 +46,20 @@ class AssetFactory extends Factory
         ];
     }
 
+    public function withMaintainableData(array $data = [])
+    {
+        return $this->afterCreating(function (Asset $asset) use ($data) {
+            $maintainableData = array_merge([
+                'name' => fake()->text(20),
+                'description' => fake()->sentence(6),
+            ], $data);
+
+            $asset->maintainable()->save(
+                Maintainable::factory()->make($maintainableData)
+            );
+        });
+    }
+
     public function forLocation($location): static
     {
         return $this->for($location, 'location')->state(function () use ($location) {
@@ -58,18 +74,5 @@ class AssetFactory extends Factory
                 'code' => $codeNumber
             ];
         });
-    }
-
-
-    public function configure()
-    {
-        return $this->afterCreating(
-
-            function (Asset $asset) {
-                $asset->maintainable()->save(
-                    Maintainable::factory()->make()
-                );
-            }
-        );
     }
 }

@@ -23,13 +23,13 @@ beforeEach(function () {
     CategoryType::factory()->count(2)->create(['category' => 'document']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
     CategoryType::factory()->count(2)->create(['category' => 'asset']);
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
     $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
 
-    $this->room = Room::factory()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
-    $this->asset =  Asset::factory()->forLocation($this->room)->create();
+    $this->asset =  Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 });
 
 it('can render a new ticket page for a guest', function (string $modelType, string $routeName) {

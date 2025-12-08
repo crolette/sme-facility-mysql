@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Jobs\CreateTenantAdmin;
 use Stancl\Tenancy\Jobs;
 use Stancl\Tenancy\Events;
+use App\Jobs\CreateCompany;
 use App\Jobs\DeleteDatabase;
 use Stancl\Tenancy\Listeners;
 use Stancl\Tenancy\Middleware;
+use App\Jobs\CreateTenantAdmin;
 use Stancl\JobPipeline\JobPipeline;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,7 @@ class TenancyServiceProvider extends ServiceProvider
                 //     Jobs\MigrateDatabase::class,
                 //     Jobs\SeedDatabase::class,
                 //     CreateTenantAdmin::class,
+                // CreateCompany::class,
                 // ])->send(function (Events\TenantCreated $event) {
                 //     return $event->tenant;
                 // })->shouldBeQueued(false), // `false` by default, but you probably want to make this `true` for production.

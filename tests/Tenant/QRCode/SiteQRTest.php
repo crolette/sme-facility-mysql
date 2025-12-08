@@ -64,7 +64,7 @@ it('creates a QR Code when need_qr_code is true at site\'s creation', function (
 
 
 it('can regenerate a QR Code for a site', function () {
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
 
     $response = $this->postToTenant('api.sites.qr.regen', [], $location->reference_code);
     $response->assertSessionHasNoErrors();
