@@ -394,7 +394,7 @@ export default function CreateUpdateContract({
                                     <InputError className="mt-2" message={errors?.contract_duration ?? ''} />
                                 </div>
                                 <div>
-                                    <Label htmlFor="notice_period">{t('contracts.notice_period')}</Label>
+                                    <Label htmlFor="notice_period">{t('contracts.notice_period.title')}</Label>
                                     <select
                                         name="notice_period"
                                         onChange={(e) => setData('notice_period', e.target.value)}
@@ -410,7 +410,7 @@ export default function CreateUpdateContract({
                                         {noticePeriods && noticePeriods.length > 0 && (
                                             <>
                                                 <option value="" disabled className="bg-background text-foreground">
-                                                    {t('actions.select-type', { type: t('contracts.notice_period') })}
+                                                    {t('actions.select-type', { type: t('contracts.notice_period.title') })}
                                                 </option>
                                                 {noticePeriods?.map((noticePeriod, index) => (
                                                     <option value={noticePeriod} key={index} className="bg-background text-foreground">
@@ -427,7 +427,7 @@ export default function CreateUpdateContract({
                         </div>
                         <div className="mt-4 flex w-full flex-col gap-4 lg:flex-row">
                             <div className="w-full">
-                                <Label htmlFor="renewal_type">{t(`contracts.renewal_type`)}</Label>
+                                <Label htmlFor="renewal_type">{t(`contracts.renewal_type.title`)}</Label>
                                 <select
                                     name="renewal_type"
                                     onChange={(e) => setData('renewal_type', e.target.value)}
