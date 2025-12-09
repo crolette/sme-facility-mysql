@@ -26,11 +26,10 @@ class ContractNotificationSchedulingService
             // Create notifications for related assets/locations with manager
             $contract = Contract::with(['assets', 'sites', 'rooms', 'floors', 'buildings'])->find($contract->id);
             $contractables = $contract->contractables();
-            // dump(count($contractables));
+            dump(count($contractables));
             $contractables->each(function ($contractable) use ($contract) {
-                // dump('contractables');
+                dump('contractables');
                 if ($contractable->manager) {
-                    // dump($contractable->manager);
                     $this->createScheduleForContractNoticeDate($contract, $contractable->manager);
                     $this->createScheduleForContractEndDate($contract, $contractable->manager);
                 }

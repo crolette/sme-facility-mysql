@@ -111,7 +111,7 @@ it('creates a planned_at notification for a new created intervention for an ASSE
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addMonth(1),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $this->asset->reference_code,
         'locationType' => 'asset'
@@ -146,7 +146,7 @@ it('does not create a planned_at notification for a new created intervention for
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now(),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'locationId' => $this->asset->reference_code,
         'locationType' => 'asset'
     ];
@@ -167,7 +167,7 @@ it('creates a planned_at notification for a new created intervention for an ASSE
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::tomorrow(),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'locationId' => $this->asset->reference_code,
         'locationType' => 'asset'
     ];
@@ -194,14 +194,14 @@ it('creates a planned_at notification for a new created intervention for an ASSE
     );
 })->with(array_values(array_diff(array_column(InterventionStatus::cases(), 'value'), ['draft', 'completed', 'cancelled'])));
 
-it('does not create a planned_at notification for a new created intervention for an ASSET if status is not `planned/in progress/waiting_parts`', function ($status) {
+it('does not create a planned_at notification for a new created intervention for an ASSET if status is not `planned/in_progress/waiting_parts`', function ($status) {
 
     $formData = [
         'intervention_type_id' => $this->interventionType->id,
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addMonth(1),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $this->asset->reference_code,
         'locationType' => 'asset'
@@ -214,7 +214,7 @@ it('does not create a planned_at notification for a new created intervention for
         ]);
 
     assertDatabaseCount('scheduled_notifications', 0);
-})->with(array_values(array_diff(array_column(InterventionStatus::cases(), 'value'), ['planned', 'in progress', 'waiting for parts'])));
+})->with(array_values(array_diff(array_column(InterventionStatus::cases(), 'value'), ['planned', 'in_progress', 'waiting_parts'])));
 
 it('adds planned_at notification when maintenance_manager is linked to an ASSET', function ($status) {
 
@@ -237,7 +237,7 @@ it('adds planned_at notification when maintenance_manager is linked to an ASSET'
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addMonth(1),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $asset->reference_code,
         'locationType' => 'asset'
@@ -298,7 +298,7 @@ it('adds planned_at notification when maintenance_manager is linked to an asset 
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addMonth(1),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $asset->reference_code,
         'locationType' => 'asset'
@@ -487,7 +487,7 @@ it('does not delete planned_at notification when a maintenance manager with admi
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addMonth(1),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $asset->reference_code,
         'locationType' => 'asset'
@@ -568,7 +568,7 @@ it('deletes planned_at notification when maintenance manager with maintenance ma
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addMonth(1),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $asset->reference_code,
         'locationType' => 'asset'
@@ -650,7 +650,7 @@ it('does not delete planned_at notification when maintenance manager with mainte
         'priority' => 'medium',
         'status' => 'planned',
         'planned_at' => Carbon::now()->addMonth(1),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $asset->reference_code,
         'locationType' => 'asset'
@@ -719,7 +719,7 @@ it('does not create a planned_at notification when planned_at is not defined for
         'intervention_type_id' => $this->interventionType->id,
         'priority' => 'medium',
         'status' => $status,
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $this->asset->reference_code,
         'locationType' => 'asset'
@@ -768,7 +768,7 @@ it('updates notification when planned_at changes for an intervention', function 
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addWeeks(2),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $this->asset->reference_code,
         'locationType' => get_class($this->asset)
@@ -817,7 +817,7 @@ it('creates planned_at notification when planned_at is added for an existing int
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addWeeks(2),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'locationId' => $this->asset->reference_code,
         'locationType' => get_class($this->asset)
     ];
@@ -859,7 +859,7 @@ it('deletes planned_at notification when intervention status changes to complete
         'intervention_type_id' => $this->interventionType->id,
         'priority' => 'medium',
         'status' => $status,
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'locationId' => $this->asset->reference_code,
         'locationType' => get_class($this->asset)
     ];
@@ -885,7 +885,7 @@ it('does not delete planned_at notification when intervention status changes to 
         'intervention_type_id' => $this->interventionType->id,
         'priority' => 'medium',
         'status' => $status,
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'locationId' => $this->asset->reference_code,
         'locationType' => get_class($this->asset)
     ];
@@ -1047,7 +1047,7 @@ it('updates planned_at notification with status `pending` when user preference n
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addMonth(),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(),
         'locationId' => $this->asset->reference_code,
         'locationType' => 'asset'
@@ -1105,7 +1105,7 @@ it('does not update planned_at notification with status `sent` when user_prefere
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addMonth(),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(),
         'locationId' => $this->asset->reference_code,
         'locationType' => 'asset'

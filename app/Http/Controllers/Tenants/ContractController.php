@@ -136,6 +136,8 @@ class ContractController extends Controller
     {
         if (Auth::user()->cannot('view', $contract))
             abort(403);
+
+
         // dd(Contract::where('notice_date', '>', Carbon::now())->get());
         // dd($contract->end_date, $contract->end_date->subYears(5) < $contract->start_date);
         return Inertia::render('tenants/contracts/ShowContract', ['item' => $contract->load('provider', 'documents'), 'objects' => $contract->getObjects()]);

@@ -70,14 +70,17 @@ it('creates the notice_date notification for an admin when a new contract is cre
     $formData = [
         ...$this->basicContractData,
         'contract_duration' => $duration,
-        'notice_period' => $period
+        'notice_period' => $period,
+        'notice_date' => $noticeDate
     ];
 
-    $this->postToTenant('api.contracts.store', $formData);
 
     if ($noticeDate <= Carbon::now()->toDateString()) {
         assertDatabaseCount('scheduled_notifications', 0);
     } else {
+
+        $response = $this->postToTenant('api.contracts.store', $formData);
+        $response->assertSessionHasNoErrors();
 
         $preference = $this->admin->notification_preferences()->where('notification_type', 'notice_date')->first();
 
