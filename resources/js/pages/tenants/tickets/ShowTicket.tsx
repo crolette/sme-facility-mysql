@@ -92,6 +92,7 @@ export default function ShowTicket({ item }: { item: Ticket }) {
                                             text={ticket.reporter ? ticket.reporter.full_name : ticket.reporter_email}
                                         />
                                         <Field label={t('common.created_at')} text={ticket.created_at} />
+                                        {ticket.handled_at && <Field label={t('tickets.handled_at')} text={ticket.handled_at} />}
                                     </div>
 
                                     <div className="flex flex-wrap gap-2">

@@ -106,6 +106,10 @@ class APITicketController extends Controller
                 ...$request->validated()
             ]);
 
+            if ($request->status === 'ongoing' && !$ticket->handled_at) {
+                $ticket->update(['handled_at' => Carbon::now()]);
+            }
+
             $models = [
                 'assets'    => \App\Models\Tenants\Asset::class,
                 'rooms'     => \App\Models\Tenants\Room::class,
@@ -150,7 +154,7 @@ class APITicketController extends Controller
 
             // TODO Check if ok with tests
             if ($request->status === 'ongoing' && !$ticket->handled_at) {
-                $ticket->update(['handled_at' => Carbon::now()->toDateString()]);
+                $ticket->update(['handled_at' => Carbon::now()]);
             }
 
             $ticket->update(['status' => $request->status]);

@@ -15,6 +15,7 @@ return [
     'pictures_max' => 'Maximum :number pictures',
     'be_notified' => 'Do you want to be notified when the ticket is closed ?',
     'closed_at' => 'Closed at',
+    'handled_at' => 'Handled at',
     'existing_tickets' => 'Existing ticket|Existing tickets',
     'encode_ticket' => 'What issue did you encounter?',
 ];

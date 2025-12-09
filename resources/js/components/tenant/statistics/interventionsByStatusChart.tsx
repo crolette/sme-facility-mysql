@@ -32,7 +32,7 @@ export const InterventionsByStatusChart = ({ interventionsByStatus }: { interven
 
     const [labels, setLabels] = useState<string[]>(
         Object.entries(interventionsByStatus).map((item) => {
-            return t(`interventions.status.${item[0]}`);
+            return t(`common.status.${item[0]}`);
         }),
     );
 

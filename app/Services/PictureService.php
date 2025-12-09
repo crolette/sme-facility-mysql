@@ -28,7 +28,6 @@ class PictureService
             if (TenantLimits::canAddFile($file->getSize())) {
                 try {
                     $directory = "$tenantId/$modelType/$modelId/pictures"; // e.g., "webxp/tickets/1/pictures"
-
                     $newfileName = Str::chopEnd($file->getClientOriginalName(), ['.png', '.jpg', '.jpeg']);
 
                     $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . Str::slug($newfileName, '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $file->extension();

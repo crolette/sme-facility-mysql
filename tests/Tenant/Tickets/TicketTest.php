@@ -10,10 +10,13 @@ use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 
 use App\Models\Tenants\Ticket;
+use App\Services\TenantLimits;
 use App\Models\Tenants\Building;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Queue;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
@@ -33,6 +36,16 @@ beforeEach(function () {
     $this->room = Room::factory()->withMaintainableData()->create();
 
     $this->asset =  Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
+
+    $tenant = tenant();
+
+    if ($tenant) {
+        Cache::remember(
+            "tenant:{$tenant->id}:limits",
+            now()->addDay(),
+            fn() => TenantLimits::loadLimitsFromDatabase($tenant)
+        );
+    }
 });
 
 it('can render the index tickets page', function () {
@@ -109,6 +122,7 @@ it('can create a new ticket to an ASSET with the logged user', function () {
 });
 
 it('can create a ticket with uploaded pictures', function () {
+    Queue::fake();
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->image('test.jpg');
 
@@ -278,7 +292,7 @@ it('can create a new ticket to a SITE', function () {
     ]);
 });
 
-it('updates status to and handled_at columns when intervention is created for a ticket', function () {
+it('updates ticket status and handled_at columns when intervention is created for a ticket', function () {
 
     $ticket = Ticket::factory()->forLocation($this->asset)->create();
 
@@ -301,12 +315,39 @@ it('updates status to and handled_at columns when intervention is created for a 
     assertDatabaseHas('tickets', [
         'id' => $ticket->id,
         'status' => 'ongoing',
-        'handled_at' => Carbon::now()->toDateString(),
+        'handled_at' => Carbon::now()->toDateTimeString(),
+    ]);
+});
+
+it('updates ticket status to closed and closed_at columns when intervention is completed for a ticket', function () {
+    Carbon::setTestNow(Carbon::now());
+    $ticket = Ticket::factory()->forLocation($this->asset)->create();
+    $intervention = Intervention::factory()->forTicket($ticket)->create();
+
+    $formData = [
+        'intervention_type_id' => $this->interventionType->id,
+        'priority' => 'medium',
+        'status' => 'completed',
+        'description' => fake()->paragraph(),
+        'ticket_id' => $ticket->id,
+    ];
+
+    $response = $this->patchToTenant('api.interventions.update', $formData, $intervention->id);
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseHas('tickets', [
+        'id' => $ticket->id,
+        'status' => 'closed',
+        'handled_at' => Carbon::now()->toDateTimeString(),
+        'closed_at' => Carbon::now()->toDateTimeString(),
     ]);
 });
 
 it('can update an existing ticket', function () {
-
+    Carbon::setTestNow(Carbon::now());
     $ticket = Ticket::factory()->forLocation($this->asset)->create(['reported_by' => $this->user->id]);
 
     $formData = [
@@ -327,11 +368,12 @@ it('can update an existing ticket', function () {
         'description' => 'A nice description for this new ticket',
         'ticketable_type' => get_class($this->site),
         'ticketable_id' => $this->site->id,
+        'handled_at' => Carbon::now()->toDateTimeString()
     ]);
 });
 
 it('can update the status of an existing ticket', function () {
-
+    Carbon::setTestNow(Carbon::now());
     $ticket = Ticket::factory()->forLocation($this->asset)->create(['reported_by' => $this->user->id]);
 
     $response = $this->patchToTenant('api.tickets.status', ['status' => TicketStatus::ONGOING->value], $ticket);
@@ -341,11 +383,12 @@ it('can update the status of an existing ticket', function () {
         'id' => $ticket->id,
         'status' => TicketStatus::ONGOING->value,
         'closed_by' => null,
+        'handled_at' => Carbon::now()->toDateTimeString()
     ]);
 });
 
 it('can close an existing ticket and update handled_at', function () {
-
+    Carbon::setTestNow(Carbon::now());
     $ticket = Ticket::factory()->forLocation($this->asset)->create(['reported_by' => $this->user->id]);
 
     $response = $this->patchToTenant('api.tickets.status', ['status' => 'closed'], $ticket);
@@ -355,7 +398,7 @@ it('can close an existing ticket and update handled_at', function () {
         'id' => $ticket->id,
         'status' => 'closed',
         'closed_by' => $this->user->id,
-        'handled_at' => Carbon::now()->toDateString()
+        'handled_at' => Carbon::now()->toDateTimeString()
     ]);
     $this->assertNotNull($ticket->fresh()->closed_at);
 });

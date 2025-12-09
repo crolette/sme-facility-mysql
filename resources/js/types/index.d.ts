@@ -280,6 +280,7 @@ export interface Ticket {
     reporter_email?: string;
     being_notified: boolean;
     code: string;
+    handled_at?: string;
     closed_at?: string;
     ticketable_route: string;
     created_at: string;

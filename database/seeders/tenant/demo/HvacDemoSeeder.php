@@ -121,6 +121,7 @@ class HvacDemoSeeder extends Seeder
             'description' => 'La chaudière fuit',
             'reported_by' => User::role('Maintenance Manager')->first(),
             'created_at' => Carbon::now()->subMonths(6),
+            'handled_at' => Carbon::now()->subMonths(6)->addDays(2),
             'status' => TicketStatus::CLOSED->value,
             'closed_at' => Carbon::now()->subMonths(6)->addDays(4),
             'closed_by' => User::role('Maintenance Manager')->first()

@@ -51,10 +51,10 @@ class Ticket extends Model
     protected function casts(): array
     {
         return [
-            'closed_at' => 'date:Y-m-d',
-            'created_at' => 'date:Y-m-d',
-            'updated_at' => 'date:Y-m-d',
-            'handled_at' => 'date:Y-m-d',
+            'closed_at' => 'datetime:Y-m-d h:i',
+            'created_at' => 'datetime:Y-m-d h:i',
+            'updated_at' => 'datetime:Y-m-d h:i',
+            'handled_at' => 'datetime:Y-m-d h:i',
             'being_notified' => 'boolean',
             'status' => TicketStatus::class
         ];
@@ -105,10 +105,10 @@ class Ticket extends Model
             $this->closer()->associate(Auth::guard('tenant')->user()->id);
 
         if (!$this->handled_at)
-            $this->handled_at = Carbon::now()->toDateString();
+            $this->handled_at = Carbon::now();
 
         $this->status = TicketStatus::CLOSED->value;
-        $this->closed_at = now();
+        $this->closed_at = $this->closed_at ?? Carbon::now();
 
         return $this->save();
     }
@@ -129,7 +129,7 @@ class Ticket extends Model
 
     public function changeStatusToOngoing(): void
     {
-        $this->handled_at = Carbon::now()->toDateString();
+        $this->handled_at = $this->handled_at ?? Carbon::now();
         $this->status = TicketStatus::ONGOING->value;
         $this->save();
     }
