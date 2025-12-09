@@ -170,7 +170,7 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                     <TableHead>
                         <TableHeadRow>
                             <TableHeadData>{t('common.code')}</TableHeadData>
-                            <TableHeadData>{t('common.status')}</TableHeadData>
+                            <TableHeadData>{t('common.status.title')}</TableHeadData>
                             <TableHeadData>{t('tickets.reporter')}</TableHeadData>
                             <TableHeadData>{t('common.description')}</TableHeadData>
                             <TableHeadData>{t('common.created_at')}</TableHeadData>
@@ -186,7 +186,7 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                                         <a href={route('tenant.tickets.show', ticket.id)}>{ticket.code}</a>
                                     </TableBodyData>
                                     <TableBodyData>
-                                        <Pill variant={ticket.status}>{t(`tickets.status.${ticket.status}`)}</Pill>
+                                        <Pill variant={ticket.status}>{t(`common.status.${ticket.status}`)}</Pill>
                                     </TableBodyData>
                                     <TableBodyData>{ticket.reporter_email ?? ticket.reporter?.email}</TableBodyData>
                                     <TableBodyData>{ticket.description}</TableBodyData>

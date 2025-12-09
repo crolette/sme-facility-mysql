@@ -29,6 +29,9 @@ class UserPolicy
      */
     public function view(User $user, User $model): bool
     {
+        if ($model->hasRole('Super Admin', 'tenant'))
+            return false;
+
         if ($user->hasPermissionTo('view any users')) {
             return true;
         } else {
@@ -53,6 +56,10 @@ class UserPolicy
      */
     public function updateOwn(User $user, User $model): bool
     {
+        if ($model->hasRole('Super Admin', 'tenant'))
+            return false;
+
+
         return $user->can('update users') && $user->id === $model->id;
     }
 
@@ -61,6 +68,10 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
+        if ($model->hasRole('Super Admin', 'tenant'))
+            return false;
+
+
         return $user->can('update users');
         // return $user->can('update users') && $user->id !== $model->id;
     }
@@ -70,6 +81,10 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
+        if ($model->hasRole('Super Admin', 'tenant'))
+            return false;
+
+
         return $user->can('delete users') && $user->id !== $model->id;
     }
 }

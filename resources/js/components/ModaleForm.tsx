@@ -21,10 +21,10 @@ export default function ModaleForm({ title, children, isUpdating = false }: Moda
                                 <p className="mx-auto animate-pulse text-center text-3xl font-bold">{t('actions.updating')}.</p>
                             </>
                         ) : (
-                            <>
+                            <div className="space-y-2">
                                 <h4 className="lowercase first-letter:uppercase">{title}</h4>
                                 {children}
-                            </>
+                            </div>
                         )}
                     </div>
                 </div>

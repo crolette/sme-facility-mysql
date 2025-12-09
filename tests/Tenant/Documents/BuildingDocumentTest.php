@@ -28,10 +28,10 @@ beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
 
-    $this->site = Site::factory()->create();
-    $this->location = Building::factory()->create();
-    Floor::factory()->create();
-    $this->room = Room::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->location = Building::factory()->withMaintainableData()->create();
+    Floor::factory()->withMaintainableData()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 });
 
 it('can attach existing documents to building', function () {

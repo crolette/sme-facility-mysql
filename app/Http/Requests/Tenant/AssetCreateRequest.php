@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Tenant;
 
+use App\Enums\MeterReadingsUnits;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use App\Models\Central\CategoryType;
@@ -20,8 +21,15 @@ class AssetCreateRequest extends FormRequest
 
     public function prepareForValidation()
     {
-
         $data = $this->all();
+
+        isset($data['has_meter_readings']) && ($data['has_meter_readings'] === 'true' || $data['has_meter_readings'] === true) ? $data['has_meter_readings'] = true : $data['has_meter_readings'] = false;
+
+        if ($data['has_meter_readings'] === false) {
+            $data['meter_number'] = null;
+            $data['meter_unit'] = null;
+        }
+
 
         isset($data['need_qr_code']) && ($data['need_qr_code'] === 'true' || $data['need_qr_code'] === true) ? $data['need_qr_code'] = true : $data['need_qr_code'] = false;
         isset($data['is_mobile']) && ($data['is_mobile'] === 'true' || $data['is_mobile'] === true) ? $data['is_mobile'] = true : $data['is_mobile'] = false;
@@ -86,6 +94,9 @@ class AssetCreateRequest extends FormRequest
             'model' => ['nullable', 'string', 'max:100'],
             'brand' => ['nullable', 'string', 'max:100'],
             'serial_number' => ['nullable', 'string', 'max:50'],
+            'has_meter_readings' => 'boolean',
+            'meter_number' => 'nullable|string|max:20',
+            'meter_unit' => ['nullable', Rule::in(array_column(MeterReadingsUnits::cases(), 'value'))]
         ];
     }
 }

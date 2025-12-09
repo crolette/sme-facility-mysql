@@ -26,7 +26,7 @@ Route::middleware([
         if (Auth::user()->cannot('viewAny', Provider::class))
             return ApiResponse::notAuthorized();
 
-        $query  = Provider::select('id', 'name', 'category_type_id', 'email');
+        $query  = Provider::select('id', 'name', 'email');
 
         Debugbar::info($request->query('users'));
 

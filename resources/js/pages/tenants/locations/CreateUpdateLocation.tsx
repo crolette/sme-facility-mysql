@@ -104,9 +104,10 @@ export default function CreateUpdateLocation({
     contractDurations?: string[];
     noticePeriods?: string[];
 }) {
+    const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Create ${routeName} type`,
+            title: location ? `${t('actions.update-type', { type: location.name })}` : `${t('actions.create-type', { type: routeName })}`,
             href: '/locations/create',
         },
     ];
@@ -235,16 +236,16 @@ export default function CreateUpdateLocation({
 
     const addFileModalForm = () => {
         return (
-            <ModaleForm title={'Add new document'}>
+            <ModaleForm title={t('actions.add-type', { type: tChoice('documents.title', 1) })}>
                 <div className="flex flex-col gap-2">
                     <form onSubmit={addFile} className="space-y-2">
-                        <p className="text-center">Add new document</p>
+                        <Label htmlFor={`type`}>{t('common.type')}</Label>
                         <select
                             name="documentType"
                             required
                             value={newDocumentType ?? ''}
                             onChange={(e) => setNewDocumentType(parseInt(e.target.value))}
-                            id=""
+                            id="type"
                             className={cn(
                                 'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
                                 'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
@@ -264,39 +265,41 @@ export default function CreateUpdateLocation({
                                 </>
                             )}
                         </select>
+                        <Label htmlFor={`file`}>{t('documents.file')}</Label>
                         <Input
                             type="file"
-                            name=""
-                            id=""
+                            id="file"
                             onChange={(e) => setNewFile(e.target.files ? e.target.files[0] : null)}
                             required
                             accept="image/png, image/jpeg, image/jpg, .pdf"
                         />
 
+                        <Label htmlFor={`name`}>{t('common.name')}</Label>
                         <Input
                             type="text"
                             name="name"
+                            id="name"
                             required
                             minLength={4}
                             maxLength={100}
                             placeholder="Document name"
                             onChange={(e) => setNewFileName(e.target.value)}
                         />
-                        <p className="text-border text-xs">Servira à la sauvegarde du nom du fichier</p>
+                        <p className="text-border text-xs dark:text-white">{t('documents.filename_description')}</p>
+                        <Label htmlFor={`description`}>{t('common.description')}</Label>
                         <Input
                             type="text"
                             name="description"
                             id="description"
-                            required
                             minLength={10}
                             maxLength={250}
                             placeholder="Document description"
                             onChange={(e) => setNewFileDescription(e.target.value)}
                         />
                         <div className="flex justify-between">
-                            <Button>Submit</Button>
+                            <Button>{t('actions.add-type', { type: tChoice('documents.title', 1) })}</Button>
                             <Button type="button" onClick={closeFileModal} variant={'outline'}>
-                                Cancel
+                                {t('actions.cancel')}
                             </Button>
                         </div>
                     </form>
@@ -354,12 +357,11 @@ export default function CreateUpdateLocation({
         setCountContracts((prev) => prev - 1);
     };
 
-    const { t, tChoice } = useLaravelReactI18n();
     const minEndDateWarranty = new Date().toISOString().split('T')[0];
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Create location type`} />
+            <Head title={location ? `${t('actions.update-type', { type: location.name })}` : `${t('actions.create-type', { type: routeName })}`} />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 {location && (
                     <div>
@@ -443,6 +445,7 @@ export default function CreateUpdateLocation({
                             type="text"
                             required
                             autoFocus
+                            minLength={4}
                             maxLength={100}
                             value={data.name}
                             onChange={(e) => setData('name', e.target.value)}
@@ -455,7 +458,7 @@ export default function CreateUpdateLocation({
                             id="description"
                             type="text"
                             required
-                            // disabled={type?.prefix ? true : false}
+                            minLength={10}
                             maxLength={255}
                             value={data.description}
                             onChange={(e) => setData('description', e.target.value)}
@@ -484,6 +487,7 @@ export default function CreateUpdateLocation({
                                     type="text"
                                     required
                                     autoFocus
+                                    minLength={10}
                                     maxLength={100}
                                     value={data.address}
                                     onChange={(e) => setData('address', e.target.value)}
@@ -496,14 +500,15 @@ export default function CreateUpdateLocation({
                         {data.locationTypeName === 'outdoor' && (
                             <div className="flex">
                                 <div className="w-full">
-                                    <Label htmlFor="surface_floor">{t('common.surface')}</Label>
+                                    <Label htmlFor="surface_outdoor">{t('common.surface')} (m²)</Label>
                                     <Input
                                         id="surface_outdoor"
                                         type="number"
+                                        fef
                                         min={0}
                                         step="0.01"
                                         value={data.surface_outdoor ?? ''}
-                                        placeholder="Surface outdoor (max. 2 decimals) : 4236.3"
+                                        placeholder={t('locations.surface_outdoor_placeholder')}
                                         onChange={(e) => setData('surface_outdoor', parseFloat(e.target.value))}
                                     />
                                     <InputError className="mt-2" message={errors.surface_outdoor ?? ''} />
@@ -558,14 +563,14 @@ export default function CreateUpdateLocation({
                             <>
                                 <div className="flex">
                                     <div className="w-full">
-                                        <Label htmlFor="surface_floor">{t('locations.surface_floor')}</Label>
+                                        <Label htmlFor="surface_floor">{t('locations.surface_floor')} (m²)</Label>
                                         <Input
                                             id="surface_floor"
                                             type="number"
                                             min={0}
                                             step="0.01"
                                             value={data.surface_floor ?? ''}
-                                            placeholder="Surface floor (max. 2 decimals) : 4236.3"
+                                            placeholder={t('locations.surface_floor_placeholder')}
                                             onChange={(e) => setData('surface_floor', parseFloat(e.target.value))}
                                         />
                                         <InputError className="mt-2" message={errors.surface_floor ?? ''} />
@@ -616,7 +621,7 @@ export default function CreateUpdateLocation({
                                 </div>
                                 <div className="flex">
                                     <div className="w-full">
-                                        <Label htmlFor="surface_walls">{t('locations.surface_wall')}</Label>
+                                        <Label htmlFor="surface_walls">{t('locations.surface_wall')} (m²)</Label>
                                         <Input
                                             id="surface_walls"
                                             type="number"
@@ -624,7 +629,7 @@ export default function CreateUpdateLocation({
                                             step="0.01"
                                             value={data.surface_walls ?? ''}
                                             onChange={(e) => setData('surface_walls', parseFloat(e.target.value))}
-                                            placeholder="Surface walls (max. 2 decimals) : 4236.3"
+                                            placeholder={t('locations.surface_wall_placeholder')}
                                         />
                                         <InputError className="mt-2" message={errors.surface_walls ?? ''} />
                                     </div>
@@ -674,14 +679,14 @@ export default function CreateUpdateLocation({
                                 </div>
                                 {routeName === 'rooms' && (
                                     <div className="w-full">
-                                        <Label htmlFor="height">{t('locations.height')}</Label>
+                                        <Label htmlFor="height">{t('locations.height')} (m)</Label>
                                         <Input
                                             id="height"
                                             type="number"
                                             min={0}
                                             step="0.01"
                                             value={data.height ?? ''}
-                                            placeholder="Height (max. 2 decimals) : 4236.3"
+                                            placeholder={t('locations.height_placeholder')}
                                             onChange={(e) => setData('height', parseFloat(e.target.value))}
                                         />
                                         <InputError className="mt-2" message={errors.height ?? ''} />
@@ -691,10 +696,10 @@ export default function CreateUpdateLocation({
                         )}
                     </div>
 
-                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                    <div className="border-sidebar-border bg-sidebar space-y-2 rounded-md border p-4 shadow-xl">
                         <h5>{tChoice('maintenances.title', 1)}</h5>
 
-                        <div>
+                        <div className="flex items-center gap-2">
                             <Label htmlFor="need_maintenance">{t('maintenances.need_maintenance')} ?</Label>
                             <Checkbox
                                 id="need_maintenance"
@@ -709,7 +714,7 @@ export default function CreateUpdateLocation({
                             <>
                                 <div className="flex flex-col gap-4 md:flex-row">
                                     <div className="w-full">
-                                        <Label htmlFor="maintenance_frequency">{t('maintenances.frequency')}</Label>
+                                        <Label htmlFor="maintenance_frequency">{t('maintenances.frequency.title')}</Label>
                                         <select
                                             name="maintenance_frequency"
                                             value={data.maintenance_frequency ?? ''}
@@ -725,7 +730,7 @@ export default function CreateUpdateLocation({
                                             {frequencies && frequencies.length > 0 && (
                                                 <>
                                                     <option value="" disabled className="bg-background text-foreground">
-                                                        {t('actions.select-type', { type: t('maintenances.frequency') })}
+                                                        {t('actions.select-type', { type: t('maintenances.frequency.title') })}
                                                     </option>
                                                     {frequencies?.map((frequency, index) => (
                                                         <option value={frequency} key={index} className="bg-background text-foreground">
@@ -763,6 +768,7 @@ export default function CreateUpdateLocation({
                                         <InputError className="mt-2" message={errors?.next_maintenance_date ?? ''} />
                                     </div>
                                 </div>
+                                <p className="mx-auto mt-1 text-center text-sm">{t('maintenances.next_maintenance_date_default')}</p>
                             </>
                         )}
                         <div>
@@ -826,34 +832,42 @@ export default function CreateUpdateLocation({
 
                             {countContracts > 0 &&
                                 [...Array(countContracts)].map((_, index) => (
-                                    <div key={index} className="flex flex-col gap-2 rounded-md border-2 border-slate-400 p-4">
-                                        <div className="flex w-fit gap-2">
-                                            <p>
-                                                {' '}
-                                                {tChoice('contracts.title', 1)} {index + 1}
-                                            </p>
-                                            <MinusCircleIcon onClick={() => handleRemoveContract(index)} />
-                                        </div>
+                                    <details key={index} className="flex flex-col rounded-md border-2 border-slate-400 p-4" open>
+                                        <summary>
+                                            <div className="flex w-fit gap-2">
+                                                <p>
+                                                    {tChoice('contracts.title', 1)} {index + 1}{' '}
+                                                    {data.contracts[index]?.name ? `- ${data.contracts[index]?.name}` : ''}
+                                                </p>
+                                                <MinusCircleIcon onClick={() => handleRemoveContract(index)} />
+                                            </div>
+                                        </summary>
                                         <div>
-                                            <Label className="font-medium">{t('common.name')}</Label>
+                                            <Label className="font-medium" htmlFor={`contract.name.` + index}>
+                                                {t('common.name')}
+                                            </Label>
                                             <Input
                                                 type="text"
+                                                id={`contract.name.` + index}
                                                 value={data.contracts[index]?.name ?? ''}
                                                 placeholder={`Contract name ${index + 1}`}
-                                                className="rounded border px-2 py-1"
                                                 minLength={4}
                                                 maxLength={100}
+                                                required
                                                 onChange={(e) => handleChangeContracts(index, 'name', e.target.value)}
                                             />
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.name : ''} />
-                                            <Label className="font-medium">{t('common.type')}</Label>
+                                            <Label className="font-medium" htmlFor={`contract.type.` + index}>
+                                                {t('common.type')}
+                                            </Label>
                                             <Input
                                                 type="text"
+                                                id={`contract.type.` + index}
                                                 // value={data.contracts[index].name ?? ''}
                                                 placeholder={`Type ${index + 1}`}
-                                                className="rounded border px-2 py-1"
                                                 minLength={4}
                                                 maxLength={100}
+                                                required
                                                 onChange={(e) => handleChangeContracts(index, 'type', e.target.value)}
                                             />
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.type : ''} />
@@ -862,6 +876,7 @@ export default function CreateUpdateLocation({
                                             <SearchableInput<Provider>
                                                 searchUrl={route('api.providers.search')}
                                                 getKey={(provider) => provider.id}
+                                                required
                                                 displayValue={data.contracts[index]?.provider_name ?? ''}
                                                 getDisplayText={(provider) => provider.name}
                                                 onSelect={(provider) => {
@@ -901,7 +916,7 @@ export default function CreateUpdateLocation({
                                                         </option>
                                                         {contractDurations?.map((type, index) => (
                                                             <option value={type} key={index} className="bg-background text-foreground">
-                                                                {type}
+                                                                {t('contracts.duration.' + type)}
                                                             </option>
                                                         ))}
                                                     </>
@@ -911,31 +926,34 @@ export default function CreateUpdateLocation({
                                                 className="mt-2"
                                                 message={errors?.contracts ? errors?.contracts[index]?.contract_duration : ''}
                                             />
-                                            <Label>Notes</Label>
+                                            <Label htmlFor={`contract.notes.` + index}>Notes</Label>
                                             <Textarea
+                                                id={`contract.notes.` + index}
                                                 onChange={(e) => handleChangeContracts(index, 'notes', e.target.value)}
                                                 value={data.contracts[index]?.notes ?? ''}
                                                 minLength={4}
                                                 maxLength={250}
                                             />
                                             <InputError message={errors?.contracts ? errors?.contracts[index]?.notes : ''} />
-                                            <Label>{t('contracts.internal_ref')}</Label>
+                                            <Label htmlFor={`contract.internal_ref.` + index}>{t('contracts.internal_ref')}</Label>
                                             <Input
+                                                id={`contract.internal_ref.` + index}
                                                 type="text"
                                                 onChange={(e) => handleChangeContracts(index, 'internal_reference', e.target.value)}
                                                 value={data.contracts[index]?.internal_reference ?? ''}
                                                 maxLength={50}
                                             />
                                             <InputError message={errors?.contracts ? errors?.contracts[index]?.internal_reference : ''} />
-                                            <Label>{t('contracts.provider_ref')}</Label>
+                                            <Label htmlFor={`contract.provider_ref.` + index}>{t('contracts.provider_ref')}</Label>
                                             <Input
+                                                id={`contract.provider_ref.` + index}
                                                 type="text"
                                                 onChange={(e) => handleChangeContracts(index, 'provider_reference', e.target.value)}
                                                 value={data.contracts[index]?.provider_reference ?? ''}
                                                 maxLength={50}
                                             />
                                             <InputError message={errors?.contracts ? errors?.contracts[index]?.provider_reference : ''} />
-                                            <Label htmlFor="notice_period">{t('contracts.notice_period')}</Label>
+                                            <Label htmlFor="notice_period">{t('contracts.notice_period.title')}</Label>
                                             <select
                                                 name="notice_period"
                                                 onChange={(e) => handleChangeContracts(index, 'notice_period', e.target.value)}
@@ -950,24 +968,25 @@ export default function CreateUpdateLocation({
                                             >
                                                 {noticePeriods && noticePeriods.length > 0 && (
                                                     <>
-                                                        {/* <option value="" disabled className="bg-background text-foreground">
-                                                                                                Select a duration
-                                                                                            </option> */}
+                                                        <option value="" disabled className="bg-background text-foreground">
+                                                            {t('actions.select-type', { type: t('contracts.notice_period.title') })}
+                                                        </option>
                                                         {noticePeriods?.map((type, index) => (
                                                             <option value={type} key={index} className="bg-background text-foreground">
-                                                                {type}
+                                                                {t('contracts.notice_period.' + type)}
                                                             </option>
                                                         ))}
                                                     </>
                                                 )}
                                             </select>
                                             <InputError className="mt-2" message={errors?.notice_period ?? ''} />
-                                            <Label htmlFor="renewal_type">{t('contracts.renewal_type')}</Label>
+                                            <Label htmlFor={`contract.renewal_type.` + index}>{t('contracts.renewal_type.title')}</Label>
                                             <select
                                                 name="renewal_type"
                                                 // value={data.renewal_type ?? ''}
+                                                required
                                                 onChange={(e) => handleChangeContracts(index, 'renewal_type', e.target.value)}
-                                                id=""
+                                                id={`contract.renewal_type.` + index}
                                                 defaultValue={''}
                                                 // required={data.need_maintenance}
                                                 className={cn(
@@ -979,7 +998,7 @@ export default function CreateUpdateLocation({
                                                 {renewalTypes && renewalTypes.length > 0 && (
                                                     <>
                                                         <option value="" disabled className="bg-background text-foreground">
-                                                            {t('actions.select-type', { type: t('contracts.renewal_type') })}
+                                                            {t('actions.select-type', { type: t('contracts.renewal_type.title') })}
                                                         </option>
                                                         {renewalTypes?.map((type, index) => (
                                                             <option value={type} key={index} className="bg-background text-foreground">
@@ -991,15 +1010,14 @@ export default function CreateUpdateLocation({
                                             </select>
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.renewal_type : ''} />
                                             <div className="w-full">
-                                                {' '}
-                                                <Label htmlFor="status">{t('common.status')} </Label>
-                                                <Label htmlFor="status">Status</Label>
+                                                <Label htmlFor={`contract.status.` + index}>{t('common.status.title')} </Label>
                                                 <select
                                                     name="status"
                                                     // value={data.status ?? ''}
+                                                    required
                                                     defaultValue={''}
                                                     onChange={(e) => handleChangeContracts(index, 'status', e.target.value)}
-                                                    id=""
+                                                    id={`contract.status.` + index}
                                                     // required={data.need_maintenance}
                                                     className={cn(
                                                         'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
@@ -1010,11 +1028,11 @@ export default function CreateUpdateLocation({
                                                     {statuses && statuses.length > 0 && (
                                                         <>
                                                             <option value="" disabled className="bg-background text-foreground">
-                                                                {t('actions.select-type', { type: t('common.status') })}
+                                                                {t('actions.select-type', { type: t('common.status.title') })}
                                                             </option>
                                                             {statuses?.map((status, index) => (
                                                                 <option value={status} key={index} className="bg-background text-foreground">
-                                                                    {t(`contracts.status.${status}`)}
+                                                                    {t(`common.status.${status}`)}
                                                                 </option>
                                                             ))}
                                                         </>
@@ -1023,7 +1041,7 @@ export default function CreateUpdateLocation({
                                                 <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.status : ''} />
                                             </div>
                                         </div>
-                                    </div>
+                                    </details>
                                 ))}
                         </div>
                     )}

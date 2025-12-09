@@ -43,7 +43,7 @@ class ContractFactory extends Factory
     public function forLocation($location)
     {
         return $this->afterCreating(function (Contract $contract) use ($location) {
-            $location->contracts()->attach($contract);
+            $location->contracts()->sync($contract);
         });
     }
 }

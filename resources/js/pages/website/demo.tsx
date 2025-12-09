@@ -64,6 +64,7 @@ export default function Demo() {
                                 <h1>{t('website_demo.title')}</h1>
                                 <p className="leading-8">{t('website_demo.description')}</p>
                             </div>
+
                             <div className="container mx-auto">
                                 <div className="mx-auto flex flex-col gap-10 p-4 md:p-10 lg:max-w-11/12">
                                     <form onSubmit={handleForm} className="space-y-4">
@@ -88,6 +89,7 @@ export default function Demo() {
                                             />
                                             <InputError message={errors?.email} />
                                         </div>
+
                                         <div className="w-full">
                                             <Label htmlFor={'phone_number'}>{t('common.phone')}</Label>
                                             <Input

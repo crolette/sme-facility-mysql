@@ -29,7 +29,7 @@ beforeEach(function () {
     $this->actingAs($this->admin, 'tenant');
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
     $this->buildingType = LocationType::factory()->create(['level' => 'building']);
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
     $this->wallMaterial = CategoryType::factory()->create(['category' => 'wall_materials']);
     $this->floorMaterial = CategoryType::factory()->create(['category' => 'floor_materials']);
 });

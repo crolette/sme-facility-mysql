@@ -41,7 +41,7 @@ class ContractExportController extends Controller
         $validated['template'] = isset($validated['template']) ?  $validated['template'] : false;
 
 
-        Log::info('DISPATCH EXPORT CONTRACTS EXCEL JOB');
+        Log::info('DISPATCH EXPORT CONTRACTS EXCEL JOB ');
         ExportContractsExcelJob::dispatch(Auth::user(), $validated)->onQueue('default');;
 
         return ApiResponse::success([], 'Contracts will be exported, you will receive an e-mail when it\'s done');

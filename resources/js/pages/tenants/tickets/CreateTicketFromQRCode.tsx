@@ -98,7 +98,7 @@ export default function CreateTicketFromQRCode({
                     {existingTickets.length > 0 && (
                         <div>
                             <h4>{tChoice('tickets.existing_tickets', existingTickets.length)}</h4>
-                            <ul className="h-36 overflow-hidden overflow-scroll text-sm">
+                            <ul className="max-h-36 overflow-hidden overflow-y-scroll text-sm">
                                 {existingTickets.map((ticket) => (
                                     <li className="even:bg-accent odd:bg-accent/40 p-1">{ticket.description}</li>
                                 ))}

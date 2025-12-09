@@ -33,8 +33,6 @@ export default function Pricing() {
                 <div className="container mx-auto">
                     <div className="mx-auto flex flex-col gap-10 p-4 md:p-10 xl:w-11/12">
                         <h1>{t('website_pricing.title')}</h1>
-                        {/* <h2>{t('website_pricing.subtitle')}</h2> */}
-                        {/* <p>Un peu de patience... Plus d'informations très bientôt</p> */}
                         <p>{t('website_pricing.description')}</p>
 
                         <div className="bg-cta p-4 text-center">
@@ -47,8 +45,14 @@ export default function Pricing() {
                                 <Building size={36} className="mx-auto" />
                                 <h3 className="text-center">{t('website_pricing.starter.title')}</h3>
                                 <div className="text-center">
-                                    <p className={'text-xl line-through'}>149€ / {t('website_pricing.month')}</p>
-                                    <p className={'animate-pulse text-2xl font-extrabold'}>99€ / {t('website_pricing.month')}</p>
+                                    <p className={'text-xl line-through'}>
+                                        149€ / {t('website_pricing.month')}
+                                        <sup className="">*</sup>
+                                    </p>
+                                    <p className={'animate-pulse text-2xl font-extrabold'}>
+                                        {(149 * 0.665).toFixed(2)} € / {t('website_pricing.month')}
+                                        <sup className="">*</sup>
+                                    </p>
                                 </div>
                                 <ul className="flex flex-col gap-6">
                                     <li className="grid grid-cols-[24px_1fr] gap-4">
@@ -90,8 +94,14 @@ export default function Pricing() {
                                 <Building2 size={36} className="mx-auto" />
                                 <h3 className="text-center">Premium</h3>
                                 <div className="text-center">
-                                    <p className={'text-xl line-through'}>299€ / {t('website_pricing.month')}</p>
-                                    <p className={'animate-pulse text-2xl font-extrabold'}>199€ / {t('website_pricing.month')}</p>
+                                    <p className={'text-xl line-through'}>
+                                        299€ / {t('website_pricing.month')}
+                                        <sup className="">*</sup>
+                                    </p>
+                                    <p className={'animate-pulse text-2xl font-extrabold'}>
+                                        {(299 * 0.665).toFixed(2)} € / {t('website_pricing.month')}
+                                        <sup className="">*</sup>
+                                    </p>
                                 </div>
                                 <ul className="flex flex-col gap-6">
                                     <li className="grid grid-cols-[24px_1fr] gap-4">
@@ -157,6 +167,9 @@ export default function Pricing() {
                                 </a>
                             </div>
                         </div>
+                        <p className="mx-auto text-sm">
+                            *{t('website_pricing.vat_excluded_description')} {t('website_pricing.launching_offer.conditions')}
+                        </p>
                     </div>
                 </div>
             </section>

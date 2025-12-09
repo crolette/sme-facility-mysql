@@ -43,6 +43,9 @@ class AssetExportImportService
             "brand" => $asset->brand,
             "model" => $asset->model,
             "serial_number" => $asset->serial_number,
+            "has_meter_readings" => $asset->has_meter_readings,
+            "meter_number" => $asset->meter_number,
+            "meter_unit" =>  $asset->meter_unit?->value ?? null,
             "depreciable" => $asset->depreciable,
             "depreciation_start_date" => $asset->depreciation_start_date
                 ? $asset->depreciation_start_date->format('Y-m-d')
@@ -97,6 +100,9 @@ class AssetExportImportService
             "brand" => $asset->brand,
             "model" => $asset->model,
             "serial_number" => $asset->serial_number,
+            "has_meter_readings" => $asset->has_meter_readings ? 'Yes' : 'No',
+            "meter_number" => $asset->meter_number,
+            "meter_unit" =>  $asset->meter_unit?->value ?? null,
             "depreciable" => $asset->depreciable ? 'Yes' : 'No',
             "depreciation_start_date" => $asset->depreciation_start_date ? Date::dateTimeToExcel($asset->depreciation_start_date) : null,
             "depreciation_end_date" => $asset->depreciation_end_date ? Date::dateTimeToExcel($asset->depreciation_end_date) : null,

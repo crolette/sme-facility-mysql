@@ -7,7 +7,9 @@ export default function CheckoutCancelled() {
 
     return (
         <WebsiteLayout>
-            <Head title={t('website_pricing.meta_title')}></Head>
+            <Head title={t('website_pricing.meta_title')}>
+                <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+            </Head>
             <section className="text-website-font w-full">
                 <h1>Cancelled</h1>
             </section>

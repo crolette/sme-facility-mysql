@@ -9,6 +9,9 @@ return [
     'description' => 'A complete platform, without unnecessary complexity, to control your costs and gain efficiency.',
     'from' => 'From',
     'month' => 'month',
+    'year' => 'year',
+    'vat_excluded' => 'excluding VAT',
+    'vat_excluded_description' => 'The prices shown are exclusive of VAT. The applicable VAT will be added in accordance with the legal provisions in force at the time of billing.',
     'start_today' => 'Start today',
     'starter' => [
         'title' => 'Starter',
@@ -25,6 +28,7 @@ return [
     'launching_offer' => [
         'title' => 'Launching offer',
         'description' => 'To celebrate the launch of SME Facility, enjoy an exceptional offer!',
+        'conditions' => 'The launching offer is reserved for new customers and applies exclusively to the first year of subscription. From the second year onward, the applicable rate in effect will be automatically applied.'
     ],
     'premium' => [
         'title' => 'Premium',

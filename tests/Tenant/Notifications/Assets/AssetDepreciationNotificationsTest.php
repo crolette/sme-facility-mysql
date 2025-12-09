@@ -32,12 +32,12 @@ beforeEach(function () {
 
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
 
-    $this->site = Site::factory()->create();
-    Building::factory()->create();
-    Floor::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    Building::factory()->withMaintainableData()->create();
+    Floor::factory()->withMaintainableData()->create();
     $this->provider = Provider::factory()->create();
 
-    $this->room = Room::factory()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
     $this->basicAssetData = [
         'name' => 'New asset',
@@ -1027,13 +1027,13 @@ it('creates depreciation notifications for maintenance manager when notification
 
 it('creates depreciation notifications for a new created user with admin role and only for not soft deleted assets', function () {
 
-    $assetActive = Asset::factory()->forLocation($this->room)->create([
+    $assetActive = Asset::factory()->withMaintainableData()->forLocation($this->room)->create([
         'depreciation_start_date' => Carbon::now()->toDateString(),
         'depreciation_end_date' => Carbon::now()->addYears(3)->toDateString(),
         'depreciation_duration' => 3,
     ]);
 
-    $assetSoftDeleted = Asset::factory()->forLocation($this->room)->create([
+    $assetSoftDeleted = Asset::factory()->withMaintainableData()->forLocation($this->room)->create([
         'depreciation_start_date' => Carbon::now()->toDateString(),
         'depreciation_end_date' => Carbon::now()->addYears(3)->toDateString(),
         'depreciation_duration' => 3,
@@ -1080,13 +1080,13 @@ it('creates depreciation notifications for a new created user with admin role an
 
 it('creates depreciation notifications when the role of a maintenance manager changes to admin', function () {
 
-    $assetActive = Asset::factory()->forLocation($this->room)->create([
+    $assetActive = Asset::factory()->withMaintainableData()->forLocation($this->room)->create([
         'depreciation_start_date' => Carbon::now()->toDateString(),
         'depreciation_end_date' => Carbon::now()->addYears(3)->toDateString(),
         'depreciation_duration' => 3,
     ]);
 
-    $assetSoftDeleted = Asset::factory()->forLocation($this->room)->create([
+    $assetSoftDeleted = Asset::factory()->withMaintainableData()->forLocation($this->room)->create([
         'depreciation_start_date' => Carbon::now()->toDateString(),
         'depreciation_end_date' => Carbon::now()->addYears(3)->toDateString(),
         'depreciation_duration' => 3,
@@ -1167,7 +1167,7 @@ it('creates depreciation notifications when the role of a maintenance manager ch
 });
 
 it('deletes depreciation notifications when the role of an admin changes to maintenance manager', function () {
-    $assetActive = Asset::factory()->forLocation($this->room)->create([
+    $assetActive = Asset::factory()->withMaintainableData()->forLocation($this->room)->create([
         'depreciation_start_date' => Carbon::now()->toDateString(),
         'depreciation_end_date' => Carbon::now()->addYears(3)->toDateString(),
         'depreciation_duration' => 3,
@@ -1223,13 +1223,13 @@ it('deletes depreciation notifications when the role of an admin changes to main
 });
 
 it('deletes depreciation notifications when the role of an admin changes to maintenance manager for assets only where he is not maintenance manager', function () {
-    $assetActive = Asset::factory()->forLocation($this->room)->create([
+    $assetActive = Asset::factory()->withMaintainableData()->forLocation($this->room)->create([
         'depreciation_start_date' => Carbon::now()->toDateString(),
         'depreciation_end_date' => Carbon::now()->addYears(3)->toDateString(),
         'depreciation_duration' => 3,
     ]);
 
-    $assetWithManager = Asset::factory()->forLocation($this->room)->create([
+    $assetWithManager = Asset::factory()->withMaintainableData()->forLocation($this->room)->create([
         'depreciation_start_date' => Carbon::now()->toDateString(),
         'depreciation_end_date' => Carbon::now()->addYears(3)->toDateString(),
         'depreciation_duration' => 3,
@@ -1313,7 +1313,7 @@ it('deletes depreciation notifications when the role of an admin changes to main
 
 it('deletes depreciation notifications when a user is deleted', function () {
 
-    $assetActive = Asset::factory()->forLocation($this->room)->create([
+    $assetActive = Asset::factory()->withMaintainableData()->forLocation($this->room)->create([
         'depreciation_start_date' => Carbon::now()->toDateString(),
         'depreciation_end_date' => Carbon::now()->addYears(3)->toDateString(),
         'depreciation_duration' => 3,

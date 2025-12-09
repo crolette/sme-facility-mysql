@@ -27,28 +27,28 @@ beforeEach(function () {
     $this->actingAs($this->user, 'tenant');
     $this->interventionType = CategoryType::factory()->create(['category' => 'intervention']);
     $this->interventionActionType = CategoryType::factory()->create(['category' => 'action']);
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
     $this->provider = Provider::factory()->create();
 
-    $this->room = Room::factory()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
-    $this->asset =  Asset::factory()->forLocation($this->room)->create();
+    $this->asset =  Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $this->asset->refresh();
     $this->ticket = Ticket::factory()->forLocation($this->asset)->create();
 });
 
 it('can factory intervention', function () {
-    Intervention::factory()->forLocation($this->asset)->create();
-    Intervention::factory()->forTicket($this->ticket)->create();
-    Intervention::factory()->forProvider($this->provider)->create();
+    Intervention::factory()->withAction()->forLocation($this->asset)->create();
+    Intervention::factory()->withAction()->forTicket($this->ticket)->create();
+    Intervention::factory()->withAction()->forProvider($this->provider)->create();
     assertDatabaseCount('interventions', 3);
     assertDatabaseCount('intervention_actions', 3);
 });
 
 it('shows an intervention page', function () {
-    $intervention = Intervention::factory()->forLocation($this->asset)->create(['ticket_id' => $this->ticket->id]);
+    $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create(['ticket_id' => $this->ticket->id]);
 
     $response = $this->getFromTenant('tenant.interventions.show', $intervention);
     $response->assertOk();
@@ -62,7 +62,7 @@ it('shows an intervention page', function () {
 });
 
 it('shows the index interventions page', function () {
-    Intervention::factory()->forLocation($this->asset)->count(2)->create();
+    Intervention::factory()->withAction()->forLocation($this->asset)->count(2)->create();
 
     $response = $this->getFromTenant('tenant.interventions.index');
     $response->assertOk();
@@ -249,7 +249,7 @@ it('can create a new intervention for a ROOM', function () {
 
 it('can update an existing intervention', function () {
 
-    $intervention = Intervention::factory()->forLocation($this->room)->create(['status' => 'draft']);
+    $intervention = Intervention::factory()->withAction()->forLocation($this->room)->create(['status' => 'draft']);
 
     $formData = [
         'intervention_type_id' => $this->interventionType->id,
@@ -280,7 +280,7 @@ it('can update an existing intervention', function () {
 
 it('can delete an intervention', function () {
 
-    $intervention = Intervention::factory()->forLocation($this->site)->create();
+    $intervention = Intervention::factory()->withAction()->forLocation($this->site)->create();
 
     $response = $this->deleteFromTenant('api.interventions.destroy', $intervention);
     $response->assertStatus(200)

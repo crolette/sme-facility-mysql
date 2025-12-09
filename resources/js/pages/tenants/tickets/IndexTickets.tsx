@@ -145,7 +145,7 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                 setQuery((prev) => ({ ...prev, q: null, status: 'open' }));
                             }}
                         >
-                            {t('tickets.status.open')}
+                            {t('common.status.open')}
                         </li>
                         <li
                             className={cn(
@@ -156,7 +156,7 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                 setQuery((prev) => ({ ...prev, q: null, status: 'ongoing' }));
                             }}
                         >
-                            {t('tickets.status.ongoing')}
+                            {t('common.status.ongoing')}
                         </li>
                         <li
                             className={cn(
@@ -167,7 +167,7 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                 setQuery((prev) => ({ ...prev, q: null, status: 'closed' }));
                             }}
                         >
-                            {t('tickets.status.closed')}
+                            {t('common.status.closed')}
                         </li>
                     </ul>
                 </div>
@@ -227,7 +227,7 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                             <TableHeadRow>
                                 <TableHeadData>{t('common.code')}</TableHeadData>
                                 <TableHeadData>{t('tickets.related_to')}</TableHeadData>
-                                <TableHeadData>{t('common.status')}</TableHeadData>
+                                <TableHeadData>{t('common.status.title')}</TableHeadData>
                                 <TableHeadData>{t('tickets.reporter')}</TableHeadData>
                                 <TableHeadData>{t('common.description')}</TableHeadData>
                                 <TableHeadData>
@@ -296,19 +296,19 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                                             <a href={ticket.ticketable.location_route}>{ticket.asset_code}</a>
                                         </TableBodyData>
                                         <TableBodyData>
-                                            <Pill variant={ticket.status}>{t(`tickets.status.${ticket.status}`)}</Pill>
+                                            <Pill variant={ticket.status}>{t(`common.status.${ticket.status}`)}</Pill>
                                         </TableBodyData>
                                         <TableBodyData>{ticket.reporter?.full_name ?? ticket.reporter_email}</TableBodyData>
                                         <TableBodyData className="flex h-full w-40 items-center">
                                             <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{ticket.description}</p>
-                                            <p className="tooltip tooltip-bottom">{ticket.description}</p>
+                                            <p className="tooltip tooltip-top">{ticket.description}</p>
                                         </TableBodyData>
                                         <TableBodyData>{ticket.created_at}</TableBodyData>
 
                                         <TableBodyData className="space-x-2">
                                             {ticket.status == 'open' && (
                                                 <Button variant={'green'} onClick={() => changeStatusTicket(ticket.id, 'ongoing')}>
-                                                    {t('tickets.status.ongoing')}
+                                                    {t('common.status.ongoing')}
                                                 </Button>
                                             )}
                                             {ticket.status !== 'closed' && (

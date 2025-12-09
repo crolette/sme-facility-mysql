@@ -16,7 +16,6 @@ export default function CGU() {
             </Head>
             <section className="text-website-font w-full">
                 <div className="container mx-auto">
-                    {/* <div className="mx-auto grid h-full gap-10 md:grid-cols-2 md:p-10 lg:max-w-11/12"></div> */}
                     <div className="mx-auto flex flex-col gap-10 p-4 md:p-10 lg:max-w-11/12">
                         <h1>CGU</h1>
                     </div>

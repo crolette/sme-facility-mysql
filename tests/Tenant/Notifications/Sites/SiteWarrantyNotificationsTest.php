@@ -612,14 +612,14 @@ it('creates warranty notification for admin when notification preference warrant
 
     $this->patchToTenant('api.notifications.update', $formData, $preference->id);
 
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
     $location->refresh();
     $location->maintainable->update([
         'under_warranty' => true,
         'end_warranty_date' => Carbon::tomorrow()
     ]);
 
-    $locationInThePast = Site::factory()->create();
+    $locationInThePast = Site::factory()->withMaintainableData()->create();
     $locationInThePast->refresh();
     $locationInThePast->maintainable->update([
         'under_warranty' => true,
@@ -676,7 +676,7 @@ it('creates warranty notification for maintenance manager when notification pref
 
     $this->patchToTenant('api.notifications.update', $formData, $preference->id);
 
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
     $location->refresh();
     $location->maintainable->update([
         'under_warranty' => true,
@@ -684,7 +684,7 @@ it('creates warranty notification for maintenance manager when notification pref
         'maintenance_manager_id' => $this->manager->id
     ]);
 
-    $locationInThePast = Site::factory()->create();
+    $locationInThePast = Site::factory()->withMaintainableData()->create();
     $locationInThePast->refresh();
     $locationInThePast->maintainable->update([
         'under_warranty' => true,
@@ -749,7 +749,7 @@ it('creates warranty notification for maintenance manager when notification pref
 
 it('creates warranty notifications for a new created user with admin role', function () {
 
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
 
     $location->maintainable()->update([
         'under_warranty' => true,
@@ -784,7 +784,7 @@ it('creates warranty notifications for a new created user with admin role', func
 
 it('creates warranty notifications when the role of a maintenance manager changes to admin', function () {
 
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
 
     $location->maintainable()->update([
         'under_warranty' => true,
@@ -841,7 +841,7 @@ it('creates warranty notifications when the role of a maintenance manager change
 });
 
 it('deletes warranty notifications when the role of an admin changes to maintenance manager', function () {
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
 
     $location->maintainable()->update([
         'under_warranty' => true,
@@ -898,14 +898,14 @@ it('deletes warranty notifications when the role of an admin changes to maintena
 });
 
 it('deletes warranty notifications when the role of an admin changes to maintenance manager for sites where he is not maintenance manager', function () {
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
 
     $location->maintainable()->update([
         'under_warranty' => true,
         'end_warranty_date' => Carbon::tomorrow(),
     ]);
 
-    $locationWithManager = Site::factory()->create();
+    $locationWithManager = Site::factory()->withMaintainableData()->create();
 
     $locationWithManager->maintainable()->update([
         'under_warranty' => true,
@@ -991,7 +991,7 @@ it('deletes warranty notifications when the role of an admin changes to maintena
 
 it('deletes warranty notifications when a user is deleted', function () {
 
-    $location = Site::factory()->create();
+    $location = Site::factory()->withMaintainableData()->create();
 
     $location->maintainable()->update([
         'under_warranty' => true,

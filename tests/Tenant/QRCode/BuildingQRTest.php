@@ -26,7 +26,7 @@ beforeEach(function () {
     $this->actingAs($this->user, 'tenant');
     LocationType::factory()->create(['level' => 'site']);
     $this->locationType = LocationType::factory()->create(['level' => 'building']);
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
 
 
     $this->formData = [
@@ -66,7 +66,7 @@ it('creates a QR Code when need_qr_code is true at building\'s creation', functi
 
 
 it('can regenerate a QR Code for a building', function () {
-    $location = Building::factory()->create();
+    $location = Building::factory()->withMaintainableData()->create();
 
     $response = $this->postToTenant('api.buildings.qr.regen', [], $location->reference_code);
     $response->assertSessionHasNoErrors();

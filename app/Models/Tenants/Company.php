@@ -93,14 +93,14 @@ class Company extends Model
     public function diskSizeMb(): Attribute
     {
         return Attribute::make(
-            get: fn() => round($this->disk_size / 1024 / 1024, 2)
+            get: fn() => round($this->disk_size / 1024 / 1024, 2) ?? null
         );
     }
 
     public function diskSizeGb(): Attribute
     {
         return Attribute::make(
-            get: fn() => round($this->disk_size / 1024 / 1024 / 1024, 2)
+            get: fn() => round($this->disk_size / 1024 / 1024 / 1024, 2) ?? null
         );
     }
 

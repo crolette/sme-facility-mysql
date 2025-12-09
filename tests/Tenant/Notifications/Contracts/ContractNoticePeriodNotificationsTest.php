@@ -37,11 +37,11 @@ beforeEach(function () {
     $this->manager = User::factory()->withRole('Maintenance Manager')->create();
 
     $this->provider = Provider::factory()->create();
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
-    $this->room = Room::factory()->create();
-    $this->asset = Asset::factory()->forLocation($this->room)->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
+    $this->asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     $this->basicContractData = [
         'provider_id' => $this->provider->id,
@@ -70,14 +70,17 @@ it('creates the notice_date notification for an admin when a new contract is cre
     $formData = [
         ...$this->basicContractData,
         'contract_duration' => $duration,
-        'notice_period' => $period
+        'notice_period' => $period,
+        'notice_date' => $noticeDate
     ];
 
-    $this->postToTenant('api.contracts.store', $formData);
 
     if ($noticeDate <= Carbon::now()->toDateString()) {
         assertDatabaseCount('scheduled_notifications', 0);
     } else {
+
+        $response = $this->postToTenant('api.contracts.store', $formData);
+        $response->assertSessionHasNoErrors();
 
         $preference = $this->admin->notification_preferences()->where('notification_type', 'notice_date')->first();
 

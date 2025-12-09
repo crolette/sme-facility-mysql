@@ -2,11 +2,12 @@
 
 namespace Database\Factories\Tenants;
 
+use Carbon\Carbon;
+use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Company;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Maintainable;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -23,8 +24,10 @@ class AssetFactory extends Factory
      */
     public function definition(): array
     {
+        $category = CategoryType::where('category', 'asset')->first();
+        if (!$category)
+            $category = CategoryType::factory()->create(['category' => 'asset']);
 
-        $category = CategoryType::factory()->create(['category' => 'asset']);
 
         $randomDepreciationDuration = fake()->randomDigitNotZero();
         return [
@@ -44,6 +47,20 @@ class AssetFactory extends Factory
         ];
     }
 
+    public function withMaintainableData(array $data = [])
+    {
+        return $this->afterCreating(function (Asset $asset) use ($data) {
+            $maintainableData = array_merge([
+                'name' => fake()->text(20),
+                'description' => fake()->sentence(6),
+            ], $data);
+
+            $asset->maintainable()->save(
+                Maintainable::factory()->make($maintainableData)
+            );
+        });
+    }
+
     public function forLocation($location): static
     {
         return $this->for($location, 'location')->state(function () use ($location) {
@@ -51,25 +68,14 @@ class AssetFactory extends Factory
 
             $codeNumber = generateCodeNumber($count, 'A', 4);
 
-            $referenceCode = $location->reference_code . '-' . $codeNumber;
+            $locationClass = get_class($location);
+
+            $referenceCode = $locationClass === User::class ? $codeNumber : $location->reference_code . '-' . $codeNumber;
 
             return [
                 'reference_code' => $referenceCode,
                 'code' => $codeNumber
             ];
         });
-    }
-
-
-    public function configure()
-    {
-        return $this->afterCreating(
-
-            function (Asset $asset) {
-                $asset->maintainable()->save(
-                    Maintainable::factory()->make()
-                );
-            }
-        );
     }
 }

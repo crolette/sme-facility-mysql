@@ -4,7 +4,7 @@ import { useLaravelReactI18n } from 'laravel-react-i18n';
 export default function LocaleChange({ url = 'tenant.locale' }) {
     const { t, getLocales, currentLocale } = useLaravelReactI18n();
 
-    const handleLocaleChange = (locale) => {
+    const handleLocaleChange = (locale: string) => {
         router.visit(route(url, locale));
     };
 

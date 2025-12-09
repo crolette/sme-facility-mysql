@@ -59,10 +59,8 @@ class RegenerateAllQRCodes extends Command
             $items = $collection->merge($sites)->merge($buildings)->merge($floors)->merge($rooms)->merge($assets);
 
             foreach ($items as $item) {
-                app(QRCodeService::class)->createAndAttachQR($item);
+                app(QRCodeService::class)->createAndAttachQR($item, $tenant->domain->domain);
             }
-
-
 
             Log::info("Dispatched QR Code regeneration for tenant: {$tenant->company_code}");
         });

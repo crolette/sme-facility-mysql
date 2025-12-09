@@ -9,6 +9,9 @@ return [
     'description' => 'Een compleet platform, zonder onnodige complexiteit, om uw kosten te beheersen en efficiënter te worden.',
     'from' => 'Vanaf',
     'month' => 'maand',
+    'year' => 'jaar',
+    'vat_excluded' => 'excl. btw',
+    'vat_excluded_description' => 'De vermelde prijzen zijn exclusief btw. De toepasselijke btw wordt bij facturatie toegevoegd conform de op dat moment geldende wettelijke bepalingen.',
     'start_today' => 'Start vandaag',
     'starter' => [
         'title' => 'Starter',
@@ -23,8 +26,9 @@ return [
         ],
     ],
     'launching_offer' => [
-        'title' => 'Lancering aanbieding',
+        'title' => 'Lanceringsaanbieding',
         'description' => 'Om de lancering van SME Facility te vieren, profiteert u van een uitzonderlijke aanbieding!',
+        'conditions' => 'De lanceringsaanbieding is voorbehouden aan nieuwe klanten en is uitsluitend van toepassing op het eerste abonnementsjaar. Vanaf het tweede jaar wordt automatisch het dan geldende tarief toegepast.',
     ],
     'premium' => [
         'title' => 'Premium',

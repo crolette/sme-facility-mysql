@@ -35,11 +35,11 @@ beforeEach(function () {
     $this->roomType = LocationType::factory()->create(['level' => 'room']);
 
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
 
-    $this->room = Room::factory()
+    $this->room = Room::factory()->withMaintainableData()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
@@ -155,7 +155,7 @@ it('can add maintenance frequency to asset with next_maintenance_date (and does 
 
 it('can update maintenance frequency/date from asset', function (string $frequency) {
 
-    $asset = Asset::factory()->forLocation($this->site)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->site)->create();
 
     $formData = [
         ...$this->basicAssetData,

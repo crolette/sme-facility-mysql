@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use Stancl\Tenancy\Jobs;
 use Stancl\Tenancy\Events;
+use App\Jobs\CreateCompany;
 use App\Jobs\DeleteDatabase;
 use Stancl\Tenancy\Listeners;
 use Stancl\Tenancy\Middleware;
@@ -36,6 +37,7 @@ class TenancyServiceProvider extends ServiceProvider
                 //     Jobs\MigrateDatabase::class,
                 //     Jobs\SeedDatabase::class,
                 //     CreateTenantAdmin::class,
+                // CreateCompany::class,
                 // ])->send(function (Events\TenantCreated $event) {
                 //     return $event->tenant;
                 // })->shouldBeQueued(false), // `false` by default, but you probably want to make this `true` for production.

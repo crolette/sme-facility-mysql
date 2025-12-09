@@ -38,19 +38,19 @@ beforeEach(function () {
     CategoryType::factory()->create(['category' => 'document']);
     CategoryType::factory()->create(['category' => 'asset']);
     CategoryType::factory()->create(['category' => 'provider']);
-    Site::factory()->create();
-    Building::factory()->create();
-    Floor::factory()->create();
+    Site::factory()->withMaintainableData()->create();
+    Building::factory()->withMaintainableData()->create();
+    Floor::factory()->withMaintainableData()->create();
 
-    $this->room = Room::factory()
+    $this->room = Room::factory()->withMaintainableData()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
 
-    $this->asset = Asset::factory()->forLocation($this->room)->create();
+    $this->asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $this->provider = Provider::factory()->create();
     $this->contract = Contract::factory()->create();
-    
+
     $this->formData = [
         'provider_id' => $this->provider->id,
         'name' => 'Contrat de bail',
@@ -195,8 +195,8 @@ test('test access roles to post a new document to a contract', function (string 
 
 test('test access roles to detach a document from a contract', function (string $role, int $expectedStatus) {
 
-        $user = User::factory()->withRole($role)->create();
-        $this->actingAs($user, 'tenant');
+    $user = User::factory()->withRole($role)->create();
+    $this->actingAs($user, 'tenant');
 
     $document = Document::factory()->withCustomAttributes([
         'user' => $this->user,

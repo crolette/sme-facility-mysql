@@ -42,6 +42,8 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
                 $rowWithoutHash = $row;
                 unset($rowWithoutHash['hash']);
 
+                Log::info('rowWithoutHash', ['row' => $rowWithoutHash]);
+
                 $calculatedHash = app(ProviderExportImportService::class)->calculateHash([...$rowWithoutHash]);
 
                 if ($providerHash !== $calculatedHash) {
@@ -77,7 +79,7 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
             'postal_code' => $rowData['postal_code'] ?? null,
             'city' => $rowData['city'] ?? null,
             'country_code' => $rowData['country_code'] ?? null,
-            'categoryId' => $rowData['categoryId'] ?? null,
+            'categories' => $rowData['categories'] ?? null,
         ];
 
         return $data;
@@ -111,16 +113,24 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
             $data['postal_code'] = strval($data['postal_code']);
         }
 
-        $translation = Translation::where('translatable_type', CategoryType::class)
-            ->where('label', $data['category'])
-            ->whereHasMorph('translatable', [CategoryType::class], function (Builder $query) {
-                $query->where('category', 'provider');
-            })
-            ->first();
+        $categories = [];
 
-        if ($translation !== null) {
-            $data['categoryId'] = $translation->translatable_id;
+        for ($i = 1; $i < 4; $i++) {
+            $categoryOne = Translation::where('translatable_type', CategoryType::class)
+                ->where('label', $data['category_' . $i])
+                ->whereHasMorph('translatable', [CategoryType::class], function (Builder $query) {
+                    $query->where('category', 'provider');
+                })
+                ->first();
+
+            if ($categoryOne !== null) {
+                $categories = [...$categories, $categoryOne->translatable];
+            }
         }
+
+        $data['categories'] = $categories;
+
+        Log::info('categories prepare validation', $data['categories']);
 
         $countryTranslation = CountryTranslation::where('label', $data['country'])->first();
 
@@ -149,7 +159,8 @@ class ProvidersDataImport implements ToCollection, WithHeadingRow, WithStartRow,
             'vat_number' => ['nullable', 'string', 'regex:/^[A-Z]{2}[0-9A-Z]{2,12}$/', 'max:14',],
             'phone_number' => 'required|string|regex:/^\+\d{8,15}$/|max:16',
             'website' => 'nullable|url:http,https',
-            'categoryId' => ['required', Rule::in(CategoryType::where('category', 'provider')->pluck('id')->toArray())],
+            'categories' => 'array|min:1',
+            // 'categoryId' => ['required', Rule::in(CategoryType::where('category', 'provider')->pluck('id')->toArray())],
         ];
     }
 

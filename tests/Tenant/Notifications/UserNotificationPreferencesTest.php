@@ -35,14 +35,14 @@ beforeEach(function () {
     $this->user->assignRole('Admin');
     $this->actingAs($this->user, 'tenant');
 
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
     $this->provider = Provider::factory()->create();
 
-    $this->room = Room::factory()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
-    $this->asset = Asset::factory()->forLocation(Room::first())->create();
+    $this->asset = Asset::factory()->withMaintainableData()->forLocation(Room::first())->create();
 
     // $this->notificationTypes = [...collect(config('notifications.notification_types'))->flatten()];
 });

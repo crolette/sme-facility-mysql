@@ -36,7 +36,7 @@ class ExportSuccessMail extends Mailable
     {
         return new Envelope(
             from: new Address('notifications@sme-facility.com', 'SME-Facility - Notification'),
-            subject: __('export.type-exported', ['type' =>  $$this->dataType]),
+            subject: __('export.type-exported', ['type' =>  $this->dataType]),
         );
     }
 

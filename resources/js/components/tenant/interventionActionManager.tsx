@@ -284,12 +284,12 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                         className="flex flex-col space-y-4"
                     >
                         <div className="flex flex-col gap-2 space-y-2">
-                            <Label>
+                            <Label htmlFor="intervention_action_type">
                                 {tChoice('interventions.actions', 1)} {t('common.type')}
                             </Label>
                             <select
                                 name="action_type"
-                                id="intervention_type"
+                                id="intervention_action_type"
                                 required
                                 value={interventionActionDataForm.action_type_id ?? ''}
                                 onChange={(e) =>
@@ -308,8 +308,9 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <Label>{t('common.description')}</Label>
+                            <Label htmlFor="description">{t('common.description')}</Label>
                             <Textarea
+                                id="description"
                                 placeholder="description"
                                 value={interventionActionDataForm.description ?? ''}
                                 onChange={(e) =>
@@ -337,10 +338,11 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                             </div>
                         )}
                         <div className="space-y-2">
-                            <Label>
+                            <Label htmlFor="intervention_costs">
                                 {tChoice('interventions.title', 1)} {t('interventions.costs')}
                             </Label>
                             <Input
+                                id="intervention_costs"
                                 type="number"
                                 step="0.01"
                                 min="0"
@@ -354,12 +356,14 @@ export const InterventionActionManager = ({ interventionId, closed, actionsChang
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label>
+                            <Label htmlFor="intervention_date">
                                 {tChoice('interventions.title', 1)} {t('common.date')}
                             </Label>
                             <div className="flex flex-col gap-4 sm:flex-row">
                                 <Input
+                                    id="intervention_date"
                                     type="date"
+                                    required
                                     value={interventionActionDataForm.intervention_date ?? ''}
                                     onChange={(e) =>
                                         setInterventionActionDataForm((prev) => ({

@@ -67,8 +67,14 @@ export default function CreateUpdateContract({
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
-            title: `Contract`,
-            href: `/contract/${contract?.id ?? 'create'}`,
+            title: `Index ${tChoice('contracts.title', 2)}`,
+            href: '/contracts',
+        },
+        {
+            title: contract
+                ? `${t('actions.update-type', { type: contract.name })}`
+                : `${t('actions.create-type', { type: tChoice('contracts.title', 1) })}`,
+            href: '/contracts/create',
         },
     ];
     const { showToast } = useToast();
@@ -207,19 +213,25 @@ export default function CreateUpdateContract({
                 }
             />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-                <h1>{contract?.name ?? 'New contract'}</h1>
+                <h1>
+                    {contract
+                        ? `${t('actions.update-type', { type: contract.name })}`
+                        : `${t('actions.create-type', { type: tChoice('contracts.title', 1) })}`}
+                </h1>
                 <form onSubmit={submit} className="space-y-4">
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
                         <div className="flex w-full flex-col gap-4 lg:flex-row">
                             <div className="w-full">
-                                <Label>{t('common.name')}</Label>
+                                <Label htmlFor="name">{t('common.name')}</Label>
                                 <Input
+                                    id="name"
                                     type="text"
                                     onChange={(e) => setData('name', e.target.value)}
                                     required
                                     value={data.name}
                                     minLength={4}
                                     maxLength={100}
+                                    placeholder={t('contracts.name_placeholder')}
                                 />
                                 <InputError message={errors?.name ?? ''} />
                             </div>
@@ -228,7 +240,7 @@ export default function CreateUpdateContract({
                                 <select
                                     name="type"
                                     onChange={(e) => setData('type', e.target.value)}
-                                    id=""
+                                    id="type"
                                     required
                                     value={data.type}
                                     className={cn(
@@ -263,6 +275,7 @@ export default function CreateUpdateContract({
                                     onChange={(e) => setData('internal_reference', e.target.value)}
                                     value={data.internal_reference}
                                     maxLength={50}
+                                    placeholder={t('contracts.internal_ref_placeholder')}
                                 />
                                 <InputError message={errors?.internal_reference ?? ''} />
                             </div>
@@ -273,6 +286,7 @@ export default function CreateUpdateContract({
                                     onChange={(e) => setData('provider_reference', e.target.value)}
                                     value={data.provider_reference}
                                     maxLength={50}
+                                    placeholder={t('contracts.internal_ref_placeholder')}
                                 />
                                 <InputError message={errors?.provider_reference ?? ''} />
                             </div>
@@ -380,7 +394,7 @@ export default function CreateUpdateContract({
                                     <InputError className="mt-2" message={errors?.contract_duration ?? ''} />
                                 </div>
                                 <div>
-                                    <Label htmlFor="notice_period">{t('contracts.notice_period')}</Label>
+                                    <Label htmlFor="notice_period">{t('contracts.notice_period.title')}</Label>
                                     <select
                                         name="notice_period"
                                         onChange={(e) => setData('notice_period', e.target.value)}
@@ -396,7 +410,7 @@ export default function CreateUpdateContract({
                                         {noticePeriods && noticePeriods.length > 0 && (
                                             <>
                                                 <option value="" disabled className="bg-background text-foreground">
-                                                    {t('actions.select-type', { type: t('contracts.notice_period') })}
+                                                    {t('actions.select-type', { type: t('contracts.notice_period.title') })}
                                                 </option>
                                                 {noticePeriods?.map((noticePeriod, index) => (
                                                     <option value={noticePeriod} key={index} className="bg-background text-foreground">
@@ -413,7 +427,7 @@ export default function CreateUpdateContract({
                         </div>
                         <div className="mt-4 flex w-full flex-col gap-4 lg:flex-row">
                             <div className="w-full">
-                                <Label htmlFor="renewal_type">{t(`contracts.renewal_type`)}</Label>
+                                <Label htmlFor="renewal_type">{t(`contracts.renewal_type.title`)}</Label>
                                 <select
                                     name="renewal_type"
                                     onChange={(e) => setData('renewal_type', e.target.value)}
@@ -429,7 +443,7 @@ export default function CreateUpdateContract({
                                     {renewalTypes && renewalTypes.length > 0 && (
                                         <>
                                             <option value="" disabled className="bg-background text-foreground">
-                                                {t('actions.select-type', { type: t('contracts.renewal_type') })}
+                                                {t('actions.select-type', { type: t('contracts.renewal_type.title') })}
                                             </option>
                                             {renewalTypes?.map((renewalType, index) => (
                                                 <option value={renewalType} key={index} className="bg-background text-foreground">
@@ -441,7 +455,7 @@ export default function CreateUpdateContract({
                                 </select>
                             </div>
                             <div className="w-full">
-                                <Label htmlFor="status">{t('common.status')}</Label>
+                                <Label htmlFor="status">{t('common.status.title')}</Label>
                                 <select
                                     name="status"
                                     value={data.status}
@@ -457,11 +471,11 @@ export default function CreateUpdateContract({
                                     {statuses && statuses.length > 0 && (
                                         <>
                                             <option value="" disabled className="bg-background text-foreground">
-                                                {t('actions.select-type', { type: t('common.status') })}
+                                                {t('actions.select-type', { type: t('common.status.title') })}
                                             </option>
                                             {statuses?.map((status, index) => (
                                                 <option value={status} key={index} className="bg-background text-foreground">
-                                                    {t(`contracts.status.${status}`)}
+                                                    {t(`common.status.${status}`)}
                                                 </option>
                                             ))}
                                         </>

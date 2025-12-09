@@ -64,7 +64,7 @@ class ProcessTenantNotifications implements ShouldQueue
     {
         Log::info("Try send mail to : {$notification->recipient_email} for type : {$notification->notification_type}");
         try {
-            if(env('APP_ENV') === 'local')  {
+            if (env('APP_ENV') === 'local') {
                 Mail::to('crolweb@gmail.com')->send(
                     new \App\Mail\ScheduledNotificationMail($notification)
                 );
@@ -74,26 +74,23 @@ class ProcessTenantNotifications implements ShouldQueue
                     new \App\Mail\ScheduledNotificationMail($notification)
                 );
                 Log::info("Mail sent to : {$notification->recipient_email}");
-
             }
+            // Marquer comme envoyée
+            $notification->update([
+                'status' => 'sent',
+                'sent_at' => now()
+            ]);
+
+            Log::info("Notification sent successfully", [
+                'tenant_id' => $tenantId,
+                'notification_id' => $notification->id,
+                'type' => $notification->notification_type,
+                'recipient' => $notification->recipient_email
+            ]);
         } catch (\Exception $e) {
             Log::error("Email failed: " . $e->getMessage());
             throw $e;
         }
-
-
-        // Marquer comme envoyée
-        $notification->update([
-            'status' => 'sent',
-            'sent_at' => now()
-        ]);
-
-        Log::info("Notification sent successfully", [
-            'tenant_id' => $tenantId,
-            'notification_id' => $notification->id,
-            'type' => $notification->notification_type,
-            'recipient' => $notification->recipient_email
-        ]);
     }
 
     protected function handleNotificationError(ScheduledNotification $notification, \Exception $e, $tenantId)

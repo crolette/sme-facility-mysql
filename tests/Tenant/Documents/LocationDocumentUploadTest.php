@@ -31,16 +31,16 @@ beforeEach(function () {
     $this->actingAs($this->user, 'tenant');
 
     // on créée les différentes "locations" possibles pour attacher un asset
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
-    $this->room = Room::factory()
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
+    $this->room = Room::factory()->withMaintainableData()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
 
     // on créé un asset qu'on attache à une room
-    // $this->asset = Asset::factory()->forLocation($this->room)->create();
+    // $this->asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 });
 
 it('can upload several files to asset', function () {
@@ -157,7 +157,7 @@ it('fails when upload exceeding document size : ' . Document::maxUploadSizeKB() 
 
 it('can delete a document from an asset', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $document = Document::factory()->withCustomAttributes([
         'user' => $this->user,
         'directoryName' => 'assets',
@@ -181,7 +181,7 @@ it('can delete a document from an asset', function () {
 
 it('can update name and description a document from an asset ', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $document = Document::factory()->withCustomAttributes([
         'user' => $this->user,
         'directoryName' => 'assets',
@@ -213,7 +213,7 @@ it('deletes the documents directory if it is empty', function () {
     $file1 = UploadedFile::fake()->image('avatar.png');
     $categoryType = CategoryType::where('category', 'document')->first();
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     $formData = [
 
@@ -256,7 +256,7 @@ it('deletes the documents directory if it is empty', function () {
 //     $file1 = UploadedFile::fake()->image('avatar.png');
 //     $categoryType = CategoryType::where('category', 'document')->first();
 
-//     $asset = Asset::factory()->forLocation($this->room)->create();
+//     $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
 //     $formData = [
 

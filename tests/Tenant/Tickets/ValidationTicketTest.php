@@ -30,17 +30,16 @@ beforeEach(function () {
     CategoryType::factory()->count(2)->create(['category' => 'document']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
     CategoryType::factory()->count(2)->create(['category' => 'asset']);
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
 
-    $this->room = Room::factory()
+    $this->room = Room::factory()->withMaintainableData()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
 
-    $this->asset =  Asset::factory()->forLocation($this->room)->create();
-    
+    $this->asset =  Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 });
 
 it('fails when creating a new ticket with a wrong asset code', function () {
@@ -128,7 +127,7 @@ it('fails when not uploading an image', function () {
 });
 
 
-it('fails when uploading more than 3 pictures', function() {
+it('fails when uploading more than 3 pictures', function () {
 
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->image('test.jpg');
@@ -159,7 +158,7 @@ it('fails when uploading more than 3 pictures', function() {
     assertDatabaseEmpty('tickets');
 });
 
-it('fails when uploading a picture > Max MB', function() {
+it('fails when uploading a picture > Max MB', function () {
 
     $file1 = UploadedFile::fake()->image('avatar.png')->size('10000');
     $formData = [
@@ -183,7 +182,7 @@ it('fails when uploading a picture > Max MB', function() {
     );
 });
 
-it('fails when creating ticket with description less than 10 characters', function() {
+it('fails when creating ticket with description less than 10 characters', function () {
     $formData = [
         'location_type' => 'assets',
         'location_code' => $this->asset->reference_code,
@@ -199,4 +198,3 @@ it('fails when creating ticket with description less than 10 characters', functi
         ]
     );
 });
-

@@ -26,13 +26,13 @@ beforeEach(function () {
     $this->interventionType = CategoryType::factory()->create(['category' => 'intervention']);
     CategoryType::factory()->create(['category' => 'action']);
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
 
-    $this->room = Room::factory()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
-    $this->asset =  Asset::factory()->forLocation($this->room)->create();
+    $this->asset =  Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 });
 
 it('can render the index tickets page', function () {
@@ -67,7 +67,7 @@ it('can render the show ticket page', function () {
 
 it('can render interventions in the ticket page', function () {
     $ticket = Ticket::factory()->forLocation($this->asset)->create();
-    Intervention::factory()->forTicket($ticket)->count(2)->create();
+    Intervention::factory()->withAction()->forTicket($ticket)->count(2)->create();
 
     $response = $this->getFromTenant('tenant.tickets.show', $ticket);
     $response->assertOk();

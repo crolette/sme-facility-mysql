@@ -30,11 +30,11 @@ beforeEach(function () {
     $this->roomType = LocationType::factory()->create(['level' => 'room']);
     $this->category = CategoryType::factory()->create(['category' => 'asset']);
 
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
 
-    $this->room = Room::factory()
+    $this->room = Room::factory()->withMaintainableData()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();

@@ -73,6 +73,13 @@ class Intervention extends Model
             $intervention->ticket?->changeStatusToOngoing();
         });
 
+        static::updated(function ($intervention) {
+            if ($intervention->status === InterventionStatus::COMPLETED || $intervention->status === InterventionStatus::CANCELLED) {
+                $intervention->ticket?->closeTicket();
+            }
+        });
+
+
         static::deleted(function ($intervention) {
             $intervention->notifications()->delete();
         });

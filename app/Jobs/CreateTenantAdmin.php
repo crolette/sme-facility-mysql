@@ -46,6 +46,7 @@ class CreateTenantAdmin implements ShouldQueue
 
         app(UserNotificationPreferenceService::class)->createDefaultUserNotificationPreferences($admin);
 
-             tenancy()->end();
+
+        tenancy()->end();
     }
 }

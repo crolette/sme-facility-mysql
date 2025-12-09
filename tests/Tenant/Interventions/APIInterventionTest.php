@@ -31,21 +31,21 @@ beforeEach(function () {
     $this->actingAs($this->user, 'tenant');
     $this->interventionType = CategoryType::factory()->create(['category' => 'intervention']);
     $this->interventionActionType = CategoryType::factory()->create(['category' => 'action']);
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
 
-    $this->room = Room::factory()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
     $this->provider = Provider::factory()->create();
 
-    $this->asset =  Asset::factory()->forLocation($this->room)->create();
+    $this->asset =  Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $this->asset->refresh();
     $this->ticket = Ticket::factory()->forLocation($this->asset)->create();
 });
 
 it('can get an intervention', function () {
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
     $response = $this->getFromTenant('api.interventions.show', $intervention->id);
     $response->assertStatus(200)
         ->assertJson([
@@ -60,7 +60,7 @@ it('can retrieve providers linked to an intervention (asset) to select to which 
     $providers = Provider::factory()->count(2)->create();
     $this->asset->maintainable->providers()->sync($providers->pluck('id'));
 
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
     $response = $this->getFromTenant('api.interventions.providers', $intervention->id);
     $response->assertOk();
@@ -70,7 +70,7 @@ it('can retrieve providers linked to an intervention (asset) to select to which 
 });
 
 it('can get an intervention with ticket', function () {
-    $intervention = Intervention::factory()->forTicket($this->ticket)->create();
+    $intervention = Intervention::factory()->withAction()->forTicket($this->ticket)->create();
     $response = $this->getFromTenant('api.interventions.show', $intervention->id);
     $response->assertStatus(200)
         ->assertJson([
@@ -80,7 +80,7 @@ it('can get an intervention with ticket', function () {
 });
 
 it('can get all interventions for an ASSET', function () {
-    Intervention::factory()->forLocation($this->asset)->count(2)->create();
+    Intervention::factory()->withAction()->forLocation($this->asset)->count(2)->create();
     $response = $this->getFromTenant('api.assets.interventions', $this->asset->reference_code);
 
     $response->assertStatus(200)
@@ -93,7 +93,7 @@ it('can get all interventions for an ASSET', function () {
 
 
 it('can get all interventions for a SITE', function () {
-    Intervention::factory()->forLocation($this->site)->count(2)->create();
+    Intervention::factory()->withAction()->forLocation($this->site)->count(2)->create();
     $response = $this->getFromTenant('api.sites.interventions', $this->site);
 
     $response->assertStatus(200)
@@ -104,7 +104,7 @@ it('can get all interventions for a SITE', function () {
 });
 
 it('can get all interventions for a BUILDING', function () {
-    Intervention::factory()->forLocation($this->building)->count(2)->create();
+    Intervention::factory()->withAction()->forLocation($this->building)->count(2)->create();
     $response = $this->getFromTenant('api.buildings.interventions', $this->building);
 
     $response->assertStatus(200)
@@ -116,7 +116,7 @@ it('can get all interventions for a BUILDING', function () {
 
 
 it('can get all interventions for a FLOOR', function () {
-    Intervention::factory()->forLocation($this->floor)->count(2)->create();
+    Intervention::factory()->withAction()->forLocation($this->floor)->count(2)->create();
     $response = $this->getFromTenant('api.floors.interventions', $this->floor);
 
     $response->assertStatus(200)
@@ -127,7 +127,7 @@ it('can get all interventions for a FLOOR', function () {
 });
 
 it('can get all interventions for a ROOM', function () {
-    Intervention::factory()->forLocation($this->room)->count(2)->create();
+    Intervention::factory()->withAction()->forLocation($this->room)->count(2)->create();
     $response = $this->getFromTenant('api.rooms.interventions', $this->room->reference_code);
 
     $response->assertStatus(200)
@@ -138,7 +138,7 @@ it('can get all interventions for a ROOM', function () {
 });
 
 it('can get all interventions directly linked to a PROVIDER', function () {
-    Intervention::factory()->forProvider($this->provider)->count(2)->create();
+    Intervention::factory()->withAction()->forProvider($this->provider)->count(2)->create();
     $response = $this->getFromTenant('api.providers.interventions', $this->provider->id);
 
     $response->assertStatus(200)
@@ -149,8 +149,8 @@ it('can get all interventions directly linked to a PROVIDER', function () {
 });
 
 it('can get all interventions directly linked to and assigned to a PROVIDER ', function () {
-    Intervention::factory()->forProvider($this->provider)->count(2)->create();
-    $intervention = Intervention::factory()->forProvider($this->room)->create();
+    Intervention::factory()->withAction()->forProvider($this->provider)->count(2)->create();
+    $intervention = Intervention::factory()->withAction()->forProvider($this->room)->create();
     $intervention->assignable()->associate($this->provider)->save();
 
     $response = $this->getFromTenant('api.providers.interventions', $this->provider->id);

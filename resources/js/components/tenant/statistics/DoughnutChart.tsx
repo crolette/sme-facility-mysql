@@ -29,7 +29,7 @@ export default function DoughnutChart({
     };
 
     return (
-        <div className="h-96 w-xs lg:w-md xl:w-xl">
+        <div className="h-96 w-xs lg:w-md xl:w-xl ">
             <Doughnut
                 width={100}
                 height={100}

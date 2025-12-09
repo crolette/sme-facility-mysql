@@ -31,20 +31,20 @@ beforeEach(function () {
     LocationType::factory()->create(['level' => 'room']);
     CategoryType::factory()->count(2)->create(['category' => 'document']);
     $this->categoryTypeAsset = CategoryType::factory()->create(['category' => 'asset']);
-    Site::factory()->create();
-    Building::factory()->create();
-    $this->floor = Floor::factory()->create();
-    $this->room = Room::factory()->create();
+    Site::factory()->withMaintainableData()->create();
+    Building::factory()->withMaintainableData()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
-    $this->assetOneWithManager = Asset::factory()->forLocation($this->room)->create();
+    $this->assetOneWithManager = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $this->assetOneWithManager->refresh();
     $this->assetOneWithManager->maintainable->manager()->associate($this->manager)->save();
 
-    $this->assetTwoWithManager = Asset::factory()->forLocation($this->floor)->create();
+    $this->assetTwoWithManager = Asset::factory()->withMaintainableData()->forLocation($this->floor)->create();
     $this->assetTwoWithManager->refresh();
     $this->assetTwoWithManager->maintainable->manager()->associate($this->manager)->save();
 
-    $this->assetWithoutManager = Asset::factory()->forLocation($this->room)->create();
+    $this->assetWithoutManager = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $this->assetWithoutManager->refresh();
 });
 
@@ -91,7 +91,7 @@ test('index with only assets for which user is maintenance manager', function ()
 //     $user->assignRole($role);
 //     $this->actingAs($user, 'tenant');
 
-//     $asset = Asset::factory()->forLocation($this->room)->create();
+//     $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
 //     $asset->maintainable()->update(['maintenance_manager_id' => $user->id]);
 
@@ -135,7 +135,7 @@ test('index with only assets for which user is maintenance manager', function ()
 //     $user = User::factory()->create();
 //     $user->assignRole($role);
 //     $this->actingAs($user, 'tenant');
-//     $asset = Asset::factory()->forLocation($this->room)->create();
+//     $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
 //     $asset->maintainable()->update(['maintenance_manager_id' => $user->id]);
 
@@ -182,7 +182,7 @@ test('index with only assets for which user is maintenance manager', function ()
 //     $user->assignRole($role);
 //     $this->actingAs($user, 'tenant');
 
-//     $asset = Asset::factory()->forLocation($this->room)->create();
+//     $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
 //     $asset->maintainable()->update(['maintenance_manager_id' => $user->id]);
 

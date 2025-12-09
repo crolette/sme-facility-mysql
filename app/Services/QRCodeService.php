@@ -3,17 +3,18 @@
 namespace App\Services;
 
 use Carbon\Carbon;
+use tbQuar\Facades\Quar;
 use Illuminate\Support\Str;
 use App\Models\Tenants\Document;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use tbQuar\Facades\Quar;
 
 class QRCodeService
 {
-    public function createAndAttachQR(Model $model): void
+    public function createAndAttachQR(Model $model, $tenantDomain = false): void
     {
         $tenantId = tenancy()->tenant->id;
         $modelType = Str::plural(Str::lower(class_basename($model))); // e.g., "assets", "sites", "buildings"
@@ -25,7 +26,17 @@ class QRCodeService
 
         $fileName = 'qr_'  . $qr_hash . '_' . Carbon::now()->isoFormat('YYYYMMDDhhmm')  . '.png';
 
-        $route = route('tenant.' . $modelType . '.tickets.create', $qr_hash);
+        // condition pour si nom de domaine passé par la commande app:regen-qr-codes
+        if ($tenantDomain) {
+            $route = route('tenant.' . $modelType . '.tickets.create', $qr_hash);
+            $route = preg_replace(
+                '#^https?://+#',
+                "https://{$tenantDomain}.",
+                $route
+            );
+        } else {
+            $route = route('tenant.' . $modelType . '.tickets.create', $qr_hash);
+        }
 
         $files = Storage::disk('tenants')->files($directory);
 

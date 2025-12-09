@@ -25,7 +25,6 @@ class DatabaseSeeder extends Seeder
             ProvidersPermissionsSeeder::class,
             CountriesSeeder::class,
             CountryTranslationsSeeder::class,
-            NewPermissions::class,
         ]);
 
         if (!User::where('email', 'super@sme-facility.com')->first()) {

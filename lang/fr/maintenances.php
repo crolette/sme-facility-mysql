@@ -4,6 +4,7 @@ return [
     'title' => 'Maintenance|Maintenances',
     'none' => 'Aucune maintenance planifiée',
     'frequency' => [
+        'title' => 'Fréquence de maintenance',
         'daily' => 'Quotidienne',
         'weekly' => 'Hebdomadaire',
         'bimonthly' => 'Bimensuelle',
@@ -18,6 +19,7 @@ return [
     'mark_done' => 'Marquer la maintenance comme effectuée',
     'next_maintenance_date' => 'Date de la prochaine maintenance',
     'last_maintenance_date' => 'Date de la dernière maintenance',
+    'next_maintenance_date_default' => 'Par défaut, pour calculer la date de prochaine maintenance, la date d\'aujourd\'hui sera considérée comme date de dernière maintenance.',
     'maintenance_manager' => 'Responsable de la maintenance',
     'no_manager' => 'Pas de responsable',
 ];

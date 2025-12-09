@@ -32,8 +32,8 @@ beforeEach(function () {
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
     $this->buildingType = LocationType::factory()->create(['level' => 'building']);
     $this->floorType = LocationType::factory()->create(['level' => 'floor']);
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
     $this->wallMaterial = CategoryType::factory()->create(['category' => 'wall_materials']);
     $this->floorMaterial = CategoryType::factory()->create(['category' => 'floor_materials']);
 });

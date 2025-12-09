@@ -26,8 +26,8 @@ beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
     $this->buildingType = LocationType::factory()->create(['level' => 'building']);
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
 
     $this->formData = [
         'name' => 'New building',

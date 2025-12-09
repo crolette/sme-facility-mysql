@@ -19,7 +19,7 @@ beforeEach(function () {
     $this->manager = User::factory()->withRole('Maintenance Manager')->create();
     $this->actingAs($this->admin, 'tenant');
     $this->locationType = LocationType::factory()->create(['level' => 'building']);
-    $this->site = Site::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
 
     $this->basicLocationData = [
         'name' => 'New building',
@@ -606,14 +606,14 @@ it('creates warranty notification for admin when notification preference warrant
 
     $this->patchToTenant('api.notifications.update', $formData, $preference->id);
 
-    $location = Building::factory()->create();
+    $location = Building::factory()->withMaintainableData()->create();
     $location->refresh();
     $location->maintainable->update([
         'under_warranty' => true,
         'end_warranty_date' => Carbon::tomorrow()
     ]);
 
-    $locationInThePast = Building::factory()->create();
+    $locationInThePast = Building::factory()->withMaintainableData()->create();
     $locationInThePast->refresh();
     $locationInThePast->maintainable->update([
         'under_warranty' => true,
@@ -670,7 +670,7 @@ it('creates warranty notification for maintenance manager when notification pref
 
     $this->patchToTenant('api.notifications.update', $formData, $preference->id);
 
-    $location = Building::factory()->create();
+    $location = Building::factory()->withMaintainableData()->create();
     $location->refresh();
     $location->maintainable->update([
         'under_warranty' => true,
@@ -678,7 +678,7 @@ it('creates warranty notification for maintenance manager when notification pref
         'maintenance_manager_id' => $this->manager->id
     ]);
 
-    $locationInThePast = Building::factory()->create();
+    $locationInThePast = Building::factory()->withMaintainableData()->create();
     $locationInThePast->refresh();
     $locationInThePast->maintainable->update([
         'under_warranty' => true,
@@ -743,7 +743,7 @@ it('creates warranty notification for maintenance manager when notification pref
 
 it('creates warranty notifications for a new created user with admin role', function () {
 
-    $location = Building::factory()->create();
+    $location = Building::factory()->withMaintainableData()->create();
 
     $location->maintainable()->update([
         'under_warranty' => true,
@@ -778,7 +778,7 @@ it('creates warranty notifications for a new created user with admin role', func
 
 it('creates warranty notifications when the role of a maintenance manager changes to admin', function () {
 
-    $location = Building::factory()->create();
+    $location = Building::factory()->withMaintainableData()->create();
 
     $location->maintainable()->update([
         'under_warranty' => true,
@@ -835,7 +835,7 @@ it('creates warranty notifications when the role of a maintenance manager change
 });
 
 it('deletes warranty notifications when the role of an admin changes to maintenance manager', function () {
-    $location = Building::factory()->create();
+    $location = Building::factory()->withMaintainableData()->create();
 
     $location->maintainable()->update([
         'under_warranty' => true,
@@ -892,14 +892,14 @@ it('deletes warranty notifications when the role of an admin changes to maintena
 });
 
 it('deletes warranty notifications when the role of an admin changes to maintenance manager for sites where he is not maintenance manager', function () {
-    $location = Building::factory()->create();
+    $location = Building::factory()->withMaintainableData()->create();
 
     $location->maintainable()->update([
         'under_warranty' => true,
         'end_warranty_date' => Carbon::tomorrow(),
     ]);
 
-    $locationWithManager = Building::factory()->create();
+    $locationWithManager = Building::factory()->withMaintainableData()->create();
 
     $locationWithManager->maintainable()->update([
         'under_warranty' => true,
@@ -985,7 +985,7 @@ it('deletes warranty notifications when the role of an admin changes to maintena
 
 it('deletes warranty notifications when a user is deleted', function () {
 
-    $location = Building::factory()->create();
+    $location = Building::factory()->withMaintainableData()->create();
 
     $location->maintainable()->update([
         'under_warranty' => true,

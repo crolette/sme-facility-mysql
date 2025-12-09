@@ -65,7 +65,9 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
                 "name",
                 "email",
                 "website",
-                "category",
+                "category_1",
+                "category_2",
+                "category_3",
                 "vat_number",
                 "phone_number",
                 "street",
@@ -80,7 +82,9 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
                 __('providers.company_name'),
                 __('common.email'),
                 __('providers.website'),
-                __('common.category'),
+                __('common.category') . ' 1',
+                __('common.category') . ' 2',
+                __('common.category') . ' 3',
                 __('providers.vat_number'),
                 __('common.phone'),
                 __('common.street'),
@@ -103,22 +107,24 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
     public function styles(Worksheet $sheet)
     {
         $protection = $sheet->getProtection();
-        $protection->setPassword('');
+        $protection->setPassword('SME_2025!fwebxp');
         $protection->setSheet(true);
         $protection->setFormatColumns(true);
 
         $sheet->getColumnDimension('C')->setWidth(40);
         $sheet->getColumnDimension('D')->setWidth(40);
         $sheet->getColumnDimension('E')->setWidth(50);
-        $sheet->getColumnDimension('H')->setWidth(50);
-        $sheet->getColumnDimension('K')->setWidth(50);
-        $sheet->getColumnDimension('L')->setWidth(50);
+        $sheet->getColumnDimension('F')->setWidth(50);
+        $sheet->getColumnDimension('G')->setWidth(50);
+        $sheet->getColumnDimension('J')->setWidth(50);
+        $sheet->getColumnDimension('M')->setWidth(50);
+        $sheet->getColumnDimension('N')->setWidth(50);
 
-        $sheet->getStyle('B3:M9999')->getProtection()
+        $sheet->getStyle('B3:N9999')->getProtection()
             ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
 
         $sheet->getRowDimension('1')->setRowHeight(0);
-        $sheet->getColumnDimension('M')->setVisible(false);
+        $sheet->getColumnDimension('O')->setVisible(false);
         $sheet->freezePane('D3');
 
         // $categories = CategoryType::where('category', 'provider')->get()->pluck('label');
@@ -139,10 +145,12 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
         $validation->setFormula1('categories');
 
         $sheet->setDataValidation('E3:E9999', clone $validation);
+        $sheet->setDataValidation('F3:F9999', clone $validation);
+        $sheet->setDataValidation('G3:G9999', clone $validation);
 
         // Countries
         $validation->setFormula1('countriesLabels');
-        $sheet->setDataValidation('L3:L9999', clone $validation);
+        $sheet->setDataValidation('N3:N9999', clone $validation);
 
         // Conditional formatting
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
@@ -153,6 +161,7 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
             ->getStartColor()->setARGB('FFFF0000');
         $sheet->getStyle('C3:C9999')->setConditionalStyles([$conditional]);
 
+        // Category 1
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
         $conditional->addCondition('OR(AND($C3<>"",ISBLANK($E3)),AND($B3<>"",ISBLANK($E3)))');
@@ -161,23 +170,16 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
             ->getStartColor()->setARGB('FFFF0000');
         $sheet->getStyle('E3:E9999')->setConditionalStyles([$conditional]);
 
+        // Phone number
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
-        $conditional->addCondition('OR(AND($C3<>"",ISBLANK($G3)),AND($B3<>"",ISBLANK($G3)))');
+        $conditional->addCondition('OR(AND($C3<>"",ISBLANK($I3)),AND($B3<>"",ISBLANK($I3)))');
         $conditional->getStyle()->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFF0000');
-        $sheet->getStyle('G3:G9999')->setConditionalStyles([$conditional]);
+        $sheet->getStyle('I3:I9999')->setConditionalStyles([$conditional]);
 
-
-        $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
-        $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
-        $conditional->addCondition('OR(AND($C3<>"",ISBLANK($H3)),AND($B3<>"",ISBLANK($H3)))');
-        $conditional->getStyle()->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('FFFF0000');
-        $sheet->getStyle('H3:H9999')->setConditionalStyles([$conditional]);
-
+        // Street
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
         $conditional->addCondition('OR(AND($C3<>"",ISBLANK($J3)),AND($B3<>"",ISBLANK($J3)))');
@@ -186,15 +188,8 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
             ->getStartColor()->setARGB('FFFF0000');
         $sheet->getStyle('J3:J9999')->setConditionalStyles([$conditional]);
 
-        $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
-        $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
-        $conditional->addCondition('OR(AND($C3<>"",ISBLANK($K3)),AND($B3<>"",ISBLANK($K3)))');
-        $conditional->getStyle()->getFill()
-            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-            ->getStartColor()->setARGB('FFFF0000');
-        $sheet->getStyle('K3:K9999')->setConditionalStyles([$conditional]);
 
-
+        // Postal code
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
         $conditional->addCondition('OR(AND($C3<>"",ISBLANK($L3)),AND($B3<>"",ISBLANK($L3)))');
@@ -203,7 +198,26 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
             ->getStartColor()->setARGB('FFFF0000');
         $sheet->getStyle('L3:L9999')->setConditionalStyles([$conditional]);
 
+        // City
+        $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
+        $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
+        $conditional->addCondition('OR(AND($C3<>"",ISBLANK($M3)),AND($B3<>"",ISBLANK($M3)))');
+        $conditional->getStyle()->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFF0000');
+        $sheet->getStyle('M3:M9999')->setConditionalStyles([$conditional]);
+
+        // Country
+        $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
+        $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
+        $conditional->addCondition('OR(AND($C3<>"",ISBLANK($N3)),AND($B3<>"",ISBLANK($N3)))');
+        $conditional->getStyle()->getFill()
+            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+            ->getStartColor()->setARGB('FFFF0000');
+        $sheet->getStyle('N3:N9999')->setConditionalStyles([$conditional]);
+
         // Validation longueur de champs
+        // Name
         $validationLength = $sheet->getDataValidation('B3');
         $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
         $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_BETWEEN);
@@ -215,6 +229,7 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
         $validationLength->setError('Le texte doit contenir entre 4 et 255 caractères.');
         $sheet->setDataValidation('B3:B9999', clone $validationLength);
 
+        // Description
         $validationLength = $sheet->getDataValidation('C3');
         $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
         $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_BETWEEN);
@@ -226,7 +241,8 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
         $validationLength->setError('Le texte doit contenir entre 4 et 255 caractères.');
         $sheet->setDataValidation('C3:C9999', clone $validationLength);
 
-        $validationLength = $sheet->getDataValidation('F3');
+        // VAT Number
+        $validationLength = $sheet->getDataValidation('H3');
         $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
         $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_LESSTHANOREQUAL);
         $validationLength->setFormula1('14');
@@ -234,9 +250,10 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
         $validationLength->setShowErrorMessage(true);
         $validationLength->setErrorTitle('Erreur de longueur');
         $validationLength->setError('Le texte doit contenir max 14 caractères.');
-        $sheet->setDataValidation('F3:F9999', clone $validationLength);
+        $sheet->setDataValidation('H3:H9999', clone $validationLength);
 
-        $validationLength = $sheet->getDataValidation('G3');
+        // Phone Number
+        $validationLength = $sheet->getDataValidation('I3');
         $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
         $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_LESSTHANOREQUAL);
         $validationLength->setFormula1('16');
@@ -244,9 +261,10 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
         $validationLength->setShowErrorMessage(true);
         $validationLength->setErrorTitle('Erreur de longueur');
         $validationLength->setError('Le texte doit contenir max 16 caractères.');
-        $sheet->setDataValidation('G3:G9999', clone $validationLength);
+        $sheet->setDataValidation('I3:I9999', clone $validationLength);
 
-        $validationLength = $sheet->getDataValidation('H3');
+        // Street
+        $validationLength = $sheet->getDataValidation('J3');
         $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
         $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_LESSTHANOREQUAL);
         $validationLength->setFormula1('100');
@@ -255,10 +273,10 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
 
         $validationLength->setErrorTitle('Erreur de longueur');
         $validationLength->setError('Le texte doit contenir max 100 caractères.');
-        $sheet->setDataValidation('H3:H9999', clone $validationLength);
+        $sheet->setDataValidation('J3:J9999', clone $validationLength);
 
-
-        $validationLength = $sheet->getDataValidation('J3');
+        // House number
+        $validationLength = $sheet->getDataValidation('K3');
         $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
         $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_LESSTHANOREQUAL);
         $validationLength->setFormula1('8');
@@ -266,9 +284,10 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
         $validationLength->setShowErrorMessage(true);
         $validationLength->setErrorTitle('Erreur de longueur');
         $validationLength->setError('Le texte doit contenir max 8 caractères.');
-        $sheet->setDataValidation('J3:J9999', clone $validationLength);
+        $sheet->setDataValidation('K3:K9999', clone $validationLength);
 
-        $validationLength = $sheet->getDataValidation('K3');
+        // City
+        $validationLength = $sheet->getDataValidation('M3');
         $validationLength->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_TEXTLENGTH);
         $validationLength->setOperator(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::OPERATOR_LESSTHANOREQUAL);
         $validationLength->setFormula1('100');
@@ -277,7 +296,7 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
 
         $validationLength->setErrorTitle('Erreur de longueur');
         $validationLength->setError('Le texte doit contenir max 100 caractères.');
-        $sheet->setDataValidation('K3:K9999', clone $validationLength);
+        $sheet->setDataValidation('M3:M9999', clone $validationLength);
 
 
         return [
@@ -292,7 +311,7 @@ class ProvidersSheet implements FromQuery, WithMapping, Responsable, WithEvents,
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 $event->sheet->getDelegate()
-                    ->getStyle('G:G')
+                    ->getStyle('I:I')
                     ->getNumberFormat()
                     ->setFormatCode(NumberFormat::FORMAT_TEXT);
             },

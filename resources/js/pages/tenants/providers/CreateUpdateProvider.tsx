@@ -3,6 +3,7 @@ import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Pill } from '@/components/ui/pill';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
@@ -10,7 +11,7 @@ import { BreadcrumbItem, CentralType, Country, Provider } from '@/types';
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
+import { MinusCircleIcon, PlusCircleIcon, X } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 
 type ContactPerson = {
@@ -32,7 +33,7 @@ type TypeFormData = {
     postal_code: string;
     city: string;
     country_code: string;
-    categoryId: number | string;
+    categories: CentralType[];
     pictures: File[] | null;
     users: ContactPerson[];
 };
@@ -68,7 +69,7 @@ export default function CreateUpdateProvider({
         postal_code: provider?.postal_code ?? '',
         city: provider?.city ?? '',
         country_code: provider?.country.iso_code ?? '',
-        categoryId: provider?.category_type_id ?? '',
+        categories: provider?.categories ?? [],
         pictures: [],
         users: [],
     });
@@ -132,6 +133,26 @@ export default function CreateUpdateProvider({
         });
     };
 
+    const handleCategoryProvider = (categoryId: number) => {
+        const category = providerCategories.find((elem) => elem.id == categoryId);
+        if (!data.categories.find((elem) => elem.id == categoryId)) {
+            if (category) {
+                const newCategories = data.categories;
+
+                setData((prev) => ({ ...prev, categories: [...newCategories, category] }));
+            }
+        }
+    };
+
+    const handleRemoveCategoryProvider = (categoryId: number) => (e: React.MouseEvent<SVGElement, MouseEvent>) => {
+        e.stopPropagation();
+        e.preventDefault();
+        const newCategories = data.categories.filter((elem) => elem.id !== categoryId);
+        setData((prev) => ({ ...prev, categories: newCategories }));
+    };
+
+    console.log(data.categories);
+
     const [selectedCountry, setSelectedCountry] = useState(data.country_code ?? '');
 
     useEffect(() => {
@@ -147,18 +168,29 @@ export default function CreateUpdateProvider({
                         <h2>{t('common.information')}</h2>
                         <div className="flex w-full flex-col gap-4 lg:flex-row">
                             <div className="w-full">
-                                <Label>{t('providers.company_name')}</Label>
-                                <Input type="text" onChange={(e) => setData('name', e.target.value)} value={data.name} required />
+                                <Label htmlFor="name">{t('providers.company_name')}</Label>
+                                <Input
+                                    id="name"
+                                    type="text"
+                                    onChange={(e) => setData('name', e.target.value)}
+                                    value={data.name}
+                                    required
+                                    minLength={4}
+                                    maxLength={100}
+                                    placeholder="Company SA"
+                                />
                                 <InputError className="mt-2" message={errors?.name ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label htmlFor="name">{t('common.category')}</Label>
+                                <Label htmlFor="category">{t('common.category')}</Label>
+
                                 <select
                                     name="category"
-                                    required
-                                    value={data.categoryId === '' ? 0 : data.categoryId}
-                                    onChange={(e) => setData('categoryId', e.target.value)}
-                                    id=""
+                                    value={''}
+                                    required={data.categories.length < 1}
+                                    // onChange={(e) => setData('categoryId', e.target.value)}
+                                    onChange={(e) => handleCategoryProvider(parseInt(e.target.value))}
+                                    id="category"
                                     className={cn(
                                         'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
                                         'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
@@ -167,7 +199,7 @@ export default function CreateUpdateProvider({
                                 >
                                     {providerCategories && providerCategories.length > 0 && (
                                         <>
-                                            <option value="0" disabled className="bg-background text-foreground">
+                                            <option value="" disabled className="bg-background text-foreground">
                                                 {t('actions.select-type', { type: t('common.category') })}
                                             </option>
                                             {providerCategories?.map((category) => (
@@ -178,14 +210,25 @@ export default function CreateUpdateProvider({
                                         </>
                                     )}
                                 </select>
-                                <InputError className="mt-2" message={errors?.categoryId ?? ''} />
+                                <div className="flex flex-wrap gap-2">
+                                    {data.categories.map((category, index) => (
+                                        <Pill size={'sm'} key={index} className="flex items-center gap-2">
+                                            {category.label}
+                                            <X size={16} onClick={handleRemoveCategoryProvider(category.id)} />
+                                        </Pill>
+                                    ))}
+                                </div>
+                                <InputError className="mt-2" message={errors?.categories ?? ''} />
                             </div>
                         </div>
                         <div className="flex w-full flex-col gap-4 lg:flex-row">
                             <div className="w-full">
-                                <Label>{t('common.email')}</Label>
+                                <Label htmlFor="email">{t('common.email')}</Label>
                                 <Input
+                                    id="email"
                                     type="email"
+                                    minLength={20}
+                                    maxLength={255}
                                     onChange={(e) => setData('email', e.target.value)}
                                     value={data.email}
                                     required
@@ -194,8 +237,9 @@ export default function CreateUpdateProvider({
                                 <InputError className="mt-2" message={errors?.email ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label>{t('common.phone')}</Label>
+                                <Label htmlFor="phone_number">{t('common.phone')}</Label>
                                 <Input
+                                    id="phone_number"
                                     type="text"
                                     onChange={(e) => setData('phone_number', e.target.value)}
                                     value={data.phone_number}
@@ -213,17 +257,17 @@ export default function CreateUpdateProvider({
                                     type="text"
                                     onChange={(e) => setData('vat_number', e.target.value)}
                                     value={data.vat_number}
-                                    placeholder={t('common.vat_number_placeholder')}
+                                    placeholder={t('providers.vat_number_placeholder')}
                                 />
                                 <InputError className="mt-2" message={errors?.vat_number ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label>{t('common.website')}</Label>
+                                <Label>{t('providers.website')}</Label>
                                 <Input
                                     type="text"
                                     onChange={(e) => setData('website', e.target.value)}
                                     value={data.website}
-                                    placeholder={t('common.website_placeholder')}
+                                    placeholder={t('providers.website_placeholder')}
                                 />
                                 <InputError className="mt-2" message={errors?.website ?? ''} />
                             </div>
@@ -232,8 +276,9 @@ export default function CreateUpdateProvider({
                         <h5>{t('common.address')}</h5>
                         <div className="flex w-full flex-col gap-4 lg:flex-row">
                             <div className="w-full">
-                                <Label>{t('common.street')}</Label>
+                                <Label htmlFor="street">{t('common.street')}</Label>
                                 <Input
+                                    id="street"
                                     type="text"
                                     onChange={(e) => setData('street', e.target.value)}
                                     value={data.street}
@@ -243,18 +288,20 @@ export default function CreateUpdateProvider({
                                 <InputError className="mt-2" message={errors?.street ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label>{t('common.house_number')}</Label>
+                                <Label htmlFor="house_number">{t('common.house_number')}</Label>
                                 <Input
+                                    id="house_number"
                                     type="text"
                                     onChange={(e) => setData('house_number', e.target.value)}
                                     value={data.house_number}
-                                    placeholder={t('common.house_number_placeholder')}
+                                    placeholder="10"
                                 />
                                 <InputError className="mt-2" message={errors?.house_number ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label>{t('common.postal_code')}</Label>
+                                <Label htmlFor="postal_code">{t('common.postal_code')}</Label>
                                 <Input
+                                    id="postal_code"
                                     type="text"
                                     onChange={(e) => setData('postal_code', e.target.value)}
                                     value={data.postal_code}
@@ -264,8 +311,9 @@ export default function CreateUpdateProvider({
                                 <InputError className="mt-2" message={errors?.postal_code ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label>{t('common.city')}</Label>
+                                <Label htmlFor="city">{t('common.city')}</Label>
                                 <Input
+                                    id="city"
                                     type="text"
                                     onChange={(e) => setData('city', e.target.value)}
                                     value={data.city}
@@ -275,7 +323,7 @@ export default function CreateUpdateProvider({
                                 <InputError className="mt-2" message={errors?.city ?? ''} />
                             </div>
                             <div className="w-full">
-                                <Label>{t('common.country')}</Label>
+                                <Label htmlFor="country">{t('common.country')}</Label>
                                 <Select value={selectedCountry} onValueChange={setSelectedCountry} required>
                                     <SelectTrigger className="w-[180px]">
                                         <SelectValue placeholder="Select a country" />
@@ -293,7 +341,7 @@ export default function CreateUpdateProvider({
 
                         {!provider && (
                             <>
-                                <Label>{t('common.logo')}</Label>
+                                <Label htmlFor="logo">{t('common.logo')}</Label>
                                 <Input
                                     type="file"
                                     name="logo"
@@ -341,7 +389,7 @@ export default function CreateUpdateProvider({
                                                             type="text"
                                                             value={data.users[index]?.first_name ?? ''}
                                                             placeholder={t('common.first_name_placeholder')}
-                                                            minLength={4}
+                                                            minLength={3}
                                                             maxLength={100}
                                                             required
                                                             onChange={(e) => handleChangeContactPerson(index, 'first_name', e.target.value)}
@@ -360,7 +408,7 @@ export default function CreateUpdateProvider({
                                                             type="text"
                                                             value={data.users[index]?.last_name ?? ''}
                                                             placeholder={t('common.last_name_placeholder')}
-                                                            minLength={4}
+                                                            minLength={3}
                                                             maxLength={100}
                                                             required
                                                             onChange={(e) => handleChangeContactPerson(index, 'last_name', e.target.value)}
@@ -375,10 +423,10 @@ export default function CreateUpdateProvider({
                                                         </Label>
                                                         <Input
                                                             id={data.users[index]?.email}
-                                                            type="text"
+                                                            type="email"
                                                             value={data.users[index]?.email ?? ''}
                                                             placeholder={t('common.email_placeholder')}
-                                                            minLength={4}
+                                                            minLength={20}
                                                             maxLength={100}
                                                             required
                                                             onChange={(e) => handleChangeContactPerson(index, 'email', e.target.value)}

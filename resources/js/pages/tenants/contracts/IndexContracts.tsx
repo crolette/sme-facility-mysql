@@ -205,7 +205,7 @@ export default function IndexContracts({
 
                         <div className="bg-border border-border text-background dark:text-foreground absolute top-full z-10 flex flex-col items-center gap-4 rounded-b-md border-2 p-2 lg:flex-row">
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="role">{t('contracts.renewal_type')}</Label>
+                                <Label htmlFor="role">{t('contracts.renewal_type.title')}</Label>
                                 <div className="space-x-1 text-center">
                                     {renewalTypes.map((renewalType) => (
                                         <Pill
@@ -254,7 +254,7 @@ export default function IndexContracts({
                             </div>
                             <div className="border-foreground hidden h-10 w-0.5 border lg:block"></div>
                             <div className="flex flex-col items-center gap-2">
-                                <Label htmlFor="status">{t('common.status')}</Label>
+                                <Label htmlFor="status">{t('common.status.title')}</Label>
                                 <div className="space-x-1 text-center">
                                     {statuses.map((status) => (
                                         <Pill
@@ -263,7 +263,7 @@ export default function IndexContracts({
                                             onClick={() => setStatusSearch(status)}
                                             className="cursor-pointer"
                                         >
-                                            {t(`contracts.status.${status}`)}
+                                            {t(`common.status.${status}`)}
                                         </Pill>
                                     ))}
                                 </div>
@@ -348,11 +348,15 @@ export default function IndexContracts({
                                     </div>
 
                                     <p className="text-xs">{contract.type}</p>
-                                    <p className="text-xs">{contract.provider?.category}</p>
+                                    <p className="text-xs">
+                                        {contract.provider.categories.length > 0
+                                            ? contract.provider.categories?.map((category, index) => <p key={index}>{category.label}</p>)
+                                            : ''}
+                                    </p>
                                     {contract.provider && (
                                         <a href={route(`tenant.providers.show`, contract.provider?.id)}> {contract.provider?.name} </a>
                                     )}
-                                    <Pill variant={contract.status}>{t(`contracts.status.${contract.status}`)}</Pill>
+                                    <Pill variant={contract.status}>{t(`common.status.${contract.status}`)}</Pill>
                                     <p>{contract.internal_reference}</p>
                                     <p className="text-xs">
                                         {t('contracts.end_date')} : {contract.end_date}
@@ -391,10 +395,10 @@ export default function IndexContracts({
                                 </TableHeadData>
                                 <TableHeadData>{t('common.type')}</TableHeadData>
                                 <TableHeadData>{t('common.category')}</TableHeadData>
-                                <TableHeadData>{t('common.status')}</TableHeadData>
+                                <TableHeadData>{t('common.status.title')}</TableHeadData>
                                 <TableHeadData>{t('contracts.internal_ref')}</TableHeadData>
                                 <TableHeadData>{t('contracts.provider_ref')}</TableHeadData>
-                                <TableHeadData>{t('contracts.renewal_type')}</TableHeadData>
+                                <TableHeadData>{t('contracts.renewal_type.title')}</TableHeadData>
                                 <TableHeadData>{tChoice('providers.title', 1)}</TableHeadData>
                                 <TableHeadData>
                                     <div className="flex items-center gap-2">
@@ -451,9 +455,13 @@ export default function IndexContracts({
                                                 </div>
                                             </TableBodyData>
                                             <TableBodyData>{t(`contracts.type.${contract.type}`)}</TableBodyData>
-                                            <TableBodyData>{contract.provider?.category}</TableBodyData>
                                             <TableBodyData>
-                                                <Pill variant={contract.status}>{t(`contracts.status.${contract.status}`)}</Pill>
+                                                {contract.provider.categories.length > 0
+                                                    ? contract.provider.categories?.map((category, index) => <p key={index}>{category.label}</p>)
+                                                    : ''}
+                                            </TableBodyData>
+                                            <TableBodyData>
+                                                <Pill variant={contract.status}>{t(`common.status.${contract.status}`)}</Pill>
                                             </TableBodyData>
                                             <TableBodyData>{contract.internal_reference}</TableBodyData>
                                             <TableBodyData>{contract.provider_reference}</TableBodyData>

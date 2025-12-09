@@ -77,7 +77,8 @@ class AssetDataSheet implements FromCollection, WithHeadings, ShouldAutoSize, Wi
             'sites',
             'buildings',
             'floors',
-            'rooms'
+            'rooms',
+            'users'
         ];
     }
 

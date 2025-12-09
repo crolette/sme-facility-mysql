@@ -12,7 +12,8 @@ export default function DisplayGridTableIndex() {
         <div className="flex gap-2">
                 <div className={cn(layout === 'grid' ? "bg-border text-background dark:text-foreground": "bg-sidebar"," hover:bg-sidebar-accent cursor-pointer rounded-md p-2")} onClick={() => setLayout('grid')}>
                 <LayoutGrid size={20} />
-            </div>
+                </div>
+                
             <div className={cn(layout === 'table' ? "bg-border text-background dark:text-foreground": "bg-sidebar"," hover:bg-sidebar-accent cursor-pointer rounded-md p-2")} onClick={() => setLayout('table')}>
                 <TableIcon size={20} />
             </div>

@@ -28,18 +28,18 @@ beforeEach(function () {
 
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
     CategoryType::factory()->count(2)->create(['category' => 'asset']);
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
-    $this->room = Room::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 });
 
 it('can render the index assets page', function () {
 
-    $asset = Asset::factory()->forLocation($this->site)->create();
-    Asset::factory()->forLocation($this->building)->create();
-    Asset::factory()->forLocation($this->floor)->create();
-    Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->site)->create();
+    Asset::factory()->withMaintainableData()->forLocation($this->building)->create();
+    Asset::factory()->withMaintainableData()->forLocation($this->floor)->create();
+    Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     $response = $this->getFromTenant('tenant.assets.index');
     $response->assertOk();
@@ -51,7 +51,6 @@ it('can render the index assets page', function () {
         $page->component('tenants/assets/IndexAssets')
             ->has('items.data', 4)
             ->where('items.data.0.maintainable.name', $asset->maintainable->name)
-            ->where('items.data.0.location.id', $this->site->id)
             ->where('items.data.0.category', $asset->assetCategory->label)
             ->where('items.data.0.location_type', get_class($this->site))
             ->where('items.data.0.location_id', $this->site->id)
@@ -327,7 +326,7 @@ it('can create a new asset to room', function () {
 
 it('can show the asset page', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create(['category_type_id' => $this->categoryType->id]);
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create(['category_type_id' => $this->categoryType->id]);
 
     $asset = Asset::find($asset->id);
 
@@ -347,7 +346,7 @@ it('can show the asset page', function () {
 
 it('can render the update asset page', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     $response = $this->getFromTenant('tenant.assets.edit', $asset);
 
@@ -361,7 +360,7 @@ it('can render the update asset page', function () {
 
 it('can update asset and his maintainable', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $asset = Asset::find($asset->id);
 
     $oldName = $asset->maintainable->name;
@@ -406,7 +405,7 @@ it('can update asset and his maintainable', function () {
 
 it('can update asset\'s location', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     $asset = Asset::find($asset->id);
 
@@ -451,7 +450,7 @@ it('can update asset\'s location', function () {
 
 it('can soft delete an asset but kept in DB with his maintainable', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $asset = Asset::find($asset->id);
 
     assertDatabaseHas('maintainables', [
@@ -479,7 +478,7 @@ it('can soft delete an asset but kept in DB with his maintainable', function () 
 });
 
 it('can restore a soft deleted asset', function () {
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $asset = Asset::find($asset->id);
     $response = $this->deleteFromTenant('api.assets.destroy', $asset);
     $response->assertStatus(200)
@@ -511,7 +510,7 @@ it('can restore a soft deleted asset', function () {
 });
 
 it('can force delete a soft deleted asset', function () {
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $asset = Asset::find($asset->id);
 
     $assetName = $asset->maintainable->name;
@@ -568,7 +567,7 @@ it('can update providers to an asset\'s maintainable', function () {
     CategoryType::factory()->create(['category' => 'provider']);
     Provider::factory()->count(3)->create();
     $providers = Provider::all()->pluck('id');
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $asset = Asset::find($asset->id);
 
     $formData = [
@@ -585,3 +584,42 @@ it('can update providers to an asset\'s maintainable', function () {
     $asset = Asset::find($asset->id);
     assertCount(3, $asset->maintainable->providers);
 });
+
+// it('can create a new asset to room', function () {
+
+//     $formData = [
+//         'name' => 'New asset',
+//         'description' => 'Description new asset',
+//         'has_meter_readings' => true,
+//         'meter_number' => '0235845568',
+//         'locationId' => $this->room->id,
+//         'locationReference' => $this->room->reference_code,
+//         'locationType' => 'room',
+//         'categoryId' => $this->categoryType->id,
+//     ];
+
+//     $response = $this->postToTenant('api.assets.store', $formData);
+//     $response->assertStatus(200)
+//         ->assertJson(['status' => 'success']);
+
+//     $asset = Asset::first();
+
+//     assertDatabaseCount('assets', 1);
+
+//     assertDatabaseHas('assets', [
+//         'code' => 'A0001',
+//         'reference_code' => $this->room->reference_code . '-' . 'A0001',
+//         'location_type' => get_class($this->room),
+//         'location_id' => $this->room->id,
+//         'category_type_id' => $this->categoryType->id,
+//         'has_meter_readings' => true,
+//         'meter_number' => '0235845568',
+//     ]);
+
+//     assertDatabaseHas('maintainables', [
+//         'maintainable_type' => get_class($asset),
+//         'maintainable_id' => $asset->id,
+//         'name' => 'New asset',
+//         'description' => 'Description new asset',
+//     ]);
+// });

@@ -37,16 +37,16 @@ beforeEach(function () {
 
 
     // on créée les différentes "locations" possibles pour attacher un asset
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
-    $this->room = Room::factory()
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
+    $this->room = Room::factory()->withMaintainableData()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
 
     // on créé un asset qu'on attache à une room
-    // $this->asset = Asset::factory()->forLocation($this->room)->create();
+    // $this->asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 });
 
 it('can upload a new document (document) without attaching to a model', function () {

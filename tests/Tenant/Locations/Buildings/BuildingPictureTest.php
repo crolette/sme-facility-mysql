@@ -27,8 +27,8 @@ beforeEach(function () {
     $this->actingAs($this->user, 'tenant');
     LocationType::factory()->create(['level' => 'site']);
     $this->locationType = LocationType::factory()->create(['level' => 'building']);
-    Site::factory()->create();
-    $this->location = Building::factory()->create();
+    Site::factory()->withMaintainableData()->create();
+    $this->location = Building::factory()->withMaintainableData()->create();
 });
 
 it('can add pictures to a building', function () {

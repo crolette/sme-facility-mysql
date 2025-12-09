@@ -9,7 +9,9 @@ use App\Models\Tenants\Asset;
 use App\Services\AssetService;
 use App\Enums\NoticePeriodEnum;
 use App\Services\QRCodeService;
+use App\Enums\ContractTypesEnum;
 use App\Enums\ContractStatusEnum;
+use App\Enums\MeterReadingsUnits;
 use App\Enums\ContractDurationEnum;
 use App\Enums\MaintenanceFrequency;
 use App\Http\Controllers\Controller;
@@ -94,11 +96,13 @@ class TenantAssetController extends Controller
         $documentTypes = CategoryType::getByCategoryCache('document');
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
+        $meterUnits = array_column(MeterReadingsUnits::cases(), 'value');
+        $contractTypes = array_column(ContractTypesEnum::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
         $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
         $noticePeriods = array_column(NoticePeriodEnum::cases(), 'value');
 
-        return Inertia::render('tenants/assets/CreateUpdateAsset', ['categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
+        return Inertia::render('tenants/assets/CreateUpdateAsset', ['categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractTypes' => $contractTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods, 'meterUnits' => $meterUnits]);
     }
 
 
@@ -112,7 +116,7 @@ class TenantAssetController extends Controller
             return back();
         }
 
-        $asset = Asset::where('reference_code', $asset->reference_code)->with(['maintainable.manager:id,first_name,last_name', 'contracts:id,name,type,provider_id,status,renewal_type,end_date,internal_reference,provider_reference', 'contracts.provider:id,name,logo', 'maintainable.providers:id,name'])->first();
+        $asset = Asset::where('reference_code', $asset->reference_code)->with(['maintainable.manager:id,first_name,last_name', 'contracts:id,name,type,provider_id,status,renewal_type,end_date,internal_reference,provider_reference', 'contracts.provider:id,name,logo', 'meterReadings', 'maintainable.providers:id,name'])->first();
 
 
         return Inertia::render('tenants/assets/ShowAsset', ['item' => $asset->append('level_path')]);
@@ -138,9 +142,11 @@ class TenantAssetController extends Controller
 
         $categories = CategoryType::getByCategoryCache('asset');
         $documentTypes = CategoryType::getByCategoryCache('document');
+        $contractTypes = array_column(ContractTypesEnum::cases(), 'value');
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
+        $meterUnits = array_column(MeterReadingsUnits::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
-        return Inertia::render('tenants/assets/CreateUpdateAsset', ['asset' => $asset->load(['assetCategory', 'location', 'documents', 'maintainable.manager', 'maintainable.providers:id,name,category_type_id', 'contracts']), 'categories' => $categories, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes]);
+        return Inertia::render('tenants/assets/CreateUpdateAsset', ['asset' => $asset->load(['assetCategory', 'location', 'documents', 'maintainable.manager', 'maintainable.providers:id,name', 'contracts']), 'categories' => $categories, 'contractTypes' => $contractTypes, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'meterUnits' => $meterUnits]);
     }
 }

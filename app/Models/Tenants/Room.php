@@ -249,4 +249,10 @@ class Room extends Model
 
     // SCOPES
 
+    public function scopeGetByName(Builder $query, $name)
+    {
+        return $query->whereHas('maintainable', function ($q) use ($name) {
+            $q->where('name', $name);
+        });
+    }
 }

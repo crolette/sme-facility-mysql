@@ -17,6 +17,7 @@ use App\Http\Requests\Tenant\PictureUploadRequest;
 use App\Http\Controllers\API\V1\APIAssetController;
 use App\Http\Requests\Tenant\DocumentUploadRequest;
 use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
+use App\Http\Controllers\Tenants\MeterReadingsController;
 use App\Http\Requests\Tenant\ContractWithModelStoreRequest;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\Tenants\ForceDeleteAssetController;
@@ -68,6 +69,11 @@ Route::middleware([
                 $qRCodeService->createAndAttachQR($asset);
                 return ApiResponse::success([], 'QR Code created');
             })->name('api.assets.qr.regen');
+
+            Route::prefix('/meter-readings')->group(function () {
+                Route::get('', [MeterReadingsController::class, 'index'])->name('api.assets.meter-readings');
+                Route::post('', [MeterReadingsController::class, 'store'])->name('api.assets.meter-readings.store');
+            });
 
             Route::prefix('/documents')->group(function () {
                 // Get all the documents from an asset

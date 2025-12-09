@@ -65,9 +65,9 @@ export interface Flash {
 
 export type LocationLevel = 'site' | 'building' | 'floor' | 'room';
 export type TicketStatus = 'open' | 'ongoing' | 'closed';
-export type CategoryTypeEnum = 'document' | 'intervention' | 'asset' | 'provider' | 'outdoor materials' | 'floor materials' | 'wall materials';
+export type CategoryTypeEnum = 'document' | 'intervention' | 'asset' | 'provider' | 'outdoor_materials' | 'floor_materials' | 'wall_materials';
 export type PriorityLevel = 'low' | 'middle' | 'high' | 'urgent';
-export type InterventionStatus = 'draft' | 'planned' | 'in progress' | 'waiting for parts' | 'completed' | 'cancelled';
+export type InterventionStatus = 'draft' | 'planned' | 'in_progress' | 'waiting_parts' | 'completed' | 'cancelled';
 
 export interface Maintainable {
     id: number;
@@ -183,6 +183,9 @@ export interface Asset {
     model: string;
     brand: string;
     serial_number: string;
+    has_meter_readings: boolean;
+    meter_number: string;
+    meter_unit: string;
     category: string;
     asset_category_id: number;
     tickets?: Ticket[];
@@ -203,6 +206,18 @@ export interface Asset {
     asset_category: AssetCategory;
     maintainable: Maintainable;
     location: Partial<TenantSite | TenantBuilding | TenantFloor | TenantRoom | User>;
+    meter_readings?: MeterReadings[];
+}
+
+export interface MeterReadings {
+    id: number;
+    meter: number;
+    meter_date: string;
+    user_id: number;
+    user: User;
+    asset_id: number;
+    asset: Asset;
+    notes: string;
 }
 
 export interface Picture {
@@ -345,6 +360,7 @@ export interface Provider {
     house_number?: string;
     postal_code: string;
     city: string;
+    address: string;
     country_code: string;
     country_id: number;
     country: Country;
@@ -352,8 +368,8 @@ export interface Provider {
     phone_number: string;
     logo?: string;
     logo_path?: string;
-    category: string;
-    category_type_id: number;
+    categories: CentralType[];
+    // category_type_id: number;
     users?: User[];
     assigned_interventions?: Intervention[];
     contracts?: Contract[];

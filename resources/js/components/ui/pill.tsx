@@ -10,6 +10,7 @@ const pillVariants = cva(
     variants: {
       variant: {
         default: "bg-sidebar-accent text-foreground hover:bg-sidebar dark:hover:bg-ring",
+        disabled: "bg-slate-300 hover:bg-slate-700 hover:text-background dark:text-background dark:hover:text-foreground",
         draft: "bg-sidebar-accent",
         waiting_parts:"bg-sidebar-border text-background dark:text-foreground",
         open: "bg-destructive text-background dark:text-foreground",

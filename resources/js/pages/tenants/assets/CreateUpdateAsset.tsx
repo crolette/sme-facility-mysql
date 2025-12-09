@@ -73,6 +73,9 @@ type TypeFormData = {
     brand: string;
     model: string;
     serial_number: string;
+    has_meter_readings: boolean;
+    meter_number: string;
+    meter_unit: string;
     maintenance_manager_id: number | null;
     maintenance_manager_name: string;
     need_maintenance: boolean;
@@ -108,8 +111,10 @@ export default function CreateUpdateAsset({
     frequencies,
     statuses,
     renewalTypes,
+    contractTypes,
     contractDurations,
     noticePeriods,
+    meterUnits,
 }: {
     asset?: Asset;
     categories?: AssetCategory[];
@@ -117,8 +122,10 @@ export default function CreateUpdateAsset({
     frequencies: string[];
     statuses: string[];
     renewalTypes: string[];
+    contractTypes: string[];
     contractDurations?: string[];
     noticePeriods: string[];
+    meterUnits: string[];
 }) {
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
@@ -127,7 +134,7 @@ export default function CreateUpdateAsset({
             href: '/assets',
         },
         {
-            title: asset ? `Update ${tChoice('assets.title', 1)} ${asset.name}` : `Create ${tChoice('assets.title', 1)}`,
+            title: asset ? `${t('actions.update-type', { type: asset.name })}` : `${t('actions.create-type', { type: tChoice('assets.title', 1) })}`,
             href: '/assets/create',
         },
     ];
@@ -166,6 +173,9 @@ export default function CreateUpdateAsset({
         brand: asset?.brand ?? '',
         model: asset?.model ?? '',
         serial_number: asset?.serial_number ?? '',
+        has_meter_readings: asset?.has_meter_readings ?? false,
+        meter_number: asset?.meter_number ?? '',
+        meter_unit: asset?.meter_unit ?? '',
         files: selectedDocuments,
         pictures: [],
         contracts: [],
@@ -174,6 +184,7 @@ export default function CreateUpdateAsset({
         existing_documents: [],
     });
 
+    console.log(data);
     const [listIsOpen, setListIsOpen] = useState(false);
     const [isSearching, setIsSearching] = useState(false);
     const [locations, setLocations] = useState<SearchedLocation[]>();
@@ -426,9 +437,9 @@ export default function CreateUpdateAsset({
                             onChange={(e) => setNewFileDescription(e.target.value)}
                         />
                         <div className="flex justify-between">
-                            <Button>Submit</Button>
+                            <Button>{t('actions.add')}</Button>
                             <Button type="button" onClick={closeFileModal} variant="secondary">
-                                Cancel
+                                {t('actions.cancel')}
                             </Button>
                         </div>
                     </form>
@@ -468,7 +479,11 @@ export default function CreateUpdateAsset({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title={`Create asset`} />
+            <Head
+                title={
+                    asset ? `${t('actions.update-type', { type: asset.name })}` : `${t('actions.create-type', { type: tChoice('assets.title', 1) })}`
+                }
+            />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 {asset && (
                     <div>
@@ -530,6 +545,15 @@ export default function CreateUpdateAsset({
                                         className="mb-4"
                                     />
                                 </div>
+                                <Label htmlFor="locationType">{t('assets.selected_location')}</Label>
+                                <Input
+                                    required
+                                    type="text"
+                                    disabled
+                                    className="font-bold"
+                                    value={data.locationName ? data.locationName : t('assets.selected_location_none')}
+                                />
+                                <InputError className="mt-2" message={errors?.locationType ?? ''} />
                             </>
                         ) : (
                             <>
@@ -602,6 +626,7 @@ export default function CreateUpdateAsset({
                                 type="text"
                                 required
                                 autoFocus
+                                minLength={4}
                                 maxLength={100}
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
@@ -627,7 +652,7 @@ export default function CreateUpdateAsset({
                         <select
                             name="category"
                             required
-                            value={data.categoryId === '' ? 0 : data.categoryId}
+                            value={data.categoryId === '' ? '' : data.categoryId}
                             onChange={(e) => setData('categoryId', e.target.value)}
                             id="category"
                             className={cn(
@@ -638,7 +663,7 @@ export default function CreateUpdateAsset({
                         >
                             {categories && categories.length > 0 && (
                                 <>
-                                    <option value="0" disabled className="bg-background text-foreground">
+                                    <option value="" disabled className="bg-background text-foreground">
                                         {t('actions.select-type', { type: t('common.category') })}
                                     </option>
                                     {categories?.map((category) => (
@@ -655,6 +680,7 @@ export default function CreateUpdateAsset({
                         <Input
                             id="description"
                             type="text"
+                            minLength={10}
                             maxLength={255}
                             required
                             value={data.description}
@@ -712,6 +738,49 @@ export default function CreateUpdateAsset({
                                 <InputError className="mt-2" message={errors?.serial_number ?? ''} />
                             </div>
                         </div>
+                        <div className="mt-2 flex items-center gap-2">
+                            <Label htmlFor="has_meter_readings">{t('assets.has_meter_readings')} ?</Label>
+                            <Checkbox
+                                id="has_meter_readings"
+                                name="has_meter_readings"
+                                checked={data.has_meter_readings ?? true}
+                                onClick={() => setData('has_meter_readings', !data.has_meter_readings)}
+                            />
+                            <InputError className="mt-2" message={errors?.has_meter_readings ?? ''} />
+                        </div>
+                        {data.has_meter_readings && (
+                            <div className="flex gap-4">
+                                <div className="">
+                                    <Label htmlFor="meter_number">{t('assets.meter_number')}</Label>
+                                    <Input
+                                        id="meter_number"
+                                        type="text"
+                                        maxLength={18}
+                                        value={data.meter_number}
+                                        onChange={(e) => setData('meter_number', e.target.value)}
+                                        placeholder="16832477962041"
+                                    />
+                                    <InputError className="mt-2" message={errors?.meter_number ?? ''} />
+                                </div>
+                                <div>
+                                    <Label>{t('assets.meter_readings.unit')}</Label>
+                                    <select
+                                        name="meter_unit"
+                                        id="meter_unit"
+                                        className="block"
+                                        value={data.meter_unit ?? ''}
+                                        onChange={(e) => setData('meter_unit', e.target.value)}
+                                    >
+                                        <option value="">{t('actions.add-type', { type: t('assets.meter_readings.unit') })}</option>
+                                        {meterUnits.map((unit: string) => (
+                                            <option key={unit} value={unit}>
+                                                {unit}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
@@ -722,7 +791,7 @@ export default function CreateUpdateAsset({
                                 <Input
                                     id="purchase_date"
                                     type="date"
-                                    value={data.purchase_date}
+                                    value={data.purchase_date ?? ''}
                                     max={minEndDateWarranty}
                                     onChange={(e) => setData('purchase_date', e.target.value)}
                                     placeholder={t('assets.purchase_date_placeholder')}
@@ -761,7 +830,8 @@ export default function CreateUpdateAsset({
                                 <Input
                                     id="end_warranty_date"
                                     type="date"
-                                    value={data.end_warranty_date}
+                                    required={data.under_warranty}
+                                    value={data.end_warranty_date ?? ''}
                                     min={asset ? '' : minEndDateWarranty}
                                     onChange={(e) => setData('end_warranty_date', e.target.value)}
                                     placeholder="Date end of warranty"
@@ -839,7 +909,7 @@ export default function CreateUpdateAsset({
                             </div>
                         )}
                     </div>
-                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                    <div className="border-sidebar-border bg-sidebar space-y-2 rounded-md border p-4 shadow-xl">
                         <h5>{tChoice('maintenances.title', 1)}</h5>
 
                         <div className="flex items-center gap-2">
@@ -857,7 +927,7 @@ export default function CreateUpdateAsset({
                             <>
                                 <div className="flex flex-col gap-4 md:flex-row">
                                     <div className="w-full">
-                                        <Label htmlFor="maintenance_frequency">{t('maintenances.frequency')}</Label>
+                                        <Label htmlFor="maintenance_frequency">{t('maintenances.frequency.title')}</Label>
                                         <select
                                             name="maintenance_frequency"
                                             value={data.maintenance_frequency ?? ''}
@@ -873,7 +943,7 @@ export default function CreateUpdateAsset({
                                             {frequencies && frequencies.length > 0 && (
                                                 <>
                                                     <option value="" disabled className="bg-background text-foreground">
-                                                        {t('actions.select-type', { type: t('maintenances.frequency') })}
+                                                        {t('actions.select-type', { type: t('maintenances.frequency.title') })}
                                                     </option>
                                                     {frequencies?.map((frequency, index) => (
                                                         <option value={frequency} key={index} className="bg-background text-foreground">
@@ -911,6 +981,7 @@ export default function CreateUpdateAsset({
                                         <InputError className="mt-2" message={errors?.next_maintenance_date ?? ''} />
                                     </div>
                                 </div>
+                                <p className="mx-auto mt-1 text-center text-sm">{t('maintenances.next_maintenance_date_default')}</p>
                             </>
                         )}
                         <div>
@@ -989,9 +1060,12 @@ export default function CreateUpdateAsset({
                                             </div>
                                         </summary>
                                         <div>
-                                            <Label className="font-medium">{t('common.name')}</Label>
+                                            <Label className="font-medium" htmlFor={`contract.name.` + index}>
+                                                {t('common.name')}
+                                            </Label>
                                             <Input
                                                 type="text"
+                                                id={`contract.name.` + index}
                                                 value={data.contracts[index]?.name ?? ''}
                                                 placeholder={`Contract name ${index + 1}`}
                                                 minLength={4}
@@ -1000,16 +1074,35 @@ export default function CreateUpdateAsset({
                                                 onChange={(e) => handleChangeContracts(index, 'name', e.target.value)}
                                             />
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.name : ''} />
-                                            <Label className="font-medium">{t('common.type')}</Label>
-                                            <Input
-                                                type="text"
-                                                // value={data.contracts[index].name ?? ''}
-                                                placeholder={`Type ${index + 1}`}
-                                                minLength={4}
-                                                maxLength={100}
-                                                required
+                                            <Label className="font-medium" htmlFor={`contract.type.` + index}>
+                                                {t('common.type')}
+                                            </Label>
+                                            <select
+                                                name="type"
                                                 onChange={(e) => handleChangeContracts(index, 'type', e.target.value)}
-                                            />
+                                                id="type"
+                                                required
+                                                value={data.contracts[index]?.type ?? ''}
+                                                className={cn(
+                                                    'border-input placeholder:text-muted-foreground mt-1 flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                    'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                    'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                                )}
+                                            >
+                                                {contractTypes && contractTypes.length > 0 && (
+                                                    <>
+                                                        <option value="" disabled className="bg-background text-foreground">
+                                                            {t('actions.select-type', { type: t('common.type') })}
+                                                        </option>
+                                                        {contractTypes?.map((type, index) => (
+                                                            <option value={type} key={index} className="bg-background text-foreground">
+                                                                {t(`contracts.type.${type}`)}
+                                                            </option>
+                                                        ))}
+                                                    </>
+                                                )}
+                                            </select>
+
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.type : ''} />
 
                                             <Label className="font-medium">{tChoice('providers.title', 2)}</Label>
@@ -1026,19 +1119,19 @@ export default function CreateUpdateAsset({
                                                 placeholder={t('actions.search-type', { type: tChoice('providers.title', 1) })}
                                             />
 
-                                            <Label htmlFor="start_date">{t('contracts.start_date')}</Label>
+                                            <Label htmlFor={`contract.start_date.` + index}>{t('contracts.start_date')}</Label>
                                             <Input
-                                                id="start_date"
+                                                id={`contract.start_date.` + index}
                                                 type="date"
                                                 value={data.contracts[index]?.start_date ?? new Date().toISOString().split('T')[0]}
                                                 onChange={(e) => handleChangeContracts(index, 'start_date', e.target.value)}
                                             />
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.start_date : ''} />
-                                            <Label htmlFor="contract_duration">{t('contracts.duration_contract')}</Label>
+                                            <Label htmlFor={`contract.contract_duration.` + index}>{t('contracts.duration_contract')}</Label>
                                             <select
+                                                id={`contract.contract_duration.` + index}
                                                 name="contract_duration"
                                                 onChange={(e) => handleChangeContracts(index, 'contract_duration', e.target.value)}
-                                                id=""
                                                 required
                                                 defaultValue={Date.now().toLocaleString()}
                                                 value={data.contracts[index]?.contract_duration ?? ''}
@@ -1055,7 +1148,7 @@ export default function CreateUpdateAsset({
                                                         </option>
                                                         {contractDurations?.map((type, index) => (
                                                             <option value={type} key={index} className="bg-background text-foreground">
-                                                                {type}
+                                                                {t('contracts.duration.' + type)}
                                                             </option>
                                                         ))}
                                                     </>
@@ -1065,37 +1158,39 @@ export default function CreateUpdateAsset({
                                                 className="mt-2"
                                                 message={errors?.contracts ? errors?.contracts[index]?.contract_duration : ''}
                                             />
-                                            <Label>Notes</Label>
+                                            <Label htmlFor={`contract.notes.` + index}>Notes</Label>
                                             <Textarea
+                                                id={`contract.notes.` + index}
                                                 onChange={(e) => handleChangeContracts(index, 'notes', e.target.value)}
                                                 value={data.contracts[index]?.notes ?? ''}
                                                 minLength={4}
                                                 maxLength={250}
                                             />
                                             <InputError message={errors?.contracts ? errors?.contracts[index]?.notes : ''} />
-                                            <Label>{t('contracts.internal_ref')}</Label>
+                                            <Label htmlFor={`contract.internal_ref.` + index}>{t('contracts.internal_ref')}</Label>
                                             <Input
+                                                id={`contract.internal_ref.` + index}
                                                 type="text"
                                                 onChange={(e) => handleChangeContracts(index, 'internal_reference', e.target.value)}
                                                 value={data.contracts[index]?.internal_reference ?? ''}
                                                 maxLength={50}
                                             />
                                             <InputError message={errors?.contracts ? errors?.contracts[index]?.internal_reference : ''} />
-                                            <Label>{t('contracts.provider_ref')}</Label>
+                                            <Label htmlFor={`contract.provider_ref.` + index}>{t('contracts.provider_ref')}</Label>
                                             <Input
+                                                id={`contract.provider_ref.` + index}
                                                 type="text"
                                                 onChange={(e) => handleChangeContracts(index, 'provider_reference', e.target.value)}
                                                 value={data.contracts[index]?.provider_reference ?? ''}
                                                 maxLength={50}
                                             />
                                             <InputError message={errors?.contracts ? errors?.contracts[index]?.provider_reference : ''} />
-                                            <Label htmlFor="notice_period">{t('contracts.notice_period')}</Label>
+                                            <Label htmlFor={`contract.notice_period.` + index}>{t('contracts.notice_period.title')}</Label>
                                             <select
                                                 name="notice_period"
                                                 onChange={(e) => handleChangeContracts(index, 'notice_period', e.target.value)}
-                                                id=""
+                                                id={`contract.notice_period.` + index}
                                                 required
-                                                defaultValue={''}
                                                 value={data.contracts[index]?.notice_period ?? ''}
                                                 className={cn(
                                                     'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
@@ -1106,24 +1201,24 @@ export default function CreateUpdateAsset({
                                                 {noticePeriods && noticePeriods.length > 0 && (
                                                     <>
                                                         <option value="" disabled className="bg-background text-foreground">
-                                                            {t('actions.select-type', { type: t('contracts.duration_notice') })}
+                                                            {t('actions.select-type', { type: t('contracts.notice_period.title') })}
                                                         </option>
                                                         {noticePeriods?.map((type, index) => (
                                                             <option value={type} key={index} className="bg-background text-foreground">
-                                                                {type}
+                                                                {t('contracts.notice_period.' + type)}
                                                             </option>
                                                         ))}
                                                     </>
                                                 )}
                                             </select>
                                             <InputError className="mt-2" message={errors?.notice_period ?? ''} />
-                                            <Label htmlFor="renewal_type">{t('contracts.renewal_type')}</Label>
+                                            <Label htmlFor={`contract.renewal_type.` + index}>{t('contracts.renewal_type.title')}</Label>
                                             <select
                                                 name="renewal_type"
                                                 // value={data.renewal_type ?? ''}
                                                 required
                                                 onChange={(e) => handleChangeContracts(index, 'renewal_type', e.target.value)}
-                                                id=""
+                                                id={`contract.renewal_type.` + index}
                                                 defaultValue={''}
                                                 className={cn(
                                                     'border-input placeholder:text-muted-foreground flex w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
@@ -1134,7 +1229,7 @@ export default function CreateUpdateAsset({
                                                 {renewalTypes && renewalTypes.length > 0 && (
                                                     <>
                                                         <option value="" disabled className="bg-background text-foreground">
-                                                            {t('actions.select-type', { type: t('contracts.renewal_type') })}
+                                                            {t('actions.select-type', { type: t('contracts.renewal_type.title') })}
                                                         </option>
                                                         {renewalTypes?.map((type, index) => (
                                                             <option value={type} key={index} className="bg-background text-foreground">
@@ -1145,14 +1240,14 @@ export default function CreateUpdateAsset({
                                                 )}
                                             </select>
                                             <div className="w-full">
-                                                <Label htmlFor="status">{t('common.status')} </Label>
+                                                <Label htmlFor={`contract.status.` + index}>{t('common.status.title')} </Label>
                                                 <select
                                                     name="status"
                                                     // value={data.status ?? ''}
                                                     required
                                                     defaultValue={''}
                                                     onChange={(e) => handleChangeContracts(index, 'status', e.target.value)}
-                                                    id=""
+                                                    id={`contract.status.` + index}
                                                     // required={data.need_maintenance}
                                                     className={cn(
                                                         'border-input placeholder:text-muted-foreground flex w-full min-w-0 rounded-md border bg-transparent px-3 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
@@ -1163,11 +1258,11 @@ export default function CreateUpdateAsset({
                                                     {statuses && statuses.length > 0 && (
                                                         <>
                                                             <option value="" disabled className="bg-background text-foreground">
-                                                                {t('actions.select-type', { type: t('common.status') })}
+                                                                {t('actions.select-type', { type: t('common.status.title') })}
                                                             </option>
                                                             {statuses?.map((status, index) => (
                                                                 <option value={status} key={index} className="bg-background text-foreground">
-                                                                    {t(`contracts.status.${status}`)}
+                                                                    {t(`common.status.${status}`)}
                                                                 </option>
                                                             ))}
                                                         </>
@@ -1264,7 +1359,7 @@ export default function CreateUpdateAsset({
                                 placeholder="Add existing documents..."
                             />
                             <Button onClick={() => setShowFileModal(!showFileModal)} type="button" className="block">
-                                Add file
+                                {t('actions.add-type', { type: tChoice('documents.title', 1) })}
                             </Button>
                             {selectedDocuments.length > 0 && (
                                 <ul className="flex gap-4">

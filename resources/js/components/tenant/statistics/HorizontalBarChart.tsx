@@ -29,7 +29,7 @@ export default function HorizontalBarChart({
     };
 
     return (
-        <div className="h-96 w-xs lg:w-md xl:w-xl">
+        <div className="h-96 w-xs lg:w-md xl:w-xl ">
             <Bar
                 width={100}
                 height={100}

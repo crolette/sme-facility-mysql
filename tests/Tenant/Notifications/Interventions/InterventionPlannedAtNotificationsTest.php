@@ -46,14 +46,14 @@ beforeEach(function () {
     $this->interventionType = CategoryType::factory()->create(['category' => 'intervention']);
     $this->interventionActionType = CategoryType::factory()->create(['category' => 'action']);
 
-    $this->site = Site::factory()->create();
-    Building::factory()->create();
-    Floor::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    Building::factory()->withMaintainableData()->create();
+    Floor::factory()->withMaintainableData()->create();
     $this->provider = Provider::factory()->create();
 
-    $this->room = Room::factory()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
-    $this->asset = Asset::factory()->forLocation($this->room)->create();
+    $this->asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 });
 
 it('creates a user preference "planned_at" notification when user (admin) is created', function () {
@@ -111,7 +111,7 @@ it('creates a planned_at notification for a new created intervention for an ASSE
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addMonth(1),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $this->asset->reference_code,
         'locationType' => 'asset'
@@ -146,7 +146,7 @@ it('does not create a planned_at notification for a new created intervention for
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now(),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'locationId' => $this->asset->reference_code,
         'locationType' => 'asset'
     ];
@@ -167,7 +167,7 @@ it('creates a planned_at notification for a new created intervention for an ASSE
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::tomorrow(),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'locationId' => $this->asset->reference_code,
         'locationType' => 'asset'
     ];
@@ -194,14 +194,14 @@ it('creates a planned_at notification for a new created intervention for an ASSE
     );
 })->with(array_values(array_diff(array_column(InterventionStatus::cases(), 'value'), ['draft', 'completed', 'cancelled'])));
 
-it('does not create a planned_at notification for a new created intervention for an ASSET if status is not `planned/in progress/waiting_parts`', function ($status) {
+it('does not create a planned_at notification for a new created intervention for an ASSET if status is not `planned/in_progress/waiting_parts`', function ($status) {
 
     $formData = [
         'intervention_type_id' => $this->interventionType->id,
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addMonth(1),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $this->asset->reference_code,
         'locationType' => 'asset'
@@ -214,7 +214,7 @@ it('does not create a planned_at notification for a new created intervention for
         ]);
 
     assertDatabaseCount('scheduled_notifications', 0);
-})->with(array_values(array_diff(array_column(InterventionStatus::cases(), 'value'), ['planned', 'in progress', 'waiting for parts'])));
+})->with(array_values(array_diff(array_column(InterventionStatus::cases(), 'value'), ['planned', 'in_progress', 'waiting_parts'])));
 
 it('adds planned_at notification when maintenance_manager is linked to an ASSET', function ($status) {
 
@@ -237,7 +237,7 @@ it('adds planned_at notification when maintenance_manager is linked to an ASSET'
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addMonth(1),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $asset->reference_code,
         'locationType' => 'asset'
@@ -298,7 +298,7 @@ it('adds planned_at notification when maintenance_manager is linked to an asset 
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addMonth(1),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $asset->reference_code,
         'locationType' => 'asset'
@@ -360,7 +360,7 @@ it('creates planned_at notification for new maintenance manager when maintenance
     $this->postToTenant('api.assets.store', $formData);
 
     $asset = Asset::whereHas('maintainable', fn($query) => $query->where('name', 'New asset'))->first();
-    Intervention::factory()->forLocation($asset)->create(['status' =>  $status]);
+    Intervention::factory()->withAction()->forLocation($asset)->create(['status' =>  $status]);
 
     assertDatabaseCount('scheduled_notifications', 2);
 
@@ -421,7 +421,7 @@ it('deletes planned_at notification for old maintenance manager when he is repla
     $this->postToTenant('api.assets.store', $formData);
 
     $asset = Asset::whereHas('maintainable', fn($query) => $query->where('name', 'New asset'))->first();
-    Intervention::factory()->forLocation($asset)->create(['status' =>  $status]);
+    Intervention::factory()->withAction()->forLocation($asset)->create(['status' =>  $status]);
 
     assertDatabaseCount('scheduled_notifications', 2);
 
@@ -487,7 +487,7 @@ it('does not delete planned_at notification when a maintenance manager with admi
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addMonth(1),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $asset->reference_code,
         'locationType' => 'asset'
@@ -568,7 +568,7 @@ it('deletes planned_at notification when maintenance manager with maintenance ma
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addMonth(1),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $asset->reference_code,
         'locationType' => 'asset'
@@ -650,7 +650,7 @@ it('does not delete planned_at notification when maintenance manager with mainte
         'priority' => 'medium',
         'status' => 'planned',
         'planned_at' => Carbon::now()->addMonth(1),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $asset->reference_code,
         'locationType' => 'asset'
@@ -719,7 +719,7 @@ it('does not create a planned_at notification when planned_at is not defined for
         'intervention_type_id' => $this->interventionType->id,
         'priority' => 'medium',
         'status' => $status,
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $this->asset->reference_code,
         'locationType' => 'asset'
@@ -748,7 +748,7 @@ it('does not create a planned_at notification when planned_at is not defined for
 
 it('updates notification when planned_at changes for an intervention', function ($status) {
 
-    Intervention::factory()->forLocation($this->asset)->create();
+    Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
     assertDatabaseHas(
         'scheduled_notifications',
@@ -768,7 +768,7 @@ it('updates notification when planned_at changes for an intervention', function 
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addWeeks(2),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(1),
         'locationId' => $this->asset->reference_code,
         'locationType' => get_class($this->asset)
@@ -801,7 +801,7 @@ it('updates notification when planned_at changes for an intervention', function 
 
 it('creates planned_at notification when planned_at is added for an existing intervention', function ($status) {
 
-    Intervention::factory()->forLocation($this->asset)->create(['planned_at' => null]);
+    Intervention::factory()->withAction()->forLocation($this->asset)->create(['planned_at' => null]);
 
     assertDatabaseMissing(
         'scheduled_notifications',
@@ -817,7 +817,7 @@ it('creates planned_at notification when planned_at is added for an existing int
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addWeeks(2),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'locationId' => $this->asset->reference_code,
         'locationType' => get_class($this->asset)
     ];
@@ -849,7 +849,7 @@ it('creates planned_at notification when planned_at is added for an existing int
 
 it('deletes planned_at notification when intervention status changes to completed/cancelled and status is pending', function ($status) {
 
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
     $notification = ScheduledNotification::where('notifiable_type', get_class($intervention))->where('notifiable_id', $intervention->id)->first();
 
@@ -859,7 +859,7 @@ it('deletes planned_at notification when intervention status changes to complete
         'intervention_type_id' => $this->interventionType->id,
         'priority' => 'medium',
         'status' => $status,
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'locationId' => $this->asset->reference_code,
         'locationType' => get_class($this->asset)
     ];
@@ -875,7 +875,7 @@ it('deletes planned_at notification when intervention status changes to complete
 
 it('does not delete planned_at notification when intervention status changes to completed/cancelled and status is sent', function ($status) {
 
-    $intervention = Intervention::factory()->forLocation($this->asset)->create();
+    $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
     $notification = ScheduledNotification::where('notifiable_type', get_class($intervention))->where('notifiable_id', $intervention->id)->first();
 
@@ -885,7 +885,7 @@ it('does not delete planned_at notification when intervention status changes to 
         'intervention_type_id' => $this->interventionType->id,
         'priority' => 'medium',
         'status' => $status,
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'locationId' => $this->asset->reference_code,
         'locationType' => get_class($this->asset)
     ];
@@ -901,7 +901,7 @@ it('does not delete planned_at notification when intervention status changes to 
 
 it('deletes planned_at notification with status `pending` when intervention is deleted', function () {
 
-    Intervention::factory()->forLocation($this->asset)->create();
+    Intervention::factory()->withAction()->forLocation($this->asset)->create();
     assertDatabaseCount('scheduled_notifications', 1);
 
     $intervention = Intervention::first();
@@ -913,7 +913,7 @@ it('deletes planned_at notification with status `pending` when intervention is d
 
 it('deletes planned_at notification with status `sent` when intervention is deleted', function () {
 
-    Intervention::factory()->forLocation($this->asset)->create();
+    Intervention::factory()->withAction()->forLocation($this->asset)->create();
     assertDatabaseCount('scheduled_notifications', 1);
 
     $intervention = Intervention::first();
@@ -927,7 +927,7 @@ it('deletes planned_at notification with status `sent` when intervention is dele
 });
 
 it('deletes planned_at notifcation with status `pending` when user_preference planned_at is disabled', function () {
-    Intervention::factory()->forLocation($this->asset)->create();
+    Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
     assertDatabaseCount('scheduled_notifications', 1);
 
@@ -959,7 +959,7 @@ it('deletes planned_at notifcation with status `pending` when user_preference pl
 });
 
 it('does not delete planned_at notifcation with status `sent` when user_preference planned_at is disabled', function () {
-    Intervention::factory()->forLocation($this->asset)->create();
+    Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
     assertDatabaseCount('scheduled_notifications', 1);
 
@@ -995,7 +995,7 @@ it('does not delete planned_at notifcation with status `sent` when user_preferen
 
 it('creates notification when user preference planned_at is enabled', function () {
 
-    Intervention::factory()->forLocation($this->asset)->create();
+    Intervention::factory()->withAction()->forLocation($this->asset)->create();
 
     assertDatabaseCount('scheduled_notifications', 1);
 
@@ -1047,7 +1047,7 @@ it('updates planned_at notification with status `pending` when user preference n
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addMonth(),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(),
         'locationId' => $this->asset->reference_code,
         'locationType' => 'asset'
@@ -1105,7 +1105,7 @@ it('does not update planned_at notification with status `sent` when user_prefere
         'priority' => 'medium',
         'status' => $status,
         'planned_at' => Carbon::now()->addMonth(),
-        'description' => fake()->paragraph(),
+        'description' => fake()->paragraph(3),
         'repair_delay' => Carbon::now()->addMonth(),
         'locationId' => $this->asset->reference_code,
         'locationType' => 'asset'
@@ -1174,8 +1174,8 @@ it('does not create planned_at notifications for admin when user preference plan
 
     $this->patchToTenant('api.notifications.update', $formData, $preference->id);
 
-    Intervention::factory()->forLocation($this->asset)->create(['planned_at' => Carbon::yesterday()]);
-    Intervention::factory()->forLocation($this->asset)->create(['planned_at' => Carbon::tomorrow()]);
+    Intervention::factory()->withAction()->forLocation($this->asset)->create(['planned_at' => Carbon::yesterday()]);
+    Intervention::factory()->withAction()->forLocation($this->asset)->create(['planned_at' => Carbon::tomorrow()]);
 
     assertDatabaseCount('scheduled_notifications', 0);
 });
@@ -1193,8 +1193,8 @@ it('creates planned_at notifications for admin when user preference planned_at i
 
     $this->patchToTenant('api.notifications.update', $formData, $preference->id);
 
-    Intervention::factory()->forLocation($this->asset)->create(['planned_at' => Carbon::yesterday()]);
-    Intervention::factory()->forLocation($this->asset)->create(['planned_at' => Carbon::tomorrow()]);
+    Intervention::factory()->withAction()->forLocation($this->asset)->create(['planned_at' => Carbon::yesterday()]);
+    Intervention::factory()->withAction()->forLocation($this->asset)->create(['planned_at' => Carbon::tomorrow()]);
 
     assertDatabaseCount('scheduled_notifications', 0);
 
@@ -1250,8 +1250,8 @@ it('creates planned_at notifications for maintenance_manager when user preferenc
 
     $this->patchToTenant('api.notifications.update', $formData, $preference->id);
 
-    Intervention::factory()->forLocation($this->asset)->create(['planned_at' => Carbon::yesterday()]);
-    Intervention::factory()->forLocation($this->asset)->create(['planned_at' => Carbon::tomorrow()]);
+    Intervention::factory()->withAction()->forLocation($this->asset)->create(['planned_at' => Carbon::yesterday()]);
+    Intervention::factory()->withAction()->forLocation($this->asset)->create(['planned_at' => Carbon::tomorrow()]);
 
     $this->asset->maintainable->update(['maintenance_manager_id' => $this->manager->id]);
 
@@ -1296,7 +1296,7 @@ it('creates planned_at notifications for maintenance_manager when user preferenc
 
 it('creates planned_at notifications for a new created user with admin role', function () {
 
-    $intervention = Intervention::factory()->forLocation($this->asset)->create(['planned_at' => Carbon::tomorrow()]);
+    $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create(['planned_at' => Carbon::tomorrow()]);
 
     $formData = [
         'first_name' => 'Jane',
@@ -1328,7 +1328,7 @@ it('creates planned_at notifications for a new created user with admin role', fu
 
 it('creates end_date notifications when the role of a maintenance manager changes to admin', function () {
 
-    $intervention = Intervention::factory()->forLocation($this->asset)->create(['planned_at' => Carbon::tomorrow()]);
+    $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create(['planned_at' => Carbon::tomorrow()]);
 
 
     $formData = [
@@ -1381,7 +1381,7 @@ it('creates end_date notifications when the role of a maintenance manager change
 });
 
 it('deletes end_date notifications when the role of an admin changes to maintenance manager', function () {
-    $intervention = Intervention::factory()->forLocation($this->asset)->create(['planned_at' => Carbon::tomorrow()]);
+    $intervention = Intervention::factory()->withAction()->forLocation($this->asset)->create(['planned_at' => Carbon::tomorrow()]);
 
     $formData = [
         'first_name' => 'Jane',
@@ -1434,8 +1434,8 @@ it('deletes end_date notifications when the role of an admin changes to maintena
 });
 
 it('deletes end_date notifications when the role of an admin changes to maintenance manager for assets only where he is not maintenance manager', function () {
-    $interventionOne = Intervention::factory()->forLocation($this->asset)->create(['planned_at' => Carbon::tomorrow()]);
-    $interventionTwo = Intervention::factory()->forLocation($this->room)->create(['planned_at' => Carbon::tomorrow()]);
+    $interventionOne = Intervention::factory()->withAction()->forLocation($this->asset)->create(['planned_at' => Carbon::tomorrow()]);
+    $interventionTwo = Intervention::factory()->withAction()->forLocation($this->room)->create(['planned_at' => Carbon::tomorrow()]);
 
     $this->room->refresh();
 

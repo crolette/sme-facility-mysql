@@ -62,7 +62,7 @@ class DemoController extends Controller
         } catch (Exception $e) {
             Log::info('Error during insert email to newsletters', [$e->getMessage()]);
             DB::rollback();
-            return ApiResponse::error('Error E-mail sent');
+            return ApiResponse::error('Error E-mail sent ');
         }
 
         return redirect()->back()->withInput();

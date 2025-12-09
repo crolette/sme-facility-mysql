@@ -1,10 +1,12 @@
 import { cn } from '@/lib/utils';
 import { CentralType } from '@/types';
 import axios from 'axios';
+import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { FormEventHandler, useEffect, useState } from 'react';
 import ModaleForm from '../ModaleForm';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import { Label } from '../ui/label';
 
 type TypeFormData = {
     files: {
@@ -24,6 +26,7 @@ interface FileManagerProps {
 }
 
 export default function FileManager({ documents, showModal, onDocumentsChange, onToggleModal }: FileManagerProps) {
+    const { t, tChoice } = useLaravelReactI18n();
     const [newFileName, setNewFileName] = useState('');
     const [newFileDescription, setNewFileDescription] = useState('');
     const [newFile, setNewFile] = useState<File | null>(null);
@@ -34,9 +37,7 @@ export default function FileManager({ documents, showModal, onDocumentsChange, o
             const response = await axios.get(route('api.category-types', { type: 'document' }));
             setDocumentTypes(response.data.data);
         } catch (error) {
-            console.error('Erreur lors de la recherche :', error);
             const errors = error.response.data.errors;
-            console.error('Erreur de validation :', errors);
             return [];
         }
     };
@@ -77,17 +78,20 @@ export default function FileManager({ documents, showModal, onDocumentsChange, o
         setNewFile(null);
     };
 
+    console.log(newDocumentType);
+
     return (
         showModal && (
-            <ModaleForm title={'Add new document'}>
+            <ModaleForm title={t('actions.add-type', { type: tChoice('documents.title', 1) })}>
                 <div className="flex flex-col gap-2">
                     <form onSubmit={addFile} className="space-y-2">
+                        <Label htmlFor={`type`}>{t('common.type')}</Label>
                         <select
                             name="documentType"
                             required
                             value={newDocumentType ?? ''}
                             onChange={(e) => setNewDocumentType(parseInt(e.target.value))}
-                            id=""
+                            id="type"
                             className={cn(
                                 'border-input placeholder:text-muted-foreground flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
                                 'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
@@ -97,7 +101,7 @@ export default function FileManager({ documents, showModal, onDocumentsChange, o
                             {documentTypes && documentTypes.length > 0 && (
                                 <>
                                     <option value="" disabled className="bg-background text-foreground">
-                                        Select an option
+                                        {t('actions.select-type', { type: t('common.type') })}
                                     </option>
                                     {documentTypes?.map((documentType) => (
                                         <option value={documentType.id} key={documentType.id} className="bg-background text-foreground">
@@ -107,17 +111,29 @@ export default function FileManager({ documents, showModal, onDocumentsChange, o
                                 </>
                             )}
                         </select>
+
+                        <Label htmlFor={`file`}>{t('documents.file')}</Label>
                         <Input
                             type="file"
-                            name=""
-                            id=""
+                            id="file"
                             onChange={(e) => setNewFile(e.target.files ? e.target.files[0] : null)}
                             required
                             accept="image/png, image/jpeg, image/jpg, .pdf"
                         />
 
-                        <Input type="text" name="name" required placeholder="Document name" onChange={(e) => setNewFileName(e.target.value)} />
-                        <p className="text-border text-xs">Servira à la sauvegarde du nom du fichier</p>
+                        <Label htmlFor={`name`}>{t('common.name')}</Label>
+                        <Input
+                            type="text"
+                            name="name"
+                            id="name"
+                            required
+                            minLength={10}
+                            maxLength={100}
+                            placeholder="Document name"
+                            onChange={(e) => setNewFileName(e.target.value)}
+                        />
+                        <p className="text-border text-xs dark:text-white">{t('documents.filename_description')}</p>
+                        <Label htmlFor={`description`}>{t('common.description')}</Label>
                         <Input
                             type="text"
                             name="description"
@@ -128,9 +144,9 @@ export default function FileManager({ documents, showModal, onDocumentsChange, o
                             onChange={(e) => setNewFileDescription(e.target.value)}
                         />
                         <div className="flex justify-between">
-                            <Button>Submit</Button>
+                            <Button>{t('actions.add-type', { type: tChoice('documents.title', 1) })}</Button>
                             <Button type="button" onClick={onToggleModal} variant={'outline'}>
-                                Cancel
+                                {t('actions.cancel')}
                             </Button>
                         </div>
                     </form>

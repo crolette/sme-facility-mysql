@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use App\Enums\ContractDurationEnum;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 
@@ -121,13 +122,13 @@ class ContractService
             $contract->provider()->associate($request['provider_id'])->save();
         }
 
+        $contract->save();
+
         if (isset($request['contractables']))
             $contract = $this->syncContractables($contract, $request['contractables']);
 
         if (isset($request['files']))
             app(DocumentService::class)->uploadAndAttachDocuments($contract, $request['files']);
-
-        $contract->save();
 
         return $contract;
     }
@@ -146,10 +147,11 @@ class ContractService
             }
         }
 
+        $contract->save();
+
         if (isset($request['contractables']))
             $contract = $this->syncContractables($contract, $request['contractables']);
 
-        $contract->save();
 
         return $contract;
     }

@@ -9,6 +9,9 @@ return [
     'description' => 'Eine vollständige Plattform ohne unnötige Komplexität, um Ihre Kosten zu kontrollieren und effizienter zu werden.',
     'from' => 'Ab',
     'month' => 'Monat',
+    'month' => 'Jahr',
+    'vat_excluded' => 'zzgl. MwSt.',
+    'vat_excluded_description' => 'Die angegebenen Preise verstehen sich ohne Mehrwertsteuer (netto). Die gesetzlich geltende Mehrwertsteuer wird bei der Rechnungsstellung entsprechend den gesetzlichen Vorschriften hinzugerechnet.',
     'start_today' => 'Heute starten',
     'starter' => [
         'title' => 'Starter',
@@ -25,6 +28,7 @@ return [
     'launching_offer' => [
         'title' => 'Startangebot',
         'description' => 'Um den Start von SME Facility zu feiern, profitieren Sie von einem außergewöhnlichen Angebot!',
+        'conditions' => 'Das Einführungsangebot ist neuen Kunden vorbehalten und gilt ausschließlich für das erste Jahr des Abonnements. Ab dem zweiten Jahr wird automatisch der dann gültige Tarif angewendet.',
     ],
     'premium' => [
         'title' => 'Premium',

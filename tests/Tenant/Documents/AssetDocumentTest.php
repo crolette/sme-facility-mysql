@@ -30,14 +30,14 @@ beforeEach(function () {
     CategoryType::factory()->count(2)->create(['category' => 'asset']);
 
     // on créée les différentes "locations" possibles pour attacher un asset
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
-    $this->room = Room::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 });
 
 it('can attach existing documents to asset', function () {
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     CategoryType::where('category', 'document')->first();
     $documents = Document::factory()->count(2)->withCustomAttributes([
@@ -332,7 +332,7 @@ it('can remove/detach a document from an asset', function () {
 
 it('can update name and description a document from an asset ', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $document = Document::factory()->withCustomAttributes([
         'user' => $this->user,
         'directoryName' => 'assets',
@@ -363,7 +363,7 @@ it('can upload a document to an asset', function () {
     $file1 = UploadedFile::fake()->image('avatar.png');
     $categoryType = CategoryType::where('category', 'document')->first();
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     $formData = [
 
@@ -392,7 +392,7 @@ it('deletes the documents directory if it is empty', function () {
     $file1 = UploadedFile::fake()->image('avatar.png');
     $categoryType = CategoryType::where('category', 'document')->first();
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     $formData = [
 

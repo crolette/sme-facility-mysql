@@ -33,11 +33,11 @@ beforeEach(function () {
     $this->roomType = LocationType::factory()->create(['level' => 'room']);
 
     $this->categoryType = CategoryType::factory()->create(['category' => 'asset']);
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
 
-    $this->room = Room::factory()
+    $this->room = Room::factory()->withMaintainableData()
         ->for(LocationType::where('level', 'room')->first())
         ->for(Floor::first())
         ->create();
@@ -71,7 +71,7 @@ it('can add a maintenance manager when creating asset', function () {
 
 it('can update a maintenance manager on existing asset', function () {
 
-    $asset = Asset::factory()->forLocation($this->room)->create();
+    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 
     $formData = [
         'name' => 'New asset',

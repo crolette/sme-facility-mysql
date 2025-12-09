@@ -2,14 +2,16 @@
 
 namespace App\Models\Tenants;
 
+use App\Enums\MeterReadingsUnits;
 use App\Observers\AssetObserver;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
 use App\Models\Tenants\Maintainable;
+use App\Models\Tenants\MeterReading;
+use App\Traits\HasMaintenanceManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Tenants\ScheduledNotification;
-use App\Traits\HasMaintenanceManager;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -31,6 +33,9 @@ class Asset extends Model
         'surface',
         'reference_code',
         'serial_number',
+        'has_meter_readings',
+        'meter_number',
+        'meter_unit',
         'depreciable',
         "depreciation_start_date",
         "depreciation_end_date",
@@ -60,13 +65,18 @@ class Asset extends Model
         'location_route'
     ];
 
-    protected $casts = [
-        'is_mobile' => 'boolean',
-        'depreciable' => 'boolean',
-        'residual_value' => 'decimal:2',
-        'depreciation_start_date' => 'date:Y-m-d',
-        'depreciation_end_date' => 'date:Y-m-d',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'is_mobile' => 'boolean',
+            'has_meter_readings' => 'boolean',
+            'meter_unit' => MeterReadingsUnits::class,
+            'depreciable' => 'boolean',
+            'residual_value' => 'decimal:2',
+            'depreciation_start_date' => 'date:Y-m-d',
+            'depreciation_end_date' => 'date:Y-m-d',
+        ];
+    }
 
     // Ensure route model binding use the slug instead of ID
     public function getRouteKeyName()
@@ -135,6 +145,11 @@ class Asset extends Model
     public function tickets(): MorphMany
     {
         return $this->morphMany(Ticket::class, 'ticketable');
+    }
+
+    public function meterReadings(): HasMany
+    {
+        return $this->hasMany(MeterReading::class);
     }
 
     public function assetCategory(): BelongsTo

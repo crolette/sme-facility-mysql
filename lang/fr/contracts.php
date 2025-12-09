@@ -3,6 +3,7 @@
 return [
     'title' => 'Contrat|Contrats',
     'renewal_type' => [
+        'title' => 'Type de renouvellement',
         'automatic' => 'Automatique',
         'manual' => 'Manuel',
     ],
@@ -15,15 +16,12 @@ return [
         'other' => 'Autre',
     ],
     'linked_to' => 'Lié à',
-    'status' => [
-        'active' => 'Actif',
-        'expired' => 'Expiré',
-        'cancelled' => 'Annulé',
-    ],
+    'name_placeholder' => 'Nom du contract',
     'internal_ref' => 'Réf. interne',
+    'internal_ref_placeholder' => 'CO-63-ABC',
     'provider_ref' => 'Réf. fournisseur',
     'duration_contract' => 'Durée du contrat',
-    'duration_notice' => 'Durée du préavis',
+    'notice_period.title' => 'Durée du préavis',
     'duration' => [
         '1_month' => '1 mois',
         '6_months' => '6 mois',

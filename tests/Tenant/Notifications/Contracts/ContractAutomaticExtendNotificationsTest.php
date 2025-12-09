@@ -37,14 +37,14 @@ beforeEach(function () {
 
     $this->manager = User::factory()->withRole('Maintenance Manager')->create();
 
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
     $this->provider = Provider::factory()->create();
 
-    $this->room = Room::factory()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
-    $this->asset = Asset::factory()->forLocation($this->room)->create();
+    $this->asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $this->asset->refresh();
 
     $this->basicContractData = [
@@ -56,7 +56,6 @@ beforeEach(function () {
         'provider_reference' => 'Provider reference 2025',
         'start_date' => Carbon::now()->toDateString(),
         'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
-        // 'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
         'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
         'status' => ContractStatusEnum::ACTIVE->value,
         'contractables' => [

@@ -33,14 +33,14 @@ beforeEach(function () {
 
     $this->manager = User::factory()->withRole('Maintenance Manager')->create();
 
-    $this->site = Site::factory()->create();
-    $this->building = Building::factory()->create();
-    $this->floor = Floor::factory()->create();
+    $this->site = Site::factory()->withMaintainableData()->create();
+    $this->building = Building::factory()->withMaintainableData()->create();
+    $this->floor = Floor::factory()->withMaintainableData()->create();
     $this->provider = Provider::factory()->create();
 
-    $this->room = Room::factory()->create();
+    $this->room = Room::factory()->withMaintainableData()->create();
 
-    $this->asset = Asset::factory()->forLocation($this->room)->create();
+    $this->asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
     $this->asset->refresh();
 
     $this->basicContractData = [
@@ -52,7 +52,7 @@ beforeEach(function () {
         'provider_reference' => 'Provider reference 2025',
         'start_date' => Carbon::now()->toDateString(),
         'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
-        // 'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
+        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
         'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
         'status' => ContractStatusEnum::ACTIVE->value,
         'contractables' => [
@@ -123,21 +123,33 @@ it('creates the end_date notification for the maintenance manager for a new crea
 
     $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
 
-    $formData = [
-        ...$this->basicContractData,
-        'contract_duration' => $duration
-    ];
+    // $formData = [
+    //     ...$this->basicContractData,
+    //     'contract_duration' => $duration
+    // ];
 
-    $this->postToTenant('api.contracts.store', $formData);
+    // $this->postToTenant('api.contracts.store', $formData);
 
-    $formData = [
-        ...$this->basicContractData,
+    // $formData = [
+    //     ...$this->basicContractData,
+    //     'contract_duration' => $duration,
+    //     'start_date' => Carbon::now()->subYears(2)->toDateString(),
+    //     'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now()->subYears(2))
+    // ];
+
+    // $this->postToTenant('api.contracts.store', $formData);
+
+    $contractOne = Contract::factory()->forLocation($this->asset)->create([
         'contract_duration' => $duration,
-        'start_date' => Carbon::now()->subYears(2)->toDateString(),
-        // 'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now()->subYears(2))
-    ];
+        'start_date' => Carbon::now(),
+        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
+    ]);
 
-    $this->postToTenant('api.contracts.store', $formData);
+    $contractTwo = Contract::factory()->forLocation($this->asset)->create([
+        'contract_duration' => $duration,
+        'start_date' => Carbon::now()->subYears(2),
+        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now()->subYears(2))
+    ]);
 
     assertDatabaseCount('scheduled_notifications', 2);
 

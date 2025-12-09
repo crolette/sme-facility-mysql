@@ -26,9 +26,7 @@
                     <p>{{__('notifications.notice_date_subtitle')}} :</p>
                     <div class="details">
                         <strong>{{__('common.name')}} :</strong> {{ $data['provider'] }}<br>
-                        {{-- <strong>{{__('common.type')}} :</strong> {{ $notification->notifiable->type->value }}<br> --}}
-                        {{-- <strong>{{__('contracts.internal_ref')}} :</strong> {{ $notification->notifiable->internal_reference ?? 'N/A' }}<br> --}}
-                        <strong>{{__('contracts.renewal_type')}} :</strong> {{__(`contracts.renewal_type.` . $data['renewal_type'] )}}<br>
+                        <strong>{{__('contracts.renewal_type.title')}} :</strong> {{__('contracts.renewal_type.' . $data['renewal_type'] )}}<br>
                         <strong>{{__('contracts.notice_date')}} :</strong> {{ isset($data['notice_date']) ? \Carbon\Carbon::parse($data['notice_date'])->format('d/m/Y') : 'N/A' }}<br>
                         <strong>{{__('contracts.end_date')}} :</strong> {{ isset($data['end_date']) ? \Carbon\Carbon::parse($data['end_date'])->format('d/m/Y') : 'N/A' }}<br>
                         @if(isset($data['provider']))
@@ -49,9 +47,7 @@
                     <p>{{__('notifications.end_date_subtitle')}}</p>
                     <div class="details">
                         <strong>{{__('common.name')}} :</strong> {{ $data['subject'] }}<br>
-                        {{-- <strong>{{__('common.type')}} :</strong> {{ __(`contracts.type.` . $notification->notifiable->type->value) }}<br>
-                        <strong>{{__('contracts.internal_ref')}} :</strong> {{ $notification->notifiable->internal_reference }}<br> --}}
-                        <strong>{{__('contracts.renewal_type')}} :</strong> {{__(`contracts.renewal_type.` . $data['renewal_type'])}}<br>
+                        <strong>{{__('contracts.renewal_type.title')}} :</strong> {{__('contracts.renewal_type.' . $data['renewal_type'] )}}<br>
                         @if ($notification->notifiable->notice_date)
                         <strong>{{__('contracts.notice_date')}} :</strong> {{\Carbon\Carbon::parse($data['end_date'])->format('d/m/Y') }}<br>
                             
@@ -73,7 +69,7 @@
                     <p>{{__('notifications.planned_at_subtitle')}}</p>
                     <div class="details">
                         <strong>{{__('common.type')}} :</strong> {{ $data['type'] ?? 'N/A' }}<br>
-                        <strong>{{__('interventions.priority')}} :</strong> {{ $data['priority'] ?? 'N/A' }}<br>
+                        <strong>{{__('interventions.priority.title')}} :</strong> {{ $data['priority'] ?? 'N/A' }}<br>
                         <strong>{{trans_choice('locations.location', 1)}} : </strong> {{ $data['subject'] ?? 'N/A' }}<br>
                         <strong>{{__('common.description')}} : </strong> {{ $data['description'] ?? 'N/A' }}<br>
                         <strong>{{__('notifications.planned_at')}} :</strong> {{ isset($data['planned_at']) ? \Carbon\Carbon::parse($data['planned_at'])->format('d/m/Y') : 'N/A' }}<br>

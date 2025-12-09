@@ -349,16 +349,18 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                 <TableHeadRow>
                                     <TableHeadData className="w-52">{t('common.description')}</TableHeadData>
                                     <TableHeadData>{t('common.type')}</TableHeadData>
-                                    <TableHeadData>{t('interventions.priority')}</TableHeadData>
-                                    <TableHeadData>{t('interventions.status')}</TableHeadData>
+                                    <TableHeadData>{t('interventions.priority.title')}</TableHeadData>
+                                    <TableHeadData>{t('common.status.title')}</TableHeadData>
                                     <TableHeadData>{t('interventions.assigned_to')}</TableHeadData>
                                     <TableHeadData>{t('interventions.planned_at')}</TableHeadData>
                                     <TableHeadData>{t('interventions.repair_delay')}</TableHeadData>
                                     <TableHeadData>{t('interventions.total_costs')}</TableHeadData>
                                     <TableHeadData>
-                                        <Button onClick={() => sendIntervention(intervention.id)} variant={'cta'}>
-                                            {t('interventions.assign_to')}
-                                        </Button>
+                                        {intervention.status !== 'completed' && (
+                                            <Button onClick={() => sendIntervention(intervention.id)} variant={'cta'}>
+                                                {t('interventions.assign_to')}
+                                            </Button>
+                                        )}
                                     </TableHeadData>
                                 </TableHeadRow>
                             </TableHead>
@@ -378,7 +380,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     <TableBodyData>
                                         <Pill variant={intervention.priority}>{t(`interventions.priority.${intervention.priority}`)}</Pill>
                                     </TableBodyData>
-                                    <TableBodyData>{t(`interventions.status.${intervention.status}`)}</TableBodyData>
+                                    <TableBodyData>{t(`common.status.${intervention.status}`)}</TableBodyData>
                                     <TableBodyData>
                                         {intervention.assignable ? (
                                             intervention.assignable.full_name ? (
@@ -644,7 +646,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                             onSubmit={submitType === 'new' ? submitIntervention : submitEditIntervention}
                             className="flex w-full flex-col space-y-4"
                         >
-                            <Label>{t('common.type')}</Label>
+                            <Label htmlFor="intervention_type">{t('common.type')}</Label>
                             <select
                                 name="intervention_type"
                                 id="intervention_type"
@@ -664,7 +666,7 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     </option>
                                 ))}
                             </select>
-                            <Label htmlFor="status">{t('common.status')}</Label>
+                            <Label htmlFor="status">{t('common.status.title')}</Label>
                             <select
                                 name="status"
                                 id="status"
@@ -677,18 +679,18 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     }))
                                 }
                             >
-                                <option value="">{t('actions.select-type', { type: t('common.status') })}</option>
-                                <option value="draft">{t('interventions.status.draft')}</option>
-                                <option value="planned">{t('interventions.status.planned')}</option>
-                                <option value="in_progress">{t('interventions.status.in_progress')}</option>
-                                <option value="waiting_parts">{t('interventions.status.waiting_parts')}</option>
-                                <option value="completed">{t('interventions.status.completed')}</option>
-                                <option value="cancelled">{t('interventions.status.cancelled')}</option>
+                                <option value="">{t('actions.select-type', { type: t('common.status.title') })}</option>
+                                <option value="draft">{t('common.status.draft')}</option>
+                                <option value="planned">{t('common.status.planned')}</option>
+                                <option value="in_progress">{t('common.status.in_progress')}</option>
+                                <option value="waiting_parts">{t('common.status.waiting_parts')}</option>
+                                <option value="completed">{t('common.status.completed')}</option>
+                                <option value="cancelled">{t('common.status.cancelled')}</option>
                             </select>
-                            <Label>{t('interventions.priority')}</Label>
+                            <Label htmlFor="priority">{t('interventions.priority.title')}</Label>
                             <select
                                 name=""
-                                id=""
+                                id="priority"
                                 required
                                 value={interventionDataForm.priority ?? ''}
                                 onChange={(e) =>
@@ -698,15 +700,17 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     }))
                                 }
                             >
-                                <option value="">{t('actions.select-type', { type: t('interventions.priority') })}</option>
+                                <option value="">{t('actions.select-type', { type: t('interventions.priority.title') })}</option>
                                 <option value="low">{t('interventions.priority.low')}</option>
                                 <option value="medium">{t('interventions.priority.medium')}</option>
                                 <option value="high">{t('interventions.priority.high')}</option>
                                 <option value="urgent">{t('interventions.priority.urgent')}</option>
                             </select>
-                            <Label>{t('common.description')}</Label>
+                            <Label htmlFor="description">{t('common.description')}</Label>
                             <Textarea
+                                id="description"
                                 placeholder="description"
+                                maxLength={255}
                                 value={interventionDataForm.description ?? ''}
                                 onChange={(e) =>
                                     setInterventionDataForm((prev) => ({

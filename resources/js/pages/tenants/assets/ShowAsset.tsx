@@ -1,6 +1,7 @@
 import { ContractsList } from '@/components/tenant/contractsList';
 import { DocumentManager } from '@/components/tenant/documentManager';
 import { InterventionManager } from '@/components/tenant/interventionManager';
+import { MeterReadingsManager } from '@/components/tenant/meterReadingsManager';
 import { PictureManager } from '@/components/tenant/pictureManager';
 import SidebarMenuAssetLocation from '@/components/tenant/sidebarMenuAssetLocation';
 import { TicketManager } from '@/components/tenant/ticketManager';
@@ -150,10 +151,12 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             )}
                         </>
                     )}
-                    <Button onClick={generateQR} variant={'secondary'}>
-                        <QrCode />
-                        {t('actions.generate_qr')}
-                    </Button>
+                    {!asset.deleted_at && (
+                        <Button onClick={generateQR} variant={'secondary'}>
+                            <QrCode />
+                            {t('actions.generate_qr')}
+                        </Button>
+                    )}
                 </div>
 
                 <div className="grid max-w-full gap-4 lg:grid-cols-[1fr_6fr]">
@@ -166,7 +169,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                             code: asset.code,
                             reference: asset.reference_code,
                             levelPath: asset.level_path,
-                            levelName: asset.is_mobile ? asset.location.full_name : asset.location.name,
+                            levelName: asset.is_mobile ? asset.location.full_name : (asset.location?.name ?? ''),
                         }}
                     />
                     <div className="overflow-hidden">
@@ -183,10 +186,20 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                             {asset.model && <Field label={t('assets.model')} text={asset.model} />}
                                             {asset.serial_number && <Field label={t('assets.serial_number')} text={asset.serial_number} />}
                                         </div>
+                                        {asset.has_meter_readings && (
+                                            <>
+                                                <Field label={t('assets.meter_number')} text={asset.meter_number} />
+                                                <MeterReadingsManager
+                                                    items={asset.meter_readings}
+                                                    unit={asset.meter_unit}
+                                                    assetCode={asset.reference_code}
+                                                />
+                                            </>
+                                        )}
                                         {asset.surface && <Field label={t('common.surface')} text={asset.surface + ' m²'} />}
                                     </div>
                                     <div className="mx-auto h-fit shrink-1 bg-white">
-                                        {asset.qr_code && (
+                                        {!asset.deleted_at && asset.qr_code && (
                                             <a href={route('api.file.download', { path: asset.qr_code })} download className="w-fit cursor-pointer">
                                                 <img
                                                     key={asset.qr_code}
@@ -222,7 +235,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                         {asset.maintainable.need_maintenance && (
                                             <>
                                                 <Field
-                                                    label={t('maintenances.frequency')}
+                                                    label={t('maintenances.frequency.title')}
                                                     text={t(`maintenances.frequency.${asset.maintainable.maintenance_frequency}`)}
                                                 />
                                                 <Field

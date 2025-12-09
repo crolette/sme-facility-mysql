@@ -135,7 +135,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                     {hasPermission('create locations') && routeName === 'rooms' && (
                         <Button variant={'secondary'} onClick={() => setShowModaleRelocateRoom(!showModaleRelocateRoom)}>
                             <Move />
-                            {t('locations.rooms.relocate')}
+                            {t('locations.rooms_relocate')}
                         </Button>
                     )}
                 </div>
@@ -230,7 +230,7 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
 
                                     {location.maintainable.need_maintenance && (
                                         <>
-                                            <Field label={t('maintenances.frequency')} text={location.maintainable.maintenance_frequency} />
+                                            <Field label={t('maintenances.frequency.title')} text={location.maintainable.maintenance_frequency} />
                                             <Field
                                                 label={t('maintenances.next_maintenance_date')}
                                                 date

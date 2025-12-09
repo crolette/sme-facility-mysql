@@ -36,7 +36,9 @@ export default function FAQ() {
                 <div className="container mx-auto">
                     <div className="mx-auto flex flex-col gap-10 p-4 md:p-10 lg:max-w-11/12">
                         <h1>FAQ</h1>
+
                         <div className="border-website-border flex w-full flex-col gap-4 rounded-md border p-6">{FAQ()}</div>
+
                         <a href={route('website.demo')} className="mx-auto">
                             <Button variant={'cta'}>{t('website_menu.demo_appointment')}</Button>
                         </a>

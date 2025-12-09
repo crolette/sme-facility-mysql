@@ -23,9 +23,9 @@ class SiteFactory extends Factory
      */
     public function definition(): array
     {
-        $locationType = LocationType::where('level', 'site')->where('prefix', 'S')->first();
+        $locationType = LocationType::where('level', 'site')->first();
         if (!$locationType)
-            $locationType = LocationType::factory()->create(['level' => 'site', 'prefix' => 'S']);
+            $locationType = LocationType::factory()->create(['level' => 'site']);
 
 
         return [
@@ -33,6 +33,20 @@ class SiteFactory extends Factory
             'surface_floor' => fake()->numberBetween(100, 3000),
             'surface_walls' => fake()->numberBetween(100, 3000)
         ];
+    }
+
+    public function withMaintainableData(array $data = [])
+    {
+        return $this->afterCreating(function (Site $site) use ($data) {
+            $maintainableData = array_merge([
+                'name' => fake()->text(20),
+                'description' => fake()->sentence(6),
+            ], $data);
+
+            $site->maintainable()->save(
+                Maintainable::factory()->make($maintainableData)
+            );
+        });
     }
 
     public function configure()
@@ -51,10 +65,6 @@ class SiteFactory extends Factory
                     'reference_code' => $codeNumber,
                     'code' => $codeNumber,
                 ]);
-
-                $site->maintainable()->save(
-                    Maintainable::factory()->make()
-                );
             }
         );
     }

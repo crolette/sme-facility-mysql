@@ -48,7 +48,7 @@ it('can upload contracts and dispatch import contracts job', function () {
 
     $formData = ['file' => $file];
 
-    $response = $this->postToTenant('api.tenant.import', $formData, [], [
+    $this->postToTenant('api.tenant.import', $formData, [], [
         'Content-Type' => 'multipart/form-data'
     ]);
     Queue::assertPushed(ImportExcelContractsJob::class, function ($job) {
