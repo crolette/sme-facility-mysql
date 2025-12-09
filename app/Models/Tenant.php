@@ -176,10 +176,10 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     {
         if ($this->companyAddress) {
 
-            $country = CentralCountry::where('iso_code_a2', $this->companyAddress->country)->first();
+            // $country = CentralCountry::where('iso_code_a2', $this->companyAddress->country)->first();
 
             return Attribute::make(
-                get: fn() => $this->companyAddress->street . ', ' . $this->companyAddress->house_number . ' - ' . $this->companyAddress->zip_code . ' ' . $this->companyAddress->city . ' - ' . $country->name
+                get: fn() => $this->companyAddress->street . ', ' . $this->companyAddress->house_number . ' - ' . $this->companyAddress->zip_code . ' ' . $this->companyAddress->city . ' - ' . $this->companyAddress->country->name
             );
         } else {
             return Attribute::make(get: fn() => null);
@@ -190,11 +190,11 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     {
         if ($this->invoiceAddress) {
 
-            $country = CentralCountry::where('iso_code_a2', $this->invoiceAddress->country)->first();
+            // $country = CentralCountry::where('iso_code_a2', $this->invoiceAddress->country)->first();
 
             return Attribute::make(
                 get: fn() => $this->invoiceAddress ?
-                    $this->invoiceAddress->street . ', ' . $this->invoiceAddress->house_number . ' - ' . $this->invoiceAddress->zip_code . ' ' . $this->invoiceAddress->city . ' - ' . $country->name
+                    $this->invoiceAddress->street . ', ' . $this->invoiceAddress->house_number . ' - ' . $this->invoiceAddress->zip_code . ' ' . $this->invoiceAddress->city . ' - ' . $this->country?->name
                     : null
             );
         } else {

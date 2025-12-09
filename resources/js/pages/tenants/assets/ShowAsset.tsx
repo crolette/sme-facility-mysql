@@ -164,6 +164,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                         activeTab={activeTab}
                         setActiveTab={setActiveTab}
                         menu="asset"
+                        item={item}
                         infos={{
                             name: asset.name,
                             code: asset.code,
@@ -174,7 +175,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                     />
                     <div className="overflow-hidden">
                         {activeTab === 'information' && (
-                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
+                            <div className="border-sidebar-border bg-sidebar space-y-4 rounded-md border p-4 shadow-xl">
                                 <h2>{t('common.information')}</h2>
                                 <div className="grid grid-cols-[1fr_160px] gap-4">
                                     <div className="space-y-2">
@@ -211,6 +212,18 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                         )}
                                     </div>
                                 </div>
+                                {asset.maintainable.providers?.length > 0 && (
+                                    <>
+                                        <h2>{tChoice('providers.title', 2)}</h2>
+                                        <ul className="flex gap-4">
+                                            {asset.maintainable.providers?.map((provider, index) => (
+                                                <li key={index}>
+                                                    <Field text={<a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>} />
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </>
+                                )}
                             </div>
                         )}
 
@@ -252,9 +265,13 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                         )}
                                     </div>
                                 </div>
+                            </>
+                        )}
 
+                        {activeTab === 'depreciation' && (
+                            <>
                                 {asset.depreciable && (
-                                    <div className="border-sidebar-border bg-sidebar mt-4 rounded-md border p-4">
+                                    <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
                                         <h2>{t('assets.depreciation')}</h2>
                                         <div className="space-y-2">
                                             <Field
@@ -263,6 +280,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                             />
                                             <Field label={t('assets.depreciation_start_date')} date text={asset.depreciation_start_date} />
                                             <Field label={t('assets.depreciation_end_date')} date text={asset.depreciation_end_date} />
+                                            <Field label={t('assets.accounting_reference')} date text={asset.accounting_reference} />
                                             <Field
                                                 label={t('assets.residual_value')}
                                                 text={asset.residual_value ? asset.residual_value + ' €' : 'NC'}
@@ -299,24 +317,6 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                 removable
                                 // onContractsChange={updateContracts}
                             />
-                        )}
-
-                        {activeTab === 'providers' && (
-                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
-                                <h2>{tChoice('providers.title', 2)}</h2>
-                                <div className="space-y-2">
-                                    <ul>
-                                        {asset.maintainable.providers?.map((provider, index) => (
-                                            <li key={index}>
-                                                <Field
-                                                    label={tChoice('providers.title', 1)}
-                                                    text={<a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>}
-                                                />
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            </div>
                         )}
 
                         {activeTab === 'interventions' && (

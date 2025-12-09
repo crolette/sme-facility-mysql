@@ -44,6 +44,7 @@ it('can create a new depreciable asset without depreciation_end_date which will 
         'depreciation_duration' => 3,
         'depreciation_end_date' => null,
         'residual_value' => 1250.69,
+        'accounting_reference' => 'COMPTA-01',
         'locationId' => $this->site->id,
         'locationType' => 'site',
         'locationReference' => $this->site->reference_code,
@@ -69,6 +70,7 @@ it('can create a new depreciable asset without depreciation_end_date which will 
         'depreciation_end_date' => Carbon::now()->addYear(3)->toDateString(),
         'depreciation_duration' => 3,
         'residual_value' => 1250.69,
+        'accounting_reference' => 'COMPTA-01',
     ]);
 
     assertDatabaseHas('maintainables', [

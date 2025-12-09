@@ -189,6 +189,23 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                                                 {location.height && <Field label={t('locations.height')} text={`${location.height} m`} />}
                                             </>
                                         )}
+                                        {location.maintainable?.providers?.length > 0 && (
+                                            <>
+                                                <h2>{tChoice('providers.title', 2)}</h2>
+                                                {location.maintainable.providers && location.maintainable.providers.length > 0 && (
+                                                    <ul>
+                                                        {location.maintainable.providers.map((provider, index) => (
+                                                            <li key={index}>
+                                                                <Field
+                                                                    label={tChoice('providers.title', 1)}
+                                                                    text={<a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>}
+                                                                />
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                )}
+                                            </>
+                                        )}
                                     </div>
                                     <div className="mx-auto h-fit shrink-1 bg-white">
                                         {location.qr_code && (
@@ -244,24 +261,6 @@ export default function ShowLocation({ item, routeName }: { item: TenantSite | T
                                         </>
                                     )}
                                 </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'providers' && (
-                            <div className="border-sidebar-border bg-sidebar rounded-md border p-4 shadow-xl">
-                                <h2>{tChoice('providers.title', 2)}</h2>
-                                {location.maintainable.providers && location.maintainable.providers.length > 0 && (
-                                    <ul>
-                                        {location.maintainable.providers.map((provider, index) => (
-                                            <li key={index}>
-                                                <Field
-                                                    label={tChoice('providers.title', 1)}
-                                                    text={<a href={route('tenant.providers.show', provider.id)}>{provider.name}</a>}
-                                                />
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
                             </div>
                         )}
 

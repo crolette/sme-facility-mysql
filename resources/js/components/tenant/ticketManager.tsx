@@ -37,9 +37,10 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
     const auth = usePage().props.auth.user;
     const { showToast } = useToast();
 
-    const [tickets, setTickets] = useState<Ticket[]>();
+    const [tickets, setTickets] = useState<Ticket[] | null>(null);
     const [addTicketModal, setAddTicketModal] = useState<boolean>(false);
     const [submitTypeTicket, setSubmitTypeTicket] = useState<'edit' | 'new'>('edit');
+    const [isLoading, setIsLoading] = useState(true);
     const [isProcessing, setIsProcessing] = useState(false);
 
     const updateTicketData = {
@@ -64,6 +65,7 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
             const response = await axios.get(route(getTicketsUrl, itemCode));
             if (response.data.status === 'success') {
                 setTickets(await response.data.data);
+                setIsLoading(false);
             }
         } catch (error) {
             return;
@@ -165,21 +167,30 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                 )}
             </div>
 
-            {tickets && tickets?.length > 0 && (
-                <Table>
-                    <TableHead>
-                        <TableHeadRow>
-                            <TableHeadData>{t('common.code')}</TableHeadData>
-                            <TableHeadData>{t('common.status.title')}</TableHeadData>
-                            <TableHeadData>{t('tickets.reporter')}</TableHeadData>
-                            <TableHeadData>{t('common.description')}</TableHeadData>
-                            <TableHeadData>{t('common.created_at')}</TableHeadData>
-                            <TableHeadData>{t('common.updated_at')}</TableHeadData>
-                            <TableHeadData></TableHeadData>
-                        </TableHeadRow>
-                    </TableHead>
-                    <TableBody>
-                        {tickets?.map((ticket, index) => {
+            <Table>
+                <TableHead>
+                    <TableHeadRow>
+                        <TableHeadData>{t('common.code')}</TableHeadData>
+                        <TableHeadData>{t('common.status.title')}</TableHeadData>
+                        <TableHeadData>{t('tickets.reporter')}</TableHeadData>
+                        <TableHeadData>{t('common.description')}</TableHeadData>
+                        <TableHeadData>{t('common.created_at')}</TableHeadData>
+                        <TableHeadData>{t('common.updated_at')}</TableHeadData>
+                        <TableHeadData></TableHeadData>
+                    </TableHeadRow>
+                </TableHead>
+                <TableBody>
+                    {isLoading ? (
+                        <TableBodyRow>
+                            <TableBodyData>
+                                <p className="flex animate-pulse gap-2">
+                                    <Loader />
+                                    {t('actions.loading')}
+                                </p>
+                            </TableBodyData>
+                        </TableBodyRow>
+                    ) : tickets !== null && tickets?.length > 0 ? (
+                        tickets?.map((ticket, index) => {
                             return (
                                 <TableBodyRow key={index}>
                                     <TableBodyData>
@@ -209,10 +220,14 @@ export const TicketManager = ({ itemCode, getTicketsUrl, locationType, canAdd = 
                                     </TableBodyData>
                                 </TableBodyRow>
                             );
-                        })}
-                    </TableBody>
-                </Table>
-            )}
+                        })
+                    ) : (
+                        <TableBodyRow key={0}>
+                            <TableBodyData>{t('common.no_results')}</TableBodyData>
+                        </TableBodyRow>
+                    )}
+                </TableBody>
+            </Table>
 
             {addTicketModal && (
                 <ModaleForm title={'Add new ticket'}>
