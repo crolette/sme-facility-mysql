@@ -41,6 +41,7 @@ class AssetCreateRequest extends FormRequest
             $data['depreciation_end_date'] = null;
             $data['depreciation_duration'] = null;
             $data['residual_value'] = null;
+            $data['accounting_reference'] = null;
         }
 
         if ($data['depreciable'] === true && $data['depreciation_end_date'] === null) {
@@ -90,6 +91,7 @@ class AssetCreateRequest extends FormRequest
             "depreciation_start_date" => 'nullable|date|required_if_accepted:depreciable',
             "depreciation_end_date" => 'nullable|date|after:depreciation_start_date',
             "depreciation_duration" => 'nullable|required_with:depreciation_start_date|numeric|gt:0',
+            "accounting_reference" => 'nullable|string|max:25',
             "residual_value" => 'nullable|numeric|decimal:0,2',
             'model' => ['nullable', 'string', 'max:100'],
             'brand' => ['nullable', 'string', 'max:100'],

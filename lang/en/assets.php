@@ -30,6 +30,7 @@ return [
     'depreciation_end_date' => 'Depreciation end date',
     'residual_value' => 'Residual value',
     'residual_value_placeholder' => 'Residual value after end of depreciation (max. 2 decimals) : 4236.36',
+    'accounting_reference' => 'Account reference',
     'still_under_warranty' => 'Still under warranty',
     'purchase_warranty' => 'Purchase/Warranty',
     'purchase_date' => 'Purchase date',

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\AddressTypes;
+use App\Models\Central\CentralCountry;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,10 +29,10 @@ class Address extends Model
         'updated_at'
     ];
 
-    // public function country(): BelongsTo
-    // {
-    //     return $this->belongsTo(CentralCountry::class);
-    // }
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(CentralCountry::class);
+    }
 
     public function tenantCompanyAddress(): BelongsTo
     {

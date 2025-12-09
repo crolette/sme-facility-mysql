@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { CentralType, Documents } from '@/types';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Loader2, Pencil, PlusCircle, Trash2, Unlink } from 'lucide-react';
+import { Loader, Loader2, Pencil, PlusCircle, Trash2, Unlink } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 import Modale from '../Modale';
@@ -47,6 +47,7 @@ export const DocumentManager = ({
     const { showToast } = useToast();
     const [documents, setDocuments] = useState<Documents[]>();
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
 
     useEffect(() => {
         fetchDocuments();
@@ -93,6 +94,7 @@ export const DocumentManager = ({
             const response = await axios.get(route(getDocumentsUrl, itemCodeId));
             setDocuments(response.data.data);
             setIsUpdating(false);
+            setIsLoading(false);
         } catch (error) {
             console.error('Erreur lors de la recherche :', error);
         }
@@ -254,21 +256,30 @@ export const DocumentManager = ({
                     )}
                 </div>
             </div>
-            {documents && documents.length > 0 && (
-                <Table>
-                    <TableHead>
-                        <TableHeadRow>
-                            <TableHeadData>{t('documents.file')}</TableHeadData>
-                            <TableHeadData>{t('documents.size')}</TableHeadData>
-                            <TableHeadData>{t('common.name')}</TableHeadData>
-                            <TableHeadData>{t('common.description')}</TableHeadData>
-                            <TableHeadData>{t('common.category')}</TableHeadData>
-                            <TableHeadData>{t('common.created_at')}</TableHeadData>
-                            <TableHeadData></TableHeadData>
-                        </TableHeadRow>
-                    </TableHead>
-                    <TableBody>
-                        {documents.map((document, index) => {
+            <Table>
+                <TableHead>
+                    <TableHeadRow>
+                        <TableHeadData>{t('documents.file')}</TableHeadData>
+                        <TableHeadData>{t('documents.size')}</TableHeadData>
+                        <TableHeadData>{t('common.name')}</TableHeadData>
+                        <TableHeadData>{t('common.description')}</TableHeadData>
+                        <TableHeadData>{t('common.category')}</TableHeadData>
+                        <TableHeadData>{t('common.created_at')}</TableHeadData>
+                        <TableHeadData></TableHeadData>
+                    </TableHeadRow>
+                </TableHead>
+                <TableBody>
+                    {isLoading ? (
+                        <TableBodyRow>
+                            <TableBodyData>
+                                <p className="flex animate-pulse gap-2">
+                                    <Loader />
+                                    {t('actions.loading')}
+                                </p>
+                            </TableBodyData>
+                        </TableBodyRow>
+                    ) : documents !== null && documents?.length > 0 ? (
+                        documents?.map((document, index) => {
                             const isImage = document.mime_type.startsWith('image/');
                             const isPdf = document.mime_type === 'application/pdf';
                             return (
@@ -316,10 +327,15 @@ export const DocumentManager = ({
                                     </TableBodyData>
                                 </TableBodyRow>
                             );
-                        })}
-                    </TableBody>
-                </Table>
-            )}
+                        })
+                    ) : (
+                        <TableBodyRow key={0}>
+                            <TableBodyData>{t('common.no_results')}</TableBodyData>
+                        </TableBodyRow>
+                    )}
+                </TableBody>
+            </Table>
+
             {isUpdating && (
                 <ModaleForm>
                     <Loader2 size={36} className="animate-spin" />

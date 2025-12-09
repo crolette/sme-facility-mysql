@@ -61,7 +61,7 @@ export default function ShowContract({ item, objects }: { item: Contract; object
                             name: contract.name,
                             code: contract.internal_reference,
                             status: contract.status,
-                            reference: contract.type ?? contract.provider?.category ?? 'NC',
+                            reference: t('contracts.type.' + contract.type) ?? 'NC',
                             levelPath: contract.provider ? route('tenant.providers.show', contract.provider_id) : '',
                             levelName: contract.provider?.name ?? 'NC',
                         }}
@@ -88,10 +88,15 @@ export default function ShowContract({ item, objects }: { item: Contract; object
 
                                         <Field label={t('contracts.end_date')} date text={contract.end_date} />
                                     </div>
-                                    <div className="flex gap-4">
-                                        <Field label={t('contracts.notice_period')} text={t(`contracts.notice_period.${contract.notice_period}`)} />
-                                        <Field label={t('contracts.notice_date')} date text={contract.notice_date} />
-                                    </div>
+                                    {contract.notice_period && (
+                                        <div className="flex gap-4">
+                                            <Field
+                                                label={t('contracts.notice_period.title')}
+                                                text={t(`contracts.notice_period.${contract.notice_period}`)}
+                                            />
+                                            <Field label={t('contracts.notice_date')} date text={contract.notice_date} />
+                                        </div>
+                                    )}
                                     <Field label={t('common.notes')} text={contract.notes} />
                                 </div>
                             </div>

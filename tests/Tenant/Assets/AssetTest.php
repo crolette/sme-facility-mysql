@@ -43,6 +43,7 @@ it('can create a new asset to site', function () {
         'depreciation_start_date' => Carbon::now(),
         'depreciation_end_date' => Carbon::now()->addYear(3),
         'depreciation_duration' => 3,
+        'accounting_reference' => 'COMPTA-01',
         'residual_value' => 1250.69,
         'locationId' => $this->site->id,
         'locationType' => 'site',
@@ -72,6 +73,7 @@ it('can create a new asset to site', function () {
         'depreciation_end_date' => Carbon::now()->addYear(3)->toDateString(),
         'depreciation_duration' => 3,
         'residual_value' => 1250.69,
+        'accounting_reference' => 'COMPTA-01',
     ]);
 
     assertDatabaseHas('maintainables', [

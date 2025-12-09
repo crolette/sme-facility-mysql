@@ -85,17 +85,10 @@ export default function ImageUploadModale({ isOpen, onClose, uploadUrl, onUpload
     };
 
     const handleUpload = async () => {
-        // if (!selectedFile) return;
-
         setUploading(true);
         setError(null);
 
         try {
-            // const formData = new FormData();
-            // formData.append('pictures', [selectedFile]);
-
-            // console.log(formData);
-
             const response = await axios.post(uploadUrl, data, {
                 headers: {
                     'Content-Type': 'multipart/form-data',

@@ -60,6 +60,7 @@ type TypeFormData = {
     depreciation_end_date: null | string;
     depreciation_duration: null | number;
     residual_value: null | number;
+    accounting_reference: null | string;
     description: string;
     locationId: number;
     locationReference: string;
@@ -152,7 +153,8 @@ export default function CreateUpdateAsset({
         depreciation_end_date: asset?.depreciation_end_date ?? null,
         depreciation_duration: asset?.depreciation_duration ?? null,
         contract_end_date: asset?.contract_end_date ?? null,
-        residual_value: asset?.residual_value ?? null,
+        residual_value: asset?.residual_value ?? '',
+        accounting_reference: asset?.accounting_reference ?? '',
         locationId: asset?.location_id ?? '',
         locationReference: asset?.is_mobile ? '' : (asset?.location.reference_code ?? ''),
         locationType: asset?.is_mobile ? 'user' : (asset?.location.location_type.level ?? ''),
@@ -161,7 +163,7 @@ export default function CreateUpdateAsset({
         maintenance_manager_id: asset?.maintainable?.maintenance_manager_id ?? null,
         maintenance_manager_name: asset?.maintainable?.manager?.full_name ?? '',
         purchase_date: asset?.maintainable.purchase_date ?? null,
-        purchase_cost: asset?.maintainable.purchase_cost ?? null,
+        purchase_cost: asset?.maintainable.purchase_cost ?? '',
         under_warranty: asset?.maintainable.under_warranty ?? false,
         end_warranty_date: asset?.maintainable.end_warranty_date ?? '',
         is_mobile: asset?.is_mobile ?? false,
@@ -365,7 +367,6 @@ export default function CreateUpdateAsset({
     useEffect(() => {
         if (data.depreciation_duration) {
             if (data.depreciation_start_date !== null) {
-                console.log(data.depreciation_start_date);
                 const [year, month, day] = data.depreciation_start_date.split('-');
                 const dateObj = new Date(year, month - 1, day);
                 dateObj.setFullYear(dateObj.getFullYear() + data.depreciation_duration);
@@ -857,6 +858,7 @@ export default function CreateUpdateAsset({
                             />
                         </div>
                         <InputError className="mt-2" message={errors?.depreciable ?? ''} />
+
                         {data.depreciable && (
                             <div className="flex flex-col gap-4 md:flex-row">
                                 <div className="w-full">
@@ -865,6 +867,7 @@ export default function CreateUpdateAsset({
                                         id="depreciation_start_date"
                                         type="date"
                                         value={data.depreciation_start_date ?? ''}
+                                        required={data.depreciable}
                                         onChange={(e) => setData('depreciation_start_date', e.target.value)}
                                         placeholder="Depreciation start date"
                                     />
@@ -877,6 +880,7 @@ export default function CreateUpdateAsset({
                                         type="number"
                                         min={1}
                                         step="1"
+                                        required={data.depreciable}
                                         value={data.depreciation_duration ?? ''}
                                         placeholder={t('assets.depreciation_duration_placeholder')}
                                         onChange={(e) => setData('depreciation_duration', parseFloat(e.target.value))}
@@ -907,6 +911,18 @@ export default function CreateUpdateAsset({
                                         placeholder={t('assets.residual_value_placeholder')}
                                     />
                                     <InputError className="mt-2" message={errors?.residual_value ?? ''} />
+                                </div>
+                                <div className="w-full">
+                                    <Label htmlFor="accounting_reference">{t('assets.accounting_reference')}</Label>
+                                    <Input
+                                        id="accounting_reference"
+                                        type="text"
+                                        maxLength={25}
+                                        value={data.accounting_reference}
+                                        onChange={(e) => setData('accounting_reference', e.target.value)}
+                                        placeholder="2025-IT-XFZ"
+                                    />
+                                    <InputError className="mt-2" message={errors?.accounting_reference ?? ''} />
                                 </div>
                             </div>
                         )}
