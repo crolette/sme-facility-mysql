@@ -483,7 +483,7 @@ export default function IndexInterventions({
                                                 <a href={route('tenant.interventions.show', item.id)} className="flex w-40">
                                                     <p className="overflow-hidden overflow-ellipsis whitespace-nowrap">{item.description}</p>
                                                 </a>
-                                                <p className="tooltip tooltip-bottom">{item.description}</p>
+                                                <p className="tooltip tooltip-top">{item.description}</p>
                                             </TableBodyData>
                                             <TableBodyData>{item.type}</TableBodyData>
                                             <TableBodyData>

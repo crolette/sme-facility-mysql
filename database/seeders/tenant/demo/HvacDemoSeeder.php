@@ -88,7 +88,7 @@ class HvacDemoSeeder extends Seeder
         Intervention::factory()->forLocation($assetHvac)->create([
             'description' => 'Entretien annuel',
             'intervention_type_id' => $interventionMaintenance->id,
-            'priority' => PriorityLevel::MEDIUM->value,
+            'priority' => PriorityLevel::LOW->value,
             'status' => InterventionStatus::PLANNED->value,
             'planned_at' => Carbon::tomorrow(),
             'repair_delay' => null,

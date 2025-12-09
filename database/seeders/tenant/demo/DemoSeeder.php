@@ -249,7 +249,7 @@ class DemoSeeder extends Seeder
         $intervention = Intervention::factory()->forTicket($ticket)->create([
             'description' => '2 ampoules à remplacer',
             'intervention_type_id' => $interventionRepair->id,
-            'priority' => PriorityLevel::URGENT->value,
+            'priority' => PriorityLevel::HIGH->value,
             'status' => InterventionStatus::COMPLETED->value,
             'planned_at' => Carbon::now(),
             'repair_delay' => null,
