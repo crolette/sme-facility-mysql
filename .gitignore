@@ -26,6 +26,7 @@ TODO_*.md
 composer.lock
 package-lock.json
 /auth.json
+/demo
 /.fleet
 /.idea
 /.nova

@@ -72,14 +72,14 @@ export const TicketsByAvgHandlingDurationChart = ({ ticketsByAvgHandlingDuration
                 ) : (
                     <>
                         {type === 'horizontalBar' && (
-                            <HorizontalBarChart type={type} labels={labels} dataCount={dataCount} chartName="TicketsByAvgDuration" />
+                            <HorizontalBarChart type={type} labels={labels} dataCount={dataCount} chartName="TicketsByAvgHandlingDuration" />
                         )}
 
                         {type === 'verticalBar' && (
-                            <VerticalBarChart type={type} labels={labels} dataCount={dataCount} chartName="TicketsByAvgDuration" />
+                            <VerticalBarChart type={type} labels={labels} dataCount={dataCount} chartName="TicketsByAvgHandlingDuration" />
                         )}
 
-                        {type === 'line' && <LineChart type={type} labels={labels} dataCount={dataCount} chartName="TicketsByAvgDuration" />}
+                        {type === 'line' && <LineChart type={type} labels={labels} dataCount={dataCount} chartName="TicketsByAvgHandlingDuration" />}
                     </>
                 )}
             </div>

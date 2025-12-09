@@ -77,7 +77,7 @@ export const TicketsByPeriodChart = ({ ticketsByPeriod }: { ticketsByPeriod: [] 
 
                     {type === 'verticalBar' && <VerticalBarChart type={type} labels={labels} dataCount={dataCount} chartName="TicketsByPeriod" />}
 
-                    {type === 'line' && <LineChart type={type} labels={labels} dataCount={dataCount} chartName="TicketsByAvgDuration" />}
+                    {type === 'line' && <LineChart type={type} labels={labels} dataCount={dataCount} chartName="TicketsByPeriod" />}
                 </>
             )}
         </div>
