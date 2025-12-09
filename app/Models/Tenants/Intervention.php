@@ -2,6 +2,7 @@
 
 namespace App\Models\Tenants;
 
+use Carbon\Carbon;
 use App\Enums\PriorityLevel;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Ticket;
@@ -34,7 +35,9 @@ class Intervention extends Model
         'status',
         'planned_at',
         'description',
-        'repair_delay'
+        'repair_delay',
+        'completed_at',
+        'cancelled_at',
     ];
 
     protected $with = [
@@ -58,6 +61,8 @@ class Intervention extends Model
             'repair_delay' => 'date:Y-m-d',
             'created_at' => 'date:Y-m-d',
             'updated_at' => 'date:Y-m-d',
+            'completed_at' => 'date:Y-m-d h:i',
+            'cancelled_at' => 'date:Y-m-d h:i',
             'status' => InterventionStatus::class,
             'priority' => PriorityLevel::class
         ];
@@ -72,13 +77,6 @@ class Intervention extends Model
         static::created(function ($intervention) {
             $intervention->ticket?->changeStatusToOngoing();
         });
-
-        static::updated(function ($intervention) {
-            if ($intervention->status === InterventionStatus::COMPLETED || $intervention->status === InterventionStatus::CANCELLED) {
-                $intervention->ticket?->closeTicket();
-            }
-        });
-
 
         static::deleted(function ($intervention) {
             $intervention->notifications()->delete();
@@ -134,6 +132,11 @@ class Intervention extends Model
     {
         $this->total_costs = $this->actions()->sum('intervention_costs');
         $this->save();
+    }
+
+    public function setCompletedAtNow(): void
+    {
+        $this->update(['completed_at' => Carbon::now()]);
     }
 
 

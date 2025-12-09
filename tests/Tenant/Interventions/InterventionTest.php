@@ -8,13 +8,16 @@ use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Ticket;
-use App\Models\Tenants\Building;
+use App\Services\TenantLimits;
 
+use App\Models\Tenants\Building;
 use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
-use App\Models\Central\CategoryType;
 
+use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Queue;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
@@ -69,7 +72,7 @@ it('shows the index interventions page', function () {
 
     $response->assertInertia(
         fn($page) => $page->component('tenants/interventions/IndexInterventions')
-            ->has('items', 2)
+            ->has('items.data', 2)
     );
 });
 
@@ -293,7 +296,7 @@ it('can delete an intervention', function () {
 
 
 it('can upload pictures when creating an intervention', function () {
-
+    Queue::fake();
     $file1 = UploadedFile::fake()->image('file1.png');
     $file2 = UploadedFile::fake()->image('file2.jpg');
 

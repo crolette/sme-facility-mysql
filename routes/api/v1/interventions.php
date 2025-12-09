@@ -9,6 +9,7 @@ use App\Services\PictureService;
 use App\Enums\InterventionStatus;
 use App\Services\DocumentService;
 use App\Models\Tenants\Intervention;
+use App\Services\InterventionService;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Stancl\Tenancy\Middleware\ScopeSessions;
 use App\Http\Controllers\API\V1\APIUserController;
@@ -62,7 +63,10 @@ Route::middleware([
                 return ApiResponse::notAuthorized();
 
             if (in_array($request->status, array_column(InterventionStatus::cases(), 'value'))) {
-                $intervention->update(['status' => $request->status]);
+
+                $data = app(InterventionService::class)->handleStatusChange($intervention, $request->all());
+
+                $intervention->update($data);
                 return ApiResponse::success(null, 'Status updated');
             } else {
                 return ApiResponse::error('Unknow status');

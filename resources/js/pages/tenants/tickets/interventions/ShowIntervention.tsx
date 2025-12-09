@@ -326,8 +326,14 @@ export default function ShowIntervention({
                                             <Field label={t('interventions.repair_delay')} text={intervention.repair_delay} />
                                         )}
                                         <div className="flex flex-wrap gap-4">
-                                            <Field label={t('common.created_at')} date text={intervention.created_at} />
-                                            <Field label={t('common.updated_at')} date text={intervention.updated_at} />
+                                            <Field label={t('common.created_at')} text={intervention.created_at} />
+                                            <Field label={t('common.updated_at')} text={intervention.updated_at} />
+                                            {intervention.completed_at && (
+                                                <Field label={t('interventions.completed_at')} text={intervention.completed_at} />
+                                            )}
+                                            {intervention.cancelled_at && (
+                                                <Field label={t('interventions.cancelled_at')} text={intervention.cancelled_at} />
+                                            )}
                                         </div>
                                         <Field
                                             label={t('interventions.assigned_to')}

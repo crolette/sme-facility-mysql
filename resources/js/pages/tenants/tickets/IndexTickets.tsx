@@ -127,10 +127,10 @@ export default function IndexTickets({ items, filters, statuses }: { items: Pagi
                         <li
                             className={cn(
                                 'cursor-pointer rounded-t-lg border-x-2 border-t-2 px-6 py-1',
-                                query.status === null ? 'bg-primary text-background' : 'bg-secondary',
+                                query.status === 'all' ? 'bg-primary text-background' : 'bg-secondary',
                             )}
                             onClick={() => {
-                                setQuery((prev) => ({ ...prev, q: null, status: null }));
+                                setQuery((prev) => ({ ...prev, q: null, status: 'all' }));
                             }}
                         >
                             {t('common.all')}

@@ -51,7 +51,6 @@ class APIInterventionActionController extends Controller
             // }
 
             // $intervention->actions()->save($action);
-
             if ($pictureUploadRequest->validated('pictures')) {
                 $this->pictureService->uploadAndAttachPictures($interventionAction, $pictureUploadRequest->validated('pictures'));
             }
