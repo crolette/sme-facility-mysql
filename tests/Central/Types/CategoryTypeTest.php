@@ -1,7 +1,7 @@
 <?php
 
-use App\Models\Central\CentralUser;
 use App\Enums\CategoryTypes;
+use App\Models\Central\CentralUser;
 use App\Models\Central\CategoryType;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -9,12 +9,14 @@ use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseMissing;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 
 uses(DatabaseTransactions::class);
 
 beforeEach(function () {
     $this->withoutMiddleware([
         \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
+        CustomInitializeTenancyBySubdomain::class,
         \Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain::class,
         \Stancl\Tenancy\Middleware\InitializeTenancyByPath::class,
         \Stancl\Tenancy\Middleware\InitializeTenancyByRequestData::class,
@@ -78,7 +80,7 @@ it('creates a new category type in the database', function () {
 
         assertDatabaseCount('category_types', 1);
         assertDatabaseHas('category_types', [
-            'slug' => 'category-en'
+            'slug' => 'document-category-en'
         ]);
 
 
@@ -119,7 +121,7 @@ it('fails to create a new category type with a non existing type', function () {
 it('shows the category type page', function () {
     $this->actingAs($user = CentralUser::factory()->create());
 
-    $category = CategoryType::factory()->create();;
+    $category = CategoryType::factory()->create();
 
     try {
         $response = $this->get(route('central.types.show', $category->slug));

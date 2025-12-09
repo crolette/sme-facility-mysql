@@ -32,6 +32,7 @@ abstract class TenantTestCase extends BaseTestCase
 
     protected $preservedCentralTables = [
         'migrations',
+        'countries',
         'addresses',
         'tenants',
         'domains',

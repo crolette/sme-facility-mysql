@@ -39,8 +39,10 @@ class TenantAssetController extends Controller
      */
     public function index(Request $request)
     {
-        if (Auth::user()->cannot('viewAny', Asset::class))
-            abort(403);
+        if (Auth::user()->cannot('viewAny', Asset::class)) {
+            ApiResponse::notAuthorizedFlash();
+            return back();
+        }
 
         $validator = Validator::make($request->all(), [
             'q' => 'string|max:255|nullable',
@@ -69,8 +71,8 @@ class TenantAssetController extends Controller
         };
 
         if (isset($validatedFields['q'])) {
-            $assets->where('code', 'like', '%' . $validatedFields['q'] . '%')->orWhereHas('maintainable', function (Builder $query) use ($validatedFields) {
-                $query->where('name', 'like', '%' . $validatedFields['q'] . '%');
+            $assets->where('code', 'like', '%' . $validatedFields['q'] . '%')->orWhere('reference_code', 'like', '%' . $validatedFields['q'] . '%')->orWhereHas('maintainable', function (Builder $query) use ($validatedFields) {
+                $query->where('name', 'like', '%' . $validatedFields['q'] . '%')->orWhere('description', 'like', '%' . $validatedFields['q'] . '%');
             });
         }
 
@@ -85,8 +87,10 @@ class TenantAssetController extends Controller
      */
     public function create()
     {
-        if (Auth::user()->cannot('create', Asset::class))
-            abort(403);
+        if (Auth::user()->cannot('create', Asset::class)) {
+            ApiResponse::notAuthorizedFlash();
+            return back();
+        }
 
         $categories = CategoryType::getByCategoryCache('asset');
         $documentTypes = CategoryType::getByCategoryCache('document');
@@ -107,8 +111,10 @@ class TenantAssetController extends Controller
      */
     public function show(Asset $asset)
     {
-        if (Auth::user()->cannot('view', $asset))
-            abort(403);
+        if (Auth::user()->cannot('view', $asset)) {
+            ApiResponse::notAuthorizedFlash();
+            return back();
+        }
 
         $asset = Asset::where('reference_code', $asset->reference_code)->with(['maintainable.manager:id,first_name,last_name', 'contracts:id,name,type,provider_id,status,renewal_type,end_date,internal_reference,provider_reference', 'contracts.provider:id,name,logo', 'meterReadings', 'maintainable.providers:id,name'])->first();
 
@@ -128,8 +134,10 @@ class TenantAssetController extends Controller
      */
     public function edit(Asset $asset)
     {
-        if (Auth::user()->cannot('update', $asset))
-            abort(403);
+        if (Auth::user()->cannot('update', $asset)) {
+            ApiResponse::notAuthorizedFlash();
+            return back();
+        }
 
 
         $categories = CategoryType::getByCategoryCache('asset');

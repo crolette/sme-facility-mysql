@@ -8,13 +8,18 @@ use App\Models\Tenant;
 use App\Enums\AddressTypes;
 use App\Helpers\ApiResponse;
 use Illuminate\Http\Request;
+use Laravel\Cashier\Cashier;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 use App\Http\Controllers\Controller;
+use App\Models\Central\Subscription;
+use App\Models\Central\CentralCountry;
 use App\Http\Requests\Central\CentralTenantRequest;
 use App\Http\Requests\Central\CompanyAddressRequest;
 use App\Http\Requests\Central\InvoiceAddressRequest;
+use App\Models\Central\SubscriptionItem;
 
 class CentralTenantController extends Controller
 {
@@ -23,7 +28,7 @@ class CentralTenantController extends Controller
      */
     public function index()
     {
-        $tenants = Tenant::with('domain')->get();
+        $tenants = Tenant::with('domain', 'subscriptions')->get();
 
         return Inertia::render('central/tenants/index', ['items' => $tenants]);
     }
@@ -33,17 +38,14 @@ class CentralTenantController extends Controller
      */
     public function show(Tenant $tenant)
     {
-        if (str_starts_with(config('app.url'), 'https://')) {
-            $suffix = substr(config('app.url'), strlen('https://'));
-            $address =preg_replace('/^https?:\/\/[^\/]+/', "https://{$tenant->domain->domain}" . '.' . $suffix, config('app.url'));
-        } else {
-            $suffix = substr(config('app.url'), strlen('http://'));
-            $address =preg_replace('/^http?:\/\/[^\/]+/', "http://{$tenant->domain->domain}" . '.' . $suffix, config('app.url'));
-        }
+        if (!$tenant->hasActiveSubscription)
+            $url = URL::temporarySignedRoute(
+                'choose-plan',
+                now()->addDays(7),
+                ['email' => $tenant->email, 'vat_number' => $tenant->vat_number]
+            );
 
-        // dd($address);
-       
-        return Inertia::render('central/tenants/show', ['tenant' => $tenant->load('domain')]);
+        return Inertia::render('central/tenants/show', ['tenant' => $tenant->load('domain'), 'url' => $url ?? null]);
     }
 
     /**
@@ -51,7 +53,8 @@ class CentralTenantController extends Controller
      */
     public function edit(Tenant $tenant)
     {
-        return Inertia::render('central/tenants/create', ['company' => $tenant->load('domain')]);
+        $countries = CentralCountry::all();
+        return Inertia::render('central/tenants/create', ['company' => $tenant->load('domain'), 'countries' => $countries]);
     }
 
     /**
@@ -66,7 +69,7 @@ class CentralTenantController extends Controller
             ]);
             return ApiResponse::error($errors, $errors);
         }
-        
+
         if ($tenant->company_code !== $tenantRequest->validated('company_code')) {
             $errors = new MessageBag([
                 'company_code' => ['You cannot change the company code as it is used for your QR codes.'],
@@ -93,10 +96,24 @@ class CentralTenantController extends Controller
             if ($invoiceAddressRequest->validated('same_address_as_company') && $tenant->invoiceAddress)
                 $tenant->invoiceAddress()->delete();
 
+
+            // $stripeCustomer = $tenant->updateStripeCustomer([
+            //     'business_name' => $tenant->company_name,
+            //     'individual_name' => $tenant->first_name . ' ' . $tenant->last_name,
+            //     'email' => $tenant->email,
+            //     'phone' => $tenant->phone_number,
+            //     'address' =>
+            //     [
+            //         'city' => $companyAddressRequest->validated('company')['city'],
+            //         'line1' => $companyAddressRequest->validated('company')['street'] . ' ' . $companyAddressRequest->validated('company')['house_number'],
+            //         'postal_code' => $companyAddressRequest->validated('company')['zip_code'],
+            //         'country' => 'BE'
+            //     ]
+            // ]);
+
             DB::commit();
 
             return ApiResponse::success([], 'Tenant updated');
-
         } catch (Exception $e) {
             DB::rollBack();
             Log::info('Error during tenant update : ' . $e->getMessage());
@@ -115,12 +132,11 @@ class CentralTenantController extends Controller
             try {
                 $tenant->delete();
                 return ApiResponse::success([], 'Tenant deleted');
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 Log::info('Error during tenant update : ' . $e->getMessage());
                 return ApiResponse::error($e->getMessage());
             }
         }
         return ApiResponse::error('Error during tenant deletion.');
-
     }
 }

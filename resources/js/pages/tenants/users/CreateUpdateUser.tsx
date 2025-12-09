@@ -25,7 +25,7 @@ interface FormDataUser {
     role: string;
 }
 
-export default function CreateUpdateUser({ user, roles }: { user?: User; roles: [] }) {
+export default function CreateUpdateUser({ user, roles, canAddLoginableUser }: { user?: User; roles: []; canAddLoginableUser: boolean }) {
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -168,31 +168,39 @@ export default function CreateUpdateUser({ user, roles }: { user?: User; roles: 
                             <InputError message={errors?.job_position ?? ''} />
                         </div>
 
+                        {!user && !canAddLoginableUser && <p>Loginable user limit reached</p>}
                         <div className="mt-4 space-y-2">
-                            <div className="flex items-center gap-2">
-                                <Label htmlFor="can_login">{t('contacts.can_login')}</Label>
-                                <Checkbox id="can_login" onClick={() => setData('can_login', !data.can_login)} checked={data.can_login ?? false} />
-                            </div>
-                            {data.can_login && (
-                                <div>
-                                    <Label htmlFor="role">{t('contacts.role')}</Label>
-                                    <select
-                                        required={data.can_login}
-                                        name="role"
-                                        id="role"
-                                        value={data.role}
-                                        onChange={(e) => setData('role', e.target.value)}
-                                        className="block"
-                                    >
-                                        <option value="">{t('actions.select-type', { type: t('contacts.role') })}</option>
-                                        {roles.map((role, index) => (
-                                            <option key={index} value={role}>
-                                                {role}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <InputError message={errors?.can_login ? 'Wrong value' : ''} />
-                                </div>
+                            {(user?.can_login || canAddLoginableUser) && (
+                                <>
+                                    <div className="flex items-center gap-2">
+                                        <Label htmlFor="can_login">{t('contacts.can_login')}</Label>
+                                        <Checkbox
+                                            id="can_login"
+                                            onClick={() => setData('can_login', !data.can_login)}
+                                            checked={data.can_login ?? false}
+                                        />
+                                    </div>
+                                    {data.can_login && (
+                                        <div>
+                                            <Label htmlFor="role">{t('contacts.role')}</Label>
+                                            <select
+                                                name="role"
+                                                id="role"
+                                                value={data.role}
+                                                onChange={(e) => setData('role', e.target.value)}
+                                                className="block"
+                                            >
+                                                <option value="">{t('actions.select-type', { type: t('contacts.role') })}</option>
+                                                {roles.map((role, index) => (
+                                                    <option key={index} value={role}>
+                                                        {role}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <InputError message={errors?.can_login ? 'Wrong value' : ''} />
+                                        </div>
+                                    )}
+                                </>
                             )}
                         </div>
                         {!user && (

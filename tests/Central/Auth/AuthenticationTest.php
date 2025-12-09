@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 use App\Models\Central\CentralUser;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 
 uses(DatabaseTransactions::class);
 
@@ -10,6 +12,7 @@ uses(DatabaseTransactions::class);
 beforeEach(function () {
     $this->withoutMiddleware([
         \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
+        CustomInitializeTenancyBySubdomain::class,
         \Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain::class,
         \Stancl\Tenancy\Middleware\InitializeTenancyByPath::class,
         \Stancl\Tenancy\Middleware\InitializeTenancyByRequestData::class,

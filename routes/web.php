@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Support\Facades\Password;
 use App\Http\Middleware\AuthenticateCentral;
+use Laravel\Cashier\Http\Controllers\WebhookController;
 use App\Http\Controllers\Central\CentralTenantController;
 use App\Http\Controllers\Central\AdminLocationTypeController;
 use App\Http\Controllers\Central\CentralCategoryTypeController;
@@ -23,6 +24,8 @@ use App\Notifications\TenantAdminCreatedPasswordResetNotification;
 
 foreach (config('tenancy.central_domains') as $domain) {
     Route::domain($domain)->group(function () {
+        Route::post('stripe/webhook', [WebhookController::class, 'handleWebhook'])->name('stripe.webhook');
+
 
         Route::get('/robots.txt', function () {
             // Central : bloquer seulement l'app, permettre le site vitrine
@@ -34,6 +37,10 @@ foreach (config('tenancy.central_domains') as $domain) {
 
             return response($content)->header('Content-Type', 'text/plain');
         });
+
+        // Route::get('subscription/checkout', [SubscriptionController::class, 'checkout'])->name('subscription.checkout');
+        // Route::get('subscription/success', [SubscriptionController::class, 'checkoutSuccess'])->name('subscription.success');
+        // Route::get('subscription/cancel', [SubscriptionController::class, 'checkoutCanceled'])->name('subscription.cancel');
 
 
         Route::middleware([

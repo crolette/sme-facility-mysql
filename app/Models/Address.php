@@ -20,7 +20,6 @@ class Address extends Model
         'house_number',
         'zip_code',
         'city',
-        'country',
         'address_type'
     ];
 
@@ -28,6 +27,11 @@ class Address extends Model
         'created_at',
         'updated_at'
     ];
+
+    // public function country(): BelongsTo
+    // {
+    //     return $this->belongsTo(CentralCountry::class);
+    // }
 
     public function tenantCompanyAddress(): BelongsTo
     {

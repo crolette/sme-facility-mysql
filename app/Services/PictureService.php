@@ -25,36 +25,38 @@ class PictureService
         $modelId = $model->id;
 
         foreach ($files as $file) {
-            try {
-                $directory = "$tenantId/$modelType/$modelId/pictures"; // e.g., "webxp/tickets/1/pictures"
+            if (TenantLimits::canAddFile($file->getSize())) {
+                try {
+                    $directory = "$tenantId/$modelType/$modelId/pictures"; // e.g., "webxp/tickets/1/pictures"
 
-                $newfileName = Str::chopEnd($file->getClientOriginalName(), ['.png', '.jpg', '.jpeg']);
+                    $newfileName = Str::chopEnd($file->getClientOriginalName(), ['.png', '.jpg', '.jpeg']);
 
-                $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . Str::slug($newfileName, '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $file->extension();
+                    $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . Str::slug($newfileName, '-') . '_' . Str::substr(Str::uuid(), 0, 8) . '.' . $file->extension();
 
-                $path = Storage::disk('tenants')->putFileAs($directory, $file, $fileName);
+                    $path = Storage::disk('tenants')->putFileAs($directory, $file, $fileName);
 
-                // Company::incrementDiskSize($file->getSize());
+                    // Company::incrementDiskSize($file->getSize());
 
-                $picture = new Picture([
-                    'path' => $directory . '/' . $fileName,
-                    'filename' => $fileName,
-                    'directory' => $directory,
-                    'size' => $file->getSize(),
-                    'mime_type' => $file->getMimeType(),
-                    'uploader_email' => $email ?? Auth::guard('tenant')->user()->email
-                ]);
+                    $picture = new Picture([
+                        'path' => $directory . '/' . $fileName,
+                        'filename' => $fileName,
+                        'directory' => $directory,
+                        'size' => $file->getSize(),
+                        'mime_type' => $file->getMimeType(),
+                        'uploader_email' => $email ?? Auth::guard('tenant')->user()->email
+                    ]);
 
-                if (Auth::guard('tenant')->check()) {
-                    $picture->uploader()->associate(Auth::guard('tenant')->user());
+                    if (Auth::guard('tenant')->check()) {
+                        $picture->uploader()->associate(Auth::guard('tenant')->user());
+                    }
+
+                    $model->pictures()->save($picture);
+
+                    Log::info('DISPATCH COMPRESS PICTURE JOB');
+                    CompressPictureJob::dispatch($picture)->onQueue('default');
+                } catch (Exception $e) {
+                    Log::info('Erreur: ' . $e->getMessage());
                 }
-
-                $model->pictures()->save($picture);
-
-                Log::info('DISPATCH COMPRESS PICTURE JOB');
-                CompressPictureJob::dispatch($picture)->onQueue('default');
-            } catch (Exception $e) {
-                Log::info('Erreur: ' . $e->getMessage());
             }
         }
     }

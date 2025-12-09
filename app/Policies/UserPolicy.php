@@ -50,6 +50,7 @@ class UserPolicy
         return $user->can('create users');
     }
 
+
     /**
      * Determine whether the user can update the model.
      */

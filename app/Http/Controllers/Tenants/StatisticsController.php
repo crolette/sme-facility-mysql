@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Cache;
 use App\Http\Requests\Tenant\StatisticsRequest;
 use App\Services\Statistics\StatisticTicketsService;
 use App\Services\Statistics\StatisticInterventionsService;
@@ -15,9 +16,17 @@ class StatisticsController extends Controller
 
     public function index(StatisticsRequest $request)
     {
+        $tenant = tenant();
+        $limits = Cache::get("tenant:{$tenant->id}:limits");
+
         if (!Gate::allows('view statistics')) {
             ApiResponse::notAuthorized();
-            return redirect()->back();
+            return redirect()->route('tenant.dashboard');
+        }
+
+        if ($limits['has_statistics'] === false) {
+            ApiResponse::notAuthorized();
+            return redirect()->route('tenant.dashboard');
         }
 
         $interventionsByStatus = app(StatisticInterventionsService::class)->getByStatus($request->validated());

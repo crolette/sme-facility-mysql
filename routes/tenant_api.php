@@ -8,10 +8,13 @@ use App\Models\Tenants\Document;
 use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Route;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use App\Http\Middleware\CacheTenantLimits;
+use App\Http\Middleware\TenantLocaleMiddleware;
 use App\Http\Controllers\API\V1\DestroyPictureController;
 use App\Http\Controllers\API\V1\UpdateDocumentController;
 use App\Http\Controllers\API\V1\UploadDocumentController;
 use App\Http\Controllers\API\V1\DestroyDocumentController;
+use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\API\V1\ApiSearchLocationController;
 use App\Http\Controllers\API\V1\APISearchAssetsLocationController;
@@ -20,10 +23,12 @@ Route::prefix('/v1/')->group(
     function () {
         Route::middleware([
             'web',
-
-            InitializeTenancyBySubdomain::class,
+            CustomInitializeTenancyBySubdomain::class,
+            // InitializeTenancyBySubdomain::class,
             \Stancl\Tenancy\Middleware\ScopeSessions::class,
             \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+            CacheTenantLimits::class,
+            TenantLocaleMiddleware::class,
             'auth:tenant'
         ])->group(function () {
 

@@ -17,12 +17,14 @@ use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 
 uses(ManagesTenantDatabases::class);
 
 beforeEach(function () {
     $this->withoutMiddleware([
         \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class,
+        CustomInitializeTenancyBySubdomain::class,
         \Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain::class,
         \Stancl\Tenancy\Middleware\InitializeTenancyByPath::class,
         \Stancl\Tenancy\Middleware\InitializeTenancyByRequestData::class,
@@ -103,14 +105,10 @@ it('can create tenant & attach the domain & verifies that database exists', func
     $companyAddress = Address::factory()->make();
     $invoiceAddress = Address::factory()->make(['address_type' => AddressTypes::INVOICE->value]);
 
-    $pwd = fake()->password(10);
-
     $formData = [
         'company_name' => 'Buzon',
         'first_name' => 'Michel',
         'last_name' => 'Dupont',
-        'password' => $pwd,
-        'password_confirmation' => $pwd,
         'email' => 'buzon@buzon.com',
         'vat_number' => 'BE0987654321',
         'domain_name' => 'buzon',
@@ -121,7 +119,7 @@ it('can create tenant & attach the domain & verifies that database exists', func
             'house_number' => $companyAddress->house_number,
             'zip_code' => $companyAddress->zip_code,
             'city' => $companyAddress->city,
-            'country' => $companyAddress->country,
+            'country' => 'BE',
         ],
         'same_address_as_company' => false,
         'invoice' => [
@@ -129,7 +127,7 @@ it('can create tenant & attach the domain & verifies that database exists', func
             'house_number' => $invoiceAddress->house_number,
             'zip_code' => $invoiceAddress->zip_code,
             'city' => $invoiceAddress->city,
-            'country' => $invoiceAddress->country,
+            'country' => 'NL',
         ],
     ];
 
@@ -224,14 +222,10 @@ it('verifies that initialized tenant is on his database', function () {
     $companyAddress = Address::factory()->make();
     $invoiceAddress = Address::factory()->make(['address_type' => AddressTypes::INVOICE->value]);
 
-    $pwd = fake()->password(10);
-
     $formData = [
         'company_name' => 'Buzon',
         'first_name' => 'Michel',
         'last_name' => 'Dupont',
-        'password' => $pwd,
-        'password_confirmation' => $pwd,
         'email' => 'buzon@buzon.com',
         'vat_number' => 'BE0987654321',
         'domain_name' => 'buzon',

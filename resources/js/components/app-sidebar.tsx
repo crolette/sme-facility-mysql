@@ -114,7 +114,7 @@ export function AppSidebar() {
             title: `${t('common.statistics')}`,
             href: '/statistics',
             icon: ChartLine,
-            canView: hasPermission('view statistics'),
+            canView: props.has_statistics && hasPermission('view statistics'),
         },
     ];
 

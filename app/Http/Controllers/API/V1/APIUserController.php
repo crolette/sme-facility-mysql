@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Password;
 use App\Http\Requests\Tenant\UserRequest;
 use App\Services\AssetNotificationSchedulingService;
 use App\Services\NotificationSchedulingService;
+use App\Services\TenantLimits;
 use App\Services\UserNotificationPreferenceService;
 
 class APIUserController extends Controller
@@ -29,7 +30,7 @@ class APIUserController extends Controller
     public function show(User $user)
     {
         if (Auth::user()->cannot('view', $user)) {
-            abort(403);
+            return ApiResponse::notAuthorized();
         }
 
         try {
@@ -43,7 +44,11 @@ class APIUserController extends Controller
     public function store(UserRequest $request)
     {
         if ($request->user()->cannot('create', User::class)) {
-            abort(403);
+            return ApiResponse::notAuthorized();
+        }
+
+        if ($request->validated('can_login') && !TenantLimits::canCreateLoginableUser()) {
+            return ApiResponse::notAuthorized();
         }
 
         try {
@@ -53,11 +58,15 @@ class APIUserController extends Controller
                 Password::sendResetLink(
                     $request->only('email')
                 );
+
+                TenantLimits::setUsersUsage();
             }
+
+
 
             return ApiResponse::successFlash([], 'User created');
         } catch (Exception $e) {
-            Debugbar::info($e->getMessage());
+            Log::info($e->getMessage());
             return ApiResponse::error($e->getMessage());
         }
 
@@ -68,7 +77,7 @@ class APIUserController extends Controller
     {
 
         if ($request->user()->cannot('update', $user)) {
-            abort(403);
+            return ApiResponse::notAuthorized();
         }
 
         try {
@@ -156,6 +165,14 @@ class APIUserController extends Controller
 
     public function destroy(User $user)
     {
+        if (Auth::user()->cannot('delete', $user)) {
+            return ApiResponse::notAuthorized();
+        }
+
+        if ($user->can_login) {
+            TenantLimits::setUsersUsage();
+        }
+
         try {
             $user->delete();
             return ApiResponse::successFlash('', 'User deleted');

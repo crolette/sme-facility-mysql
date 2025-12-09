@@ -4,7 +4,7 @@ import AppLayout from '@/layouts/app-layout';
 import { Intervention, Maintainable, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Cuboid, HardDrive, Ticket, Wrench } from 'lucide-react';
+import { Cuboid, Ticket, Wrench } from 'lucide-react';
 
 export default function TenantDashboard({
     counts,
@@ -35,7 +35,7 @@ export default function TenantDashboard({
             <Head title="Dashboard" />
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="grid grid-flow-col-dense gap-4">
-                    {hasPermission('update company') && (
+                    {/* {hasPermission('update company') && (
                         <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex items-center justify-center overflow-hidden rounded-xl border p-4">
                             <div className="flex flex-col">
                                 <p className="font-semibold uppercase">{t('dashboard.disk_space')}</p>
@@ -44,9 +44,8 @@ export default function TenantDashboard({
                                     {diskSizes.gb} GB <span className="text-xs">({diskSizes.percent < 1 ? '< 1 ' : diskSizes.percent} %)</span>
                                 </p>
                             </div>
-                            {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
                         </div>
-                    )}
+                    )} */}
                     <div className="border-sidebar-border/70 dark:border-sidebar-border hover:bg-secondary relative flex items-center justify-center overflow-hidden rounded-xl border p-4">
                         <a href={route('tenant.tickets.index')} className="w-full text-center !no-underline">
                             <div className="flex flex-col">

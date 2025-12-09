@@ -33,7 +33,7 @@ class CompanyAddressRequest extends FormRequest
             'company.house_number' => 'required|string|max:10',
             'company.city' => 'required|string|max:50',
             'company.zip_code' => 'required|string|min:4|max:6',
-            'company.country' => 'required|string|max:30',
+            'company.country' =>  'nullable|string|exists:countries,iso_code_a2',
         ];
     }
 }

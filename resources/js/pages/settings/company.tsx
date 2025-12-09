@@ -12,7 +12,7 @@ import { Trash2, Upload } from 'lucide-react';
 import { useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
-export default function CompanySettings({ item }: { item: Company }) {
+export default function CompanySettings({ item, billingPortal, usage }: { item: Company; billingPortal: string; usage: [] }) {
     const { t, tChoice } = useLaravelReactI18n();
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -53,6 +53,8 @@ export default function CompanySettings({ item }: { item: Company }) {
         }
     };
 
+    console.log(usage);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.company_title')} />
@@ -85,18 +87,7 @@ export default function CompanySettings({ item }: { item: Company }) {
                                 {t('common.address')}:{company.address}
                             </p>
                         </div>
-                        {/* <div className="flex flex-row gap-6">
-                            <div className="flex flex-col justify-evenly bg-amber-100">
-                                <p className="font-semibold">Name</p>
-                                <p className="font-semibold">VAT number</p>
-                                <p className="font-semibold">Address</p>
-                            </div>
-                            <div className="flex flex-col justify-between gap-2">
-                                <p className="bg-accent/25 rounded-md px-4 py-2 font-normal">{company.name}</p>
-                                <p className="bg-accent/25 rounded-md px-4 py-2 font-normal">{company.vat_number}</p>
-                                <p className="bg-accent/25 rounded-md px-4 py-2 font-normal">{company.address}</p>
-                            </div>
-                        </div> */}
+
                         {company.logo && (
                             <div className="absolute top-2 right-2 shrink-1">
                                 <img src={route('api.image.show', { path: company.logo })} alt="" className="max-h-40 max-w-full object-cover" />
@@ -114,6 +105,26 @@ export default function CompanySettings({ item }: { item: Company }) {
                         onUploadSuccess={fetchCompany}
                     />
                 </div>
+                <div>
+                    <h3>Subscription Usage</h3>
+                    <ul className="flex gap-2">
+                        <li>
+                            Sites: {usage.sites.current} / <span className="font-bold">{usage.sites.max}</span>
+                        </li>
+                        <span className="">|</span>
+                        <li>
+                            Users: {usage.users.current} / <span className="font-bold">{usage.users.max}</span>
+                        </li>
+                        <span className="">|</span>
+                        <li>
+                            Storage GB: {item.disk_size_gb} / <span className="font-bold">{usage.storage.max / 1024 / 1024}</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <a href={billingPortal} target="_blank">
+                    <Button>Billing Portal</Button>
+                </a>
             </SettingsLayout>
         </AppLayout>
     );

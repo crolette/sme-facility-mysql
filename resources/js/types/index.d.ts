@@ -344,6 +344,13 @@ export interface Country {
     label: string;
 }
 
+export interface CentralCountry {
+    id: number;
+    iso_code_a3: string;
+    iso_code_a2: string;
+    name: string;
+}
+
 export interface Provider {
     id: number;
     name: string;
@@ -418,8 +425,27 @@ export interface Tenant {
     full_company_address: string;
     full_invoice_address?: string;
     phone_number: string;
+    stripe_id: string;
+    verified_vat_status: string;
+    trial_ends_at: string;
     domain: Domain;
     domain_address: string;
+    max_sites: number;
+    max_users: number;
+    max_storage_gb: number;
+    has_statistics: boolean;
+    current_sites_count: number;
+    current_users_count: number;
+    current_storage_bytes: number;
+    disk_size_gb: number;
+    disk_size_mb: number;
+    subscription_name?: string;
+    subscription_plan?: string;
+    active_subscription?: Subscription;
+}
+
+export interface Subscription {
+    [key: string]: string | number;
 }
 
 export interface Domain {

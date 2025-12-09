@@ -18,44 +18,48 @@ class DocumentService
 
     public function store(array $file)
     {
-        $tenantId = tenancy()->tenant->id;
+        if (TenantLimits::canAddFile($file['file']->getSize())) {
+            $tenantId = tenancy()->tenant->id;
 
-        $uuid = Str::substr(Str::uuid(), 0, 8);
-        $directory = "$tenantId/documents/" . Carbon::now()->isoFormat('YYYYMMDD') . "/$uuid/";
-        $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . Str::slug($file['name'], '-') . '_' . $uuid  . '.' . $file['file']->extension();
+            $uuid = Str::substr(Str::uuid(), 0, 8);
+            $directory = "$tenantId/documents/" . Carbon::now()->isoFormat('YYYYMMDD') . "/$uuid/";
+            $fileName = Carbon::now()->isoFormat('YYYYMMDDhhmm') . '_' . Str::slug($file['name'], '-') . '_' . $uuid  . '.' . $file['file']->extension();
 
-        $path = Storage::disk('tenants')->putFileAs($directory, $file['file'], $fileName);
+            $path = Storage::disk('tenants')->putFileAs($directory, $file['file'], $fileName);
 
-        $document = new Document([
-            'path' => $path,
-            'filename' => $fileName,
-            'directory' => $directory,
-            'name' => $file['name'],
-            'description' => $file['description'] ?? null,
-            'size' => $file['file']->getSize(),
-            'mime_type' => $file['file']->getMimeType(),
-        ]);
+            $document = new Document([
+                'path' => $path,
+                'filename' => $fileName,
+                'directory' => $directory,
+                'name' => $file['name'],
+                'description' => $file['description'] ?? null,
+                'size' => $file['file']->getSize(),
+                'mime_type' => $file['file']->getMimeType(),
+            ]);
 
-        $document->documentCategory()->associate($file['typeId']);
-        $document->uploader()->associate(Auth::guard('tenant')->user());
-        $document->save();
+            $document->documentCategory()->associate($file['typeId']);
+            $document->uploader()->associate(Auth::guard('tenant')->user());
+            $document->save();
 
-        if (in_array($file['file']->extension(), ['png', 'jpg', 'jpeg'])) {
-            CompressPictureJob::dispatch($document)->onQueue('default');
+            if (in_array($file['file']->extension(), ['png', 'jpg', 'jpeg'])) {
+                CompressPictureJob::dispatch($document)->onQueue('default');
+            }
+
+            return $document;
         }
-
-        return $document;
     }
 
     public function uploadAndAttachDocuments(Model $model, array $files): void
     {
         foreach ($files as $file) {
             $document = $this->store($file);
+            if ($document) {
 
-            $model->documents()->attach($document);
+                $model->documents()->attach($document);
 
-            if (in_array($file['file']->extension(), ['png', 'jpg', 'jpeg'])) {
-                CompressPictureJob::dispatch($document)->onQueue('default');
+                if (in_array($file['file']->extension(), ['png', 'jpg', 'jpeg'])) {
+                    CompressPictureJob::dispatch($document)->onQueue('default');
+                }
             }
         }
     }

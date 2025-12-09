@@ -16,11 +16,10 @@ use App\Http\Middleware\AuthenticateCentral;
 use App\Http\Requests\Central\ContactRequest;
 use App\Http\Controllers\Website\DemoController;
 use App\Http\Controllers\Website\ContactController;
+use App\Http\Controllers\Central\CheckoutTenantController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 foreach (config('tenancy.central_domains') as $domain) {
-
-
     Route::domain($domain)->group(function () {
 
 
@@ -40,6 +39,10 @@ foreach (config('tenancy.central_domains') as $domain) {
         //     return (new ContactDemoMail($request))->render();
         // });
 
+        // Route::get('subscriptions', function () {
+        //     return Inertia::render('website/stripe');
+        // });
+
         Route::get('locale/{locale}', function (Request $request, $locale) {
 
             $oldLocale = Session::get('locale');
@@ -56,12 +59,18 @@ foreach (config('tenancy.central_domains') as $domain) {
             return Inertia::location($newLocation);
         })->name('website.locale');
 
+        Route::middleware(['signed'])->get('choose-plan', [CheckoutTenantController::class, 'create'])->name('choose-plan');
+
         Route::prefix(LaravelLocalization::setLocale())->middleware([
             'web',
             'localeSessionRedirect',
             'localizationRedirect'
         ])->group(function () {
 
+
+            Route::post('choose-plan/', [CheckoutTenantController::class, 'store'])->name('checkout');
+            Route::get('subscription/confirmed', [CheckoutTenantController::class, 'confirmed'])->name('checkout.confirmed');
+            Route::get('subscription/cancelled', [CheckoutTenantController::class, 'cancelled'])->name('checkout.cancelled');
 
             Route::get('/', function () {
                 return Inertia::render('welcome');

@@ -2,16 +2,22 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Middleware\CacheTenantLimits;
+use App\Http\Middleware\TenantLocaleMiddleware;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
+use App\Http\Middleware\CustomInitializeTenancyBySubdomain;
 use Stancl\Tenancy\Middleware\InitializeTenancyBySubdomain;
 use App\Http\Controllers\Tenants\Auth\TenantAuthenticatedSessionController;
 
 Route::middleware([
     'web',
-    InitializeTenancyBySubdomain::class,
+    // InitializeTenancyBySubdomain::class,
+    CustomInitializeTenancyBySubdomain::class,
     \Stancl\Tenancy\Middleware\ScopeSessions::class,
     \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
+    CacheTenantLimits::class,
+    TenantLocaleMiddleware::class,
 ])->group(function () {
 
     Route::get('/robots.txt', function () {

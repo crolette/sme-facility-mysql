@@ -26,7 +26,7 @@ return [
         ],
     ],
     'launching_offer' => [
-        'title' => 'Einführungsangebot',
+        'title' => 'Startangebot',
         'description' => 'Um den Start von SME Facility zu feiern, profitieren Sie von einem außergewöhnlichen Angebot!',
         'conditions' => 'Das Einführungsangebot ist neuen Kunden vorbehalten und gilt ausschließlich für das erste Jahr des Abonnements. Ab dem zweiten Jahr wird automatisch der dann gültige Tarif angewendet.',
     ],
