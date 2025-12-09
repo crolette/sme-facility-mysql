@@ -9,11 +9,12 @@ use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Ticket;
 
+use App\Models\Tenants\Picture;
 use App\Models\Tenants\Building;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
-use App\Models\Tenants\Picture;
 
+use Illuminate\Support\Facades\Queue;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
@@ -102,7 +103,7 @@ it('fails when creating a new ticket with a wrong status', function () {
 });
 
 it('fails when not uploading an image', function () {
-
+    Queue::fake();
     $file1 = UploadedFile::fake()->image('avatar.pdf');
 
     $formData = [
@@ -128,7 +129,7 @@ it('fails when not uploading an image', function () {
 
 
 it('fails when uploading more than 3 pictures', function () {
-
+    Queue::fake();
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->image('test.jpg');
     $file3 = UploadedFile::fake()->image('ticket.jpg');
@@ -159,7 +160,7 @@ it('fails when uploading more than 3 pictures', function () {
 });
 
 it('fails when uploading a picture > Max MB', function () {
-
+    Queue::fake();
     $file1 = UploadedFile::fake()->image('avatar.png')->size('10000');
     $formData = [
         'location_type' => 'assets',

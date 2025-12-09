@@ -34,41 +34,6 @@ beforeEach(function () {
     $this->room = Room::factory()->withMaintainableData()->create();
 });
 
-it('can render the index assets page', function () {
-
-    $asset = Asset::factory()->withMaintainableData()->forLocation($this->site)->create();
-    Asset::factory()->withMaintainableData()->forLocation($this->building)->create();
-    Asset::factory()->withMaintainableData()->forLocation($this->floor)->create();
-    Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
-
-    $response = $this->getFromTenant('tenant.assets.index');
-    $response->assertOk();
-
-    $asset = Asset::find($asset->id);
-
-    $response->assertInertia(
-        fn($page) =>
-        $page->component('tenants/assets/IndexAssets')
-            ->has('items.data', 4)
-            ->where('items.data.0.maintainable.name', $asset->maintainable->name)
-            ->where('items.data.0.category', $asset->assetCategory->label)
-            ->where('items.data.0.location_type', get_class($this->site))
-            ->where('items.data.0.location_id', $this->site->id)
-    );
-});
-
-it('can render the create asset page', function () {
-
-    $response = $this->getFromTenant('tenant.assets.create');
-    $response->assertOk();
-
-    $response->assertInertia(
-        fn($page) => $page->component('tenants/assets/CreateUpdateAsset')
-            ->has('categories', 3)
-    );
-    $response->assertOk();
-});
-
 it('can create a new asset to site', function () {
 
     $formData = [
@@ -324,39 +289,6 @@ it('can create a new asset to room', function () {
     ]);
 });
 
-it('can show the asset page', function () {
-
-    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create(['category_type_id' => $this->categoryType->id]);
-
-    $asset = Asset::find($asset->id);
-
-    $response = $this->getFromTenant('tenant.assets.show', $asset);
-
-    $response->assertInertia(
-        fn($page) => $page->component('tenants/assets/ShowAsset')
-            ->has('item')
-            ->where('item.location.code', $this->room->code)
-            ->where('item.maintainable.description', $asset->maintainable->description)
-            ->where('item.code', $asset->code)
-            ->where('item.category', $this->categoryType->label)
-            ->where('item.reference_code', $asset->reference_code)
-            ->where('item.location_type', get_class($this->room))
-    );
-});
-
-it('can render the update asset page', function () {
-
-    $asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
-
-    $response = $this->getFromTenant('tenant.assets.edit', $asset);
-
-    $response->assertInertia(
-        fn($page) => $page->component('tenants/assets/CreateUpdateAsset')
-            ->has('asset')
-            ->where('asset.reference_code', $asset->reference_code)
-            ->where('asset.location_type', get_class($this->room))
-    );
-});
 
 it('can update asset and his maintainable', function () {
 

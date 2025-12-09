@@ -9,9 +9,12 @@ use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Ticket;
 
+use App\Services\TenantLimits;
 use App\Models\Tenants\Building;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Queue;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
@@ -30,6 +33,16 @@ beforeEach(function () {
     $this->room = Room::factory()->withMaintainableData()->create();
 
     $this->asset =  Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
+
+    $tenant = tenant();
+
+    if ($tenant) {
+        Cache::remember(
+            "tenant:{$tenant->id}:limits",
+            now()->addDay(),
+            fn() => TenantLimits::loadLimitsFromDatabase($tenant)
+        );
+    }
 });
 
 it('can render a new ticket page for a guest', function (string $modelType, string $routeName) {
@@ -65,6 +78,7 @@ it('can render a new ticket page for a guest', function (string $modelType, stri
 ]);
 
 it('can create a new ticket with pictures has "anonymous" user', function (string $modelType, string $locationType) {
+    Queue::fake();
 
     $model = match ($modelType) {
         'asset' => $this->asset,

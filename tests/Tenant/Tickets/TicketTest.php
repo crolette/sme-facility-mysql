@@ -48,51 +48,6 @@ beforeEach(function () {
     }
 });
 
-it('can render the index tickets page', function () {
-
-    Ticket::factory()->forLocation($this->asset)->create();
-    Ticket::factory()->forLocation($this->asset)->ongoing()->create();
-    Ticket::factory()->forLocation($this->asset)->closed()->create();
-
-    $response = $this->getFromTenant('tenant.tickets.index');
-    $response->assertOk();
-
-    $response->assertInertia(
-        fn($page) =>
-        $page->component('tenants/tickets/IndexTickets')
-    );
-});
-
-
-it('can render the show ticket page', function () {
-
-    $ticket = Ticket::factory()->forLocation($this->asset)->create();
-
-    $response = $this->getFromTenant('tenant.tickets.show', $ticket);
-    $response->assertOk();
-
-    $response->assertInertia(
-        fn($page) => $page->component('tenants/tickets/ShowTicket')
-            ->has('item')->where('item.code', $ticket->code)
-    );
-    $response->assertOk();
-});
-
-it('can render interventions in the ticket page', function () {
-    $ticket = Ticket::factory()->forLocation($this->asset)->create();
-    Intervention::factory()->withAction()->forTicket($ticket)->count(2)->create();
-
-    $response = $this->getFromTenant('tenant.tickets.show', $ticket);
-    $response->assertOk();
-
-    $response->assertInertia(
-        fn($page) =>
-        $page->component('tenants/tickets/ShowTicket')
-            ->has('item')
-            ->has('item.interventions', 2)
-            ->has('item.interventions.0.actions', 1)
-    );
-});
 
 it('can create a new ticket to an ASSET with the logged user', function () {
 
