@@ -456,7 +456,7 @@ export default function IndexContracts({
                                             </TableBodyData>
                                             <TableBodyData>{t(`contracts.type.${contract.type}`)}</TableBodyData>
                                             <TableBodyData>
-                                                {contract.provider.categories.length > 0
+                                                {contract.provider?.categories?.length > 0
                                                     ? contract.provider.categories?.map((category, index) => <p key={index}>{category.label}</p>)
                                                     : ''}
                                             </TableBodyData>

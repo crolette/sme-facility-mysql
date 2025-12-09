@@ -87,6 +87,7 @@ export default function CreateUpdateLocation({
     outdoorMaterials,
     statuses,
     renewalTypes,
+    contractTypes,
     contractDurations,
     noticePeriods,
 }: {
@@ -101,6 +102,7 @@ export default function CreateUpdateLocation({
     routeName: string;
     statuses: string[];
     renewalTypes: string[];
+    contractTypes?: string[];
     contractDurations?: string[];
     noticePeriods?: string[];
 }) {
@@ -860,16 +862,32 @@ export default function CreateUpdateLocation({
                                             <Label className="font-medium" htmlFor={`contract.type.` + index}>
                                                 {t('common.type')}
                                             </Label>
-                                            <Input
-                                                type="text"
-                                                id={`contract.type.` + index}
-                                                // value={data.contracts[index].name ?? ''}
-                                                placeholder={`Type ${index + 1}`}
-                                                minLength={4}
-                                                maxLength={100}
-                                                required
+                                            <select
+                                                name="type"
                                                 onChange={(e) => handleChangeContracts(index, 'type', e.target.value)}
-                                            />
+                                                id="type"
+                                                required
+                                                value={data.contracts[index]?.type ?? ''}
+                                                className={cn(
+                                                    'border-input placeholder:text-muted-foreground mt-1 flex h-9 w-full min-w-0 rounded-md border bg-transparent px-3 py-1 text-base shadow-xs transition-[color,box-shadow] outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+                                                    'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+                                                    'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+                                                )}
+                                            >
+                                                {contractTypes && contractTypes.length > 0 && (
+                                                    <>
+                                                        <option value="" disabled className="bg-background text-foreground">
+                                                            {t('actions.select-type', { type: t('common.type') })}
+                                                        </option>
+                                                        {contractTypes?.map((type, index) => (
+                                                            <option value={type} key={index} className="bg-background text-foreground">
+                                                                {t(`contracts.type.${type}`)}
+                                                            </option>
+                                                        ))}
+                                                    </>
+                                                )}
+                                            </select>
+
                                             <InputError className="mt-2" message={errors?.contracts ? errors?.contracts[index]?.type : ''} />
 
                                             <Label className="font-medium">{tChoice('providers.title', 2)}</Label>

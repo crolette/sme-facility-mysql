@@ -203,6 +203,8 @@ export default function CreateUpdateContract({
         }
     }, [data.contract_duration, data.start_date]);
 
+    console.log(data);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head

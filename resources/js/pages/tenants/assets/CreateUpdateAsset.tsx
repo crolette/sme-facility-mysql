@@ -249,6 +249,7 @@ export default function CreateUpdateAsset({
                         'Content-Type': 'multipart/form-data',
                     },
                 });
+                console.log(response);
                 if (response.data.status === 'success') {
                     setIsProcessing(false);
                     router.visit(route(`tenant.assets.index`), {
@@ -256,6 +257,7 @@ export default function CreateUpdateAsset({
                     });
                 }
             } catch (error) {
+                console.log(error);
                 setIsProcessing(false);
                 showToast(error.response.data.message, error.response.data.status);
                 setErrors(error.response.data.errors);
@@ -1408,7 +1410,7 @@ export default function CreateUpdateAsset({
                             <Loader size={48} className="animate-pulse" />
                             <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.processing')}</p>
                             <p className="mx-auto">
-                                {location
+                                {asset
                                     ? t('actions.type-being-updated', { type: tChoice('assets.title', 2) })
                                     : t('actions.type-being-created', { type: tChoice('assets.title', 2) })}
                             </p>

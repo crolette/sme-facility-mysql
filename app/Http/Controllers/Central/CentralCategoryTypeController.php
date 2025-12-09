@@ -79,7 +79,7 @@ class CentralCategoryTypeController extends Controller
      */
     public function show(CategoryType $categoryType)
     {
-        dump(count($categoryType->translations));
+        // dump(count($categoryType->translations));
         return Inertia::render('central/types/show', ['type' => $categoryType]);
     }
 

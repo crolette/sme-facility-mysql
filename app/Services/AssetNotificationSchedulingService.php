@@ -19,6 +19,8 @@ class AssetNotificationSchedulingService
     {
         $users = User::role('Admin')->get();
 
+        // dump('AssetNotificationSchedulingService');
+
         if ($asset->depreciable) {
 
             if ($asset->maintainable->manager) {
@@ -71,6 +73,8 @@ class AssetNotificationSchedulingService
         $preference = $user->notification_preferences()->where('notification_type', 'depreciation_end_date')->first();
         $delay = $preference->notification_delay_days;
 
+        // dump('create schedule for depreciable');
+        // dump($asset->name);
 
         if ($preference && $preference->enabled && $asset->depreciation_end_date?->toDateString() > Carbon::now()->toDateString()) {
             // if ($preference && $preference->enabled && $asset->depreciation_end_date->subDays($delay) < now()) {

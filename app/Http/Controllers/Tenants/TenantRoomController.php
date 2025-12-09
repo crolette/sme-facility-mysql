@@ -82,8 +82,9 @@ class TenantRoomController extends Controller
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
         $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
         $noticePeriods = array_column(NoticePeriodEnum::cases(), 'value');
+        $contractTypes = array_column(ContractTypesEnum::cases(), 'value');
 
-        return Inertia::render('tenants/locations/CreateUpdateLocation', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
+        return Inertia::render('tenants/locations/CreateUpdateLocation', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'rooms', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'contractTypes' => $contractTypes, 'noticePeriods' => $noticePeriods]);
     }
 
 

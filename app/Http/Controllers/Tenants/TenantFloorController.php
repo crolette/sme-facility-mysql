@@ -86,8 +86,9 @@ class TenantFloorController extends Controller
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
         $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
         $noticePeriods = array_column(NoticePeriodEnum::cases(), 'value');
+        $contractTypes = array_column(ContractTypesEnum::cases(), 'value');
 
-        return Inertia::render('tenants/locations/CreateUpdateLocation', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'floors', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
+        return Inertia::render('tenants/locations/CreateUpdateLocation', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'floors', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'contractTypes' => $contractTypes, 'noticePeriods' => $noticePeriods]);
     }
 
     /**
@@ -120,6 +121,7 @@ class TenantFloorController extends Controller
         $frequencies = array_column(MaintenanceFrequency::cases(), 'value');
         $floorMaterials = CategoryType::getByCategoryCache('floor_materials');
         $wallMaterials = CategoryType::getByCategoryCache('wall_materials');
+
         return Inertia::render('tenants/locations/CreateUpdateLocation', ['location' => $floor->load('building'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'floors', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials]);
     }
 }

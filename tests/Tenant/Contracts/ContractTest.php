@@ -235,7 +235,7 @@ it('can create a contract and attach asset and locations', function () {
     assertDatabaseCount('contractables', 5);
 });
 
-it('can store a site with contracts', function () {
+it('can store a site with new contracts', function () {
 
     $formData = [
         'name' => 'New site',

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Services\TenantLimits;
 use App\Enums\NoticePeriodEnum;
 use App\Services\QRCodeService;
+use App\Enums\ContractTypesEnum;
 use App\Enums\ContractStatusEnum;
 use App\Services\DocumentService;
 use Illuminate\Support\Facades\DB;
@@ -96,8 +97,9 @@ class TenantSiteController extends Controller
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
         $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
         $noticePeriods = array_column(NoticePeriodEnum::cases(), 'value');
+        $contractTypes = array_column(ContractTypesEnum::cases(), 'value');
 
-        return Inertia::render('tenants/locations/CreateUpdateLocation', ['locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
+        return Inertia::render('tenants/locations/CreateUpdateLocation', ['locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'contractTypes' => $contractTypes, 'noticePeriods' => $noticePeriods]);
     }
 
     /**
@@ -135,6 +137,6 @@ class TenantSiteController extends Controller
         $floorMaterials = CategoryType::getByCategoryCache('floor_materials');
         $wallMaterials = CategoryType::getByCategoryCache('wall_materials');
 
-        return Inertia::render('tenants/locations/CreateUpdateLocation', ['location' => $site, 'locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials]);
+        return Inertia::render('tenants/locations/CreateUpdateLocation', ['location' => $site, 'locationTypes' => $locationTypes, 'routeName' => 'sites', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials,  'wallMaterials' => $wallMaterials]);
     }
 }

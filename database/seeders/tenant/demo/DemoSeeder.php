@@ -285,6 +285,7 @@ class DemoSeeder extends Seeder
 
         $ticket = Ticket::factory()->forLocation($assetLightingHalo)->create(['description' => 'Ampoule clignote', 'reported_by' => $admin->id, 'created_at' => Carbon::yesterday()]);
 
+
         app(QRCodeService::class)->createAndAttachQR($assetLightingHalo);
 
         $this->call([

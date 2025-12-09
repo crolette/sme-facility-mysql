@@ -90,8 +90,9 @@ class TenantBuildingController extends Controller
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
         $contractDurations = array_column(ContractDurationEnum::cases(), 'value');
         $noticePeriods = array_column(NoticePeriodEnum::cases(), 'value');
+        $contractTypes = array_column(ContractTypesEnum::cases(), 'value');
 
-        return Inertia::render('tenants/locations/CreateUpdateLocation', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'outdoorMaterials' => $outdoorMaterials, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
+        return Inertia::render('tenants/locations/CreateUpdateLocation', ['levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'outdoorMaterials' => $outdoorMaterials, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'contractTypes' => $contractTypes, 'contractDurations' => $contractDurations, 'noticePeriods' => $noticePeriods]);
     }
 
     /**
@@ -124,6 +125,7 @@ class TenantBuildingController extends Controller
         $floorMaterials = CategoryType::getByCategoryCache('floor_materials');
         $wallMaterials = CategoryType::getByCategoryCache('wall_materials');
         $outdoorMaterials = CategoryType::getByCategoryCache('outdoor_materials');
-        return Inertia::render('tenants/locations/CreateUpdateLocation', ['location' => $building->load('site'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials, 'outdoorMaterials' => $outdoorMaterials,]);
+
+        return Inertia::render('tenants/locations/CreateUpdateLocation', ['location' => $building->load('site'), 'levelTypes' => $levelTypes, 'locationTypes' => $locationTypes, 'routeName' => 'buildings', 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'floorMaterials' => $floorMaterials, 'wallMaterials' => $wallMaterials,  'outdoorMaterials' => $outdoorMaterials,]);
     }
 }

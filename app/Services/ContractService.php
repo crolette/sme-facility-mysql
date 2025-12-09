@@ -118,11 +118,12 @@ class ContractService
     {
         $contract = new Contract([...$request]);
 
-        if (isset($contractRequest['provider_id'])) {
+        $contract->save();
+
+        if (isset($request['provider_id'])) {
             $contract->provider()->associate($request['provider_id'])->save();
         }
 
-        $contract->save();
 
         if (isset($request['contractables']))
             $contract = $this->syncContractables($contract, $request['contractables']);

@@ -94,14 +94,23 @@ class ITDemoSeeder extends Seeder
                 'model' => 'Pavilion H25B',
                 'serial_number' => 'X25-ABC-96',
                 "depreciable" => true,
-                "depreciation_start_date" => Carbon::now()->subYear(),
-                "depreciation_end_date" => Carbon::now()->addYear(3),
-                "depreciation_duration" =>  3,
+                "depreciation_start_date" => Carbon::tomorrow()->subYears(2)->addDays(8),
+                "depreciation_end_date" => Carbon::now()->tomorrow()->addDays(8),
+                "depreciation_duration" =>  2,
                 "surface" => null
             ]);
 
+
         $assetComputerSales->refresh();
         $assetComputerSales->maintainable->providers()->sync([Provider::where('name', 'Le comptoir de la ram')->first()->id]);
+
+        $assetComputerSales->update(
+            [
+                "depreciation_start_date" => Carbon::tomorrow()->subYears(2)->addDays(7),
+                "depreciation_end_date" => Carbon::now()->tomorrow()->addDays(7),
+                "depreciation_duration" =>  2,
+            ]
+        );
 
         $roomOfficeDirector = Room::getByName('Bureau directeur')->first();
 
@@ -110,10 +119,10 @@ class ITDemoSeeder extends Seeder
                 [
                     'name' => 'Laptop directeur ASUS',
                     'description' => 'PC portable du directeur',
-                    'purchase_date' => Carbon::yesterday(),
+                    'purchase_date' => Carbon::tomorrow()->subYears(2),
                     'purchase_cost' => 1299.99,
                     'under_warranty' => true,
-                    'end_warranty_date' => Carbon::yesterday()->addYear(2),
+                    'end_warranty_date' => Carbon::tomorrow(),
                     'maintenance_manager_id' => $itGuy->id,
                 ]
             )
@@ -124,14 +133,15 @@ class ITDemoSeeder extends Seeder
                 'model' => 'Vivobook E25F',
                 'serial_number' => 'AZ5-CD-257BC',
                 "depreciable" => true,
-                "depreciation_start_date" => Carbon::yesterday(),
-                "depreciation_end_date" => Carbon::yesterday()->addYear(2),
-                "depreciation_duration" =>  2,
+                "depreciation_start_date" => Carbon::tomorrow()->subYears(2),
+                "depreciation_end_date" => Carbon::tomorrow()->subYears(2)->addYear(3),
+                "depreciation_duration" =>  3,
                 "surface" => null
             ]);
 
         $assetComputerDirector->refresh();
         $assetComputerDirector->maintainable->providers()->sync([Provider::where('name', 'Le comptoir de la ram')->first()->id]);
+
 
 
         $assetSoftDeleted = Asset::factory()

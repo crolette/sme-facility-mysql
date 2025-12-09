@@ -147,6 +147,7 @@ class TenantAssetController extends Controller
         $statuses = array_column(ContractStatusEnum::cases(), 'value');
         $meterUnits = array_column(MeterReadingsUnits::cases(), 'value');
         $renewalTypes = array_column(ContractRenewalTypesEnum::cases(), 'value');
+
         return Inertia::render('tenants/assets/CreateUpdateAsset', ['asset' => $asset->load(['assetCategory', 'location', 'documents', 'maintainable.manager', 'maintainable.providers:id,name', 'contracts']), 'categories' => $categories, 'contractTypes' => $contractTypes, 'documentTypes' => $documentTypes, 'frequencies' => $frequencies, 'statuses' => $statuses, 'renewalTypes' => $renewalTypes, 'meterUnits' => $meterUnits]);
     }
 }
