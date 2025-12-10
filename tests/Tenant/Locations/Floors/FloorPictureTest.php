@@ -13,6 +13,7 @@ use App\Models\Tenants\Document;
 use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -31,6 +32,7 @@ beforeEach(function () {
     Site::factory()->withMaintainableData()->create();
     $this->building = Building::factory()->withMaintainableData()->create();
     $this->location = Floor::factory()->withMaintainableData()->create();
+    Queue::fake();
 });
 
 it('can add pictures to a floor', function () {

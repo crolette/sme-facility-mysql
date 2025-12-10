@@ -9,6 +9,7 @@ use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Enums\NoticePeriodEnum;
 
+use App\Enums\ContractTypesEnum;
 use App\Models\Tenants\Building;
 use App\Models\Tenants\Contract;
 use App\Models\Tenants\Provider;
@@ -16,9 +17,9 @@ use App\Enums\ContractStatusEnum;
 use Illuminate\Http\UploadedFile;
 use App\Enums\ContractDurationEnum;
 use App\Models\Central\CategoryType;
-use App\Enums\ContractRenewalTypesEnum;
-use App\Enums\ContractTypesEnum;
+use Illuminate\Support\Facades\Queue;
 
+use App\Enums\ContractRenewalTypesEnum;
 use function PHPUnit\Framework\assertCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -115,7 +116,7 @@ it('can store an asset with contracts', function () {
 });
 
 it('can store an asset with contracts and documents', function () {
-
+    Queue::fake();
     $file1 = UploadedFile::fake()->image('avatar.png');
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');
     $file3 = UploadedFile::fake()->create('nomdufichier.pdf', 200, 'application/pdf');

@@ -22,6 +22,7 @@ use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
 use App\Enums\ContractRenewalTypesEnum;
+use App\Enums\ContractTypesEnum;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Validator;

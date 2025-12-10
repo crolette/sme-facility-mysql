@@ -28,7 +28,7 @@ class ContractNotificationSchedulingService
             $contractables = $contract->contractables();
             // dump(count($contractables));
             $contractables->each(function ($contractable) use ($contract) {
-                // dump('contractables');
+                dump('contractables');
                 if ($contractable->manager) {
                     $this->createScheduleForContractNoticeDate($contract, $contractable->manager);
                     $this->createScheduleForContractEndDate($contract, $contractable->manager);

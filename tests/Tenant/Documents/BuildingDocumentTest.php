@@ -32,6 +32,7 @@ beforeEach(function () {
     $this->location = Building::factory()->withMaintainableData()->create();
     Floor::factory()->withMaintainableData()->create();
     $this->room = Room::factory()->withMaintainableData()->create();
+    Queue::fake();
 });
 
 it('can attach existing documents to building', function () {

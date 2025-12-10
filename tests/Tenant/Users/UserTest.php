@@ -236,9 +236,6 @@ it('can remove a provider from a user', function () {
     ]);
 });
 
-it('can ', function () {});
-
-
 it('can delete an existing user', function () {
     $user = User::factory()->create();
 

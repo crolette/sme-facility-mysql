@@ -184,7 +184,15 @@ function SearchableSelect<T>(props: SearchableSelectProps<T>) {
                 autoComplete="off"
             />
 
-            {!multiple && displayValue && <XIcon onClick={() => setSearch('')} className="absolute top-1.5 right-2" />}
+            {!multiple && displayValue && (
+                <XIcon
+                    onClick={() => {
+                        onDelete();
+                        setSearch('');
+                    }}
+                    className="absolute top-1.5 right-2"
+                />
+            )}
 
             {/* Affichage des chips en mode multiple */}
             {multiple && selectedItems.length > 0 && (

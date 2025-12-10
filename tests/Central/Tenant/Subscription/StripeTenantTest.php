@@ -41,6 +41,10 @@ it('creates a stripe customer and returns stripe ID when creating a new tenant',
     $invoiceAddress = Address::factory()->make(['address_type' => AddressTypes::INVOICE->value]);
     $faker = \Faker\Factory::create('fr_BE');
 
+    dump($companyAddress->refresh());
+    // TODO vérifier que country est bien rattaché à l'adresse
+
+
     $formData = [
         'company_name' =>  $faker->company(),
         'first_name' => 'Michel',

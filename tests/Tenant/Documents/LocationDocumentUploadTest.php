@@ -12,6 +12,8 @@ use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Queue;
+
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
@@ -39,6 +41,7 @@ beforeEach(function () {
         ->for(Floor::first())
         ->create();
 
+    Queue::fake();
     // on créé un asset qu'on attache à une room
     // $this->asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 });

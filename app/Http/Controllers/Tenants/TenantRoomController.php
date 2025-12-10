@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Tenants\Floor;
 use App\Enums\NoticePeriodEnum;
 use App\Services\QRCodeService;
+use App\Enums\ContractTypesEnum;
 use App\Enums\ContractStatusEnum;
 use App\Enums\ContractDurationEnum;
 use App\Enums\MaintenanceFrequency;
@@ -17,8 +18,8 @@ use App\Models\Central\CategoryType;
 use Illuminate\Support\Facades\Auth;
 use App\Services\MaintainableService;
 use App\Enums\ContractRenewalTypesEnum;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class TenantRoomController extends Controller
 {

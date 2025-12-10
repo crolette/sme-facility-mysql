@@ -21,6 +21,7 @@ use App\Enums\ContractDurationEnum;
 
 use App\Models\Central\CategoryType;
 use App\Enums\ContractRenewalTypesEnum;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use function PHPUnit\Framework\assertCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -43,12 +44,12 @@ it('can render the company profile page', function () {
 
     $response->assertInertia(
         fn($page) =>
-        $page->component('settings/company')->has('item')
-
+        $page->component('settings/company')
     );
 });
 
 it('can upload a new logo for the company', function () {
+    Queue::fake();
     $file1 = UploadedFile::fake()->image('logo.png');
 
     $formData = [

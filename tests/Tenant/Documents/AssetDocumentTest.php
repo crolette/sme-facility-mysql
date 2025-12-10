@@ -34,6 +34,8 @@ beforeEach(function () {
     $this->building = Building::factory()->withMaintainableData()->create();
     $this->floor = Floor::factory()->withMaintainableData()->create();
     $this->room = Room::factory()->withMaintainableData()->create();
+
+    Queue::fake();
 });
 
 it('can attach existing documents to asset', function () {
@@ -124,7 +126,7 @@ it('can upload several files to asset', function () {
 
 it('can upload several files to asset and increment disk space accordingly (before compressing picture)', function () {
 
-    Queue::fake();
+
 
     $file1 = UploadedFile::fake()->image('avatar.png')->size(4000);
     $file2 = UploadedFile::fake()->create('nomdufichier.pdf', 2000, 'application/pdf');

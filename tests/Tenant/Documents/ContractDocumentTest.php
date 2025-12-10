@@ -78,6 +78,7 @@ beforeEach(function () {
         'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
         'status' => ContractStatusEnum::ACTIVE->value
     ];
+    Queue::fake();
 });
 
 it('can create a contract with documents', function () {

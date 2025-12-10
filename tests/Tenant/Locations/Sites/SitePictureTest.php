@@ -28,10 +28,11 @@ beforeEach(function () {
     $this->user = User::factory()->withRole('Admin')->create();
     $this->actingAs($this->user, 'tenant');
     $this->siteType = LocationType::factory()->create(['level' => 'site']);
+    Queue::fake();
 });
 
 it('can add pictures to a site and increments disk size', function () {
-    Queue::fake();
+
     $site = Site::factory()->withMaintainableData()->create();
     $file1 = UploadedFile::fake()->image('avatar.png')->size(1000);
     $file2 = UploadedFile::fake()->image('test.jpg')->size(1200);
