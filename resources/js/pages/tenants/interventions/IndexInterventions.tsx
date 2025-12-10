@@ -83,6 +83,8 @@ export default function IndexInterventions({
         pictures: [],
     };
 
+    console.log(types);
+
     const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [interventionDataForm, setInterventionDataForm] = useState<InterventionFormData>(interventionData);
     const [addIntervention, setAddIntervention] = useState<boolean>(false);

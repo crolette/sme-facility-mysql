@@ -214,9 +214,13 @@ export default function InterventionProviderPage({
                     <div className="flex flex-col items-center gap-4">
                         <BadgeCheck size={48} className="text-success" />
                         <p className="text-success mx-auto text-3xl font-bold">{t('common.thank_you')}</p>
-                        <p className="mx-auto">Intervention submitted</p>
+                        <p className="mx-auto">{t('actions.type-submitted', { type: tChoice('interventions.title', 1) })}</p>
                         <p className="mx-auto">{t('common.close_window')}</p>
-                        <div className="mx-auto flex gap-4"></div>
+                        <div className="mx-auto flex gap-4">
+                            <Button variant={'secondary'} onClick={() => window.close()}>
+                                {t('actions.close')}
+                            </Button>
+                        </div>
                     </div>
                 </ModaleForm>
             )}
