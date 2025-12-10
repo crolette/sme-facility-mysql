@@ -113,15 +113,21 @@ class Contract extends Model
         return $this->morphToMany(Document::class, 'documentable');
     }
 
+
     public function contractables()
     {
-        // return $this->morphTo()->withTrashed();
-        return $this->assets
-            ->concat($this->sites)
-            ->concat($this->buildings)
-            ->concat($this->floors)
-            ->concat($this->rooms);
+        return $this->hasMany(Contractable::class);
     }
+
+    // public function contractables()
+    // {
+    //     // return $this->morphTo()->withTrashed();
+    //     return $this->assets
+    //         ->concat($this->sites)
+    //         ->concat($this->buildings)
+    //         ->concat($this->floors)
+    //         ->concat($this->rooms);
+    // }
 
 
     public function scopeForMaintenanceManager(Builder $query, ?User $user = null)

@@ -281,9 +281,9 @@ class MaintainableNotificationSchedulingService
         foreach ($contracts as $contract) {
             // dump('contracts');
 
-            $contractables = $contract->contractables()->filter(function ($item) use ($user) {
-                return $item->maintainable
-                    && $item->maintainable->maintenance_manager_id === $user->id;
+            $contractables = $contract->contractables->filter(function ($item) use ($user) {
+                return $item->contractable->maintainable
+                    && $item->contractable->maintainable->maintenance_manager_id === $user->id;
             });
 
             // dump(count($contractables));

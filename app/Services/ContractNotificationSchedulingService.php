@@ -25,14 +25,14 @@ class ContractNotificationSchedulingService
 
             // Create notifications for related assets/locations with manager
             $contract = Contract::with(['assets', 'sites', 'rooms', 'floors', 'buildings'])->find($contract->id);
-            $contractables = $contract->contractables();
-            // dump(count($contractables));
+            $contractables = $contract->contractables;
+
             $contractables->each(function ($contractable) use ($contract) {
                 // dump('contractables');
                 // dump($contractable->manager?->id);
-                if ($contractable->manager) {
-                    $this->createScheduleForContractNoticeDate($contract, $contractable->manager);
-                    $this->createScheduleForContractEndDate($contract, $contractable->manager);
+                if ($contractable->contractable->manager) {
+                    $this->createScheduleForContractNoticeDate($contract, $contractable->contractable->manager);
+                    $this->createScheduleForContractEndDate($contract, $contractable->contractable->manager);
                 }
             });
         }
@@ -47,61 +47,64 @@ class ContractNotificationSchedulingService
         // dump('Contract Service: updateScheduleForContract');
 
         $contract->load(['assets', 'sites', 'rooms', 'floors', 'buildings']);
-        $contractables = $contract->contractables();
+        $contractables = $contract->contractables;
         // dump(count($contractables));
 
         $users = User::role('Admin')->get();
 
-        if ($contract->wasChanged('end_date') && $contract->end_date?->toDateString() > Carbon::now()->toDateString()) {
-            // dump('Contract End Date Changed');
-            $notifications = $contract->notifications()->where('notification_type', 'end_date')->where('status', 'pending')->get();
-
-            if (count($notifications)) {
-                foreach ($notifications as $notification) {
-                    $this->updateScheduleForContractEndDate($contract, $notification);
-                }
-            } else {
-                foreach ($users as $user) {
-                    $this->createScheduleForContractEndDate($contract, $user);
-                }
-
-                $contractables->each(function ($contractable) use ($contract) {
-                    if ($contractable->manager) {
-                        $this->createScheduleForContractEndDate($contract, $contractable->manager);
-                    }
-                });
+        if ($contract->wasChanged('status')) {
+            if ($contract->wasChanged('status') && $contract->status === ContractStatusEnum::ACTIVE) {
+                // dump('Contract Status Changed to ACTIVE');
+                $this->scheduleForContract($contract);
             }
-        }
 
-        if ($contract->wasChanged('notice_date') && $contract->notice_date?->toDateString() > Carbon::now()->toDateString()) {
-            // dump('Contract Notice Date Changed');
-            $notifications = $contract->notifications()->where('notification_type', 'notice_date')->where('status', 'pending')->get();
-
-            if (count($notifications)) {
-                foreach ($notifications as $notification) {
-                    $this->updateScheduleForContractNoticeDate($contract, $notification);
-                }
-            } else {
-                foreach ($users as $user) {
-                    $this->createScheduleForContractNoticeDate($contract, $user);
-                }
-
-                $contractables->each(function ($contractable) use ($contract) {
-                    if ($contractable->manager) {
-                        $this->createScheduleForContractNoticeDate($contract, $contractable->manager);
-                    }
-                });
+            if ($contract->wasChanged('status') && in_array($contract->status, [ContractStatusEnum::EXPIRED, ContractStatusEnum::CANCELLED])) {
+                // dump('Contract Status Changed to EXPIRED/CANCELLED');
+                $this->removeAllPendingNotificationsForAContract($contract);
             }
-        }
+        } else {
 
-        if ($contract->wasChanged('status') && $contract->status === ContractStatusEnum::ACTIVE) {
-            // dump('Contract Status Changed to ACTIVE');
-            $this->scheduleForContract($contract);
-        }
+            if ($contract->wasChanged('end_date') && $contract->end_date?->toDateString() > Carbon::now()->toDateString()) {
+                // dump('Contract End Date Changed');
+                $notifications = $contract->notifications()->where('notification_type', 'end_date')->where('status', 'pending')->get();
 
-        if ($contract->wasChanged('status') && in_array($contract->status, [ContractStatusEnum::EXPIRED, ContractStatusEnum::CANCELLED])) {
-            // dump('Contract Status Changed to EXPIRED/CANCELLED');
-            $this->removeAllPendingNotificationsForAContract($contract);
+                if (count($notifications)) {
+                    foreach ($notifications as $notification) {
+                        $this->updateScheduleForContractEndDate($contract, $notification);
+                    }
+                } else {
+                    foreach ($users as $user) {
+                        $this->createScheduleForContractEndDate($contract, $user);
+                    }
+
+                    $contractables->each(function ($contractable) use ($contract) {
+                        if ($contractable->contractable->manager) {
+                            $this->createScheduleForContractEndDate($contract, $contractable->contractable->manager);
+                        }
+                    });
+                }
+            }
+
+            if ($contract->wasChanged('notice_date') && $contract->notice_date?->toDateString() > Carbon::now()->toDateString()) {
+                // dump('Contract Notice Date Changed');
+                $notifications = $contract->notifications()->where('notification_type', 'notice_date')->where('status', 'pending')->get();
+
+                if (count($notifications)) {
+                    foreach ($notifications as $notification) {
+                        $this->updateScheduleForContractNoticeDate($contract, $notification);
+                    }
+                } else {
+                    foreach ($users as $user) {
+                        $this->createScheduleForContractNoticeDate($contract, $user);
+                    }
+
+                    $contractables->each(function ($contractable) use ($contract) {
+                        if ($contractable->manager) {
+                            $this->createScheduleForContractNoticeDate($contract, $contractable->manager);
+                        }
+                    });
+                }
+            }
         }
     }
 

@@ -78,88 +78,88 @@ beforeEach(function () {
     ];
 });
 
-// it('can factory a contract and attach a model', function () {
+it('can factory a contract and attach a model', function () {
 
-//     Contract::factory()->forLocation($this->asset)->create();
-//     assertDatabaseCount('contracts', 1);
-//     assertDatabaseCount('contractables', 1);
-//     assertEquals(1, $this->asset->contracts()->count());
-// });
+    Contract::factory()->forLocation($this->asset)->create();
+    assertDatabaseCount('contracts', 1);
+    assertDatabaseCount('contractables', 1);
+    assertEquals(1, $this->asset->contracts()->count());
+});
 
-// it('can create a contract and attach asset and locations', function () {
+it('can create a contract and attach asset and locations', function () {
 
-//     $formData = [
-//         ...$this->contractOneData,
-//         'contractables' => [
-//             ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
-//             ['locationType' => 'asset', 'locationCode' => $this->asset->code, 'locationId' => $this->asset->id],
-//             ['locationType' => 'building', 'locationCode' => $this->building->code, 'locationId' => $this->building->id],
-//             ['locationType' => 'floor', 'locationCode' => $this->floor->code, 'locationId' => $this->floor->id],
-//             ['locationType' => 'room', 'locationCode' => $this->room->code, 'locationId' => $this->room->id]
-//         ]
-//     ];
+    $formData = [
+        ...$this->contractOneData,
+        'contractables' => [
+            ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
+            ['locationType' => 'asset', 'locationCode' => $this->asset->code, 'locationId' => $this->asset->id],
+            ['locationType' => 'building', 'locationCode' => $this->building->code, 'locationId' => $this->building->id],
+            ['locationType' => 'floor', 'locationCode' => $this->floor->code, 'locationId' => $this->floor->id],
+            ['locationType' => 'room', 'locationCode' => $this->room->code, 'locationId' => $this->room->id]
+        ]
+    ];
 
-//     $response = $this->postToTenant('api.contracts.store', $formData);
-//     $response->assertSessionHasNoErrors();
+    $response = $this->postToTenant('api.contracts.store', $formData);
+    $response->assertSessionHasNoErrors();
 
-//     $response->assertStatus(200)
-//         ->assertJson(['status' => 'success']);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
-//     assertDatabaseHas('contracts', [
-//         ...$this->contractOneData,
-//     ]);
+    assertDatabaseHas('contracts', [
+        ...$this->contractOneData,
+    ]);
 
-//     $contract = Contract::find(1);
-//     expect(count($contract->contractables()))->toBe(5);
+    $contract = Contract::find(1);
+    expect(count($contract->contractables()))->toBe(5);
 
-//     assertDatabaseCount('contractables', 5);
-//     expect(count($this->asset->contracts))->toBe(1);
-//     expect(count($this->site->contracts))->toBe(1);
-//     expect(count($this->building->contracts))->toBe(1);
-//     expect(count($this->floor->contracts))->toBe(1);
-//     expect(count($this->room->contracts))->toBe(1);
-// });
+    assertDatabaseCount('contractables', 5);
+    expect(count($this->asset->contracts))->toBe(1);
+    expect(count($this->site->contracts))->toBe(1);
+    expect(count($this->building->contracts))->toBe(1);
+    expect(count($this->floor->contracts))->toBe(1);
+    expect(count($this->room->contracts))->toBe(1);
+});
 
-// it('can update a contract and sync assets and locations to add', function () {
-//     $contract =  Contract::factory()->forLocation($this->asset)->create();
+it('can update a contract and sync assets and locations to add', function () {
+    $contract =  Contract::factory()->forLocation($this->asset)->create();
 
-//     $contract = Contract::find(1);
-//     expect(count($contract->contractables()))->toBe(1);
+    $contract = Contract::find(1);
+    expect(count($contract->contractables()))->toBe(1);
 
-//     assertDatabaseCount('contractables', 1);
-//     expect(count($this->asset->contracts))->toBe(1);
+    assertDatabaseCount('contractables', 1);
+    expect(count($this->asset->contracts))->toBe(1);
 
-//     $formData = [
-//         ...$this->contractOneData,
-//         'contractables' => [
-//             ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
-//             ['locationType' => 'asset', 'locationCode' => $this->asset->code, 'locationId' => $this->asset->id],
-//             ['locationType' => 'building', 'locationCode' => $this->building->code, 'locationId' => $this->building->id],
-//             ['locationType' => 'floor', 'locationCode' => $this->floor->code, 'locationId' => $this->floor->id],
-//             ['locationType' => 'room', 'locationCode' => $this->room->code, 'locationId' => $this->room->id]
-//         ]
-//     ];
+    $formData = [
+        ...$this->contractOneData,
+        'contractables' => [
+            ['locationType' => 'site', 'locationCode' => $this->site->code, 'locationId' => $this->site->id],
+            ['locationType' => 'asset', 'locationCode' => $this->asset->code, 'locationId' => $this->asset->id],
+            ['locationType' => 'building', 'locationCode' => $this->building->code, 'locationId' => $this->building->id],
+            ['locationType' => 'floor', 'locationCode' => $this->floor->code, 'locationId' => $this->floor->id],
+            ['locationType' => 'room', 'locationCode' => $this->room->code, 'locationId' => $this->room->id]
+        ]
+    ];
 
-//     $response = $this->patchToTenant('api.contracts.update', $formData, $contract->id);
-//     $response->assertSessionHasNoErrors();
+    $response = $this->patchToTenant('api.contracts.update', $formData, $contract->id);
+    $response->assertSessionHasNoErrors();
 
-//     $response->assertStatus(200)
-//         ->assertJson(['status' => 'success']);
+    $response->assertStatus(200)
+        ->assertJson(['status' => 'success']);
 
-//     assertDatabaseHas('contracts', [
-//         ...$this->contractOneData,
-//     ]);
+    assertDatabaseHas('contracts', [
+        ...$this->contractOneData,
+    ]);
 
-//     $contract = Contract::find(1);
-//     expect(count($contract->contractables()))->toBe(5);
+    $contract = Contract::find(1);
+    expect(count($contract->contractables()))->toBe(5);
 
-//     assertDatabaseCount('contractables', 5);
-//     expect(count($this->asset->contracts))->toBe(1);
-//     expect(count($this->site->contracts))->toBe(1);
-//     expect(count($this->building->contracts))->toBe(1);
-//     expect(count($this->floor->contracts))->toBe(1);
-//     expect(count($this->room->contracts))->toBe(1);
-// });
+    assertDatabaseCount('contractables', 5);
+    expect(count($this->asset->contracts))->toBe(1);
+    expect(count($this->site->contracts))->toBe(1);
+    expect(count($this->building->contracts))->toBe(1);
+    expect(count($this->floor->contracts))->toBe(1);
+    expect(count($this->room->contracts))->toBe(1);
+});
 
 it('can update a contract and sync assets and locations to detach', function () {
     $formData = [

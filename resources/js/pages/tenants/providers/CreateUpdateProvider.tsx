@@ -227,7 +227,7 @@ export default function CreateUpdateProvider({
                                 <Input
                                     id="email"
                                     type="email"
-                                    minLength={20}
+                                    minLength={10}
                                     maxLength={255}
                                     onChange={(e) => setData('email', e.target.value)}
                                     value={data.email}

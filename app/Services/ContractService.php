@@ -314,7 +314,7 @@ class ContractService
 
         // Create notifications for related assets/locations with manager
         $contract = Contract::with(['assets', 'sites', 'rooms', 'floors', 'buildings'])->find($contract->id);
-        $contractables = $contract->contractables();
+        $contractables = $contract->contractables;
         // dump(count($contractables));
         $contractables->each(function ($contractable) use ($contract) {
             // dump('contractables');
@@ -340,15 +340,15 @@ class ContractService
 
         // Create notifications for related assets/locations with manager
         $contract = Contract::with(['assets', 'sites', 'rooms', 'floors', 'buildings'])->find($contract->id);
-        $contractables = $contract->contractables();
+        $contractables = $contract->contractables;
         // dump(count($contractables));
         $contractables->each(function ($contractable) use ($contract) {
             // dump('contractables');
-            if ($contractable->manager) {
-                Mail::to($contractable->manager->email)->send(
+            if ($contractable->contractable->manager) {
+                Mail::to($contractable->contractable->manager->email)->send(
                     new \App\Mail\ContractExpiredMail($contract)
                 );
-                Log::info("Mail sent to : {$contractable->manager->email}");
+                Log::info("Mail sent to : {$contractable->contractable->manager->email}");
             }
         });
     }

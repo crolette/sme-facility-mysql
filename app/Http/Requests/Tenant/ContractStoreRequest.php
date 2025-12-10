@@ -40,6 +40,9 @@ class ContractStoreRequest extends FormRequest
             $data['notice_date']  = NoticePeriodEnum::from($data['notice_period'])->subFrom($data['end_date']);
         }
 
+        if (!isset($data['notice_period']))
+            $data['notice_date'] = null;
+
         if (!isset($data['type'])) {
             $data['type']  = ContractTypesEnum::OTHER->value;
         }
