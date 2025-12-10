@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Storage;
 class RoomService
 {
 
-    public function __construct(protected DocumentService $documentService) {}
+    public function __construct(protected DocumentService $documentService, protected PictureService $pictureService) {}
 
 
     public function create(array $data): Room

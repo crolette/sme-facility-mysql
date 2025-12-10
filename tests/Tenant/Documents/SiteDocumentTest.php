@@ -30,6 +30,7 @@ beforeEach(function () {
     $this->building = Building::factory()->withMaintainableData()->create();
     $this->floor = Floor::factory()->withMaintainableData()->create();
     $this->room = Room::factory()->withMaintainableData()->create();
+    Queue::fake();
 });
 
 it('can attach existing documents to floor', function () {
@@ -45,7 +46,6 @@ it('can attach existing documents to floor', function () {
         'description' => 'Description new site',
         'locationType' => LocationType::where('level', 'site')->first()->id,
         'existing_documents' => [...$documents->pluck('id')]
-
     ];
 
     $response = $this->postToTenant('api.sites.store', $formData);

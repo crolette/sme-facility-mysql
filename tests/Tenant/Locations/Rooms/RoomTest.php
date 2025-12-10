@@ -263,7 +263,7 @@ it('can render the update room page', function () {
             ->has('location')
             ->has('location.floor')
             ->has('levelTypes', 3)
-            ->has('locationTypes', 3)
+            ->has('locationTypes', 2)
             ->where('location.reference_code', $room->reference_code)
     );
 });
@@ -280,9 +280,9 @@ it('can update a room maintainable', function () {
 
     $formData = [
         'name' => 'New room',
-        'surface_floor' => "2569.12",
-        'surface_walls' => "256.9",
-        'height' => "9.2",
+        'surface_floor' => 2569.12,
+        'surface_walls' => 256.90,
+        'height' => 9.2,
         'wall_material_id' => $wallMaterial->id,
         'floor_material_id' => $floorMaterial->id,
         'description' => 'Description new room',
@@ -301,12 +301,12 @@ it('can update a room maintainable', function () {
         'location_type_id' => $locationType->id,
         'level_id' => $this->floor->id,
         'surface_floor' => 2569.12,
-        'surface_walls' => 256.9,
-        'height' => 9.2,
+        'surface_walls' => 256.90,
+        'height' => 9.20,
         'wall_material_id' => $wallMaterial->id,
         'floor_material_id' => $floorMaterial->id,
-        'code' => $locationType->prefix . '001',
-        'reference_code' => $this->floor->reference_code . '-' . $locationType->prefix . '001',
+        'code' => $locationType->prefix . '01',
+        'reference_code' => $this->floor->reference_code . '-' . $locationType->prefix . '01',
     ]);
 
     assertDatabaseHas('maintainables', [
@@ -520,13 +520,13 @@ it('can change location type of a room and related assets', function () {
         'assets' => [
             [
                 'assetId' => $assetOne->id,
-                'change' => 'change',
+                'change' => 'relocate',
                 'locationType' => 'room',
                 'locationId' => $roomOne->id,
             ],
             [
                 'assetId' => $assetTwo->id,
-                'change' => 'change',
+                'change' => 'relocate',
                 'locationType' => 'room',
                 'locationId' => $roomTwo->id,
             ],

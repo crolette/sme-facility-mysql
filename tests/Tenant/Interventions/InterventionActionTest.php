@@ -13,8 +13,9 @@ use App\Models\Tenants\Building;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Queue;
 
+use Illuminate\Support\Facades\Storage;
 use App\Models\Tenants\InterventionAction;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -193,7 +194,7 @@ it('updates intervention costs of intervention when action with intervention_cos
 });
 
 it('can upload pictures for an intervention action', function () {
-
+    Queue::fake();
     $file1 = UploadedFile::fake()->image('action1.jpg');
     $file2 = UploadedFile::fake()->image('action1.png');
 
@@ -212,6 +213,7 @@ it('can upload pictures for an intervention action', function () {
     ];
 
     $response = $this->postToTenant('api.interventions.actions.store', $formData, $this->intervention);
+
 
     $interventionAction = InterventionAction::where('description', 'New action for intervention')->first();
 

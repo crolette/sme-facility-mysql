@@ -51,6 +51,8 @@ beforeEach(function () {
         'categoryId' => $this->categoryType->id,
 
     ];
+
+    Carbon::setTestNow(Carbon::now());
 });
 
 

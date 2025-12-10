@@ -2,15 +2,17 @@
 
 namespace Tests;
 
-use App\Models\Tenants\User;
 use App\Models\Tenant;
 use App\Models\Address;
 use App\Enums\AddressTypes;
+use App\Models\Tenants\User;
+use App\Services\TenantLimits;
 use App\Models\Tenants\Company;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 // use Stancl\Tenancy\Database\Models\Tenant;
 
@@ -73,8 +75,20 @@ abstract class TenantTestCase extends BaseTestCase
             $this->tenant = Tenant::find('test')->first();
         }
 
+
+
+
         // Initialize tenant context
         tenancy()->initialize($this->tenant);
+
+        if ($this->tenant) {
+            Cache::remember(
+                "tenant:{$this->tenant->id}:limits",
+                now()->addDay(),
+                fn() => TenantLimits::loadLimitsFromDatabase($this->tenant)
+            );
+        }
+
         $company = Company::first();
         if (!$company) {
             Company::create(['last_ticket_number' => 0, 'last_asset_number' => 0]);

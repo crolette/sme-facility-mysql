@@ -43,11 +43,17 @@ class TicketController extends Controller
             $tickets->where('description', 'like', '%' . $validatedFields['q'] . '%');
         }
 
-        if (isset($validatedFields['status'])) {
+        if (isset($validatedFields['status']) && $validatedFields['status'] != 'all') {
             $tickets->where('status', $validatedFields['status']);
         }
 
-        return Inertia::render('tenants/tickets/IndexTickets', ['items' => $tickets->orderBy($validatedFields['sortBy'] ?? 'created_at', $validatedFields['orderBy'] ?? 'asc')->paginate()->withQueryString(),  'filters' =>  $validator->safe()->only(['q', 'sortBy', 'status', 'orderBy']), 'statuses' => $statuses]);
+        if (!isset($validatedFields['status'])) {
+            $tickets->where('status', TicketStatus::OPEN->value);
+            $validatedFields['status'] = TicketStatus::OPEN->value;
+        }
+        // dd($validatedFields);
+
+        return Inertia::render('tenants/tickets/IndexTickets', ['items' => $tickets->orderBy($validatedFields['sortBy'] ?? 'created_at', $validatedFields['orderBy'] ?? 'asc')->paginate()->withQueryString(),  'filters' =>  $validatedFields, 'statuses' => $statuses]);
     }
 
 

@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\AddressTypes;
 use App\Models\Address;
+use App\Models\Tenants\Country;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -24,16 +25,29 @@ class AddressFactory extends Factory
     {
         $faker = \Faker\Factory::create('fr_BE');
 
-        $countries = ['BE', 'GB', 'DE', 'FR', 'NL'];
+
+
+
 
         return [
             'street' => fake()->streetName(),
             'house_number' => fake()->buildingNumber(),
             'zip_code' => $faker->postcode(),
             'city' => $faker->cityName(),
-            'country' => $countries[array_rand($countries, 1)],
+
             'address_type' => AddressTypes::COMPANY->value
 
         ];
+    }
+
+    public function configure()
+    {
+        return $this->afterCreating(function (Address $address) {
+            $countries = ['BE', 'GB', 'DE', 'FR', 'NL'];
+
+            $country = Country::where('iso_code_a2', array_rand($countries, 1))->first();
+
+            $address->country()->associate($country);
+        });
     }
 }

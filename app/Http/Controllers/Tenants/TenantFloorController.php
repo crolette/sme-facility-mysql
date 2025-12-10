@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Tenants\Floor;
 use App\Enums\NoticePeriodEnum;
 use App\Services\QRCodeService;
+use App\Enums\ContractTypesEnum;
 use App\Models\Tenants\Building;
 use App\Enums\ContractStatusEnum;
 use App\Services\DocumentService;

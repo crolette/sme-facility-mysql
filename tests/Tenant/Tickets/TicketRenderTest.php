@@ -36,16 +36,6 @@ beforeEach(function () {
     $this->room = Room::factory()->withMaintainableData()->create();
 
     $this->asset =  Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
-
-    $tenant = tenant();
-
-    if ($tenant) {
-        Cache::remember(
-            "tenant:{$tenant->id}:limits",
-            now()->addDay(),
-            fn() => TenantLimits::loadLimitsFromDatabase($tenant)
-        );
-    }
 });
 
 it('can render the index tickets page', function () {

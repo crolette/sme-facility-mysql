@@ -43,14 +43,6 @@ class APIInterventionActionController extends Controller
             DB::beginTransaction();
 
             $interventionAction = $this->interventionActionService->create($intervention, $request->validated());
-            // $action = new InterventionAction($request->validated());
-
-            // $action->actionType()->associate($request->validated('action_type_id'));
-            // if (!$request->validated('creator_email')) {
-            //     $action->creator()->associate($request->validated('created_by'));
-            // }
-
-            // $intervention->actions()->save($action);
 
             if ($pictureUploadRequest->validated('pictures')) {
                 $this->pictureService->uploadAndAttachPictures($interventionAction, $pictureUploadRequest->validated('pictures'));

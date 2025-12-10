@@ -82,8 +82,11 @@ class InterventionService
 
     public function update($intervention, $data): Intervention
     {
-        $intervention->update($data);
         $intervention->interventionType()->associate($data['intervention_type_id']);
+
+        $data = $this->handleStatusChange($intervention, $data);
+
+        $intervention->fill($data);
         $intervention->save();
 
         return $intervention;
@@ -93,5 +96,29 @@ class InterventionService
     {
         $deleted = $intervention->delete();
         return $deleted;
+    }
+
+    public function handleStatusChange(Intervention $intervention, array $data): array
+    {
+        if (
+            isset($data['status']) &&
+            $data['status'] === 'completed' &&
+            $intervention->status !== 'completed' && !isset($intervention->completed_at)
+        ) {
+            $data['completed_at'] = now();
+        }
+
+        if (
+            isset($data['status']) &&
+            $data['status'] === 'cancelled' &&
+            $intervention->status !== 'cancelled' && !isset(
+                $intervention->cancelled_at
+            )
+        ) {
+            $data['cancelled_at'] = now();
+        }
+
+
+        return $data;
     }
 };

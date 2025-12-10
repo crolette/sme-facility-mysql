@@ -13,6 +13,8 @@ use App\Models\Tenants\Building;
 use App\Models\Tenants\Document;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Queue;
+
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
 use function Pest\Laravel\assertDatabaseCount;
@@ -31,6 +33,7 @@ beforeEach(function () {
     Site::factory()->withMaintainableData()->create();
     $this->building = Building::factory()->withMaintainableData()->create();
     $this->location = Floor::factory()->withMaintainableData()->create();
+    Queue::fake();
 });
 
 it('can attach existing documents to room', function () {

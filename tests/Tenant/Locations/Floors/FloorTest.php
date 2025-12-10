@@ -43,7 +43,7 @@ it('can render the index floors page', function () {
 
 it('can render the create floor page', function () {
     LocationType::factory()->count(2)->create(['level' => 'floor']);
-    Building::factory()->count(2)->create();
+    Building::factory()->withMaintainableData()->count(2)->create();
 
 
     $response = $this->getFromTenant('tenant.floors.create');
@@ -195,7 +195,7 @@ it('can render the show floor page', function () {
 it('can render the update floor page', function () {
     LocationType::factory()->count(2)->create(['level' => 'building']);
     LocationType::factory()->count(2)->create(['level' => 'floor']);
-    Building::factory()->count(2)->create();
+    Building::factory()->withMaintainableData()->count(2)->create();
     $floor = Floor::factory()->withMaintainableData()->create();
 
     $response = $this->getFromTenant('tenant.floors.edit', $floor);
@@ -207,7 +207,7 @@ it('can render the update floor page', function () {
             ->has('location')
             ->has('location.building')
             ->has('levelTypes', 3)
-            ->has('locationTypes', 3)
+            ->has('locationTypes', 2)
             ->where('location.reference_code', $floor->reference_code)
     );
 });
@@ -275,10 +275,10 @@ it('fails when update of an existing floor with a non existing floor type', func
 });
 
 it('cannot update a floor type of an existing floor', function () {
-    $floorType = LocationType::factory()->create(['level' => 'floor']);
 
     $floor = Floor::factory()->withMaintainableData()->create();
 
+    $floorType = LocationType::factory()->create(['level' => 'floor']);
     $formData = [
         'name' => 'New site',
         'description' => 'Description new site',

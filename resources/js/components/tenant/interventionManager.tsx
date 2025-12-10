@@ -684,8 +684,12 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                 <option value="planned">{t('common.status.planned')}</option>
                                 <option value="in_progress">{t('common.status.in_progress')}</option>
                                 <option value="waiting_parts">{t('common.status.waiting_parts')}</option>
-                                <option value="completed">{t('common.status.completed')}</option>
-                                <option value="cancelled">{t('common.status.cancelled')}</option>
+                                {interventionDataForm.intervention_id && (
+                                    <>
+                                        <option value="completed">{t('common.status.completed')}</option>
+                                        <option value="cancelled">{t('common.status.cancelled')}</option>
+                                    </>
+                                )}
                             </select>
                             <Label htmlFor="priority">{t('interventions.priority.title')}</Label>
                             <select
@@ -711,6 +715,8 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                 id="description"
                                 placeholder="description"
                                 maxLength={255}
+                                minLength={10}
+                                required
                                 value={interventionDataForm.description ?? ''}
                                 onChange={(e) =>
                                     setInterventionDataForm((prev) => ({

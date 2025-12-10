@@ -45,6 +45,7 @@ beforeEach(function () {
         ->for(Floor::first())
         ->create();
 
+    Queue::fake();
     // on créé un asset qu'on attache à une room
     // $this->asset = Asset::factory()->withMaintainableData()->forLocation($this->room)->create();
 });

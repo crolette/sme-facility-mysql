@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\V1;
 
 use Exception;
+use Carbon\Carbon;
 use App\Helpers\ApiResponse;
 use App\Models\Tenants\Room;
 use App\Models\Tenants\Site;
@@ -11,18 +12,18 @@ use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
 use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Building;
+use App\Models\Tenants\Provider;
 use App\Services\PictureService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Models\Tenants\Intervention;
 use Illuminate\Support\Facades\Auth;
+use App\Services\InterventionService;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\TicketRequest;
 use App\Http\Requests\Tenant\InterventionRequest;
 use App\Http\Requests\Tenant\PictureUploadRequest;
-use App\Models\Tenants\Provider;
-use App\Services\InterventionService;
-use Illuminate\Support\Facades\Log;
 
 class APIInterventionController extends Controller
 {
@@ -45,6 +46,8 @@ class APIInterventionController extends Controller
 
         try {
             DB::beginTransaction();
+
+
 
             $intervention = $this->interventionService->create($request->validated());
 
@@ -73,7 +76,6 @@ class APIInterventionController extends Controller
 
         try {
             DB::beginTransaction();
-
             $intervention = $this->interventionService->update($intervention, $request->safe()->except('locationType', 'locationId', 'ticket_id'));
 
             if ($pictureUploadRequest->validated('pictures')) {

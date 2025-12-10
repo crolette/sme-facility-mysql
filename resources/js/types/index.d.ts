@@ -308,6 +308,8 @@ export interface Intervention {
     type: string;
     created_at: string;
     updated_at: string;
+    completed_at?: string;
+    cancelled_at?: string;
     assignable: Provider | User;
     assignable_id?: number;
     assignable_type?: string;

@@ -14,6 +14,7 @@ use App\Models\Tenants\Document;
 use App\Models\Tenants\Provider;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
 use function PHPUnit\Framework\assertCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -34,6 +35,7 @@ beforeEach(function () {
     Building::factory()->withMaintainableData()->create();
     $this->floor = Floor::factory()->withMaintainableData()->create();
     $this->location = Room::factory()->withMaintainableData()->create();
+    Queue::fake();
 });
 
 it('can add pictures to a room', function () {
@@ -94,7 +96,7 @@ it('deletes directory and pictures if a room is deleted', function () {
     assertDatabaseCount('pictures', 2);
     Storage::disk('tenants')->assertExists($this->location->directory);
 
-    $this->deleteFromTenant('api.sites.destroy', $this->location->reference_code);
+    $this->deleteFromTenant('api.rooms.destroy', $this->location->reference_code);
     assertDatabaseCount('pictures', 0);
 
     Storage::disk('tenants')->assertMissing($this->location->directory);

@@ -29,7 +29,7 @@ it('can render the index buildings page', function () {
     LocationType::factory()->count(1)->create(['level' => 'site']);
     LocationType::factory()->count(2)->create(['level' => 'building']);
     Site::factory()->withMaintainableData()->create();
-    Building::factory()->count(3)->create();
+    Building::factory()->withMaintainableData()->count(3)->create();
     $response = $this->getFromTenant('tenant.buildings.index');
     $response->assertOk();
 
@@ -329,7 +329,7 @@ it('can render the update building page', function () {
             ->has('location')
             ->has('location.site')
             ->has('levelTypes', 1)
-            ->has('locationTypes', 4)
+            ->has('locationTypes', 3)
             ->where('location.reference_code', $building->reference_code)
     );
 });

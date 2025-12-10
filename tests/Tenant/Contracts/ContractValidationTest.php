@@ -20,6 +20,8 @@ use App\Enums\ContractDurationEnum;
 use App\Models\Central\CategoryType;
 
 use App\Enums\ContractRenewalTypesEnum;
+use App\Enums\ContractTypesEnum;
+
 use function PHPUnit\Framework\assertCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function PHPUnit\Framework\assertEquals;
@@ -50,7 +52,7 @@ beforeEach(function () {
     $this->contractOneData = [
         'provider_id' => $this->provider->id,
         'name' => 'Contrat de bail',
-        'type' => 'Bail',
+        'type' => ContractTypesEnum::ALLIN->value,
         'notes' => 'Nouveau contrat de bail 2025',
         'internal_reference' => 'Bail Site 2025',
         'provider_reference' => 'Provider reference 2025',

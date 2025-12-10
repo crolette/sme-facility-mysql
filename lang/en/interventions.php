@@ -23,6 +23,8 @@ return [
     'total_costs' => 'Total costs',
     'started_at' => 'Started at',
     'finished_at' => 'Finished at',
+    'completed_at' => 'Completed at',
+    'cancelled_at' => 'Cancelled at',
     'delete_description' => 'Are you sure to delete this intervention ? You will not be able to restore it afterwards ! All pictures, documents, ... will be deleted too.',
     'actions' => 'Action|Actions',
     'last_update' => 'Last update',

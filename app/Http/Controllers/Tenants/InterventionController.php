@@ -77,18 +77,6 @@ class InterventionController extends Controller
         return Inertia::render('tenants/interventions/IndexInterventions', ['items' => $interventions->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'sortBy', 'status', 'orderBy', 'type', 'priority']), 'priorities' => $priorities, 'types' => $types, 'statuses' => $statuses]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    // public function create(Ticket $ticket)
-    // {
-    //     if (Auth::user()->cannot('create', Intervention::class))
-    //         abort(403);
-
-
-    //     return Inertia::render('tenants/tickets/interventions/create', ['ticket' => $ticket]);
-    // }
-
 
     /**
      * Display the specified resource.
