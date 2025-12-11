@@ -12,6 +12,7 @@ use App\Models\Tenants\Floor;
 use App\Models\Tenants\Ticket;
 use App\Services\TenantLimits;
 use App\Models\Tenants\Building;
+use App\Enums\InterventionStatus;
 use Illuminate\Http\UploadedFile;
 use App\Models\Central\CategoryType;
 use App\Models\Tenants\Intervention;
@@ -244,7 +245,7 @@ it('updates ticket status and handled_at columns when intervention is created fo
     $formData = [
         'intervention_type_id' => $this->interventionType->id,
         'priority' => 'medium',
-        'status' => 'planned',
+        'status' => InterventionStatus::PLANNED->value,
         'planned_at' => Carbon::now()->add('day', 7),
         'description' => fake()->paragraph(),
         'repair_delay' => Carbon::now()->add('month', 1),
@@ -264,7 +265,7 @@ it('updates ticket status and handled_at columns when intervention is created fo
     ]);
 });
 
-it('updates ticket status to closed and closed_at columns when intervention is completed for a ticket', function () {
+it('updates ticket status to closed and closed_at columns when intervention is updated to completed for a ticket', function () {
     Carbon::setTestNow(Carbon::now());
     $ticket = Ticket::factory()->forLocation($this->asset)->create();
     $intervention = Intervention::factory()->forTicket($ticket)->create();
@@ -272,7 +273,7 @@ it('updates ticket status to closed and closed_at columns when intervention is c
     $formData = [
         'intervention_type_id' => $this->interventionType->id,
         'priority' => 'medium',
-        'status' => 'completed',
+        'status' => InterventionStatus::COMPLETED->value,
         'description' => fake()->paragraph(),
         'ticket_id' => $ticket->id,
     ];
@@ -290,6 +291,31 @@ it('updates ticket status to closed and closed_at columns when intervention is c
         'closed_at' => Carbon::now()->toDateTimeString(),
     ]);
 });
+
+it('updates ticket status to closed and closed_at columns when intervention status change to complete for a ticket', function () {
+    Carbon::setTestNow(Carbon::now());
+    $ticket = Ticket::factory()->forLocation($this->asset)->create();
+    $intervention = Intervention::factory()->forTicket($ticket)->create();
+
+    $formData = [
+        'status' => InterventionStatus::COMPLETED->value,
+    ];
+
+    $response = $this->patchToTenant('api.interventions.status', $formData, $intervention);
+
+    $response->assertStatus(200)
+        ->assertJson([
+            'status' => 'success',
+        ]);
+
+    assertDatabaseHas('tickets', [
+        'id' => $ticket->id,
+        'status' => 'closed',
+        'handled_at' => Carbon::now()->toDateTimeString(),
+        'closed_at' => Carbon::now()->toDateTimeString(),
+    ]);
+});
+
 
 it('can update an existing ticket', function () {
     Carbon::setTestNow(Carbon::now());

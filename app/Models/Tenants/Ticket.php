@@ -4,7 +4,9 @@ namespace App\Models\Tenants;
 
 use Carbon\Carbon;
 use App\Enums\TicketStatus;
+use App\Events\TicketClosed;
 use App\Models\Tenants\User;
+use App\Events\TicketCreated;
 use App\Models\Tenants\Asset;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\Debugbar\Facades\Debugbar;
@@ -64,11 +66,21 @@ class Ticket extends Model
     {
         parent::boot();
 
+        static::created(function ($ticket) {
+            event(new TicketCreated($ticket, $ticket->ticketable));
+        });
+
         static::deleting(function ($ticket) {
             $ticket->interventions()->delete();
 
             // TODO service to delete pictures from the disk
             $ticket->pictures()->delete();
+        });
+
+        static::updated(function ($ticket) {
+            if ($ticket->getOriginal('status') !== TicketStatus::CLOSED && $ticket->getChanges()['status'] === TicketStatus::CLOSED->value) {
+                event(new TicketClosed($ticket));
+            }
         });
     }
 

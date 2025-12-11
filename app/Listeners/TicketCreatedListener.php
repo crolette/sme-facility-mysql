@@ -35,15 +35,15 @@ class TicketCreatedListener
                 ->send(new TicketCreatedMail($event->ticket, $event->model));
         } else {
 
-            $users = User::role(['Admin'])->get();
+            $admins = User::role(['Admin'])->get();
 
-            foreach ($users as $user) {
-                Mail::to($user->email)
-                    ->locale($user->preferred_locale ?? config('app.locale'))
+            foreach ($admins as $admin) {
+                Mail::to($admin->email)
+                    ->locale($admin->preferred_locale ?? config('app.locale'))
                     ->send(new TicketCreatedMail($event->ticket, $event->model));
             }
 
-            if ($event->ticket->ticketable->manager) {
+            if ($event->ticket->ticketable->manager && !$admins->pluck('id')->contains($event->ticket->ticketable->manager?->id)) {
                 Mail::to($event->ticket->ticketable->manager->email)
                     ->locale(config('app.locale'))
                     ->send(new TicketCreatedMail($event->ticket, $event->model));
