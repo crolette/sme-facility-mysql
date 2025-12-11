@@ -56,12 +56,14 @@ class LocationType extends Model
 
     public static function getByLevelCache(string $level)
     {
-        return Cache::remember(
+        $categories = Cache::remember(
             "location_types.{$level}",
             3600,
             fn() =>
             static::where('level', $level)->with('translations')->get()
         );
+
+        return [...collect($categories)->sortBy('label')];
     }
 
     public function translations(): MorphMany

@@ -107,6 +107,7 @@ export default function Demo() {
                                             <Input
                                                 type="text"
                                                 id="company"
+                                                minLength={3}
                                                 maxLength={100}
                                                 required
                                                 className="text-logo"

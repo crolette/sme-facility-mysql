@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Tenant;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StatisticsRequest extends FormRequest
@@ -22,10 +23,10 @@ class StatisticsRequest extends FormRequest
             $data['period'] = 'week';
 
         if (!isset($data['date_from']))
-            $data['date_from'] = '2025-01-01';
+            $data['date_from'] = Carbon::now()->subYear()->toDateString();
 
         if (!isset($data['date_to']))
-            $data['date_to'] = '2025-12-31';
+            $data['date_to'] = Carbon::now()->toDateString();;
 
         $this->replace($data);
     }

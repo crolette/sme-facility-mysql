@@ -7,6 +7,7 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Cache;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Http\Requests\Tenant\StatisticsRequest;
 use App\Services\Statistics\StatisticTicketsService;
 use App\Services\Statistics\StatisticInterventionsService;

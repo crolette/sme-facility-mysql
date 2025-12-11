@@ -57,12 +57,14 @@ class CategoryType extends Model
 
     public static function getByCategoryCache(string $category)
     {
-        return Cache::remember(
+        $categories = Cache::remember(
             "category_types.{$category}",
             3600,
             fn() =>
             static::where('category', $category)->with('translations')->get()
         );
+
+        return [...collect($categories)->sortBy('label')];
     }
 
     public function translations(): MorphMany

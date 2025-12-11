@@ -82,6 +82,7 @@ export default function Contact({ reasons }: { reasons: string[] }) {
                                         <Input
                                             type="text"
                                             id="first_name"
+                                            minLength={3}
                                             maxLength={100}
                                             required
                                             placeholder={t('common.first_name_placeholder')}
@@ -94,6 +95,7 @@ export default function Contact({ reasons }: { reasons: string[] }) {
                                         <Input
                                             type="text"
                                             id="last_name"
+                                            minLength={3}
                                             maxLength={100}
                                             required
                                             placeholder={t('common.last_name_placeholder')}
@@ -106,7 +108,7 @@ export default function Contact({ reasons }: { reasons: string[] }) {
                                     <div className="w-full">
                                         <Label htmlFor={'email'}>{t('common.email')}</Label>
                                         <Input
-                                            type="text"
+                                            type="email"
                                             id="email"
                                             required
                                             placeholder={t('common.email_placeholder')}
@@ -133,6 +135,7 @@ export default function Contact({ reasons }: { reasons: string[] }) {
                                         <Input
                                             type="text"
                                             id="company"
+                                            minLength={3}
                                             maxLength={100}
                                             required
                                             placeholder={t('providers.company_name_placeholder')}

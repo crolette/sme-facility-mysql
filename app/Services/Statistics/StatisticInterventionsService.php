@@ -11,11 +11,14 @@ class StatisticInterventionsService
 {
     public function getByType($filters = [])
     {
+        Debugbar::info($filters);
+        Debugbar::info($filters['date_from']);
+        Debugbar::info($filters['date_to']);
         $interventionsTypeCount = Intervention::query()
             ->forMaintenanceManager()
             ->withoutGlobalScope('ancient')
-            ->where('status', '<>', 'completed')
             ->where('created_at', '>', $filters['date_from'])->where('created_at', '<', $filters['date_to'])
+            ->where('status', '<>', 'completed')
             ->selectRaw('intervention_type_id, COUNT(*) as count')
             ->groupBy('intervention_type_id')
             ->orderBy('count')

@@ -78,6 +78,8 @@ class TenantAssetController extends Controller
 
 
         $categories = CategoryType::getByCategoryCache('asset');
+        // dd(collect($categories)->sortBy('label'));
+        // $categories = collect($categories)->sortBy('label');
 
         return Inertia::render('tenants/assets/IndexAssets', ['items' => $assets->paginate()->withQueryString(), 'filters' =>  $validator->safe()->only(['q', 'sortBy', 'trashed', 'orderBy', 'category']), 'categories' => $categories]);
     }
@@ -118,7 +120,6 @@ class TenantAssetController extends Controller
 
         if ($asset->deleted_at)
             return redirect()->to(route('tenant.assets.deleted', $asset->id));
-
 
         $asset = Asset::where('reference_code', $asset->reference_code)->with(['maintainable.manager:id,first_name,last_name', 'contracts:id,name,type,provider_id,status,renewal_type,end_date,internal_reference,provider_reference', 'contracts.provider:id,name,logo', 'meterReadings', 'maintainable.providers:id,name'])->first();
         return Inertia::render('tenants/assets/ShowAsset', ['item' => $asset->append('level_path')]);
