@@ -19,7 +19,8 @@ class CompanyProfileController extends Controller
 
         return Inertia::render('settings/company', [
             'item' => Company::first(),
-            'billingPortal' => tenant()->billingPortalUrl(route('tenant.company.show')),
+            'billingPortal' => null,
+            // 'billingPortal' => tenant()->billingPortalUrl(route('tenant.company.show')),
             'usage' => ['sites' => TenantLimits::getSitesUsage(), 'users' => TenantLimits::getUsersUsage(), 'storage' => TenantLimits::getStorageUsage()]
         ]);
     }

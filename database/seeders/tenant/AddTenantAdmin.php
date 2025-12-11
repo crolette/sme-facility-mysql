@@ -4,6 +4,7 @@ namespace Database\Seeders\tenant;
 
 use App\Models\Tenants\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Tenants\Company;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Database\Seeders\tenant\NewPermissions;

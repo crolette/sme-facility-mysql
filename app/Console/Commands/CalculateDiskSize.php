@@ -45,24 +45,28 @@ class CalculateDiskSize extends Command
 
         tenancy()->runForMultiple($tenants, function ($tenant) {
 
-            $path = Storage::disk('tenants')->path($tenant->company_code);
+            if (Storage::disk('tenants')->exists($tenant->company_code)) {
 
-            $output = shell_exec("du -sb {$path}");
-            $size = (int) explode("\t", $output)[0];
+                $path = Storage::disk('tenants')->path($tenant->company_code);
 
-            // TODO : le vat number pourrait changer et donc à l'update, on retrouve pas la bonne société, il faudrait mettre sur le domain du tenant car lui ne peut pas changer
-            Company::updateOrCreate(
-                ['vat_number' => $tenant->vat_number],
-                [
-                    'disk_size' => $size,
-                    'name' => $tenant->company_name,
-                    'vat_number' => $tenant->vat_number,
-                ]
-            );
+                $output = shell_exec("du -sb {$path}");
+                $size = (int) explode("\t", $output)[0];
 
-            $tenant->update(['current_storage_bytes' => $size]);
+                // TODO : le vat number pourrait changer et donc à l'update, on retrouve pas la bonne société, il faudrait mettre sur le domain du tenant car lui ne peut pas changer
+                Company::updateOrCreate(
+                    ['vat_number' => $tenant->vat_number],
+                    [
+                        'disk_size' => $size,
+                        'name' => $tenant->company_name,
+                        'vat_number' => $tenant->vat_number,
+                    ]
+                );
 
-            Log::info("Dispatched tenant disk size calculation for tenant: {$tenant->company_code} : {$size}");
+                $tenant->update(['current_storage_bytes' => $size]);
+                Log::info("Dispatched tenant disk size calculation for tenant: {$tenant->company_code} : {$size}");
+            } else {
+                Log::info("No path for : {$tenant->company_code}");
+            }
         });
 
         Log::info('Tenant disk size calculation dispatch completed');
