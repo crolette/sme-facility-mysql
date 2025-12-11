@@ -61,7 +61,6 @@ beforeEach(function () {
         'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
         'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
         'status' => ContractStatusEnum::ACTIVE->value,
-
     ];
 
     $this->basicAssetData = [
@@ -132,7 +131,7 @@ it('can detach a contract from a site and does not delete notice_date notificati
     $endDate = ContractDurationEnum::from(ContractDurationEnum::ONE_YEAR->value)->addTo(Carbon::now());
     $noticeDate = NoticePeriodEnum::from(NoticePeriodEnum::DEFAULT->value)->subFrom($endDate)->toDateString();
 
-    $contract = Contract::factory()->forLocation($this->building)->create([
+    $contract = Contract::factory()->forLocation($this->site)->create([
         ...$this->basicContractData,
         'contract_duration' => ContractDurationEnum::ONE_YEAR->value,
         'notice_period' => NoticePeriodEnum::DEFAULT->value,
@@ -141,10 +140,8 @@ it('can detach a contract from a site and does not delete notice_date notificati
 
     $formData = ['contract_id' => $contract->id];
 
-
     $this->deleteFromTenant('api.sites.contracts.delete', $this->site, $formData);
 
-    $contract = Contract::first();
     $preference = $this->admin->notification_preferences()->where('notification_type', 'notice_date')->first();
 
     assertDatabaseHas(
@@ -160,7 +157,6 @@ it('can detach a contract from a site and does not delete notice_date notificati
         ]
     );
 });
-
 
 it('creates notice_date notification when a contract is created at building`s creation', function ($duration, $period) {
 

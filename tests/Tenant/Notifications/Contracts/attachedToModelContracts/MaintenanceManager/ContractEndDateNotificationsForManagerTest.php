@@ -76,7 +76,6 @@ beforeEach(function () {
     ];
 });
 
-
 it('creates end_date notification for manager when a contract is created at site`s creation', function ($duration) {
 
     $formData = [
@@ -112,6 +111,153 @@ it('creates end_date notification for manager when a contract is created at site
     );
 })->with(array_column(ContractDurationEnum::cases(), 'value'));
 
+it('creates end_date notification for manager when a contract is created at building`s creation', function ($duration) {
+
+    $formData = [
+        'name' => 'New building',
+        'description' => 'Description new building',
+        'levelType' => $this->site->id,
+        'locationType' => $this->buildingType->id,
+        'maintenance_manager_id' => $this->manager->id,
+
+        'contracts' => [
+            [
+                ...$this->basicContractData,
+                'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
+            ],
+        ]
+    ];
+
+    $this->postToTenant('api.buildings.store', $formData);
+
+    $contract = Contract::first();
+    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->manager->id,
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
+            'notifiable_type' => get_class($contract),
+            'notifiable_id' => $contract->id,
+        ]
+    );
+})->with(array_column(ContractDurationEnum::cases(), 'value'));
+
+it('creates end_date notification when a contract is created at floor`s creation', function ($duration) {
+
+    $formData = [
+        'name' => 'New floor',
+        'description' => 'Description new floor',
+        'levelType' => $this->building->id,
+        'locationType' => $this->floorType->id,
+        'maintenance_manager_id' => $this->manager->id,
+
+        'contracts' => [
+            [
+                ...$this->basicContractData,
+                'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
+            ],
+        ]
+    ];
+
+    $this->postToTenant('api.floors.store', $formData);
+
+    $contract = Contract::first();
+    $preference = $this->admin->notification_preferences()->where('notification_type', 'end_date')->first();
+
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->admin->id,
+            'recipient_name' => $this->admin->fullName,
+            'recipient_email' => $this->admin->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
+            'notifiable_type' => get_class($contract),
+            'notifiable_id' => $contract->id,
+        ]
+    );
+})->with(array_column(ContractDurationEnum::cases(), 'value'));
+
+it('creates end_date notification when a contract is created at room`s creation', function ($duration) {
+
+    $formData = [
+        'name' => 'New room',
+        'description' => 'Description new room',
+        'levelType' => $this->floor->id,
+        'locationType' => $this->roomType->id,
+        'maintenance_manager_id' => $this->manager->id,
+
+        'contracts' => [
+            [
+                ...$this->basicContractData,
+                'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
+            ],
+        ]
+    ];
+
+    $this->postToTenant('api.rooms.store', $formData);
+
+    $contract = Contract::first();
+    $preference = $this->admin->notification_preferences()->where('notification_type', 'end_date')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->admin->id,
+            'recipient_name' => $this->admin->fullName,
+            'recipient_email' => $this->admin->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
+            'notifiable_type' => get_class($contract),
+            'notifiable_id' => $contract->id,
+        ]
+    );
+})->with(array_column(ContractDurationEnum::cases(), 'value'));
+
+it('creates end_date notification when a contract is created at asset`s creation', function ($duration) {
+
+    $formData = [
+        'name' => 'New asset',
+        'description' => 'Description new asset',
+        'locationId' => $this->room->id,
+        'locationType' => 'room',
+        'locationReference' => $this->room->reference_code,
+        'categoryId' => $this->assetType->id,
+        'maintenance_manager_id' => $this->manager->id,
+
+        'contracts' => [
+            [
+                ...$this->basicContractData,
+                'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
+            ],
+        ]
+    ];
+
+    $this->postToTenant('api.assets.store', $formData);
+
+    $contract = Contract::first();
+    $preference = $this->admin->notification_preferences()->where('notification_type', 'end_date')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->admin->id,
+            'recipient_name' => $this->admin->fullName,
+            'recipient_email' => $this->admin->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
+            'notifiable_type' => get_class($contract),
+            'notifiable_id' => $contract->id,
+        ]
+    );
+})->with(array_column(ContractDurationEnum::cases(), 'value'));
+
 it('creates end_date notification for manager when a contract is attached to an existing site', function ($duration) {
 
     $contract = Contract::factory()->create([
@@ -127,6 +273,138 @@ it('creates end_date notification for manager when a contract is attached to an 
     ];
 
     $response = $this->postToTenant('api.sites.contracts.post', $formData, $this->site);
+    $response->assertSessionHasNoErrors();
+
+    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->manager->id,
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
+            'notifiable_type' => get_class($contract),
+            'notifiable_id' => $contract->id,
+        ]
+    );
+})->with(array_column(ContractDurationEnum::cases(), 'value'));
+
+it('creates end_date notification for manager when a contract is attached to an existing building', function ($duration) {
+
+    $contract = Contract::factory()->create([
+        ...$this->basicContractData,
+        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
+    ]);
+
+
+    $formData = [
+        'existing_contracts' => [
+            $contract->id
+        ]
+    ];
+
+    $response = $this->postToTenant('api.buildings.contracts.post', $formData, $this->building);
+    $response->assertSessionHasNoErrors();
+
+    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->manager->id,
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
+            'notifiable_type' => get_class($contract),
+            'notifiable_id' => $contract->id,
+        ]
+    );
+})->with(array_column(ContractDurationEnum::cases(), 'value'));
+
+it('creates end_date notification for manager when a contract is attached to an existing floor', function ($duration) {
+
+    $contract = Contract::factory()->create([
+        ...$this->basicContractData,
+        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
+    ]);
+
+
+    $formData = [
+        'existing_contracts' => [
+            $contract->id
+        ]
+    ];
+
+    $response = $this->postToTenant('api.floors.contracts.post', $formData, $this->floor);
+    $response->assertSessionHasNoErrors();
+
+    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->manager->id,
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
+            'notifiable_type' => get_class($contract),
+            'notifiable_id' => $contract->id,
+        ]
+    );
+})->with(array_column(ContractDurationEnum::cases(), 'value'));
+
+it('creates end_date notification for manager when a contract is attached to an existing room', function ($duration) {
+
+    $contract = Contract::factory()->create([
+        ...$this->basicContractData,
+        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
+    ]);
+
+
+    $formData = [
+        'existing_contracts' => [
+            $contract->id
+        ]
+    ];
+
+    $response = $this->postToTenant('api.rooms.contracts.post', $formData, $this->room);
+    $response->assertSessionHasNoErrors();
+
+    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->manager->id,
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
+            'notifiable_type' => get_class($contract),
+            'notifiable_id' => $contract->id,
+        ]
+    );
+})->with(array_column(ContractDurationEnum::cases(), 'value'));
+
+it('creates end_date notification for manager when a contract is attached to an existing asset', function ($duration) {
+
+    $contract = Contract::factory()->create([
+        ...$this->basicContractData,
+        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
+    ]);
+
+
+    $formData = [
+        'existing_contracts' => [
+            $contract->id
+        ]
+    ];
+
+    $response = $this->postToTenant('api.assets.contracts.post', $formData, $this->asset);
     $response->assertSessionHasNoErrors();
 
     $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
@@ -258,131 +536,6 @@ it('does not delete end_date notification of maintenance manager when contract i
     );
 });
 
-it('deletes end_date notification of maintenance manager when contract is removed from a site and manager is not linked other ways', function () {
-
-    $formData = [
-        'name' => 'New site',
-        'description' => 'Description new site',
-        'locationType' => $this->siteType->id,
-        'maintenance_manager_id' => $this->manager->id,
-
-        'contracts' => [
-            [
-                ...$this->basicContractData,
-                'end_date' => ContractDurationEnum::from(ContractDurationEnum::ONE_YEAR->value)->addTo(Carbon::now())
-            ],
-        ]
-    ];
-
-    $this->postToTenant('api.sites.store', $formData);
-
-    $site = Site::orderBy('id', 'desc')->first();
-    $contract = Contract::first();
-
-
-    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->manager->id,
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-
-
-    $formData = ['contract_id' => $contract->id];
-
-    $this->deleteFromTenant('api.sites.contracts.delete', $site, $formData);
-
-    assertDatabaseMissing(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->manager->id,
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-});
-
-it('creates end_date notification for manager when a contract is created at building`s creation', function ($duration) {
-
-    $formData = [
-        'name' => 'New building',
-        'description' => 'Description new building',
-        'levelType' => $this->site->id,
-        'locationType' => $this->buildingType->id,
-        'maintenance_manager_id' => $this->manager->id,
-
-        'contracts' => [
-            [
-                ...$this->basicContractData,
-                'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-            ],
-        ]
-    ];
-
-    $this->postToTenant('api.buildings.store', $formData);
-
-    $contract = Contract::first();
-    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->manager->id,
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-})->with(array_column(ContractDurationEnum::cases(), 'value'));
-
-it('creates end_date notification for manager when a contract is attached to an existing building', function ($duration) {
-
-    $contract = Contract::factory()->create([
-        ...$this->basicContractData,
-        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-    ]);
-
-
-    $formData = [
-        'existing_contracts' => [
-            $contract->id
-        ]
-    ];
-
-    $response = $this->postToTenant('api.buildings.contracts.post', $formData, $this->building);
-    $response->assertSessionHasNoErrors();
-
-    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->manager->id,
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-})->with(array_column(ContractDurationEnum::cases(), 'value'));
-
 it('does not delete end_date notification of maintenance manager when contract is removed from a building but user is also maintenance manager from another asset/location where this contract is used', function () {
 
     $formData = [
@@ -497,133 +650,6 @@ it('does not delete end_date notification of maintenance manager when contract i
         ]
     );
 });
-
-it('deletes end_date notification of maintenance manager when contract is removed from a building and manager is not linked other ways', function () {
-
-    $formData = [
-        'name' => 'New building',
-        'description' => 'Description new building',
-        'levelType' => $this->site->id,
-        'locationType' => $this->buildingType->id,
-        'maintenance_manager_id' => $this->manager->id,
-
-        'contracts' => [
-            [
-                ...$this->basicContractData,
-                'end_date' => ContractDurationEnum::from(ContractDurationEnum::ONE_YEAR->value)->addTo(Carbon::now())
-            ],
-        ]
-    ];
-
-    $this->postToTenant('api.buildings.store', $formData);
-
-    $building = Building::orderBy('id', 'desc')->first();
-    $contract = Contract::first();
-
-
-    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->manager->id,
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-
-
-    $formData = ['contract_id' => $contract->id];
-
-    $this->deleteFromTenant('api.buildings.contracts.delete', $building, $formData);
-
-    assertDatabaseMissing(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->manager->id,
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-});
-
-it('creates end_date notification when a contract is created at floor`s creation', function ($duration) {
-
-    $formData = [
-        'name' => 'New floor',
-        'description' => 'Description new floor',
-        'levelType' => $this->building->id,
-        'locationType' => $this->floorType->id,
-        'maintenance_manager_id' => $this->manager->id,
-
-        'contracts' => [
-            [
-                ...$this->basicContractData,
-                'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-            ],
-        ]
-    ];
-
-    $this->postToTenant('api.floors.store', $formData);
-
-    $contract = Contract::first();
-    $preference = $this->admin->notification_preferences()->where('notification_type', 'end_date')->first();
-
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-})->with(array_column(ContractDurationEnum::cases(), 'value'));
-
-it('creates end_date notification for manager when a contract is attached to an existing floor', function ($duration) {
-
-    $contract = Contract::factory()->create([
-        ...$this->basicContractData,
-        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-    ]);
-
-
-    $formData = [
-        'existing_contracts' => [
-            $contract->id
-        ]
-    ];
-
-    $response = $this->postToTenant('api.floors.contracts.post', $formData, $this->floor);
-    $response->assertSessionHasNoErrors();
-
-    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->manager->id,
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-})->with(array_column(ContractDurationEnum::cases(), 'value'));
 
 it('does not delete end_date notification of maintenance manager when contract is removed from a floor but user is also maintenance manager from another asset/location where this contract is used', function () {
 
@@ -740,132 +766,6 @@ it('does not delete end_date notification of maintenance manager when contract i
     );
 });
 
-it('deletes end_date notification of maintenance manager when contract is removed from a floor and manager is not linked other ways', function () {
-
-    $formData = [
-        'name' => 'New floor',
-        'description' => 'Description new floor',
-        'levelType' => $this->building->id,
-        'locationType' => $this->floorType->id,
-        'maintenance_manager_id' => $this->manager->id,
-
-        'contracts' => [
-            [
-                ...$this->basicContractData,
-                'end_date' => ContractDurationEnum::from(ContractDurationEnum::ONE_YEAR->value)->addTo(Carbon::now())
-            ],
-        ]
-    ];
-
-    $this->postToTenant('api.floors.store', $formData);
-
-    $floor = Floor::orderBy('id', 'desc')->first();
-    $contract = Contract::first();
-
-
-    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->manager->id,
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-
-
-    $formData = ['contract_id' => $contract->id];
-
-    $this->deleteFromTenant('api.floors.contracts.delete', $floor, $formData);
-
-    assertDatabaseMissing(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->manager->id,
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-});
-
-it('creates end_date notification when a contract is created at room`s creation', function ($duration) {
-
-    $formData = [
-        'name' => 'New room',
-        'description' => 'Description new room',
-        'levelType' => $this->floor->id,
-        'locationType' => $this->roomType->id,
-        'maintenance_manager_id' => $this->manager->id,
-
-        'contracts' => [
-            [
-                ...$this->basicContractData,
-                'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-            ],
-        ]
-    ];
-
-    $this->postToTenant('api.rooms.store', $formData);
-
-    $contract = Contract::first();
-    $preference = $this->admin->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-})->with(array_column(ContractDurationEnum::cases(), 'value'));
-
-it('creates end_date notification for manager when a contract is attached to an existing room', function ($duration) {
-
-    $contract = Contract::factory()->create([
-        ...$this->basicContractData,
-        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-    ]);
-
-
-    $formData = [
-        'existing_contracts' => [
-            $contract->id
-        ]
-    ];
-
-    $response = $this->postToTenant('api.rooms.contracts.post', $formData, $this->room);
-    $response->assertSessionHasNoErrors();
-
-    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->manager->id,
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-})->with(array_column(ContractDurationEnum::cases(), 'value'));
-
 it('does not delete end_date notification of maintenance manager when contract is removed from a room but user is also maintenance manager from another asset/location where this contract is used', function () {
 
     $formData = [
@@ -980,134 +880,6 @@ it('does not delete end_date notification of maintenance manager when contract i
         ]
     );
 });
-
-it('deletes end_date notification of maintenance manager when contract is removed from a room and manager is not linked other ways', function () {
-
-    $formData = [
-        'name' => 'New room',
-        'description' => 'Description new room',
-        'levelType' => $this->floor->id,
-        'locationType' => $this->roomType->id,
-        'maintenance_manager_id' => $this->manager->id,
-
-        'contracts' => [
-            [
-                ...$this->basicContractData,
-                'end_date' => ContractDurationEnum::from(ContractDurationEnum::ONE_YEAR->value)->addTo(Carbon::now())
-            ],
-        ]
-    ];
-
-    $this->postToTenant('api.rooms.store', $formData);
-
-    $room = Room::orderBy('id', 'desc')->first();
-    $contract = Contract::first();
-
-
-    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->manager->id,
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-
-
-    $formData = ['contract_id' => $contract->id];
-
-    $this->deleteFromTenant('api.rooms.contracts.delete', $room, $formData);
-
-    assertDatabaseMissing(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->manager->id,
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-});
-
-it('creates end_date notification when a contract is created at asset`s creation', function ($duration) {
-
-    $formData = [
-        'name' => 'New asset',
-        'description' => 'Description new asset',
-        'locationId' => $this->room->id,
-        'locationType' => 'room',
-        'locationReference' => $this->room->reference_code,
-        'categoryId' => $this->assetType->id,
-        'maintenance_manager_id' => $this->manager->id,
-
-        'contracts' => [
-            [
-                ...$this->basicContractData,
-                'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-            ],
-        ]
-    ];
-
-    $this->postToTenant('api.assets.store', $formData);
-
-    $contract = Contract::first();
-    $preference = $this->admin->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-})->with(array_column(ContractDurationEnum::cases(), 'value'));
-
-it('creates end_date notification for manager when a contract is attached to an existing asset', function ($duration) {
-
-    $contract = Contract::factory()->create([
-        ...$this->basicContractData,
-        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-    ]);
-
-
-    $formData = [
-        'existing_contracts' => [
-            $contract->id
-        ]
-    ];
-
-    $response = $this->postToTenant('api.assets.contracts.post', $formData, $this->asset);
-    $response->assertSessionHasNoErrors();
-
-    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->manager->id,
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-})->with(array_column(ContractDurationEnum::cases(), 'value'));
 
 it('does not delete end_date notification of maintenance manager when contract is removed from an asset but user is also maintenance manager from another asset/location where this contract is used', function () {
 
@@ -1228,7 +1000,234 @@ it('does not delete end_date notification of maintenance manager when contract i
     );
 });
 
-it('deletes end_date notification of maintenance manager when contract is removed from an asset and manager is not linked other ways', function () {
+it('deletes end_date notification of maintenance manager when contract is removed from a site and manager is not linked to other assets/locations with the same contract', function () {
+
+    $formData = [
+        'name' => 'New site',
+        'description' => 'Description new site',
+        'locationType' => $this->siteType->id,
+        'maintenance_manager_id' => $this->manager->id,
+
+        'contracts' => [
+            [
+                ...$this->basicContractData,
+                'end_date' => ContractDurationEnum::from(ContractDurationEnum::ONE_YEAR->value)->addTo(Carbon::now())
+            ],
+        ]
+    ];
+
+    $this->postToTenant('api.sites.store', $formData);
+
+    $site = Site::orderBy('id', 'desc')->first();
+    $contract = Contract::first();
+
+
+    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->manager->id,
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
+            'notifiable_type' => get_class($contract),
+            'notifiable_id' => $contract->id,
+        ]
+    );
+
+
+    $formData = ['contract_id' => $contract->id];
+
+    $this->deleteFromTenant('api.sites.contracts.delete', $site, $formData);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->manager->id,
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
+            'notifiable_type' => get_class($contract),
+            'notifiable_id' => $contract->id,
+        ]
+    );
+});
+
+it('deletes end_date notification of maintenance manager when contract is removed from a building and manager is not linked to other assets/locations with the same contract', function () {
+
+    $formData = [
+        'name' => 'New building',
+        'description' => 'Description new building',
+        'levelType' => $this->site->id,
+        'locationType' => $this->buildingType->id,
+        'maintenance_manager_id' => $this->manager->id,
+
+        'contracts' => [
+            [
+                ...$this->basicContractData,
+                'end_date' => ContractDurationEnum::from(ContractDurationEnum::ONE_YEAR->value)->addTo(Carbon::now())
+            ],
+        ]
+    ];
+
+    $this->postToTenant('api.buildings.store', $formData);
+
+    $building = Building::orderBy('id', 'desc')->first();
+    $contract = Contract::first();
+
+
+    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->manager->id,
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
+            'notifiable_type' => get_class($contract),
+            'notifiable_id' => $contract->id,
+        ]
+    );
+
+
+    $formData = ['contract_id' => $contract->id];
+
+    $this->deleteFromTenant('api.buildings.contracts.delete', $building, $formData);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->manager->id,
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
+            'notifiable_type' => get_class($contract),
+            'notifiable_id' => $contract->id,
+        ]
+    );
+});
+
+it('deletes end_date notification of maintenance manager when contract is removed from a floor and manager is not linked to other assets/locations with the same contract', function () {
+
+    $formData = [
+        'name' => 'New floor',
+        'description' => 'Description new floor',
+        'levelType' => $this->building->id,
+        'locationType' => $this->floorType->id,
+        'maintenance_manager_id' => $this->manager->id,
+
+        'contracts' => [
+            [
+                ...$this->basicContractData,
+                'end_date' => ContractDurationEnum::from(ContractDurationEnum::ONE_YEAR->value)->addTo(Carbon::now())
+            ],
+        ]
+    ];
+
+    $this->postToTenant('api.floors.store', $formData);
+
+    $floor = Floor::orderBy('id', 'desc')->first();
+    $contract = Contract::first();
+
+
+    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->manager->id,
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
+            'notifiable_type' => get_class($contract),
+            'notifiable_id' => $contract->id,
+        ]
+    );
+
+
+    $formData = ['contract_id' => $contract->id];
+
+    $this->deleteFromTenant('api.floors.contracts.delete', $floor, $formData);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->manager->id,
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
+            'notifiable_type' => get_class($contract),
+            'notifiable_id' => $contract->id,
+        ]
+    );
+});
+
+it('deletes end_date notification of maintenance manager when contract is removed from a room and manager is not linked to other assets/locations with the same contract', function () {
+
+    $formData = [
+        'name' => 'New room',
+        'description' => 'Description new room',
+        'levelType' => $this->floor->id,
+        'locationType' => $this->roomType->id,
+        'maintenance_manager_id' => $this->manager->id,
+
+        'contracts' => [
+            [
+                ...$this->basicContractData,
+                'end_date' => ContractDurationEnum::from(ContractDurationEnum::ONE_YEAR->value)->addTo(Carbon::now())
+            ],
+        ]
+    ];
+
+    $this->postToTenant('api.rooms.store', $formData);
+
+    $room = Room::orderBy('id', 'desc')->first();
+    $contract = Contract::first();
+
+
+    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
+
+    assertDatabaseHas(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->manager->id,
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
+            'notifiable_type' => get_class($contract),
+            'notifiable_id' => $contract->id,
+        ]
+    );
+
+
+    $formData = ['contract_id' => $contract->id];
+
+    $this->deleteFromTenant('api.rooms.contracts.delete', $room, $formData);
+
+    assertDatabaseMissing(
+        'scheduled_notifications',
+        [
+            'user_id' => $this->manager->id,
+            'recipient_name' => $this->manager->fullName,
+            'recipient_email' => $this->manager->email,
+            'notification_type' => 'end_date',
+            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
+            'notifiable_type' => get_class($contract),
+            'notifiable_id' => $contract->id,
+        ]
+    );
+});
+
+it('deletes end_date notification of maintenance manager when contract is removed from an asset and manager is not linked to other assets/locations with the same contract', function () {
 
     $formData = [
         'name' => 'New asset',

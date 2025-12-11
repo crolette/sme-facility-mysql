@@ -18,8 +18,8 @@ class MaintainableObserver implements ShouldHandleEventsAfterCommit
 
     public function updated(Maintainable $maintainable)
     {
-        Debugbar::info('--- MAINTAINABLE OBERSERVER UPDATED ---');
-        debugbar::info($maintainable->getChanges());
+        // Debugbar::info('--- MAINTAINABLE OBERSERVER UPDATED ---');
+        // Debugbar::info($maintainable->getChanges());
         app(MaintainableNotificationSchedulingService::class)->updateScheduleOfMaintainable($maintainable);
     }
 }

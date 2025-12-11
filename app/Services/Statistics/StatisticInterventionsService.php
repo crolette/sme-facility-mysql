@@ -35,6 +35,7 @@ class StatisticInterventionsService
     public function getByAssignee($filters = [])
     {
         $interventionsByAssignee = Intervention::query()
+            ->whereHas('assignable')
             ->forMaintenanceManager()
             ->withoutGlobalScope('ancient')
             ->where('created_at', '>', $filters['date_from'])->where('created_at', '<', $filters['date_to'])
@@ -46,10 +47,10 @@ class StatisticInterventionsService
             if ($item->assignable_type) {
                 $assignable = $item->assignable_type::find($item->assignable_id);
                 return [
-                    'id' => $assignable->id,
+                    'id' => $assignable?->id,
                     'name' => $assignable?->first_name ? $assignable?->full_name : $assignable->name ?? 'Unknown',
                     'type' => class_basename($item->assignable_type),
-                    'picture' => class_basename($item->assignable_type) === 'User' ? $assignable->avatar : $assignable->logo,
+                    'picture' => class_basename($item->assignable_type) === 'User' ? $assignable?->avatar : $assignable->logo,
                     'count' => $item->count
                 ];
             } else {

@@ -42,9 +42,10 @@ class MaintainableService
             $maintainable->manager()->associate($data['maintenance_manager_id'])->save();
         }
 
-        if ($maintainable->manager && !isset($data['maintenance_manager_id']))
-            if ($maintainable->manager && !isset($data['maintenance_manager_id']))
-                $maintainable->manager()->dissociate();
+        if ($maintainable->manager && !isset($data['maintenance_manager_id'])) {
+            app(MaintainableNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($maintainable, $maintainable->manager);
+            $maintainable->manager()->dissociate();
+        }
 
         if (isset($data['maintenance_manager_id']) && ($maintainable->manager?->id !== $data['maintenance_manager_id'])) {
             app(MaintainableNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($maintainable, $maintainable->manager);

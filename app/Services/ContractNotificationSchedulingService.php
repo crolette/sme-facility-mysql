@@ -7,6 +7,7 @@ use App\Models\Tenants\User;
 use App\Models\Tenants\Contract;
 use App\Enums\ContractStatusEnum;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Database\Eloquent\Model;
 use App\Models\Tenants\ScheduledNotification;
 use App\Enums\ScheduledNotificationStatusEnum;
 use App\Models\Tenants\UserNotificationPreference;
@@ -242,19 +243,15 @@ class ContractNotificationSchedulingService
         if ($manager->hasRole('Admin'))
             return;
 
-
         // check if the user is maintenance manager for other asset/location on which the contract is linked or if he is admin
         if (!$contract->contractables->pluck('contractable.manager')->pluck('id')->contains($manager->id))
             $this->removeNotificationsForOldMaintenanceManager($contract, $manager);
     }
 
-    //     $notifications = Contract::notifications()->where('')
-    // }
-
-    public function removeNotificationsForOldMaintenanceManager(Contract $contract, User $user)
+    public function removeNotificationsForOldMaintenanceManager(Model $modelWithNotifictions, User $user)
     {
         // dump('--- removeNotificationsForOldMaintenanceManager ---');
-        $notifications = $contract->notifications()->where('user_id', $user->id)->where('status', 'pending')->get();
+        $notifications = $modelWithNotifictions->notifications()->where('user_id', $user->id)->where('status', 'pending')->get();
 
         if (count($notifications) > 0)
             foreach ($notifications as $notification) {

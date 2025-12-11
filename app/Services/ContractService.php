@@ -29,7 +29,6 @@ class ContractService
     public function createWithModel(Model $model, $request): void
     {
 
-        // dump('createWithModel');
         foreach ($request as $key => $contractRequest) {
             $contract = new Contract([...$contractRequest]);
 
@@ -100,12 +99,13 @@ class ContractService
 
     public function detachContractFromModel(Contract $contract, Model $model): void
     {
+        // dump('detachContractFromModel');
+
         $toDelete = Contractable::where([
             'contract_id' => $contract->id,
             'contractable_id' => $model->id,
             'contractable_type' => $model->getMorphClass(),
         ])->first();
-
 
         if ($toDelete)
             $toDelete->delete();
