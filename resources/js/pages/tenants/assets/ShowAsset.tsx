@@ -317,6 +317,7 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                 routeName="assets"
                                 parameter="asset"
                                 removable
+                                canAdd={asset.deleted_at == null ? true : false}
                                 // onContractsChange={updateContracts}
                             />
                         )}
