@@ -104,6 +104,7 @@ class Asset extends Model
             $asset->maintainable()->delete();
             $asset->tickets()->delete();
             $asset->pictures()->delete();
+            $asset->notifications()->delete();
         });
     }
 
