@@ -97,6 +97,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
                 'depreciation_end_date',
                 'depreciation_duration',
                 'residual_value',
+                'accounting_reference',
                 'surface',
                 'purchase_date',
                 'purchase_cost',
@@ -135,6 +136,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
                 __('assets.depreciation_end_date'),
                 __('assets.depreciation_duration'),
                 __('assets.residual_value'),
+                __('assets.accounting_reference'),
                 __('common.surface') . ' (m²)',
                 __('assets.purchase_date'),
                 __('assets.purchase_cost'),
@@ -157,9 +159,9 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
             'U' => NumberFormat::FORMAT_DATE_DDMMYYYY,
             'Y' => NumberFormat::FORMAT_DATE_DDMMYYYY,
             'Z' => NumberFormat::FORMAT_DATE_DDMMYYYY,
-            'AB' => NumberFormat::FORMAT_DATE_DDMMYYYY,
-            'AE' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'AC' => NumberFormat::FORMAT_DATE_DDMMYYYY,
             'AF' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'AG' => NumberFormat::FORMAT_DATE_DDMMYYYY,
         ];
     }
 
@@ -169,10 +171,12 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $protection->setPassword('SME_2025!fwebxp');
         $protection->setSheet(true);
 
+        $sheet->getColumnDimension('A')->setWidth(25);
+        $sheet->getColumnDimension('A')->setWidth(15);
         $sheet->getColumnDimension('C')->setWidth(35);
         $sheet->getColumnDimension('D')->setWidth(35);
         $sheet->getColumnDimension('E')->setWidth(30);
-        $sheet->getColumnDimension('F')->setWidth(20);
+        $sheet->getColumnDimension('F')->setWidth(25);
         $sheet->getColumnDimension('G')->setWidth(15);
         $sheet->getColumnDimension('H')->setWidth(40);
         $sheet->getColumnDimension('I')->setWidth(40);
@@ -200,13 +204,14 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $sheet->getColumnDimension('AE')->setWidth(30);
         $sheet->getColumnDimension('AF')->setWidth(30);
         $sheet->getColumnDimension('AG')->setWidth(30);
+        $sheet->getColumnDimension('AH')->setWidth(30);
 
 
-        $sheet->getStyle('C3:AD9999')->getProtection()
+        $sheet->getStyle('C3:AH9999')->getProtection()
             ->setLocked(\PhpOffice\PhpSpreadsheet\Style\Protection::PROTECTION_UNPROTECTED);
 
         $sheet->getRowDimension('1')->setRowHeight(0);
-        $sheet->getColumnDimension('AH')->setVisible(false);
+        $sheet->getColumnDimension('AI')->setVisible(false);
         $sheet->freezePane('E3');
 
         $categories = CategoryType::where('category', 'asset')->get()->pluck('label');
@@ -255,8 +260,11 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         // Depreciable ?
         $sheet->setDataValidation('S3:S9999', clone $validation);
 
+        // // Need maintenance ?
+        // $sheet->setDataValidation('S3:S9999', clone $validation);
 
 
+        // name
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
         $conditional->addCondition('OR(AND($C3<>"",ISBLANK($C3)),AND($B3<>"",ISBLANK($C3)))');
@@ -265,6 +273,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
             ->getStartColor()->setARGB('FFFF0000');
         $sheet->getStyle('C3:C9999')->setConditionalStyles([$conditional]);
 
+        //description
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
         $conditional->addCondition('OR(AND($C3<>"",ISBLANK($D3)),AND($B3<>"",ISBLANK($D3)))');
@@ -273,7 +282,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
             ->getStartColor()->setARGB('FFFF0000');
         $sheet->getStyle('D3:D9999')->setConditionalStyles([$conditional]);
 
-
+        // category
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
         $conditional->addCondition('OR(AND($C3<>"",ISBLANK($E3)),AND($B3<>"",ISBLANK($E3)))');
@@ -282,6 +291,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
             ->getStartColor()->setARGB('FFFF0000');
         $sheet->getStyle('E3:E9999')->setConditionalStyles([$conditional]);
 
+        // need qr code
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
         $conditional->addCondition('OR(AND($C3<>"",ISBLANK($F3)),AND($B3<>"",ISBLANK($F3)))');
@@ -290,6 +300,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
             ->getStartColor()->setARGB('FFFF0000');
         $sheet->getStyle('F3:F9999')->setConditionalStyles([$conditional]);
 
+        // mobile asset
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
         $conditional->addCondition('OR(AND($C3<>"",ISBLANK($G3)),AND($B3<>"",ISBLANK($G3)))');
@@ -318,28 +329,28 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $sheet->getStyle('V3:V9999')->setConditionalStyles([$conditional]);
 
         // Under warranty
-        $sheet->setDataValidation('AA3:AA9999', clone $validation);
+        $sheet->setDataValidation('AB3:AB9999', clone $validation);
 
         // Conditional formatting on end_warranty_date
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
-        $conditional->addCondition('AND($AA3="Yes",ISBLANK($AA3))');
+        $conditional->addCondition('AND($AB3="Yes",ISBLANK($AC3))');
         $conditional->getStyle()->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFF0000');
-        $sheet->getStyle('AB3:AB9999')->setConditionalStyles([$conditional]);
+        $sheet->getStyle('AC3:AC9999')->setConditionalStyles([$conditional]);
 
         //Need maintenance
-        $sheet->setDataValidation('AC3:AC9999', clone $validation);
+        $sheet->setDataValidation('AD3:AD9999', clone $validation);
 
         // Conditional formatting on maintenance_frequency
         $conditional = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
-        $conditional->addCondition('AND($AC3="Yes",ISBLANK($AC3))');
+        $conditional->addCondition('AND($AD3="Yes",ISBLANK($AE3))');
         $conditional->getStyle()->getFill()
             ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
             ->getStartColor()->setARGB('FFFF0000');
-        $sheet->getStyle('AD3:AD9999')->setConditionalStyles([$conditional]);
+        $sheet->getStyle('AE3:AE9999')->setConditionalStyles([$conditional]);
 
 
         // Site
@@ -372,7 +383,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         // Users
         $validation->setFormula1('users');
         $sheet->setDataValidation('L3:L9999', clone $validation);
-        $sheet->setDataValidation('AG3:AG9999', clone $validation);
+        $sheet->setDataValidation('AH3:AH9999', clone $validation);
 
         $conditional1 = new \PhpOffice\PhpSpreadsheet\Style\Conditional();
         $conditional1->setConditionType(\PhpOffice\PhpSpreadsheet\Style\Conditional::CONDITION_EXPRESSION);
@@ -395,11 +406,11 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
 
         $sheet->getStyle('L3:L9999')->setConditionalStyles([$conditional2]);
 
-        // Maintenance Frequency
+        // Maintenance Frequency List
         $frequencies = collect(array_column(MaintenanceFrequency::cases(), 'value'));
         $frequenciesList = $frequencies->join(',');
 
-        $validation = $sheet->getDataValidation('AD3');
+        $validation = $sheet->getDataValidation('AE3');
         $validation->setType(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::TYPE_LIST);
         $validation->setErrorStyle(\PhpOffice\PhpSpreadsheet\Cell\DataValidation::STYLE_STOP);
         $validation->setAllowBlank(false);
@@ -412,7 +423,7 @@ class AssetsSheet implements FromQuery, WithMapping, Responsable, WithHeadings, 
         $validation->setPrompt('Please pick a value from the drop-down list.');
         $validation->setFormula1('"' . $frequenciesList . '"');
 
-        $sheet->setDataValidation('AD3:AD9999', clone $validation);
+        $sheet->setDataValidation('AE3:AE9999', clone $validation);
 
         // Meter units
         $meterUnits = collect(array_column(MeterReadingsUnits::cases(), 'value'));

@@ -30,6 +30,7 @@ return [
     'depreciation_end_date' => 'Enddatum der Abschreibung',
     'residual_value' => 'Restwert',
     'residual_value_placeholder' => 'Restwert nach Ende der Abschreibung (max. 2 Dezimalstellen) : 4236.36',
+    'accounting_reference' => 'Buchhaltungsreferenz',
     'still_under_warranty' => 'Noch unter Garantie',
     'purchase_warranty' => 'Kauf/Garantie',
     'purchase_date' => 'Kaufdatum',

@@ -30,7 +30,9 @@ return [
     'depreciation_end_date' => 'Einddatum afschrijving',
     'residual_value' => 'Restwaarde',
     'residual_value_placeholder' => 'Restwaarde na einde afschrijving (max. 2 decimalen) : 4236.36',
+    'accounting_reference' => 'Boekhoudkundige ref.',
     'still_under_warranty' => 'Nog onder garantie',
+
     'purchase_warranty' => 'Aankoop/Garantie',
     'purchase_date' => 'Aankoopdatum',
     'purchase_date_placeholder' => 'Datum van aankoop',

@@ -30,6 +30,7 @@ return [
     'depreciation_end_date' => 'Date de fin d\'amortissement',
     'residual_value' => 'Valeur résiduelle',
     'residual_value_placeholder' => 'Valeur résiduelle après fin d\'amortissement (max. 2 décimales) : 4236.36',
+    'accounting_reference' => 'Référence comptable',
     'still_under_warranty' => 'Toujours sous garantie',
     'purchase_warranty' => 'Achat/Garantie',
     'purchase_date' => 'Date d\'achat',

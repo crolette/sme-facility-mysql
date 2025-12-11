@@ -141,7 +141,7 @@ export default function Pricing() {
                             </div>
                             <div className="flex flex-col gap-6 rounded-md border p-6 sm:col-span-2 lg:col-auto lg:p-10">
                                 <Factory size={36} className="mx-auto" />
-                                <h3 className="text-center">Entreprise</h3>
+                                <h3 className="text-center">Custom</h3>
                                 <div className="text-center">
                                     <p>{t('website_pricing.offer')}</p>
                                     <p className={'text-2xl font-extrabold'}>{t('website_pricing.on_demand')}</p>

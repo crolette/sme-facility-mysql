@@ -54,6 +54,7 @@ class AssetExportImportService
                 ? $asset->depreciation_end_date->format('Y-m-d')
                 : null,
             "depreciation_duration" => $asset->depreciation_duration,
+            "accounting_reference" => $asset->accounting_reference,
             "residual_value" => $asset->residual_value
                 ? (float) $asset->residual_value
                 : null,
@@ -107,6 +108,7 @@ class AssetExportImportService
             "depreciation_start_date" => $asset->depreciation_start_date ? Date::dateTimeToExcel($asset->depreciation_start_date) : null,
             "depreciation_end_date" => $asset->depreciation_end_date ? Date::dateTimeToExcel($asset->depreciation_end_date) : null,
             "depreciation_duration" => $asset->depreciation_duration,
+            "accounting_reference" => $asset->accounting_reference,
             "residual_value" => $asset->residual_value  ? (float) $asset->residual_value : null,
             "surface" => $asset->surface ? (float) $asset->surface : null,
             "purchase_date" => $asset->maintainable->purchase_date ? Date::dateTimeToExcel($asset->maintainable->purchase_date) : null,

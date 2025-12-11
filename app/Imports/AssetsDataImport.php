@@ -105,6 +105,8 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
             'depreciation_end_date' => $rowData['depreciation_end_date'] ?? null,
             'depreciation_duration' => $rowData['depreciation_duration'] ?? null,
             'residual_value' => $rowData['residual_value'] ?? null,
+            'accounting_reference' => $rowData['accounting_reference'] ?? null,
+
 
         ];
 
@@ -159,6 +161,7 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
             $data['depreciation_end_date'] = null;
             $data['depreciation_duration'] = null;
             $data['residual_value'] = null;
+            $data['accounting_reference'] = null;
         } else {
             $startDate = Carbon::instance(Date::excelToDateTimeObject($data['depreciation_start_date']));
             $data['depreciation_start_date'] = $startDate->format('Y-m-d');
@@ -216,6 +219,7 @@ class AssetsDataImport implements ToCollection, WithHeadingRow, SkipsEmptyRows, 
             "depreciation_start_date" => 'nullable|date|required_if_accepted:depreciable',
             "depreciation_end_date" => 'nullable|date',
             "depreciation_duration" => 'nullable|required_with:depreciation_start_date|numeric|gt:0',
+            "accounting_reference" => 'nullable|string|max:25',
 
             'name' => 'required|string|min:4|max:100',
             'description' => 'required|string|min:10|max:255',
