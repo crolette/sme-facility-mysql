@@ -15,6 +15,7 @@ class ContractNotificationSchedulingService
 {
     public function scheduleForContract(Contract $contract)
     {
+        // dump('schedule for contract');
         if ($contract->status === ContractStatusEnum::ACTIVE) {
             $users = User::role('Admin')->get();
 
@@ -235,6 +236,20 @@ class ContractNotificationSchedulingService
             }
         }
     }
+
+    public function removeNotificationsForMaintenanceManagerWhenContractIsDetached(Contract $contract, User $manager)
+    {
+        if ($manager->hasRole('Admin'))
+            return;
+
+
+        // check if the user is maintenance manager for other asset/location on which the contract is linked or if he is admin
+        if (!$contract->contractables->pluck('contractable.manager')->pluck('id')->contains($manager->id))
+            $this->removeNotificationsForOldMaintenanceManager($contract, $manager);
+    }
+
+    //     $notifications = Contract::notifications()->where('')
+    // }
 
     public function removeNotificationsForOldMaintenanceManager(Contract $contract, User $user)
     {

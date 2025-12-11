@@ -110,7 +110,7 @@ it('can create a contract and attach asset and locations', function () {
     ]);
 
     $contract = Contract::find(1);
-    expect(count($contract->contractables()))->toBe(5);
+    expect(count($contract->contractables))->toBe(5);
 
     assertDatabaseCount('contractables', 5);
     expect(count($this->asset->contracts))->toBe(1);
@@ -124,7 +124,7 @@ it('can update a contract and sync assets and locations to add', function () {
     $contract =  Contract::factory()->forLocation($this->asset)->create();
 
     $contract = Contract::find(1);
-    expect(count($contract->contractables()))->toBe(1);
+    expect(count($contract->contractables))->toBe(1);
 
     assertDatabaseCount('contractables', 1);
     expect(count($this->asset->contracts))->toBe(1);
@@ -151,7 +151,7 @@ it('can update a contract and sync assets and locations to add', function () {
     ]);
 
     $contract = Contract::find(1);
-    expect(count($contract->contractables()))->toBe(5);
+    expect(count($contract->contractables))->toBe(5);
 
     assertDatabaseCount('contractables', 5);
     expect(count($this->asset->contracts))->toBe(1);
@@ -510,4 +510,122 @@ it('can detach a contract from an asset', function () {
     );
 
     assertEquals(1, $this->asset->contracts()->count());
+});
+
+
+
+// ADD EXISTING CONTRACT TO EXISTING ASSET/LOCATION
+it('can add attach an existing contract to a site', function () {
+
+    $contract = Contract::factory()->create([
+        ...$this->contractOneData,
+        'end_date' => ContractDurationEnum::from(ContractDurationEnum::ONE_YEAR->value)->addTo(Carbon::now())
+    ]);
+
+    $formData = [
+        'existing_contracts' => [
+            $contract->id
+        ]
+    ];
+
+    $response = $this->postToTenant('api.sites.contracts.post', $formData, $this->site);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseHas('contractables', [
+        'contract_id' => $contract->id,
+        'contractable_id' => $this->site->id,
+        'contractable_type' => get_class($this->site)
+    ]);
+});
+
+it('can add attach an existing contract to a building', function () {
+
+    $contract = Contract::factory()->create([
+        ...$this->contractOneData,
+        'end_date' => ContractDurationEnum::from(ContractDurationEnum::ONE_YEAR->value)->addTo(Carbon::now())
+    ]);
+
+    $formData = [
+        'existing_contracts' => [
+            $contract->id
+        ]
+    ];
+
+    $response = $this->postToTenant('api.buildings.contracts.post', $formData, $this->building);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseHas('contractables', [
+        'contract_id' => $contract->id,
+        'contractable_id' => $this->building->id,
+        'contractable_type' => get_class($this->building)
+    ]);
+});
+
+it('can add attach an existing contract to a floor', function () {
+
+    $contract = Contract::factory()->create([
+        ...$this->contractOneData,
+        'end_date' => ContractDurationEnum::from(ContractDurationEnum::ONE_YEAR->value)->addTo(Carbon::now())
+    ]);
+
+    $formData = [
+        'existing_contracts' => [
+            $contract->id
+        ]
+    ];
+
+    $response = $this->postToTenant('api.floors.contracts.post', $formData, $this->floor);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseHas('contractables', [
+        'contract_id' => $contract->id,
+        'contractable_id' => $this->floor->id,
+        'contractable_type' => get_class($this->floor)
+    ]);
+});
+
+it('can add attach an existing contract to a room', function () {
+
+    $contract = Contract::factory()->create([
+        ...$this->contractOneData,
+        'end_date' => ContractDurationEnum::from(ContractDurationEnum::ONE_YEAR->value)->addTo(Carbon::now())
+    ]);
+
+    $formData = [
+        'existing_contracts' => [
+            $contract->id
+        ]
+    ];
+
+    $response = $this->postToTenant('api.rooms.contracts.post', $formData, $this->room);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseHas('contractables', [
+        'contract_id' => $contract->id,
+        'contractable_id' => $this->room->id,
+        'contractable_type' => get_class($this->room)
+    ]);
+});
+
+it('can add attach an existing contract to an asset', function () {
+
+    $contract = Contract::factory()->create([
+        ...$this->contractOneData,
+        'end_date' => ContractDurationEnum::from(ContractDurationEnum::ONE_YEAR->value)->addTo(Carbon::now())
+    ]);
+
+    $formData = [
+        'existing_contracts' => [
+            $contract->id
+        ]
+    ];
+
+    $response = $this->postToTenant('api.assets.contracts.post', $formData, $this->asset);
+    $response->assertSessionHasNoErrors();
+
+    assertDatabaseHas('contractables', [
+        'contract_id' => $contract->id,
+        'contractable_id' => $this->asset->id,
+        'contractable_type' => get_class($this->asset)
+    ]);
 });

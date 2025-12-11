@@ -164,7 +164,7 @@ it('does not change manual contract status if end_date < now & status != active'
     ]);
 });
 
-it('extends an automatic contract if end_date < now & status is active', function ($duration) {
+it('extends an automatic contract if end_date < now & status is active for duration', function ($duration) {
 
     $expiredContract = Contract::factory()->create([...$this->automaticContract, 'contract_duration' => $duration, 'start_date' => Carbon::now()->subYear(), 'end_date' => Carbon::yesterday(),]);
     $cancelledContract = Contract::factory()->create([...$this->automaticContract, 'start_date' => Carbon::now()->subYear(), 'end_date' => Carbon::yesterday(), 'status' => ContractStatusEnum::CANCELLED]);

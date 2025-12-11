@@ -29,6 +29,7 @@ class ContractService
     public function createWithModel(Model $model, $request): void
     {
 
+        // dump('createWithModel');
         foreach ($request as $key => $contractRequest) {
             $contract = new Contract([...$contractRequest]);
 
@@ -88,6 +89,8 @@ class ContractService
 
     public function attachContractToModel(Contract $contract, Model $model): void
     {
+        // dump('attachContractToModel');
+
         Contractable::create([
             'contract_id' => $contract->id,
             'contractable_id' => $model->id,
@@ -103,7 +106,9 @@ class ContractService
             'contractable_type' => $model->getMorphClass(),
         ])->first();
 
-        $toDelete->delete();
+
+        if ($toDelete)
+            $toDelete->delete();
     }
 
 
