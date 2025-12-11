@@ -52,7 +52,7 @@ beforeEach(function () {
         'provider_reference' => 'Provider reference 2025',
         'start_date' => Carbon::now()->toDateString(),
         'contract_duration' => ContractDurationEnum::ONE_MONTH->value,
-        'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
+        // 'notice_period' => NoticePeriodEnum::FOURTEEN_DAYS->value,
         'renewal_type' => ContractRenewalTypesEnum::AUTOMATIC->value,
         'status' => ContractStatusEnum::ACTIVE->value,
         'contractables' => [
@@ -70,164 +70,7 @@ beforeEach(function () {
     ];
 });
 
-// it('creates the end_date notification for the admin for a new created contract for an asset only for contract where end_date > now', function ($duration) {
 
-//     $preference = $this->admin->notification_preferences()->where('notification_type', 'end_date')->first();
-
-//     $contractOne = Contract::factory()->forLocation($this->asset)->create([
-//         'contract_duration' => $duration,
-//         'start_date' => Carbon::now(),
-//         'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-//     ]);
-
-//     $contractTwo = Contract::factory()->forLocation($this->asset)->create([
-//         'contract_duration' => $duration,
-//         'start_date' => Carbon::now()->subYears(2),
-//         'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now()->subYears(2))
-//     ]);
-
-//     assertDatabaseCount('scheduled_notifications', 1);
-
-//     $contract = Contract::first();
-
-//     assertDatabaseHas(
-//         'scheduled_notifications',
-//         [
-//             'user_id' => $this->admin->id,
-//             'recipient_name' => $this->admin->fullName,
-//             'recipient_email' => $this->admin->email,
-//             'notification_type' => 'end_date',
-//             'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-//             'notifiable_type' => get_class($contractOne),
-//             'notifiable_id' => $contractOne->id,
-//         ]
-//     );
-
-//     assertDatabaseMissing(
-//         'scheduled_notifications',
-//         [
-//             'user_id' => $this->admin->id,
-//             'recipient_name' => $this->admin->fullName,
-//             'recipient_email' => $this->admin->email,
-//             'notification_type' => 'end_date',
-//             'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-//             'notifiable_type' => get_class($contractTwo),
-//             'notifiable_id' => $contractTwo->id,
-//         ]
-//     );
-// })->with(array_column(ContractDurationEnum::cases(), 'value'));
-
-it('creates the end_date notification for the maintenance manager for a new created contract for an asset only for contract where end_date > now', function ($duration) {
-
-    $this->asset->maintainable()->update(['maintenance_manager_id' => $this->manager->id]);
-
-    $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    // $formData = [
-    //     ...$this->basicContractData,
-    //     'contract_duration' => $duration
-    // ];
-
-    // $this->postToTenant('api.contracts.store', $formData);
-
-    // $formData = [
-    //     ...$this->basicContractData,
-    //     'contract_duration' => $duration,
-    //     'start_date' => Carbon::now()->subYears(2)->toDateString(),
-    //     'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now()->subYears(2))
-    // ];
-
-    // $this->postToTenant('api.contracts.store', $formData);
-
-    $contractOne = Contract::factory()->forLocation($this->asset)->create([
-        'contract_duration' => $duration,
-        'start_date' => Carbon::now(),
-        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-    ]);
-
-    $contractTwo = Contract::factory()->forLocation($this->asset)->create([
-        'contract_duration' => $duration,
-        'start_date' => Carbon::now()->subYears(2),
-        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now()->subYears(2))
-    ]);
-
-    // assertDatabaseCount('scheduled_notifications', 2);
-
-    $contractOne = Contract::first();
-    // dump($contractOne->assets);
-    $contractTwo = Contract::find(2);
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->manager->id,
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contractOne->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contractOne),
-            'notifiable_id' => $contractOne->id,
-        ]
-    );
-
-    assertDatabaseMissing(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->manager->id,
-            'recipient_name' => $this->manager->fullName,
-            'recipient_email' => $this->manager->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contractTwo->end_date?->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contractTwo),
-            'notifiable_id' => $contractTwo->id,
-        ]
-    );
-})->with(array_column(ContractDurationEnum::cases(), 'value'));
-
-it('updates end_date notification for admin when end_date changes for a contract based on start date', function ($duration) {
-
-    $contractOne = Contract::factory()->forLocation($this->asset)->create([
-        'contract_duration' => $duration,
-        'start_date' => Carbon::now()->toDateString(),
-        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-    ]);
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contractOne->end_date->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => 1,
-        ]
-    );
-
-    $updatedContract = [
-        ...$this->basicContractData,
-        'start_date' => Carbon::now()->addMonths(2)->toDateString(),
-        'contract_duration' => $duration,
-    ];
-
-    $this->patchToTenant('api.contracts.update', $updatedContract, $contractOne->id);
-
-    $contractOne->refresh();
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => ContractDurationEnum::from($duration)->addTo(Carbon::now()->addMonths(2))->subDays(7)->toDateString(),
-            'notifiable_type' => get_class($contractOne),
-            'notifiable_id' => $contractOne->id,
-        ]
-    );
-})->with(array_column(ContractDurationEnum::cases(), 'value'));
 
 it('updates end_date notification for maintenance_manager when end_date changes for a contract based on start date', function ($duration) {
 
@@ -279,58 +122,6 @@ it('updates end_date notification for maintenance_manager when end_date changes 
         ]
     );
 })->with(array_column(ContractDurationEnum::cases(), 'value'));
-
-it('updates end_date notificactions for admin when contract duration changes', function ($firstDuration, $otherDuration) {
-    $contractOne = Contract::factory()->forLocation($this->asset)->create([
-        'contract_duration' => $firstDuration,
-        'start_date' => Carbon::now(),
-        'end_date' => ContractDurationEnum::from($firstDuration)->addTo(Carbon::now())
-    ]);
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contractOne->end_date->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => 1,
-        ]
-    );
-
-    $updatedContract = [
-        ...$this->basicContractData,
-        'start_date' => Carbon::now()->toDateString(),
-        'contract_duration' => $otherDuration,
-    ];
-
-    $this->patchToTenant('api.contracts.update', $updatedContract, $contractOne->id);
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => ContractDurationEnum::from($otherDuration)->addTo($contractOne->start_date)->subDays(7)->toDateString(),
-            'notifiable_type' => get_class($contractOne),
-            'notifiable_id' => $contractOne->id,
-        ]
-    );
-})->with(function () {
-    $values = array_column(ContractDurationEnum::cases(), 'value');
-
-    $combinations = [];
-    foreach ($values as $f) {
-        foreach ($values as $o) {
-            $combinations[] = [$f, $o];
-        }
-    }
-    return $combinations;
-});
 
 it('creates end_date notifications when a maintenance manager is added to an existing asset with contract', function ($duration) {
 
@@ -478,54 +269,6 @@ it('creates end_date notification when a maintenance manager is changed for an e
     );
 })->with(array_column(ContractDurationEnum::cases(), 'value'));
 
-it('deletes end_date notifications for admin when the contract status changes to `expired/cancelled`', function ($status) {
-
-    $preference = $this->admin->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    $formData = [
-        ...$this->basicContractData,
-    ];
-
-    $this->postToTenant('api.contracts.store', $formData);
-
-    assertDatabaseCount('scheduled_notifications', 1);
-
-    $contract = Contract::first();
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-
-    $formData = [
-        ...$this->basicContractData,
-        'status' => $status,
-    ];
-
-    $this->patchToTenant('api.contracts.update', $formData, $contract->id);
-
-    assertDatabaseMissing(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-})->with(['expired', 'cancelled']);
-
 it('deletes end_date notifications for maintenance manager when the contract status changes to `expired/cancelled`', function ($status) {
 
     $preference = $this->manager->notification_preferences()->where('notification_type', 'end_date')->first();
@@ -625,44 +368,6 @@ it('does not delete end_date notification when maintenance manager is the same f
     );
 });
 
-it('creates end_date notification for admin when the contract status changes from `expired/cancelled` to `active`', function ($status) {
-
-    $formData = [
-        ...$this->basicContractData,
-        'status' => $status
-    ];
-
-    $this->postToTenant('api.contracts.store', $formData);
-
-    assertDatabaseEmpty('scheduled_notifications');
-
-    $contract = Contract::find(1);
-
-    $formData = [
-        ...$this->basicContractData,
-        'status' => 'active'
-    ];
-
-    $this->patchToTenant('api.contracts.update', $formData, $contract->id);
-
-    $preference = $this->admin->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    assertDatabaseCount('scheduled_notifications', 1);
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contract->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contract),
-            'notifiable_id' => $contract->id,
-        ]
-    );
-})->with(['expired', 'cancelled']);
-
 it('creates end_date notification for maintenance manager when the contract status changes from `expired/cancelled` to `active`', function ($status) {
 
     $formData = [
@@ -700,127 +405,6 @@ it('creates end_date notification for maintenance manager when the contract stat
         ]
     );
 })->with(['expired', 'cancelled']);
-
-it('updates end_date notifications of admin when notification_delay_days preference for end_date of user changes for contracts where end_date > now', function ($duration) {
-
-    $contractOne = Contract::factory()->forLocation($this->asset)->create([
-        'contract_duration' => $duration,
-        'start_date' => Carbon::now(),
-        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-    ]);
-
-    $contractTwo = Contract::factory()->forLocation($this->asset)->create([
-        'contract_duration' => $duration,
-        'start_date' => Carbon::now(),
-        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-    ]);
-
-    $contractThree = Contract::factory()->forLocation($this->asset)->create([
-        'contract_duration' => $duration,
-        'start_date' => Carbon::now(),
-        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-    ]);
-
-
-    $preference = $this->admin->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    assertDatabaseCount('scheduled_notifications', 3);
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'status' => 'pending',
-            'scheduled_at' => $contractOne->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => $contractOne->id,
-        ]
-    );
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'status' => 'pending',
-            'scheduled_at' => $contractTwo->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => $contractTwo->id,
-        ]
-    );
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'status' => 'pending',
-            'scheduled_at' => $contractThree->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => $contractThree->id,
-        ]
-    );
-
-    $contractThree->update(['end_date' => Carbon::now()]);
-
-    $formData = [
-        'asset_type' => 'contract',
-        'notification_type' => 'end_date',
-        'notification_delay_days' => 1,
-        'enabled' => true,
-    ];
-
-    $this->patchToTenant('api.notifications.update', $formData, $preference->id);
-
-    $preference->refresh();
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contractOne->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => $contractOne->id,
-        ]
-    );
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'status' => 'pending',
-            'scheduled_at' => $contractTwo->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => $contractTwo->id,
-        ]
-    );
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'status' => 'pending',
-            'scheduled_at' =>  ContractDurationEnum::from($duration)->addTo(Carbon::now())->subDays(7)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => $contractThree->id,
-        ]
-    );
-})->with(array_column(ContractDurationEnum::cases(), 'value'));
 
 it('updates end_date notification of maintenance manager when notification_delay_days preference for end_date of user changes for contracts where end_date > now', function ($duration) {
 
@@ -950,91 +534,6 @@ it('updates end_date notification of maintenance manager when notification_delay
     );
 })->with(array_column(ContractDurationEnum::cases(), 'value'));
 
-it('deletes end_date notifications for admin when notification preference end_date of user is disabled and status `pending`', function ($duration) {
-
-    $contractOne = Contract::factory()->forLocation($this->asset)->create([
-        'contract_duration' => $duration,
-        'start_date' => Carbon::now(),
-        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-    ]);
-
-    $contractTwo = Contract::factory()->forLocation($this->asset)->create([
-        'contract_duration' => $duration,
-        'start_date' => Carbon::now(),
-        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-    ]);
-
-    $preference = $this->admin->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    assertDatabaseCount('scheduled_notifications', 2);
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'status' => 'pending',
-            'scheduled_at' =>  ContractDurationEnum::from($duration)->addTo(Carbon::now())->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contractOne),
-            'notifiable_id' => $contractOne->id,
-        ]
-    );
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'status' => 'pending',
-            'scheduled_at' =>  ContractDurationEnum::from($duration)->addTo(Carbon::now())->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contractTwo),
-            'notifiable_id' => $contractTwo->id,
-        ]
-    );
-
-    $contractTwoNotification = $contractTwo->notifications()->first();
-    $contractTwoNotification->update(['status' => 'sent']);
-
-    $formData = [
-        'asset_type' => 'contract',
-        'notification_type' => 'end_date',
-        'notification_delay_days' => $preference->notification_delay_days,
-        'enabled' => false,
-    ];
-
-    $this->patchToTenant('api.notifications.update', $formData, $preference->id);
-    assertDatabaseCount('scheduled_notifications', 1);
-
-    assertDatabaseMissing(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' =>  ContractDurationEnum::from($duration)->addTo(Carbon::now())->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contractOne),
-            'notifiable_id' => $contractOne->id,
-        ]
-    );
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'status' => 'sent',
-            'scheduled_at' =>  ContractDurationEnum::from($duration)->addTo(Carbon::now())->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => get_class($contractTwo),
-            'notifiable_id' => $contractTwo->id,
-        ]
-    );
-})->with(array_column(ContractDurationEnum::cases(), 'value'));
 
 it('deletes end_date notifications for maintenance_manager when notification preference end_date of user is disabled and status `pending`', function ($duration) {
 
@@ -1127,74 +626,6 @@ it('deletes end_date notifications for maintenance_manager when notification pre
     );
 })->with(array_column(ContractDurationEnum::cases(), 'value'));
 
-it('creates end_date notifications for admin when notification preference end_date of user is enabled and contract end_date > now', function ($duration) {
-
-    $preference = $this->admin->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    $formData = [
-        'asset_type' => 'contract',
-        'notification_type' => 'end_date',
-        'notification_delay_days' => $preference->notification_delay_days,
-        'enabled' => false,
-    ];
-
-    $this->patchToTenant('api.notifications.update', $formData, $preference->id);
-
-    $contractOne = Contract::factory()->forLocation($this->asset)->create([
-        'contract_duration' => $duration,
-        'start_date' => Carbon::now(),
-        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-    ]);
-
-    $contractTwo = Contract::factory()->forLocation($this->asset)->create([
-        'contract_duration' => $duration,
-        'start_date' => Carbon::now(),
-        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-    ]);
-
-
-    assertDatabaseCount('scheduled_notifications', 0);
-
-    $contractTwo->update(['end_date' => Carbon::now()]);
-
-    $formData = [
-        'asset_type' => 'contract',
-        'notification_type' => 'end_date',
-        'notification_delay_days' => $preference->notification_delay_days,
-        'enabled' => true,
-    ];
-
-    $response = $this->patchToTenant('api.notifications.update', $formData, $preference->id);
-
-    assertDatabaseCount('scheduled_notifications', 1);
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'status' => 'pending',
-            'scheduled_at' => $contractOne->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => 1,
-        ]
-    );
-
-    assertDatabaseMissing(
-        'scheduled_notifications',
-        [
-            'user_id' => $this->admin->id,
-            'recipient_name' => $this->admin->fullName,
-            'recipient_email' => $this->admin->email,
-            'notification_type' => 'end_date',
-            'status' => 'pending',
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => 2,
-        ]
-    );
-})->with(array_column(ContractDurationEnum::cases(), 'value'));
 
 it('creates end_date notifications for maintenance_manager when notification preference end_date of user is enabled and contract end_date > now', function ($duration) {
 
@@ -1376,41 +807,6 @@ it('creates end_date notifications for all maintenance managers linked to the co
     );
 })->with(array_column(ContractDurationEnum::cases(), 'value'));
 
-it('creates end_date notifications for a new created user with admin role', function ($duration) {
-
-    $contractOne = Contract::factory()->forLocation($this->asset)->create([
-        'contract_duration' => $duration,
-        'start_date' => Carbon::now(),
-        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-    ]);
-
-    $formData = [
-        'first_name' => 'Jane',
-        'last_name' => 'Doe',
-        'email' => 'janedoe@facilitywebxp.be',
-        'can_login' => true,
-        'role' => 'Admin',
-        'job_position' => 'Manager',
-    ];
-
-    $this->postToTenant('api.users.store', $formData);
-
-    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
-    $preference = $createdUser->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'recipient_name' => $createdUser->fullName,
-            'recipient_email' => $createdUser->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contractOne->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => $contractOne->id,
-        ]
-    );
-})->with(array_column(ContractDurationEnum::cases(), 'value'));
-
 it('creates end_date notifications when the role of a maintenance manager changes to admin', function ($duration) {
 
     $contractOne = Contract::factory()->forLocation($this->asset)->create([
@@ -1469,64 +865,8 @@ it('creates end_date notifications when the role of a maintenance manager change
     );
 })->with(array_column(ContractDurationEnum::cases(), 'value'));
 
-it('deletes end_date notifications when the role of an admin changes to maintenance manager', function ($duration) {
-    $contractOne = Contract::factory()->forLocation($this->asset)->create([
-        'contract_duration' => $duration,
-        'start_date' => Carbon::now(),
-        'end_date' => ContractDurationEnum::from($duration)->addTo(Carbon::now())
-    ]);
 
-    $formData = [
-        'first_name' => 'Jane',
-        'last_name' => 'Doe',
-        'email' => 'janedoe@facilitywebxp.be',
-        'can_login' => true,
-        'role' => 'Admin',
-        'job_position' => 'Manager',
-    ];
-
-    $this->postToTenant('api.users.store', $formData);
-
-    $createdUser = User::where('email', 'janedoe@facilitywebxp.be')->first();
-    $preference = $createdUser->notification_preferences()->where('notification_type', 'end_date')->first();
-
-    assertDatabaseHas(
-        'scheduled_notifications',
-        [
-            'recipient_name' => $createdUser->fullName,
-            'recipient_email' => $createdUser->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contractOne->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => $contractOne->id,
-        ]
-    );
-
-    $formData = [
-        'first_name' => 'Jane',
-        'last_name' => 'Doe',
-        'email' => 'janedoe@facilitywebxp.be',
-        'can_login' => true,
-        'role' => 'Maintenance Manager',
-        'job_position' => 'Manager',
-    ];
-
-    $this->patchToTenant('api.users.update', $formData, $createdUser->id);
-
-    assertDatabaseMissing(
-        'scheduled_notifications',
-        [
-            'recipient_name' => $createdUser->fullName,
-            'recipient_email' => $createdUser->email,
-            'notification_type' => 'end_date',
-            'scheduled_at' => $contractOne->end_date->subDays($preference->notification_delay_days)->toDateString(),
-            'notifiable_type' => 'App\Models\Tenants\Contract',
-            'notifiable_id' => $contractOne->id,
-        ]
-    );
-})->with(array_column(ContractDurationEnum::cases(), 'value'));
-
-it('deletes end_date notifications when the role of an admin changes to maintenance manager for assets only where he is not maintenance manager', function ($duration) {
+it('deletes end_date notifications when the role of an admin changes to maintenance manager for assets/locations only where he is not maintenance manager', function ($duration) {
     $contractOne = Contract::factory()->forLocation($this->asset)->create([
         'contract_duration' => $duration,
         'start_date' => Carbon::now(),

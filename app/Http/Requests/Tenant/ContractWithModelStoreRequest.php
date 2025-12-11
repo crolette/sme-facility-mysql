@@ -43,6 +43,9 @@ class ContractWithModelStoreRequest extends FormRequest
                     $data['contracts'][$index]['notice_date']  = NoticePeriodEnum::from($contract['notice_period'])->subFrom($data['contracts'][$index]['end_date']);
                     // dump($contract['notice_date']);
                 }
+
+                if (!isset($contract['notice_period']))
+                    $data['contracts'][$index]['notice_date'] = null;
             }
         }
 

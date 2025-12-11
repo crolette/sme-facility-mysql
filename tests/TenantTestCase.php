@@ -76,7 +76,11 @@ abstract class TenantTestCase extends BaseTestCase
         }
 
 
-
+        $this->tenant->update([
+            'current_sites_count' => 0,
+            'current_users_count' => 0,
+            'current_storage_bytes' => 0
+        ]);
 
         // Initialize tenant context
         tenancy()->initialize($this->tenant);

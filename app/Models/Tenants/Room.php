@@ -9,13 +9,14 @@ use App\Models\Tenants\Floor;
 use App\Models\Tenants\Contract;
 use App\Models\Tenants\Document;
 use App\Models\Central\CategoryType;
+use App\Models\Tenants\Contractable;
 use App\Models\Tenants\Maintainable;
 use Illuminate\Support\Facades\Auth;
+use App\Traits\HasMaintenanceManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
 use App\Models\Tenants\ScheduledNotification;
-use App\Traits\HasMaintenanceManager;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -117,7 +118,7 @@ class Room extends Model
 
     public function contracts(): MorphToMany
     {
-        return $this->morphToMany(Contract::class, 'contractable')->withTimestamps();
+        return $this->morphToMany(Contract::class, 'contractable')->using(Contractable::class)->withTimestamps();
     }
 
     public function assets(): MorphMany

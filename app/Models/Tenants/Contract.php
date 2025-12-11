@@ -6,14 +6,15 @@ use App\Models\Tenants\Site;
 use App\Models\Tenants\User;
 use App\Models\Tenants\Asset;
 use App\Models\Tenants\Floor;
-use App\Models\Tenants\Document;
 use App\Enums\NoticePeriodEnum;
 use App\Enums\ContractTypesEnum;
+use App\Models\Tenants\Document;
 use App\Enums\ContractStatusEnum;
 use App\Enums\ContractDurationEnum;
-use App\Enums\ContractRenewalTypesEnum;
 use App\Observers\ContractObserver;
+use App\Models\Tenants\Contractable;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\ContractRenewalTypesEnum;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -84,27 +85,27 @@ class Contract extends Model
 
     public function assets()
     {
-        return $this->morphedByMany(Asset::class, 'contractable');
+        return $this->morphedByMany(Asset::class, 'contractable')->using(Contractable::class)->withTimestamps();
     }
 
     public function sites()
     {
-        return $this->morphedByMany(Site::class, 'contractable');
+        return $this->morphedByMany(Site::class, 'contractable')->using(Contractable::class)->withTimestamps();
     }
 
     public function buildings()
     {
-        return $this->morphedByMany(Building::class, 'contractable');
+        return $this->morphedByMany(Building::class, 'contractable')->using(Contractable::class)->withTimestamps();
     }
 
     public function floors()
     {
-        return $this->morphedByMany(Floor::class, 'contractable');
+        return $this->morphedByMany(Floor::class, 'contractable')->using(Contractable::class)->withTimestamps();
     }
 
     public function rooms()
     {
-        return $this->morphedByMany(Room::class, 'contractable');
+        return $this->morphedByMany(Room::class, 'contractable')->using(Contractable::class)->withTimestamps();
     }
 
     public function documents(): MorphToMany
@@ -112,15 +113,21 @@ class Contract extends Model
         return $this->morphToMany(Document::class, 'documentable');
     }
 
+
     public function contractables()
     {
-        // return $this->morphTo()->withTrashed();
-        return $this->assets
-            ->concat($this->sites)
-            ->concat($this->buildings)
-            ->concat($this->floors)
-            ->concat($this->rooms);
+        return $this->hasMany(Contractable::class);
     }
+
+    // public function contractables()
+    // {
+    //     // return $this->morphTo()->withTrashed();
+    //     return $this->assets
+    //         ->concat($this->sites)
+    //         ->concat($this->buildings)
+    //         ->concat($this->floors)
+    //         ->concat($this->rooms);
+    // }
 
 
     public function scopeForMaintenanceManager(Builder $query, ?User $user = null)

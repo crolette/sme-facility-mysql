@@ -45,7 +45,7 @@ class ProviderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'lowercase', 'email', 'min:20', 'max:255', new NotDisposableEmail, Rule::unique(Provider::class)->ignore($this->route('provider'))],
+            'email' => ['required', 'string', 'lowercase', 'email', 'min:10', 'max:255', new NotDisposableEmail, Rule::unique(Provider::class)->ignore($this->route('provider'))],
             'name' => ['required', 'string', 'min:10', 'max:100'],
 
             'street' => 'required|string|min:4|max:100',

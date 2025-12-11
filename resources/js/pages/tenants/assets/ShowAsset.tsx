@@ -187,6 +187,21 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                             {asset.model && <Field label={t('assets.model')} text={asset.model} />}
                                             {asset.serial_number && <Field label={t('assets.serial_number')} text={asset.serial_number} />}
                                         </div>
+                                        {asset.maintainable.manager && (
+                                            <Field
+                                                label={t('maintenances.maintenance_manager')}
+                                                text={
+                                                    asset.maintainable.manager ? (
+                                                        <a href={route('tenant.users.show', asset.maintainable.manager.id)}>
+                                                            {' '}
+                                                            {asset.maintainable.manager.full_name}
+                                                        </a>
+                                                    ) : (
+                                                        t('maintenances.no_manager')
+                                                    )
+                                                }
+                                            />
+                                        )}
                                         {asset.has_meter_readings && (
                                             <>
                                                 <Field label={t('assets.meter_number')} text={asset.meter_number} />
@@ -232,19 +247,6 @@ export default function ShowAsset({ item }: { item: Asset }) {
                                 <div className="border-sidebar-border bg-sidebar rounded-md border p-4">
                                     <h2>{tChoice('maintenances.title', 1)}</h2>
                                     <div className="space-y-2">
-                                        <Field
-                                            label={t('maintenances.maintenance_manager')}
-                                            text={
-                                                asset.maintainable.manager ? (
-                                                    <a href={route('tenant.users.show', asset.maintainable.manager.id)}>
-                                                        {' '}
-                                                        {asset.maintainable.manager.full_name}
-                                                    </a>
-                                                ) : (
-                                                    t('maintenances.no_manager')
-                                                )
-                                            }
-                                        />
                                         {asset.maintainable.need_maintenance && (
                                             <>
                                                 <Field

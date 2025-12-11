@@ -24,6 +24,7 @@ yarn-error.log
 TODO.md
 TODO_*.md
 composer.lock
+results.json
 package-lock.json
 /auth.json
 /demo

@@ -8,9 +8,10 @@ use App\Models\Tenants\Asset;
 use App\Models\Tenants\Contract;
 use App\Models\Tenants\Document;
 use App\Models\Central\CategoryType;
+use App\Models\Tenants\Contractable;
 use App\Models\Tenants\Maintainable;
-use App\Traits\HasMaintenanceManager;
 use Illuminate\Support\Facades\Auth;
+use App\Traits\HasMaintenanceManager;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
@@ -118,7 +119,7 @@ class Floor extends Model
 
     public function contracts(): MorphToMany
     {
-        return $this->morphToMany(Contract::class, 'contractable')->withTimestamps();
+        return $this->morphToMany(Contract::class, 'contractable')->using(Contractable::class)->withTimestamps();
     }
 
     public function rooms(): HasMany

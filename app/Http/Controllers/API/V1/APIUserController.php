@@ -75,7 +75,6 @@ class APIUserController extends Controller
 
     public function update(UserRequest $request, User $user)
     {
-
         if ($request->user()->cannot('update', $user)) {
             return ApiResponse::notAuthorized();
         }
@@ -89,20 +88,23 @@ class APIUserController extends Controller
             $newRoles = $user->getRoleNames();
 
             if (!$user->can_login && $request->validated('can_login') === true && $user->hasAnyRole('Admin', 'Maintenance Manager')) {
+                // FIXME pourquoi ne pas mettre ça dans le User Observer ?
                 app(UserNotificationPreferenceService::class)->createDefaultUserNotificationPreferences($user);
                 Password::sendResetLink(
                     $request->only('email')
                 );
             }
 
+            // FIXME pourquoi ne pas mettre ça dans le User Observer ?
             if ($user->can_login && $request->validated('can_login') === false) {
                 app(UserNotificationPreferenceService::class)->deleteNotifications($user);
             }
-
+            // FIXME pourquoi ne pas mettre ça dans le User Observer ?
             if ([...$previousRoles] !== [...$newRoles] && $newRoles->contains('Maintenance Manager')) {
                 app(NotificationSchedulingService::class)->removeNotificationsForOldAdminRole($user);
             }
 
+            // FIXME pourquoi ne pas mettre ça dans le User Observer ?
             if ([...$previousRoles] !== [...$newRoles] && $newRoles->contains('Admin')) {
                 app(NotificationSchedulingService::class)->createNotificationsForNewAdmin($user);
             }

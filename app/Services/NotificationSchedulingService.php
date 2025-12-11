@@ -241,8 +241,6 @@ class NotificationSchedulingService
 
     public function removeNotificationsForOldAdminRole(User $user)
     {
-        // dump('removeNotificationsForOldAdminRole');
-
         $assetsOrLocations = collect()
             ->merge(Asset::all())
             ->merge(Site::all())
@@ -254,6 +252,14 @@ class NotificationSchedulingService
         foreach ($assetsOrLocations as $assetOrLocation) {
             if ($assetOrLocation->manager?->id !== $user->id)
                 app(MaintainableNotificationSchedulingService::class)->removeNotificationsForOldMaintenanceManager($assetOrLocation->maintainable, $user);
+        }
+
+        $contracts = Contract::whereDoesntHave('contractables')->get();
+
+        foreach ($contracts as $contract) {
+            $notifications = $contract->notifications;
+            foreach ($notifications as $notification)
+                $notification->delete();
         }
     }
 }

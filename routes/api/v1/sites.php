@@ -116,9 +116,11 @@ Route::middleware([
 
                 // Remove/Detach a contract 
                 Route::delete('', function (Site $site, Request $request) {
+                    // dump('route site detach contract');
                     $validated = $request->validateWithBag('errors', [
                         'contract_id' => 'required|exists:contracts,id'
                     ]);
+                    // dump('route site detach contract');
                     app(ContractService::class)->detachExistingContractFromModel($site, $validated['contract_id']);
                     return ApiResponse::success([], 'Contract removed');
                 })->name('api.sites.contracts.delete');

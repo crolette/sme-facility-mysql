@@ -55,7 +55,6 @@ class APIContractController extends Controller
             DB::beginTransaction();
 
             $contract = $this->contractService->update($contract, $request->validated());
-
             DB::commit();
 
             return ApiResponse::successFlash('', 'Contract updated');

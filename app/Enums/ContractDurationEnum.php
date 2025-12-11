@@ -33,4 +33,17 @@ enum ContractDurationEnum: string
             self::TWO_YEARS => $date->copy()->addYears(2),
         };
     }
+
+    /**
+     * Enlève la durée de contrat à une date donnée.
+     */
+    public function subFrom(Carbon $date): Carbon
+    {
+        return match ($this) {
+            self::ONE_MONTH => $date->copy()->subMonth(),
+            self::SIX_MONTHS => $date->copy()->subMonths(6),
+            self::ONE_YEAR => $date->copy()->subYear(),
+            self::TWO_YEARS => $date->copy()->subYears(2),
+        };
+    }
 }

@@ -101,9 +101,9 @@ class MaintainableNotificationSchedulingService
         };
 
         // dump($maintainable->wasChanged('maintenance_manager_id'));
-        Debugbar::info('BEFORE maintainable->wasChanged maintenance_manager_id');
+        // Debugbar::info('BEFORE maintainable->wasChanged maintenance_manager_id');
         if ($maintainable->wasChanged('maintenance_manager_id') && $maintainable->manager) {
-            Debugbar::info('maintainable->wasChanged maintenance_manager_id');
+            // Debugbar::info('maintainable->wasChanged maintenance_manager_id');
             $this->createScheduleForUser($maintainable, $maintainable->manager);
 
             if (get_class($maintainable->maintainable) === Asset::class) {
@@ -281,9 +281,9 @@ class MaintainableNotificationSchedulingService
         foreach ($contracts as $contract) {
             // dump('contracts');
 
-            $contractables = $contract->contractables()->filter(function ($item) use ($user) {
-                return $item->maintainable
-                    && $item->maintainable->maintenance_manager_id === $user->id;
+            $contractables = $contract->contractables->filter(function ($item) use ($user) {
+                return $item->contractable->maintainable
+                    && $item->contractable->maintainable->maintenance_manager_id === $user->id;
             });
 
             // dump(count($contractables));

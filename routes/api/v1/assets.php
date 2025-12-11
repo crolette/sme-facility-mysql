@@ -130,7 +130,7 @@ Route::middleware([
 
                 // Remove/Detach a contract from an asset
                 Route::delete('', function (Asset $asset, Request $request) {
-                    Debugbar::info($request);
+
                     $validated = $request->validateWithBag('errors', [
                         'contract_id' => 'required|exists:contracts,id'
                     ]);
