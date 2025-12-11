@@ -356,11 +356,12 @@ export const InterventionManager = ({ itemCodeId, getInterventionsUrl, type, clo
                                     <TableHeadData>{t('interventions.repair_delay')}</TableHeadData>
                                     <TableHeadData>{t('interventions.total_costs')}</TableHeadData>
                                     <TableHeadData>
-                                        {intervention.status !== 'completed' && (
-                                            <Button onClick={() => sendIntervention(intervention.id)} variant={'cta'}>
-                                                {t('interventions.assign_to')}
-                                            </Button>
-                                        )}
+                                        {!closed &&
+                                            (intervention.status !== 'completed' || (
+                                                <Button onClick={() => sendIntervention(intervention.id)} variant={'cta'}>
+                                                    {t('interventions.assign_to')}
+                                                </Button>
+                                            ))}
                                     </TableHeadData>
                                 </TableHeadRow>
                             </TableHead>

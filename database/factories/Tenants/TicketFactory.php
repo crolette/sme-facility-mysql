@@ -28,11 +28,14 @@ class TicketFactory extends Factory
         $count = Company::incrementAndGetTicketNumber();
         $codeNumber = generateCodeNumber($count, 'TK', 4);
 
+        $user = User::withoutRole(['Super Admin'])->first() ?? User::factory()->create()->id;
+
         return [
             'code' => $codeNumber,
             'status' => TicketStatus::OPEN->value,
             'description' => fake()->paragraph(2),
-            'reported_by' => User::withoutRole(['Super Admin', 'Admin'])->first() ?? User::factory()->create()->id,
+            'reported_by' => $user,
+            'reporter_email' => $user->email,
             'being_notified' => fake()->boolean(50),
         ];
     }
@@ -40,7 +43,7 @@ class TicketFactory extends Factory
     public function anonymous()
     {
         return $this->state(fn() => [
-            'reporter_id' => null,
+            'reported_by' => null,
             'reporter_email' => fake()->safeEmail,
         ]);
     }

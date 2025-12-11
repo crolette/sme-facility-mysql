@@ -92,7 +92,7 @@ class Asset extends Model
         parent::boot();
 
         static::deleting(function ($asset) {
-            $asset->notifications()->delete();
+            $asset->notifications()->where('status', '<>', 'sent')->delete();
 
             $tickets = $asset->tickets;
             foreach ($tickets as $ticket) {
@@ -104,6 +104,7 @@ class Asset extends Model
             $asset->maintainable()->delete();
             $asset->tickets()->delete();
             $asset->pictures()->delete();
+            $asset->notifications()->delete();
         });
     }
 

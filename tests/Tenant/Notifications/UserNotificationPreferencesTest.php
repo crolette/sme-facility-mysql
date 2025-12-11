@@ -68,7 +68,6 @@ it('creates default notification preferences when user with role is created', fu
     assertEquals($createdUser->notification_preferences()->count(), $nbNotifications);
 })->with(['Admin', 'Maintenance Manager']);
 
-
 it('creates default notification preferences when user with no roles is assigned a role', function ($role) {
 
     $user = User::factory()->create();
@@ -91,9 +90,6 @@ it('creates default notification preferences when user with no roles is assigned
     assertDatabaseCount('user_notification_preferences', $nbNotifications);
     assertEquals($user->notification_preferences()->count(), $nbNotifications);
 })->with(['Admin', 'Maintenance Manager']);
-
-
-
 
 it('can update notification preferences days', function () {
 

@@ -71,8 +71,6 @@ class APITicketController extends Controller
             $ticket->ticketable()->associate($location);
             $ticket->save();
 
-
-
             // TODO Send email to admin / maintenance manager if not the one who created the ticket
 
             $files = $pictureUploadRequest->validated('pictures');
@@ -145,8 +143,6 @@ class APITicketController extends Controller
         if (in_array($request->status, ['open', 'closed', 'ongoing'])) {
             if ($request->status === 'closed') {
                 $ticket->closeTicket();
-
-                event(new TicketClosed($ticket));
 
 
                 return ApiResponse::success(null, 'Ticket closed');

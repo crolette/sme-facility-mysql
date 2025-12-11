@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Events\TicketClosed;
 use App\Models\Tenants\Ticket;
 use App\Models\Tenants\Provider;
 use App\Services\DocumentService;

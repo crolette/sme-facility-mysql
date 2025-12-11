@@ -2,10 +2,11 @@
 
 namespace App\Observers;
 
+use Carbon\Carbon;
+use App\Events\TicketClosed;
 use App\Enums\InterventionStatus;
 use App\Models\Tenants\Intervention;
 use App\Services\InterventionNotificationSchedulingService;
-use Carbon\Carbon;
 use Illuminate\Contracts\Events\ShouldHandleEventsAfterCommit;
 
 class InterventionObserver  implements ShouldHandleEventsAfterCommit
@@ -21,7 +22,9 @@ class InterventionObserver  implements ShouldHandleEventsAfterCommit
         app(InterventionNotificationSchedulingService::class)->updateScheduleForIntervention($intervention);
 
         if ($intervention->wasChanged('status') && ($intervention->status === InterventionStatus::COMPLETED || $intervention->status === InterventionStatus::CANCELLED)) {
-            $intervention->ticket?->closeTicket();
+            if ($intervention->ticket) {
+                $intervention->ticket?->closeTicket();
+            }
         }
     }
 }
