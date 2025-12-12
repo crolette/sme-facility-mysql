@@ -2,6 +2,7 @@
 
 return [
     'title' => 'Notification|Notifications',
+    'upcoming' => 'Upcoming deadlines',
     'depreciation_end_date' => 'Depreciation end date',
     'depreciation_end_date_subtitle' => 'An asset depreciation is about to expire:',
     'depreciation_end_date_description' => 'After this date, the asset will be fully depreciated.',

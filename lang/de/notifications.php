@@ -2,6 +2,7 @@
 
 return [
     'title' => 'Benachrichtigung|Benachrichtigungen',
+    'upcoming' => 'Nächste Fälligkeiten',
     'depreciation_end_date' => 'Enddatum der Abschreibung',
     'depreciation_end_date_subtitle' => 'Die Abschreibung eines Assets läuft ab:',
     'depreciation_end_date_description' => 'Nach diesem Datum ist das Asset vollständig abgeschrieben.',

@@ -3,6 +3,8 @@
 namespace App\Models\Tenants;
 
 use App\Enums\ScheduledNotificationStatusEnum;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -44,5 +46,16 @@ class ScheduledNotification extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function scopeNextPending($query)
+    {
+        return $query
+            ->where('scheduled_at', '>=', Carbon::now()->toDateString())
+            // ->where('scheduled_at', '<', Carbon::now()->addMonth())
+            ->whereNotIn('notification_type', ['next_maintenance_date', 'planned_at'])
+            ->where('status', 'pending')
+            ->orderBy('scheduled_at');
+        // ->limit(5);
     }
 }

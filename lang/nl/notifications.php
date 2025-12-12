@@ -2,6 +2,7 @@
 
 return [
     'title' => 'Kennisgeving|Kennisgevingen',
+    'upcoming' => 'Komende deadlines',
     'depreciation_end_date' => 'Einddatum van afschrijving',
     'depreciation_end_date_subtitle' => 'De afschrijving van een asset loopt binnenkort af:',
     'depreciation_end_date_description' => 'Na deze datum is het asset volledig afgeschreven.',

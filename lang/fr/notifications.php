@@ -2,6 +2,7 @@
 
 return [
     'title' => 'Notification|Notifications',
+    'upcoming' => 'Prochaines échéances',
     'depreciation_end_date' => 'Date de fin d’amortissement',
     'depreciation_end_date_subtitle' => 'L’amortissement d’un asset arrive à expiration :',
     'depreciation_end_date_description' => 'Après cette date, l’asset sera totalement amorti.',

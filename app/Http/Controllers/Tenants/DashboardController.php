@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\App;
 use App\Http\Controllers\Controller;
 use App\Models\Tenants\Intervention;
 use App\Models\Tenants\Maintainable;
+use App\Models\Tenants\ScheduledNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
@@ -33,6 +34,8 @@ class DashboardController extends Controller
             'percent' => round($company->disk_size_gb / 0.5, 2)
         ];
 
+
+
         $maintainables = Maintainable::select(
             'id',
             'name',
@@ -44,7 +47,7 @@ class DashboardController extends Controller
             ->where('need_maintenance', true)
             ->whereNotNull('next_maintenance_date')
             ->where('next_maintenance_date', '>=', today())
-            ->where('next_maintenance_date', '<=', Carbon::now()->addWeek())
+            ->where('next_maintenance_date', '<=', Carbon::now()->addWeeks(2))
             ->whereHasMorph(
                 'maintainable',
                 [
@@ -99,7 +102,7 @@ class DashboardController extends Controller
 
         $interventions = Intervention::select('id', 'intervention_type_id', 'priority', 'status', 'maintainable_id', 'interventionable_type', 'interventionable_id', 'ticket_id', 'planned_at')
             ->where('planned_at', '>=', today())
-            ->where('planned_at', '<=', Carbon::now()->addWeek())
+            ->where('planned_at', '<=', Carbon::now()->addWeeks(2))
             ->withoutTrashed()
             ->orderBy('planned_at')
             ->limit(10)
@@ -134,9 +137,11 @@ class DashboardController extends Controller
         ];
 
         // dd('dashboard');
+        $nextNotifications = Auth::user()->notifications()->nextPending()->get();
 
         return Inertia::render('tenants/dashboard', [
             'counts' => $counts,
+            'nextNotifications' => $nextNotifications,
             'overdueMaintenances' => $overdueMaintenances->get(),
             'overdueInterventions' => $overdueInterventions->get(),
             'maintainables' => $maintainables->get(),

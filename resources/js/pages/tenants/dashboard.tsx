@@ -1,7 +1,7 @@
 import { Pill } from '@/components/ui/pill';
 import { usePermissions } from '@/hooks/usePermissions';
 import AppLayout from '@/layouts/app-layout';
-import { Intervention, Maintainable, type BreadcrumbItem } from '@/types';
+import { Intervention, Maintainable, ScheduledNotification, type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
 import { Cuboid, Ticket, Wrench } from 'lucide-react';
@@ -12,14 +12,14 @@ export default function TenantDashboard({
     interventions,
     overdueMaintenances,
     overdueInterventions,
-    diskSizes,
+    nextNotifications,
 }: {
     counts: { ticketsCount: number; assetsCount: number; interventionsCount: number };
+    nextNotifications: ScheduledNotification[];
     maintainables: Maintainable[];
     interventions: Intervention[];
     overdueMaintenances: Maintainable[];
     overdueInterventions: Intervention[];
-    diskSizes: { mb: number; gb: number; percent: number };
 }) {
     const { hasPermission } = usePermissions();
     const { t, tChoice } = useLaravelReactI18n();
@@ -29,6 +29,20 @@ export default function TenantDashboard({
             href: '/dashboard',
         },
     ];
+
+    function parseDate(dateString) {
+        const d = new Date(dateString);
+
+        const date = new Date(dateString);
+
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+
+        return `${day}/${month}/${year}`;
+    }
+
+    console.log(nextNotifications);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -75,6 +89,55 @@ export default function TenantDashboard({
                                 <p className="text-lg">{counts.interventionsCount}</p>
                             </div>
                         </a>
+                    </div>
+                </div>
+                <div>
+                    <h2>{t('notifications.upcoming')}</h2>
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 rounded-xl border p-4">
+                        <ul className="flex max-h-54 flex-col gap-2 overflow-hidden overflow-y-scroll">
+                            {nextNotifications.length > 0 &&
+                                nextNotifications.map((notification) => (
+                                    <li key={notification.id} className="even:bg-sidebar odd:bg-secondary p-2">
+                                        {notification.notification_type === 'end_date' && (
+                                            <a href={notification.data.link} className="!no-underline">
+                                                <p>
+                                                    {t('contracts.end_date')} : {notification.data.subject} -{' '}
+                                                    {tChoice('contracts.renewal_type.title', 1)} :
+                                                    {t('contracts.renewal_type.' + notification.data.renewal_type)} ({notification.data.provider}) -{' '}
+                                                    {parseDate(notification.data.end_date)}
+                                                </p>
+                                            </a>
+                                        )}
+                                        {notification.notification_type === 'notice_date' && (
+                                            <a href={notification.data.link} className="!no-underline">
+                                                <p>
+                                                    {t('contracts.notice_date')} : {notification.data.subject} -{' '}
+                                                    {tChoice('contracts.renewal_type.title', 1)} :
+                                                    {t('contracts.renewal_type.' + notification.data.renewal_type)} ({notification.data.provider}) -{' '}
+                                                    {parseDate(notification.data.notice_date)}
+                                                </p>
+                                            </a>
+                                        )}
+                                        {notification.notification_type === 'end_warranty_date' && (
+                                            <a href={notification.data.link} className="!no-underline">
+                                                <p>
+                                                    {t('assets.warranty_end_date')} : {notification.data.subject} ({notification.data.reference}) -{' '}
+                                                    {parseDate(notification.data.end_warranty_date)}
+                                                </p>
+                                            </a>
+                                        )}
+
+                                        {notification.notification_type === 'depreciation_end_date' && (
+                                            <a href={notification.data.link} className="!no-underline">
+                                                <p>
+                                                    {t('assets.depreciation_end_date')} :{notification.data.subject} - {notification.data.location} (
+                                                    {notification.data.reference}) - {parseDate(notification.data.depreciation_end_date)}
+                                                </p>
+                                            </a>
+                                        )}
+                                    </li>
+                                ))}
+                        </ul>
                     </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">

@@ -91,6 +91,32 @@ export interface Maintainable {
     providers?: Provider[];
 }
 
+export interface ScheduledNotification {
+    id: number;
+    notifiable: Intervention | Asset | Contract | Maintainable;
+    notification_type: 'depreciation_end_date' | 'notice_date' | 'end_date' | 'planned_at' | 'next_maintenance_date' | 'end_warranty_date';
+    user: User;
+    status: 'pending' | 'sent' | 'failed' | 'error';
+    scheduled_at: string;
+    data: {
+        link: string;
+        provider: string;
+        reference: string;
+        renewal_type: string;
+        type: string;
+        subject: string;
+        location: string;
+        priority: string;
+        description: string;
+        depreciation_end_date: Date;
+        notice_date: string;
+        end_date: string;
+        planned_at: string;
+        end_warranty_date: string;
+        next_maintenance_date: string;
+    };
+}
+
 export interface TenantSite {
     id: number;
     name: string;
