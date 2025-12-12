@@ -19,16 +19,6 @@ export default function ButtonsChart({
                     className={cn('cursor-pointer rounded-sm border border-blue-200 p-1', activeType === 'line' ? 'bg-chart-2' : 'hover:bg-chart-3')}
                 />
             )}
-            {types && types.find((type) => type == 'horizontalBar') && (
-                <ChartBar
-                    onClick={() => setType('horizontalBar')}
-                    size={32}
-                    className={cn(
-                        'cursor-pointer rounded-sm border border-blue-200 p-1',
-                        activeType === 'horizontalBar' ? 'bg-chart-2' : 'hover:bg-chart-3',
-                    )}
-                />
-            )}
             {types && types.find((type) => type == 'verticalBar') && (
                 <ChartColumn
                     onClick={() => setType('verticalBar')}
@@ -39,6 +29,17 @@ export default function ButtonsChart({
                     )}
                 />
             )}
+            {types && types.find((type) => type == 'horizontalBar') && (
+                <ChartBar
+                    onClick={() => setType('horizontalBar')}
+                    size={32}
+                    className={cn(
+                        'cursor-pointer rounded-sm border border-blue-200 p-1',
+                        activeType === 'horizontalBar' ? 'bg-chart-2' : 'hover:bg-chart-3',
+                    )}
+                />
+            )}
+
             {types && types.find((type) => type == 'doughnut') && (
                 <ChartPie
                     onClick={() => setType('doughnut')}

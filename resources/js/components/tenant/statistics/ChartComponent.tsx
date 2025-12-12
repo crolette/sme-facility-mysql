@@ -51,7 +51,7 @@ export const ChartComponent = ({
     const [period, setPeriod] = useState<string | null>(null);
     const [labels, setLabels] = useState<string[]>(
         Object.entries(datas).map((data) => {
-            return withPeriods ? `${t('statistics.week')}` + ' ' + data[0] : data[0];
+            return withPeriods ? `W` + data[0] : data[0];
         }),
     );
 
@@ -73,7 +73,7 @@ export const ChartComponent = ({
             );
             setLabels(
                 Object.entries(response.data.data).map((item) => {
-                    return withPeriods ? (period === 'week' ? `${t('statistics.week')}` + ' ' + item[0] : item[0]) : item[0];
+                    return withPeriods ? (period === 'week' ? `W` + item[0] : item[0]) : item[0];
                 }),
             );
 
@@ -97,7 +97,7 @@ export const ChartComponent = ({
             <div className="border-accent min-h-80 w-full rounded-md border p-10">
                 <div className="flex justify-between">
                     <ButtonsChart setType={setType} types={chartTypes} activeType={type} />
-                    {withPeriods && <ButtonsPeriod setPeriod={setPeriod} />}
+                    {withPeriods && <ButtonsPeriod setPeriod={setPeriod} activePeriod={period} />}
                 </div>
                 {isFetching ? (
                     <p className="animate-pulse">{t('statistics.fetching_datas')}</p>
@@ -105,9 +105,9 @@ export const ChartComponent = ({
                     <p>{t('statistics.no_datas')}</p>
                 ) : (
                     <>
-                        {type === 'horizontalBar' && <HorizontalBarChart type={type} labels={labels} dataCount={dataCount} chartName={chartName} />}
-
                         {type === 'verticalBar' && <VerticalBarChart type={type} labels={labels} dataCount={dataCount} chartName={chartName} />}
+
+                        {type === 'horizontalBar' && <HorizontalBarChart type={type} labels={labels} dataCount={dataCount} chartName={chartName} />}
 
                         {type === 'doughnut' && <DoughnutChart type={type} labels={labels} dataCount={dataCount} chartName={chartName} />}
 
