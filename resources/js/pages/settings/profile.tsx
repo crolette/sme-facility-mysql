@@ -77,7 +77,7 @@ export default function Profile() {
                     <HeadingSmall title={t('settings.profile_title')} description={t('settings.profile_description')} />
                     <div className="flex flex-col">
                         <Label htmlFor="locale">{t('common.language')}</Label>
-                        <LocaleChange />
+                        <LocaleChange withModale />
                     </div>
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">
