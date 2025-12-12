@@ -4,13 +4,14 @@ import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, useForm } from '@inertiajs/react';
-import { FormEventHandler, useRef } from 'react';
+import { FormEventHandler, useRef, useState } from 'react';
 
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
+import { Check, Eye, EyeClosed, X } from 'lucide-react';
 
 export default function Password() {
     const { t, tChoice } = useLaravelReactI18n();
@@ -53,6 +54,16 @@ export default function Password() {
         });
     };
 
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmationPassword, setShowConfirmationPassword] = useState(false);
+
+    const regexSymbols = /^(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])/;
+    const regexNumber = /^(?=.*\d)/;
+    const regexUppercase = /^(?=.*[A-Z])/;
+    const regexLowercase = /^(?=.*[a-z])/;
+    const regexLength = /^.{12,}$/;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{12,}$/;
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t('settings.password_title')} />
@@ -64,36 +75,71 @@ export default function Password() {
                     <form onSubmit={updatePassword} className="space-y-6">
                         <div className="grid gap-2">
                             <Label htmlFor="current_password">{t('auth.password_current')}</Label>
-
-                            <Input
-                                id="current_password"
-                                ref={currentPasswordInput}
-                                value={data.current_password}
-                                onChange={(e) => setData('current_password', e.target.value)}
-                                type="password"
-                                className="mt-1 block w-full"
-                                autoComplete="current-password"
-                                placeholder={t('auth.password_current')}
-                            />
-
+                            <div className="flex items-center gap-2">
+                                <Input
+                                    id="current_password"
+                                    ref={currentPasswordInput}
+                                    value={data.current_password}
+                                    onChange={(e) => setData('current_password', e.target.value)}
+                                    type={showPassword ? 'text' : 'password'}
+                                    className="mt-1 block w-full"
+                                    autoComplete="current-password"
+                                    placeholder={t('auth.password_current')}
+                                />
+                                {showPassword ? (
+                                    <Eye onClick={() => setShowPassword(!showPassword)} />
+                                ) : (
+                                    <EyeClosed onClick={() => setShowPassword(!showPassword)} />
+                                )}
+                            </div>
                             <InputError message={errors.current_password} />
                         </div>
 
                         <div className="grid gap-2">
                             <Label htmlFor="password">{t('auth.password_new')}</Label>
-
-                            <Input
-                                id="password"
-                                ref={passwordInput}
-                                value={data.password}
-                                onChange={(e) => setData('password', e.target.value)}
-                                type="password"
-                                className="mt-1 block w-full"
-                                autoComplete="new-password"
-                                placeholder={t('auth.password_new')}
-                            />
+                            <div className="flex items-center gap-2">
+                                <Input
+                                    id="password"
+                                    ref={passwordInput}
+                                    value={data.password}
+                                    onChange={(e) => setData('password', e.target.value)}
+                                    type={showConfirmationPassword ? 'text' : 'password'}
+                                    className="mt-1 block w-full"
+                                    autoComplete="new-password"
+                                    minLength={12}
+                                    required
+                                    placeholder={t('auth.password_new')}
+                                />
+                                {showConfirmationPassword ? (
+                                    <Eye onClick={() => setShowConfirmationPassword(!showConfirmationPassword)} />
+                                ) : (
+                                    <EyeClosed onClick={() => setShowConfirmationPassword(!showConfirmationPassword)} />
+                                )}
+                            </div>
                             <span className="text-xs">{t('auth.password_description')}</span>
                             <InputError message={errors.password} />
+                            <ul>
+                                <li className="flex items-center gap-3 text-xs">
+                                    {regexSymbols.test(data.password) ? <Check className="text-success" /> : <X className="text-destructive" />}
+                                    {t('auth.password_constraints.special')}
+                                </li>
+                                <li className="flex items-center gap-3 text-xs">
+                                    {regexNumber.test(data.password) ? <Check className="text-success" /> : <X className="text-destructive" />}
+                                    {t('auth.password_constraints.numbers')}
+                                </li>
+                                <li className="flex items-center gap-3 text-xs">
+                                    {regexLowercase.test(data.password) ? <Check className="text-success" /> : <X className="text-destructive" />}
+                                    {t('auth.password_constraints.lowercase')}
+                                </li>
+                                <li className="flex items-center gap-3 text-xs">
+                                    {regexUppercase.test(data.password) ? <Check className="text-success" /> : <X className="text-destructive" />}
+                                    {t('auth.password_constraints.uppercase')}
+                                </li>
+                                <li className="flex items-center gap-3 text-xs">
+                                    {regexLength.test(data.password) ? <Check className="text-success" /> : <X className="text-destructive" />}
+                                    {t('auth.password_constraints.length')}
+                                </li>
+                            </ul>
                         </div>
 
                         <div className="grid gap-2">
@@ -104,6 +150,8 @@ export default function Password() {
                                 value={data.password_confirmation}
                                 onChange={(e) => setData('password_confirmation', e.target.value)}
                                 type="password"
+                                minLength={12}
+                                required
                                 className="mt-1 block w-full"
                                 autoComplete="new-password"
                                 placeholder={t('auth.password_confirm')}
@@ -113,7 +161,9 @@ export default function Password() {
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <Button disabled={processing}>{t('actions.save-type', { type: t('auth.password') })}</Button>
+                            <Button disabled={processing || !passwordRegex.test(data.password) || data.password !== data.password_confirmation}>
+                                {t('actions.save-type', { type: t('auth.password') })}
+                            </Button>
 
                             <Transition
                                 show={recentlySuccessful}
