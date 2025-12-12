@@ -21,7 +21,6 @@ Route::middleware([
 
             $interventionsByType = app(StatisticInterventionsService::class)->getByType($request->validated());
 
-
             return ApiResponse::success($interventionsByType);
         })->name('api.statistics.interventions.by-type');
 
@@ -36,12 +35,16 @@ Route::middleware([
 
         Route::get('/by-status', function (StatisticsRequest $request) {
 
-
             $interventionsByStatus = app(StatisticInterventionsService::class)->getByStatus($request->validated());
-
-
 
             return ApiResponse::success($interventionsByStatus);
         })->name('api.statistics.interventions.by-status');
+
+        Route::get('/missed', function (StatisticsRequest $request) {
+
+            $interventionsMissed = app(StatisticInterventionsService::class)->getMissed($request->validated());
+
+            return ApiResponse::success($interventionsMissed);
+        })->name('api.statistics.interventions.missed');
     }
 );

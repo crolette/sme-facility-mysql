@@ -25,12 +25,12 @@ class Subscription extends CashierSubscription
 
     public function tenant(): BelongsTo
     {
-        return $this->belongsTo(Tenant::class);
+        return $this->belongsTo(Tenant::class, 'tenant_id');
     }
 
-    public function scopeActiveUserSubscription(Builder $query, Tenant $tenant): Builder
+    public function scopeActiveTenantSubscription(Builder $query, Tenant $tenant): Builder
     {
         return
-            $query->where('stripe_status', "=", 'active')->orWhere('stripe_status', "=", 'trialing')->where('tenant_id', $tenant->id);
+            $query->whereIn('stripe_status', ['trialing', 'active'])->where('tenant_id', $tenant->id);
     }
 }

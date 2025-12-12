@@ -11,9 +11,6 @@ class StatisticInterventionsService
 {
     public function getByType($filters = [])
     {
-        Debugbar::info($filters);
-        Debugbar::info($filters['date_from']);
-        Debugbar::info($filters['date_to']);
         $interventionsTypeCount = Intervention::query()
             ->forMaintenanceManager()
             ->withoutGlobalScope('ancient')
@@ -46,24 +43,39 @@ class StatisticInterventionsService
             ->groupBy('assignable_type', 'assignable_id')
             ->get();
 
-        $interventionsByAssignee = $interventionsByAssignee->map(function ($item) {
+
+        $interventionsByAssignee = $interventionsByAssignee->mapWithKeys(function ($item) {
             if ($item->assignable_type) {
                 $assignable = $item->assignable_type::find($item->assignable_id);
                 return [
-                    'id' => $assignable?->id,
-                    'name' => $assignable?->first_name ? $assignable?->full_name : $assignable->name ?? 'Unknown',
-                    'type' => class_basename($item->assignable_type),
-                    'picture' => class_basename($item->assignable_type) === 'User' ? $assignable?->avatar : $assignable->logo,
-                    'count' => $item->count
+                    $assignable?->first_name ? $assignable?->full_name : $assignable->name ?? 'Unknown' => $item->count
                 ];
             } else {
                 return [
-                    'name' => 'Not assigned',
-                    'type' => 'Not assigned',
-                    'count' => $item->count
+                    __('interventions.assigned_not') => $item->count
                 ];
             }
         });
+
+        // $interventionsByAssignee = $interventionsByAssignee->map(function ($item) {
+        //     if ($item->assignable_type) {
+        //         $assignable = $item->assignable_type::find($item->assignable_id);
+        //         return [
+        //             // 'id' => $assignable?->id,
+        //             'name' => $assignable?->first_name ? $assignable?->full_name : $assignable->name ?? 'Unknown',
+        //             'type' => class_basename($item->assignable_type),
+        //             'picture' => class_basename($item->assignable_type) === 'User' ? $assignable?->avatar : $assignable->logo,
+        //             'count' => $item->count
+        //         ];
+        //     } else {
+        //         return [
+        //             'name' => __('interventions.assigned_not'),
+        //             'type' => __('interventions.assigned_not'),
+        //             'count' => $item->count
+        //         ];
+        //     }
+        // });
+        // dd($interventionsByAssignee);
 
         return $interventionsByAssignee;
     }
@@ -80,8 +92,40 @@ class StatisticInterventionsService
             ->groupBy('status')
             ->pluck('count', 'status');
 
+        $interventionsByStatus = $interventionsByStatus->mapWithKeys(function ($count, $key) use ($interventionsByStatus) {
+            return [__('common.status.' . $key) => $count];
+        });
 
 
         return $interventionsByStatus;
+    }
+
+
+    public function getMissed($filters = [])
+    {
+        $interventionsMissed = Intervention::query()
+            ->forMaintenanceManager()
+            ->withoutGlobalScope('ancient')
+            ->where('created_at', '>', $filters['date_from'])->where('created_at', '<', $filters['date_to'])
+            ->where('status', '=', 'completed');
+
+        if ($filters['period'] === 'week') {
+
+            $interventionsMissed = $interventionsMissed
+                ->selectRaw('WEEK(completed_at, 1) AS week')
+                ->selectRaw('SUM(DATE(completed_at) > planned_at) AS missed_count')
+                ->groupBy('week')
+                ->orderBy('week')
+                ->pluck('missed_count', 'week');
+        } else {
+            $interventionsMissed =  $interventionsMissed
+                ->selectRaw('DATE_FORMAT(completed_at, \'%m-%Y\') AS month')
+                ->selectRaw('SUM(DATE(completed_at) > planned_at) AS missed_count')
+                ->groupBy('month')
+                ->orderBy('month')
+                ->pluck('missed_count', 'month');
+        }
+
+        return $interventionsMissed;
     }
 }

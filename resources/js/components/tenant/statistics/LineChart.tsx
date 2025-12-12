@@ -29,7 +29,7 @@ export default function LineChart({
     };
 
     return (
-        <div className="h-96 w-xs lg:w-md xl:w-xl">
+        <div className="h-96">
             <Line
                 width={100}
                 height={100}
@@ -37,6 +37,7 @@ export default function LineChart({
                     ...baseOptions,
                     maintainAspectRatio: false,
                     scales: {
+                        ...baseOptions.scales,
                         y: {
                             ...baseOptions.scales.y,
                             suggestedMin: 0,

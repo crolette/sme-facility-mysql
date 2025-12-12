@@ -121,20 +121,20 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 
     public function subscriptions(): HasMany
     {
-        return $this->hasMany(Subscription::class);
+        return $this->hasMany(Subscription::class, 'tenant_id');
     }
 
     public function activeSubscription(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->subscriptions()->where('stripe_status', 'trialing')->orWhere('stripe_status', 'active')->first() ?? null
+            get: fn() => $this->subscriptions()->whereIn('stripe_status', ['trialing', 'active'])->first() ?? null
         );
     }
 
     public function hasActiveSubscription(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->subscriptions()->where('stripe_status', 'trialing')->orWhere('stripe_status', 'active')->first() ? true : false
+            get: fn() => $this->subscriptions()->whereIn('stripe_status', ['trialing', 'active'])->first() ? true : false
         );
     }
 

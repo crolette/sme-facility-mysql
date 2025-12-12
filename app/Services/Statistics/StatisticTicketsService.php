@@ -47,21 +47,36 @@ class StatisticTicketsService
             ->limit(10)
             ->get();
 
-        $ticketsByAssetOrLocations = $ticketsByAssetOrLocations->map(function ($item) {
-            if (class_basename($item->ticketable_type) === class_basename(Asset::class)) {
-                $ticketable = $item->ticketable_type::withTrashed()->find($item->ticketable_id);
-            } else {
-                $ticketable = $item->ticketable_type::find($item->ticketable_id);
-            }
 
-            return [
-                'id' => $ticketable->id,
-                'reference_code' => $ticketable?->reference_code  ?? 'Unknown', // Adapte selon ton attribut
-                'name' => $ticketable?->name  ?? 'Unknown', // Adapte selon ton attribut
-                'type' => class_basename($item->ticketable_type),
-                'count' => $item->count
-            ];
-        });
+        $ticketsByAssetOrLocations = $ticketsByAssetOrLocations->mapWithKeys(
+            function ($item) {
+                if (class_basename($item->ticketable_type) === class_basename(Asset::class)) {
+                    $ticketable = $item->ticketable_type::withTrashed()->find($item->ticketable_id);
+                } else {
+                    $ticketable = $item->ticketable_type::find($item->ticketable_id);
+                }
+
+                return [
+                    $ticketable?->reference_code  ?? 'Unknown' => $item->count
+                ];
+            }
+        );
+
+        // $ticketsByAssetOrLocations = $ticketsByAssetOrLocations->map(function ($item) {
+        //     if (class_basename($item->ticketable_type) === class_basename(Asset::class)) {
+        //         $ticketable = $item->ticketable_type::withTrashed()->find($item->ticketable_id);
+        //     } else {
+        //         $ticketable = $item->ticketable_type::find($item->ticketable_id);
+        //     }
+
+        //     return [
+        //         'id' => $ticketable->id,
+        //         'reference_code' => $ticketable?->reference_code  ?? 'Unknown', // Adapte selon ton attribut
+        //         'name' => $ticketable?->name  ?? 'Unknown', // Adapte selon ton attribut
+        //         'type' => class_basename($item->ticketable_type),
+        //         'count' => $item->count
+        //     ];
+        // });
 
         return $ticketsByAssetOrLocations;
     }
@@ -100,7 +115,6 @@ class StatisticTicketsService
                 ->pluck('avg_duration', 'week');
         } else {
             $ticketsByAvgHandlingDuration =  $ticketsByAvgHandlingDuration
-                ->where('created_at', '>', $filters['date_from'])->where('created_at', '<', $filters['date_to'])
                 ->selectRaw('DATE_FORMAT(closed_at, \'%m-%Y\') AS month')
                 ->selectRaw('AVG(DATEDIFF(handled_at, created_at)) AS avg_duration')
                 ->groupBy('month')

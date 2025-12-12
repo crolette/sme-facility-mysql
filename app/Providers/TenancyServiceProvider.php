@@ -37,7 +37,7 @@ class TenancyServiceProvider extends ServiceProvider
                 //     Jobs\MigrateDatabase::class,
                 //     Jobs\SeedDatabase::class,
                 //     CreateTenantAdmin::class,
-                // CreateCompany::class,
+                //     CreateCompany::class,
                 // ])->send(function (Events\TenantCreated $event) {
                 //     return $event->tenant;
                 // })->shouldBeQueued(false), // `false` by default, but you probably want to make this `true` for production.

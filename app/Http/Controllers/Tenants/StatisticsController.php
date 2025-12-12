@@ -33,12 +33,14 @@ class StatisticsController extends Controller
         $interventionsByStatus = app(StatisticInterventionsService::class)->getByStatus($request->validated());
         $interventionsByType = app(StatisticInterventionsService::class)->getByType($request->validated());
         $interventionsByAssignee = app(StatisticInterventionsService::class)->getByAssignee($request->validated());
+        $interventionsMissed = app(StatisticInterventionsService::class)->getMissed($request->validated());
+
 
         $ticketsByPeriod = app(StatisticTicketsService::class)->getByPeriod($request->validated());
         $ticketsByAssetOrLocations = app(StatisticTicketsService::class)->getByAssetOrLocations($request->validated());
         $ticketsAvgDuration = app(StatisticTicketsService::class)->getByAvgDuration($request->validated());
         $ticketsByAvgHandlingDuration = app(StatisticTicketsService::class)->getByAvgHandlingDuration($request->validated());
 
-        return Inertia::render('tenants/statistics/IndexStatistics', ['interventionsByStatus' => $interventionsByStatus, 'interventionsByType' => $interventionsByType, 'interventionsByAssignee' => $interventionsByAssignee, 'ticketsByPeriod' => $ticketsByPeriod, 'ticketsByAssetOrLocations' => $ticketsByAssetOrLocations, 'ticketsAvgDuration' => $ticketsAvgDuration, 'ticketsByAvgHandlingDuration' => $ticketsByAvgHandlingDuration]);
+        return Inertia::render('tenants/statistics/IndexStatistics', ['interventionsByStatus' => $interventionsByStatus, 'interventionsByType' => $interventionsByType, 'interventionsMissed' => $interventionsMissed, 'interventionsByAssignee' => $interventionsByAssignee, 'ticketsByPeriod' => $ticketsByPeriod, 'ticketsByAssetOrLocations' => $ticketsByAssetOrLocations, 'ticketsAvgDuration' => $ticketsAvgDuration, 'ticketsByAvgHandlingDuration' => $ticketsByAvgHandlingDuration]);
     }
 }

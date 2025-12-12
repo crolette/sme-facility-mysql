@@ -38,6 +38,7 @@ class CentralTenantController extends Controller
      */
     public function show(Tenant $tenant)
     {
+        // dd($tenant->activeSubscription, $tenant->subscriptions);
         if (!$tenant->hasActiveSubscription)
             $url = URL::temporarySignedRoute(
                 'choose-plan',

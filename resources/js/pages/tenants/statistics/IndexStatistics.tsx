@@ -1,10 +1,4 @@
-import { InterventionsByAssigneeChart } from '@/components/tenant/statistics/interventionsByAssigneeChart';
-import { InterventionsByStatusChart } from '@/components/tenant/statistics/interventionsByStatusChart';
-import { InterventionsByTypeChart } from '@/components/tenant/statistics/interventionsByTypeChart';
-import { TicketsByAvgDurationChart } from '@/components/tenant/statistics/TicketsByAvgDurationChart';
-import { TicketsByAvgHandlingDurationChart } from '@/components/tenant/statistics/TicketsByAvgHandlingDurationChart';
-import { TicketsByItemChart } from '@/components/tenant/statistics/TicketsByItemChart';
-import { TicketsByPeriodChart } from '@/components/tenant/statistics/TicketsByPeriodChart';
+import { ChartComponent } from '@/components/tenant/statistics/ChartComponent';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
@@ -26,6 +20,7 @@ export default function IndexStatistics({
     interventionsByStatus,
     interventionsByType,
     interventionsByAssignee,
+    interventionsMissed,
     ticketsByPeriod,
     ticketsByAssetOrLocations,
     ticketsAvgDuration,
@@ -34,6 +29,7 @@ export default function IndexStatistics({
     interventionsByStatus: [];
     interventionsByType: [];
     interventionsByAssignee: [];
+    interventionsMissed: [];
     ticketsByPeriod: [];
     ticketsByAssetOrLocations: [];
     ticketsAvgDuration: [];
@@ -125,10 +121,33 @@ export default function IndexStatistics({
                     {showTab === 'interventions' && (
                         <>
                             <h2>{tChoice('interventions.title', 2)}</h2>
-                            <div className="border-accent flex w-full flex-wrap gap-10 border-b-2">
-                                <InterventionsByTypeChart interventionsByType={interventionsByType} />
-                                <InterventionsByStatusChart interventionsByStatus={interventionsByStatus} />
-                                <InterventionsByAssigneeChart interventionsByAssignee={interventionsByAssignee} />
+                            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                {/* <div className="border-accent flex w-full flex-wrap gap-10"> */}
+                                <ChartComponent
+                                    datas={interventionsByType}
+                                    url="api.statistics.interventions.by-type"
+                                    chartName={t('statistics.interventions_by_type')}
+                                    chartTypes={['horizontalBar', 'verticalBar', 'doughnut']}
+                                />
+                                <ChartComponent
+                                    datas={interventionsByStatus}
+                                    url="api.statistics.interventions.by-status"
+                                    chartName={t('statistics.interventions_by_status')}
+                                    chartTypes={['horizontalBar', 'verticalBar', 'doughnut']}
+                                />
+                                <ChartComponent
+                                    datas={interventionsByAssignee}
+                                    url="api.statistics.interventions.by-assignee"
+                                    chartName={t('statistics.interventions_by_assignee')}
+                                    chartTypes={['horizontalBar', 'verticalBar', 'doughnut']}
+                                />
+                                <ChartComponent
+                                    datas={interventionsMissed}
+                                    url="api.statistics.interventions.missed"
+                                    chartName={t('statistics.interventions_missed')}
+                                    chartTypes={['horizontalBar', 'verticalBar', 'line']}
+                                    withPeriods
+                                />
                             </div>
                         </>
                     )}
@@ -137,10 +156,28 @@ export default function IndexStatistics({
                         <>
                             {' '}
                             <h2>{tChoice('tickets.title', 2)}</h2>
-                            <div className="border-accent flex w-full flex-wrap gap-10 border-b-2">
-                                <TicketsByPeriodChart ticketsByPeriod={ticketsByPeriod} />
-                                <TicketsByAvgDurationChart ticketsAvgDuration={ticketsAvgDuration} />
-                                <TicketsByAvgHandlingDurationChart ticketsByAvgHandlingDuration={ticketsByAvgHandlingDuration} />
+                            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                <ChartComponent
+                                    datas={ticketsByPeriod}
+                                    url="api.statistics.tickets.by-period"
+                                    chartName={t('statistics.tickets_by_period')}
+                                    chartTypes={['horizontalBar', 'verticalBar', 'line']}
+                                    withPeriods
+                                />
+                                <ChartComponent
+                                    datas={ticketsAvgDuration}
+                                    url="api.statistics.tickets.by-duration"
+                                    chartName={t('statistics.tickets_by_avg_duration')}
+                                    chartTypes={['horizontalBar', 'verticalBar', 'line']}
+                                    withPeriods
+                                />
+                                <ChartComponent
+                                    datas={ticketsByAvgHandlingDuration}
+                                    url="api.statistics.tickets.by-handling-duration"
+                                    chartName={t('statistics.tickets_by_avg_duration')}
+                                    chartTypes={['horizontalBar', 'verticalBar', 'line']}
+                                    withPeriods
+                                />
                             </div>
                         </>
                     )}
@@ -150,8 +187,13 @@ export default function IndexStatistics({
                             <h2>
                                 {tChoice('assets.title', 2)}/{tChoice('locations.location', 2)}
                             </h2>
-                            <div className="border-accent flex w-full flex-wrap gap-10 border-b-2">
-                                <TicketsByItemChart ticketsByAssetOrLocations={ticketsByAssetOrLocations} />
+                            <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                <ChartComponent
+                                    datas={ticketsByAssetOrLocations}
+                                    url="api.statistics.tickets.by-items"
+                                    chartName={t('statistics.tickets_by_items')}
+                                    chartTypes={['horizontalBar', 'verticalBar', 'doughnut']}
+                                />
                             </div>
                         </>
                     )}

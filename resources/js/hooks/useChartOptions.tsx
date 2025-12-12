@@ -38,6 +38,7 @@ export const useChartOptions = (title?: string, type: 'doughnut' | 'horizontalBa
                 formatter: (value) => parseInt(value), // Format the label (e.g., show the value)
             },
         },
+
         scales: {
             x: {
                 grid: {
