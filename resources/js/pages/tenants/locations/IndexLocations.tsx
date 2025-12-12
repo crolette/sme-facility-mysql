@@ -66,9 +66,9 @@ export default function IndexSites({
             if (response.data.status === 'success') {
                 setShowDeleteModale(false);
                 setLocationToDelete(null);
-                setQuery({ category: null, q: null, sortBy: null, orderBy: null });
+                // setQuery({ category: null, q: null, sortBy: null, orderBy: null });
                 showToast(response.data.message, response.data.status);
-                router.visit(`tenant.${routeName}.index`);
+                router.visit(route(`tenant.${routeName}.index`, { ...query }));
             }
         } catch (error) {
             setShowDeleteModale(false);

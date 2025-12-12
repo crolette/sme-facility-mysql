@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableBodyData, TableBodyRow, TableHead, TableHeadData, TableHeadRow } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
 import { cn } from '@/lib/utils';
-import { BreadcrumbItem, CentralType, PaginatedData } from '@/types';
+import { BreadcrumbItem, CentralType, Documents, PaginatedData } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
@@ -114,7 +114,7 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
                 setShowDeleteModale(false);
                 setIsUpdating(false);
                 showToast(response.data.message, response.data.status);
-                router.visit(route('tenant.documents.index'));
+                router.visit(route('tenant.documents.index', { ...query }));
             }
         } catch (error) {
             showToast(error.response.data.message, error.response.data.status);
@@ -171,7 +171,7 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
             if (response.data.status === 'success') {
                 closeFileModal();
                 showToast(response.data.message, response.data.status);
-                router.visit(route('tenant.documents.index'));
+                router.visit(route('tenant.documents.index', { ...query }));
             }
         } catch (error) {
             showToast(error.response.data.message, error.response.data.status);
@@ -280,7 +280,7 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
                                 </TableBodyData>
                             </TableBodyRow>
                         ) : (
-                            items.data.map((document, index) => {
+                            items.data.map((document: Documents, index) => {
                                 const isImage = document.mime_type.startsWith('image/');
                                 const isPdf = document.mime_type === 'application/pdf';
                                 return (
@@ -330,7 +330,7 @@ export default function IndexDocuments({ items, filters, types }: { items: Pagin
             </div>
             <Modale
                 title={t('actions.delete-type', { type: tChoice('documents.title', 1) })}
-                message={`Are you sure you want to delete this document ?`}
+                message={t('documents.delete_description')}
                 isOpen={showDeleteModale}
                 isUpdating={isUpdating}
                 onConfirm={deleteDocument}

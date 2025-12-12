@@ -1,4 +1,5 @@
 import InputError from '@/components/input-error';
+import Modale from '@/components/Modale';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -484,6 +485,15 @@ export default function CreateUpdateProvider({
                     </div>
                 </form>
             </div>
+            <Modale
+                title={
+                    provider
+                        ? t('actions.type-being-updated', { type: tChoice('providers.title', 1) })
+                        : t('actions.type-being-submitted', { type: tChoice('providers.title', 1) })
+                }
+                isOpen={isSubmitting}
+                isProcessing={isSubmitting}
+            />
         </AppLayout>
     );
 }

@@ -1,4 +1,5 @@
 import InputError from '@/components/input-error';
+import Modale from '@/components/Modale';
 import SearchableInput from '@/components/SearchableInput';
 import { useToast } from '@/components/ToastrContext';
 import { Button } from '@/components/ui/button';
@@ -52,6 +53,8 @@ export default function CreateUpdateUser({ user, roles, canAddLoginableUser }: {
         provider_name: user?.provider?.name ?? '',
         role: user?.roles?.length > 0 ? user?.roles[0].name : '',
     });
+
+    console.log(user);
 
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
@@ -248,6 +251,17 @@ export default function CreateUpdateUser({ user, roles, canAddLoginableUser }: {
                     </div>
                 </form>
             </div>
+            {isSubmitting && (
+                <Modale
+                    message={
+                        user
+                            ? t('actions.type-being-updated', { type: tChoice('contacts.title', 1) })
+                            : t('actions.type-being-submitted', { type: tChoice('contacts.title', 1) })
+                    }
+                    isOpen={isSubmitting}
+                    isProcessing={isSubmitting}
+                />
+            )}
         </AppLayout>
     );
 }

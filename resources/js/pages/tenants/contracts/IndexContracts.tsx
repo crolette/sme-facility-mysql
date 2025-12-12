@@ -64,7 +64,7 @@ export default function IndexContracts({
         try {
             const response = await axios.delete(route('api.contracts.destroy', contractToDelete.id));
             if (response.data.status === 'success') {
-                router.visit(route('tenant.contracts.index'));
+                router.visit(route('tenant.contracts.index', { ...query }));
                 setShowDeleteModale(false);
             }
         } catch (error) {

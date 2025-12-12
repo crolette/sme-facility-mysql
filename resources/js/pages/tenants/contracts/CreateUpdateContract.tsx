@@ -1,4 +1,5 @@
 import InputError from '@/components/input-error';
+import Modale from '@/components/Modale';
 import SearchableInput from '@/components/SearchableInput';
 import FileManager from '@/components/tenant/FileManager';
 import { useToast } from '@/components/ToastrContext';
@@ -95,6 +96,7 @@ export default function CreateUpdateContract({
         }
     }, [objects]);
 
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [selectedDocuments, setSelectedDocuments] = useState<TypeFormData['files']>([]);
     const { data, setData, setError } = useForm<TypeFormData>({
         provider_id: contract?.provider_id ?? null,
@@ -118,6 +120,7 @@ export default function CreateUpdateContract({
 
     const submit: FormEventHandler = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
         if (contract) {
             try {
                 const response = await axios.patch(route('api.contracts.update', contract.id), data);
@@ -127,6 +130,7 @@ export default function CreateUpdateContract({
             } catch (error) {
                 showToast(error.response.data.message, error.response.data.status);
                 setErrors(error.response.data.errors);
+                setIsSubmitting(false);
             }
         } else {
             try {
@@ -141,6 +145,7 @@ export default function CreateUpdateContract({
             } catch (error) {
                 showToast(error.response.data.message, error.response.data.status);
                 setErrors(error.response.data.errors);
+                setIsSubmitting(false);
             }
         }
     };
@@ -202,8 +207,6 @@ export default function CreateUpdateContract({
             setData('end_date', date.toISOString().split('T')[0]);
         }
     }, [data.contract_duration, data.start_date]);
-
-    console.log(data);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -530,9 +533,12 @@ export default function CreateUpdateContract({
                         )}
                     </div>
                     <div className="flex gap-4">
-                        <Button type="submit">{contract ? t('actions.update') : t('actions.submit')}</Button>
+                        <Button disabled={isSubmitting} type="submit">
+                            {contract ? t('actions.update') : t('actions.submit')}
+                        </Button>
                         <Button
                             variant={'secondary'}
+                            disabled={isSubmitting}
                             onClick={() =>
                                 contract ? router.visit(route('tenant.contracts.show', contract.id)) : router.visit(route('tenant.contracts.index'))
                             }
@@ -551,6 +557,17 @@ export default function CreateUpdateContract({
                     onToggleModal={() => setShowFileModal(!showFileModal)}
                 />
             </div>
+            {isSubmitting && (
+                <Modale
+                    message={
+                        contract
+                            ? t('actions.type-being-updated', { type: tChoice('contracts.title', 1) })
+                            : t('actions.type-being-submitted', { type: tChoice('contracts.title', 1) })
+                    }
+                    isOpen={isSubmitting}
+                    isProcessing={isSubmitting}
+                />
+            )}
         </AppLayout>
     );
 }

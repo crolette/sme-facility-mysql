@@ -47,6 +47,7 @@ return [
     'confirmed' => 'Bestätigt',
     'sent' => 'Gesendet',
     'loading' => 'Laden...',
+    'updating' => 'Aktualisierung...',
     'searching' => 'Suchen...',
     'processing' => 'Verarbeiten...',
     'type-being-created' => ':type wird erstellt...',

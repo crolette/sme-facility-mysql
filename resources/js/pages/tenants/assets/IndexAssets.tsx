@@ -65,7 +65,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                 setTrashedAssetsTab(true);
                 setActiveAssetsTab(false);
                 fetchTrashedAssets();
-                setQuery({ category: null, q: null, sortBy: null, orderBy: null, trashed: null });
+                // setQuery((prev) => ({ ...prev, trashed: true }));
                 setShowDeleteDefinitelyModale(false);
                 showToast(response.data.message, response.data.status);
             }
@@ -83,7 +83,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                 // setTrashedAssetsTab(!trashedAssetsTab);
                 // setActiveAssetsTab(!activeAssetsTab);
                 // fetchAssets();
-                setQuery({ category: null, q: null, sortBy: null, orderBy: null, trashed: null });
+                // setQuery((prev) => ({ ...prev }));
                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {
@@ -101,7 +101,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
             showToast(error.response.data.message, error.response.data.status);
         }
     };
-
+    console.log(query);
     const [assetToDelete, setAssetToDelete] = useState<Asset | null>(null);
 
     const deleteAsset = async () => {
@@ -111,7 +111,7 @@ export default function IndexAssets({ items, filters, categories }: { items: Ass
                 // setSearch('');
                 // fetchAssets();
                 setShowDeleteModale(!showDeleteModale);
-                setQuery({ category: null, q: null, sortBy: null, orderBy: null, trashed: null });
+                setQuery((prev) => ({ ...prev }));
                 showToast(response.data.message, response.data.status);
             }
         } catch (error) {

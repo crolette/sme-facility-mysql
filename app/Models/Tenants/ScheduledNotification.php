@@ -52,7 +52,7 @@ class ScheduledNotification extends Model
     {
         return $query
             ->where('scheduled_at', '>=', Carbon::now()->toDateString())
-            // ->where('scheduled_at', '<', Carbon::now()->addMonth())
+            ->where('scheduled_at', '<', Carbon::now()->addMonth())
             ->whereNotIn('notification_type', ['next_maintenance_date', 'planned_at'])
             ->where('status', 'pending')
             ->orderBy('scheduled_at');

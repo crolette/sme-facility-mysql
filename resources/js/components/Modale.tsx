@@ -11,13 +11,13 @@ export default function Modale({
     onConfirm,
     onCancel,
 }: {
-    title: string;
-    message: string;
+    title?: string;
+    message?: string;
     isOpen: boolean;
     isProcessing?: boolean;
     isUpdating?: boolean;
-    onConfirm: () => void;
-    onCancel: () => void;
+    onConfirm?: () => void;
+    onCancel?: () => void;
 }) {
     const { t } = useLaravelReactI18n();
     return (
@@ -27,17 +27,19 @@ export default function Modale({
                     <div className="bg-background/50 fixed inset-0 z-50 overflow-y-auto">
                         <div className="bg-background/20 flex min-h-dvh items-center justify-center">
                             <div className="bg-background flex max-h-[90vh] items-center justify-center overflow-y-auto p-10 text-center md:max-w-1/3">
-                                <div className="flex flex-col items-center gap-4">
+                                <div className="flex flex-col items-center justify-center gap-4 text-center">
                                     {isProcessing && (
                                         <>
                                             <Loader className="animate-pulse" />
                                             <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.processing')}</p>
+                                            <p className="mx-auto w-2/3">{message}</p>
                                         </>
                                     )}
                                     {isUpdating && (
                                         <>
-                                            <Loader className="animate-pulse" />
+                                            <Loader className="animate-pulse text-center" />
                                             <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.updating')}</p>
+                                            <p className="mx-auto w-2/3">{message}</p>
                                         </>
                                     )}
                                     {!isProcessing && !isUpdating && (

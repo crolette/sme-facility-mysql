@@ -47,6 +47,7 @@ return [
     'confirmed' => 'Bevestigd',
     'sent' => 'Verzonden',
     'loading' => 'Laden...',
+    'updating' => 'Bijwerking...',
     'searching' => 'Zoeken...',
     'processing' => 'Verwerken...',
     'type-being-created' => ':type wordt aangemaakt...',

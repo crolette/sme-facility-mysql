@@ -92,18 +92,18 @@ export default function TenantDashboard({
                     </div>
                 </div>
                 <div>
-                    <h2>{t('notifications.upcoming')}</h2>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 rounded-xl border p-4">
-                        <ul className="flex max-h-54 flex-col gap-2 overflow-hidden overflow-y-scroll">
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 space-y-3 rounded-xl border p-4">
+                        <h2>{t('notifications.upcoming')}</h2>
+                        <ul className="flex max-h-42 flex-col gap-2 overflow-hidden overflow-y-auto">
                             {nextNotifications.length > 0 &&
                                 nextNotifications.map((notification) => (
                                     <li key={notification.id} className="even:bg-sidebar odd:bg-secondary p-2">
                                         {notification.notification_type === 'end_date' && (
                                             <a href={notification.data.link} className="!no-underline">
                                                 <p>
-                                                    {t('contracts.end_date')} : {notification.data.subject} -{' '}
-                                                    {tChoice('contracts.renewal_type.title', 1)} :
-                                                    {t('contracts.renewal_type.' + notification.data.renewal_type)} ({notification.data.provider}) -{' '}
+                                                    {t('contracts.end_date')} : {notification.data.subject} ({notification.data.provider}) -{' '}
+                                                    {tChoice('contracts.renewal_type.title', 1)} :{' '}
+                                                    {t('contracts.renewal_type.' + notification.data.renewal_type)} -{' '}
                                                     {parseDate(notification.data.end_date)}
                                                 </p>
                                             </a>
@@ -141,10 +141,11 @@ export default function TenantDashboard({
                     </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative flex-1 rounded-xl border p-4">
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative h-fit flex-1 space-y-3 overflow-hidden rounded-xl border p-4 md:min-h-min">
                         <h2>{t('dashboard.maintenances_overdue')}</h2>
+
                         {overdueMaintenances && overdueMaintenances.length > 0 ? (
-                            <ul className="flex max-h-96 flex-col gap-2 overflow-hidden overflow-y-scroll">
+                            <ul className="flex max-h-96 flex-col gap-2 overflow-hidden overflow-y-auto">
                                 {overdueMaintenances.map((maintainable) => (
                                     <li key={maintainable.id} className="even:bg-sidebar odd:bg-secondary p-2">
                                         <a href={maintainable.maintainable.location_route} className="!no-underline">
@@ -163,10 +164,10 @@ export default function TenantDashboard({
                             <p>{t('maintenances.none')}</p>
                         )}
                     </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative h-fit flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative h-full flex-1 space-y-3 overflow-hidden rounded-xl border p-4 md:min-h-min">
                         <h2>{t('dashboard.interventions_overdue')}</h2>
                         {overdueInterventions && overdueInterventions.length > 0 ? (
-                            <ul className="flex max-h-96 flex-col gap-2 overflow-hidden overflow-y-scroll">
+                            <ul className="flex max-h-96 flex-col gap-2 overflow-hidden overflow-y-auto">
                                 {overdueInterventions.map((intervention) => (
                                     <li key={intervention.id} className="even:bg-sidebar odd:bg-secondary p-2">
                                         <a href={intervention.interventionable.location_route} className="!no-underline">
@@ -188,10 +189,10 @@ export default function TenantDashboard({
                     </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative h-fit flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative h-fit flex-1 space-y-3 overflow-hidden rounded-xl border p-4 md:min-h-min">
                         <h2>{t('dashboard.maintenances_next')}</h2>
                         {maintainables && maintainables.length > 0 ? (
-                            <ul className="flex max-h-96 flex-col gap-2 overflow-hidden overflow-y-scroll">
+                            <ul className="flex max-h-96 flex-col gap-2 overflow-hidden overflow-y-auto">
                                 {maintainables.map((maintainable) => (
                                     <li key={maintainable.id} className="even:bg-sidebar odd:bg-secondary p-2">
                                         <a href={maintainable.maintainable.location_route} className="!no-underline">
@@ -211,10 +212,10 @@ export default function TenantDashboard({
                         )}
                         {/* <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" /> */}
                     </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative h-fit flex-1 overflow-hidden rounded-xl border p-4 md:min-h-min">
+                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative h-fit flex-1 space-y-3 overflow-hidden rounded-xl border p-4 md:min-h-min">
                         <h2>{t('dashboard.interventions_next')}</h2>
                         {interventions && interventions.length > 0 ? (
-                            <ul className="flex max-h-96 flex-col gap-2 overflow-hidden overflow-y-scroll">
+                            <ul className="flex max-h-96 flex-col gap-2 overflow-hidden overflow-y-auto">
                                 {interventions.map((intervention) => (
                                     <li key={intervention.id} className="even:bg-sidebar odd:bg-secondary p-2">
                                         <a href={intervention.interventionable.location_route} className="!no-underline">

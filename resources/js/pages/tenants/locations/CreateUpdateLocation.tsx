@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import InputError from '@/components/input-error';
+import Modale from '@/components/Modale';
 import ModaleForm from '@/components/ModaleForm';
 import SearchableInput from '@/components/SearchableInput';
 import { Button } from '@/components/ui/button';
@@ -13,7 +14,7 @@ import { CentralType, LocationType, TenantBuilding, TenantFloor, TenantRoom, Ten
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Loader, MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
+import { MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
@@ -1117,27 +1118,28 @@ export default function CreateUpdateLocation({
                         </div>
                     )}
                     <div className="mt-2 flex gap-2">
-                        <Button type="submit">{location ? t('actions.update') : t('actions.submit')}</Button>
+                        <Button type="submit" disabled={isProcessing}>
+                            {location ? t('actions.update') : t('actions.submit')}
+                        </Button>
                         <a href={location ? route(`tenant.${routeName}.show`, location.reference_code) : route(`tenant.${routeName}.index`)}>
-                            <Button type="button" tabIndex={6} variant={'secondary'}>
+                            <Button type="button" disabled={isProcessing} tabIndex={6} variant={'secondary'}>
                                 {t('actions.cancel')}
                             </Button>
                         </a>
                     </div>
                 </form>
                 {showFileModal && addFileModalForm()}
+
                 {isProcessing && (
-                    <ModaleForm>
-                        <div className="flex flex-col items-center gap-4">
-                            <Loader size={48} className="animate-pulse" />
-                            <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.processing')}</p>
-                            <p className="mx-auto">
-                                {location
-                                    ? t('actions.type-being-updated', { type: routeName })
-                                    : t('actions.type-being-created', { type: routeName })}
-                            </p>
-                        </div>
-                    </ModaleForm>
+                    <Modale
+                        message={
+                            location
+                                ? t('actions.type-being-updated', { type: tChoice(`locations.${location}`, 1) })
+                                : t('actions.type-being-submitted', { type: tChoice(`locations.${location}`, 1) })
+                        }
+                        isOpen={isProcessing}
+                        isProcessing={isProcessing}
+                    />
                 )}
             </div>
         </AppLayout>

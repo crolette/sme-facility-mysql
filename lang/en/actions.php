@@ -51,6 +51,7 @@ return [
     'added-type' => ':type added',
     'closed-type' => ':type closed',
     'loading' => 'Loading...',
+    'updating' => 'Updating...',
     'searching' => 'Searching...',
     'processing' => 'Processing...',
     'type-being-created' => ':type is being created...',

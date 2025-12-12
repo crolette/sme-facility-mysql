@@ -49,6 +49,7 @@ return [
     'confirmed' => 'Confirmé',
     'sent' => 'Envoyé',
     'loading' => 'Chargement...',
+    'updating' => 'Mise à jour...',
     'searching' => 'Recherche...',
     'processing' => 'Traitement...',
     'type-being-created' => ':type en cours de création...',

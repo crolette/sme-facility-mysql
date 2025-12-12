@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import InputError from '@/components/input-error';
+import Modale from '@/components/Modale';
 import ModaleForm from '@/components/ModaleForm';
 import SearchableInput from '@/components/SearchableInput';
 import FileManager from '@/components/tenant/FileManager';
@@ -16,7 +17,7 @@ import { Asset, AssetCategory, CentralType, Provider, TenantBuilding, TenantFloo
 import { Head, router, useForm } from '@inertiajs/react';
 import axios from 'axios';
 import { useLaravelReactI18n } from 'laravel-react-i18n';
-import { Loader, MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
+import { MinusCircleIcon, PlusCircleIcon } from 'lucide-react';
 import { FormEventHandler, useEffect, useState } from 'react';
 import { BiSolidFilePdf } from 'react-icons/bi';
 
@@ -1419,19 +1420,16 @@ export default function CreateUpdateAsset({
                         </a>
                     </div>
                 </form>
-
                 {isProcessing && (
-                    <ModaleForm>
-                        <div className="flex flex-col items-center gap-4">
-                            <Loader size={48} className="animate-pulse" />
-                            <p className="mx-auto animate-pulse text-3xl font-bold">{t('actions.processing')}</p>
-                            <p className="mx-auto">
-                                {asset
-                                    ? t('actions.type-being-updated', { type: tChoice('assets.title', 2) })
-                                    : t('actions.type-being-created', { type: tChoice('assets.title', 2) })}
-                            </p>
-                        </div>
-                    </ModaleForm>
+                    <Modale
+                        message={
+                            asset
+                                ? t('actions.type-being-updated', { type: tChoice('assets.title', 1) })
+                                : t('actions.type-being-submitted', { type: tChoice('assets.title', 1) })
+                        }
+                        isOpen={isProcessing}
+                        isProcessing={isProcessing}
+                    />
                 )}
 
                 {showFileModal && addFileModalForm()}
